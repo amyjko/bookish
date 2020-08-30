@@ -1,0 +1,16 @@
+{
+	"title": "Peruse Example Book",
+	"authors": ["Amy J. Ko"],
+	"contributors": null,
+	"cover": ["cover.jpg", "A photograph of Boomy the cat sleeping.", "Boomy is excited that you're trying Peruse!", "Amy J. Ko"],
+	"unknown": ["unknown.jpg", "A photograph of Boomy the cat looking skeptical.", "Boomy is worried that you're lost.", "Amy J. Ko"],
+	"description": "This is an example book, intended for presentation with the Peruse framework. Don't let it's simplicity fool you: it demonstrates all of the features of peruse, so you should be able to copy and modify any of its content to hepl you write your book.",
+	"chapters": [
+		["Introduction", "introduction.md"],
+		["Chapter 1", "chapter1.md"]
+	],
+	"revisions": [
+		["August 30th, 2020", "Created the initial draft."]
+	],
+	"license": "CC BY-ND 4.0"
+}

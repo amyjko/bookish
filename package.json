@@ -1,0 +1,29 @@
+{
+	"name": "Peruse",
+	"version": "0.1.0",
+	"description": "A simple framework for creating highly readable single-page client-side online books.",
+	"license": "MIT",
+	"repository": "https://github.com/amyjko/peruse.git",
+	"scripts": {
+		"build": "browserify -t [ babelify --presets [ @babel/preset-env @babel/preset-react ] ] peruse.js | uglifyjs > build/peruse.js"
+	},
+	"devDependencies": {
+		"browserify": "^16.5.2",
+		"babelify": "^10",
+		"@babel/core": "^7",
+		"@babel/cli": "^7",
+		"@babel/preset-react": "^7",
+		"@babel/preset-env": "^7",
+		"uglify-js": "^3.4.7"
+	},
+	"dependencies": {
+		"bootstrap": "^3.3.7",
+		"history": "^4.7.2",
+		"jquery": "^3.0.0",
+		"lodash": "^4.17.10",
+		"npm": "^6.13.4",
+		"react": "^16.3",
+		"react-dom": "^16.3",
+		"react-router-dom": "^5.2"
+	}
+}
