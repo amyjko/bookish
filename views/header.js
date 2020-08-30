@@ -1,7 +1,7 @@
 import _ from 'lodash';
 import React from 'react';
 
-import {CaptionedImage} from "./image";
+import {Figure} from "./image";
 
 class Header extends React.Component {
 
@@ -9,7 +9,7 @@ class Header extends React.Component {
 
 		return (
 			<div>
-				<CaptionedImage {...this.props.image}/>
+				<Figure {...this.props.image}/>
 				<h1>{this.props.header}</h1>
 				<div className="lead">{this.props.content}</div>
 			</div>

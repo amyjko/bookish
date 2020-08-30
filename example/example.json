@@ -6,8 +6,8 @@
 	"unknown": ["unknown.jpg", "A photograph of Boomy the cat looking skeptical.", "Boomy is worried that you're lost.", "Amy J. Ko"],
 	"description": "This is an example book, intended for presentation with the Peruse framework. Don't let it's simplicity fool you: it demonstrates all of the features of peruse, so you should be able to copy and modify any of its content to hepl you write your book.",
 	"chapters": [
-		["Introduction", "introduction"],
-		["Chapter 1", "chapter1"]
+		["Introduction", "introduction", "chapter1.jpg", "A photo of Boomy", "Let's dive in!", "Amy J. Ko"],
+		["Chapter 1", "chapter1", "unknown.jpg", "A photo of skeptical Boomy", "Let's do more!", "Amy J. Ko"]
 	],
 	"revisions": [
 		["August 30th, 2020", "Created the initial draft."]

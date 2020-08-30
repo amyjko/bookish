@@ -69,7 +69,13 @@ class Peruse extends React.Component {
 							var updatedChapters = _.clone(this.state.chapters);
 							updatedChapters[chapter[1]] = {
 								title: chapter[0],
-								text: text
+								text: text,
+								image: {
+									url: chapter[2],
+									alt: chapter[3],
+									caption: chapter[4],
+									credit: chapter[5]
+								}
 							};
 							this.setState({ chapters: updatedChapters });
 						});

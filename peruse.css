@@ -41,6 +41,7 @@ li {
 }
 
 .figure-caption {
+	margin-top: 0.5em;
 	text-align: center;
 	line-height: 1.5em;
 	font-size: 13pt;
@@ -49,4 +50,11 @@ li {
 .figure-img {
 	border: 1px solid #EAEAEA;
 	border-radius: 3px;
+}
+
+pre {
+	border: 1px solid #EAEAEA;
+	border-radius: 3px;
+	padding: 1em;
+	background-color: #F7F7F7;
 }
