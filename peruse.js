@@ -188,7 +188,7 @@ class Peruse extends React.Component {
 		// Request all of the chapter content...
 		_.each(this.getChapters(), (chapter) => {
 
-			fetch("chapters/" + chapter[1])
+			fetch("chapters/" + chapter[1] + ".md")
 				.then((response) => {
 					// Uh oh, something bad happened. We couldn't load the chapter.
 					if(response.ok) {
