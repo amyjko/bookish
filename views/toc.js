@@ -41,6 +41,14 @@ class TableOfContents extends React.Component {
 							_.map(this.props.app.getChapters(), (chapter, index) => {
 								return (
 									<tr key={"chapter" + index}>
+										<td>
+											<img 
+												className="img-rounded" 
+												style={{height: "1.5em"}} 
+												src={"images/" + chapter[2]}
+												alt={chapter[3]} 
+											/>
+										</td>
 										<td><em>{chapter[0]}</em></td>
 										<td>
 											{
