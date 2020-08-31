@@ -283,13 +283,13 @@ class Chapter extends React.Component {
 				<div>
 					<Header image={chapter.image} header={chapter.title} content={null} />
 					{this.translate(chapter.text)}
-					<p className="text-center">
+					<div className="text-center lead">
 					{
 						nextChapter === null ? 
 							<Link to={"/"}>Back to table of contents</Link> :
 							<Link to={"/" + nextChapter.id}>Next chapter: {nextChapter.title}</Link>
 					}
-					</p>
+					</div>
 				</div>
 			);
 		else
