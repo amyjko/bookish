@@ -1,5 +1,6 @@
 import _ from 'lodash';
 import React from 'react';
+import { Link } from 'react-router-dom';
 
 import {Figure} from './image';
 import {Header} from './header';
@@ -74,7 +75,7 @@ class Chapter extends React.Component {
 			// Link
 			else if(line.peek() === "[") {
 
-				// Capture the fragment prior.
+				// Capture the fragment prior before processing the link.
 				if(fragment.length > 0) {
 					segments.push(<span key={"segment" + key++}>{fragment}</span>);
 					fragment = "";
@@ -94,7 +95,12 @@ class Chapter extends React.Component {
 				if(line.peek() === "]")
 					line.next();
 
-				segments.push(<a key={"segment" + key++} href={link}>{content}</a>)
+				// If this is external, make an anchor.
+				if(link.startsWith("http"))
+					segments.push(<a key={"segment" + key++} href={link}>{content}</a>)
+				// If this is internal, make a route link.
+				else
+					segments.push(<Link key={"segment" + key++} to={link}>{content}</Link>)
 
 			}
 			// Accumulate a fragment.

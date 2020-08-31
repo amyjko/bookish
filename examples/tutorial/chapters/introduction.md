@@ -83,6 +83,12 @@ You can include [links to content|http://amyjko.com].
 
 The \| separates the link text from the URL.
 
+You can add links to chapters by just using the chapter identifier given in the book's specification. For example, here's a link to [Chapter 1|chapter1].
+
+`
+Visit [Chapter 1|chapter1].
+`
+
 You can include captioned images like the one at the top of this chapter by using this format, indicating the caption, description of the image, credit for the image, and the image file name:
 
 `
