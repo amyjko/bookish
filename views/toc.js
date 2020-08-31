@@ -1,8 +1,8 @@
 import _ from 'lodash';
 import React from 'react';
 import { Link } from 'react-router-dom';
-
 import { Header } from "./header";
+import { parseLine, parseChapter } from "../parser";
 
 class TableOfContents extends React.Component {
 
@@ -31,7 +31,7 @@ class TableOfContents extends React.Component {
 					}
 				/>
 				
-				<p className="tight">{this.props.app.getDescription()}</p>
+				{parseChapter(this.props.app.getDescription())}
 
 				<h2>Chapters</h2>
 
@@ -73,7 +73,7 @@ class TableOfContents extends React.Component {
 				
 				<ul>
 					{_.map(this.props.app.getRevisions(), (revision, index) => {
-						return <li key={"revision" + index}><em>{revision[0]}</em>. {revision[1]}</li>;
+						return <li key={"revision" + index}><em>{revision[0]}</em>. {parseLine(revision[1])}</li>;
 					})}
 				</ul>
 
