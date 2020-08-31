@@ -17,7 +17,6 @@
 		"uglify-js": "^3.4.7"
 	},
 	"dependencies": {
-		"bootstrap": "^3.3.7",
 		"history": "^4.7.2",
 		"jquery": "^3.0.0",
 		"lodash": "^4.17.10",
