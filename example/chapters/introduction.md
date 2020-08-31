@@ -1,14 +1,16 @@
-Welcome to the Peruse example book! This introduction contains all of the features supported by peruse.
+Welcome to the Peruse example book! This introduction contains all of the features supported by the platform, and explanation of how they work.
 
-For example, you can create top level headers by starting a line with the pound symbol #:
+Let's go through each of the basic formatting features of book chapters. To begin, let's start with headers, all of which can be indicated by starting a line with the pound symbol #. For example, here's some code that starts a top-level header:
 
 `
 # This is a header
 `
 
+That will be formatted like this:
+
 # This is a header
 
-You can put as many as six three consecutive pounds for subheaders and sub-subheaders:
+You can put as many as three consecutive pounds for subheaders and sub-subheaders. Even though the web supports more than that, I didn't include more than that because readers tend to get overwhelmed by complex document structures. Here are the three different size:
 
 `
 # Header
@@ -73,10 +75,10 @@ The numbers don't have to be in a particular order, they just have to be a numbe
 2. Item 2
 1. Item 3
 
-You can include [links to content|https://amyjko.com] like this:
+You can include [links to content|http://amyjko.com] like this:
 
 `
-You can include [links to content|https://amyjko.com].
+You can include [links to content|http://amyjko.com].
 `
 
 The \| separates the link text from the URL.
