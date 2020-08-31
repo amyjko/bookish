@@ -1,0 +1,21 @@
+*Informatics* is _the study, design, and development of information technology for the good of people, organizations, and society._ This means that the overarching objective of the Informatics curriculum is to give students both a _conceptual_ and _practical_ appreciation of how information is woven through society and its systems, how information technology supports these systems, how to design and build these systems, and how to make sense of information through quantitative and qualitative information.
+
+Our faculty view information technology broadly: it includes not just computational technologies but also analog ones such as books, speech, and other media. And our faculty view information systems as more than just the internet: communities, organizations, libraries, and countless other ways of organizing people and information technology are all systems. We want students to leave with as broad of perspectives on information as our faculty have. This includes the empowering ability to *create* information systems by developing software. But it also includes the ability to *criticize* information technology, having a more nuanced and less utopian view of it's role in society, and who information technology is serving.
+
+To achieve these goals, our curriculum has several key courses:
+
+* *INFO 200* _Intellectual Foundations_ provides a broad overview of criticial perspectives on the design and impact of information systems in society.
+* *INFO 201* _Technical Foundations_ provides a data-driven introduction to the development of software-based information technology and the computational analysis of data.
+* *INFO 300* _Research Methods_ teaches how we gather and analyze data to answer questions.
+* *INFO 330* _Databases and Data Modeling_ teaches how we represent, persist, and retireve data representations of entities in the world.
+* *INFO 340* _Client-side Development_ teaches how to create information technology for the internet
+* *INFO 350* _Information Ethics and Policy_ teaches how to reason about values, rights, and laws related to information and intellectual property.
+* *INFO 360* _Design Methods_ teaches how to envision, evaluate, and communicate new information systems.
+* *INFO 380* _Information Systems Analysis_ teaches how to reason about and evolve information systems, especially those in organizations.
+* *INFO 3XX* electives teach foundational ideas related to networking, cybersecurity, information assurance, information retrieval, and data science.
+* *INFO 4XX* electives teach advanced topics in software development, data science, databases, design, ethics, cybersecurity, information assurance, and justice.		
+* *INFO 490/491* _Capstone I and II_ teach students how to apply everything they've learned above to solving information problems in teams.
+
+With the courses above, most students leave with just enough knowledge to be productive entry-level UX designers, software developers, data scientists, and cybersecurity analysts. Many are also well positioned to be product managers and entrepreneurs, since they get such a holistic view on designing, creating, and evolving information technologies. Some students interested in research and data science also find that they need a masters degrees to compete for entry level jobs. Unlike many computer science majors, many end up in management and leadership positions after a few years because of their broader training.
+
+There is still a disconnect between our goals in the curriculum and these outcomes. Students rarely learn enough to be _excellent_ software developers (the same is true of CS majors), but they still get jobs. Students are rarely as critical of information technology as our faculty want them to be (but they are still more critical than most CS majors). Students' broad training is often at the expense of depth, but this positions them well in the longer term to make change in organizations and the world. The short term goal of preparing them for careers and graduate school is often in tension with the long term goal of graduating sharp, intellectually curious, critical thinkers of information technology. It is our job as teachers to balance this tension.
