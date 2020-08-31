@@ -27,7 +27,7 @@ class Line {
 
 class Chapter extends React.Component {
 
-	translateSegment(line) {
+	translateSegment(line, key) {
 
 		var segments = [];
 		var line = new Line(line);
@@ -40,7 +40,7 @@ class Chapter extends React.Component {
 
 				// Capture the fragment prior.
 				if(fragment.length > 0) {
-					segments.push(<span key={"segment" + segments.length}>{fragment}</span>);
+					segments.push(<span key={"segment" + key++}>{fragment}</span>);
 					fragment = "";
 				}
 
@@ -56,10 +56,10 @@ class Chapter extends React.Component {
 					line.next();
 				segments.push(
 					delimeter === "_" ?
-						<em key={"segment" + segments.length}>{segment}</em> :
+						<em key={"segment" + key++}>{segment}</em> :
 					delimeter === "*" ?
-						<strong key={"segment" + segments.length}>{segment}</strong> :
-						<strong><em key={"segment" + segments.length}>{segment}</em></strong>
+						<strong key={"segment" + key++}>{segment}</strong> :
+						<em key={"segment" + key++}><strong>{segment}</strong></em>
 				);
 
 			}
@@ -76,7 +76,7 @@ class Chapter extends React.Component {
 
 				// Capture the fragment prior.
 				if(fragment.length > 0) {
-					segments.push(<span key={"segment" + segments.length}>{fragment}</span>);
+					segments.push(<span key={"segment" + key++}>{fragment}</span>);
 					fragment = "";
 				}
 				
@@ -94,7 +94,7 @@ class Chapter extends React.Component {
 				if(line.peek() === "]")
 					line.next();
 
-				segments.push(<a key={"segment" + segments.length} href={link}>{content}</a>)
+				segments.push(<a key={"segment" + key++} href={link}>{content}</a>)
 
 			}
 			// Accumulate a fragment.
@@ -107,7 +107,7 @@ class Chapter extends React.Component {
 		}
 
 		if(fragment !== null)
-			segments.push(<span key={"segment" + segments.length}>{fragment}</span>);
+			segments.push(<span key={"segment" + key++}>{fragment}</span>);
 
 		return segments;
 
@@ -171,21 +171,21 @@ class Chapter extends React.Component {
 				// Convert everything until the next line into a header.
 				elements.push(
 					count === 1 ? 
-						<h2 key={"element" + key++}>{this.translateSegment(trimmed)}</h2> :
+						<h2 key={"element" + key++}>{this.translateSegment(trimmed, 0)}</h2> :
 					count === 2 ? 
-						<h3 key={"element" + key++}>{this.translateSegment(trimmed)}</h3> :
-						<h4 key={"element" + key++}>{this.translateSegment(trimmed)}</h4>
+						<h3 key={"element" + key++}>{this.translateSegment(trimmed, 0)}</h3> :
+						<h4 key={"element" + key++}>{this.translateSegment(trimmed, 0)}</h4>
 				);
 
 			}
 			// Bulleted list
-			else if(trimmed.startsWith("*")) {
+			else if(trimmed.startsWith("* ")) {
 
 				var bullets = [];
 
 				// Process all the bullets until there aren't any.
 				while(trimmed && trimmed.startsWith("*")) {
-					bullets.push(<li key={"bullet" + bullets.length}>{this.translateSegment(trimmed.substring(1).trim())}</li>);
+					bullets.push(<li key={"bullet" + bullets.length}>{this.translateSegment(trimmed.substring(1).trim(), 0)}</li>);
 					trimmed = lines.shift();
 					if(trimmed) trimmed = trimmed.trim();
 				}
@@ -195,13 +195,13 @@ class Chapter extends React.Component {
 
 			}
 			// Numbered list
-			else if(trimmed.match("[0-9]+.*")) {
+			else if(trimmed.match("^[0-9]+.*")) {
 
 				var items = [];
 
 				// Process all the items until there aren't any.
-				while(trimmed.match("[0-9]+.*")) {
-					items.push(<li key={"item" + items.length}>{this.translateSegment(trimmed.substring(2).trim())}</li>);
+				while(trimmed && trimmed.match("^[0-9]+.*")) {
+					items.push(<li key={"item" + items.length}>{this.translateSegment(trimmed.substring(2).trim(), 0)}</li>);
 					trimmed = lines.shift();
 					if(trimmed) trimmed = trimmed.trim();
 				}
@@ -246,7 +246,7 @@ class Chapter extends React.Component {
 				else {
 					sequence.push(<br key={"break" + sequence.length} />)
 				}
-				sequence = sequence.concat(this.translateSegment(line));
+				sequence = sequence.concat(this.translateSegment(line, sequence.length));
 			}
 
 		}

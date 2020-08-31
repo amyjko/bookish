@@ -44,12 +44,12 @@ class TableOfContents extends React.Component {
 										<td>
 											<img 
 												className="img-rounded" 
-												style={{height: "1.5em"}} 
+												style={{width: "5em"}} 
 												src={"images/" + chapter[2]}
 												alt={chapter[3]} 
 											/>
 										</td>
-										<td><em>{chapter[0]}</em></td>
+										<td><em>Chapter {index + 1}</em></td>
 										<td>
 											{
 												// If it's not loaded, say so.

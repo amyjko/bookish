@@ -135,6 +135,6 @@ window.peruse = function(url) {
 		<HashRouter>
 			<Route path="/" render={(props) => <PeruseWithRouter {...props} book={url} /> } />
 		</HashRouter>
-	), document.body);
+	), document.body.appendChild(document.createElement("div")));
 	
 }
