@@ -8,28 +8,18 @@
 		<!-- Bootstrap CSS -->
 		<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" integrity="sha384-JcKb8q3iqJ61gNV9KGb8thSsNjpSL0n8PARn9HuZOnIxN0hoP+VmmDGMN5t9UJ0Z" crossorigin="anonymous">
 
-		<!-- Bootstrap requires slim jQuery -->
+		<!-- Bootstrap jQuery -->
 		<script src="https://code.jquery.com/jquery-3.4.1.slim.min.js" integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n" crossorigin="anonymous"></script>
 
 		<!-- Load Lora font -->
 		<link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,700;1,400;1,700&display=swap" rel="stylesheet">
 
-        <title>Puruse</title>
-
-		<!-- Include Puruse style -->
+		<!-- Puruse style -->
 		<link rel="stylesheet" href="../peruse.css">
 
-		<!-- Load Peruse -->
+		<!-- Peruse app -->
 		<script src="../build/peruse.js"></script>
 
     </head>
-    <body>
-        <div id="book">
-			<!-- This element's contents will be replaced with your component. -->
-		</div>
-
-		<!-- Display the book -->
-		<script>window.peruse("example.json", "book", "example");</script>		
-
-    </body>
+    <body onload='window.peruse("example.json")'><body>
 </html>

@@ -69,7 +69,7 @@ class TableOfContents extends React.Component {
 					</tbody>
 				</table>
 
-				<h2>Revision history</h2>
+				<h2>Revisions</h2>
 				
 				<ul>
 					{_.map(this.props.app.getRevisions(), (revision, index) => {

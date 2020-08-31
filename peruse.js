@@ -23,7 +23,10 @@ class Peruse extends React.Component {
 			.then(response => response.json())
 			.then(data => {
 				// Yay, we got data! Set the state, then fetch the chapters.
-				this.setState({ book: data }, () => { this.fetchChapters(); });
+				this.setState({ book: data }, () => { 
+					document.title = this.getTitle();
+					this.fetchChapters(); 
+				});
 			})
 			.catch(err => { 
 				// Uh oh, something bad happened. Set data to null to render an error.
@@ -126,12 +129,12 @@ class Peruse extends React.Component {
 
 var PeruseWithRouter = withRouter(Peruse);
 
-window.peruse = function(url, elementID, root) {
+window.peruse = function(url) {
 	
 	ReactDOM.render((
-		<HashRouter basename={root}>
-			<Route path="/" render={(props) => <PeruseWithRouter {...props} book={url}  root={root} /> } />
+		<HashRouter>
+			<Route path="/" render={(props) => <PeruseWithRouter {...props} book={url} /> } />
 		</HashRouter>
-	), document.getElementById(elementID));
+	), document.body);
 	
 }
