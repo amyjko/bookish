@@ -101,7 +101,7 @@ You can include code by wrapping any text with a backtick \`:
 
 `
 This is Python code
-but it will not compile, silly
+but it will not compile
 it has syntax errors
 `
 
