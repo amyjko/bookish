@@ -40,6 +40,10 @@ li {
 	border-radius: 4px;
 }
 
+.figure {
+	width: 100%;
+}
+
 .figure-caption {
 	margin-top: 0.5em;
 	text-align: center;
@@ -57,4 +61,5 @@ pre {
 	border-radius: 3px;
 	padding: 1em;
 	background-color: #F7F7F7;
+	font-size: 80%;
 }
