@@ -1,7 +1,7 @@
 import _ from 'lodash';
 import React from 'react';
 import ReactDOM from 'react-dom';
-import { Route, BrowserRouter, Switch, withRouter } from 'react-router-dom';
+import { Route, HashRouter, Switch, withRouter } from 'react-router-dom';
 
 import 'bootstrap';
 
@@ -131,9 +131,9 @@ var PeruseWithRouter = withRouter(Peruse);
 window.peruse = function(url, elementID, root) {
 	
 	ReactDOM.render((
-		<BrowserRouter basename={root}>
+		<HashRouter basename={root}>
 			<Route path="/" render={(props) => <PeruseWithRouter {...props} book={url}  root={root} /> } />
-		</BrowserRouter>
+		</HashRouter>
 	), document.getElementById(elementID));
 	
 }

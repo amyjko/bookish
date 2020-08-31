@@ -264,12 +264,15 @@ class Chapter extends React.Component {
 
 		var chapter = this.props.app.getContent(this.props.id);
 
-		return (
-			<div>
-				<Header image={chapter.image} header={chapter.title} content={null} />
-				{this.translate(chapter.text)}
-			</div>
-		);
+		if(chapter)
+			return (
+				<div>
+					<Header image={chapter.image} header={chapter.title} content={null} />
+					{this.translate(chapter.text)}
+				</div>
+			);
+		else
+			return "Loading...";
 
 	}
 
