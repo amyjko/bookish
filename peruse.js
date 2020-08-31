@@ -56,12 +56,30 @@ class Peruse extends React.Component {
 	getCover() { return this.getImage(this.getBook().cover); }
 	getUnknown() { return this.getImage(this.getBook().unknown); }
 
+	getNextChapter(id) {
+
+		var chapters = this.getChapters();
+		for(var i = 0; i < chapters.length; i++) {
+			if(chapters[i][1] === id) {
+				if(i < chapters.length - 1)
+					return this.getContent(chapters[i + 1][1]);
+				else
+					return null;
+			}
+		}
+
+		return null;
+
+	}
+
 	fetchChapters() {
 
 		// Request all of the chapter content...
 		_.each(this.getChapters(), (chapter) => {
 
-			fetch("chapters/" + chapter[1] + ".md")
+			var chapterID = chapter[1];
+
+			fetch("chapters/" + chapterID + ".md")
 				.then((response) => {
 					// Uh oh, something bad happened. We couldn't load the chapter.
 					if(response.ok) {
@@ -71,6 +89,7 @@ class Peruse extends React.Component {
 							updatedChapters[chapter[1]] = {
 								title: chapter[0],
 								text: text,
+								id: chapterID,
 								image: {
 									url: chapter[2],
 									alt: chapter[3],

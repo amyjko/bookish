@@ -276,12 +276,20 @@ class Chapter extends React.Component {
 	render() {
 
 		var chapter = this.props.app.getContent(this.props.id);
+		var nextChapter = this.props.app.getNextChapter(this.props.id);
 
 		if(chapter)
 			return (
 				<div>
 					<Header image={chapter.image} header={chapter.title} content={null} />
 					{this.translate(chapter.text)}
+					<p className="text-center">
+					{
+						nextChapter === null ? 
+							<Link to={"/"}>Back to table of contents</Link> :
+							<Link to={"/" + nextChapter.id}>Next chapter: {nextChapter.title}</Link>
+					}
+					</p>
 				</div>
 			);
 		else
