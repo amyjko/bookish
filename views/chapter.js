@@ -184,10 +184,14 @@ class Chapter extends React.Component {
 				var bullets = [];
 
 				// Process all the bullets until there aren't any.
-				while(trimmed && trimmed.startsWith("*")) {
+				while(trimmed && trimmed.startsWith("* ")) {
 					bullets.push(<li key={"bullet" + bullets.length}>{this.translateSegment(trimmed.substring(1).trim(), 0)}</li>);
-					trimmed = lines.shift();
-					if(trimmed) trimmed = trimmed.trim();
+					// Keep reading blank lines.
+					do {
+						trimmed = lines.shift();
+						if(trimmed) trimmed = trimmed.trim();
+						console.log("Next line is: " + trimmed);
+					} while(trimmed === "");
 				}
 
 				// Make the list.
@@ -202,8 +206,11 @@ class Chapter extends React.Component {
 				// Process all the items until there aren't any.
 				while(trimmed && trimmed.match("^[0-9]+.*")) {
 					items.push(<li key={"item" + items.length}>{this.translateSegment(trimmed.substring(2).trim(), 0)}</li>);
-					trimmed = lines.shift();
-					if(trimmed) trimmed = trimmed.trim();
+					// Keep reading blank lines.
+					do {
+						trimmed = lines.shift();
+						if(trimmed) trimmed = trimmed.trim();
+					} while(trimmed === "");
 				}
 
 				// Make the list.
