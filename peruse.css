@@ -31,20 +31,21 @@ li {
 }
 
 .img-responsive, .embed-responsive {
-	margin-top: 2em;
 	border: 1px solid #EAEAEA;
 	border-radius: 4px;
 }
 
 .figure {
+	margin-top: 1em;
+	margin-bottom: 1em;
 	width: 100%;
 }
 
 .figure-caption {
-	margin-top: 0.5em;
 	text-align: center;
 	line-height: 1.5em;
 	font-size: 13pt;
+	margin-bottom: 1em;
 }
 
 .figure-img {
