@@ -69,7 +69,21 @@ class Peruse extends React.Component {
 					return null;
 			}
 		}
+		return null;
 
+	}
+
+	getPreviousChapter(id) {
+
+		var chapters = this.getChapters();
+		for(var i = 0; i < chapters.length; i++) {
+			if(chapters[i][1] === id) {
+				if(i > 0)
+					return this.getContent(chapters[i - 1][1]);
+				else
+					return null;
+			}
+		}
 		return null;
 
 	}

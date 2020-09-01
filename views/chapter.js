@@ -14,6 +14,7 @@ class Chapter extends React.Component {
 
 		if(chapter) {
 			var nextChapter = this.props.app.getNextChapter(this.props.id);
+			var previousChapter = this.props.app.getPreviousChapter(this.props.id);
 			var parse = new ChapterParser(chapter.text);
 			var citations = parse.getCitations();
 			return (
@@ -22,9 +23,11 @@ class Chapter extends React.Component {
 					{parse.getElements()}
 					<div className="text-center lead">
 					{
-						nextChapter ? 
-						<Link to={"/" + nextChapter.id}>Next chapter: {nextChapter.title}</Link> :
-						<Link to={"/"}>Back to table of contents</Link>
+						previousChapter ? <span><Link to={"/" + previousChapter.id}>Previous: {previousChapter.title}</Link> | </span> : null						
+					}
+						<Link to={"/"}>Table of Contents</Link>
+					{
+						nextChapter ? <span> | <Link to={"/" + nextChapter.id}>Next: {nextChapter.title}</Link></span> : null						
 					}
 					</div>
 					{
