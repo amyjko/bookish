@@ -31,7 +31,6 @@ li {
 }
 
 .img-responsive, .embed-responsive {
-	border: 1px solid #EAEAEA;
 	border-radius: 4px;
 }
 
@@ -49,7 +48,6 @@ li {
 }
 
 .figure-img {
-	border: 1px solid #EAEAEA;
 	border-radius: 3px;
 	width: 100%;
 }
