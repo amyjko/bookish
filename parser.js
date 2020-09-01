@@ -277,11 +277,18 @@ function parseLine(line, key, chapter) {
 
             // Process each citation.
             _.each(
-                citationIDs, 
+                citationIDs,
                 citationID => {
                     if(chapter)
                         chapter.addCitation(citationID);
-                    segments.push(<NavHashLink smooth key={"segment" + key++} to={"#ref-" + citationID}>[{citationNumber++}]</NavHashLink>)
+                    segments.push(
+                        <NavHashLink 
+                            smooth 
+                            key={"segment" + key++}
+                            to={"#ref-" + citationID}>
+                            [{citationNumber++}]
+                        </NavHashLink>
+                    )
                 }
             );
 

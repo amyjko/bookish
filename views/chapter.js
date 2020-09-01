@@ -1,16 +1,18 @@
 import _ from 'lodash';
 import React from 'react';
 import { Link } from 'react-router-dom';
+import $ from 'jquery';
 
 import { ChapterParser, parseLine } from "../parser";
 import { Header } from './header';
 
 class Chapter extends React.Component {
 
-
 	render() {
 
 		var chapter = this.props.app.getContent(this.props.id);
+		var refHighlight = window.location.hash.split("#")[2];
+		var refHighlight = refHighlight ? refHighlight.split("-")[1] : null;
 
 		if(chapter) {
 			var nextChapter = this.props.app.getNextChapter(this.props.id);
@@ -39,7 +41,7 @@ class Chapter extends React.Component {
 							{_.map(citations, citationID => {
 								var refs = this.props.app.getReferences();
 								if(_.has(refs, citationID))
-									return <li key={"citation-" + citationID} id={"ref-" + citationID}>{parseLine(refs[citationID])}</li>
+									return <li key={"citation-" + citationID} className={citationID === refHighlight ? "highlight" : null} id={"ref-" + citationID}>{parseLine(refs[citationID])}</li>
 								else {
 									return <li className="alert alert-danger">unknown reference "{citationID}"</li>;
 								}
