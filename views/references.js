@@ -5,6 +5,11 @@ import { parseLine } from "../parser.js";
 
 class References extends React.Component {
 
+    // Always start at the top of the page.
+	componentDidMount() {
+		window.scrollTo(0, 0)
+	}
+
 	render() {
 
         var references = this.props.app.getReferences();

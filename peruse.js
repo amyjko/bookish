@@ -166,11 +166,9 @@ class Peruse extends React.Component {
 var PeruseWithRouter = withRouter(Peruse);
 
 window.peruse = function(url) {
-	
 	ReactDOM.render((
 		<HashRouter>
 			<Route path="/" render={(props) => <PeruseWithRouter {...props} book={url} /> } />
 		</HashRouter>
 	), document.body.appendChild(document.createElement("div")));
-	
 }

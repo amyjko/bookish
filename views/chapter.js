@@ -8,6 +8,11 @@ import { Header } from './header';
 
 class Chapter extends React.Component {
 
+	// Always start at the top of the page.
+	componentDidMount() {
+		window.scrollTo(0, 0)
+	}
+
 	render() {
 
 		var chapter = this.props.app.getContent(this.props.id);
