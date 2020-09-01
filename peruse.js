@@ -5,6 +5,7 @@ import { Route, HashRouter, Switch, withRouter } from 'react-router-dom';
 
 import { Chapter } from "./views/chapter";
 import { TableOfContents } from "./views/toc";
+import { References } from "./views/references";
 import { Unknown } from "./views/unknown";
 
 class Peruse extends React.Component {
@@ -55,6 +56,7 @@ class Peruse extends React.Component {
 	}
 	getCover() { return this.getImage(this.getBook().cover); }
 	getUnknown() { return this.getImage(this.getBook().unknown); }
+	getReferences() { return this.getBook().references; }
 
 	getNextChapter(id) {
 
@@ -137,6 +139,7 @@ class Peruse extends React.Component {
 							return <Route key={"chapter" + index} path={"/" + chapter[1]} render={(props) => <Chapter {...props} id={chapter[1]} app={this} />} />
 						})
 					}
+					<Route path="/references" render={(props) => <References {...props} app={this} />} />
 					<Route path="*" render={(props) => <Unknown {...props} app={this} />}/>
 				</Switch>
 		

@@ -2,7 +2,7 @@ import _ from 'lodash';
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { Header } from "./header";
-import { parseLine, parseChapter } from "../parser";
+import { parseLine, ChapterParser } from "../parser";
 
 class TableOfContents extends React.Component {
 
@@ -31,7 +31,7 @@ class TableOfContents extends React.Component {
 					}
 				/>
 				
-				{parseChapter(this.props.app.getDescription())}
+				{(new ChapterParser(this.props.app.getDescription())).getElements()}
 
 				<h2>Chapters</h2>
 
@@ -65,6 +65,14 @@ class TableOfContents extends React.Component {
 									</tr>
 								)
 							})
+						}
+						{
+							this.props.app.getReferences() === null ? null :
+							<tr key="references">
+								<td></td>
+								<td></td>
+								<td><Link to="/references">References</Link></td>
+							</tr>
 						}
 					</tbody>
 				</table>

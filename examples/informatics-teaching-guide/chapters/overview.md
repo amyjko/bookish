@@ -1,6 +1,6 @@
 Teaching at the [University of Washington|https://www.washington.edu/"] can be great fun. But it can also be really hard. I wrote this guide to help you maximize the fun and minimize the hard. Whether you're a new teaching assistant, a novice teacher, or a lifelong teacher, I hope there's something you can learn from it. 
 
-And the chances are good you will, because very few people who teach in higher education have ever had the opportunity to learn about [the science of learning|https://www.nap.edu/read/9853/chapter/1] (NRC 2000, NASEM 2018). At the very least, you'll learn what we know about learning and teaching. This might confirm some of your beliefs. It might cause you to question others.
+And the chances are good you will, because very few people who teach in higher education have ever had the opportunity to learn about the science of learning <nrc2000,nasem2018>. At the very least, you'll learn what we know about learning and teaching. This might confirm some of your beliefs. It might cause you to question others.
 
 Why listen to me? I don't have a formal education in education, so I'm not fully versed in it's complexities, but I'm not inexpert either:
 		
@@ -20,9 +20,3 @@ Of course, as with any advice, there are some caveats:
 * If you're reading this, a lot of it is tailored to teaching at UW and in Informatics in particular. Much of the advice I share might only be relevant to our particular university and population.
 
 With those disclaimers in mind, let's start with a discussion of Informatics students at UW.
-
-# Further reading
-		
-National Research Council (2000) [How people learn: Brain, mind, experience, and school: Expanded edition|https://www.nap.edu/catalog/9853/how-people-learn-brain-mind-experience-and-school-expanded-edition]. National Academies Press.
-
-National Academies of Sciences, Engineering, and Medicine (2018). [How people learn II: Learners, contexts, and cultures|https://www.nap.edu/catalog/24783/how-people-learn-ii-learners-contexts-and-cultures]. National Academies Press.

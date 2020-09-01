@@ -1,7 +1,7 @@
 		
 Learning doesn't necessarily require teaching. People can teach themselves, especially if they have good self-regulation skills. But the long list of things required for successful learning in the previous section shows why teaching is so valuable: great teachers provide purpose, provide resources, organize practice, develop identity, and structure environments conducive to learning.
 		
-Being an effective teacher requires three types of knowledge (Cochran et al. 1993):
+Being an effective teacher requires three types of knowledge <cochran1993>
 
 * *Content knowledge* (CK). This is knowledge if your subject. If you don't have this, you'll quickly lose your authority. It's okay to disclose that you don't know something, but on balance, learners have to believe that you know more than them. 
 * *Pedagogical knowledge* (PK). This is knowledge of how to teach. I'm imparting some of this knowledge in this book, but most of this has to be acquired through practice. This includes the wide range of teaching methods, classroom management skills, and social and communication skills necessary for managing a group of learners' attention. 
@@ -37,7 +37,3 @@ Unfortunately, some teachers do the oppposite of these things:
 All of these behaviors abdicate a teacher's responsibility to provide continued guidance, feedback, and encouragement.
 		
 Teaching is, therefore, as much about a _way of being_ as it is about ways of teaching.
-		
-# References
-		
-Cochran, K. F., DeRuiter, J. A., & King, R. A. (1993). <a href="https://doi.org/10.1177%2F0022487193044004004">Pedagogical content knowing: An integrative model for teacher preparation</a>. Journal of teacher Education, 44(4), 263-272.

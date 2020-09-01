@@ -2,6 +2,7 @@
 	"title": "Informatics Teaching Guide",
 	"authors": ["Amy J. Ko"],
 	"contributors": null,
+	"license": "CC BY-ND 4.0",
 	"cover": ["cover.jpg", "An illustration of several modes of teaching.", "Higher education teaching happens in many different contexts.", "Amy J. Ko"],
 	"unknown": ["cover.jpg", "An illustration of several modes of teaching.", "It looks like you're lost.", "Amy J. Ko"],
 	"description": "Teaching is hard, especially in higher education, where few people have a formal training in learning, teaching, or education. I wrote this book to support the teachers in the University of Washington Information school who lack training in teaching, providing a personal, but also evidence-based understanding of teaching and learning. It shouldn't take more than 1 hour to read, and should provide the knowledge you need to structure your practice as a teacher.\n\nI hope you enjoy! If not, please file an [issue|https://github.com/amyjko/informatics-teaching-guide/issues/new] on the book's [GitHub repository|https://github.com/amyjko/informatics-teaching-guide/]",
@@ -21,5 +22,18 @@
 		["August 31st, 2020", "Moved to Peruse for improved reading experience."],
 		["August 30th, 2019", "Created the initial draft."]
 	],
-	"license": "CC BY-ND 4.0"
+	"references": {
+		"cochran1993": "Cochran, K. F., DeRuiter, J. A., & King, R. A. (1993). [Pedagogical content knowing: An integrative model for teacher preparation|https://doi.org/10.1177%2F0022487193044004004]. Journal of teacher Education, 44(4), 263-272.",
+		"nrc2000": "National Research Council (2000) [How people learn: Brain, mind, experience, and school: Expanded edition|https://www.nap.edu/catalog/9853/how-people-learn-brain-mind-experience-and-school-expanded-edition]. National Academies Press.",
+		"nasem2018": "National Academies of Sciences, Engineering, and Medicine (2018). [How people learn II: Learners, contexts, and cultures|https://www.nap.edu/catalog/24783/how-people-learn-ii-learners-contexts-and-cultures]. National Academies Press.",
+		"deslauriers2019": "Louis Deslauriers, Logan S. McCarty, Kelly Miller, Kristina Callaghan, Greg Kestin (2019). [Measuring actual learning versus feeling of learning in response to being actively engaged in the classroom|https://doi.org/10.1073/pnas.1821936116]. Proceedings of the National Academy of Sciences",
+		"dweck2008": "Dweck, C. S. (2008). [Mindset: The new psychology of success|https://books.google.com/books?hl=en&lr=&id=bOGHDQAAQBAJ&oi=fnd&pg=PR9&dq=intelligence+mindset&ots=YMVW1isFij&sig=tQubuMFOIZT7BNRm8eydJAdIU9E#v=onepage&q=intelligence%20mindset&f=false]. Random House Digital, Inc.",
+		"ericsson1993": "Ericsson, K. A., Krampe, R. T., & Tesch-Römer, C. (1993). [The role of deliberate practice in the acquisition of expert performance|https://psycnet.apa.org/buy/1993-40718-001]. Psychological review, 100(3), 363",
+		"haskell2000": "Haskell, R. E. (2000). [Transfer of learning: Cognition and instruction|https://www.elsevier.com/books/transfer-of-learning/haskell/978-0-12-330595-4]. Elsevier",
+		"hidi2006": "Hidi, S., & Renninger, K. A. (2006). [The four-phase model of interest development|https://doi.org/10.1207/s15326985ep4102_4]. Educational psychologist, 41(2), 111-127.",
+		"pashler2009": "Pashler, H., McDaniel, M., Rohrer, D., & Bjork, R. (2008). [Learning styles: Concepts and evidence|https://doi.org/10.1111%2Fj.1539-6053.2009.01038.x]. Psychological science in the public interest, 9(3), 105-119.",
+		"tobias1994": "Tobias, S. (1994). [Interest, prior knowledge, and learning|https://doi.org/10.3102%2F00346543064001037]. Review of Educational Research, 64(1), 37-54.",
+		"wenger1998": "Wenger, E. (1998). [Communities of practice: Learning, meaning, and identity|https://doi.org/10.1017/CBO9780511803932]. Cambridge university press.",
+		"zimmerman1990": "Zimmerman, B. J. (1990). [Self-regulated learning and academic achievement: An overview|https://doi.org/10.1207/s15326985ep2501_2]. Educational psychologist, 25(1), 3-17."
+	}
 }
