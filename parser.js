@@ -298,7 +298,7 @@ function parseLine(line, key, chapter) {
                 line.next();
 
             // Trim any whitespace, then split by commas.
-            citationIDs = citationIDs.trim().split(",");
+            citationIDs = _.map(citationIDs.trim().split(","), citationID => citationID.trim());
 
             // Process each citation.
             _.each(
