@@ -176,6 +176,31 @@ class ChapterParser {
                 this.add(<pre key={this.key()}>{code}</pre>);
 
             }
+            // Quote
+            else if(trimmed.startsWith("\"")) {
+
+                var elements = [];
+
+                do {
+                    line = lines.shift();
+                    if(line && !line.trim().startsWith("\""))
+                        elements.push(parseLine(line, 0, this));
+                } while(line && !line.startsWith("\""));
+
+                var credit = null;
+                if(line && line.trim().length > 1) {
+                    credit = parseLine(line.substring(1).trim(), 0, this);
+                }
+
+                // Add the quote.
+                this.add(
+                    <blockquote className="blockquote" key={this.key()}>
+                        {elements}
+                        {credit ? <footer className="blockquote-footer"><cite>{credit}</cite></footer> : null }
+                    </blockquote>
+                );
+
+            }
             // Make a paragraph with whatever came before this empty line.
             else if(trimmed === "") {
 

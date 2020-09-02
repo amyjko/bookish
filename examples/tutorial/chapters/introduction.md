@@ -141,3 +141,15 @@ space between them,
 rather than creating a paragraph,
 the lines will be treated as a single
 paragraph with embedded line breaks.
+
+It's also possible to include quotes:
+
+`
+"
+This is my quote
+" Me
+`
+
+"
+This is my quote
+" Me

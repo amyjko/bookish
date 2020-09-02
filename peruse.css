@@ -70,3 +70,10 @@ a {
 	padding-top: 5px;
 	padding-bottom: 5px;
 }
+
+blockquote {
+	border-top: 1px solid lightGray;
+	border-bottom: 1px solid lightGray;
+	padding: 1em;
+	font-style: italic;
+}
