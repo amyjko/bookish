@@ -38,12 +38,12 @@ class Chapter extends React.Component {
 					}
 					</div>
 					{
-						citations.length === 0 ? null :
+						Object.keys(citations).length === 0 ? null :
 						<div>
 							<h1>References</h1>
 
 							<ol>
-							{_.map(citations, citationID => {
+							{_.map(Object.keys(citations), citationID => {
 								var refs = this.props.app.getReferences();
 								if(_.has(refs, citationID))
 									return <li key={"citation-" + citationID} className={citationID === refHighlight ? "highlight" : null} id={"ref-" + citationID}>{parseLine(refs[citationID])}</li>

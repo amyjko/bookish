@@ -31,7 +31,7 @@ class ChapterParser {
 
         // A list of citations that occurred in this chapter,
         // so we can render them at the end.
-        this.citations = [];
+        this.citations = {};
 
         // The list of elements that represent the chapter we're building.
         this.elements = [];
@@ -45,8 +45,8 @@ class ChapterParser {
     }
 
     getElements() { return this.elements; }
+    addCitation(citationID) { this.citations[citationID] = true; }
     getCitations() { return this.citations; }
-    addCitation(citationID) { this.citations.push(citationID); }
 
     // Add an element to
     add(element) {
@@ -281,7 +281,7 @@ function parseLine(line, key, chapter) {
         chapter = null;
 
     // Were we given a citation number? If not, start at 1.
-    var citationNumber = chapter ? chapter.getCitations().length + 1 : 1;
+    var citationNumber = chapter ? (Object.keys(chapter).length) + 1 : 1;
 
     while(line.more()) {
 
