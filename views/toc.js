@@ -59,10 +59,10 @@ class TableOfContents extends React.Component {
 											{
 												// If it's not loaded, say so.
 												this.props.app.getContent(chapter[1]) === undefined ?
-													<span>Loading...</span> :
+													<span>...</span> :
 												// If it failed to load, say so.
 												this.props.app.getContent(chapter[1]) === null ?
-													<span>Unable to load this chapter</span> :
+													<span>Unable to load</span> :
 												// If it did load, link it!
 												<Link to={"/" + chapter[1]}>{chapter[0]}</Link>
 											}

@@ -138,13 +138,11 @@ class Peruse extends React.Component {
 	
 	render() {
 		
-		// var currentRoute = this.props.location.pathname;
-		
 		// Return the single page app.
 		return (
 		
 			this.getBook() == null ?
-				<p>Loading the book...</p> :
+				<p>...</p> :
 				<Switch>
 					<Route exact path="/" render={(props) => <TableOfContents {...props} app={this} />} />
 					{
