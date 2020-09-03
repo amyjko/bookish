@@ -128,11 +128,13 @@ class ChapterParser {
                 while(trimmed && trimmed.startsWith("* ")) {
                     bullets.push(<li key={"bullet" + bullets.length}>{parseLine(trimmed.substring(1).trim(), 0, this)}</li>);
                     // Keep reading blank lines.
-                    do {
-                        trimmed = lines.shift();
-                        if(trimmed) trimmed = trimmed.trim();
-                    } while(trimmed === "");
+                    while(lines.length > 0 && lines[0].trim() === "")
+                        trimmed = lines.shift().trim();
+                    trimmed = lines.shift();
+                    if(trimmed) trimmed = trimmed.trim();
                 }
+
+                lines.unshift(trimmed);
 
                 // Make the list.
                 this.add(<ul key={this.key()}>{bullets}</ul>);
@@ -147,11 +149,13 @@ class ChapterParser {
                 while(trimmed && trimmed.match("^[0-9]+.*")) {
                     items.push(<li key={"item" + items.length}>{parseLine(trimmed.substring(2).trim(), 0, this)}</li>);
                     // Keep reading blank lines.
-                    do {
-                        trimmed = lines.shift();
-                        if(trimmed) trimmed = trimmed.trim();
-                    } while(trimmed === "");
+                    while(lines.length > 0 && lines[0].trim() === "")
+                        trimmed = lines.shift().trim();
+                    trimmed = lines.shift();
+                    if(trimmed) trimmed = trimmed.trim();
                 }
+
+                lines.unshift(trimmed);
 
                 // Make the list.
                 this.add(<ol key={this.key()}>{items}</ol>);
