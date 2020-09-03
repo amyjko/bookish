@@ -163,3 +163,5 @@ And if you want to break up sections, type:
 ---
 
 And you'll have a new section.
+
+If you use "quotes" in a sentence, it will replace them with "smart" quotes.

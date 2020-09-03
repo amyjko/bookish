@@ -242,11 +242,33 @@ class ChapterParser {
 
 }
 
+// Use regular expressions to replace plain single and double quotes with curly ones.
+function smarten(text) {
+    return text
+        /* opening singles */
+        .replace(/(^|[-\u2014\s(\["])'/g, "$1\u2018")
+
+        /* closing singles & apostrophes */
+        .replace(/'/g, "\u2019")
+
+        /* opening doubles */
+        .replace(/(^|[-\u2014/\[(\u2018\s])"/g, "$1\u201c")
+
+        /* closing doubles */
+        .replace(/"/g, "\u201d")
+
+        /* em-dashes */
+        .replace(/--/g, "\u2014");
+};
+
 function parseLine(line, key, chapter) {
 
     if(!(typeof line === "string" )) {
         return null;
     }
+
+    // Replace straight quotes with smart quotes before processing.
+    line = smarten(line);
 
     var segments = [];
     var line = new Line(line);
