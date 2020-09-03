@@ -30,7 +30,7 @@ class TableOfContents extends React.Component {
 							<em>by</em> {this.props.app.getAuthors()}
 							<small>
 								{this.props.app.getContributors() ? 
-								<span> with contributions from {this.props.app.getContributors()}</span> : null}
+								<span><em> with contributions from</em> {this.props.app.getContributors()}</span> : null}
 							</small>
 						</div>
 					}
