@@ -119,6 +119,12 @@ class ChapterParser {
                 );
 
             }
+            // Rule
+            else if(trimmed.startsWith("---")) {
+
+                this.add(<hr key={this.key()} />);
+
+            }
             // Bulleted list
             else if(trimmed.startsWith("* ")) {
 

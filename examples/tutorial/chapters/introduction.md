@@ -153,3 +153,13 @@ This is my quote
 "
 This is my quote
 " Me
+
+And if you want to break up sections, type:
+
+`
+---
+`
+
+---
+
+And you'll have a new section.
