@@ -46,7 +46,7 @@ class Chapter extends React.Component {
 							<h1>References</h1>
 
 							<ol>
-							{_.map(Object.keys(citations), citationID => {
+							{_.map(Object.keys(citations).sort(), citationID => {
 								var refs = this.props.app.getReferences();
 								if(_.has(refs, citationID))
 									return <li key={"citation-" + citationID} className={citationID === refHighlight ? "highlight" : null} id={"ref-" + citationID}>{parseLine(refs[citationID])}</li>
