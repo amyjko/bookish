@@ -64,7 +64,15 @@ class TableOfContents extends React.Component {
 												this.props.app.getContent(chapter[1]) === null ?
 													<span>Unable to load</span> :
 												// If it did load, link it!
-												<Link to={"/" + chapter[1]}>{chapter[0]}</Link>
+												<div>
+													<Link to={"/" + chapter[1]}>{chapter[0]}</Link>
+													<br/>
+													<small>
+														<em>
+															{ Math.max(1, Math.round(this.props.app.getContent(chapter[1]).text.split(/\s+/).length / 200)) } minute read
+														</em>
+													</small>
+												</div>
 											}
 										</td>
 									</tr>
