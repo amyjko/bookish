@@ -12,5 +12,9 @@
 	"revisions": [
 		["August 30th, 2020", "Created the initial draft."]
 	],
-	"license": "CC BY-ND 4.0"
+	"license": "CC BY-ND 4.0",
+	"references": {
+		"ref1": "Sample reference 1.",
+		"ref2": "Sample reference 2."
+	}
 }

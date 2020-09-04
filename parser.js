@@ -36,6 +36,11 @@ class ChapterParser {
         // so we can render them at the end.
         this.citations = {};
 
+        // Gather all of the citations so that we can render citation numbers.
+        _.each(text.match(/<[a-zA-Z0-9,]+>/g), (citations) => {
+            _.each(citations.substring(1, citations.length - 1).split(","), (citation) => { this.citations[citation] = true; })
+        });
+
         // The list of elements that represent the chapter we're building.
         this.elements = [];
 
@@ -48,9 +53,12 @@ class ChapterParser {
     }
 
     getElements() { return this.elements; }
-    addCitation(citationID) { this.citations[citationID] = true; }
     getCitations() { return this.citations; }
-    getReferences() { return this.app.getReferences(); }
+    getCitationNumber(citationID) { 
+        
+        return Object.keys(this.citations).sort().indexOf(citationID) + 1;
+    
+    }
 
     // Add an element to
     add(element) {
@@ -339,32 +347,22 @@ function parseLine(line, key, chapter) {
             // Process each citation.
             _.each(
                 citationIDs,
-                citationID => {
+                (citationID, index) => {
                     // If there's no chapter context, ignore the citation.
                     if(chapter) {
-                        // Remember that this was cited, so we can generate the reference list.
-                        chapter.addCitation(citationID);
-                        // Try to find the name and year to render this citation.
-                        var reference = chapter.getReferences()[citationID];
-                        var citation = "*";
-                        if(reference) {
-                            var author = reference.split(/[\s,\.]/)[0];
-                            // Year is probably first digit.
-                            var indexOfDigit = reference.search(/\d/);
-                            var year = reference.substring(indexOfDigit, indexOfDigit + 4);
-                            citation = author + " " + year;
-
-                        }
-                        
                         // For now, representation citations as unobtrusive big bullets.
                         segments.push(
                             <NavHashLink 
                                 smooth 
                                 key={"segment" + key++}
                                 to={"#ref-" + citationID}>
-                                &#x25CF;
+                                <sup>{chapter.getCitationNumber(citationID)}</sup>
                             </NavHashLink>
                         )
+
+                        if(citationIDs.length > 1 && index < citationIDs.length - 1)
+                            segments.push(<sup key={"segment" + key++}>,</sup>);
+
                     }
                 }
             );
