@@ -62,7 +62,7 @@ class Chapter extends React.Component {
 			);
 		}
 		else
-			return "Loading...";
+			return "...";
 
 	}
 
