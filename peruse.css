@@ -78,3 +78,7 @@ blockquote {
 	padding: 1em;
 	font-style: italic;
 }
+
+.table {
+	line-height: 1.4em;
+}
