@@ -36,7 +36,7 @@ class TableOfContents extends React.Component {
 					}
 				/>
 				
-				{(new ChapterParser(this.props.app.getDescription())).getElements()}
+				{(new ChapterParser(this.props.app.getDescription(), this.props.app)).getElements()}
 
 				<h2>Chapters</h2>
 

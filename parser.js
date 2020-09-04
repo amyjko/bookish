@@ -27,7 +27,10 @@ class Line {
 
 class ChapterParser {
 
-    constructor(text) {
+    constructor(text, app) {
+
+        // Remember the app
+        this.app = app;
 
         // A list of citations that occurred in this chapter,
         // so we can render them at the end.
@@ -47,6 +50,7 @@ class ChapterParser {
     getElements() { return this.elements; }
     addCitation(citationID) { this.citations[citationID] = true; }
     getCitations() { return this.citations; }
+    getReferences() { return this.app.getReferences(); }
 
     // Add an element to
     add(element) {
@@ -336,16 +340,32 @@ function parseLine(line, key, chapter) {
             _.each(
                 citationIDs,
                 citationID => {
-                    if(chapter)
+                    // If there's no chapter context, ignore the citation.
+                    if(chapter) {
+                        // Remember that this was cited, so we can generate the reference list.
                         chapter.addCitation(citationID);
-                    segments.push(
-                        <NavHashLink 
-                            smooth 
-                            key={"segment" + key++}
-                            to={"#ref-" + citationID}>
-                            [{citationNumber++}]
-                        </NavHashLink>
-                    )
+                        // Try to find the name and year to render this citation.
+                        var reference = chapter.getReferences()[citationID];
+                        var citation = "*";
+                        if(reference) {
+                            var author = reference.split(/[\s,\.]/)[0];
+                            // Year is probably first digit.
+                            var indexOfDigit = reference.search(/\d/);
+                            var year = reference.substring(indexOfDigit, indexOfDigit + 4);
+                            citation = author + " " + year;
+
+                        }
+                        
+                        // For now, representation citations as unobtrusive big bullets.
+                        segments.push(
+                            <NavHashLink 
+                                smooth 
+                                key={"segment" + key++}
+                                to={"#ref-" + citationID}>
+                                &#x25CF;
+                            </NavHashLink>
+                        )
+                    }
                 }
             );
 

@@ -22,7 +22,7 @@ class Chapter extends React.Component {
 		if(chapter) {
 			var nextChapter = this.props.app.getNextChapter(this.props.id);
 			var previousChapter = this.props.app.getPreviousChapter(this.props.id);
-			var parse = new ChapterParser(chapter.text);
+			var parse = new ChapterParser(chapter.text, this.props.app);
 			var citations = parse.getCitations();
 			return (
 				<div>
