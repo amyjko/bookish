@@ -11,7 +11,7 @@ class Unknown extends React.Component {
 		return <Header 
 			image={this.props.app.getUnknown()} 
 			header="Uh oh." 
-			content={<p>This URL doesn't exist for this book. Want to go back to the <Link to="/">table of contents?</Link></p>}
+			content={<p>This URL doesn't exist for this book. Want to go back to the <Link to="/">Table of Contents?</Link></p>}
 		/>
 
 	}
