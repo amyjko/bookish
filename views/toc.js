@@ -99,6 +99,10 @@ class TableOfContents extends React.Component {
 					</tbody>
 				</table>
 
+				<h2>License</h2>
+
+				<p>{parseLine(this.props.app.getLicense())}</p>
+
 				<h2>Revisions</h2>
 				
 				<ul>

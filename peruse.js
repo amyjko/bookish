@@ -45,6 +45,7 @@ class Peruse extends React.Component {
 	getDescription() { return this.getBook().description; }
 	getRevisions() { return this.getBook().revisions; }
 	getChapters() { return this.getBook().chapters; }
+	getLicense() { return this.getBook().license; }
 	getImage(image) {
 		return {
 			url: image[0],
