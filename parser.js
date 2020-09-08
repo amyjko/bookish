@@ -298,8 +298,8 @@ function parseLine(line, key, chapter) {
 
     while(line.more()) {
 
-        // Italic, bold, bold/italic
-        if(line.peek() === "_" || line.peek() === "*" || line.peek() === "^") {
+        // Italic, bold, bold/italic, code
+        if(line.peek() === "_" || line.peek() === "*" || line.peek() === "^" || line.peek() === "`") {
 
             // Capture the fragment prior.
             if(fragment.length > 0) {
@@ -322,6 +322,8 @@ function parseLine(line, key, chapter) {
                     <em key={"segment" + key++}>{segment}</em> :
                 delimeter === "*" ?
                     <strong key={"segment" + key++}>{segment}</strong> :
+                delimeter === "`" ?
+                    <code key={"segment" + key++}>{segment}</code> :
                     <em key={"segment" + key++}><strong>{segment}</strong></em>
             );
 

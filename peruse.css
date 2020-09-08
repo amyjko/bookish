@@ -59,6 +59,8 @@ pre {
 	padding: 1em;
 	background-color: #F7F7F7;
 	font-size: 80%;
+	color: #e83e8c;
+	white-space: pre-wrap;
 }
 
 a {

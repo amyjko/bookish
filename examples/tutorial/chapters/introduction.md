@@ -113,6 +113,8 @@ it has syntax errors
 
 (Yes, that was a haiku.)
 
+You can also include code `inline` by wrapping things in \`in backticks\`.
+
 You can include comments in text by starting a line with the \% symbol:
 
 `
