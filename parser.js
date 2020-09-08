@@ -159,13 +159,14 @@ class ChapterParser {
 
             }
             // Numbered list
-            else if(trimmed.match("^[0-9]+.*")) {
+            else if(trimmed.match("^[0-9]+\.")) {
 
                 var items = [];
 
                 // Process all the items until there aren't any.
-                while(trimmed && trimmed.match("^[0-9]+.*")) {
-                    items.push(<li key={"item" + items.length}>{parseLine(trimmed.substring(2).trim(), 0, this)}</li>);
+                while(trimmed && trimmed.match("^[0-9]+\.")) {
+                    // Ignore the number and dot, trim the string, then parse the rest.
+                    items.push(<li key={"item" + items.length}>{parseLine(trimmed.substring(trimmed.indexOf(".") + 1).trim(), 0, this)}</li>);
                     // Keep reading blank lines.
                     while(lines.length > 0 && lines[0].trim() === "")
                         trimmed = lines.shift().trim();

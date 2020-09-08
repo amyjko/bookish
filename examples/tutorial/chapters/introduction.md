@@ -68,12 +68,12 @@ The numbers don't have to be in a particular order, they just have to be a numbe
 
 `
 3. Item 1
-2. Item 2
-1. Item 3
+22. Item 2
+111. Item 3
 `
 3. Item 1
-2. Item 2
-1. Item 3
+22. Item 2
+111. Item 3
 
 You can include [links to content|http://amyjko.com] like this:
 
