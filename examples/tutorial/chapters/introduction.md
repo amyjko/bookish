@@ -92,8 +92,10 @@ Visit [Chapter 1|chapter1].
 You can include captioned images like the one at the top of this chapter by using this format, indicating the caption, description of the image, credit for the image, and the image file name:
 
 `
-![Boomy welcomes you to the example chapter!][A photograph of Boomy seeking nuzzles.][Amy J. Ko](/images/chapter1.jpg)
+|chapter1.jpg|A photograph of Boomy seeking nuzzles|A caption with a reference <ref1>.|Amy J. Ko|
 `
+
+|chapter1.jpg|A photograph of Boomy seeking nuzzles|A caption with a reference <ref1>.|Amy J. Ko|
 
 You can also include YouTube videos by using the same syntax as above, but just including a YouTube video in the URL instead.
 

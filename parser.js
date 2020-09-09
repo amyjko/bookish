@@ -107,8 +107,8 @@ class ChapterParser {
                         key={this.key()}
                         url={image[1]}
                         alt={image[2]}
-                        caption={image[3]}
-                        credit={image[4]}
+                        caption={parseLine(image[3], 0, this)}
+                        credit={parseLine(image[4], 0, this)}
                     />
                 );
             }
