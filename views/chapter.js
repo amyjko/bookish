@@ -1,7 +1,6 @@
 import _ from 'lodash';
 import React from 'react';
 import { Link } from 'react-router-dom';
-import $ from 'jquery';
 
 import { ChapterParser, parseLine } from "../parser";
 import { Header } from './header';
@@ -31,15 +30,6 @@ class Chapter extends React.Component {
 						<em>by</em> {parseLine(this.props.app.getAuthors())}
 					</div>
 					{parse.getElements()}
-					<div className="text-center lead">
-					{
-						previousChapter ? <span><Link to={"/" + previousChapter.id}>Previous: {previousChapter.title}</Link> | </span> : null						
-					}
-						<Link to={"/"}>Table of Contents</Link>
-					{
-						nextChapter ? <span> | <Link to={"/" + nextChapter.id}>Next: {nextChapter.title}</Link></span> : null						
-					}
-					</div>
 					{
 						Object.keys(citations).length === 0 ? null :
 						<div>
@@ -58,6 +48,17 @@ class Chapter extends React.Component {
 							</ol>
 						</div>
 					}
+					<div className="navigation-footer">
+					{
+						previousChapter ? <span><Link to={"/" + previousChapter.id}>Previous</Link></span> : <span className="text-muted">Previous</span>				
+					}
+						<span> | </span>
+						<Link to={"/"}>Table of Contents</Link>
+						<span> | </span>
+					{
+						nextChapter ? <Link to={"/" + nextChapter.id}>Next</Link> : <span className="text-muted">Next</span>
+					}						
+					</div>
 				</div>
 			);
 		}

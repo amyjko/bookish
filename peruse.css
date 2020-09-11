@@ -8,6 +8,9 @@ body {
 	font-family: "Lora", serif;
 	font-size: 14pt;
 	line-height: 1.75em;
+
+	background-color: white;
+	color: black;
 }
 
 .h1, .h2, .h3, .h4, .h5, .h6, h1, h2, h3, h4, h5, h6 {
@@ -83,4 +86,16 @@ blockquote {
 
 .table {
 	line-height: 1.4em;
+}
+
+.navigation-footer {
+	position: fixed;
+	left: 0;
+	bottom: 0;
+	width: 100%;
+	text-align: center;
+	border: 1px solid lightGray;
+	background-color:white;
+	padding: 1em;
+	text-shadow: 0px 0px #000000;
 }

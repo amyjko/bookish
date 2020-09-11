@@ -1,5 +1,6 @@
 import _ from 'lodash';
 import React from 'react';
+import { Link } from 'react-router-dom';
 
 import { parseLine } from "../parser.js";
 
@@ -26,6 +27,9 @@ class References extends React.Component {
                             return <p key={citationID}>{parseLine(references[citationID])}</p>
                         })
                 }
+				<div className="navigation-footer">
+					<Link to={"/"}>Table of Contents</Link>
+				</div>
 			</div>
 		);
 
