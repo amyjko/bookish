@@ -28,7 +28,7 @@ class Chapter extends React.Component {
 				<div>
 					<Header image={chapter.image} header={chapter.title} content={null} />
 					<div>
-						<em>by</em> {this.props.app.getAuthors()}
+						<em>by</em> {parseLine(this.props.app.getAuthors())}
 					</div>
 					{parse.getElements()}
 					<div className="text-center lead">

@@ -27,10 +27,10 @@ class TableOfContents extends React.Component {
 					header={this.props.app.getTitle()} 
 					content={
 						<div>
-							<em>by</em> {this.props.app.getAuthors()}
+							<em>by</em> {parseLine(this.props.app.getAuthors())}
 							<small>
 								{this.props.app.getContributors() ? 
-								<span><em> with contributions from</em> {this.props.app.getContributors()}</span> : null}
+								<span><em> with contributions from</em> {parseLine(this.props.app.getContributors())}</span> : null}
 							</small>
 						</div>
 					}
