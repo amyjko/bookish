@@ -1,6 +1,10 @@
 body {
 	max-width: 800px;
+
+	/* To make room for navigation footer*/
 	padding: 1em;
+	padding-bottom: 5em;
+
 	margin-left: auto;
 	margin-right: auto;
 
