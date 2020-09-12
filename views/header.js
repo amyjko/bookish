@@ -9,7 +9,11 @@ class Header extends React.Component {
 
 		return (
 			<div>
-				<Figure {...this.props.image}/>
+				{
+					this.props.image ?
+						<Figure {...this.props.image}/> :
+						null
+				}
 				<h1>{this.props.header}</h1>
 				<div className="lead">{this.props.content}</div>
 			</div>

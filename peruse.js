@@ -20,6 +20,7 @@ class Peruse extends React.Component {
 			chapters: {}
 		};
 		
+		// Fetch the JSON
 		fetch(this.props.book)
 			.then(response => response.json())
 			.then(data => {
@@ -31,8 +32,8 @@ class Peruse extends React.Component {
 			})
 			.catch(err => { 
 				// Uh oh, something bad happened. Set data to null to render an error.
-				this.setState({ data: null });
-				console.error(err);
+				this.setState({ book: null });
+				console.error("Unable to load " + this.props.book + ": " + err);
 			});
 
 	}
@@ -56,7 +57,7 @@ class Peruse extends React.Component {
 	
 	}
 	getCover() { return this.getImage(this.getBook().cover); }
-	getUnknown() { return this.getImage(this.getBook().unknown); }
+	getUnknown() { return this.getBook() ? this.getImage(this.getBook().unknown) : null; }
 	getReferences() { return this.getBook().references; }
 
 	getNextChapter(id) {
@@ -142,8 +143,12 @@ class Peruse extends React.Component {
 		// Return the single page app.
 		return (
 		
-			this.getBook() == null ?
+			// If it's loading, show loading feedback
+			this.getBook() === undefined ?
 				<p>...</p> :
+			// If it failed to load, provide some feedback.
+			this.getBook() === null ?
+				<Unknown message={<p className="alert alert-danger">Wasn't able to load the book <code>{this.props.book}</code>. The book specification probably has a syntax error, but it's also possible that this file doesn't exist or there was a problem with the server..</p>} app={this} /> :
 				<Switch>
 					<Route exact path="/" render={(props) => <TableOfContents {...props} app={this} />} />
 					{
@@ -153,7 +158,7 @@ class Peruse extends React.Component {
 						})
 					}
 					<Route path="/references" render={(props) => <References {...props} app={this} />} />
-					<Route path="*" render={(props) => <Unknown {...props} app={this} />}/>
+				<Route path="*" render={(props) => <Unknown {...props} message={<p>This URL doesn't exist for this book. Want to go back to the <Link to="/">Table of Contents?</Link></p>} app={this} />}/>
 				</Switch>
 		
 		);
