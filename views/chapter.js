@@ -7,9 +7,75 @@ import { Header } from './header';
 
 class Chapter extends React.Component {
 
-	// Always start at the top of the page.
+	constructor(props){
+		super(props);
+
+		this.handleScroll = this.handleScroll.bind(this);
+
+		// Assume the chapter is loaded initially.
+		this.state = { loaded : true };
+
+	  }
+
 	componentDidMount() {
-		window.scrollTo(0, 0)
+
+		window.addEventListener('scroll', this.handleScroll);
+
+		// If the component renders after the chapter is loaded and rendered, scroll to the last location.
+		var chapter = this.props.app.getContent(this.props.id);
+		if(chapter)
+			this.scrollToLastLocation();
+		// Otherwise, mark it as not loaded.
+		else
+			this.setState({ loaded: false })
+
+	}
+
+	componentWillUnmount() {
+		window.removeEventListener('scroll', this.handleScroll);
+	}
+
+	// If the chapter was rendered, and the chapter wasn't yet loaded, but now it is, scroll to the last location.
+	componentDidUpdate() {
+
+		var chapter = this.props.app.getContent(this.props.id);
+		if(!this.state.loaded && chapter) {
+			this.setState({ loaded: true});
+			this.scrollToLastLocation();
+		}
+
+	}
+
+	scrollToLastLocation() {
+
+		var progress = localStorage.getItem("chapterProgress");
+		if(progress === null) {
+			progress = {};
+		} else {
+			progress = JSON.parse(progress);
+		}
+		var progress = (this.props.id in progress) ? progress[this.props.id] : 0;
+		var position = (progress / 100.0) * Math.max(document.body.scrollHeight, document.body.offsetHeight);
+
+		window.scrollTo(0, position);
+
+	}
+	
+	handleScroll() {
+
+		var top = window.scrollY;
+		var height = Math.max(document.body.scrollHeight, document.body.offsetHeight);
+		var percent = Math.max(0, Math.round(100 * (top / height)));
+		
+		var progress = localStorage.getItem("chapterProgress");
+		if(progress === null) {
+			progress = {};
+		} else {
+			progress = JSON.parse(progress);
+		}
+		progress[this.props.id] = percent;
+		localStorage.setItem("chapterProgress", JSON.stringify(progress));
+
 	}
 
 	render() {
