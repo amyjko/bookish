@@ -1,7 +1,7 @@
 import _ from 'lodash';
 import React from 'react';
 import ReactDOM from 'react-dom';
-import { Route, HashRouter, Switch, withRouter } from 'react-router-dom';
+import { Link, Route, HashRouter, Switch, withRouter } from 'react-router-dom';
 
 import { Chapter } from "./views/chapter";
 import { TableOfContents } from "./views/toc";

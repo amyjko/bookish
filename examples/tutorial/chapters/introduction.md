@@ -89,6 +89,14 @@ You can add links to chapters by just using the chapter identifier given in the 
 Visit [Chapter 1|chapter1].
 `
 
+If you link to a chapter that doesn't exist, bad things happen:
+
+`
+Visit [a chapter that doesn't exist|doesnotexist].
+`
+
+Visit [a chapter that doesn't exist|doesnotexist].
+
 You can include captioned images like the one at the top of this chapter by using this format, indicating the caption, description of the image, credit for the image, and the image file name:
 
 `
