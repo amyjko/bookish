@@ -52,11 +52,17 @@ class ChapterParser {
 
     }
 
+    isValidCitation(citationID) { return citationID in this.app.getReferences(); }
     getElements() { return this.elements; }
     getCitations() { return this.citations; }
     getCitationNumber(citationID) { 
         
-        return Object.keys(this.citations).sort().indexOf(citationID) + 1;
+        var index = Object.keys(this.citations).sort().indexOf(citationID);
+
+        if(index < 0)
+            return null;
+        else
+            return index + 1;
     
     }
 
@@ -293,9 +299,6 @@ function parseLine(line, key, chapter) {
     if(chapter === undefined)
         chapter = null;
 
-    // Were we given a citation number? If not, start at 1.
-    var citationNumber = chapter ? (Object.keys(chapter).length) + 1 : 1;
-
     while(line.more()) {
 
         // Italic, bold, bold/italic, code
@@ -353,16 +356,23 @@ function parseLine(line, key, chapter) {
                 (citationID, index) => {
                     // If there's no chapter context, ignore the citation.
                     if(chapter) {
-                        // For now, representation citations as unobtrusive big bullets.
-                        segments.push(
-                            <NavHashLink 
-                                smooth 
-                                key={"segment" + key++}
-                                to={"#ref-" + citationID}>
-                                <sup>{chapter.getCitationNumber(citationID)}</sup>
-                            </NavHashLink>
-                        )
+                        // Find the citation number. There should always be one,
+                        var citationNumber = chapter.getCitationNumber(citationID)
+                        if(citationNumber !== null && chapter.isValidCitation(citationID))
+                            // Add a citation.
+                            segments.push(
+                                <NavHashLink 
+                                    smooth 
+                                    key={"segment" + key++}
+                                    to={"#ref-" + citationID}>
+                                    <sup>{citationNumber}</sup>
+                                </NavHashLink>
+                            )
+                        else {
+                            segments.push(<span className="alert alert-danger">Unknown reference: <code>{citationID}</code></span>)
+                        }
 
+                        // If there's more than one citation and this isn't the last, add a comma.
                         if(citationIDs.length > 1 && index < citationIDs.length - 1)
                             segments.push(<sup key={"segment" + key++}>,</sup>);
 

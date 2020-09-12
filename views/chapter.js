@@ -126,7 +126,7 @@ class Chapter extends React.Component {
 								if(_.has(refs, citationID))
 									return <li key={"citation-" + citationID} className={citationID === refHighlight ? "highlight" : null} id={"ref-" + citationID}>{parseLine(refs[citationID])}</li>
 								else {
-									return <li className="alert alert-danger">unknown reference "{citationID}"</li>;
+									return <li className="alert alert-danger">Unknown reference: <code>{citationID}</code></li>;
 								}
 							})
 							}

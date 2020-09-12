@@ -105,6 +105,8 @@ You can include captioned images like the one at the top of this chapter by usin
 
 |chapter1.jpg|A photograph of Boomy seeking nuzzles|A caption with a reference <ref1>.|Amy J. Ko|
 
+If you cite something that doesn't appear in your book specification's reference list, you'll get an error like this: <thisisanunknowncitation>.
+
 You can also include YouTube videos by using the same syntax as above, but just including a YouTube video in the URL instead.
 
 `
