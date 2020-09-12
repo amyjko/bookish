@@ -65,7 +65,7 @@ class TableOfContents extends React.Component {
 
 				<h2>Chapters</h2>
 
-				<table className="table">
+				<table className="table" id="toc">
 					<tbody>
 						{
 							_.map(this.props.app.getChapters(), (chapter, index) => {

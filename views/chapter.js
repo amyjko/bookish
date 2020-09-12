@@ -1,6 +1,7 @@
 import _ from 'lodash';
 import React from 'react';
 import { Link } from 'react-router-dom';
+import { NavHashLink } from "react-router-hash-link";
 
 import { ChapterParser, parseLine } from "../parser";
 import { Header } from './header';
@@ -137,7 +138,7 @@ class Chapter extends React.Component {
 						previousChapter ? <span><Link to={"/" + previousChapter.id}>Previous</Link></span> : <span className="text-muted">Previous</span>				
 					}
 						<span> | </span>
-						<Link to={"/"}>Table of Contents</Link>
+						<NavHashLink to={"/#toc"}>Table of Contents</NavHashLink>
 						<span> | </span>
 					{
 						nextChapter ? <Link to={"/" + nextChapter.id}>Next</Link> : <span className="text-muted">Next</span>
