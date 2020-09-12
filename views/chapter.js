@@ -46,7 +46,7 @@ class Chapter extends React.Component {
 
 	}
 
-	scrollToLastLocation() {
+	getProgress() {
 
 		var progress = localStorage.getItem("chapterProgress");
 		if(progress === null) {
@@ -54,9 +54,21 @@ class Chapter extends React.Component {
 		} else {
 			progress = JSON.parse(progress);
 		}
-		var progress = (this.props.id in progress) ? progress[this.props.id] : 0;
-		var position = (progress / 100.0) * Math.max(document.body.scrollHeight, document.body.offsetHeight);
 
+		// If we don't have an entry for this chapter, treat it as 0.
+		var progress = (this.props.id in progress) ? progress[this.props.id] : 0;
+		
+		return progress;
+
+	}
+
+	scrollToLastLocation() {
+
+		// Read the saved position.
+		var progress = this.getProgress();
+		var position = (progress / 100.0) * (Math.max(document.body.scrollHeight, document.body.offsetHeight) - window.innerHeight);
+
+		// Scroll the window to roughly the same position.
 		window.scrollTo(0, position);
 
 	}
@@ -64,7 +76,10 @@ class Chapter extends React.Component {
 	handleScroll() {
 
 		var top = window.scrollY;
-		var height = Math.max(document.body.scrollHeight, document.body.offsetHeight);
+		// The ground truth location is the bottom of the window. (If we used the top of the window,
+		// it wouldn't be possible to get to 100%, which would be very annoying when giving feedback to
+		// readers about their progress!
+		var height = Math.max(document.body.scrollHeight, document.body.offsetHeight) - window.innerHeight;
 		var percent = Math.max(0, Math.round(100 * (top / height)));
 		
 		var progress = localStorage.getItem("chapterProgress");
@@ -75,6 +90,9 @@ class Chapter extends React.Component {
 		}
 		progress[this.props.id] = percent;
 		localStorage.setItem("chapterProgress", JSON.stringify(progress));
+
+		// Update the progress bar in the navigation bar.
+		this.forceUpdate();
 
 	}
 
@@ -123,7 +141,8 @@ class Chapter extends React.Component {
 						<span> | </span>
 					{
 						nextChapter ? <Link to={"/" + nextChapter.id}>Next</Link> : <span className="text-muted">Next</span>
-					}						
+					}
+						<div className="progress" style={{right: "" + (100 - this.getProgress()) + "%"}}></div>
 					</div>
 				</div>
 			);

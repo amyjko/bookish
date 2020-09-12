@@ -17,7 +17,32 @@ class TableOfContents extends React.Component {
 		window.scrollTo(0, 0)
 	}
 
+	getProgressDescription(progress) {
+
+		if(progress === null)
+			return null;
+		else if(progress === 0)
+			return null;
+		else if(progress < 30)
+			return "; just started";
+		else if(progress < 70)
+			return "; halfway";
+		else if(progress < 95)
+			return "; almost done";
+		else
+			return "; done";
+
+	}
+
 	render() {
+
+		// Get the chapter progress
+		var progress = localStorage.getItem("chapterProgress");
+		if(progress === null) {
+			progress = {};
+		} else {
+			progress = JSON.parse(progress);
+		}
 
 		return (
 			<div className="toc">
@@ -79,6 +104,9 @@ class TableOfContents extends React.Component {
 														<small>
 															<em>
 																{ Math.max(1, Math.round(this.props.app.getContent(chapter[1]).text.split(/\s+/).length / 200)) } minute read
+																{
+																	this.getProgressDescription(chapter[1] in progress ? progress[chapter[1]] : null)
+																}
 															</em>
 														</small>
 													</div>
