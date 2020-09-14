@@ -4,60 +4,509 @@ import { Link } from 'react-router-dom';
 import { NavHashLink } from "react-router-hash-link";
 import { Figure } from './views/image';
 
-class Line {
+// A simple recursive descent parser for this grammar.
+// Embeds a tokenizer, since the lexical grammar is simple.
+//
+// CHAPTER :: (BLOCK\n)*
+// BLOCK :: (COMMENT | HEADER | RULE | EMBED | ORDERED | UNORDERED | CODE | QUOTE | PARAGRAPH)
+// COMMENT :: %.+
+// HEADER :: # CONTENT | ## CONTENT | ### CONTENT
+// RULE :: ---
+// EMBED :: |TEXT|TEXT|CONTENT|CONTENT|
+// ORDERED :: (* CONTENT)+
+// UNORDERED :: ([0-9]+. CONTENT)+
+// CODE :: `\nTEXT`
+// QUOTE :: "\nCONTENT\n"CONTENT
+// PARAGRAPH :: CONTENT
+// CONTENT :: FORMATTED | CITATIONS | ESCAPED | LINK
+// FORMATTED :: *CONTENT* | _CONTENT_ | `CONTENT`
+// CITATIONS || <TEXT+,>
+// ESCAPED :: \[char]
+// LINK :: [CONTENT|TEXT]
+// TEXT :: (.+)
+class Parser {
 
-	constructor(line) {
+    constructor(text) {
+        if(typeof text !== "string")
+            throw "Parser expected a string but received " + typeof text;
 
-		this.line = line;
-		this.rest = line;
+        this.text = text;
 
-	}
-
-	more() { return this.peek() !== null; }
-	peek() { return this.rest.length > 0 ? this.rest.charAt(0) : null; }
-	next() { 
-		if(!this.more())
-			return null;
-		var next = this.rest.charAt(0);
-		this.rest = this.rest.substring(1);
-		return next;
-	}
-
-}
-
-class ChapterParser {
-
-    constructor(text, app) {
-
-        // Remember the app
-        this.app = app;
-
-        // A list of citations that occurred in this chapter,
-        // so we can render them at the end.
-        this.citations = {};
-
-        // Gather all of the citations so that we can render citation numbers.
-        _.each(text.match(/<[a-zA-Z0-9,]+>/g), (citations) => {
-            _.each(citations.substring(1, citations.length - 1).split(","), (citation) => { this.citations[citation] = true; })
-        });
-
-        // The list of elements that represent the chapter we're building.
-        this.elements = [];
-
-        // The key that React needs to distinguish elements.
-        this.currentKey = 0;
-
-        // Parse the text.
-        this.parse(text);
+        // Start at the first character.
+        this.index = 0;
 
     }
 
-    isValidCitation(citationID) { return citationID in this.app.getReferences(); }
-    getElements() { return this.elements; }
-    getCitations() { return this.citations; }
+    static parseChapter(text) {
+        return (new Parser(text)).parseChapter();
+    }
+
+    static parseContent(text) {
+        return (new Parser(text)).parseContent();
+    }
+
+    // Get the next character, if there is one, null otherwise.
+    peek() { 
+        return this.more() ? this.text.charAt(this.index) : null; 
+    }
+    
+    // True if there are more characters to parse.
+    more() { 
+        return this.index < this.text.length; 
+    }
+
+    // Return the current character--if there is one-- and increment the index.
+	read() { 
+		if(!this.more())
+            return null;
+        
+        var char = this.text.charAt(this.index);
+
+        if(char === '"') {
+            if(this.text.charAt(this.index - 1) === " ")
+                char = "\u201c";
+            else if(this.text.charAt(this.index + 1) === " ")
+                char = "\u201d";
+        } else if(char === "'") {
+            if(this.text.charAt(this.index - 1) === " ")
+                char = "\u2018";
+            else
+                char = "\u2019";
+        } 
+
+        this.index++;
+
+        return char;
+    }
+
+    // All of the text including and after the current index.
+    rest() {
+        return this.text.substring(this.index);
+    }
+
+    // All the text until the next newline
+    restOfLine() {
+        var nextNewline = this.text.substring(this.index).indexOf("\n") + this.index;
+        if(nextNewline < 0)
+            return this.text.substring(this.index);
+        else  
+            return this.text.substring(this.index, Math.max(this.index, nextNewline));
+    }
+
+    // True if the given string is occurs next in the text.
+    nextIs(string) {
+        if(!this.more())
+            return false;
+        return this.text.substring(this.index, this.index + string.length) === string;
+    }
+
+    nextIsContentDelimiter() {
+
+        var next = this.peek();
+        return next === "\n" ||
+            next === "_" ||
+            next === "*" ||
+            next === "`" ||
+            next === "<" ||
+            next === "[" ||
+            next === "\\";
+
+    }
+
+    // True if the next part of this string matches the given regular expression.
+    nextMatches(regex) {
+        if(!this.more())
+            return false;
+        return regex.test(this.rest());
+    }
+
+    // Returns true if all of the text between the current character and the next newline is whitespace.
+    isBlankLine() {
+        return this.restOfLine().trim() === "";
+    }
+
+    // Read until encountering non-whitespace.
+    readWhitespace() {
+        while(this.more() && /^[ \t]/.test(this.peek()))
+            this.read();
+    }
+
+    // Read until the end of the line.
+    readUntilNewLine() {
+        var text = "";
+        while(this.more() && this.peek() !== "\n")
+            text = text + this.read();
+        return text;
+    }
+
+    // Read until encountering the given string and return the read text.
+    readUntilNewlineOr(string) {
+        var text = "";
+        while(this.more() && !this.nextIs("\n") && !this.nextIs(string))
+            text = text + this.read();
+        return text;
+    }
+
+    parseChapter() {
+
+        var blocks = [];
+
+        var metadata = {
+            citations: {}
+        }
+
+        // While there's more text, parse a line.
+        while(this.more()) {
+            // Read a block
+            var block = this.parseBlock(metadata);
+            // Add it to the list.
+            if(block !== null)
+                blocks.push(block);            
+            // Read whitespace until we find the next thing.
+            while(this.peek() === " " || this.peek() === "\t" || this.peek() === "\n")
+                this.read();
+        }
+
+        return new ChapterNode(blocks, metadata);
+
+    }
+
+    parseBlock(metadata) {
+
+        // Read whitespace before the block.
+        this.readWhitespace();
+
+        // Read the comment and return nothing.
+        if(this.nextIs("%")) {
+            this.readUntilNewLine();
+            return null;
+        }
+        // Parse and return a header
+        else if(this.nextIs("#"))
+            return this.parseHeader(metadata);
+        // Parse and return a horizontal rule
+        else if(this.nextIs("-"))
+            return this.parseRule(metadata);
+        // Parse and return an embed.
+        else if(this.nextIs("|"))
+            return this.parseEmbed(metadata);
+        // Parse and return a bulleted list
+        else if(this.nextIs("* "))
+            return this.parseBulletedList(metadata);
+        // Parse and return a numbered list
+        else if(this.nextMatches(/^[0-9]+\./))
+            return this.parseNumberedList(metadata);
+        // Parse and return a code block
+        else if(this.nextIs("`"))
+            return this.parseCode(metadata);
+        // Parse and return a quote block
+        else if(this.nextIs("\""))
+            return this.parseQuote(metadata);
+        // Parse the text as paragraph;
+        else
+            return this.parseParagraph(metadata);
+
+    }
+
+    parseParagraph(metadata) {
+
+        return new ParagraphNode(this.parseContent(metadata));
+
+    }
+
+    parseHeader(metadata) {
+
+        var count = 0;
+        while(this.nextIs("#")) {
+            this.read();
+            count++;
+        }
+        this.readWhitespace();
+        return new HeaderNode(count, this.parseContent(metadata));
+
+    }
+    
+    parseRule(metadata) {
+
+        // Read until the end of the line. Ignore all text that follows.
+        this.readUntilNewLine();
+
+        return new RuleNode();
+
+    }
+
+    parseBulletedList(metadata) {
+
+        var bullets = [];
+
+        // Process all the bullets until there aren't any.
+        while(this.nextIs("* ")) {
+            // Read the bullet and then any trailing whitespace before content.
+            this.read();
+            this.readWhitespace();
+            // Parse content.
+            bullets.push(this.parseContent(metadata));
+            // Read trailing whitespace.
+            this.readWhitespace();
+            // Read the newline
+            this.read();            
+        }
+        return new BulletedListNode(bullets);
+
+    }
+
+    parseNumberedList(metadata) {
+
+        var bullets = [];
+
+        // Process all the bullets until there aren't any.
+        while(this.nextMatches(/^[0-9]+\./)) {
+            // Read until the period.
+            this.readUntilNewlineOr(".");
+            // Read the period, then whitespace.
+            this.read();
+            this.readWhitespace();
+            // Parse some content.
+            bullets.push(this.parseContent(metadata));
+            // Read whitespace.
+            this.readWhitespace();
+            // Read the newline
+            this.read();            
+        }
+        return new NumberedListNode(bullets);
+
+    }
+
+    parseCode(metadata) {
+
+        // Parse the back tick
+        this.read();
+
+        // Parse through the next new line
+        this.readUntilNewLine();
+        this.read();
+
+        // Read until we encounter a closing back tick.
+        var code = "";
+        while(this.more() && !this.nextIs("`")) {
+            code = code + this.read();
+        }
+
+        // Read the backtick.
+        if(this.nextIs("`"))
+            this.read();
+
+        return new CodeNode(code);
+
+    }
+
+    parseQuote(metadata) {
+
+        var elements = [];
+
+        // Parse the ", then any whitespace, then the newline
+        this.read();
+        // Then read 
+        this.readWhitespace();
+        this.read();
+
+        while(!this.nextIs("\"")) {
+            elements.push(this.parseContent(metadata));
+            this.readWhitespace()
+            if(this.nextIs("\n"))
+                this.read();
+        }
+
+        // Read the closing " and the whitespace that follows.
+        this.read();
+        this.readWhitespace();
+
+        // Read the credit.
+        var credit = this.nextIs("\n") ? null : this.parseContent(metadata);
+
+        return new QuoteNode(elements, credit);
+
+    }
+
+    // The "awaiting" argument keeps track of upstream formatting. We don't need a stack here
+    // because we don't allow infinite nesting of the same formatting type.
+    parseContent(metadata, awaiting) {
+
+        var segments = [];
+
+        // Read until hitting a delimiter.
+        while(this.more() && !this.nextIs("\n")) {
+            // Parse some formatted text
+            if(this.nextIs("_") || this.nextIs("*") || this.nextIs("`"))
+                segments.push(this.parseFormatted(metadata, this.peek()));
+            // Parse a citation list
+            else if(this.nextIs("<"))
+                segments.push(this.parseCitations(metadata));
+            // Parse an escaped character
+            else if(this.nextIs("\\"))
+                segments.push(this.parseEscaped(metadata));
+            // Parse a link
+            else if(this.nextIs("["))
+               segments.push(this.parseLink(metadata));
+            // Keep reading text until finding a delimiter.
+            else {
+
+                var text = "";
+                while(this.more() && (!awaiting || !this.nextIs(awaiting)) && !this.nextIsContentDelimiter() && !this.nextIs("\n"))
+                    text = text + this.read();
+                segments.push(new TextNode(text));
+            }
+
+            // If we've reached a delimiter we're waiting for, then stop parsing, so it can handle it. Otherwise, we'll keep reading.
+            if(this.peek() === awaiting)
+                break;
+
+        }
+
+        return new ContentNode(segments);
+
+    }
+
+    parseEmbed(metadata) {
+
+        // Read |
+        this.read();
+        // Read the URL
+        var url = this.readUntilNewlineOr("|");
+        // Read a |
+        this.read();
+        // Read the description
+        var description = this.readUntilNewlineOr("|");
+        // Read a |
+        this.read();
+        // Parse the caption
+        var caption = this.parseContent(metadata, "|");
+        // Read a |
+        this.read();
+        // Parse the credit
+        var credit = this.parseContent(metadata, "|");
+        // Parse the closing bar
+        this.read();
+
+        return new EmbedNode(url, description, caption, credit);
+
+    }
+
+    parseFormatted(metadata, awaiting) {
+
+        // Remember what we're matching.
+        var delimeter = this.read();
+        var segments = [];
+        var text = "";
+
+        // Read some content
+        while(this.more() && this.peek() !== delimeter && this.peek()&& !this.nextIs("\n")) {
+            // If this is more formatted text, make a text node with whatever we've accumulated so far, 
+            // then parse the formatted text, then reset the accumulator.
+            if(this.peek() === "_" || this.peek() === "*" || this.peek() == "`" || this.peek() === "<" || this.peek() === "\\" || this.peek() === "[") {
+                // If the text is a non-empty string, make a text node.
+                if(text !== "")
+                    segments.push(new TextNode(text));
+                // Parse the formatted content.
+                segments.push(this.parseContent(metadata, awaiting));
+                // Reset the accumulator.
+                text = "";
+            }
+            // Add the next character to the accumulator.
+            else {
+                text = text + this.read();
+            }
+        }
+
+        if(text !== "")
+            segments.push(new TextNode(text));
+
+        // Read the closing delimter
+        if(this.nextIs(delimeter))
+            this.read();
+        else
+            throw "Expected " + delimeter + ", but found: " + this.text.substring(this.index, this.index + 140);
+
+        return new FormattedNode(delimeter, segments);
+
+    }
+
+    parseCitations(metadata) {
+        
+        var citations = "";
+
+        // Read the <
+        this.read();
+        // Read the citations.
+        var citations = this.readUntilNewlineOr(">");
+        if(this.peek() === ">")
+            this.read();
+
+        // Trim any whitespace, then split by commas.
+        citations = _.map(citations.trim().split(","), citation => citation.trim());
+
+        // We won't necessarily be gathering this data.
+        // This does mean that if someone cites something in a non-chapter
+        // it will silently fail.
+        if(metadata)
+            // Record each citation for later.
+            _.each(citations, citation => {
+                metadata.citations[citation] = true;
+            });
+
+        return new CitationsNode(citations);
+
+    }
+
+    parseEscaped(metadata) {
+
+        // Skip the scape and just add the next character.
+        this.read();
+        return new TextNode(this.read());
+
+    }
+    
+    parseLink(metadata) {
+ 
+        // Read the [
+        this.read();
+        // Read some content, awaiting |
+        var content = this.parseContent(metadata, "|");
+        // Read the |
+        this.read();
+        // Read the link
+        var link = this.readUntilNewlineOr("]");
+        // Read the ]
+        this.read();
+
+        return new LinkNode(content, link);
+
+    }
+
+}
+
+class Node {
+    constructor() {}
+}
+
+class ChapterNode extends Node {
+    constructor(blocks, metadata) {
+        super();
+        this.blocks = blocks;
+
+        // A set of citations that occurred in this chapter.
+        // Citation nodes will add.
+        this.metadata = metadata;
+
+    }
+
+    getCitations() { 
+        return this.metadata.citations; 
+    }
+
     getCitationNumber(citationID) { 
         
-        var index = Object.keys(this.citations).sort().indexOf(citationID);
+        var index = Object.keys(this.getCitations()).sort().indexOf(citationID);
 
         if(index < 0)
             return null;
@@ -66,200 +515,231 @@ class ChapterParser {
     
     }
 
-    // Add an element to
-    add(element) {
+    toDOM(app) {
+        return <div key="chapter">
+            {_.map(this.blocks, (block, index) => block.toDOM(app, this, "block-" + index))}
+        </div>;
+    }
+}
 
-        // Add the element and increment the key, so react doesn't get confused about siblings.
-        this.elements.push(element);
-        this.currentKey++;
+class ParagraphNode extends Node {
 
+    constructor(content) {
+        super();
+        this.content = content;
+    }
+    toDOM(app, chapter, key) {
+        return <p key={key}>{this.content.toDOM(app, chapter)}</p>;
     }
 
-    // Generate a key for the current element.
-    key() { return "element" + this.currentKey }
+}
 
-    // Parse the markdown into React components.
-    parse(text) {
+class EmbedNode extends Node {
+    constructor(url, description, caption, credit) {
+        super();
+        this.url = url;
+        this.description = description;
+        this.caption = caption;
+        this.credit = credit;
+    }
 
-        // Split the text by two consecutive carriage returns.
-        var lines = text.split("\n");
+    toDOM(app, chapter, key) {
+        return <Figure key={key}
+            url={this.url}
+            alt={this.description}
+            caption={this.caption.toDOM(app, chapter)}
+            credit={this.credit.toDOM(app, chapter)}
+        />
+    }
+}
 
-        // Keep an accumulator for children of each block.
-        // Null means we're not tracking anything yet.
-        var sequence = null;
+class HeaderNode extends Node {
+    constructor(level, content) {
+        super();
+        this.level = level;
+        this.content = content;
+    }
 
-        // Translate each line into React components.
-        while(lines.length > 0) {
+    toDOM(app, chapter, key) {
+        return this.level === 1 ?
+            <h2 key={key}>{this.content.toDOM(app, chapter)}</h2> :
+            this.level === 2 ?
+            <h3 key={key}>{this.content.toDOM(app, chapter)}</h3> :
+            <h4 key={key}>{this.content.toDOM(app, chapter)}</h4>
+    }
+}
 
-            // Get the next line.
-            var line = lines.shift();
+class RuleNode extends Node {
+    constructor() {
+        super();
+    }
+    toDOM(app, chapter, key) { return <hr key={key} />; }
+}
 
-            var trimmed = line.trim();
+class BulletedListNode extends Node {
+    constructor(items) {
+        super();
+        this.items = items;
+    }
+    toDOM(app, chapter, key) {
+        return <ul key={key}>{_.map(this.items, (item, index) => <li key={"item-" + index}>{item.toDOM(app, chapter)}</li>)}</ul>
+    }
 
-            // Comment
-            if(trimmed.startsWith("%")) {
-            
-                // Do nothing.
+}
 
-            }
-            // Image or video
-            else if(trimmed.startsWith("|")) {
+class NumberedListNode extends Node {
+    constructor(items) {
+        super();
+        this.items = items;
+    }
+    toDOM(app, chapter, key) {
+        return <ol key={key}>{_.map(this.items, (item, index) => <li key={"item-" + index}>{item.toDOM(app, chapter)}</li>)}</ol>;
+    }
+}
 
-                // Remove the !
-                var image = _.map(trimmed.split("|"), line => line.trim());
-                
-                this.add(
-                    <Figure
-                        key={this.key()}
-                        url={image[1]}
-                        alt={image[2]}
-                        caption={parseLine(image[3], 0, this)}
-                        credit={parseLine(image[4], 0, this)}
-                    />
-                );
-            }
-            // Header
-            else if(trimmed.startsWith("#")) {
-                var count = 0;
-                while(trimmed.startsWith("#")) {
-                    trimmed = trimmed.substring(1);
-                    count++;
-                }
-                trimmed = trimmed.trim();
+class CodeNode extends Node {
+    constructor(text) {
+        super();
+        this.text = text;
+    }
+    toDOM(app, chapter, key) {
+        return <pre key={key}>{this.text}</pre>;
+    }
+}
 
-                // Convert everything until the next line into a header.
-                this.add(
-                    count === 1 ? 
-                        <h2 key={this.key()}>{parseLine(trimmed, 0, this)}</h2> :
-                    count === 2 ? 
-                        <h3 key={this.key()}>{parseLine(trimmed, 0, this)}</h3> :
-                        <h4 key={this.key()}>{parseLine(trimmed, 0, this)}</h4>
-                );
+class QuoteNode extends Node {
 
-            }
-            // Rule
-            else if(trimmed.startsWith("---")) {
+    constructor(elements, credit) {
+        super();
+        this.elements = elements;
+        this.credit = credit;
+    }
 
-                this.add(<hr key={this.key()} />);
+    toDOM(app, chapter, key) {
 
-            }
-            // Bulleted list
-            else if(trimmed.startsWith("* ")) {
-
-                var bullets = [];
-
-                // Process all the bullets until there aren't any.
-                while(trimmed && trimmed.startsWith("* ")) {
-                    bullets.push(<li key={"bullet" + bullets.length}>{parseLine(trimmed.substring(1).trim(), 0, this)}</li>);
-                    // Keep reading blank lines.
-                    while(lines.length > 0 && lines[0].trim() === "")
-                        trimmed = lines.shift().trim();
-                    trimmed = lines.shift();
-                    if(trimmed) trimmed = trimmed.trim();
-                }
-
-                lines.unshift(trimmed);
-
-                // Make the list.
-                this.add(<ul key={this.key()}>{bullets}</ul>);
-
-            }
-            // Numbered list
-            else if(trimmed.match("^[0-9]+\.")) {
-
-                var items = [];
-
-                // Process all the items until there aren't any.
-                while(trimmed && trimmed.match("^[0-9]+\.")) {
-                    // Ignore the number and dot, trim the string, then parse the rest.
-                    items.push(<li key={"item" + items.length}>{parseLine(trimmed.substring(trimmed.indexOf(".") + 1).trim(), 0, this)}</li>);
-                    // Keep reading blank lines.
-                    while(lines.length > 0 && lines[0].trim() === "")
-                        trimmed = lines.shift().trim();
-                    trimmed = lines.shift();
-                    if(trimmed) trimmed = trimmed.trim();
-                }
-
-                lines.unshift(trimmed);
-
-                // Make the list.
-                this.add(<ol key={this.key()}>{items}</ol>);
-
-            }
-            // Code
-            else if(trimmed.startsWith("`")) {
-
-                var code = trimmed.substring(1);
-
-                do {
-                    line = lines.shift();
-                    if(line) {
-                        if(line.trim().endsWith("`"))
-                            line = line.substring(0, line.length - 1);
-                        if(line.length > 0)
-                            code = code + line + "\n";
-                    }
-                } while(line && !line.startsWith("`"));
-
-                // Add the code block.
-                this.add(<pre key={this.key()}>{code}</pre>);
-
-            }
-            // Quote
-            else if(trimmed.startsWith("\"")) {
-
-                var elements = [];
-
-                do {
-                    line = lines.shift();
-                    if(line && !line.trim().startsWith("\""))
-                        elements.push(parseLine(line, 0, this));
-                } while(line && !line.startsWith("\""));
-
-                var credit = null;
-                if(line && line.trim().length > 1) {
-                    credit = parseLine(line.substring(1).trim(), 0, this);
-                }
-
-                // Add the quote.
-                this.add(
-                    <blockquote className="blockquote" key={this.key()}>
-                        {elements}
-                        {credit ? <footer className="blockquote-footer"><cite>{credit}</cite></footer> : null }
-                    </blockquote>
-                );
-
-            }
-            // Make a paragraph with whatever came before this empty line.
-            else if(trimmed === "") {
-
-                // Add a paragraph with whatever was in the sequence before.
-                if(sequence !== null) {
-                    this.add(<p key={this.key()}>{sequence}</p>);
-                    sequence = null;
-                }
-
-            }
-            // If it didn't match any of the blocks, make a paragraph.
-            else {
-                if(sequence === null)
-                    sequence = [];
-                else {
-                    sequence.push(<br key={"break" + sequence.length} />)
-                }
-                sequence = sequence.concat(parseLine(line, sequence.length, this));
-            }
-
-        }
-
-        // Add a paragraph with whatever was in the sequence before.
-        if(sequence !== null) {
-            this.add(<p key={this.key()}>{sequence}</p>);
-        }
+        return <blockquote className="blockquote" key={key}>
+            {_.map(this.elements, (element, index) => element.toDOM(app, chapter, "quote-" + index))}
+            {this.credit ? <footer className="blockquote-footer"><cite>{this.credit.toDOM()}</cite></footer> : null }
+        </blockquote>
 
     }
 
 }
+
+class FormattedNode extends Node {
+
+    constructor(format, segments) {
+        super();
+        this.format = format;
+        this.segments = segments;
+    }
+
+    toDOM(app, chapter, key) {
+        
+        var segmentDOMs = _.map(this.segments, (segment, index) => segment.toDOM(app, chapter, "formatted-" + index));
+
+        if(this.format === "*")
+            return <strong key={key}>{segmentDOMs}</strong>;
+        else if(this.format === "_")
+            return <em key={key}>{segmentDOMs}</em>;
+        else if(this.format === "`")
+            return <code key={key}>{segmentDOMs}</code>;
+        else
+            return <span key={key}>{segmentDOMs}</span>;
+        
+    }
+
+}
+
+class LinkNode extends Node {
+    constructor(content, url) {
+        super();
+        this.content = content;
+        this.url = url;
+    }
+    toDOM(app, chapter, key) {
+        return this.url.startsWith("http") ?
+            // If this is external, make an anchor that opens a new window.
+            <a  key={key} href={this.url} target="_blank">{this.content.toDOM(app, chapter)}</a> :
+            // If this is internal, make a route link.
+            <Link key={key} to={this.url}>{this.content.toDOM(app, chapter)}</Link>;
+    }
+}
+
+class CitationsNode extends Node {
+    constructor(citations) {
+        super();
+        this.citations = citations;
+    }
+    toDOM(app, chapter, key) {
+
+        var segments = [];
+
+        if(!chapter)
+            return null;
+
+        // Convert each citation ID until a link.
+        _.each(
+            this.citations,
+            (citationID, index) => {
+                // Find the citation number. There should always be one,
+                var citationNumber = chapter.getCitationNumber(citationID)
+                if(citationNumber !== null && citationID in app.getReferences()) 
+                    // Add a citation.
+                    segments.push(
+                        <NavHashLink 
+                            smooth 
+                            key={"citation-" + index}
+                            to={"#ref-" + citationID}>
+                            <sup>{citationNumber}</sup>
+                        </NavHashLink>
+                    )
+                // If it's not a valid citation number, add an error.
+                else {
+                    segments.push(<span className="alert alert-danger" key={"citation-error-" + index}>Unknown reference: <code>{citationID}</code></span>)
+                }
+
+                // If there's more than one citation and this isn't the last, add a comma.
+                if(this.citations.length > 1 && index < this.citations.length - 1)
+                    segments.push(<sup key={"citation-comma-" + index}>,</sup>);
+            }
+        );
+
+        return <span key={key}>{segments}</span>;
+
+    }
+
+}
+
+class ContentNode extends Node {
+    constructor(segments) {
+        super();
+        this.segments = segments;
+    }
+    toDOM(app, chapter, key) {
+        return <span key={key}>{_.map(this.segments, (segment, index) => segment.toDOM(app, chapter, "content-" + index))}</span>;
+    }
+}
+
+class LineBreakNode extends Node {
+    constructor() {
+        super();
+    }
+    toDOM(app, chapter, key) {
+        return <br key={key}/>;
+    }
+}
+
+class TextNode extends Node {
+    constructor(text) {
+        super();
+        this.text = text;
+    }
+    toDOM(app, chapter, key) {
+        return this.text;
+    }
+}
+
 
 // Use regular expressions to replace plain single and double quotes with curly ones.
 function smarten(text) {
@@ -280,160 +760,4 @@ function smarten(text) {
         .replace(/--/g, "\u2014");
 };
 
-function parseLine(line, key, chapter) {
-
-    if(!(typeof line === "string" )) {
-        return null;
-    }
-
-    // Replace straight quotes with smart quotes before processing.
-    line = smarten(line);
-
-    var segments = [];
-    var line = new Line(line);
-    var fragment = "";
-
-    if(key === undefined)
-        key = 0;
-
-    if(chapter === undefined)
-        chapter = null;
-
-    while(line.more()) {
-
-        // Italic, bold, bold/italic, code
-        if(line.peek() === "_" || line.peek() === "*" || line.peek() === "^" || line.peek() === "`") {
-
-            // Capture the fragment prior.
-            if(fragment.length > 0) {
-                segments.push(<span key={"segment" + key++}>{fragment}</span>);
-                fragment = "";
-            }
-
-            // Remember what we're matching.
-            var delimeter = line.peek();
-
-            // Make an em, strong, or combo.
-            var segment = "";
-            line.next();
-            while(line.more() && line.peek() !== delimeter)
-                segment = segment + line.next();
-            if(line.peek() === delimeter)
-                line.next();
-            segments.push(
-                delimeter === "_" ?
-                    <em key={"segment" + key++}>{segment}</em> :
-                delimeter === "*" ?
-                    <strong key={"segment" + key++}>{segment}</strong> :
-                delimeter === "`" ?
-                    <code key={"segment" + key++}>{segment}</code> :
-                    <em key={"segment" + key++}><strong>{segment}</strong></em>
-            );
-
-        }
-        // Citations
-        else if(line.peek() === "<") {
-
-            // Capture the fragment prior.
-            if(fragment.length > 0) {
-                segments.push(<span key={"segment" + key++}>{fragment}</span>);
-                fragment = "";
-            }
-
-            var citationIDs = "";
-            line.next();
-            while(line.more() && line.peek() !== ">")
-                citationIDs = citationIDs + line.next();
-            if(line.peek() === ">")
-                line.next();
-
-            // Trim any whitespace, then split by commas.
-            citationIDs = _.map(citationIDs.trim().split(","), citationID => citationID.trim());
-
-            // Process each citation.
-            _.each(
-                citationIDs,
-                (citationID, index) => {
-                    // If there's no chapter context, ignore the citation.
-                    if(chapter) {
-                        // Find the citation number. There should always be one,
-                        var citationNumber = chapter.getCitationNumber(citationID)
-                        if(citationNumber !== null && chapter.isValidCitation(citationID))
-                            // Add a citation.
-                            segments.push(
-                                <NavHashLink 
-                                    smooth 
-                                    key={"segment" + key++}
-                                    to={"#ref-" + citationID}>
-                                    <sup>{citationNumber}</sup>
-                                </NavHashLink>
-                            )
-                        else {
-                            segments.push(<span className="alert alert-danger">Unknown reference: <code>{citationID}</code></span>)
-                        }
-
-                        // If there's more than one citation and this isn't the last, add a comma.
-                        if(citationIDs.length > 1 && index < citationIDs.length - 1)
-                            segments.push(<sup key={"segment" + key++}>,</sup>);
-
-                    }
-                }
-            );
-
-        }
-        // Escape symbol
-        else if(line.peek() === "\\") {
-
-            // Skip the scape and just add the next character.
-            line.next();
-            fragment = fragment + line.next();
-
-        }
-        // Link
-        else if(line.peek() === "[") {
-
-            // Capture the fragment prior before processing the link.
-            if(fragment.length > 0) {
-                segments.push(<span key={"segment" + key++}>{fragment}</span>);
-                fragment = "";
-            }
-            
-            line.next();
-            var content = "";
-            var link = "";
-            while(line.more() && line.peek() !== "|") {
-                content = content + line.next();
-            }
-            if(line.peek() === "|")
-                line.next();
-            while(line.more() && line.peek() !== "]") {
-                link = link + line.next();
-            }
-            if(line.peek() === "]")
-                line.next();
-
-            // If this is external, make an anchor.
-            if(link.startsWith("http"))
-                segments.push(<a key={"segment" + key++} href={link} target="_blank">{content}</a>)
-            // If this is internal, make a route link.
-            else
-                segments.push(<Link key={"segment" + key++} to={link}>{content}</Link>)
-
-        }
-        // Accumulate a fragment.
-        else {
-
-            fragment = fragment + line.next();
-
-        }
-
-    }
-
-    if(fragment !== null)
-        segments.push(<span key={"segment" + key++}>{fragment}</span>);
-
-    return segments;
-
-}
-
-export {ChapterParser, parseLine};
+export {Parser};

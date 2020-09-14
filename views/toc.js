@@ -2,7 +2,7 @@ import _ from 'lodash';
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { Header } from "./header";
-import { parseLine, ChapterParser } from "../parser";
+import { Parser } from "../parser";
 
 class TableOfContents extends React.Component {
 
@@ -52,16 +52,16 @@ class TableOfContents extends React.Component {
 					header={this.props.app.getTitle()} 
 					content={
 						<div>
-							<em>by</em> {parseLine(this.props.app.getAuthors())}
+							<em>by</em> {Parser.parseContent(this.props.app.getAuthors()).toDOM()}
 							<small>
 								{this.props.app.getContributors() ? 
-								<span><em> with contributions from</em> {parseLine(this.props.app.getContributors())}</span> : null}
+								<span><em> with contributions from</em> {Parser.parseContent(this.props.app.getContributors()).toDOM()}</span> : null}
 							</small>
 						</div>
 					}
 				/>
 				
-				{(new ChapterParser(this.props.app.getDescription(), this.props.app)).getElements()}
+				{Parser.parseChapter(this.props.app.getDescription()).toDOM()}
 
 				<h2>Chapters</h2>
 
@@ -129,13 +129,13 @@ class TableOfContents extends React.Component {
 
 				<h2>License</h2>
 
-				<p>{parseLine(this.props.app.getLicense())}</p>
+				<p>{this.props.app.getLicense() ? Parser.parseContent(this.props.app.getLicense()).toDOM() : "All rights reserved."}</p>
 
 				<h2>Revisions</h2>
 				
 				<ul>
 					{_.map(this.props.app.getRevisions(), (revision, index) => {
-						return <li key={"revision" + index}><em>{revision[0]}</em>. {parseLine(revision[1])}</li>;
+						return <li key={"revision" + index}><em>{revision[0]}</em>. {Parser.parseContent(revision[1]).toDOM()}</li>;
 					})}
 				</ul>
 

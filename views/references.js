@@ -2,7 +2,7 @@ import _ from 'lodash';
 import React from 'react';
 import { Link } from 'react-router-dom';
 
-import { parseLine } from "../parser.js";
+import { Parser } from "../parser.js";
 
 class References extends React.Component {
 
@@ -24,7 +24,7 @@ class References extends React.Component {
                     references === null ?
                         <p>This book has no references.</p> :
                         _.map(_.keys(references).sort(), (citationID) => {
-                            return <p key={citationID}>{parseLine(references[citationID])}</p>
+                            return <p key={citationID}>{Parser.parseContent(references[citationID]).toDOM()}</p>
                         })
                 }
 				<div className="navigation-footer">

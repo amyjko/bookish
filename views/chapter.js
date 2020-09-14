@@ -3,7 +3,7 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { NavHashLink } from "react-router-hash-link";
 
-import { ChapterParser, parseLine } from "../parser";
+import { Parser } from "../parser";
 import { Header } from './header';
 
 class Chapter extends React.Component {
@@ -106,15 +106,15 @@ class Chapter extends React.Component {
 		if(chapter) {
 			var nextChapter = this.props.app.getNextChapter(this.props.id);
 			var previousChapter = this.props.app.getPreviousChapter(this.props.id);
-			var parse = new ChapterParser(chapter.text, this.props.app);
-			var citations = parse.getCitations();
+			var chapterAST = Parser.parseChapter(chapter.text);
+			var citations = chapterAST.getCitations();
 			return (
 				<div>
 					<Header image={chapter.image} header={chapter.title} content={null} />
 					<div>
-						<em>by</em> {parseLine(this.props.app.getAuthors())}
+						<em>by</em> {Parser.parseContent(this.props.app.getAuthors()).toDOM()}
 					</div>
-					{parse.getElements()}
+					{chapterAST.toDOM(this.props.app)}
 					{
 						Object.keys(citations).length === 0 ? null :
 						<div>
@@ -124,9 +124,9 @@ class Chapter extends React.Component {
 							{_.map(Object.keys(citations).sort(), citationID => {
 								var refs = this.props.app.getReferences();
 								if(_.has(refs, citationID))
-									return <li key={"citation-" + citationID} className={citationID === refHighlight ? "highlight" : null} id={"ref-" + citationID}>{parseLine(refs[citationID])}</li>
+									return <li key={"citation-" + citationID} className={citationID === refHighlight ? "highlight" : null} id={"ref-" + citationID}>{Parser.parseContent(refs[citationID]).toDOM()}</li>
 								else {
-									return <li className="alert alert-danger">Unknown reference: <code>{citationID}</code></li>;
+									return <li className="alert alert-danger" key={"citation-" + citationID}>Unknown reference: <code>{citationID}</code></li>;
 								}
 							})
 							}

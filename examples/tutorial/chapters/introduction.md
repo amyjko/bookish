@@ -27,19 +27,19 @@ There are many ways to format text.
 It can be _italic_ by wrapping text with the \_ symbol:
 
 `
-This is _italic_ text.
+It can be _italic_ by wrapping text with the \_ symbol:
 `
 
 It can be *bold* by wrapping text with the \* symbol.
 
 `
-This is *bold* text.
+It can be *bold* by wrapping text with the \* symbol.
 `
 
-It can be both ^bold and italic^ by wrapping words with \^.
+It can be both *_bold and italic_* by wrapping words with both \* and \_.
 
 `
-This is ^bold and italic^ text.
+It can be both *_bold and italic_* by wrapping words with both.
 `
 
 It can be in bullet form by starting a line with \*:
@@ -81,13 +81,15 @@ You can include [links to content|http://amyjko.com] like this:
 You can include [links to content|http://amyjko.com].
 `
 
-The \| separates the link text from the URL.
+The \| separates the link text from the URL. All links will open new windows.
 
 You can add links to chapters by just using the chapter identifier given in the book's specification. For example, here's a link to [Chapter 1|chapter1].
 
 `
 Visit [Chapter 1|chapter1].
 `
+
+Chapter links won't open in new windows.
 
 If you link to a chapter that doesn't exist, bad things happen:
 
@@ -120,7 +122,7 @@ You can include code by wrapping any text with a backtick \`:
 `
 This is Python code
 but it will not compile
-it has syntax errors
+invalid syntax
 `
 
 (Yes, that was a haiku.)
@@ -149,13 +151,6 @@ To use any of the special symbols above, place a \\ a before it to mean that you
 
 The same is true of extra lines before and after paragraphs.
 
-But, if you include 
-_consecutive_ lines without a 
-space between them, 
-rather than creating a paragraph,
-the lines will be treated as a single
-paragraph with embedded line breaks.
-
 It's also possible to include quotes:
 
 `
@@ -168,7 +163,7 @@ This is my quote
 This is my quote
 " Me
 
-And if you want to break up sections, type:
+If you start a line with any number of hyphens...
 
 `
 ---
@@ -176,8 +171,8 @@ And if you want to break up sections, type:
 
 ---
 
-And you'll have a new section.
+You'll get a horizontal rule.
 
-If you use "quotes" in a sentence, it will replace them with "smart" quotes.
+If you use plain "quotes" in a sentence, it will replace them with 'smart' quotes. Quotes that follow a space get a left curly quote; quotes that come before a space get a right curly quote. And single quotes that appear anywhere other than after a space get a right curly single quote for apostrophes. Isn't that cool?
 
 You can also cite things <ref1,ref2> or just cite one thing <ref1>.
