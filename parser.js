@@ -37,7 +37,6 @@ class Parser {
 
         // Track most recently observed quotes.
         this.openedDoubleQuote = false;
-        this.openedSingleQuote = false;
 
     }
 
