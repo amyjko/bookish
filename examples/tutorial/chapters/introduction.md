@@ -179,7 +179,8 @@ Quotes of things "should be curly".
 This should be independent of "where periods are."
 This also works for 'single quotes'.
 Also independent of 'where periods are.' And what follows. 
-This shouldn't break for contractions.
+This shouldn't break for contractions, including 'those that appear'n in quotes a'nat' or sentences with 'multiple apostrophes'.
 This shouldn't break for "things followed by citations"<ref1>.
+This shouldn't "break for commas," either.
 
 You can also cite things <ref1,ref2> or just cite one thing <ref1>.

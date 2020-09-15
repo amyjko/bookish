@@ -35,6 +35,10 @@ class Parser {
         // Start at the first character.
         this.index = 0;
 
+        // Track most recently observed quotes.
+        this.openedDoubleQuote = false;
+        this.openedSingleQuote = false;
+
     }
 
     static parseChapter(text) {
@@ -62,21 +66,27 @@ class Parser {
         
         var char = this.text.charAt(this.index);
 
+        if(char === "\n")
+            this.openedDoubleQuote = false;
+
         // As we read, replace straight quotes with smart quotes.
         if(char === '"') {
             // Replace left quotes after whitespace.
-            if(/[\s_*`<>\[\]]/.test(this.text.charAt(this.index - 1)))
-                char = "\u201c";
-            // Replace right quotes before whitespace.
-            else if(/[\s_*`<>\[\]]/.test(this.text.charAt(this.index + 1)) || this.text.charAt(this.index + 1) === ".")
+            if(this.openedDoubleQuote) {
                 char = "\u201d";
+            }
+            else {
+                char = "\u201c";
+            }
+            this.openedDoubleQuote = !this.openedDoubleQuote;
         } else if(char === "'") {
-            // Replace left single quotes after whitespace.
-            if(/[\s_*`<>\[\]]/.test(this.text.charAt(this.index - 1)))
+            // If there's whitespace before this, it's a left single quote.
+            if(/\s/.test(this.text.charAt(this.index - 1)))
                 char = "\u2018";
-            // Replace all other single quotes with right quotes.
-            else
+            // Otherwise, it's a right single quote.
+            else {
                 char = "\u2019";
+            }
         }
 
         // Advance to the next character in the document.
