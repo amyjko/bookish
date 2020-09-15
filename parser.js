@@ -16,7 +16,7 @@ import { Figure } from './views/image';
 // ORDERED :: (* CONTENT)+
 // UNORDERED :: ([0-9]+. CONTENT)+
 // CODE :: `\nTEXT`
-// QUOTE :: "\nCONTENT\n"CONTENT
+// QUOTE :: "\nBLOCK*\n"CONTENT
 // PARAGRAPH :: CONTENT
 // CONTENT :: FORMATTED | CITATIONS | ESCAPED | LINK
 // FORMATTED :: *CONTENT* | _CONTENT_ | `CONTENT`
@@ -62,6 +62,7 @@ class Parser {
         
         var char = this.text.charAt(this.index);
 
+        // As we read, replace straight quotes with smart quotes.
         if(char === '"') {
             if(this.text.charAt(this.index - 1) === " ")
                 char = "\u201c";
@@ -72,8 +73,9 @@ class Parser {
                 char = "\u2018";
             else
                 char = "\u2019";
-        } 
+        }
 
+        // Advance to the next character in the document.
         this.index++;
 
         return char;
@@ -151,6 +153,7 @@ class Parser {
 
         var blocks = [];
 
+        // We pass this to all parsing functions to gather information strewn about the document.
         var metadata = {
             citations: {}
         }
@@ -159,7 +162,7 @@ class Parser {
         while(this.more()) {
             // Read a block
             var block = this.parseBlock(metadata);
-            // Add it to the list.
+            // Add it to the list if we parsed something.
             if(block !== null)
                 blocks.push(block);            
             // Read whitespace until we find the next thing.
@@ -200,7 +203,7 @@ class Parser {
         else if(this.nextIs("`"))
             return this.parseCode(metadata);
         // Parse and return a quote block
-        else if(this.nextIs("\""))
+        else if(this.nextMatches(/^"[ \t]*\n/))
             return this.parseQuote(metadata);
         // Parse the text as paragraph;
         else
@@ -216,12 +219,17 @@ class Parser {
 
     parseHeader(metadata) {
 
+        // Read a sequence of hashes
         var count = 0;
         while(this.nextIs("#")) {
             this.read();
             count++;
         }
+
+        // Read any whitespace after the hashes.
         this.readWhitespace();
+
+        // Parse some content and then return a header.
         return new HeaderNode(count, this.parseContent(metadata));
 
     }
@@ -246,10 +254,14 @@ class Parser {
             this.readWhitespace();
             // Parse content.
             bullets.push(this.parseContent(metadata));
-            // Read trailing whitespace.
+            // Read trailing whitespace and newlines.            
             this.readWhitespace();
-            // Read the newline
-            this.read();            
+            while(this.peek() === "\n") {
+                // Read the newline
+                this.read();
+                // Read whitespace before the next block.
+                this.readWhitespace();
+            }
         }
         return new BulletedListNode(bullets);
 
@@ -268,10 +280,14 @@ class Parser {
             this.readWhitespace();
             // Parse some content.
             bullets.push(this.parseContent(metadata));
-            // Read whitespace.
+            // Read trailing whitespace and newlines.            
             this.readWhitespace();
-            // Read the newline
-            this.read();            
+            while(this.peek() === "\n") {
+                // Read the newline
+                this.read();
+                // Read whitespace before the next block.
+                this.readWhitespace();
+            }
         }
         return new NumberedListNode(bullets);
 
@@ -302,18 +318,25 @@ class Parser {
 
     parseQuote(metadata) {
 
-        var elements = [];
+        var blocks = [];
 
         // Parse the ", then any whitespace, then the newline
         this.read();
-        // Then read 
+
+        // Then read any whitespace after the quote
         this.readWhitespace();
+
+        // Then read the newline.
         this.read();
 
-        while(!this.nextIs("\"")) {
-            elements.push(this.parseContent(metadata));
-            this.readWhitespace()
-            if(this.nextIs("\n"))
+        while(this.more() && !this.nextIs("\"")) {
+            // Read a block
+            var block = this.parseBlock(metadata);
+            // Add it to the list if we parsed something.
+            if(block !== null)
+            blocks.push(block);            
+            // Read whitespace until we find the next thing.
+            while(this.peek() === " " || this.peek() === "\t" || this.peek() === "\n")
                 this.read();
         }
 
@@ -324,7 +347,7 @@ class Parser {
         // Read the credit.
         var credit = this.nextIs("\n") ? null : this.parseContent(metadata);
 
-        return new QuoteNode(elements, credit);
+        return new QuoteNode(blocks, credit);
 
     }
 
@@ -373,18 +396,44 @@ class Parser {
         this.read();
         // Read the URL
         var url = this.readUntilNewlineOr("|");
+
+        if(this.peek() !== "|") {
+            this.readUntilNewLine();
+            return new ErrorNode("Missing '|' in embed");
+        }
+
         // Read a |
         this.read();
+
         // Read the description
         var description = this.readUntilNewlineOr("|");
+
+        if(this.peek() !== "|") {
+            this.readUntilNewLine();
+            return new ErrorNode("Missing '|' in link");
+        }
+
         // Read a |
         this.read();
         // Parse the caption
         var caption = this.parseContent(metadata, "|");
+
+        if(this.peek() !== "|") {
+            this.readUntilNewLine();
+            return new ErrorNode("Missing '|' in link");
+        }
+
         // Read a |
         this.read();
+
         // Parse the credit
         var credit = this.parseContent(metadata, "|");
+
+        if(this.peek() !== "|") {
+            this.readUntilNewLine();
+            return new ErrorNode("Missing '|' in link");
+        }
+
         // Parse the closing bar
         this.read();
 
@@ -399,12 +448,12 @@ class Parser {
         var segments = [];
         var text = "";
 
-        // Read some content
-        while(this.more() && this.peek() !== delimeter && this.peek()&& !this.nextIs("\n")) {
+        // Read some content until reaching the delimiter or the end of the line
+        while(this.more() && this.peek() !== delimeter && !this.nextIs("\n")) {
             // If this is more formatted text, make a text node with whatever we've accumulated so far, 
             // then parse the formatted text, then reset the accumulator.
             if(this.peek() === "_" || this.peek() === "*" || this.peek() == "`" || this.peek() === "<" || this.peek() === "\\" || this.peek() === "[") {
-                // If the text is a non-empty string, make a text node.
+                // If the text is a non-empty string, make a text node with what we've accumulated.
                 if(text !== "")
                     segments.push(new TextNode(text));
                 // Parse the formatted content.
@@ -424,8 +473,9 @@ class Parser {
         // Read the closing delimter
         if(this.nextIs(delimeter))
             this.read();
+        // If it wasn't closed, add an error
         else
-            throw "Expected " + delimeter + ", but found: " + this.text.substring(this.index, this.index + 140);
+            segments.push(new ErrorNode("Unclosed " + delimeter));
 
         return new FormattedNode(delimeter, segments);
 
@@ -472,10 +522,28 @@ class Parser {
         this.read();
         // Read some content, awaiting |
         var content = this.parseContent(metadata, "|");
+
+        // Catch links with no label.
+        if(content.segments.length === 0)
+            return new ErrorNode("Unclosed link");
+
+        // Catch missing bars
+        if(this.peek() !== "|") {
+            this.readUntilNewLine();
+            return new ErrorNode("Missing '|' in link");
+        }
+
         // Read the |
         this.read();
         // Read the link
         var link = this.readUntilNewlineOr("]");
+
+        // Catch missing closing
+        if(this.peek() !== "]") {
+            this.readUntilNewLine();
+            return new ErrorNode("Missing ] in link");
+        }
+
         // Read the ]
         this.read();
 
@@ -721,15 +789,6 @@ class ContentNode extends Node {
     }
 }
 
-class LineBreakNode extends Node {
-    constructor() {
-        super();
-    }
-    toDOM(app, chapter, key) {
-        return <br key={key}/>;
-    }
-}
-
 class TextNode extends Node {
     constructor(text) {
         super();
@@ -740,24 +799,14 @@ class TextNode extends Node {
     }
 }
 
-
-// Use regular expressions to replace plain single and double quotes with curly ones.
-function smarten(text) {
-    return text
-        /* opening singles */
-        .replace(/(^|[-\u2014\s(\["])'/g, "$1\u2018")
-
-        /* closing singles & apostrophes */
-        .replace(/'/g, "\u2019")
-
-        /* opening doubles */
-        .replace(/(^|[-\u2014/\[(\u2018\s])"/g, "$1\u201c")
-
-        /* closing doubles */
-        .replace(/"/g, "\u201d")
-
-        /* em-dashes */
-        .replace(/--/g, "\u2014");
-};
+class ErrorNode extends Node {
+    constructor(error) {
+        super();
+        this.error = error;
+    }
+    toDOM(app, chapter, key) {
+        return <span key={key} className="alert alert-danger">Error: {this.error}</span>;
+    }
+}
 
 export {Parser};

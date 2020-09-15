@@ -148,7 +148,7 @@ class Peruse extends React.Component {
 				<p>...</p> :
 			// If it failed to load, provide some feedback.
 			this.getBook() === null ?
-				<Unknown message={<p className="alert alert-danger">Wasn't able to load the book <code>{this.props.book}</code>. The book specification probably has a syntax error, but it's also possible that this file doesn't exist or there was a problem with the server..</p>} app={this} /> :
+				<Unknown message={<p className="alert alert-danger">Wasn't able to load the book <code>{this.props.book}</code>. The book specification probably has a syntax error, but it's also possible that this file doesn't exist or there was a problem with the server.</p>} app={this} /> :
 				<Switch>
 					<Route exact path="/" render={(props) => <TableOfContents {...props} app={this} />} />
 					{
