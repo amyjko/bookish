@@ -175,4 +175,11 @@ You'll get a horizontal rule.
 
 If you use plain "quotes" in a sentence, it will replace them with 'smart' quotes. Quotes that follow a space get a left curly quote; quotes that come before a space get a right curly quote. And single quotes that appear anywhere other than after a space get a right curly single quote for apostrophes. Isn't that cool?
 
+Quotes of things "should be curly".
+This should be independent of "where periods are."
+This also works for 'single quotes'.
+Also independent of 'where periods are.' And what follows. 
+This shouldn't break for contractions.
+This shouldn't break for "things followed by citations"<ref1>.
+
 You can also cite things <ref1,ref2> or just cite one thing <ref1>.

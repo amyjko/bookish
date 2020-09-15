@@ -64,13 +64,17 @@ class Parser {
 
         // As we read, replace straight quotes with smart quotes.
         if(char === '"') {
-            if(this.text.charAt(this.index - 1) === " ")
+            // Replace left quotes after whitespace.
+            if(/[\s_*`<>\[\]]/.test(this.text.charAt(this.index - 1)))
                 char = "\u201c";
-            else if(this.text.charAt(this.index + 1) === " ")
+            // Replace right quotes before whitespace.
+            else if(/[\s_*`<>\[\]]/.test(this.text.charAt(this.index + 1)) || this.text.charAt(this.index + 1) === ".")
                 char = "\u201d";
         } else if(char === "'") {
-            if(this.text.charAt(this.index - 1) === " ")
+            // Replace left single quotes after whitespace.
+            if(/[\s_*`<>\[\]]/.test(this.text.charAt(this.index - 1)))
                 char = "\u2018";
+            // Replace all other single quotes with right quotes.
             else
                 char = "\u2019";
         }
