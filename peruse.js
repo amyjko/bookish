@@ -52,7 +52,7 @@ class Peruse extends React.Component {
 	getContributors() { return this.getBook().contributors == null ? null : this.getBook().contributors.join(", "); }
 	getDescription() { return this.getBook().description; }
 	getRevisions() { return this.getBook().revisions; }
-	getChapterReadingTime(chapterID) {  return _.has(this.state.chapters, chapterID) ? Math.max(1, Math.round(this.state.chapters[chapterID].wordCount / 100)) : 0; }
+	getChapterReadingTime(chapterID) {  return _.has(this.state.chapters, chapterID) ? Math.max(1, Math.round(this.state.chapters[chapterID].wordCount / 150)) : 0; }
 	getBookReadingTime() {
 
 		return _.reduce(_.map(Object.keys(this.state.chapters), chapterID => this.getChapterReadingTime(chapterID)), (total, count) => total + count);
