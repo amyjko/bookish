@@ -63,7 +63,7 @@ class TableOfContents extends React.Component {
 					}
 				/>
 
-				<small><em>{readingTime < 60 ? readingTime + " minute read" : (new Number(readingTime / 60.0)).toPrecision(2) + " hour read" }</em></small>
+				<small><em>{readingTime < 60 ? readingTime + " minute read" : (new Number(readingTime / 60.0)).toPrecision(1) + " hour read" }</em></small>
 
 				{Parser.parseChapter(this.props.app.getDescription()).toDOM()}
 
