@@ -52,6 +52,13 @@ class Peruse extends React.Component {
 	getContributors() { return this.getBook().contributors == null ? null : this.getBook().contributors.join(", "); }
 	getDescription() { return this.getBook().description; }
 	getRevisions() { return this.getBook().revisions; }
+	getChapterReadingTime(chapterID) {  return _.has(this.state.chapters, chapterID) ? Math.max(1, Math.round(this.state.chapters[chapterID].wordCount / 200)) : 0; }
+	getBookReadingTime() {
+
+		return _.reduce(_.map(Object.keys(this.state.chapters), chapterID => this.getChapterReadingTime(chapterID)), (total, count) => total + count);
+
+
+	}
 	getChapters() { return this.getBook().chapters; }
 	getChapterNumber(chapterID) {
 		if(!(chapterID in this.chapterNumbers)) {
@@ -210,6 +217,7 @@ class Peruse extends React.Component {
 							updatedChapters[chapter[1]] = {
 								title: chapter[0],
 								text: text,
+								wordCount: text.split(/\s+/).length,
 								id: chapterID,
 								image: {
 									url: chapter[2],

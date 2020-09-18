@@ -44,6 +44,8 @@ class TableOfContents extends React.Component {
 			progress = JSON.parse(progress);
 		}
 
+		var readingTime = this.props.app.getBookReadingTime();
+
 		return (
 			<div className="toc">
 
@@ -60,7 +62,9 @@ class TableOfContents extends React.Component {
 						</div>
 					}
 				/>
-				
+
+				<small><em>{readingTime < 60 ? readingTime + " minute read" : (new Number(readingTime / 60.0)).toPrecision(2) + " hour read" }</em></small>
+
 				{Parser.parseChapter(this.props.app.getDescription()).toDOM()}
 
 				<h2>Chapters</h2>
@@ -103,7 +107,7 @@ class TableOfContents extends React.Component {
 														<br/>
 														<small>
 															<em>
-																{ Math.max(1, Math.round(this.props.app.getContent(chapter[1]).text.split(/\s+/).length / 200)) } minute read
+																{ this.props.app.getChapterReadingTime(chapter[1]) } minute read
 																{
 																	this.getProgressDescription(chapter[1] in progress ? progress[chapter[1]] : null)
 																}
