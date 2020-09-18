@@ -24,8 +24,9 @@ class Chapter extends React.Component {
 
 		// If the component renders after the chapter is loaded and rendered, scroll to the last location.
 		var chapter = this.props.app.getContent(this.props.id);
-		if(chapter)
+		if(chapter) {
 			this.scrollToLastLocation();
+		}
 		// Otherwise, mark it as not loaded.
 		else
 			this.setState({ loaded: false })
@@ -41,7 +42,10 @@ class Chapter extends React.Component {
 
 		var chapter = this.props.app.getContent(this.props.id);
 		if(!this.state.loaded && chapter) {
+
+			// Remember that it was loaded.
 			this.setState({ loaded: true});
+
 			this.scrollToLastLocation();
 		}
 
@@ -65,12 +69,27 @@ class Chapter extends React.Component {
 
 	scrollToLastLocation() {
 
-		// Read the saved position.
-		var progress = this.getProgress();
-		var position = (progress / 100.0) * (Math.max(document.body.scrollHeight, document.body.offsetHeight) - window.innerHeight);
+		// Scroll to the first match.
+		if(this.props.match.params.word) {
 
-		// Scroll the window to roughly the same position.
-		window.scrollTo(0, position);
+			var match = document.getElementsByClassName("query-match");
+			if(match.length > 0)
+				match[0].scrollIntoView({
+					behavior: "smooth",
+					block: "center"
+				});
+
+		} 
+		else {
+		
+			// Read the saved position.
+			var progress = this.getProgress();
+			var position = (progress / 100.0) * (Math.max(document.body.scrollHeight, document.body.offsetHeight) - window.innerHeight);
+
+			// Scroll the window to roughly the same position.
+			window.scrollTo(0, position);
+
+		}
 
 	}
 	
@@ -114,7 +133,7 @@ class Chapter extends React.Component {
 					<div>
 						<em>by</em> {Parser.parseContent(this.props.app.getAuthors()).toDOM()}
 					</div>
-					{chapterAST.toDOM(this.props.app)}
+					{chapterAST.toDOM(this.props.app, this.props.match.params.word)}
 					{
 						Object.keys(citations).length === 0 ? null :
 						<div>

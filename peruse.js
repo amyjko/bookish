@@ -3,9 +3,11 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import { Link, Route, HashRouter, Switch, withRouter } from 'react-router-dom';
 
+import { Parser } from "./parser";
 import { Chapter } from "./views/chapter";
 import { TableOfContents } from "./views/toc";
 import { References } from "./views/references";
+import { Index } from "./views/index";
 import { Unknown } from "./views/unknown";
 
 class Peruse extends React.Component {
@@ -36,6 +38,11 @@ class Peruse extends React.Component {
 				console.error("Unable to load " + this.props.book + ": " + err);
 			});
 
+		this.index = null;
+		
+		// Lookup table for optmization
+		this.chapterNumbers = {};
+
 	}
 
 	getBook() { return this.state.book; }
@@ -46,6 +53,18 @@ class Peruse extends React.Component {
 	getDescription() { return this.getBook().description; }
 	getRevisions() { return this.getBook().revisions; }
 	getChapters() { return this.getBook().chapters; }
+	getChapterNumber(chapterID) {
+		if(!(chapterID in this.chapterNumbers)) {
+			var chapterNumber = _.map(this.getChapters(), chapter => chapter[1]).indexOf(chapterID);
+			if(chapterNumber < 0) return null;
+			else this.chapterNumbers[chapterID] = chapterNumber + 1;
+		}
+		return this.chapterNumbers[chapterID];
+	}
+	getChapterName(chapterID) {
+		return chapterID in this.state.chapters ? this.state.chapters[chapterID].title : null;	}
+	getLoadedChapters() { return this.state.chapters; }
+	chaptersAreLoaded() { return Object.keys(this.state.chapters).length === this.getBook().chapters.length; }
 	getLicense() { return this.getBook().license; }
 	getImage(image) {
 		return {
@@ -54,11 +73,95 @@ class Peruse extends React.Component {
 			caption: image[2],
 			credit: image[3]
 		}
-	
 	}
 	getCover() { return this.getImage(this.getBook().cover); }
 	getUnknown() { return this.getBook() ? this.getImage(this.getBook().unknown) : null; }
 	getReferences() { return this.getBook().references; }
+
+	computeIndex(text) {
+
+		// Build a list of common words
+		var commonWords = _.keyBy(["a","about","all","also","and","as","at","be","because","but","by","can","come","could","day","do","even","find","first","for","from","get","give","go","have","he","her","here","him","his","how","I","if","in","into","it","its","just","know","like","look","make","man","many","me","more","my","new","no","not","now","of","on","one","only","or","other","our","out","people","say","see","she","so","some","take","tell","than","that","the","their","them","then","there","these","they","thing","think","this","those","time","to","two","up","use","very","want","was","way","we","well","what","when","which","who","will","with","would","year","yes","you","your"]);
+
+		// Get all the text in the chapter.
+        var text = Parser.parseChapter(text).toText();
+		
+		// Remove all non-letters
+		text = text.trim().replace(/[^a-zA-Z\u2019]/g, ' ');
+
+		// Split by spaces.
+		var words = text.split(/\s+/);
+
+		// Index the words
+		var index = {};
+		_.each(words, word => {
+		
+			word = word.toLowerCase();
+			if(!(word in commonWords) && word.indexOf('\u2019') < 0 && (word.length > 2 && word.substring(word.length - 2, word.length) !== "ly"))
+				index[word] = true;
+		
+		});
+
+		return this.cleanIndex(index);
+
+	}
+
+	cleanIndex(index) {
+
+		// Remove any:
+		// * upper case versions of words if they appear in lower case,
+		// * plural versions of words if they appear in singular
+		// as a heuristic for detecting non-proper nounds.
+		var duplicates = [];
+		_.each(Object.keys(index), word => {
+			var duplicate = false;
+			var canonical = null;
+			if((word.charAt(0) === word.charAt(0).toUpperCase() && word.toLowerCase() in index)) {
+				duplicate = true;
+				canonical = word.toLowerCase();
+			}
+			if(word.charAt(word.length - 1) === "s" && word.toLowerCase().substring(0, word.length - 1) in index) {
+				duplicate = true;
+				canonical = word.toLowerCase().substring(0, word.length - 1);
+			}
+			if(duplicate) {				
+				duplicates.push(word);
+				if(Array.isArray(index[canonical]))
+					index[canonical] = _.uniq(index[canonical].concat(index[word]));
+			}
+		})
+		_.each(duplicates, word => {
+			delete index[word];
+		});
+
+		return index;
+
+	}
+
+	getBookIndex() {
+
+		var bookIndex = {};
+
+		// Construct the index.
+		_.each(this.state.chapters, chapter => {
+			_.each(_.keys(chapter.index), (word) => {
+				if(word !== "" && word.length > 2) {
+					if(_.has(bookIndex, word))
+						bookIndex[word].push(chapter.id);
+					else
+						bookIndex[word] = [chapter.id];
+				}
+			});
+		});
+
+		// Sort the chapter numbers for each word.
+		_.each(Object.keys(bookIndex), (word) => {
+			bookIndex[word] = bookIndex[word].sort((a, b) => { return this.getChapterNumber(a) > this.getChapterNumber(b); });
+		});
+
+		return this.cleanIndex(bookIndex);
+
+	}
 
 	getNextChapter(id) {
 
@@ -113,7 +216,8 @@ class Peruse extends React.Component {
 									alt: chapter[3],
 									caption: chapter[4],
 									credit: chapter[5]
-								}
+								},
+								index: this.computeIndex(text)
 							};
 							this.setState({ chapters: updatedChapters });
 						});
@@ -154,10 +258,11 @@ class Peruse extends React.Component {
 					{
 						// Map all the book chapters to routes
 						_.map(this.getChapters(), (chapter, index) => {
-							return <Route key={"chapter" + index} path={"/" + chapter[1]} render={(props) => <Chapter {...props} id={chapter[1]} app={this} />} />
+							return <Route key={"chapter" + index} path={"/" + chapter[1] + "/:word?"} render={(props) => <Chapter {...props} id={chapter[1]} app={this} />} />
 						})
 					}
 					<Route path="/references" render={(props) => <References {...props} app={this} />} />
+					<Route path="/index/:letter?" render={(props) => <Index {...props} app={this} />} />
 				<Route path="*" render={(props) => <Unknown {...props} message={<p>This URL doesn't exist for this book. Want to go back to the <Link to="/">Table of Contents?</Link></p>} app={this} />}/>
 				</Switch>
 		

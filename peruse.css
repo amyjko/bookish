@@ -119,3 +119,10 @@ blockquote {
 	font-family: "Lora", serif;
 	padding: .25em;
 }
+
+.query-match {
+	background-color: rgb(247, 244, 157);
+	border: 1px solid lightGray;
+	border-radius: 5px;
+	padding: .25em;
+}

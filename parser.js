@@ -596,11 +596,16 @@ class ChapterNode extends Node {
     
     }
 
-    toDOM(app) {
+    toDOM(app, query) {
         return <div key="chapter">
-            {_.map(this.blocks, (block, index) => block.toDOM(app, this, "block-" + index))}
+            {_.map(this.blocks, (block, index) => block.toDOM(app, this, query, "block-" + index))}
         </div>;
     }
+
+    toText() {
+        return _.join(_.map(this.blocks, block => block.toText()), " ");
+    }
+
 }
 
 class ParagraphNode extends Node {
@@ -609,8 +614,12 @@ class ParagraphNode extends Node {
         super();
         this.content = content;
     }
-    toDOM(app, chapter, key) {
-        return <p key={key}>{this.content.toDOM(app, chapter)}</p>;
+    toDOM(app, chapter, query, key) {
+        return <p key={key}>{this.content.toDOM(app, chapter, query)}</p>;
+    }
+
+    toText() {
+        return this.content.toText();
     }
 
 }
@@ -624,14 +633,19 @@ class EmbedNode extends Node {
         this.credit = credit;
     }
 
-    toDOM(app, chapter, key) {
+    toDOM(app, chapter, query, key) {
         return <Figure key={key}
             url={this.url}
             alt={this.description}
-            caption={this.caption.toDOM(app, chapter)}
-            credit={this.credit.toDOM(app, chapter)}
+            caption={this.caption.toDOM(app, chapter, query)}
+            credit={this.credit.toDOM(app, chapter, query)}
         />
     }
+
+    toText() {
+        return this.caption.toText();
+    }
+
 }
 
 class HeaderNode extends Node {
@@ -641,20 +655,31 @@ class HeaderNode extends Node {
         this.content = content;
     }
 
-    toDOM(app, chapter, key) {
+    toDOM(app, chapter, query, key) {
         return this.level === 1 ?
-            <h2 key={key}>{this.content.toDOM(app, chapter)}</h2> :
+            <h2 key={key}>{this.content.toDOM(app, chapter, query)}</h2> :
             this.level === 2 ?
-            <h3 key={key}>{this.content.toDOM(app, chapter)}</h3> :
-            <h4 key={key}>{this.content.toDOM(app, chapter)}</h4>
+            <h3 key={key}>{this.content.toDOM(app, chapter, query)}</h3> :
+            <h4 key={key}>{this.content.toDOM(app, chapter, query)}</h4>
     }
+
+    toText() {
+        return this.content.toText();
+    }
+
 }
 
 class RuleNode extends Node {
     constructor() {
         super();
     }
-    toDOM(app, chapter, key) { return <hr key={key} />; }
+
+    toDOM(app, chapter, query, key) { return <hr key={key} />; }
+
+    toText() {
+        return "";
+    }
+
 }
 
 class BulletedListNode extends Node {
@@ -662,8 +687,13 @@ class BulletedListNode extends Node {
         super();
         this.items = items;
     }
-    toDOM(app, chapter, key) {
-        return <ul key={key}>{_.map(this.items, (item, index) => <li key={"item-" + index}>{item.toDOM(app, chapter)}</li>)}</ul>
+
+    toDOM(app, chapter, query, key) {
+        return <ul key={key}>{_.map(this.items, (item, index) => <li key={"item-" + index}>{item.toDOM(app, chapter, query)}</li>)}</ul>
+    }
+
+    toText() {
+        return _.join(_.map(this.items, item => item.toText()), " ");
     }
 
 }
@@ -673,9 +703,15 @@ class NumberedListNode extends Node {
         super();
         this.items = items;
     }
-    toDOM(app, chapter, key) {
-        return <ol key={key}>{_.map(this.items, (item, index) => <li key={"item-" + index}>{item.toDOM(app, chapter)}</li>)}</ol>;
+
+    toDOM(app, chapter, query, key) {
+        return <ol key={key}>{_.map(this.items, (item, index) => <li key={"item-" + index}>{item.toDOM(app, chapter, query)}</li>)}</ol>;
     }
+
+    toText() {
+        return _.join(_.map(this.items, item => item.toText()), " ");
+    }
+
 }
 
 class CodeNode extends Node {
@@ -683,9 +719,14 @@ class CodeNode extends Node {
         super();
         this.text = text;
     }
-    toDOM(app, chapter, key) {
+    toDOM(app, chapter, query, key) {
         return <pre key={key}>{this.text}</pre>;
     }
+
+    toText() {
+        return "";
+    }
+
 }
 
 class QuoteNode extends Node {
@@ -696,13 +737,17 @@ class QuoteNode extends Node {
         this.credit = credit;
     }
 
-    toDOM(app, chapter, key) {
+    toDOM(app, chapter, query, key) {
 
         return <blockquote className="blockquote" key={key}>
-            {_.map(this.elements, (element, index) => element.toDOM(app, chapter, "quote-" + index))}
-            {this.credit ? <footer className="blockquote-footer"><cite>{this.credit.toDOM()}</cite></footer> : null }
+            {_.map(this.elements, (element, index) => element.toDOM(app, chapter, query, "quote-" + index))}
+            {this.credit ? <footer className="blockquote-footer"><cite>{this.credit.toDOM(app, chapter, query)}</cite></footer> : null }
         </blockquote>
 
+    }
+
+    toText() {
+        return _.join(_.map(this.elements, element => element.toText()), " ") + (this.credit ? " " + this.credit.toText() : "");
     }
 
 }
@@ -715,9 +760,9 @@ class FormattedNode extends Node {
         this.segments = segments;
     }
 
-    toDOM(app, chapter, key) {
+    toDOM(app, chapter, query, key) {
         
-        var segmentDOMs = _.map(this.segments, (segment, index) => segment.toDOM(app, chapter, "formatted-" + index));
+        var segmentDOMs = _.map(this.segments, (segment, index) => segment.toDOM(app, chapter, query, "formatted-" + index));
 
         if(this.format === "*")
             return <strong key={key}>{segmentDOMs}</strong>;
@@ -730,6 +775,10 @@ class FormattedNode extends Node {
         
     }
 
+    toText() {
+        return _.join(_.map(this.segments, segment => segment.toText()), " ");
+    }
+
 }
 
 class LinkNode extends Node {
@@ -738,13 +787,18 @@ class LinkNode extends Node {
         this.content = content;
         this.url = url;
     }
-    toDOM(app, chapter, key) {
+    toDOM(app, chapter, query, key) {
         return this.url.startsWith("http") ?
             // If this is external, make an anchor that opens a new window.
-            <a  key={key} href={this.url} target="_blank">{this.content.toDOM(app, chapter)}</a> :
+            <a  key={key} href={this.url} target="_blank">{this.content.toDOM(app, chapter, query)}</a> :
             // If this is internal, make a route link.
-            <Link key={key} to={this.url}>{this.content.toDOM(app, chapter)}</Link>;
+            <Link key={key} to={this.url}>{this.content.toDOM(app, chapter, query)}</Link>;
     }
+
+    toText() {
+        return this.content.toText();
+    }
+
 }
 
 class CitationsNode extends Node {
@@ -752,7 +806,7 @@ class CitationsNode extends Node {
         super();
         this.citations = citations;
     }
-    toDOM(app, chapter, key) {
+    toDOM(app, chapter, query, key) {
 
         var segments = [];
 
@@ -790,6 +844,10 @@ class CitationsNode extends Node {
 
     }
 
+    toText() {
+        return "";
+    }
+
 }
 
 class ContentNode extends Node {
@@ -797,9 +855,15 @@ class ContentNode extends Node {
         super();
         this.segments = segments;
     }
-    toDOM(app, chapter, key) {
-        return <span key={key}>{_.map(this.segments, (segment, index) => segment.toDOM(app, chapter, "content-" + index))}</span>;
+
+    toDOM(app, chapter, query, key) {
+        return <span key={key}>{_.map(this.segments, (segment, index) => segment.toDOM(app, chapter, query, "content-" + index))}</span>;
     }
+
+    toText() {
+        return _.join(_.map(this.segments, segment => segment.toText()), " ");
+    }
+
 }
 
 class TextNode extends Node {
@@ -807,9 +871,49 @@ class TextNode extends Node {
         super();
         this.text = text;
     }
-    toDOM(app, chapter, key) {
+
+    toDOM(app, chapter, query, key) {
+        
+        if(query) {
+            var text = this.text;
+            var lowerText = text.toLowerCase();
+            if(lowerText.indexOf(query) >= 0) {
+
+                // Find all the matches
+                var indices = [];
+                for(var i = 0; i < text.length; ++i) {
+                    if (lowerText.substring(i, i + query.length) === query) {
+                        indices.push(i);
+                    }
+                }
+
+                // Go through each one and construct contents for the span to return.
+                var segments = [];
+                for(var i = 0; i < indices.length; i++) {
+                    // Push the text from the end of the last match or the start of the string.
+                    segments.push(text.substring(i === 0 ? 0 : indices[i - 1] + query.length, indices[i]));
+                    segments.push(<span key={"match-" + i} className="query-match">{text.substring(indices[i], indices[i] + query.length)}</span>);
+                }
+                if(indices[indices.length - 1] < text.length - 1)
+                    segments.push(text.substring(indices[indices.length - 1] + query.length, text.length));
+
+                return <span key={key}>{segments}</span>;
+                // var left = this.text.substring(0, index);
+                // var match = this.text.substring(index, index + query.length);
+                // var right = this.text.substring(index + query.length);
+
+                // return <span key={key}>{left}<span className="query-match">{match}</span><span>{right}</span></span>
+
+            }
+            else return this.text;
+        } else return this.text;
+
+    }
+
+    toText() {
         return this.text;
     }
+
 }
 
 class ErrorNode extends Node {
@@ -817,9 +921,15 @@ class ErrorNode extends Node {
         super();
         this.error = error;
     }
+
     toDOM(app, chapter, key) {
         return <span key={key} className="alert alert-danger">Error: {this.error}</span>;
     }
+
+    toText() {
+        return "";
+    }
+
 }
 
 export {Parser};

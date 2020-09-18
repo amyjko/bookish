@@ -124,6 +124,11 @@ class TableOfContents extends React.Component {
 								<td><Link to="/references">References</Link></td>
 							</tr>
 						}
+						<tr key="index">
+							<td></td>
+							<td></td>
+							<td><Link to="/index">Index</Link></td>
+						</tr>
 					</tbody>
 				</table>
 
