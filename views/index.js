@@ -17,14 +17,17 @@ class Index extends React.Component {
 
         var rows = [];
         var currentLetter = undefined;
-        var letters = [];
+        var letters = {};
 
+        // Build a list of words in alphabetical order.
         _.each(Object.keys(bookIndex).sort((a, b) => a.localeCompare(b)), (word, index) => {
 
+            // This block of code renders headers for letter groups
             var firstLetter = word.charAt(0).toLowerCase();
+
             if(currentLetter !== firstLetter) {
                 currentLetter = firstLetter;
-                letters.push(currentLetter);
+                letters[currentLetter] = true;
 
                 if(this.props.match.params.letter === currentLetter)
                     rows.push(
@@ -34,6 +37,7 @@ class Index extends React.Component {
                     );
             }
 
+            // Or is this the selected letter?
             if(this.props.match.params.letter === currentLetter)
                 rows.push(
                     <tr key={"entry-" + index}>
@@ -52,22 +56,41 @@ class Index extends React.Component {
                 );
         })
 
-        letters = letters.sort((a, b) => a.localeCompare(b));
-
 		return (
 			<div>
 				<h1>Index</h1>
                 <NavHashLink to={"/#toc"}>Table of Contents</NavHashLink>
 
-                <p>Pick a letter. <em>Includes all words, excluding common English words, words with apostrophes, and words ending in -ly.</em></p>
+                <p><em>This index includes all words, excluding common English words, words with apostrophes, and words ending in -ly.</em></p>
 
-                { _.map(letters, (letter, index) => <strong><Link to={"/index/" + letter}>{letter.toUpperCase()}</Link>{index < letters.length - 1 ? <span>&sdot;</span> : null}</strong>) }
+                <p>Pick a letter to browse:</p>
+
+                <p>
+                    { _.map("abcdefghijklmnopqrstuvwxyz".split(""), 
+                        (letter, index) => 
+                            <span key={index}>
+                                {
+                                    letter in letters ? 
+                                        <strong><Link to={"/index/" + letter}>{letter.toUpperCase()}</Link></strong> :
+                                        <span className={"text-muted"}>{letter.toUpperCase()}</span>
+                                }
+                                { 
+                                    index < 26 - 1 ? 
+                                        <span>&sdot;</span> : 
+                                        null 
+                                }
+                            </span>
+                    )}
+                </p>
 
                 <table className="table">
                     <tbody>
                         {rows}
                     </tbody>
                 </table>
+				<div className="navigation-footer">
+					<Link to={"/"}>Table of Contents</Link>
+				</div>
             </div>
 		);
 

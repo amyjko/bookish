@@ -133,6 +133,11 @@ class TableOfContents extends React.Component {
 							<td></td>
 							<td><Link to="/index">Index</Link></td>
 						</tr>
+						<tr key="search">
+							<td></td>
+							<td></td>
+							<td><Link to="/search">Search</Link></td>
+						</tr>
 					</tbody>
 				</table>
 

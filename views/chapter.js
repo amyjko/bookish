@@ -74,8 +74,11 @@ class Chapter extends React.Component {
 		if(this.props.match.params.word) {
 
 			var match = document.getElementsByClassName("query-match");
+
+			var number = this.props.match.params.number && this.props.match.params.number < match.length ? this.props.match.params.number : 0;
+
 			if(match.length > 0)
-				match[0].scrollIntoView({
+				match[number].scrollIntoView({
 					behavior: "smooth",
 					block: "center"
 				});

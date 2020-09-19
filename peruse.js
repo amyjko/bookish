@@ -8,6 +8,7 @@ import { Chapter } from "./views/chapter";
 import { TableOfContents } from "./views/toc";
 import { References } from "./views/references";
 import { Index } from "./views/index";
+import { Search } from "./views/search";
 import { Unknown } from "./views/unknown";
 
 class Peruse extends React.Component {
@@ -87,24 +88,46 @@ class Peruse extends React.Component {
 	computeIndex(text) {
 
 		// Build a list of common words
-		var commonWords = _.keyBy(["a","about","all","also","and","as","at","be","because","but","by","can","come","could","day","do","does","even","find","first","for","from","get","give","go","has","have","he","her","here","him","his","how","I","if","in","into","it","its","just","know","like","look","make","man","many","me","more","my","new","no","not","now","of","on","one","only","or","other","our","out","people","say","see","she","so","some","take","tell","than","that","the","their","them","then","there","these","they","thing","think","this","those","time","to","two","up","use","very","want","was","way","we","well","went","what","when","which","who","will","with","would","year","yes","you","your"]);
+		var commonWords = _.keyBy(["a","about","all","also","and","are","as","at","be","because","but","by","can","come","could","day","do","does","even","find","first","for","from","get","give","go","has","have","he","her","here","him","his","how","I","if","in","into","is","it","its","just","know","like","look","make","man","many","me","more","my","new","no","not","now","of","on","one","only","or","other","our","out","people","say","see","she","so","some","take","tell","than","that","the","their","them","then","there","these","they","thing","think","this","those","time","to","two","up","use","very","want","was","way","we","well","went","what","when","which","who","will","with","would","year","yes","you","your"]);
 
 		// Get all the text in the chapter.
         var text = Parser.parseChapter(text).toText();
 		
-		// Remove all non-letters
-		text = text.trim().replace(/[^a-zA-Z\u2019]/g, ' ');
+		// Remove all non-letters, non-apostrophes
+		text = text.trim().replace(/[^a-zA-Z\u2019.]/g, ' ');
 
 		// Split by spaces.
-		var words = text.split(/\s+/);
+		var words = text.split(/(\.|\s+)/);
 
 		// Index the words
 		var index = {};
-		_.each(words, word => {
+		_.each(words, (word, wordNumber) => {
+
+			// Skip the periods. But we need them to match sentence boundaries.
+			if(word === ".")
+				return;
 		
 			word = word.toLowerCase();
-			if(!(word in commonWords) && word.indexOf('\u2019') < 0 && (word.length > 2 && word.substring(word.length - 2, word.length) !== "ly"))
-				index[word] = true;
+			
+			// Should we include?
+			// • It shouldn't be a common word
+			// • It shouldn't have an apostrophe
+			// • It should be longer than two letters
+			// • It shouldn't end in 'ly'
+			if(!(word in commonWords) && word.indexOf('\u2019') < 0 && (word.length > 2 && word.substring(word.length - 2, word.length) !== "ly")) {
+				
+				// If we haven't started a list of occurences, start one.
+				if(!(word in index))
+					index[word] = [];
+				
+				var match = {
+					left: words.slice(Math.max(0, wordNumber - 5), Math.max(0, wordNumber - 1) + 1),
+					match: words[wordNumber],
+					right: words.slice(Math.min(words.length - 1, wordNumber + 1), Math.min(words.length - 1, wordNumber + 5) + 1)
+				}
+				// Add the occurence
+				index[word].push(match);
+			}
 		
 		});
 
@@ -132,6 +155,7 @@ class Peruse extends React.Component {
 			}
 			if(duplicate) {				
 				duplicates.push(word);
+				// Merge any chapter occurences
 				if(Array.isArray(index[canonical]))
 					index[canonical] = _.uniq(index[canonical].concat(index[word]));
 			}
@@ -142,6 +166,10 @@ class Peruse extends React.Component {
 
 		return index;
 
+	}
+
+	getChapterIndex(chapterID) {
+		return chapterID in this.state.chapters ? this.state.chapters[chapterID].index : null;
 	}
 
 	getBookIndex() {
@@ -265,12 +293,13 @@ class Peruse extends React.Component {
 					{
 						// Map all the book chapters to routes
 						_.map(this.getChapters(), (chapter, index) => {
-							return <Route key={"chapter" + index} path={"/" + chapter[1] + "/:word?"} render={(props) => <Chapter {...props} id={chapter[1]} app={this} />} />
+							return <Route key={"chapter" + index} path={"/" + chapter[1] + "/:word?/:number?"} render={(props) => <Chapter {...props} id={chapter[1]} app={this} />} />
 						})
 					}
 					<Route path="/references" render={(props) => <References {...props} app={this} />} />
 					<Route path="/index/:letter?" render={(props) => <Index {...props} app={this} />} />
-				<Route path="*" render={(props) => <Unknown {...props} message={<p>This URL doesn't exist for this book. Want to go back to the <Link to="/">Table of Contents?</Link></p>} app={this} />}/>
+					<Route path="/search/" render={(props) => <Search {...props} app={this} />} />
+					<Route path="*" render={(props) => <Unknown {...props} message={<p>This URL doesn't exist for this book. Want to go back to the <Link to="/">Table of Contents?</Link></p>} app={this} />}/>
 				</Switch>
 		
 		);
