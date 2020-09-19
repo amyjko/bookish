@@ -322,7 +322,14 @@ readUntilNewLine() {
         // Read until we encounter a closing back tick.
         var code = "";
         while(this.more() && !this.nextIs("`")) {
-            code = code + this.read();
+            var next = this.read();
+            if(next === "\\") {
+                if(this.nextIs("`")) {
+                    this.read();
+                    next = "`";
+                }
+            }
+            code = code + next;
         }
 
         // Read the backtick.

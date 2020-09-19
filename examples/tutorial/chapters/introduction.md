@@ -127,7 +127,17 @@ It just gets formatted in plain text, fixed width format.
 
 (Yes, that was a haiku.)
 
-If you include a language name after the first backtick, we will try to highlight based on that language's syntax.
+If you include a language name after the first backtick like this:
+
+`markdown
+\`python
+two = 1 + 1
+if two == 2:
+   print "Truth"
+\`
+`
+
+ Peruse will try to highlight based on that language's syntax.
 
 `python
 two = 1 + 1
@@ -135,12 +145,7 @@ if two == 2:
    print "Truth"
 `
 
-`javascript
-var two = 1 + 1;
-if(two == 2)
-     console.log("Truth");
-`
-
+Supported languages are listed in [the HighlightJS documentation|https://github.com/highlightjs/highlight.js/blob/master/SUPPORTED_LANGUAGES.md].
 
 You can also include code `inline` by wrapping things in \`in backticks\`.
 
