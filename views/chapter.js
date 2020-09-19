@@ -143,8 +143,13 @@ class Chapter extends React.Component {
 							<ol>
 							{_.map(Object.keys(citations).sort(), citationID => {
 								var refs = this.props.app.getReferences();
-								if(_.has(refs, citationID))
-									return <li key={"citation-" + citationID} className={citationID === refHighlight ? "highlight" : null} id={"ref-" + citationID}>{Parser.parseContent(refs[citationID]).toDOM()}</li>
+								if(_.has(refs, citationID)) {
+									var ref = refs[citationID];
+									return <li key={"citation-" + citationID} className={citationID === refHighlight ? "highlight" : null} id={"ref-" + citationID}>
+										{Parser.parseReference(ref)}
+									</li>
+
+								}
 								else {
 									return <li className="alert alert-danger" key={"citation-" + citationID}>Unknown reference: <code>{citationID}</code></li>;
 								}

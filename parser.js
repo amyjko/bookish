@@ -50,6 +50,19 @@ class Parser {
         return (new Parser(text)).parseContent();
     }
 
+    static parseReference(ref) {
+
+        return (
+            typeof ref === "string" ? 
+                Parser.parseContent(ref).toDOM() :
+            Array.isArray(ref) ?
+                // APA Format. Could eventually suppport multiple formats.
+                <span>{ref[0]} ({ref[1]}). <a href={ref[4]} target={"_blank"}>{ref[2]}</a>. <em>{ref[3]}</em>.</span> :
+                <span>Invalid reference: <code>{"" + ref}</code></span>
+        );
+
+    }
+
     // Get the next character, if there is one, null otherwise.
     peek() { 
         return this.more() ? this.text.charAt(this.index) : null; 

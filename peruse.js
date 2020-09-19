@@ -54,10 +54,7 @@ class Peruse extends React.Component {
 	getRevisions() { return this.getBook().revisions; }
 	getChapterReadingTime(chapterID) {  return _.has(this.state.chapters, chapterID) ? Math.max(1, Math.round(this.state.chapters[chapterID].wordCount / 150)) : 0; }
 	getBookReadingTime() {
-
 		return _.reduce(_.map(Object.keys(this.state.chapters), chapterID => this.getChapterReadingTime(chapterID)), (total, count) => total + count);
-
-
 	}
 	getChapters() { return this.getBook().chapters; }
 	getChapterNumber(chapterID) {

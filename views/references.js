@@ -24,7 +24,7 @@ class References extends React.Component {
                     references === null ?
                         <p>This book has no references.</p> :
                         _.map(_.keys(references).sort(), (citationID) => {
-                            return <p key={citationID}>{Parser.parseContent(references[citationID]).toDOM()}</p>
+                            return <p key={citationID}>{Parser.parseReference(references[citationID])}</p>
                         })
                 }
 				<div className="navigation-footer">
