@@ -61,32 +61,34 @@ class Parser {
     }
 
     // Return the current character--if there is one-- and increment the index.
-	read() { 
+	read(smarten=true) { 
 		if(!this.more())
             return null;
         
         var char = this.text.charAt(this.index);
 
-        if(char === "\n")
-            this.openedDoubleQuote = false;
+        if(smarten) {
+            if(char === "\n")
+                this.openedDoubleQuote = false;
 
-        // As we read, replace straight quotes with smart quotes.
-        if(char === '"') {
-            // Replace left quotes after whitespace.
-            if(this.openedDoubleQuote) {
-                char = "\u201d";
-            }
-            else {
-                char = "\u201c";
-            }
-            this.openedDoubleQuote = !this.openedDoubleQuote;
-        } else if(char === "'") {
-            // If there's whitespace before this, it's a left single quote.
-            if(/\s/.test(this.text.charAt(this.index - 1)))
-                char = "\u2018";
-            // Otherwise, it's a right single quote.
-            else {
-                char = "\u2019";
+            // As we read, replace straight quotes with smart quotes.
+            if(char === '"') {
+                // Replace left quotes after whitespace.
+                if(this.openedDoubleQuote) {
+                    char = "\u201d";
+                }
+                else {
+                    char = "\u201c";
+                }
+                this.openedDoubleQuote = !this.openedDoubleQuote;
+            } else if(char === "'") {
+                // If there's whitespace before this, it's a left single quote.
+                if(/\s/.test(this.text.charAt(this.index - 1)))
+                    char = "\u2018";
+                // Otherwise, it's a right single quote.
+                else {
+                    char = "\u2019";
+                }
             }
         }
 
@@ -322,7 +324,7 @@ readUntilNewLine() {
         // Read until we encounter a closing back tick.
         var code = "";
         while(this.more() && !this.nextIs("`")) {
-            var next = this.read();
+            var next = this.read(false);
             if(next === "\\") {
                 if(this.nextIs("`")) {
                     this.read();
