@@ -24,6 +24,7 @@
 		"npm": "^6.13.4",
 		"react": "^16.3",
 		"react-dom": "^16.3",
+		"react-highlight.js": "^1.0.7",
 		"react-router-dom": "^5.2",
 		"react-router-hash-link": "^2.0.0"
 	}

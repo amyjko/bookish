@@ -6,6 +6,7 @@ import { NavHashLink } from "react-router-hash-link";
 import { Parser } from "../parser";
 import { Header } from './header';
 
+
 class Chapter extends React.Component {
 
 	constructor(props){

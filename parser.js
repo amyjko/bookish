@@ -3,6 +3,8 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { NavHashLink } from "react-router-hash-link";
 import { Figure } from './views/image';
+import Highlight from 'react-highlight.js';
+
 
 // A simple recursive descent parser for this grammar.
 // Embeds a tokenizer, since the lexical grammar is simple.
@@ -147,7 +149,7 @@ class Parser {
     }
 
     // Read until the end of the line.
-    readUntilNewLine() {
+readUntilNewLine() {
         var text = "";
         while(this.more() && this.peek() !== "\n")
             text = text + this.read();
@@ -312,7 +314,9 @@ class Parser {
         this.read();
 
         // Parse through the next new line
-        this.readUntilNewLine();
+        var language = this.readUntilNewLine();
+
+        // Read the newline
         this.read();
 
         // Read until we encounter a closing back tick.
@@ -325,7 +329,7 @@ class Parser {
         if(this.nextIs("`"))
             this.read();
 
-        return new CodeNode(code);
+        return new CodeNode(code, language);
 
     }
 
@@ -715,12 +719,13 @@ class NumberedListNode extends Node {
 }
 
 class CodeNode extends Node {
-    constructor(text) {
+    constructor(code, language) {
         super();
-        this.text = text;
+        this.code = code;
+        this.language = language ? language : "plaintext";
     }
     toDOM(app, chapter, query, key) {
-        return <pre key={key}>{this.text}</pre>;
+        return <Highlight key={key} language={this.language}>{this.code}</Highlight>;
     }
 
     toText() {

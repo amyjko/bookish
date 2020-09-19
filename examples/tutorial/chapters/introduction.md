@@ -112,20 +112,35 @@ If you cite something that doesn't appear in your book specification's reference
 You can also include YouTube videos by using the same syntax as above, but just including a YouTube video in the URL instead.
 
 `
-|https://www.youtube.com/embed/Gc5ReRHqlkk|A video Amy made with her daughter back when Angry Birds was popular.|A YouTube video showing Angry Birds enacted in real life.|Amy J. Ko
+|https://www.youtube.com/embed/Gc5ReRHqlkk|A video Amy made with her daughter back when Angry Birds was popular.|A YouTube video showing Angry Birds enacted in real life.|Amy J. Ko|
 `
 
-|https://www.youtube.com/embed/Gc5ReRHqlkk|A video Amy made with her daughter back when Angry Birds was popular.|A YouTube video showing Angry Birds enacted in real life.|Amy J. Ko
+|https://www.youtube.com/embed/Gc5ReRHqlkk|A video Amy made with her daughter back when Angry Birds was popular.|A YouTube video showing Angry Birds enacted in real life.|Amy J. Ko|
 
 You can include code by wrapping any text with a backtick \`:
 
 `
-This is Python code
-but it will not compile
-invalid syntax
+This isn't any particular programming language
+It's just some English sentences
+It just gets formatted in plain text, fixed width format.
 `
 
 (Yes, that was a haiku.)
+
+If you include a language name after the first backtick, we will try to highlight based on that language's syntax.
+
+`python
+two = 1 + 1
+if two == 2:
+   print "Truth"
+`
+
+`javascript
+var two = 1 + 1;
+if(two == 2)
+     console.log("Truth");
+`
+
 
 You can also include code `inline` by wrapping things in \`in backticks\`.
 
