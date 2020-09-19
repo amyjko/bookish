@@ -65,8 +65,10 @@ class Peruse extends React.Component {
 		}
 		return this.chapterNumbers[chapterID];
 	}
-	getChapterName(chapterID) {
-		return chapterID in this.state.chapters ? this.state.chapters[chapterID].title : null;	}
+	getSource(sourceID) { 
+		return sourceID.charAt(0) === "#" && sourceID.substring(1) in this.getBook().sources ? this.getBook().sources[sourceID.substring(1)] : null;
+	}
+	getChapterName(chapterID) { return chapterID in this.state.chapters ? this.state.chapters[chapterID].title : null;	}
 	getLoadedChapters() { return this.state.chapters; }
 	chaptersAreLoaded() { return Object.keys(this.state.chapters).length === this.getBook().chapters.length; }
 	getLicense() { return this.getBook().license; }

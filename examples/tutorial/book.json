@@ -14,13 +14,16 @@
 		["August 30th, 2020", "Created the initial draft."]
 	],
 	"license": "[Creative Commons Attribution-NoDeriviatives 4.0|https://creativecommons.org/licenses/by-nd/4.0/]",
+	"sources": {
+		"ICER": "ACM International Computing Education Research Conference (ICER)"
+	},
 	"references": {
 		"ref1": "Amanda Swearngin, Chenglong Wang, Alannah Oleson, James Fogarty, Amy J. Ko (2020). [Scout: Rapid Exploration of Interface Layout Alternatives through High-Level Design Constraints|http://faculty.washington.edu/ajko/papers/Swearngin2020Scout.pdf]. _ACM SIGCHI Conference on Human Factors in Computing Systems_ (CHI), 1-13.",
 		"ref2": "Thomas D. LaToza, Maryam Arab, Dastyni Loksa, Amy J. Ko (2020). [Explicit Programming Strategies|http://faculty.washington.edu/ajko/papers/Latoza2020ExplicitProgrammingStrategies.pdf]. Empirical Software Engineering.",
 		"ref3": [
 			"Yim Register, Amy J. Ko", 2020,
-			"Learning Machine Learning with Personal Data Helps Stakeholders Ground Advocacy Arguments in Model Mechanics",
-			"ACM International Computing Education Research Conference (ICER)", 
+			"Learning machine learning with personal data helps stakeholders ground advocacy arguments in model mechanics",
+			"#ICER", 
 			"http://faculty.washington.edu/ajko/papers/Register2020PersonalData.pdf"
 		]
 	}

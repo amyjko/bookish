@@ -50,16 +50,34 @@ class Parser {
         return (new Parser(text)).parseContent();
     }
 
-    static parseReference(ref) {
+    static parseReference(ref, app) {
 
-        return (
-            typeof ref === "string" ? 
-                Parser.parseContent(ref).toDOM() :
-            Array.isArray(ref) ?
-                // APA Format. Could eventually suppport multiple formats.
-                <span>{ref[0]} ({ref[1]}). <a href={ref[4]} target={"_blank"}>{ref[2]}</a>. <em>{ref[3]}</em>.</span> :
-                <span>Invalid reference: <code>{"" + ref}</code></span>
-        );
+        var dom = null;
+
+        if(typeof ref === "string")
+            dom = Parser.parseContent(ref).toDOM();
+        else if(Array.isArray(ref)) {
+            // APA Format. Could eventually suppport multiple formats.
+            if(ref.length >= 4) {
+                var authors = ref[0];
+                var year = ref[1];
+                var title = ref[2];
+                var source = ref[3];
+                var url = ref.length === 5 ? ref[4] : null;
+                if(source.charAt(0) === "#") {
+                    source = app.getSource(source);
+                    if(source === null)
+                        source = <span className="alert alert-danger">Unknown source <code>{ref[3]}</code></span>;
+                }
+                dom = <span>{authors} ({year}). {url === null ? title : <a href={url} target={"_blank"}>{title}</a>}. <em>{source}</em>.</span>
+            }
+            else
+                dom = <span className="alert alert-danger">Expected at least 4 items in the reference array, but found {ref.length}: <code>{ref.toString()}</code></span>
+        }
+        else
+            dom = <span className="alert alert-danger">Invalid reference: <code>{"" + ref}</code></span>
+
+        return dom;
 
     }
 

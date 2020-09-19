@@ -146,7 +146,7 @@ class Chapter extends React.Component {
 								if(_.has(refs, citationID)) {
 									var ref = refs[citationID];
 									return <li key={"citation-" + citationID} className={citationID === refHighlight ? "highlight" : null} id={"ref-" + citationID}>
-										{Parser.parseReference(ref)}
+										{Parser.parseReference(ref, this.props.app)}
 									</li>
 
 								}
