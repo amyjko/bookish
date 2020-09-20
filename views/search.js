@@ -9,10 +9,17 @@ class Search extends React.Component {
         super(props);
         this.state = { query: ""}
         this.handleQueryChange = this.handleQueryChange.bind(this);
+        this.handleKeyDown = this.handleKeyDown.bind(this);
     }
 
     handleQueryChange(event) {
         this.setState({query: event.target.value});
+    }
+
+    handleKeyDown(event) {
+        if(event.key === " ") {
+            event.preventDefault();
+        }
     }
 
     componentDidMount() {
@@ -67,9 +74,20 @@ class Search extends React.Component {
 				<h1>Search</h1>
                 <NavHashLink to={"/#toc"}>Table of Contents</NavHashLink>
 
-                <p>Type a word we'll show its occurrence in this book.</p>
+                <p>Type a word—just a single word—and we'll show its occurrence in this book</p>
 
-                <p><input className="form-control" type="text" name="query" value={this.state.value} onChange={this.handleQueryChange} placeholder={"search for a word"} ref={(input)=>{this.queryInput = input}}></input></p>
+                <p>
+                    <input 
+                        className="form-control" 
+                        type="text" 
+                        name="query" 
+                        value={this.state.value} 
+                        onChange={this.handleQueryChange}
+                        onKeyDown={this.handleKeyDown}
+                        placeholder={"search for a word"} 
+                        ref={(input)=>{this.queryInput = input}}>
+                    </input>
+                </p>
 
                 {
                     this.state.query === "" ? null :
