@@ -83,7 +83,7 @@ class TableOfContents extends React.Component {
 												alt={chapter[3]} 
 											/>
 										</td>
-										<td><em>Chapter {index + 1}</em></td>
+										<td style={{textAlign: "right"}}><em>Chapter {index + 1}</em></td>
 										<td>
 											{
 												// If it's not loaded, say so.
@@ -124,19 +124,19 @@ class TableOfContents extends React.Component {
 							this.props.app.getReferences() === null ? null :
 							<tr key="references">
 								<td></td>
-								<td></td>
-								<td><Link to="/references">References</Link></td>
+								<td style={{textAlign: "right"}}><em>@</em></td>
+								<td><Link to="/references">References</Link><br/><small><em>Everything cited</em></small></td>
 							</tr>
 						}
 						<tr key="index">
 							<td></td>
-							<td></td>
-							<td><Link to="/index">Index</Link></td>
+							<td style={{textAlign: "right"}}><em>A-Z</em></td>
+							<td><Link to="/index">Index</Link><br/><small><em>Common words and where they are</em></small></td>
 						</tr>
 						<tr key="search">
 							<td></td>
-							<td></td>
-							<td><Link to="/search">Search</Link></td>
+							<td style={{textAlign: "right", fontSize: "150%"}}>&#8981;</td>
+							<td><Link to="/search">Search</Link><br/><small><em>Find where words occur</em></small></td>
 						</tr>
 					</tbody>
 				</table>
