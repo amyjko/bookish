@@ -5,8 +5,8 @@
 	"license": "MIT",
 	"repository": "https://github.com/amyjko/peruse.git",
 	"scripts": {
-		"build": "set -e -o pipefail; browserify -t [ babelify --presets [ @babel/preset-env @babel/preset-react ] ] peruse.js | uglifyjs > build/bundle.js; cp build/bundle.js build/peruse.js; rm build/bundle.js",
-		"deploy": "ssh -t ajko@ovid.u.washington.edu \"cd public_html && cd books && cd peruse && git pull && npm run build\""
+		"build": "set -e -o pipefail; rm build/*; browserify -t [ babelify --presets [ @babel/preset-env @babel/preset-react ] ] peruse.js | uglifyjs > build/peruse.js; cp peruse.css build/; cp icons/* build/",
+		"deploy": "rsync -avz --delete build/ ajko@ovid.u.washington.edu:~/public_html/peruse/"
 	},
 	"devDependencies": {
 		"browserify": "^16.5.2",
