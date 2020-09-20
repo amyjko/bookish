@@ -131,7 +131,7 @@ class TableOfContents extends React.Component {
 						<tr key="index">
 							<td></td>
 							<td style={{textAlign: "right"}}><em>A-Z</em></td>
-							<td><Link to="/index">Index</Link><br/><small><em>Common words and where they are</em></small></td>
+							<td><Link to="/index/a">Index</Link><br/><small><em>Common words and where they are</em></small></td>
 						</tr>
 						<tr key="search">
 							<td></td>

@@ -12,6 +12,10 @@ class Index extends React.Component {
 
     }
 
+    componentDidMount() {
+        window.scrollTo(0, 0);
+    }
+
 	render() {
 
         var bookIndex = this.props.app.getBookIndex();
