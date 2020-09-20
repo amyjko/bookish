@@ -93,18 +93,15 @@ class Peruse extends React.Component {
 		// Get all the text in the chapter.
         var text = Parser.parseChapter(text).toText();
 		
-		// Remove all non-letters, non-apostrophes
-		text = text.trim().replace(/[^a-zA-Z\u2019.]/g, ' ');
-
-		// Split by spaces.
-		var words = text.split(/(\.|\s+)/);
+		// Split by word boundaries.
+		var words = text.split(/\b/);
 
 		// Index the words
 		var index = {};
 		_.each(words, (word, wordNumber) => {
 
-			// Skip the periods. But we need them to match sentence boundaries.
-			if(word === ".")
+			// Skip non words. We keep them for search results.
+			if(!/[a-zA-Z\u2019]+/.test(word))
 				return;
 		
 			word = word.toLowerCase();
@@ -121,9 +118,9 @@ class Peruse extends React.Component {
 					index[word] = [];
 				
 				var match = {
-					left: words.slice(Math.max(0, wordNumber - 5), Math.max(0, wordNumber - 1) + 1),
+					left: words.slice(Math.max(0, wordNumber - 10), Math.max(0, wordNumber - 1) + 1).join(""),
 					match: words[wordNumber],
-					right: words.slice(Math.min(words.length - 1, wordNumber + 1), Math.min(words.length - 1, wordNumber + 5) + 1)
+					right: words.slice(Math.min(words.length - 1, wordNumber + 1), Math.min(words.length - 1, wordNumber + 10) + 1).join("")
 				}
 				// Add the occurence
 				index[word].push(match);

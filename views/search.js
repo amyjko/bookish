@@ -52,9 +52,9 @@ class Search extends React.Component {
                 if(chapterMatches.length > 0) {
                     results.push(<h2 key={"header-" + chapterID}>Chapter {chapterNumber+1} - {chapter[0]}</h2>);
                     _.each(chapterMatches, (match, index) => {
-                        var left = match.left.join(" ");
+                        var left = match.left;
                         var wordMatch = <span className="query-match">{match.match}</span>;
-                        var right = match.right.join(" ");
+                        var right = match.right;
 
                         results.push(<p key={"header-" + chapterID + "-" + index}><Link to={"/" + chapterID + "/" + match.match.toLowerCase() + "/" + index}>...{left}{wordMatch}{right}...</Link></p>);
                     })
