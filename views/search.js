@@ -32,7 +32,7 @@ class Search extends React.Component {
         var query = this.state.query.toLowerCase();
         var matchCount = 0;
 
-        // Go through all the chapters and find matches.
+        // Go through all the chapter indexes and find matches.
         if(query.length > 2)
             _.each(this.props.app.getChapters(), (chapter, chapterNumber) => {
                 var chapterID = chapter[1];
@@ -59,9 +59,11 @@ class Search extends React.Component {
                 if(chapterMatches.length > 0) {
                     results.push(<h2 key={"header-" + chapterID}>Chapter {chapterNumber+1} - {chapter[0]}</h2>);
                     _.each(chapterMatches, (match, index) => {
-                        var left = match.left;
-                        var wordMatch = <span className="query-match">{match.match}</span>;
-                        var right = match.right;
+                        // Only highlight the part of the word that matches.
+                        var start = match.match.indexOf(query);
+                        var left = match.left + match.match.substring(0, start);
+                        var wordMatch = <span className="query-match">{match.match.substring(start, start + query.length)}</span>;
+                        var right = match.right + match.match.substring(start + query.length);
 
                         results.push(<p key={"header-" + chapterID + "-" + index}><Link to={"/" + chapterID + "/" + match.match.toLowerCase() + "/" + index}>...{left}{wordMatch}{right}...</Link></p>);
                     })
