@@ -1,4 +1,5 @@
-import _ from 'lodash';
+import _each from 'lodash/each';
+import _map from 'lodash/map';
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { NavHashLink } from 'react-router-hash-link';
@@ -34,7 +35,7 @@ class Search extends React.Component {
 
         // Go through all the chapter indexes and find matches.
         if(query.length > 2)
-            _.each(this.props.app.getChapters(), (chapter, chapterNumber) => {
+            _each(this.props.app.getChapters(), (chapter, chapterNumber) => {
                 var chapterID = chapter[1];
                 var index = this.props.app.getChapterIndex(chapterID);
 
@@ -46,9 +47,9 @@ class Search extends React.Component {
                 var chapterMatches = [];
 
                 // What are all of the words in the index that match the query?
-                _.map(Object.keys(index), word => {
+                _map(Object.keys(index), word => {
                     if(query.length > 0 && word.indexOf(query) >= 0) {
-                        _.each(index[word], match => {
+                        _each(index[word], match => {
                             chapterMatches.push(match);
                         });
                     }
@@ -58,7 +59,7 @@ class Search extends React.Component {
 
                 if(chapterMatches.length > 0) {
                     results.push(<h2 key={"header-" + chapterID}>Chapter {chapterNumber+1} - {chapter[0]}</h2>);
-                    _.each(chapterMatches, (match, index) => {
+                    _each(chapterMatches, (match, index) => {
                         // Only highlight the part of the word that matches.
                         var start = match.match.indexOf(query);
                         var left = match.left + match.match.substring(0, start);

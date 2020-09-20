@@ -1,4 +1,4 @@
-import _ from 'lodash';
+import _map from 'lodash/map';
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { Header } from "./header";
@@ -72,7 +72,7 @@ class TableOfContents extends React.Component {
 				<table className="table" id="toc">
 					<tbody>
 						{
-							_.map(this.props.app.getChapters(), (chapter, index) => {
+							_map(this.props.app.getChapters(), (chapter, index) => {
 								return (
 									<tr key={"chapter" + index}>
 										<td>
@@ -148,7 +148,7 @@ class TableOfContents extends React.Component {
 				<h2>Revisions</h2>
 				
 				<ul>
-					{_.map(this.props.app.getRevisions(), (revision, index) => {
+					{_map(this.props.app.getRevisions(), (revision, index) => {
 						return <li key={"revision" + index}><em>{revision[0]}</em>. {Parser.parseContent(revision[1]).toDOM()}</li>;
 					})}
 				</ul>

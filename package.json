@@ -5,17 +5,24 @@
 	"license": "MIT",
 	"repository": "https://github.com/amyjko/peruse.git",
 	"scripts": {
-		"build": "set -e -o pipefail; rm build/*; browserify -t [ babelify --presets [ @babel/preset-env @babel/preset-react ] ] peruse.js | uglifyjs > build/peruse.js; cp peruse.css build/; cp icons/* build/",
-		"deploy": "rsync -avz --delete build/ ajko@ovid.u.washington.edu:~/public_html/peruse/"
+		"clean": "rm build/*",
+		"build-assets": "cp peruse.css build/; cp icons/* build/",
+		"build-test": "rm build/*; browserify -g [ babelify --presets [ @babel/preset-env @babel/preset-react ] ] peruse.js | terser > build/peruse.js; npm run build-assets",
+		"test": "npm run clean; npm run build-assets; npm run build-test",
+		"sync": "rsync -avz --delete build/ ajko@ovid.u.washington.edu:~/public_html/peruse/",
+		"build-prod": "browserify -g uglifyify -t [ babelify --presets [ @babel/preset-env @babel/preset-react ] ] peruse.js | terser --compress --mangle > build/peruse.js",
+		"ship": "set -e -o pipefail; npm run clean; npm run build-assets; npm run build-prod; npm run sync"
 	},
 	"devDependencies": {
-		"browserify": "^16.5.2",
-		"babelify": "^10",
-		"@babel/core": "^7",
 		"@babel/cli": "^7",
-		"@babel/preset-react": "^7",
+		"@babel/core": "^7",
 		"@babel/preset-env": "^7",
-		"uglify-js": "^3.4.7"
+		"@babel/preset-react": "^7",
+		"babelify": "^10",
+		"browserify": "^16.5.2",
+		"terser": "^5.3.2",
+		"uglify-js": "^3.4.7",
+		"uglifyify": "^5.0.2"
 	},
 	"dependencies": {
 		"history": "^4.7.2",

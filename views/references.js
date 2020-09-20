@@ -1,4 +1,4 @@
-import _ from 'lodash';
+import _map from 'lodash/map';
 import React from 'react';
 import { Link } from 'react-router-dom';
 
@@ -23,7 +23,7 @@ class References extends React.Component {
 				{
                     references === null ?
                         <p>This book has no references.</p> :
-                        _.map(_.keys(references).sort(), (citationID) => {
+                        _map(Object.keys(references).sort(), (citationID) => {
                             return <p key={citationID}>{Parser.parseReference(references[citationID], this.props.app)}</p>
                         })
                 }

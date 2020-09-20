@@ -1,7 +1,6 @@
-import _ from 'lodash';
 import React from 'react';
 
-import {Figure} from "./image";
+import { Figure } from "./image";
 
 class Header extends React.Component {
 

@@ -1,4 +1,5 @@
-import _ from 'lodash';
+import _each from 'lodash/each';
+import _map from 'lodash/map';
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { NavHashLink } from 'react-router-hash-link';
@@ -20,7 +21,7 @@ class Index extends React.Component {
         var letters = {};
 
         // Build a list of words in alphabetical order.
-        _.each(Object.keys(bookIndex).sort((a, b) => a.localeCompare(b)), (word, index) => {
+        _each(Object.keys(bookIndex).sort((a, b) => a.localeCompare(b)), (word, index) => {
 
             // This block of code renders headers for letter groups
             var firstLetter = word.charAt(0).toLowerCase();
@@ -43,7 +44,7 @@ class Index extends React.Component {
                     <tr key={"entry-" + index}>
                         <td>{word}</td>
                         <td>
-                            {_.map(
+                            {_map(
                                 bookIndex[word], 
                                 (chapter, index) => 
                                     <span key={index}>
@@ -66,7 +67,7 @@ class Index extends React.Component {
                 <p>Pick a letter to browse:</p>
 
                 <p>
-                    { _.map("abcdefghijklmnopqrstuvwxyz".split(""), 
+                    { _map("abcdefghijklmnopqrstuvwxyz".split(""), 
                         (letter, index) => 
                             <span key={index} style={{display: "inline-block"}}>
                                 {

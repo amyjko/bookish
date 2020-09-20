@@ -1,4 +1,4 @@
-import _ from 'lodash';
+import _map from 'lodash/map';
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { NavHashLink } from "react-router-hash-link";
@@ -144,9 +144,9 @@ class Chapter extends React.Component {
 							<h1>References</h1>
 
 							<ol>
-							{_.map(Object.keys(citations).sort(), citationID => {
+							{_map(Object.keys(citations).sort(), citationID => {
 								var refs = this.props.app.getReferences();
-								if(_.has(refs, citationID)) {
+								if(citationID in refs) {
 									var ref = refs[citationID];
 									return <li key={"citation-" + citationID} className={citationID === refHighlight ? "highlight" : null} id={"ref-" + citationID}>
 										{Parser.parseReference(ref, this.props.app)}

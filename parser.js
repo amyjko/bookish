@@ -1,10 +1,11 @@
-import _ from 'lodash';
+import _map from 'lodash/map';
+import _each from 'lodash/each';
+
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { NavHashLink } from "react-router-hash-link";
 import { Figure } from './views/image';
 import Highlight from 'react-highlight.js';
-
 
 // A simple recursive descent parser for this grammar.
 // Embeds a tokenizer, since the lexical grammar is simple.
@@ -550,14 +551,14 @@ readUntilNewLine() {
             this.read();
 
         // Trim any whitespace, then split by commas.
-        citations = _.map(citations.trim().split(","), citation => citation.trim());
+        citations = _map(citations.trim().split(","), citation => citation.trim());
 
         // We won't necessarily be gathering this data.
         // This does mean that if someone cites something in a non-chapter
         // it will silently fail.
         if(metadata)
             // Record each citation for later.
-            _.each(citations, citation => {
+            _each(citations, citation => {
                 metadata.citations[citation] = true;
             });
 
@@ -642,12 +643,12 @@ class ChapterNode extends Node {
 
     toDOM(app, query) {
         return <div key="chapter">
-            {_.map(this.blocks, (block, index) => block.toDOM(app, this, query, "block-" + index))}
+            {_map(this.blocks, (block, index) => block.toDOM(app, this, query, "block-" + index))}
         </div>;
     }
 
     toText() {
-        return _.join(_.map(this.blocks, block => block.toText()), " ");
+        return _map(this.blocks, block => block.toText()).join(" ");
     }
 
 }
@@ -733,11 +734,11 @@ class BulletedListNode extends Node {
     }
 
     toDOM(app, chapter, query, key) {
-        return <ul key={key}>{_.map(this.items, (item, index) => <li key={"item-" + index}>{item.toDOM(app, chapter, query)}</li>)}</ul>
+        return <ul key={key}>{_map(this.items, (item, index) => <li key={"item-" + index}>{item.toDOM(app, chapter, query)}</li>)}</ul>
     }
 
     toText() {
-        return _.join(_.map(this.items, item => item.toText()), " ");
+        return _map(this.items, item => item.toText()).join(" ");
     }
 
 }
@@ -749,11 +750,11 @@ class NumberedListNode extends Node {
     }
 
     toDOM(app, chapter, query, key) {
-        return <ol key={key}>{_.map(this.items, (item, index) => <li key={"item-" + index}>{item.toDOM(app, chapter, query)}</li>)}</ol>;
+        return <ol key={key}>{_map(this.items, (item, index) => <li key={"item-" + index}>{item.toDOM(app, chapter, query)}</li>)}</ol>;
     }
 
     toText() {
-        return _.join(_.map(this.items, item => item.toText()), " ");
+        return _map(this.items, item => item.toText()).join(" ");
     }
 
 }
@@ -785,14 +786,14 @@ class QuoteNode extends Node {
     toDOM(app, chapter, query, key) {
 
         return <blockquote className="blockquote" key={key}>
-            {_.map(this.elements, (element, index) => element.toDOM(app, chapter, query, "quote-" + index))}
+            {_map(this.elements, (element, index) => element.toDOM(app, chapter, query, "quote-" + index))}
             {this.credit ? <footer className="blockquote-footer"><cite>{this.credit.toDOM(app, chapter, query)}</cite></footer> : null }
         </blockquote>
 
     }
 
     toText() {
-        return _.join(_.map(this.elements, element => element.toText()), " ") + (this.credit ? " " + this.credit.toText() : "");
+        return _map(this.elements, element => element.toText()).join(" ") + (this.credit ? " " + this.credit.toText() : "");
     }
 
 }
@@ -807,7 +808,7 @@ class FormattedNode extends Node {
 
     toDOM(app, chapter, query, key) {
         
-        var segmentDOMs = _.map(this.segments, (segment, index) => segment.toDOM(app, chapter, query, "formatted-" + index));
+        var segmentDOMs = _map(this.segments, (segment, index) => segment.toDOM(app, chapter, query, "formatted-" + index));
 
         if(this.format === "*")
             return <strong key={key}>{segmentDOMs}</strong>;
@@ -821,7 +822,7 @@ class FormattedNode extends Node {
     }
 
     toText() {
-        return _.join(_.map(this.segments, segment => segment.toText()), " ");
+        return _map(this.segments, segment => segment.toText()).join(" ");
     }
 
 }
@@ -859,7 +860,7 @@ class CitationsNode extends Node {
             return null;
 
         // Convert each citation ID until a link.
-        _.each(
+        _each(
             this.citations,
             (citationID, index) => {
                 // Find the citation number. There should always be one,
@@ -902,11 +903,11 @@ class ContentNode extends Node {
     }
 
     toDOM(app, chapter, query, key) {
-        return <span key={key}>{_.map(this.segments, (segment, index) => segment.toDOM(app, chapter, query, "content-" + index))}</span>;
+        return <span key={key}>{_map(this.segments, (segment, index) => segment.toDOM(app, chapter, query, "content-" + index))}</span>;
     }
 
     toText() {
-        return _.join(_.map(this.segments, segment => segment.toText()), " ");
+        return _map(this.segments, segment => segment.toText()).join(" ");
     }
 
 }

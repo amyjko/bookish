@@ -1,4 +1,9 @@
-import _ from 'lodash';
+import _each from 'lodash/each';
+import _map from 'lodash/map';
+import _clone from 'lodash/clone';
+import _reduce from 'lodash/reduce';
+import _uniq from 'lodash/uniq';
+
 import React from 'react';
 import ReactDOM from 'react-dom';
 import { Link, Route, HashRouter, Switch, withRouter } from 'react-router-dom';
@@ -47,20 +52,20 @@ class Peruse extends React.Component {
 	}
 
 	getBook() { return this.state.book; }
-	getContent(chapterID) { return _.has(this.state.chapters, chapterID) ? this.state.chapters[chapterID] : undefined; }
+	getContent(chapterID) { return chapterID in this.state.chapters ? this.state.chapters[chapterID] : undefined; }
 	getTitle() { return this.getBook().title; }
 	getAuthors() { return this.getBook().authors.join(", "); }
 	getContributors() { return this.getBook().contributors == null ? null : this.getBook().contributors.join(", "); }
 	getDescription() { return this.getBook().description; }
 	getRevisions() { return this.getBook().revisions; }
-	getChapterReadingTime(chapterID) {  return _.has(this.state.chapters, chapterID) ? Math.max(1, Math.round(this.state.chapters[chapterID].wordCount / 150)) : 0; }
+	getChapterReadingTime(chapterID) {  return chapterID in this.state.chapters ? Math.max(1, Math.round(this.state.chapters[chapterID].wordCount / 150)) : 0; }
 	getBookReadingTime() {
-		return _.reduce(_.map(Object.keys(this.state.chapters), chapterID => this.getChapterReadingTime(chapterID)), (total, count) => total + count);
+		return _reduce(_map(Object.keys(this.state.chapters), chapterID => this.getChapterReadingTime(chapterID)), (total, count) => total + count);
 	}
 	getChapters() { return this.getBook().chapters; }
 	getChapterNumber(chapterID) {
 		if(!(chapterID in this.chapterNumbers)) {
-			var chapterNumber = _.map(this.getChapters(), chapter => chapter[1]).indexOf(chapterID);
+			var chapterNumber = _map(this.getChapters(), chapter => chapter[1]).indexOf(chapterID);
 			if(chapterNumber < 0) return null;
 			else this.chapterNumbers[chapterID] = chapterNumber + 1;
 		}
@@ -88,7 +93,9 @@ class Peruse extends React.Component {
 	computeIndex(text) {
 
 		// Build a list of common words
-		var commonWords = _.keyBy(["a","about","all","also","and","are","as","at","be","because","but","by","can","come","could","day","do","does","even","find","first","for","from","get","give","go","has","have","he","her","here","him","his","how","I","if","in","into","is","it","its","just","know","like","look","make","man","many","me","more","my","new","no","not","now","of","on","one","only","or","other","our","out","people","say","see","she","so","some","take","tell","than","that","the","their","them","then","there","these","they","thing","think","this","those","time","to","two","up","use","very","want","was","way","we","well","went","what","when","which","who","will","with","would","year","yes","you","your"]);
+		var commonWords = {};
+		_each(["a","about","all","also","and","are","as","at","be","because","but","by","can","come","could","day","do","does","even","find","first","for","from","get","give","go","has","have","he","her","here","him","his","how","I","if","in","into","is","it","its","just","know","like","look","make","man","many","me","more","my","new","no","not","now","of","on","one","only","or","other","our","out","people","say","see","she","so","some","take","tell","than","that","the","their","them","then","there","these","they","thing","think","this","those","time","to","two","up","use","very","want","was","way","we","well","went","what","when","which","who","will","with","would","year","yes","you","your"],
+			word => commonWords[word] = true);
 
 		// Get all the text in the chapter.
         var text = Parser.parseChapter(text).toText();
@@ -98,7 +105,7 @@ class Peruse extends React.Component {
 
 		// Index the words
 		var index = {};
-		_.each(words, (word, wordNumber) => {
+		_each(words, (word, wordNumber) => {
 
 			// Skip non words. We keep them for search results.
 			if(!/[a-zA-Z\u2019]+/.test(word))
@@ -139,7 +146,7 @@ class Peruse extends React.Component {
 		// * plural versions of words if they appear in singular
 		// as a heuristic for detecting non-proper nounds.
 		var duplicates = [];
-		_.each(Object.keys(index), word => {
+		_each(Object.keys(index), word => {
 			var duplicate = false;
 			var canonical = null;
 			if((word.charAt(0) === word.charAt(0).toUpperCase() && word.toLowerCase() in index)) {
@@ -154,10 +161,10 @@ class Peruse extends React.Component {
 				duplicates.push(word);
 				// Merge any chapter occurences
 				if(Array.isArray(index[canonical]))
-					index[canonical] = _.uniq(index[canonical].concat(index[word]));
+					index[canonical] = _uniq(index[canonical].concat(index[word]));
 			}
 		})
-		_.each(duplicates, word => {
+		_each(duplicates, word => {
 			delete index[word];
 		});
 
@@ -174,10 +181,10 @@ class Peruse extends React.Component {
 		var bookIndex = {};
 
 		// Construct the index.
-		_.each(this.state.chapters, chapter => {
-			_.each(_.keys(chapter.index), (word) => {
+		_each(this.state.chapters, chapter => {
+			_each(Object.keys(chapter.index), (word) => {
 				if(word !== "" && word.length > 2) {
-					if(_.has(bookIndex, word))
+					if(word in bookIndex)
 						bookIndex[word].push(chapter.id);
 					else
 						bookIndex[word] = [chapter.id];
@@ -186,7 +193,7 @@ class Peruse extends React.Component {
 		});
 
 		// Sort the chapter numbers for each word.
-		_.each(Object.keys(bookIndex), (word) => {
+		_each(Object.keys(bookIndex), (word) => {
 			bookIndex[word] = bookIndex[word].sort((a, b) => { return this.getChapterNumber(a) > this.getChapterNumber(b); });
 		});
 
@@ -227,7 +234,7 @@ class Peruse extends React.Component {
 	fetchChapters() {
 
 		// Request all of the chapter content...
-		_.each(this.getChapters(), (chapter) => {
+		_each(this.getChapters(), (chapter) => {
 
 			var chapterID = chapter[1];
 
@@ -237,7 +244,7 @@ class Peruse extends React.Component {
 					if(response.ok) {
 						response.text().then(text => {
 							// Notify the component that we got a new chapter.
-							var updatedChapters = _.clone(this.state.chapters);
+							var updatedChapters = _clone(this.state.chapters);
 							updatedChapters[chapter[1]] = {
 								title: chapter[0],
 								text: text,
@@ -255,14 +262,14 @@ class Peruse extends React.Component {
 						});
 					}
 					else {
-						var updatedChapters = _.clone(this.state.chapters);
+						var updatedChapters = _clone(this.state.chapters);
 						updatedChapters[chapter[1]] = null;
 						this.setState({ chapters: updatedChapters });
 					}
 				})
 				.catch(err => { 
 					// Uh oh, something bad happened. We couldn't load the chapter.
-					var updatedChapters = _.clone(this.state.chapters);
+					var updatedChapters = _clone(this.state.chapters);
 					updatedChapters[chapter[1]] = null;
 					// Notify the component that we got a new chapter.
 					this.setState({ chapters: updatedChapters });
@@ -289,7 +296,7 @@ class Peruse extends React.Component {
 					<Route exact path="/" render={(props) => <TableOfContents {...props} app={this} />} />
 					{
 						// Map all the book chapters to routes
-						_.map(this.getChapters(), (chapter, index) => {
+						_map(this.getChapters(), (chapter, index) => {
 							return <Route key={"chapter" + index} path={"/" + chapter[1] + "/:word?/:number?"} render={(props) => <Chapter {...props} id={chapter[1]} app={this} />} />
 						})
 					}

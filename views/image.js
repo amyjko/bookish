@@ -1,4 +1,3 @@
-import _ from 'lodash';
 import React from 'react';
 
 class Figure extends React.Component {
