@@ -68,7 +68,7 @@ class Index extends React.Component {
                 <p>
                     { _.map("abcdefghijklmnopqrstuvwxyz".split(""), 
                         (letter, index) => 
-                            <span key={index}>
+                            <span key={index} style={{display: "inline-block"}}>
                                 {
                                     letter in letters ? 
                                         <strong><Link to={"/index/" + letter}>{letter.toUpperCase()}</Link></strong> :
