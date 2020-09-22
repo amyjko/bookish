@@ -34,12 +34,12 @@ class Index extends React.Component {
                 currentLetter = firstLetter;
                 letters[currentLetter] = true;
 
-                if(this.props.match.params.letter === currentLetter)
-                    rows.push(
-                        <tr key={"header-" + index} id={"header-" + currentLetter}>
-                            <td colSpan={2}><h2>{currentLetter}</h2></td>
-                        </tr>
-                    );
+                // if(this.props.match.params.letter === currentLetter)
+                //     rows.push(
+                //         <tr key={"header-" + index} id={"header-" + currentLetter}>
+                //             <td colSpan={2}><h2>{currentLetter}</h2></td>
+                //         </tr>
+                //     );
             }
 
             // Or is this the selected letter?
@@ -52,8 +52,8 @@ class Index extends React.Component {
                                 bookIndex[word], 
                                 (chapter, index) => 
                                     <span key={index}>
-                                        <Link to={"/" + chapter + "/" + word}>{this.props.app.getChapterName(chapter)}</Link>
-                                        {index < bookIndex[word].length - 1 ? ", " : null}
+                                        Chapter {this.props.app.getChapterNumber(chapter)}. <Link to={"/" + chapter + "/" + word}>{this.props.app.getChapterName(chapter)}</Link>
+                                        {index < bookIndex[word].length - 1 ? <br/> : null}
                                     </span>
                             )}
                         </td>
@@ -75,9 +75,9 @@ class Index extends React.Component {
                         (letter, index) => 
                             <span key={index} style={{display: "inline-block"}}>
                                 {
-                                    letter in letters ? 
-                                        <strong><Link to={"/index/" + letter}>{letter.toUpperCase()}</Link></strong> :
-                                        <span className={"text-muted"}>{letter.toUpperCase()}</span>
+                                    letter in letters && this.props.match.params.letter !== letter ? 
+                                        <Link to={"/index/" + letter}>{letter}</Link> :
+                                        <span>{this.props.match.params.letter === letter ? <strong><span style={{fontSize: "200%"}}>{letter}</span></strong> : <span className={"text-muted"}>{letter}</span>}</span>
                                 }
                                 { 
                                     index < 26 - 1 ? 
