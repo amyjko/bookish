@@ -122,6 +122,11 @@ class Parser {
                     char = "\u2019";
                 }
             }
+
+            if(char === '-' && this.text.charAt(this.index + 1) === '-' && this.text.charAt(this.index) !== '\n') {
+                this.index++;
+                char = "\u2014";
+            }
         }
 
         // Advance to the next character in the document.
