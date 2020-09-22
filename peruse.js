@@ -25,7 +25,8 @@ class Peruse extends React.Component {
 		// Start data as undefined, rending a loading state until it changes.
 		this.state = {
 			book: undefined,
-			chapters: {}
+			chapters: {},
+			loadingTime: undefined
 		};
 		
 		// Fetch the JSON
@@ -48,6 +49,22 @@ class Peruse extends React.Component {
 		
 		// Lookup table for optmization
 		this.chapterNumbers = {};
+
+	}
+
+	componentDidMount() {
+
+		// Keep track of how long it's been since we started loading the book, so we can show feedback
+		// if it's been more than a certain period of time. We'll check every 100 milliseconds.
+		this.loadingStartTime = Date.now();
+		this.loadingCheck = setInterval(() => { 
+
+			this.setState({loadingTime: Date.now() - this.loadingStartTime});
+			if(this.state.book !== null) {
+				clearInterval(this.loadingCheck);
+			}
+
+		}, 100);
 
 	}
 
@@ -283,15 +300,20 @@ class Peruse extends React.Component {
 	
 	render() {
 		
-		// Return the single page app.
-		return (
-		
-			// If it's loading, show loading feedback
-			this.getBook() === undefined ?
-				<p>...</p> :
-			// If it failed to load, provide some feedback.
-			this.getBook() === null ?
-				<Unknown message={<p className="alert alert-danger">Wasn't able to load the book <code>{this.props.book}</code>. The book specification probably has a syntax error, but it's also possible that this file doesn't exist or there was a problem with the server.</p>} app={this} /> :
+		// If it's loading, show loading feedback
+		if(this.getBook() === undefined) {
+			if(this.state.loadingTime === undefined || this.state.loadingTime < 500)
+				return null;
+			else
+				return <div className="text-center text-muted" style={{position: "fixed", left: "50%", top: "50%", transform: "translate(-50%, 0)"}}> Loading book...</div>;
+		} 
+		// If it failed to load, provide some feedback.
+		else if(this.getBook() === null) {
+			return <Unknown message={<p className="alert alert-danger">Wasn't able to load the book <code>{this.props.book}</code>. The book specification probably has a syntax error, but it's also possible that this file doesn't exist or there was a problem with the server.</p>} app={this} />;
+		}
+		// Render the book
+		else 
+			return (
 				<Switch>
 					<Route exact path="/" render={(props) => <TableOfContents {...props} app={this} />} />
 					{
@@ -305,8 +327,7 @@ class Peruse extends React.Component {
 					<Route path="/search/" render={(props) => <Search {...props} app={this} />} />
 					<Route path="*" render={(props) => <Unknown {...props} message={<p>This URL doesn't exist for this book. Want to go back to the <Link to="/">Table of Contents?</Link></p>} app={this} />}/>
 				</Switch>
-		
-		);
+			);
 
 	}
 	

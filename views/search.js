@@ -77,7 +77,7 @@ class Search extends React.Component {
 				<h1>Search</h1>
                 <NavHashLink to={"/#toc"}>Table of Contents</NavHashLink>
 
-                <p>Type a word—just a single word—and we'll show its occurrence in this book</p>
+                <p>Type a word—just a single word—and we'll show its occurrences in this book:</p>
 
                 <p>
                     <input 

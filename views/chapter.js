@@ -126,7 +126,13 @@ class Chapter extends React.Component {
 		var refHighlight = window.location.hash.split("#")[2];
 		var refHighlight = refHighlight ? refHighlight.split("-")[1] : null;
 
-		if(chapter) {
+		if(chapter === undefined) {
+			return null;
+		}
+		else if(chapter === null) {
+			return <p className="alert alert-danger">Unable to load chapter.</p>;
+		}
+		else {
 			var nextChapter = this.props.app.getNextChapter(this.props.id);
 			var previousChapter = this.props.app.getPreviousChapter(this.props.id);
 			var chapterAST = Parser.parseChapter(chapter.text);
@@ -176,8 +182,6 @@ class Chapter extends React.Component {
 				</div>
 			);
 		}
-		else
-			return "...";
 
 	}
 
