@@ -33,6 +33,17 @@ p {
 	margin-right: 1.5em;
 }
 
+/* Drop cap in the first paragraph's first letter. */
+.chapter > p:first-child::first-letter {
+	padding: 0 .25rem;
+	margin: 0 .5rem 0 0;
+	font-size: 4rem;
+	float: left;
+	line-height: 1;
+	color: black;
+	font-weight: 700;
+}
+
 li {
 	margin-bottom: 0.5em;
 }

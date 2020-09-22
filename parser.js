@@ -642,7 +642,7 @@ class ChapterNode extends Node {
     }
 
     toDOM(app, query) {
-        return <div key="chapter">
+        return <div key="chapter" className="chapter">
             {_map(this.blocks, (block, index) => block.toDOM(app, this, query, "block-" + index))}
         </div>;
     }
