@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,700;1,400;1,700&display=swap');
+
 body {
 	max-width: 800px;
 
@@ -18,13 +20,11 @@ body {
 }
 
 .h1, .h2, .h3, .h4, .h5, .h6, h1, h2, h3, h4, h5, h6 {
-    font-weight: 600;
-    margin-top: 1em;
-    font-family: "Verdana", sans-serif;
+	font-weight: 700;
 }
 
 strong, b {
-	font-weight: 600;
+	font-weight: 700;
 }
 
 p {
@@ -36,12 +36,12 @@ p {
 /* Drop cap in the first paragraph's first letter. */
 .chapter > p:first-child::first-letter {
 	padding: 0 .25rem;
-	margin: 0 .5rem 0 0;
+	margin: 0 .25rem 0 0;
 	font-size: 4rem;
+	font-weight: 700;
 	float: left;
 	line-height: 1;
 	color: black;
-	font-weight: 700;
 }
 
 li {
