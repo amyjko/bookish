@@ -55,6 +55,7 @@ class TableOfContents extends React.Component {
 					content={
 						<div>
 							<em>by</em> {Parser.parseContent(this.props.app.getAuthors()).toDOM()}
+							<br/>
 							<small>
 								{this.props.app.getContributors() ? 
 								<span><em> with contributions from</em> {Parser.parseContent(this.props.app.getContributors()).toDOM()}</span> : null}
@@ -63,11 +64,9 @@ class TableOfContents extends React.Component {
 					}
 				/>
 
-				<small><em>{readingTime < 60 ? Math.max(5, (Math.floor(readingTime / 10) * 10)) + " minute read" : (new Number(readingTime / 60.0)).toPrecision(1) + " hour read" }</em></small>
-
 				{Parser.parseChapter(this.props.app.getDescription()).toDOM()}
 
-				<h2>Chapters</h2>
+				<h2>Chapters <small><small className="text-muted"><em>{readingTime < 60 ? Math.max(5, (Math.floor(readingTime / 10) * 10)) + " minute read" : (new Number(readingTime / 60.0)).toPrecision(1) + " hour read" }</em></small></small></h2>
 
 				<table className="table" id="toc">
 					<tbody>
@@ -105,7 +104,7 @@ class TableOfContents extends React.Component {
 													<div>
 														<Link to={"/" + chapter[1]}>{chapter[0]}</Link>
 														<br/>
-														<small>
+														<small className="text-muted">
 															<em>
 																{ this.props.app.getChapterReadingTime(chapter[1]) } minute read
 																{
@@ -125,18 +124,18 @@ class TableOfContents extends React.Component {
 							<tr key="references">
 								<td></td>
 								<td style={{textAlign: "right"}}><em>@</em></td>
-								<td><Link to="/references">References</Link><br/><small><em>Everything cited</em></small></td>
+								<td><Link to="/references">References</Link><br/><small className="text-muted"><em>Everything cited</em></small></td>
 							</tr>
 						}
 						<tr key="index">
 							<td></td>
 							<td style={{textAlign: "right"}}><em>A-Z</em></td>
-							<td><Link to="/index/a">Index</Link><br/><small><em>Common words and where they are</em></small></td>
+							<td><Link to="/index/a">Index</Link><br/><small className="text-muted"><em>Common words and where they are</em></small></td>
 						</tr>
 						<tr key="search">
 							<td></td>
 							<td style={{textAlign: "right", fontSize: "150%"}}>&#8981;</td>
-							<td><Link to="/search">Search</Link><br/><small><em>Find where words occur</em></small></td>
+							<td><Link to="/search">Search</Link><br/><small className="text-muted"><em>Find where words occur</em></small></td>
 						</tr>
 					</tbody>
 				</table>
