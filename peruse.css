@@ -209,3 +209,25 @@ blockquote {
 .hljs-strong {
   font-weight: bold;
 }
+
+.editor {
+	position: fixed;
+	left: 0;
+	right: 0;
+	top: 0;
+	background-color: white;
+	border: 1px solid lightGray;
+	box-shadow: 5px 5px 5px 3px rgba(150,150,150,.5);
+	padding: 2em;
+	z-index: 1;
+}
+
+.editor textarea {
+	width: 100%;
+	height: 15em;
+	padding: 1em;
+}
+
+.text.highlight {
+	background-color: rgb(255,255,200)
+}

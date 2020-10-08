@@ -440,7 +440,7 @@ readUntilNewLine() {
                 var text = "";
                 while(this.more() && (!awaiting || !this.nextIs(awaiting)) && !this.nextIsContentDelimiter() && !this.nextIs("\n"))
                     text = text + this.read();
-                segments.push(new TextNode(text));
+                segments.push(new TextNode(text, this.index));
             }
 
             // If we've reached a delimiter we're waiting for, then stop parsing, so it can handle it. Otherwise, we'll keep reading.
@@ -518,7 +518,7 @@ readUntilNewLine() {
             if(this.peek() === "_" || this.peek() === "*" || this.peek() == "`" || this.peek() === "<" || this.peek() === "\\" || this.peek() === "[") {
                 // If the text is a non-empty string, make a text node with what we've accumulated.
                 if(text !== "")
-                    segments.push(new TextNode(text));
+                    segments.push(new TextNode(text, this.index));
                 // Parse the formatted content.
                 segments.push(this.parseContent(metadata, awaiting));
                 // Reset the accumulator.
@@ -531,7 +531,7 @@ readUntilNewLine() {
         }
 
         if(text !== "")
-            segments.push(new TextNode(text));
+            segments.push(new TextNode(text, this.index));
 
         // Read the closing delimter
         if(this.nextIs(delimeter))
@@ -575,7 +575,7 @@ readUntilNewLine() {
 
         // Skip the scape and just add the next character.
         this.read();
-        return new TextNode(this.read());
+        return new TextNode(this.read(), this.index);
 
     }
     
@@ -918,16 +918,19 @@ class ContentNode extends Node {
 }
 
 class TextNode extends Node {
-    constructor(text) {
+    constructor(text, position) {
         super();
         this.text = text;
+        this.position = position - text.length;
     }
 
     toDOM(app, chapter, query, key) {
         
+        // Is there a query we're supposed to highlight? If so, highlight it.
         if(query) {
             var text = this.text;
             var lowerText = text.toLowerCase();
+            // Does this text contain the query? Highlight it.
             if(lowerText.indexOf(query) >= 0) {
 
                 // Find all the matches
@@ -949,15 +952,13 @@ class TextNode extends Node {
                     segments.push(text.substring(indices[indices.length - 1] + query.length, text.length));
 
                 return <span key={key}>{segments}</span>;
-                // var left = this.text.substring(0, index);
-                // var match = this.text.substring(index, index + query.length);
-                // var right = this.text.substring(index + query.length);
-
-                // return <span key={key}>{left}<span className="query-match">{match}</span><span>{right}</span></span>
 
             }
             else return this.text;
-        } else return this.text;
+
+        } 
+        // Otherwise, just return the text.
+        else return <span key={this.position} className="text" data-position={this.position}>{this.text}</span>;
 
     }
 

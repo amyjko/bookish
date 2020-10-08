@@ -1,4 +1,5 @@
-import _map from 'lodash/map';
+import  _map from 'lodash/map';
+import  _each from 'lodash/each';
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { NavHashLink } from "react-router-hash-link";
@@ -13,11 +14,13 @@ class Chapter extends React.Component {
 		super(props);
 
 		this.handleScroll = this.handleScroll.bind(this);
+		this.handleDoubleClick = this.handleDoubleClick.bind(this);
+		this.handleChange = this.handleChange.bind(this);
 
 		// Assume the chapter is loaded initially.
-		this.state = { loaded : true };
+		this.state = { loaded: true, editing: false, draft: null };
 
-	  }
+	}
 
 	componentDidMount() {
 
@@ -120,6 +123,77 @@ class Chapter extends React.Component {
 
 	}
 
+	handleDoubleClick(event) {
+
+		if(event.shiftKey) {
+
+			var chapter = this.props.app.getContent(this.props.id);
+
+			this.setState({ editing: true, draft: chapter.text })
+		}
+
+	}
+
+	handleChange(event) {
+
+		var chapter = this.props.app.getContent(this.props.id);
+		chapter.text = event.target.value;
+
+		// What position should we scroll to?
+		let position = event.target.selectionStart;
+
+		// Update, then try to find the position.
+		this.forceUpdate(() => {
+
+			this.removeHighlights();
+
+			// Which text node is closest?
+			var textNodes = document.getElementsByClassName("text");
+			for(var i = 0; i < textNodes.length; i++) {
+				if(textNodes[i].dataset.position > position)
+					break;
+			}
+
+			let match = textNodes[i - 1];
+
+			// Highlight the match
+			match.classList.add("highlight");
+
+			// Scroll to the node.
+			match.scrollIntoView({
+				behavior: "smooth",
+				block: "center"
+			});
+			
+		});
+
+	}
+
+	removeHighlights() {
+
+		// Which text node is closest?
+		var highlights = document.getElementsByClassName("highlight");
+		_each(highlights, highlight => highlight.classList.remove("highlight"));
+		
+	}
+
+	renderEditor() {
+		
+		return <div className="editor">
+			<em>You've found editing mode (shift+double click). This is useful for editing the underlying markup of the chapter and previewing your changes, which you can then copy and save elsehwere. This does not save the text of the chapter on this server, nor does it save between page reloads.</em>
+			<br/>
+			<br/>
+			<textarea 
+				className="editor-text" 
+				onChange={this.handleChange} 
+				value={this.props.app.getContent(this.props.id).text}
+			>
+			</textarea>
+			<button onClick={() => { this.removeHighlights(); this.setState({editing: false})}}>Done</button>
+		</div>
+
+	}
+
 	render() {
 
 		var chapter = this.props.app.getContent(this.props.id);
@@ -138,12 +212,19 @@ class Chapter extends React.Component {
 			var chapterAST = Parser.parseChapter(chapter.text);
 			var citations = chapterAST.getCitations();
 			return (
-				<div>
+				<div className="chapter">
 					<Header image={chapter.image} header={chapter.title} content={null} />
 					<div>
 						<em>by</em> {Parser.parseContent(this.props.app.getAuthors()).toDOM()}
 					</div>
-					{chapterAST.toDOM(this.props.app, this.props.match.params.word)}
+
+					{ this.state.editing ? this.renderEditor() : null }
+
+					<div onDoubleClick={this.handleDoubleClick}>
+					{
+						chapterAST.toDOM(this.props.app, this.props.match.params.word)
+					}
+					</div>
 					{
 						Object.keys(citations).length === 0 ? null :
 						<div>
