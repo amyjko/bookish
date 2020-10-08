@@ -314,19 +314,25 @@ class Peruse extends React.Component {
 		// Render the book
 		else 
 			return (
-				<Switch>
-					<Route exact path="/" render={(props) => <TableOfContents {...props} app={this} />} />
-					{
-						// Map all the book chapters to routes
-						_map(this.getChapters(), (chapter, index) => {
-							return <Route key={"chapter" + index} path={"/" + chapter[1] + "/:word?/:number?"} render={(props) => <Chapter {...props} id={chapter[1]} app={this} />} />
-						})
-					}
-					<Route path="/references" render={(props) => <References {...props} app={this} />} />
-					<Route path="/index/:letter?" render={(props) => <Index {...props} app={this} />} />
-					<Route path="/search/" render={(props) => <Search {...props} app={this} />} />
-					<Route path="*" render={(props) => <Unknown {...props} message={<p>This URL doesn't exist for this book. Want to go back to the <Link to="/">Table of Contents?</Link></p>} app={this} />}/>
-				</Switch>
+				<div className="container" className="book">
+					<div className="row">
+						<div className="col-md-12">
+							<Switch>
+								<Route exact path="/" render={(props) => <TableOfContents {...props} app={this} />} />
+								{
+									// Map all the book chapters to routes
+									_map(this.getChapters(), (chapter, index) => {
+										return <Route key={"chapter" + index} path={"/" + chapter[1] + "/:word?/:number?"} render={(props) => <Chapter {...props} id={chapter[1]} app={this} />} />
+									})
+								}
+								<Route path="/references" render={(props) => <References {...props} app={this} />} />
+								<Route path="/index/:letter?" render={(props) => <Index {...props} app={this} />} />
+								<Route path="/search/" render={(props) => <Search {...props} app={this} />} />
+								<Route path="*" render={(props) => <Unknown {...props} message={<p>This URL doesn't exist for this book. Want to go back to the <Link to="/">Table of Contents?</Link></p>} app={this} />}/>
+							</Switch>
+						</div>
+					</div>
+				</div>
 			);
 
 	}
