@@ -76,7 +76,7 @@ class Parser {
                     if(source === null)
                         source = <span className="alert alert-danger">Unknown source <code>{ref[3]}</code></span>;
                 }
-                dom = <span className="reference">{authors} ({year}). {url === null ? title : <a href={url} target={"_blank"}>{title}</a>}. <em>{source}</em>.{summary ? <span className="summary">{summary}</span> : null }</span>
+                dom = <span className="reference">{authors} ({year}). {url === null ? title : <a href={url} target={"_blank"}>{title}</a>}{title.charAt(title.length - 1) === "?" ? "" : "."} <em>{source}</em>.{summary ? <span className="summary">{summary}</span> : null }</span>
             }
             else
                 dom = <span className="alert alert-danger">Expected at least 4 items in the reference array, but found {ref.length}: <code>{ref.toString()}</code></span>
