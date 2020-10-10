@@ -186,7 +186,7 @@ class Parser {
         return this.restOfLine().trim() === "";
     }
 
-    // Read until encountering non-whitespace.
+    // Read until encountering something other than a tab or a space.
     readWhitespace() {
         while(this.more() && /^[ \t]/.test(this.peek()))
             this.read();
@@ -243,27 +243,30 @@ readUntilNewLine() {
             this.readUntilNewLine();
             return null;
         }
-        // Parse and return a header
+        // Parse and return a header if it starts with a hash
         else if(this.nextIs("#"))
             return this.parseHeader(metadata);
-        // Parse and return a horizontal rule
+        // Parse and return a horizontal rule if it starts with a dash
         else if(this.nextIs("-"))
             return this.parseRule(metadata);
-        // Parse and return an embed.
+        // Parse and return an embed if it starts with a bar
         else if(this.nextIs("|"))
             return this.parseEmbed(metadata);
-        // Parse and return a bulleted list
+        // Parse and return a bulleted list if it starts with a star and space
         else if(this.nextIs("* "))
             return this.parseBulletedList(metadata);
-        // Parse and return a numbered list
+        // Parse and return a numbered list if it starts with a number
         else if(this.nextMatches(/^[0-9]+\./))
             return this.parseNumberedList(metadata);
-        // Parse and return a code block
+        // Parse and return a code block if it starts with `
         else if(this.nextIs("`"))
             return this.parseCode(metadata);
-        // Parse and return a quote block
+        // Parse and return a quote block if it starts with "
         else if(this.nextMatches(/^"[ \t]*\n/))
             return this.parseQuote(metadata);
+        // Parse and return a callout if the line starts with _
+        else if(this.nextMatches(/^=[ \t]*\n/))
+            return this.parseCallout(metadata);
         // Parse the text as paragraph;
         else
             return this.parseParagraph(metadata);
@@ -402,7 +405,7 @@ readUntilNewLine() {
             var block = this.parseBlock(metadata);
             // Add it to the list if we parsed something.
             if(block !== null)
-            blocks.push(block);            
+                blocks.push(block);
             // Read whitespace until we find the next thing.
             while(this.peek() === " " || this.peek() === "\t" || this.peek() === "\n")
                 this.read();
@@ -416,6 +419,39 @@ readUntilNewLine() {
         var credit = this.nextIs("\n") ? null : this.parseContent(metadata);
 
         return new QuoteNode(blocks, credit);
+
+    }
+
+    parseCallout(metadata) {
+
+        var blocks = [];
+
+        // Parse the _ ...
+        this.read();
+
+        // ...then any whitespace
+        this.readWhitespace();
+
+        // ...then read the newline.
+        this.read();
+
+        // Then, read until we find a closing _
+        while(this.more() && !this.nextIs("=")) {
+            // Read a block
+            var block = this.parseBlock(metadata);
+            // Add it to the list if we parsed something.
+            if(block !== null)
+                blocks.push(block);
+            // Read whitespace until we find the next thing.
+            while(this.peek() === " " || this.peek() === "\t" || this.peek() === "\n")
+                this.read();
+        }
+
+        // Read the closing _ and the whitespace that follows.
+        this.read();
+        this.readWhitespace();
+
+        return new CalloutNode(blocks);
 
     }
 
@@ -813,6 +849,27 @@ class QuoteNode extends Node {
 
     toText() {
         return _map(this.elements, element => element.toText()).join(" ") + (this.credit ? " " + this.credit.toText() : "");
+    }
+
+}
+
+class CalloutNode extends Node {
+
+    constructor(elements) {
+        super();
+        this.elements = elements;
+    }
+
+    toDOM(app, chapter, query, key) {
+
+        return <div className="callout" key={key}>
+            {_map(this.elements, (element, index) => element.toDOM(app, chapter, query, "callout-" + index))}
+        </div>
+
+    }
+
+    toText() {
+        return _map(this.elements, element => element.toText()).join(" ");
     }
 
 }

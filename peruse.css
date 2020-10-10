@@ -99,6 +99,14 @@ blockquote {
 	font-style: italic;
 }
 
+.callout {
+	border: 1px solid lightGray;
+	margin-bottom: 1em;
+	margin-top: 1em;
+	padding-left: 1em;
+	padding-right: 1em;
+	margin-right: 1em;}
+
 .table {
 	line-height: 1.4em;
 }
