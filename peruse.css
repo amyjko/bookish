@@ -137,6 +137,15 @@ blockquote {
 	padding: .25em;
 }
 
+.reference .summary {
+	font-size: 80%;
+	padding-left: 1em;
+	display: inline-block;
+	border-left: 4px solid rgb(220,220,220);
+	margin-top: 1em;
+	font-style: italic;
+}
+
 
 /* Highlight JS colors */
 

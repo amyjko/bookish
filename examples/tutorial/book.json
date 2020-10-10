@@ -31,7 +31,8 @@
 			"Yim Register, Amy J. Ko", 2020,
 			"Learning machine learning with personal data helps stakeholders ground advocacy arguments in model mechanics",
 			"#ICER", 
-			"http://faculty.washington.edu/ajko/papers/Register2020PersonalData.pdf"
+			"http://faculty.washington.edu/ajko/papers/Register2020PersonalData.pdf",
+			"Finds that teaching machine learning by tracing an algorithm with learners' personal data increases the extent to which they can identify bias in self-advocacy arguments."
 		]
 	}
 }

@@ -69,12 +69,13 @@ class Parser {
                 var title = ref[2];
                 var source = ref[3];
                 var url = ref.length === 5 ? ref[4] : null;
+                var summary = ref.length === 6 ? ref[5] : null;
                 if(source.charAt(0) === "#") {
                     source = app.getSource(source);
                     if(source === null)
                         source = <span className="alert alert-danger">Unknown source <code>{ref[3]}</code></span>;
                 }
-                dom = <span>{authors} ({year}). {url === null ? title : <a href={url} target={"_blank"}>{title}</a>}. <em>{source}</em>.</span>
+                dom = <span className="reference">{authors} ({year}). {url === null ? title : <a href={url} target={"_blank"}>{title}</a>}. <em>{source}</em>.{summary ? <span className="summary">{summary}</span> : null }</span>
             }
             else
                 dom = <span className="alert alert-danger">Expected at least 4 items in the reference array, but found {ref.length}: <code>{ref.toString()}</code></span>
