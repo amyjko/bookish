@@ -109,6 +109,12 @@ blockquote {
 
 .table {
 	line-height: 1.4em;
+	border-top: 1px solid lightGray;
+	border-bottom: 1px solid lightGray;
+}
+
+.rows center {
+	font-style: italic;
 }
 
 .navigation-footer {

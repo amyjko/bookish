@@ -6,6 +6,7 @@ import { Link } from 'react-router-dom';
 import { NavHashLink } from "react-router-hash-link";
 import { Figure } from './views/image';
 import Highlight from 'react-highlight.js';
+import { TableOfContents } from './views/toc';
 
 // A simple recursive descent parser for this grammar.
 // Embeds a tokenizer, since the lexical grammar is simple.
@@ -267,6 +268,9 @@ readUntilNewLine() {
         // Parse and return a callout if the line starts with _
         else if(this.nextMatches(/^=[ \t]*\n/))
             return this.parseCallout(metadata);
+        // Parse and return a table if the line starts with a ,
+        else if(this.nextIs(","))
+            return this.parseTable(metadata);
         // Parse the text as paragraph;
         else
             return this.parseParagraph(metadata);
@@ -452,6 +456,40 @@ readUntilNewLine() {
         this.readWhitespace();
 
         return new CalloutNode(blocks);
+
+    }
+
+    parseTable(metadata) {
+
+        var rows = [];
+
+        // Parse rows until the lines stop starting with ,
+        while(this.more() && this.nextIs(",")) {
+
+            let row = [];
+
+            while(this.more() && !this.nextIs("\n")) {
+
+                // Read the comma
+                this.read();
+
+                // Read content until reaching a comma
+                row.push(this.parseContent(metadata, ","));
+
+            }
+
+            // Add the row.
+            rows.push(row);
+
+            // Read the newline
+            this.read();
+
+        }
+
+        // Read the caption
+        var caption = this.parseContent(metadata);
+
+        return new TableNode(rows, caption);
 
     }
 
@@ -870,6 +908,39 @@ class CalloutNode extends Node {
 
     toText() {
         return _map(this.elements, element => element.toText()).join(" ");
+    }
+
+}
+
+class TableNode extends Node {
+
+    constructor(rows, caption) {
+        super();
+        this.rows = rows;
+        this.caption = caption;
+    }
+
+    toDOM(app, chapter, query, key) {
+
+        return <div className="rows" key={key}>
+            <table className="table">
+                <tbody>
+                {
+                    _map(this.rows, (row, index) => 
+                        <tr key={"row-" + index}>
+                            {_map(row, (cell, index) => <td key={"cell-" + index}>{cell.toDOM(app, chapter, query, "cell-" + index)}</td>)}
+                        </tr>
+                    )
+                }
+                </tbody>
+            </table>
+            <center>{this.caption.toDOM(app, chapter, query)}</center>
+        </div>;
+
+    }
+
+    toText() {
+        return _map(this.rows, row => _map(row, cell => cell.toText()).join(", ")).join(", ");
     }
 
 }
