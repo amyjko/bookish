@@ -36,7 +36,7 @@ class Search extends React.Component {
         // Go through all the chapter indexes and find matches.
         if(query.length > 2)
             _each(this.props.app.getChapters(), (chapter, chapterNumber) => {
-                var chapterID = chapter[1];
+                var chapterID = chapter.id;
                 var index = this.props.app.getChapterIndex(chapterID);
 
                 // No index yet? Skip this chapter.
@@ -58,7 +58,7 @@ class Search extends React.Component {
                 matchCount += chapterMatches.length;
 
                 if(chapterMatches.length > 0) {
-                    results.push(<h2 key={"header-" + chapterID}>Chapter {chapterNumber+1} - {chapter[0]}</h2>);
+                    results.push(<h2 key={"header-" + chapterID}>Chapter {chapterNumber+1} - {chapter.title}</h2>);
                     _each(chapterMatches, (match, index) => {
                         // Only highlight the part of the word that matches.
                         var start = match.match.indexOf(query);
