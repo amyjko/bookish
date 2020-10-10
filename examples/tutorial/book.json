@@ -1,14 +1,21 @@
 {
 	"title": "Peruse Tutorial",
 	"authors": ["[Amy J. Ko|https://faculty.washington.edu/ajko/]"],
-	"contributors": ["[mystery author 1|introduction]", "[mystery author 2|introduction]"],
-	"cover": ["cover.jpg", "A photograph of Boomy the cat sleeping.", "Boomy is excited that you're trying Peruse!", "Amy J. Ko"],
-	"unknown": ["unknown.jpg", "A photograph of Boomy the cat looking skeptical.", "Boomy is worried that you're lost.", "Amy J. Ko"],
+	"cover": "|cover.jpg|A photograph of Boomy the cat sleeping|Boomy is excited that you're trying Peruse!|Amy J. Ko|",
+	"unknown": "|unknown.jpg|A photograph of Boomy the cat looking skeptical.|Boomy is worried that you're lost.|Amy J. Ko|",
 	"description": "This is an example book, intended for presentation with the Peruse framework. Don't let it's simplicity fool you: it demonstrates all of the features of peruse, so you should be able to copy and modify any of its content to hepl you write your book.",
 	"chapters": [
-		["Introduction", "introduction", "chapter1.jpg", "A photo of Boomy", "Let's dive in!", "Amy J. Ko"],
-		["Chapter 1", "chapter1", "unknown.jpg", "A photo of skeptical Boomy", "Let's do more!", "Amy J. Ko"],
-		["Errors", "errors", "unknown.jpg", "A photo of skeptical Boomy", "Time to learn about errors, huh?", "Amy J. Ko"]
+		{
+			"id": "introduction",
+			"title": "Introduction",
+			"image": "|chapter1.jpg|A photo of Boomy|Let's dive in!|Amy J. Ko|"
+		},
+		{
+			"id": "errors",
+			"title": "Errors",
+			"contributors": ["Boomy", "[VS Code|https://code.visualstudio.com]"],
+			"image": "|unknown.jpg|A photo of skeptical Boomy|Time to learn about errors, huh?|Amy J. Ko|"
+		}
 	],
 	"revisions": [
 		["August 30th, 2020", "Created the initial draft."]

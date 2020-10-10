@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { Figure } from "./image";
+import { Parser } from "../parser";
 
 class Header extends React.Component {
 
@@ -10,7 +10,7 @@ class Header extends React.Component {
 			<div>
 				{
 					this.props.image ?
-						<Figure {...this.props.image}/> :
+						Parser.parseEmbed(this.props.image).toDOM() :
 						null
 				}
 				<h1>{this.props.header}</h1>

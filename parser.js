@@ -51,6 +51,10 @@ class Parser {
         return (new Parser(text)).parseContent();
     }
 
+    static parseEmbed(text) {
+        return (new Parser(text)).parseEmbed();
+    }
+
     static parseReference(ref, app) {
 
         var dom = null;
@@ -694,6 +698,15 @@ class EmbedNode extends Node {
 
     toText() {
         return this.caption.toText();
+    }
+
+    toJSON() {
+        return {
+            url: this.url,
+            alt: this.description,
+            caption: this.caption.toText(),
+            credit: this.credit.toText()
+        };   
     }
 
 }

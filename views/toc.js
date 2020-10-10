@@ -2,6 +2,7 @@ import _map from 'lodash/map';
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { Header } from "./header";
+import { Authors } from "./authors";
 import { Parser } from "../parser";
 
 class TableOfContents extends React.Component {
@@ -51,17 +52,8 @@ class TableOfContents extends React.Component {
 
 				<Header 
 					image={this.props.app.getCover()} 
-					header={this.props.app.getTitle()} 
-					content={
-						<div>
-							<em>by</em> {Parser.parseContent(this.props.app.getAuthors()).toDOM()}
-							<br/>
-							<small>
-								{this.props.app.getContributors() ? 
-								<span><em> with contributions from</em> {Parser.parseContent(this.props.app.getContributors()).toDOM()}</span> : null}
-							</small>
-						</div>
-					}
+					header={this.props.app.getTitle()}
+					content={<Authors authors={this.props.app.getAuthors()} contributors={this.props.app.getContributors()} />}
 				/>
 
 				{Parser.parseChapter(this.props.app.getDescription()).toDOM()}
@@ -72,26 +64,29 @@ class TableOfContents extends React.Component {
 					<tbody>
 						{
 							_map(this.props.app.getChapters(), (chapter, index) => {
+
+								let image = Parser.parseEmbed(chapter.image).toJSON();
+
 								return (
 									<tr key={"chapter" + index}>
 										<td>
 											<img 
 												className="img-rounded" 
 												style={{width: "5em"}} 
-												src={"images/" + chapter[2]}
-												alt={chapter[3]} 
+												src={image.url.startsWith("http") ? image.url : "images/" + image.url}
+												alt={chapter.alt}
 											/>
 										</td>
 										<td style={{textAlign: "right"}}><em>Chapter {index + 1}</em></td>
 										<td>
 											{
 												// If it's not loaded, say so.
-												this.props.app.getContent(chapter[1]) === undefined ?
-													<span>{chapter[0]}</span> :
+												this.props.app.getContent(chapter.id) === undefined ?
+													<span>{chapter.title}</span> :
 												// If it failed to load, say so.
-												this.props.app.getContent(chapter[1]) === null ?
+												this.props.app.getContent(chapter.id) === null ?
 													<div>
-														<span>{chapter[0]}</span> 
+														<span>{chapter.title}</span> 
 														<br/>
 														<small>
 															<em>
@@ -102,13 +97,13 @@ class TableOfContents extends React.Component {
 													</div> :
 													// If it did load, link it!
 													<div>
-														<Link to={"/" + chapter[1]}>{chapter[0]}</Link>
+														<Link to={"/" + chapter.id}>{chapter.title}</Link>
 														<br/>
 														<small className="text-muted">
 															<em>
-																{ this.props.app.getChapterReadingTime(chapter[1]) } minute read
+																{ this.props.app.getChapterReadingTime(chapter.id) } minute read
 																{
-																	this.getProgressDescription(chapter[1] in progress ? progress[chapter[1]] : null)
+																	this.getProgressDescription(chapter.id in progress ? progress[chapter.id] : null)
 																}
 															</em>
 														</small>

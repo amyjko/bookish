@@ -72,17 +72,26 @@ class Peruse extends React.Component {
 	getContent(chapterID) { return chapterID in this.state.chapters ? this.state.chapters[chapterID] : undefined; }
 	getTitle() { return this.getBook().title; }
 	getAuthors() { return this.getBook().authors.join(", "); }
-	getContributors() { return this.getBook().contributors == null ? null : this.getBook().contributors.join(", "); }
+	
+	getContributors() { 
+		// Merge all contributors from all chapters.
+		var contributors = [];
+		_each(this.getChapters(), 
+			chapter => _each(chapter.contributors, 
+				contributor => contributors.includes(contributor) ? null : contributors.push(contributor)));
+		return contributors;
+	}
+
 	getDescription() { return this.getBook().description; }
 	getRevisions() { return this.getBook().revisions; }
 	getChapterReadingTime(chapterID) {  return chapterID in this.state.chapters ? Math.max(1, Math.round(this.state.chapters[chapterID].wordCount / 150)) : 0; }
 	getBookReadingTime() {
 		return _reduce(_map(Object.keys(this.state.chapters), chapterID => this.getChapterReadingTime(chapterID)), (total, count) => total + count);
 	}
-	getChapters() { return this.getBook().chapters; }
+	getChapters() { return this.getBook().chapters; }	
 	getChapterNumber(chapterID) {
 		if(!(chapterID in this.chapterNumbers)) {
-			var chapterNumber = _map(this.getChapters(), chapter => chapter[1]).indexOf(chapterID);
+			var chapterNumber = _map(this.getChapters(), chapter => chapter.id).indexOf(chapterID);
 			if(chapterNumber < 0) return null;
 			else this.chapterNumbers[chapterID] = chapterNumber + 1;
 		}
@@ -95,16 +104,8 @@ class Peruse extends React.Component {
 	getLoadedChapters() { return this.state.chapters; }
 	chaptersAreLoaded() { return Object.keys(this.state.chapters).length === this.getBook().chapters.length; }
 	getLicense() { return this.getBook().license; }
-	getImage(image) {
-		return {
-			url: image[0],
-			alt: image[1],
-			caption: image[2],
-			credit: image[3]
-		}
-	}
-	getCover() { return this.getImage(this.getBook().cover); }
-	getUnknown() { return this.getBook() ? this.getImage(this.getBook().unknown) : null; }
+	getCover() { return this.getBook().cover; }
+	getUnknown() { return this.getBook().unknown; }
 	getReferences() { return this.getBook().references; }
 
 	computeIndex(text) {
@@ -222,9 +223,9 @@ class Peruse extends React.Component {
 
 		var chapters = this.getChapters();
 		for(var i = 0; i < chapters.length; i++) {
-			if(chapters[i][1] === id) {
+			if(chapters[i].id === id) {
 				if(i < chapters.length - 1)
-					return this.getContent(chapters[i + 1][1]);
+					return this.getContent(chapters[i + 1].id);
 				else
 					return null;
 			}
@@ -237,9 +238,9 @@ class Peruse extends React.Component {
 
 		var chapters = this.getChapters();
 		for(var i = 0; i < chapters.length; i++) {
-			if(chapters[i][1] === id) {
+			if(chapters[i].id === id) {
 				if(i > 0)
-					return this.getContent(chapters[i - 1][1]);
+					return this.getContent(chapters[i - 1].id);
 				else
 					return null;
 			}
@@ -253,26 +254,22 @@ class Peruse extends React.Component {
 		// Request all of the chapter content...
 		_each(this.getChapters(), (chapter) => {
 
-			var chapterID = chapter[1];
-
-			fetch("chapters/" + chapterID + ".md")
+			fetch("chapters/" + chapter.id + ".md")
 				.then((response) => {
 					// Uh oh, something bad happened. We couldn't load the chapter.
 					if(response.ok) {
 						response.text().then(text => {
 							// Notify the component that we got a new chapter.
 							var updatedChapters = _clone(this.state.chapters);
-							updatedChapters[chapter[1]] = {
-								title: chapter[0],
+
+							// Augment the chapter object with the text and other detail.
+							updatedChapters[chapter.id] = {
+								title: chapter.title,
+								id: chapter.id,
+								image: chapter.image,
+								contributors: chapter.contributors,
 								text: text,
 								wordCount: text.split(/\s+/).length,
-								id: chapterID,
-								image: {
-									url: chapter[2],
-									alt: chapter[3],
-									caption: chapter[4],
-									credit: chapter[5]
-								},
 								index: this.computeIndex(text)
 							};
 							this.setState({ chapters: updatedChapters });
@@ -280,14 +277,14 @@ class Peruse extends React.Component {
 					}
 					else {
 						var updatedChapters = _clone(this.state.chapters);
-						updatedChapters[chapter[1]] = null;
+						updatedChapters[chapter.id] = null;
 						this.setState({ chapters: updatedChapters });
 					}
 				})
 				.catch(err => { 
 					// Uh oh, something bad happened. We couldn't load the chapter.
 					var updatedChapters = _clone(this.state.chapters);
-					updatedChapters[chapter[1]] = null;
+					updatedChapters[chapter.id] = null;
 					// Notify the component that we got a new chapter.
 					this.setState({ chapters: updatedChapters });
 					// Tell the dev about the problem.
@@ -322,7 +319,7 @@ class Peruse extends React.Component {
 								{
 									// Map all the book chapters to routes
 									_map(this.getChapters(), (chapter, index) => {
-										return <Route key={"chapter" + index} path={"/" + chapter[1] + "/:word?/:number?"} render={(props) => <Chapter {...props} id={chapter[1]} app={this} />} />
+										return <Route key={"chapter" + index} path={"/" + chapter.id + "/:word?/:number?"} render={(props) => <Chapter {...props} id={chapter.id} app={this} />} />
 									})
 								}
 								<Route path="/references" render={(props) => <References {...props} app={this} />} />

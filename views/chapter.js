@@ -6,7 +6,7 @@ import { NavHashLink } from "react-router-hash-link";
 
 import { Parser } from "../parser";
 import { Header } from './header';
-
+import { Authors } from "./authors";
 
 class Chapter extends React.Component {
 
@@ -214,9 +214,7 @@ class Chapter extends React.Component {
 			return (
 				<div className="chapter">
 					<Header image={chapter.image} header={chapter.title} content={null} />
-					<div>
-						<em>by</em> {Parser.parseContent(this.props.app.getAuthors()).toDOM()}
-					</div>
+					<Authors authors={this.props.app.getAuthors()} contributors={chapter.contributors} />
 
 					{ this.state.editing ? this.renderEditor() : null }
 
