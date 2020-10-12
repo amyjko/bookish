@@ -18,7 +18,7 @@ class Authors extends React.Component {
                                     _map(
                                         this.props.contributors, 
                                         (contributor, index) => 
-                                            <span>
+                                            <span key={index}>
                                                 {
                                                     Parser.parseContent(contributor).toDOM(undefined, undefined, undefined, index)}
                                                     {index === this.props.contributors.length - 1 ? "" : ", "
