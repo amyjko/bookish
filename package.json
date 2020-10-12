@@ -14,17 +14,18 @@
 		"ship": "set -e -o pipefail; npm run clean; npm run build-assets; npm run build-prod; npm run sync"
 	},
 	"devDependencies": {
-		"@babel/cli": "^7",
-		"@babel/core": "^7",
-		"@babel/preset-env": "^7",
+		"@babel/cli": "^7.11.6",
+		"@babel/core": "^7.11.6",
+		"@babel/preset-env": "^7.11.5",
 		"@babel/preset-react": "^7",
 		"babelify": "^10",
 		"browserify": "^16.5.2",
-		"terser": "^5.3.2",
-		"uglify-js": "^3.4.7",
+		"terser": "^5.3.4",
+		"uglify-js": "^3.11.2",
 		"uglifyify": "^5.0.2"
 	},
 	"dependencies": {
+		"ajv": "^6.0",
 		"history": "^4.7.2",
 		"jquery": "^3.0.0",
 		"lodash": "^4.17.10",
@@ -33,6 +34,6 @@
 		"react-dom": "^16.3",
 		"react-highlight.js": "^1.0.7",
 		"react-router-dom": "^5.2",
-		"react-router-hash-link": "^2.0.0"
+		"react-router-hash-link": "^2.2.2"
 	}
 }

@@ -8,6 +8,10 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import { Link, Route, HashRouter, Switch, withRouter } from 'react-router-dom';
 
+import Ajv from 'ajv';
+
+var schema = require("./schema.json");
+
 import { Parser } from "./parser";
 import { Chapter } from "./views/chapter";
 import { TableOfContents } from "./views/toc";
@@ -26,23 +30,46 @@ class Peruse extends React.Component {
 		this.state = {
 			book: undefined,
 			chapters: {},
+			errors: null,
 			loadingTime: undefined
 		};
 		
 		// Fetch the JSON
 		fetch(this.props.book)
-			.then(response => response.json())
+			.then(response => {
+				if(response.status >= 200 && response.status <= 299) {
+					return response.json();
+				} else {
+					throw Error(response.statusText);
+				}
+			})
 			.then(data => {
-				// Yay, we got data! Set the state, then fetch the chapters.
-				this.setState({ book: data }, () => { 
-					document.title = this.getTitle();
-					this.fetchChapters(); 
-				});
+				// Validate the book schema before we get started.
+				var ajv = new Ajv();
+				let valid = ajv.validate(schema, data);
+				// Oops, the book JSON had errors.
+				if(!valid) {
+					this.setState({
+						book: null,
+						errors: _map(
+							ajv.errors, 
+							error => this.props.book + error.dataPath + " " + error.message)
+					});
+				} else {
+					// Yay, we got data! Set the state, then fetch the chapters.
+					this.setState({ book: data }, () => { 
+						document.title = this.getTitle();
+						this.fetchChapters(); 
+					});
+				}
 			})
 			.catch(err => { 
+				console.error(err);
 				// Uh oh, something bad happened. Set data to null to render an error.
-				this.setState({ book: null });
-				console.error("Unable to load " + this.props.book + ": " + err);
+				this.setState({ 
+					book: null,
+					errors: ["Wasn't able to load the file " + this.props.book + ": " + err.message ]
+				});
 			});
 
 		this.index = null;
@@ -306,7 +333,14 @@ class Peruse extends React.Component {
 		} 
 		// If it failed to load, provide some feedback.
 		else if(this.getBook() === null) {
-			return <Unknown message={<p className="alert alert-danger">Wasn't able to load the book <code>{this.props.book}</code>. The book specification probably has a syntax error, but it's also possible that this file doesn't exist or there was a problem with the server.</p>} app={this} />;
+			return <Unknown message={
+					<div>
+						<p>Wasn't able to load the book. Here are the errors we found:</p>
+						<ul>
+							{ _map(this.state.errors, (error, index) => <li key={index} className="alert alert-danger">{error}</li>)}
+						</ul>
+					</div>
+				} app={this} />;
 		}
 		// Render the book
 		else 
