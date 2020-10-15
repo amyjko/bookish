@@ -115,15 +115,35 @@ class Peruse extends React.Component {
 	getBookReadingTime() {
 		return _reduce(_map(Object.keys(this.state.chapters), chapterID => this.getChapterReadingTime(chapterID)), (total, count) => total + count);
 	}
-	getChapters() { return this.getBook().chapters; }	
+	getChapters() { return this.getBook().chapters; }
+
 	getChapterNumber(chapterID) {
+
+		// If we haven't cached it yet, compute it.
 		if(!(chapterID in this.chapterNumbers)) {
-			var chapterNumber = _map(this.getChapters(), chapter => chapter.id).indexOf(chapterID);
-			if(chapterNumber < 0) return null;
-			else this.chapterNumbers[chapterID] = chapterNumber + 1;
+			let chapterNumber = 1;
+			let found = false;
+			_each(this.getChapters(), chapter => {
+				// If we found a match...
+				if(chapter.id === chapterID) {
+					found = true;
+					// And it's an unnumbered chapter, set to null.
+					if("numbered" in chapter && chapter.numbered === false)
+						chapterNumber = null;
+					return false;
+				} 
+				// Otherwise, increment if it's numbered.
+				else if(!("numbered" in chapter) || chapter.numbered === true)
+					chapterNumber++;
+			});
+			// Remember the number.
+			this.chapterNumbers[chapterID] = chapterNumber;
 		}
+		// Return it.
 		return this.chapterNumbers[chapterID];
+
 	}
+
 	getSource(sourceID) { 
 		return sourceID.charAt(0) === "#" && sourceID.substring(1) in this.getBook().sources ? this.getBook().sources[sourceID.substring(1)] : null;
 	}

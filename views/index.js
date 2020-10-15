@@ -50,9 +50,9 @@ class Index extends React.Component {
                         <td>
                             {_map(
                                 bookIndex[word], 
-                                (chapter, index) => 
+                                (chapterID, index) => 
                                     <span key={index}>
-                                        Chapter {this.props.app.getChapterNumber(chapter)}. <Link to={"/" + chapter + "/" + word}>{this.props.app.getChapterName(chapter)}</Link>
+                                        Chapter { this.props.app.getChapterNumber(chapterID) !== null ? <span> {this.props.app.getChapterNumber(chapterID)}. </span>: null}<Link to={"/" + chapterID + "/" + word}>{this.props.app.getChapterName(chapterID)}</Link>
                                         {index < bookIndex[word].length - 1 ? <br/> : null}
                                     </span>
                             )}

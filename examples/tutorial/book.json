@@ -8,7 +8,8 @@
 		{
 			"id": "introduction",
 			"title": "Introduction",
-			"image": "|chapter1.jpg|A photo of Boomy|Let's dive in!|Amy J. Ko|"
+			"image": "|chapter1.jpg|A photo of Boomy|Let's dive in!|Amy J. Ko|",
+			"numbered": false
 		},
 		{
 			"id": "errors",

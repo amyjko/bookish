@@ -26,12 +26,12 @@
             "type": "array",
             "items": {
                 "type": "object",
-                "additionalProperties": false,
                 "required": ["id", "title", "image"],
                 "properties": {
                     "id": { "type": "string", "pattern": "^[a-zA-Z0-9]+$"},
                     "title": { "type": "string" },
                     "image": { "$ref": "#/definitions/embed" },
+                    "numbered": { "type": "boolean", "default": "True by default" },
                     "contributors": { "type": "array", "items": { "type": "string" }}
                 }
             }

@@ -207,13 +207,14 @@ class Chapter extends React.Component {
 			return <p className="alert alert-danger">Unable to load chapter.</p>;
 		}
 		else {
+			let chapterNumber = this.props.app.getChapterNumber(this.props.id);
 			var nextChapter = this.props.app.getNextChapter(this.props.id);
 			var previousChapter = this.props.app.getPreviousChapter(this.props.id);
 			var chapterAST = Parser.parseChapter(chapter.text);
 			var citations = chapterAST.getCitations();
 			return (
 				<div className="chapter">
-					<Header image={chapter.image} header={chapter.title} content={null} />
+					<Header image={chapter.image} header={<span>{chapterNumber === null ? null : <small><small className="text-muted">Chapter {chapterNumber}<br/></small></small>}{chapter.title}</span>} content={null} />
 					<Authors authors={this.props.app.getAuthors()} contributors={chapter.contributors} />
 
 					{ this.state.editing ? this.renderEditor() : null }

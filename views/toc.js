@@ -66,6 +66,7 @@ class TableOfContents extends React.Component {
 							_map(this.props.app.getChapters(), (chapter, index) => {
 
 								let image = Parser.parseEmbed(chapter.image).toJSON();
+								let chapterNumber = this.props.app.getChapterNumber(chapter.id);
 
 								return (
 									<tr key={"chapter" + index}>
@@ -77,7 +78,7 @@ class TableOfContents extends React.Component {
 												alt={chapter.alt}
 											/>
 										</td>
-										<td style={{textAlign: "right"}}><em>Chapter {index + 1}</em></td>
+										<td style={{textAlign: "right"}}><em>Chapter{chapterNumber === null ? "" : " " + chapterNumber}</em></td>
 										<td>
 											{
 												// If it's not loaded, say so.
