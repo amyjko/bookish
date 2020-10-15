@@ -30,16 +30,10 @@ class Index extends React.Component {
             // This block of code renders headers for letter groups
             var firstLetter = word.charAt(0).toLowerCase();
 
+            // Update the letter that we're on.
             if(currentLetter !== firstLetter) {
                 currentLetter = firstLetter;
                 letters[currentLetter] = true;
-
-                // if(this.props.match.params.letter === currentLetter)
-                //     rows.push(
-                //         <tr key={"header-" + index} id={"header-" + currentLetter}>
-                //             <td colSpan={2}><h2>{currentLetter}</h2></td>
-                //         </tr>
-                //     );
             }
 
             // Or is this the selected letter?
@@ -49,7 +43,14 @@ class Index extends React.Component {
                         <td>{word}</td>
                         <td>
                             {_map(
-                                bookIndex[word], 
+                                // Sort the chapters by chapter number
+                                bookIndex[word].sort((a, b) => {
+                                    let numberA = this.props.app.getChapterNumber(a);
+                                    let numberB = this.props.app.getChapterNumber(b);
+                                    if(numberA === null) return -1;
+                                    if(numberB === null) return 1;
+                                    return numberA - numberB;
+                                }), 
                                 (chapterID, index) => 
                                     <span key={index}>
                                         Chapter { this.props.app.getChapterNumber(chapterID) !== null ? <span> {this.props.app.getChapterNumber(chapterID)}. </span>: null}<Link to={"/" + chapterID + "/" + word}>{this.props.app.getChapterName(chapterID)}</Link>

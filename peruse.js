@@ -245,21 +245,20 @@ class Peruse extends React.Component {
 
 		var bookIndex = {};
 
-		// Construct the index.
+		// Construct the index by building a dictionary of chapters in which each word appears.
 		_each(this.state.chapters, chapter => {
 			_each(Object.keys(chapter.index), (word) => {
 				if(word !== "" && word.length > 2) {
-					if(word in bookIndex)
-						bookIndex[word].push(chapter.id);
-					else
-						bookIndex[word] = [chapter.id];
+					if(!(word in bookIndex))
+						bookIndex[word] = {};
+					bookIndex[word][chapter.id] = true;
 				}
 			});
 		});
 
-		// Sort the chapter numbers for each word.
-		_each(Object.keys(bookIndex), (word) => {
-			bookIndex[word] = bookIndex[word].sort((a, b) => { return this.getChapterNumber(a) > this.getChapterNumber(b); });
+		// Convert each word's dictionary to a list of chapter IDs for display.
+		_each(Object.keys(bookIndex), word => {
+			bookIndex[word] = Object.keys(bookIndex[word]);
 		});
 
 		return this.cleanIndex(bookIndex);
