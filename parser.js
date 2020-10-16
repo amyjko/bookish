@@ -21,6 +21,8 @@ import { TableOfContents } from './views/toc';
 // UNORDERED :: ([0-9]+. CONTENT)+
 // CODE :: `\nTEXT`
 // QUOTE :: "\nBLOCK*\n"CONTENT
+// TABLE :: ((,CONTENT)+\n)+
+// CODE :: _\nTEXT\n_
 // PARAGRAPH :: CONTENT
 // CONTENT :: FORMATTED | CITATIONS | ESCAPED | LINK
 // FORMATTED :: *CONTENT* | _CONTENT_ | `CONTENT`
