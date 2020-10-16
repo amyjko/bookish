@@ -1100,7 +1100,7 @@ class TextNode extends Node {
 
         } 
         // Otherwise, just return the text.
-        else return <span key={this.position} className="text" data-position={this.position}>{this.text}</span>;
+        else return <span key={key} className="text" data-position={this.position}>{this.text}</span>;
 
     }
 
@@ -1116,7 +1116,7 @@ class ErrorNode extends Node {
         this.error = error;
     }
 
-    toDOM(app, chapter, key) {
+    toDOM(app, chapter, query, key) {
         return <span key={key} className="alert alert-danger">Error: {this.error}</span>;
     }
 
