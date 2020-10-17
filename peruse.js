@@ -155,6 +155,16 @@ class Peruse extends React.Component {
 	getUnknown() { return this.getBook().unknown; }
 	getReferences() { return this.getBook().references; }
 
+	getFootnoteSymbol(number) {
+
+		let symbols = "abcdefghijklmnopqrstuvwxyz";
+        // TODO Let's hope there are never more than 26^2 footnotes in a single chapter...
+        return number < symbols.length ?
+            symbols.charAt(number) :
+            symbols.charAt(Math.floor(number / symbols.length) - 1) + symbols.charAt(number % symbols.length);
+
+	}
+
 	computeIndex(text) {
 
 		// Build a list of common words

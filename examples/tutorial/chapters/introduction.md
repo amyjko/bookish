@@ -109,6 +109,14 @@ You can include captioned images like the one at the top of this chapter by usin
 
 If you cite something that doesn't appear in your book specification's reference list, you'll get an error like this: <thisisanunknowncitation>.
 
+You can also include footnotes{I'm a footnote}:
+
+`
+You can also include footnotes{I'm a footnote}{I'm also a footnote}:
+`
+
+If you include more footnotes, Peruse will letter them accordingly{I'm also a footnote}.
+
 You can also include YouTube videos by using the same syntax as above, but just including a YouTube video in the URL instead.
 
 `

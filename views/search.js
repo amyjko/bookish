@@ -64,7 +64,7 @@ class Search extends React.Component {
                         // Only highlight the part of the word that matches.
                         var start = match.match.indexOf(query);
                         var left = match.left + match.match.substring(0, start);
-                        var wordMatch = <span className="query-match">{match.match.substring(start, start + query.length)}</span>;
+                        var wordMatch = <span className="content-highlight">{match.match.substring(start, start + query.length)}</span>;
                         var right = match.match.substring(start + query.length) + match.right;
 
                         results.push(<p key={"header-" + chapterID + "-" + index}><Link to={"/" + chapterID + "/" + match.match.toLowerCase() + "/" + index}>...{left}{wordMatch}{right}...</Link></p>);

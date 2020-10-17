@@ -85,13 +85,6 @@ a {
 	color: rgb(14, 121, 209);
 }
 
-.highlight {
-	background-color: rgb(204, 232, 255);
-	border-radius: 5px;
-	padding-top: 5px;
-	padding-bottom: 5px;
-}
-
 blockquote {
 	border-top: 1px solid lightGray;
 	border-bottom: 1px solid lightGray;
@@ -144,7 +137,7 @@ blockquote {
 	padding: .25em;
 }
 
-.query-match {
+.content-highlight {
 	background-color: rgb(247, 244, 157);
 	border: 1px solid lightGray;
 	border-radius: 5px;

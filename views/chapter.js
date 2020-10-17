@@ -76,7 +76,7 @@ class Chapter extends React.Component {
 		// Scroll to the first match.
 		if(this.props.match.params.word) {
 
-			var match = document.getElementsByClassName("query-match");
+			var match = document.getElementsByClassName("content-highlight");
 
 			var number = this.props.match.params.number && this.props.match.params.number < match.length ? this.props.match.params.number : 0;
 
@@ -197,8 +197,20 @@ class Chapter extends React.Component {
 	render() {
 
 		var chapter = this.props.app.getContent(this.props.id);
-		var refHighlight = window.location.hash.split("#")[2];
-		var refHighlight = refHighlight ? refHighlight.split("-")[1] : null;
+
+		// Figure out if there's something to highlight.
+		var citationHighlight = null;
+		var noteHighlight = null;
+		var highlight = window.location.hash.split("#")[2];
+		if(highlight) {
+			let parts = highlight.split("-");
+			let kind = parts[0];
+			let id = parts[1];
+			if(kind === "ref")
+				citationHighlight = id;
+			else if(kind == "note")
+				noteHighlight = parseInt(id);
+		}
 
 		if(chapter === undefined) {
 			return null;
@@ -208,10 +220,11 @@ class Chapter extends React.Component {
 		}
 		else {
 			let chapterNumber = this.props.app.getChapterNumber(this.props.id);
-			var nextChapter = this.props.app.getNextChapter(this.props.id);
-			var previousChapter = this.props.app.getPreviousChapter(this.props.id);
-			var chapterAST = Parser.parseChapter(chapter.text);
-			var citations = chapterAST.getCitations();
+			let nextChapter = this.props.app.getNextChapter(this.props.id);
+			let previousChapter = this.props.app.getPreviousChapter(this.props.id);
+			let chapterAST = Parser.parseChapter(chapter.text);
+			let citations = chapterAST.getCitations();
+			let footnotes = chapterAST.getFootnotes();
 			return (
 				<div className="chapter">
 					<Header image={chapter.image} header={<span>{chapterNumber === null ? null : <small><small className="text-muted">Chapter {chapterNumber}<br/></small></small>}{chapter.title}</span>} content={null} />
@@ -225,24 +238,36 @@ class Chapter extends React.Component {
 					}
 					</div>
 					{
+						footnotes.length === 0 ? null :
+						<div>
+							<h1>Notes</h1>
+							{
+								_map(footnotes, (footnote, index) =>
+									<p id={"note-" + (index + 1)} className={noteHighlight === index + 1 ? "content-highlight" : ""} key={index}><sup>{this.props.app.getFootnoteSymbol(index)}</sup> {footnote.footnote.toDOM(this.props.app, chapterAST, this.props.match.params.word)}</p>
+								)
+							}
+						</div>
+					}
+					{
 						Object.keys(citations).length === 0 ? null :
 						<div>
 							<h1>References</h1>
 
 							<ol>
-							{_map(Object.keys(citations).sort(), citationID => {
-								var refs = this.props.app.getReferences();
-								if(citationID in refs) {
-									var ref = refs[citationID];
-									return <li key={"citation-" + citationID} className={citationID === refHighlight ? "highlight" : null} id={"ref-" + citationID}>
-										{Parser.parseReference(ref, this.props.app)}
-									</li>
+							{
+								_map(Object.keys(citations).sort(), citationID => {
+									var refs = this.props.app.getReferences();
+									if(citationID in refs) {
+										var ref = refs[citationID];
+										return <li key={"citation-" + citationID} className={citationID === citationHighlight ? "content-highlight" : null} id={"ref-" + citationID}>
+											{Parser.parseReference(ref, this.props.app)}
+										</li>
 
-								}
-								else {
-									return <li className="alert alert-danger" key={"citation-" + citationID}>Unknown reference: <code>{citationID}</code></li>;
-								}
-							})
+									}
+									else {
+										return <li className="alert alert-danger" key={"citation-" + citationID}>Unknown reference: <code>{citationID}</code></li>;
+									}
+								})
 							}
 							</ol>
 						</div>

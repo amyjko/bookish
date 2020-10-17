@@ -24,11 +24,12 @@ import { TableOfContents } from './views/toc';
 // TABLE :: ((,CONTENT)+\n)+
 // CODE :: _\nTEXT\n_
 // PARAGRAPH :: CONTENT
-// CONTENT :: FORMATTED | CITATIONS | ESCAPED | LINK
+// CONTENT :: FORMATTED | CITATIONS | ESCAPED | LINK | FOOTNOTE
 // FORMATTED :: *CONTENT* | _CONTENT_ | `CONTENT`
 // CITATIONS || <TEXT+,>
 // ESCAPED :: \[char]
 // LINK :: [CONTENT|TEXT]
+// FOOTNOTE :: {TEXT}
 // TEXT :: (.+)
 class Parser {
 
@@ -172,6 +173,7 @@ class Parser {
             next === "*" ||
             next === "`" ||
             next === "<" ||
+            next === "{" ||
             next === "[" ||
             next === "\\";
 
@@ -217,8 +219,9 @@ readUntilNewLine() {
 
         // We pass this to all parsing functions to gather information strewn about the document.
         var metadata = {
-            citations: {}
-        }
+            citations: {},
+            footnotes: []
+        };
 
         // While there's more text, parse a line.
         while(this.more()) {
@@ -509,6 +512,9 @@ readUntilNewLine() {
             // Parse a citation list
             else if(this.nextIs("<"))
                 segments.push(this.parseCitations(metadata));
+            // Parse a footnote
+            else if(this.nextIs("{"))
+                segments.push(this.parseFootnote(metadata));
             // Parse an escaped character
             else if(this.nextIs("\\"))
                 segments.push(this.parseEscaped(metadata));
@@ -517,8 +523,7 @@ readUntilNewLine() {
                segments.push(this.parseLink(metadata));
             // Keep reading text until finding a delimiter.
             else {
-
-                var text = "";
+                let text = "";
                 while(this.more() && (!awaiting || !this.nextIs(awaiting)) && !this.nextIsContentDelimiter() && !this.nextIs("\n"))
                     text = text + this.read();
                 segments.push(new TextNode(text, this.index));
@@ -596,7 +601,7 @@ readUntilNewLine() {
         while(this.more() && this.peek() !== delimeter && !this.nextIs("\n")) {
             // If this is more formatted text, make a text node with whatever we've accumulated so far, 
             // then parse the formatted text, then reset the accumulator.
-            if(this.peek() === "_" || this.peek() === "*" || this.peek() == "`" || this.peek() === "<" || this.peek() === "\\" || this.peek() === "[") {
+            if(this.nextIsContentDelimiter()) {
                 // If the text is a non-empty string, make a text node with what we've accumulated.
                 if(text !== "")
                     segments.push(new TextNode(text, this.index));
@@ -652,6 +657,29 @@ readUntilNewLine() {
 
     }
 
+    parseFootnote(metadata) {
+        
+        // Read the {
+        this.read();
+
+        // Read the footnote content.
+        var footnote = this.parseContent(metadata, "}");
+
+        // Read the closing }
+        this.read();
+
+        let node = new FootnoteNode(footnote);
+
+        // We won't necessarily be gathering this data.
+        // This does mean that if someone cites something in a non-chapter
+        // it will silently fail.
+        if(metadata)
+            metadata.footnotes.push(node);
+
+        return node;
+
+    }
+
     parseEscaped(metadata) {
 
         // Skip the scape and just add the next character.
@@ -704,16 +732,21 @@ class Node {
 class ChapterNode extends Node {
     constructor(blocks, metadata) {
         super();
+
+        // The AST of the chapter.
         this.blocks = blocks;
 
-        // A set of citations that occurred in this chapter.
-        // Citation nodes will add.
+        // Content extracted during parsing.
         this.metadata = metadata;
 
     }
 
     getCitations() { 
         return this.metadata.citations; 
+    }
+
+    getFootnotes() { 
+        return this.metadata.footnotes; 
     }
 
     getCitationNumber(citationID) { 
@@ -1045,6 +1078,30 @@ class CitationsNode extends Node {
 
 }
 
+class FootnoteNode extends Node {
+    constructor(footnote) {
+        super();
+        this.footnote = footnote;
+    }
+    toDOM(app, chapter, query, key) {
+
+        // If no chapter was provided, then don't render the footnote, since there's no context in which to render it.
+        if(!chapter)
+            return null;
+
+        // What footnote number is this?
+        let number = chapter.getFootnotes().indexOf(this);
+        let letter = app.getFootnoteSymbol(number);
+
+        return <span key={key}><NavHashLink smooth to={"#note-" + (number + 1)}><sup>{letter}</sup></NavHashLink></span>
+    }
+
+    toText() {
+        return this.footnote.toText();
+    }
+
+}
+
 class ContentNode extends Node {
     constructor(segments) {
         super();
@@ -1090,7 +1147,7 @@ class TextNode extends Node {
                 for(var i = 0; i < indices.length; i++) {
                     // Push the text from the end of the last match or the start of the string.
                     segments.push(text.substring(i === 0 ? 0 : indices[i - 1] + query.length, indices[i]));
-                    segments.push(<span key={"match-" + i} className="query-match">{text.substring(indices[i], indices[i] + query.length)}</span>);
+                    segments.push(<span key={"match-" + i} className="content-highlight">{text.substring(indices[i], indices[i] + query.length)}</span>);
                 }
                 if(indices[indices.length - 1] < text.length - 1)
                     segments.push(text.substring(indices[indices.length - 1] + query.length, text.length));
