@@ -157,7 +157,7 @@ class Chapter extends React.Component {
 			let match = textNodes[i - 1];
 
 			// Highlight the match
-			match.classList.add("highlight");
+			match.classList.add("content-highlight");
 
 			// Scroll to the node.
 			match.scrollIntoView({
@@ -172,8 +172,8 @@ class Chapter extends React.Component {
 	removeHighlights() {
 
 		// Which text node is closest?
-		var highlights = document.getElementsByClassName("highlight");
-		_each(highlights, highlight => highlight.classList.remove("highlight"));
+		var highlights = document.getElementsByClassName("content-highlight");
+		_each(highlights, highlight => highlight.classList.remove("content-highlight"));
 		
 	}
 
