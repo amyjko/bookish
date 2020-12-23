@@ -4,16 +4,16 @@ import { Header } from "./header";
 
 class Unknown extends React.Component {
 
-	render() {
+    render() {
 
-		return <Header 
-			image={this.props.app.getBook() ? this.props.app.getUnknown() : null } 
-			header="Uh oh."
-			content={this.props.message}
-		/>
+        return <Header
+            image={this.props.app.getBook() ? this.props.app.getUnknown() : null}
+            header="Uh oh."
+            content={this.props.message}
+        />
 
-	}
+    }
 
 }
 
-export {Unknown};
+export { Unknown };

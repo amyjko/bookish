@@ -7,17 +7,14 @@ import { NavHashLink } from 'react-router-hash-link';
 class Index extends React.Component {
 
     shouldComponentUpdate() {
-
         return this.props.app.chaptersAreLoaded();
-
     }
 
     componentDidMount() {
         window.scrollTo(0, 0);
     }
 
-	render() {
-
+    render() {
         var bookIndex = this.props.app.getBookIndex();
 
         var rows = [];
@@ -31,13 +28,13 @@ class Index extends React.Component {
             var firstLetter = word.charAt(0).toLowerCase();
 
             // Update the letter that we're on.
-            if(currentLetter !== firstLetter) {
+            if (currentLetter !== firstLetter) {
                 currentLetter = firstLetter;
                 letters[currentLetter] = true;
             }
 
             // Or is this the selected letter?
-            if(this.props.match.params.letter === currentLetter)
+            if (this.props.match.params.letter === currentLetter)
                 rows.push(
                     <tr key={"entry-" + index}>
                         <td>{word}</td>
@@ -47,14 +44,14 @@ class Index extends React.Component {
                                 bookIndex[word].sort((a, b) => {
                                     let numberA = this.props.app.getChapterNumber(a);
                                     let numberB = this.props.app.getChapterNumber(b);
-                                    if(numberA === null) return -1;
-                                    if(numberB === null) return 1;
+                                    if (numberA === null) return -1;
+                                    if (numberB === null) return 1;
                                     return numberA - numberB;
-                                }), 
-                                (chapterID, index) => 
+                                }),
+                                (chapterID, index) =>
                                     <span key={index}>
-                                        Chapter { this.props.app.getChapterNumber(chapterID) !== null ? <span> {this.props.app.getChapterNumber(chapterID)}. </span>: null}<Link to={"/" + chapterID + "/" + word}>{this.props.app.getChapterName(chapterID)}</Link>
-                                        {index < bookIndex[word].length - 1 ? <br/> : null}
+                                        Chapter {this.props.app.getChapterNumber(chapterID) !== null ? <span> {this.props.app.getChapterNumber(chapterID)}. </span> : null}<Link to={"/" + chapterID + "/" + word}>{this.props.app.getChapterName(chapterID)}</Link>
+                                        {index < bookIndex[word].length - 1 ? <br /> : null}
                                     </span>
                             )}
                         </td>
@@ -62,9 +59,9 @@ class Index extends React.Component {
                 );
         })
 
-		return (
-			<div>
-				<h1>Index</h1>
+        return (
+            <div>
+                <h1>Index</h1>
                 <NavHashLink to={"/#toc"}>Table of Contents</NavHashLink>
 
                 <p><em>This index includes all words, excluding common English words, words with apostrophes, and words ending in -ly.</em></p>
@@ -72,18 +69,18 @@ class Index extends React.Component {
                 <p>Pick a letter to browse:</p>
 
                 <p>
-                    { _map("abcdefghijklmnopqrstuvwxyz".split(""), 
-                        (letter, index) => 
-                            <span key={index} style={{display: "inline-block"}}>
+                    {_map("abcdefghijklmnopqrstuvwxyz".split(""),
+                        (letter, index) =>
+                            <span key={index} style={{ display: "inline-block" }}>
                                 {
-                                    letter in letters && this.props.match.params.letter !== letter ? 
+                                    letter in letters && this.props.match.params.letter !== letter ?
                                         <Link to={"/index/" + letter}>{letter}</Link> :
-                                        <span>{this.props.match.params.letter === letter ? <strong><span style={{fontSize: "200%"}}>{letter}</span></strong> : <span className={"text-muted"}>{letter}</span>}</span>
+                                        <span>{this.props.match.params.letter === letter ? <strong><span style={{ fontSize: "200%" }}>{letter}</span></strong> : <span className={"text-muted"}>{letter}</span>}</span>
                                 }
-                                { 
-                                    index < 26 - 1 ? 
-                                        <span>&sdot;</span> : 
-                                        null 
+                                {
+                                    index < 26 - 1 ?
+                                        <span>&sdot;</span> :
+                                        null
                                 }
                             </span>
                     )}
@@ -94,14 +91,14 @@ class Index extends React.Component {
                         {rows}
                     </tbody>
                 </table>
-				<div className="navigation-footer">
-					<Link to={"/"}>Table of Contents</Link>
-				</div>
+                <div className="navigation-footer">
+                    <Link to={"/"}>Table of Contents</Link>
+                </div>
             </div>
-		);
+        );
 
-	}
+    }
 
 }
 
-export {Index};
+export { Index };
