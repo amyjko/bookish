@@ -6,7 +6,7 @@
 	"repository": "https://github.com/amyjko/peruse.git",
 	"scripts": {
 		"clean": "rm build/*",
-		"build-assets": "cp peruse.css build/; cp icons/* build/",
+		"build-assets": "mkdir -p build/; cp peruse.css build/; cp icons/* build/",
 		"build-test": "rm build/*; browserify -g [ babelify --presets [ @babel/preset-env @babel/preset-react ] ] peruse.js | terser > build/peruse.js; npm run build-assets",
 		"test": "npm run clean; npm run build-assets; npm run build-test",
 		"sync": "rsync -avz --delete build/ ajko@ovid.u.washington.edu:~/public_html/peruse/",
