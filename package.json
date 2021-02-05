@@ -9,7 +9,7 @@
 		"clean": "rm build/*",
 		"build-assets": "cp peruse.css build/; cp icons/* build/",
 		"build-test": "rm build/*; browserify -g [ babelify --presets [ @babel/preset-env @babel/preset-react ] ] peruse.js | terser > build/peruse.js; npm run build-assets",
-		"tutorial": "npm run build-test; rm -r examples/tutorial/build; mkdir -p build/ examples/tutorial/build; cp -r build/ examples/tutorial/build; http-server examples/tutorial -o",
+		"book": "sh scripts/book.sh",
 		"test": "npm run clean; npm run build-assets; npm run build-test",
 		"sync": "rsync -avz --delete build/ ajko@ovid.u.washington.edu:~/public_html/peruse/",
 		"build-prod": "browserify -g uglifyify -t [ babelify --presets [ @babel/preset-env @babel/preset-react ] ] peruse.js | terser --compress --mangle > build/peruse.js",
