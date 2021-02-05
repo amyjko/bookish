@@ -5,8 +5,9 @@
 	"license": "MIT",
 	"repository": "https://github.com/amyjko/peruse.git",
 	"scripts": {
+		"postinstall": "mkdir build/",
 		"clean": "rm build/*",
-		"build-assets": "mkdir -p build/; cp peruse.css build/; cp icons/* build/",
+		"build-assets": "cp peruse.css build/; cp icons/* build/",
 		"build-test": "rm build/*; browserify -g [ babelify --presets [ @babel/preset-env @babel/preset-react ] ] peruse.js | terser > build/peruse.js; npm run build-assets",
 		"tutorial": "npm run build-test; rm -r examples/tutorial/build; mkdir -p build/ examples/tutorial/build; cp -r build/ examples/tutorial/build; http-server examples/tutorial -o",
 		"test": "npm run clean; npm run build-assets; npm run build-test",
