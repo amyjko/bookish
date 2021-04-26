@@ -12,5 +12,5 @@ $ npm run book -- path/to/book
 For example, the following command will open a new browser tab with an example tutorial book:
 
 ```language:bash
-$ npm run book -- example/tutorial
+$ npm run book -- examples/tutorial
 ```
