@@ -30,7 +30,6 @@
 	"dependencies": {
 		"ajv": "^6.0",
 		"history": "^4.7.2",
-		"jquery": "^3.0.0",
 		"lodash": "^4.17.10",
 		"npm": "^6.13.4",
 		"react": "^16.3",
