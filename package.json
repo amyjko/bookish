@@ -1,7 +1,7 @@
 {
 	"name": "peruse",
 	"version": "0.6.1",
-	"description": "A simple plaform for creating highly readable single-page client-side online books.",
+	"description": "A simple platform for creating highly readable single-page client-side online books.",
 	"license": "MIT",
 	"repository": "https://github.com/amyjko/peruse.git",
 	"scripts": {
