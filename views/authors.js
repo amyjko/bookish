@@ -7,7 +7,7 @@ class Authors extends React.Component {
 
 	render() {
 		return (
-            <div>
+            <div className="authors">
                 <em>by</em> {Parser.parseContent(this.props.authors).toDOM()}
                 <small>
                     { 
