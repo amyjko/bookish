@@ -243,7 +243,7 @@ class Chapter extends React.Component {
 							<h1>Notes</h1>
 							{
 								_map(footnotes, (footnote, index) =>
-									<p id={"note-" + (index + 1)} className={noteHighlight === index + 1 ? "content-highlight" : ""} key={index}><sup>{this.props.app.getFootnoteSymbol(index)}</sup> {footnote.footnote.toDOM(this.props.app, chapterAST, this.props.match.params.word)}</p>
+									<p id={"note-" + (index + 1)} className={noteHighlight === index + 1 ? "footnote content-highlight" : "footnote"} key={index}><sup>{this.props.app.getFootnoteSymbol(index)}</sup> {footnote.footnote.toDOM(this.props.app, chapterAST, this.props.match.params.word)}</p>
 								)
 							}
 						</div>
@@ -259,7 +259,7 @@ class Chapter extends React.Component {
 									var refs = this.props.app.getReferences();
 									if(citationID in refs) {
 										var ref = refs[citationID];
-										return <li key={"citation-" + citationID} className={citationID === citationHighlight ? "content-highlight" : null} id={"ref-" + citationID}>
+										return <li key={"citation-" + citationID} className={citationID === citationHighlight ? "reference content-highlight" : "reference"} id={"ref-" + citationID}>
 											{Parser.parseReference(ref, this.props.app)}
 										</li>
 

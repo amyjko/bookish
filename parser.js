@@ -79,7 +79,7 @@ class Parser {
                     if(source === null)
                         source = <span className="alert alert-danger">Unknown source <code>{ref[3]}</code></span>;
                 }
-                dom = <span className="reference">{authors} ({year}). {url === null ? title : <a href={url} target={"_blank"}>{title}</a>}{title.charAt(title.length - 1) === "?" ? "" : "."} <em>{source}</em>.{summary ? <span className="summary">{summary}</span> : null }</span>
+                dom = <span>{authors} ({year}). {url === null ? title : <a href={url} target={"_blank"}>{title}</a>}{title.charAt(title.length - 1) === "?" ? "" : "."} <em>{source}</em>.{summary ? <span className="summary">{summary}</span> : null }</span>
             }
             else
                 dom = <span className="alert alert-danger">Expected at least 4 items in the reference array, but found {ref.length}: <code>{ref.toString()}</code></span>
@@ -1068,7 +1068,7 @@ class CitationsNode extends Node {
             }
         );
 
-        return <span key={key}>{segments}</span>;
+        return <span className="citation" key={key}>{segments}</span>;
 
     }
 
@@ -1093,7 +1093,7 @@ class FootnoteNode extends Node {
         let number = chapter.getFootnotes().indexOf(this);
         let letter = app.getFootnoteSymbol(number);
 
-        return <span key={key}><NavHashLink smooth to={"#note-" + (number + 1)}><sup>{letter}</sup></NavHashLink></span>
+        return <span className="footnote-link" key={key}><NavHashLink smooth to={"#note-" + (number + 1)}><sup>{letter}</sup></NavHashLink></span>
     }
 
     toText() {
