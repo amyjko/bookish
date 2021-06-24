@@ -5,9 +5,11 @@
 	"license": "MIT",
 	"repository": "https://github.com/amyjko/peruse.git",
 	"scripts": {
+		"postinstall": "mkdir build/",
 		"clean": "rm build/*",
 		"build-assets": "cp peruse.css build/; cp icons/* build/",
 		"build-test": "rm build/*; browserify -g [ babelify --presets [ @babel/preset-env @babel/preset-react ] ] peruse.js | terser > build/peruse.js; npm run build-assets",
+		"book": "sh scripts/book.sh",
 		"test": "npm run clean; npm run build-assets; npm run build-test",
 		"sync": "rsync -avz --delete build/ ajko@ovid.u.washington.edu:~/public_html/peruse/",
 		"build-prod": "browserify -g uglifyify -t [ babelify --presets [ @babel/preset-env @babel/preset-react ] ] peruse.js | terser --compress --mangle > build/peruse.js",
@@ -20,6 +22,7 @@
 		"@babel/preset-react": "^7",
 		"babelify": "^10",
 		"browserify": "^16.5.2",
+		"http-server": "^0.12.3",
 		"terser": "^5.3.4",
 		"uglify-js": "^3.11.2",
 		"uglifyify": "^5.0.2"
@@ -27,7 +30,6 @@
 	"dependencies": {
 		"ajv": "^6.0",
 		"history": "^4.7.2",
-		"jquery": "^3.0.0",
 		"lodash": "^4.17.10",
 		"npm": "^6.13.4",
 		"react": "^16.3",
