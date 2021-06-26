@@ -247,3 +247,13 @@ blockquote {
 .text.highlight {
 	background-color: rgb(255,255,200)
 }
+
+.chapter-number {
+	font-style: italic;
+	color: gray;
+}
+
+.section-name {
+	font-style: normal;
+	color: gray;
+}

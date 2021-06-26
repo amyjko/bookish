@@ -220,6 +220,7 @@ class Chapter extends React.Component {
 		}
 		else {
 			let chapterNumber = this.props.app.getChapterNumber(this.props.id);
+			let chapterSection = this.props.app.getChapterSection(this.props.id);
 			let nextChapter = this.props.app.getNextChapter(this.props.id);
 			let previousChapter = this.props.app.getPreviousChapter(this.props.id);
 			let chapterAST = Parser.parseChapter(chapter.text);
@@ -227,7 +228,16 @@ class Chapter extends React.Component {
 			let footnotes = chapterAST.getFootnotes();
 			return (
 				<div className="chapter">
-					<Header image={chapter.image} header={<span>{chapterNumber === null ? null : <small><small className="text-muted">Chapter {chapterNumber}<br/></small></small>}{chapter.title}</span>} content={null} />
+					<Header 
+						image={chapter.image} 
+						header={
+							<span>
+								{chapterNumber === null ? null : <small><small className="chapter-number">Chapter {chapterNumber}</small>{ chapterSection === null ? null : <small className="section-name"><small><small> {chapterSection}</small></small></small>}</small>}
+								<br/><span className="chapter-title">{chapter.title}</span>
+							</span>
+						}
+						content={null} 
+					/>
 					<Authors authors={this.props.app.getAuthors()} contributors={chapter.contributors} />
 
 					{ this.state.editing ? this.renderEditor() : null }

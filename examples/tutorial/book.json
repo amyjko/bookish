@@ -15,7 +15,8 @@
 			"id": "errors",
 			"title": "Errors",
 			"contributors": ["Boomy", "[VS Code|https://code.visualstudio.com]"],
-			"image": "|unknown.jpg|A photo of skeptical Boomy|Time to learn about errors, huh?|Amy J. Ko|"
+			"image": "|unknown.jpg|A photo of skeptical Boomy|Time to learn about errors, huh?|Amy J. Ko|",
+			"section": "Part I"
 		}
 	],
 	"revisions": [

@@ -32,6 +32,7 @@
                     "title": { "type": "string" },
                     "image": { "$ref": "#/definitions/embed" },
                     "numbered": { "type": "boolean", "default": "True by default" },
+                    "section": { "type": "string" },
                     "contributors": { "type": "array", "items": { "type": "string" }}
                 }
             }

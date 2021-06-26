@@ -65,8 +65,10 @@ class TableOfContents extends React.Component {
 						{
 							_map(this.props.app.getChapters(), (chapter, index) => {
 
+								// Get the image, chapter number, and section for rendering.
 								let image = Parser.parseEmbed(chapter.image).toJSON();
 								let chapterNumber = this.props.app.getChapterNumber(chapter.id);
+								let section = this.props.app.getChapterSection(chapter.id);
 
 								return (
 									<tr key={"chapter" + index}>
@@ -78,7 +80,10 @@ class TableOfContents extends React.Component {
 												alt={chapter.alt}
 											/>
 										</td>
-										<td style={{textAlign: "right"}}><em>Chapter{chapterNumber === null ? "" : " " + chapterNumber}</em></td>
+										<td style={{textAlign: "right"}}>
+											<span className="chapter-number">{chapterNumber === null ? "" : "Chapter " + chapterNumber}</span>
+											{ section === null ? "" : <span><br/><small className="section-name">{section}</small></span> }
+										</td>
 										<td>
 											{
 												// If it's not loaded, say so.

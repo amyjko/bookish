@@ -148,6 +148,7 @@ class Peruse extends React.Component {
 		return sourceID.charAt(0) === "#" && sourceID.substring(1) in this.getBook().sources ? this.getBook().sources[sourceID.substring(1)] : null;
 	}
 	getChapterName(chapterID) { return chapterID in this.state.chapters ? this.state.chapters[chapterID].title : null;	}
+	getChapterSection(chapterID) { return chapterID in this.state.chapters && "section" in this.state.chapters[chapterID] ? this.state.chapters[chapterID].section : null;	}
 	getLoadedChapters() { return this.state.chapters; }
 	chaptersAreLoaded() { return Object.keys(this.state.chapters).length === this.getBook().chapters.length; }
 	getLicense() { return this.getBook().license; }
@@ -319,15 +320,13 @@ class Peruse extends React.Component {
 							var updatedChapters = _clone(this.state.chapters);
 
 							// Augment the chapter object with the text and other detail.
-							updatedChapters[chapter.id] = {
-								title: chapter.title,
-								id: chapter.id,
-								image: chapter.image,
-								contributors: chapter.contributors,
-								text: text,
-								wordCount: text.split(/\s+/).length,
-								index: this.computeIndex(text)
-							};
+							chapter.text = text;
+							chapter.wordCount = text.split(/\s+/).length;
+							chapter.index = this.computeIndex(text);
+
+							// Update the chapter.
+							updatedChapters[chapter.id] = chapter;
+
 							this.setState({ chapters: updatedChapters });
 						});
 					}
