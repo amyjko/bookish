@@ -232,7 +232,7 @@ class Chapter extends React.Component {
 						image={chapter.image} 
 						header={
 							<span>
-								{chapterNumber === null ? null : <small><small className="chapter-number">Chapter {chapterNumber}</small>{ chapterSection === null ? null : <small className="section-name"><small><small> {chapterSection}</small></small></small>}</small>}
+								{chapterNumber === null ? null : <small><small className="chapter-number">Chapter {chapterNumber}</small> { chapterSection === null ? null : <small className="section-name"><small><small> {chapterSection}</small></small></small>}</small>}
 								<br/><span className="chapter-title">{chapter.title}</span>
 							</span>
 						}
