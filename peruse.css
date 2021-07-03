@@ -257,3 +257,8 @@ blockquote {
 	font-style: normal;
 	color: gray;
 }
+
+.footnote {
+	padding-left: 1em;
+	text-indent: -0.75em;
+}
