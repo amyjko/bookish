@@ -144,6 +144,10 @@ class Parser {
         return char;
     }
 
+    unread() {
+        this.index--;
+    }
+
     // All of the text including and after the current index.
     rest() {
         return this.text.substring(this.index);
@@ -198,7 +202,7 @@ class Parser {
     }
 
     // Read until the end of the line.
-readUntilNewLine() {
+    readUntilNewLine() {
         var text = "";
         while(this.more() && this.peek() !== "\n")
             text = text + this.read();
@@ -259,10 +263,10 @@ readUntilNewLine() {
         else if(this.nextIs("|"))
             return this.parseEmbed(metadata);
         // Parse and return a bulleted list if it starts with a star and space
-        else if(this.nextIs("* "))
+        else if(this.nextMatches(/^\*+ /))
             return this.parseBulletedList(metadata);
         // Parse and return a numbered list if it starts with a number
-        else if(this.nextMatches(/^[0-9]+\./))
+        else if(this.nextMatches(/^[0-9]+\.+/))
             return this.parseNumberedList(metadata);
         // Parse and return a code block if it starts with `
         else if(this.nextIs("`"))
@@ -317,22 +321,58 @@ readUntilNewLine() {
     parseBulletedList(metadata) {
 
         var bullets = [];
+        let lastLevel = undefined;
+        let currentLevel = undefined;
 
-        // Process all the bullets until there aren't any.
-        while(this.nextIs("* ")) {
-            // Read the bullet and then any trailing whitespace before content.
-            this.read();
+        // Keep parsing bullets until there aren't any.
+        while(this.nextMatches(/\*+ /)) {
+
+            // Remember the last level
+            lastLevel = currentLevel;
+
+            // Figure out this level.
+            currentLevel = 0;
+            while(this.nextIs("*")) {
+                this.read();
+                currentLevel++;
+            }
+
+            // If this is the first bullet, or its the same level, just parse content.
+            if(lastLevel === undefined || lastLevel === currentLevel) {
+                // Read the whitespace after the bullet.
+                this.readWhitespace();
+                // Parse content after the bullet.
+                bullets.push(this.parseContent(metadata));
+            }
+            // Otherwise, unread the stars, then either stop parsing or parse nested list.
+            else {
+
+                // Unread the stars.
+                let count = currentLevel;
+                while(count > 0) {
+                    this.unread();
+                    count--;
+                }
+
+                // If this new bullet is a lower level, then stop reading bullets.
+                if(currentLevel < lastLevel)
+                    break;
+                // Otherwise, it's greater, and we should read another list.
+                else
+                    bullets.push(this.parseBulletedList(metadata));
+            }
+
+            // Read trailing whitespace after the content.
             this.readWhitespace();
-            // Parse content.
-            bullets.push(this.parseContent(metadata));
-            // Read trailing whitespace and newlines.            
-            this.readWhitespace();
+
+            /// Keep reading newlines and content until we get to something that's neither.
             while(this.peek() === "\n") {
                 // Read the newline
                 this.read();
                 // Read whitespace before the next block.
                 this.readWhitespace();
             }
+
         }
         return new BulletedListNode(bullets);
 
@@ -341,16 +381,59 @@ readUntilNewLine() {
     parseNumberedList(metadata) {
 
         var bullets = [];
+        let lastLevel = undefined;
+        let currentLevel = undefined;
 
-        // Process all the bullets until there aren't any.
-        while(this.nextMatches(/^[0-9]+\./)) {
-            // Read until the period.
+        // Keep parsing bullets until there aren't any.
+        while(this.nextMatches(/^[0-9]+\.+/)) {
+
+            // Read the digits and remember how many there were so we can backtrack.
+            let digits = this.index;
             this.readUntilNewlineOr(".");
-            // Read the period, then whitespace.
-            this.read();
-            this.readWhitespace();
-            // Parse some content.
-            bullets.push(this.parseContent(metadata));
+            digits = this.index - digits;
+
+            // Remember the last level
+            lastLevel = currentLevel;
+
+            // Figure out this level.
+            currentLevel = 0;
+            while(this.nextIs(".")) {
+                this.read();
+                currentLevel++;
+            }
+
+            // If this is the first bullet, or its the same level, just parse content.
+            if(lastLevel === undefined || lastLevel === currentLevel) {
+                // Read the whitespace after the bullet.
+                this.readWhitespace();
+                // Parse content after the bullet.
+                bullets.push(this.parseContent(metadata));
+            }
+            // Otherwise, unread the stars, then either stop parsing or parse nested list.
+            else {
+
+                // Unread the periods.
+                let count = currentLevel;
+                while(count > 0) {
+                    this.unread();
+                    count--;
+                }
+                                
+                // Unread the digits
+                while(digits > 0) {
+                    this.unread();
+                    digits--;
+                }
+
+                // If this new bullet is a lower level, then stop reading bullets.
+                if(currentLevel < lastLevel)
+                    break;
+                // Otherwise, it's greater, and we should read another list.
+                else
+                    bullets.push(this.parseNumberedList(metadata));
+
+            }
+
             // Read trailing whitespace and newlines.            
             this.readWhitespace();
             while(this.peek() === "\n") {
@@ -359,6 +442,7 @@ readUntilNewLine() {
                 // Read whitespace before the next block.
                 this.readWhitespace();
             }
+
         }
         return new NumberedListNode(bullets);
 
@@ -862,7 +946,13 @@ class BulletedListNode extends Node {
     }
 
     toDOM(app, chapter, query, key) {
-        return <ul key={key}>{_map(this.items, (item, index) => <li key={"item-" + index}>{item.toDOM(app, chapter, query)}</li>)}</ul>
+        return <ul key={key}>{
+            _map(this.items, (item, index) =>
+                item instanceof BulletedListNode ?
+                    item.toDOM(app, chapter, query, "item-" + index) :
+                    <li key={"item-" + index}>{item.toDOM(app, chapter, query)}</li>
+            )}
+        </ul>;
     }
 
     toText() {
@@ -878,7 +968,13 @@ class NumberedListNode extends Node {
     }
 
     toDOM(app, chapter, query, key) {
-        return <ol key={key}>{_map(this.items, (item, index) => <li key={"item-" + index}>{item.toDOM(app, chapter, query)}</li>)}</ol>;
+        return <ol key={key}>{
+            _map(this.items, (item, index) =>
+                item instanceof NumberedListNode ?
+                    item.toDOM(app, chapter, query, "item-" + index) :
+                    <li key={"item-" + index}>{item.toDOM(app, chapter, query)}</li>
+            )}
+        </ol>;
     }
 
     toText() {

@@ -54,6 +54,30 @@ It can be in bullet form by starting a line with \*:
 * Item _2_
 * Item _3_
 
+Bullets can be nested by increasing or decreasing the number of \*:
+
+`
+* Item _1_
+** Item _1.1_
+** Item _1.2_
+*** Item _1.2.1_
+*** Item _1.2.2_
+** Item _1.3_
+* Item _3_
+* Item _4_
+`
+
+* Item _1_
+** Item _1.1_
+** Item _1.2_
+*** Item _1.2.1_
+*** Item _1.2.2_
+* Item _2_
+* Item _3_
+* Item _4_
+
+It doesn't matter how many \*'s there are exactly, just whether that number is more or less than the bullets before or after it.
+
 It can be in numbered form by staring a line with a number followed by a period:
 `
 1. Item 1
@@ -74,6 +98,31 @@ The numbers don't have to be in a particular order, they just have to be a numbe
 3. Item 1
 22. Item 2
 111. Item 3
+
+You can nest numbered lists by increasing or decreasing the number of \.'s:
+
+`
+1. Item _1_
+1.. Item _1.1_
+1.. Item _1.2_
+1... Item _1.2.1_
+1... Item _1.2.2_
+2. Item _1.3_
+3. Item _3_
+4. Item _4_
+`
+
+1. Item _1_
+1.. Item _1.1_
+1.. Item _1.2_
+1... Item _1.2.1_
+1... Item _1.2.2_
+2. Item _1.3_
+3. Item _3_
+4. Item _4_
+
+It doesn't matter how many \*'s there are exactly, just whether that number is more or less than the bullets before or after it.
+
 
 You can include [links to content|http://amyjko.com] like this:
 
