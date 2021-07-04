@@ -263,7 +263,7 @@ class Parser {
         else if(this.nextIs("|"))
             return this.parseEmbed(metadata);
         // Parse and return a bulleted list if it starts with a star and space
-        else if(this.nextMatches(/^\*+ /))
+        else if(this.nextMatches(/^\*+\s+/))
             return this.parseBulletedList(metadata);
         // Parse and return a numbered list if it starts with a number
         else if(this.nextMatches(/^[0-9]+\.+/))
@@ -325,7 +325,7 @@ class Parser {
         let currentLevel = undefined;
 
         // Keep parsing bullets until there aren't any.
-        while(this.nextMatches(/\*+ /)) {
+        while(this.nextMatches(/^\*+\s+/)) {
 
             // Remember the last level
             lastLevel = currentLevel;

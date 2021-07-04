@@ -298,3 +298,12 @@ We will also replace \-\- with em-dashes -- like the one in this sentence.
 You can also cite things <ref1,ref2> or just cite one thing <ref3>.
 
 When clicking on something in the index, the index word should be highlighted no matter how many times the index appears in a span of text and regardless of whether the *index word* is formatted.
+
+
+
+
+* *Usefulness*. Interfaces that meet stakeholders' information needs might be deemed useful, but knowing whether they do can be difficult. Moreover, useful interfaces are not necessarily good in other ways: they may be hard to learn, frustrating to use, unreliable, and even harmful, much like the name change interfaces I described at the beginning of the chapter, which were useful but hard and slow to use.
+* *Usability*. Interfaces that are efficient to use without error are usable, but they are not necessarily useful. For example, many users of WeChat find it incredibly useful, supporting calls, messaging, search, payments, news, taxies, hotels, and much more, but many users, especially new ones, find it overwhelmingly complex to use.
+* *Accessibility*. Interfaces that can be used by anyone, independent of their physical or cognitive abilities, are accessible. Unfortunately, few interfaces achieve such universal accessibility, with many excluding people who are blind, low vision, deaf, or have motor disabilities that make them unable to use a mouse, keyboard, or touchscreen. Interfaces that are usable to some might be unusable to others because of accessibility issues.
+
+*Accessibility* is particularly important for information interfaces: if someone cannot physically operate an interface that mediates information, then they cannot access that information. This is a critical concern, as 1 in 7 people worldwide have some form of disability that might interfere with their ability to use an interface. Moreover, all people, independent of their abilities now, will eventually be disabled in some way as we age or become injured. It is unfortunate then that designers often take what is called a "medical" or "rehabilitation" lens on disability, imagining that the problem lies with the disabled person, focusing on fixing them rather than fixing interfaces. A disability justice lens, much like a design justice lens, recognizes that accessibility problems are in the interface designs themselves, and that it is the responsibility of designers to center people with disabilities in design to ensure that they work for everyone<bennett19>. 
