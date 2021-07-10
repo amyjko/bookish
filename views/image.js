@@ -16,7 +16,7 @@ class Figure extends React.Component {
 							alt={this.props.alt}
 						/>
 				}
-				<div className="figure-caption">{this.props.caption} <em>Credit: {this.props.credit}</em></div>
+				<div className="figure-caption">{this.props.caption} <span className="figure-credit">Credit: {this.props.credit}</span></div>
 			</div>
 		)
 	}
