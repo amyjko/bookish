@@ -90,9 +90,6 @@ class TableOfContents extends React.Component {
 												alt={chapter.alt}
 											/>
 										</td>
-										<td style={{textAlign: "right"}}>
-											<span className="chapter-number">{chapterNumber === null ? "" : "Chapter " + chapterNumber}</span>
-										</td>
 										<td>
 											{
 												// If it's not loaded, say so.
@@ -112,8 +109,9 @@ class TableOfContents extends React.Component {
 													</div> :
 													// If it did load, link it!
 													<div>
-														<Link to={"/" + chapter.id}>{chapter.title}</Link>
-														{ section === null ? "" : <span><br/><small className="section-name">{section}</small></span> }														<br/>
+														{ chapterNumber === null ? null : <div className="chapter-number">{"Chapter " + chapterNumber}</div> }
+														<div><Link to={"/" + chapter.id}>{chapter.title}</Link></div>
+														{ section === null ? null : <div className="section-name">{section}</div> }
 													</div>
 											}
 										</td>
@@ -133,20 +131,17 @@ class TableOfContents extends React.Component {
 							this.props.app.getReferences() === null ? null :
 							<tr key="references">
 								<td></td>
-								<td style={{textAlign: "right"}}><em>@</em></td>
 								<td><Link to="/references">References</Link><br/><small className="text-muted"><em>Everything cited</em></small></td>
 								<td></td>
 							</tr>
 						}
 						<tr key="index">
 							<td></td>
-							<td style={{textAlign: "right"}}><em>A-Z</em></td>
 							<td><Link to="/index/a">Index</Link><br/><small className="text-muted"><em>Common words and where they are</em></small></td>
 							<td></td>
 						</tr>
 						<tr key="search">
 							<td></td>
-							<td style={{textAlign: "right", fontSize: "150%"}}>&#8981;</td>
 							<td><Link to="/search">Search</Link><br/><small className="text-muted"><em>Find where words occur</em></small></td>
 							<td></td>
 						</tr>

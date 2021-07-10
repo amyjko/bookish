@@ -259,11 +259,13 @@ blockquote {
 }
 
 .chapter-number {
+	font-weight: bold;
 	font-style: italic;
 	color: gray;
 }
 
 .section-name {
+	font-size: 12pt;
 	font-style: normal;
 	color: gray;
 }
