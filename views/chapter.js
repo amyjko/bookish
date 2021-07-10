@@ -238,7 +238,8 @@ class Chapter extends React.Component {
 						}
 						content={null} 
 					/>
-					<Authors authors={this.props.app.getAuthors()} contributors={chapter.contributors} />
+					{ /* If there are chapter authors, map them to authors declared in the book title, otherwise use all the authors of the book */ }
+					<Authors authors={chapter.authors ? _map(chapter.authors, author => this.props.app.getAuthorByID(author)) : this.props.app.getAuthors()} />
 
 					{ this.state.editing ? this.renderEditor() : null }
 

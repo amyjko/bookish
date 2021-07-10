@@ -1,35 +1,20 @@
 import React from 'react';
 import _map from 'lodash/map';
 
-import { Parser } from "../parser";
-
 class Authors extends React.Component {
 
 	render() {
 		return (
             <div className="authors">
-                <em>by</em> {Parser.parseContent(this.props.authors).toDOM()}
-                <small>
-                    { 
-                        this.props.contributors && this.props.contributors.length > 0 ? 
-                            <span>
-                                <em> with contributions from </em> 
-                                {
-                                    _map(
-                                        this.props.contributors, 
-                                        (contributor, index) => 
-                                            <span key={index}>
-                                                {
-                                                    Parser.parseContent(contributor).toDOM(undefined, undefined, undefined, index)}
-                                                    {index === this.props.contributors.length - 1 ? "" : ", "
-                                                }
-                                            </span>
-                                    )
-                                }
-                            </span> : 
-                            null
-                        }
-                </small>
+                <em>by</em> {
+                    _map(
+                        this.props.authors, 
+                        (author, index) => [
+                            author.url ? <a key={"author-" + index} href={author.url} target="_blank">{author.name}</a> : author.name,
+                            index < this.props.authors.length - 1 ? (", ") : null
+                        ]
+                    )
+                }
             </div>
         );
 	}

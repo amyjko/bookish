@@ -63,7 +63,7 @@ class TableOfContents extends React.Component {
 					image={this.props.app.getCover()} 
 					header={title}
 					subtitle={subtitle}
-					content={<Authors authors={this.props.app.getAuthors()} contributors={this.props.app.getContributors()} />}
+					content={<Authors authors={this.props.app.getAuthors()} />}
 				/>
 
 				{Parser.parseChapter(this.props.app.getDescription()).toDOM()}

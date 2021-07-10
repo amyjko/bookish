@@ -3,6 +3,7 @@ import _map from 'lodash/map';
 import _clone from 'lodash/clone';
 import _reduce from 'lodash/reduce';
 import _uniq from 'lodash/uniq';
+import _find from 'lodash/find';
 
 import React from 'react';
 import ReactDOM from 'react-dom';
@@ -74,7 +75,7 @@ class Peruse extends React.Component {
 
 		this.index = null;
 		
-		// Lookup table for optmization
+		// Lookup table for optimization
 		this.chapterNumbers = {};
 
 	}
@@ -98,17 +99,9 @@ class Peruse extends React.Component {
 	getBook() { return this.state.book; }
 	getContent(chapterID) { return chapterID in this.state.chapters ? this.state.chapters[chapterID] : undefined; }
 	getTitle() { return this.getBook().title; }
-	getAuthors() { return this.getBook().authors.join(", "); }
+	getAuthors() { return this.getBook().authors; }
+	getAuthorByID(id) { return _find(this.getAuthors(), { "id": id }); }
 	
-	getContributors() { 
-		// Merge all contributors from all chapters.
-		var contributors = [];
-		_each(this.getChapters(), 
-			chapter => _each(chapter.contributors, 
-				contributor => contributors.includes(contributor) ? null : contributors.push(contributor)));
-		return contributors;
-	}
-
 	getDescription() { return this.getBook().description; }
 	getRevisions() { return this.getBook().revisions; }
 	getChapterReadingTime(chapterID) {  return chapterID in this.state.chapters ? Math.max(1, Math.round(this.state.chapters[chapterID].wordCount / 150)) : 0; }

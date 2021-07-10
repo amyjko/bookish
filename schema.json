@@ -17,7 +17,15 @@
         "title": { "type": "string" },
         "authors": {
             "type": "array",
-            "items": { "type": "string" }
+            "items": {
+                "type": "object",
+                "required": ["id", "name"],
+                "properties": {
+                    "id": { "type": "string", "pattern": "^[a-zA-Z0-9]+$" },
+                    "name": { "type": "string" },
+                    "url": { "type": ["string", "null"], "format": "uri" }
+                }
+            }
         },
         "cover": { "$ref": "#/definitions/embed" },
         "unknown": { "$ref": "#/definitions/embed" },
@@ -33,7 +41,7 @@
                     "image": { "$ref": "#/definitions/embed" },
                     "numbered": { "type": "boolean", "default": "True by default" },
                     "section": { "type": "string" },
-                    "contributors": { "type": "array", "items": { "type": "string" }}
+                    "authors": { "type": "array", "items": { "type": "string" }}
                 }
             }
         },
@@ -63,7 +71,7 @@
                             { "type": "string" },
                             { "type": ["string", "null"], "format": "uri" }
                         ],
-                        "additionalItems": { "type": "string"}
+                        "additionalItems": { "type": "string" }
                     }
                 ]
             }
