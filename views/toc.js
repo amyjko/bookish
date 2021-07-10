@@ -47,12 +47,22 @@ class TableOfContents extends React.Component {
 
 		var readingTime = this.props.app.getBookReadingTime();
 
+		// Is there a colon? Let's make a subtitle
+		let title = this.props.app.getTitle();
+		let subtitle = null;
+		let colon = title.indexOf(":");
+		if(colon >= 0) {
+			subtitle = title.substr(colon + 1);
+			title = title.substr(0, colon);
+		}
+
 		return (
 			<div className="toc">
 
 				<Header 
 					image={this.props.app.getCover()} 
-					header={this.props.app.getTitle()}
+					header={title}
+					subtitle={subtitle}
 					content={<Authors authors={this.props.app.getAuthors()} contributors={this.props.app.getContributors()} />}
 				/>
 

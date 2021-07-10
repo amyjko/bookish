@@ -248,6 +248,16 @@ blockquote {
 	background-color: rgb(255,255,200)
 }
 
+.title {
+	margin-bottom: 0;
+}
+
+.subtitle {
+	margin-top: 0;
+	font-weight: normal;
+	font-style: italic;
+}
+
 .chapter-number {
 	font-style: italic;
 	color: gray;
