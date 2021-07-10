@@ -575,7 +575,8 @@ class Parser {
 
         }
 
-        // Read the caption
+        // Read the caption. Note that parsing inline content stops at a newline, 
+        // so if there's a line break after the last row, there won't be a caption.
         var caption = this.parseContent(metadata);
 
         return new TableNode(rows, caption);
