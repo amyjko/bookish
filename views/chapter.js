@@ -232,8 +232,22 @@ class Chapter extends React.Component {
 						image={chapter.image} 
 						header={
 							<span>
-								{chapterNumber === null ? null : <small><small className="chapter-number">Chapter {chapterNumber}</small> { chapterSection === null ? null : <small className="section-name"><small><small> {chapterSection}</small></small></small>}</small>}
-								<br/><span className="chapter-title">{chapter.title}</span>
+								{
+									chapterNumber === null ? 
+										null : 
+										<span className="chapter-number">Chapter {chapterNumber}</span> 
+								}
+								{ 
+									chapterSection === null ? 
+										null : 
+										<span className="section-name"> {chapterSection}</span>
+								}
+								{ 
+									chapterNumber || chapterSection ? 
+										<br/> : 
+										null 
+								}
+								<span className="chapter-title">{chapter.title}</span>
 							</span>
 						}
 						content={null} 

@@ -258,12 +258,21 @@ blockquote {
 	font-style: italic;
 }
 
+.title .chapter-number {
+	font-size: 18pt;
+}
+
 .chapter-number {
+	font-weight: normal;
 	font-style: italic;
 	color: gray;
+	display: inline-block; /* For the section name */
+	margin-right: 0.35em;
 }
 
 .section-name {
+	display: inline-block;
+	font-weight: normal;
 	font-size: 12pt;
 	font-style: normal;
 	color: gray;
