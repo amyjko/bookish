@@ -476,7 +476,11 @@ class Parser {
         if(this.nextIs("`"))
             this.read();
 
-        return new CodeNode(code, language);
+        // Read the caption. Note that parsing inline content stops at a newline, 
+        // so if there's a line break after the last row, there won't be a caption.
+        var caption = this.parseContent(metadata);
+
+        return new CodeNode(code, language, caption);
 
     }
 
@@ -985,13 +989,17 @@ class NumberedListNode extends Node {
 }
 
 class CodeNode extends Node {
-    constructor(code, language) {
+    constructor(code, language, caption) {
         super();
         this.code = code;
         this.language = language ? language : "plaintext";
+        this.caption = caption;
     }
     toDOM(app, chapter, query, key) {
-        return <Highlight key={key} language={this.language}>{this.code}</Highlight>;
+        return <div className="code" key={key} >
+            <Highlight language={this.language}>{this.code}</Highlight>
+            <div className="figure-caption">{this.caption.toDOM(app, chapter, query)}</div>
+        </div>
     }
 
     toText() {

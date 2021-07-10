@@ -180,9 +180,9 @@ You can include code by wrapping any text with a backtick \`:
 This isn't any particular programming language
 It's just some English sentences
 It just gets formatted in plain text, fixed width format.
-`
+` Yes, this is a haiku.
 
-(Yes, that was a haiku.)
+You can put a caption after the backtick.
 
 If you include a language name after the first backtick like this:
 
@@ -191,16 +191,15 @@ If you include a language name after the first backtick like this:
 two = 1 + 1
 if two == 2:
    print "Truth"
-\`
-`
+\``
 
- Peruse will try to highlight based on that language's syntax.
+Peruse will try to highlight based on that language's syntax.
 
 `python
 two = 1 + 1
 if two == 2:
    print "Truth"
-`
+` Look, syntax highlighting!
 
 
 
