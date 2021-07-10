@@ -1053,21 +1053,25 @@ class TableNode extends Node {
 
     toDOM(app, chapter, query, key) {
 
-        return <div className="rows" key={key}>
-            <table className="table">
-                <tbody>
-                {
-                    _map(this.rows, (row, index) => 
-                        <tr key={"row-" + index}>
-                            {_map(row, (cell, index) => <td key={"cell-" + index}>{cell.toDOM(app, chapter, query, "cell-" + index)}</td>)}
-                        </tr>
-                    )
-                }
-                </tbody>
-            </table>
-            <center>{this.caption.toDOM(app, chapter, query)}</center>
-        </div>;
+        return (
+            <div className="figure" key={key}>
+                <div className="rows">
+                    <table className="table">
+                        <tbody>
+                        {
+                            _map(this.rows, (row, index) => 
+                                <tr key={"row-" + index}>
+                                    {_map(row, (cell, index) => <td key={"cell-" + index}>{cell.toDOM(app, chapter, query, "cell-" + index)}</td>)}
+                                </tr>
+                            )
+                        }
+                        </tbody>
+                    </table>
 
+                </div>
+                <div className="figure-caption">{this.caption.toDOM(app, chapter, query)}</div>
+            </div>
+        );
     }
 
     toText() {
