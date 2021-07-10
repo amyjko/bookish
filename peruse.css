@@ -259,7 +259,6 @@ blockquote {
 }
 
 .chapter-number {
-	font-weight: bold;
 	font-style: italic;
 	color: gray;
 }
