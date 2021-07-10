@@ -274,7 +274,7 @@ class Parser {
         // Parse and return a quote block if it starts with "
         else if(this.nextMatches(/^"[ \t]*\n/))
             return this.parseQuote(metadata);
-        // Parse and return a callout if the line starts with _
+        // Parse and return a callout if the line starts with =
         else if(this.nextMatches(/^=[ \t]*\n/))
             return this.parseCallout(metadata);
         // Parse and return a table if the line starts with a ,
@@ -523,7 +523,7 @@ class Parser {
 
         var blocks = [];
 
-        // Parse the _ ...
+        // Parse the = ...
         this.read();
 
         // ...then any whitespace
@@ -544,7 +544,7 @@ class Parser {
                 this.read();
         }
 
-        // Read the closing _ and the whitespace that follows.
+        // Read the closing = and the whitespace that follows.
         this.read();
         this.readWhitespace();
 
