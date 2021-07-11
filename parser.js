@@ -5,9 +5,9 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { NavHashLink } from "react-router-hash-link";
 import { Figure } from './views/image';
-import Highlight from 'react-highlight.js';
-import { TableOfContents } from './views/toc';
+import { Code } from './views/code';
 
+// TODO This grammar is slightly out of date.
 // A simple recursive descent parser for this grammar.
 // Embeds a tokenizer, since the lexical grammar is simple.
 //
@@ -22,7 +22,7 @@ import { TableOfContents } from './views/toc';
 // CODE :: `\nTEXT`
 // QUOTE :: "\nBLOCK*\n"CONTENT
 // TABLE :: ((,CONTENT)+\n)+
-// CODE :: _\nTEXT\n_
+// CODE :: `\nTEXT\n`
 // PARAGRAPH :: CONTENT
 // CONTENT :: FORMATTED | CITATIONS | ESCAPED | LINK | FOOTNOTE
 // FORMATTED :: *CONTENT* | _CONTENT_ | `CONTENT`
@@ -705,17 +705,27 @@ class Parser {
             }
         }
 
+        // If there's more text, save it!
         if(text !== "")
             segments.push(new TextNode(text, this.index));
 
-        // Read the closing delimter
+        // Read the closing delimeter
         if(this.nextIs(delimeter))
             this.read();
         // If it wasn't closed, add an error
         else
             segments.push(new ErrorNode("Unclosed " + delimeter));
 
-        return new FormattedNode(delimeter, segments);
+        // If there's a letter immediately after a backtick, it's a language for an inline code name
+        let language = "";
+        if(delimeter === '`' && /^[a-z]$/.test(this.peek())) {
+            do {
+                language = language + this.read();
+            } while(/^[a-z]$/.test(this.peek()));
+        } else
+            language = "plaintext"
+        
+        return new FormattedNode(delimeter, segments, language);
 
     }
 
@@ -996,8 +1006,8 @@ class CodeNode extends Node {
         this.caption = caption;
     }
     toDOM(app, chapter, query, key) {
-        return <div className="code" key={key} >
-            <Highlight language={this.language}>{this.code}</Highlight>
+        return <div key={key} >
+            <Code inline={false} language={this.language}>{this.code}</Code>
             <div className="figure-caption">{this.caption.toDOM(app, chapter, query)}</div>
         </div>
     }
@@ -1091,10 +1101,11 @@ class TableNode extends Node {
 
 class FormattedNode extends Node {
 
-    constructor(format, segments) {
+    constructor(format, segments, language) {
         super();
         this.format = format;
         this.segments = segments;
+        this.language = language;
     }
 
     toDOM(app, chapter, query, key) {
@@ -1106,7 +1117,7 @@ class FormattedNode extends Node {
         else if(this.format === "_")
             return <em key={key}>{segmentDOMs}</em>;
         else if(this.format === "`")
-            return <code key={key}>{segmentDOMs}</code>;
+            return <Code key={key} inline={true} language={this.language}>{segmentDOMs}</Code>;
         else
             return <span key={key}>{segmentDOMs}</span>;
         

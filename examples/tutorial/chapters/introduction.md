@@ -2,7 +2,7 @@ Welcome to the Peruse example book! This introduction contains all of the featur
 
 Let's go through each of the basic formatting features of book chapters. To begin, let's start with headers, all of which can be indicated by starting a line with the pound symbol #. For example, here's some code that starts a top-level header:
 
-`
+`markdown
 # This is a header
 `
 
@@ -12,7 +12,7 @@ That will be formatted like this:
 
 You can put as many as three consecutive pounds for subheaders and sub-subheaders. Even though the web supports more than that, I didn't include more than that because readers tend to get overwhelmed by complex document structures. Here are the three different size:
 
-`
+`markdown
 # Header
 ## Subheader
 ### Sub-subheader
@@ -26,25 +26,25 @@ There are many ways to format text.
 
 It can be _italic_ by wrapping text with the \_ symbol:
 
-`
+`markdown
 It can be _italic_ by wrapping text with the \_ symbol:
 `
 
 It can be *bold* by wrapping text with the \* symbol.
 
-`
+`markdown
 It can be *bold* by wrapping text with the \* symbol.
 `
 
 It can be both *_bold and italic_* by wrapping words with both \* and \_.
 
-`
+`markdown
 It can be both *_bold and italic_* by wrapping words with both.
 `
 
 It can be in bullet form by starting a line with \*:
 
-`
+`markdown
 * Item _1_
 * Item _2_
 * Item _3_
@@ -56,7 +56,7 @@ It can be in bullet form by starting a line with \*:
 
 Bullets can be nested by increasing or decreasing the number of \*:
 
-`
+`markdown
 * Item _1_
 ** Item _1.1_
 ** Item _1.2_
@@ -79,7 +79,8 @@ Bullets can be nested by increasing or decreasing the number of \*:
 It doesn't matter how many \*'s there are exactly, just whether that number is more or less than the bullets before or after it.
 
 It can be in numbered form by staring a line with a number followed by a period:
-`
+
+`markdown
 1. Item 1
 2. Item 2
 3. Item 3
@@ -90,7 +91,7 @@ It can be in numbered form by staring a line with a number followed by a period:
 
 The numbers don't have to be in a particular order, they just have to be a number.
 
-`
+`markdown
 3. Item 1
 22. Item 2
 111. Item 3
@@ -101,7 +102,7 @@ The numbers don't have to be in a particular order, they just have to be a numbe
 
 You can nest numbered lists by increasing or decreasing the number of \.'s:
 
-`
+`markdown
 1. Item _1_
 1.. Item _1.1_
 1.. Item _1.2_
@@ -126,7 +127,7 @@ It doesn't matter how many \*'s there are exactly, just whether that number is m
 
 You can include [links to content|http://amyjko.com] like this:
 
-`
+`markdown
 You can include [links to content|http://amyjko.com].
 `
 
@@ -134,7 +135,7 @@ The \| separates the link text from the URL. All links will open new windows.
 
 You can add links to chapters by just using the chapter identifier given in the book's specification. For example, here's a link to [Chapter 1|chapter1].
 
-`
+`markdown
 Visit [Chapter 1|chapter1].
 `
 
@@ -142,7 +143,7 @@ Chapter links won't open in new windows.
 
 If you link to a chapter that doesn't exist, bad things happen:
 
-`
+`markdown
 Visit [a chapter that doesn't exist|doesnotexist].
 `
 
@@ -150,7 +151,7 @@ Visit [a chapter that doesn't exist|doesnotexist].
 
 You can include captioned images like the one at the top of this chapter by using this format, indicating the caption, description of the image, credit for the image, and the image file name:
 
-`
+`markdown
 |chapter1.jpg|A photograph of Boomy seeking nuzzles|A caption with a reference <ref1>.|Amy J. Ko|
 `
 
@@ -160,7 +161,7 @@ If you cite something that doesn't appear in your book specification's reference
 
 You can also include footnotes{I'm a footnote}:
 
-`
+`markdown
 You can also include footnotes{I'm a footnote}{I'm also a footnote}:
 `
 
@@ -168,11 +169,11 @@ If you include more footnotes, Peruse will letter them accordingly{I'm also a fo
 
 You can also include YouTube videos by using the same syntax as above, but just including a YouTube video in the URL instead.
 
-`
-|https://www.youtube.com/embed/Gc5ReRHqlkk|A video Amy made with her daughter back when Angry Birds was popular.|A YouTube video showing Angry Birds enacted in real life.|Amy J. Ko|
+`markdown
+|https://www.youtube.com/embed/v=317jz-PU7Mg|A video Amy made with her daughter back when Angry Birds was popular.|A YouTube video showing Angry Birds enacted in real life.|Amy J. Ko|
 `
 
-|https://www.youtube.com/embed/Gc5ReRHqlkk|A video Amy made with her daughter back when Angry Birds was popular.|A YouTube video showing Angry Birds enacted in real life.|Amy J. Ko|
+|https://www.youtube.com/embed/v=317jz-PU7Mg|A video Amy made with her daughter back when Angry Birds was popular.|A YouTube video showing Angry Birds enacted in real life.|Amy J. Ko|
 
 You can include code by wrapping any text with a backtick \`:
 
@@ -201,16 +202,13 @@ if two == 2:
    print "Truth"
 ` Look, syntax highlighting!
 
-
-
-
 Supported languages are listed in [the HighlightJS documentation|https://github.com/highlightjs/highlight.js/blob/master/SUPPORTED_LANGUAGES.md].
 
-You can also include code `inline` by wrapping things in \`in backticks\`.
+You can also include code inline by wrapping things in \`in backticks\`: `if two == 2: print "Truth"`, and by including the language name after the closing backtick, as in `\`if two == 2: print "Truth"\`python`markdown, you can language format inline code: `if two == 2: print "Truth"`python
 
 You can include comments in text by starting a line with the \% symbol:
 
-`
+`markdown
 % This is a comment.
 `
 
@@ -220,7 +218,7 @@ Text in comments won't be visible in the chapter. This is helpful for keeping no
 
 To use any of the special symbols above, place a \\ a before it to mean that you mean the symbol, and not it's special meaning.
 
-`
+`markdown
      Any space at the beginning or end of a
    line, or before or after a line, will be 
             ignored.   
@@ -232,7 +230,7 @@ The same is true of extra lines before and after paragraphs.
 
 It's also possible to include quotes:
 
-`
+`markdown
 "
 This is my quote
 " Me
@@ -244,7 +242,7 @@ This is my quote
 
 It's also important to border text with a callout:
 
-`
+`markdown
 =
 This is my callout
 =
@@ -256,7 +254,7 @@ This is my callout
 
 And if that's not enough, you can make tables with captions, with each
 
-`
+`markdown
 ,this,is,[my|dfjdfdf],table
 ,the, next,row,is
 ,my,test,is,*_failing_*
@@ -274,7 +272,7 @@ Each cell can have inline formatting as in any other paragraph (but you can't pu
 
 If you start a line with any number of hyphens...
 
-`
+`markdown
 ---
 `
 
@@ -297,12 +295,3 @@ We will also replace \-\- with em-dashes -- like the one in this sentence.
 You can also cite things <ref1,ref2> or just cite one thing <ref3>.
 
 When clicking on something in the index, the index word should be highlighted no matter how many times the index appears in a span of text and regardless of whether the *index word* is formatted.
-
-
-
-
-* *Usefulness*. Interfaces that meet stakeholders' information needs might be deemed useful, but knowing whether they do can be difficult. Moreover, useful interfaces are not necessarily good in other ways: they may be hard to learn, frustrating to use, unreliable, and even harmful, much like the name change interfaces I described at the beginning of the chapter, which were useful but hard and slow to use.
-* *Usability*. Interfaces that are efficient to use without error are usable, but they are not necessarily useful. For example, many users of WeChat find it incredibly useful, supporting calls, messaging, search, payments, news, taxies, hotels, and much more, but many users, especially new ones, find it overwhelmingly complex to use.
-* *Accessibility*. Interfaces that can be used by anyone, independent of their physical or cognitive abilities, are accessible. Unfortunately, few interfaces achieve such universal accessibility, with many excluding people who are blind, low vision, deaf, or have motor disabilities that make them unable to use a mouse, keyboard, or touchscreen. Interfaces that are usable to some might be unusable to others because of accessibility issues.
-
-*Accessibility* is particularly important for information interfaces: if someone cannot physically operate an interface that mediates information, then they cannot access that information. This is a critical concern, as 1 in 7 people worldwide have some form of disability that might interfere with their ability to use an interface. Moreover, all people, independent of their abilities now, will eventually be disabled in some way as we age or become injured. It is unfortunate then that designers often take what is called a "medical" or "rehabilitation" lens on disability, imagining that the problem lies with the disabled person, focusing on fixing them rather than fixing interfaces. A disability justice lens, much like a design justice lens, recognizes that accessibility problems are in the interface designs themselves, and that it is the responsibility of designers to center people with disabilities in design to ensure that they work for everyone<bennett19>. 

@@ -80,16 +80,6 @@ li {
 	font-size: 11pt;
 }
 
-pre {
-	border: 1px solid #EAEAEA;
-	border-radius: 3px;
-	padding: 1em;
-	background-color: #fcfcfc;
-	font-size: 80%;
-	color: #e83e8c;
-	white-space: pre-wrap;
-}
-
 a {
 	color: rgb(14, 121, 209);
 }
@@ -220,19 +210,37 @@ blockquote {
   color: #7928a1;
 }
 
-.hljs {
-  display: block;
-  overflow-x: auto;
-  color: #545454;
-  padding: 0.5em;
-}
-
 .hljs-emphasis {
   font-style: italic;
 }
 
 .hljs-strong {
   font-weight: bold;
+}
+
+.code {
+	font-size: 80%;
+	white-space: pre-wrap;	
+	border: 1px solid #EAEAEA;
+	color: gray;
+	background-color: #FCFAFA;
+}
+
+.code-block {
+	display: block;
+	padding: 1em;
+	line-height: 1.5em;
+	border-radius: 3px;
+}
+
+.code-inline {
+	display: inline;
+	padding: 0.1em;
+}
+
+.code-inline code {
+	display: inline;	
+	padding: 0em;
 }
 
 .editor {
@@ -275,8 +283,11 @@ blockquote {
 	font-weight: normal;
 	font-style: italic;
 	color: gray;
-	display: inline-block; /* For the section name */
 	margin-right: 0.35em;
+}
+
+.title .chapter-number {
+	display: inline-block; /* For the section name */
 }
 
 .section-name {
