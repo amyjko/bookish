@@ -80,6 +80,12 @@ class TableOfContents extends React.Component {
 								let chapterNumber = this.props.app.getChapterNumber(chapter.id);
 								let section = this.props.app.getChapterSection(chapter.id);
 
+								let readingTime = this.props.app.getChapterReadingTime(chapter.id);
+								let readingEstimate =
+									readingTime < 5 ? "<5 min read" :
+									readingTime < 60 ? "~" + Math.floor(readingTime / 5) * 5 + " min read" :
+									"~" + Math.floor(readingTime / 60 / 10) * 10 + "hour read";
+
 								return (
 									<tr key={"chapter" + index}>
 										<td>
@@ -118,7 +124,7 @@ class TableOfContents extends React.Component {
 										<td>
 											<small className="text-muted">
 												<em>
-													{ this.props.app.getChapterReadingTime(chapter.id) } minute read
+													{ readingEstimate }
 													{ this.getProgressDescription(chapter.id in progress ? progress[chapter.id] : null) }
 												</em>
 											</small>
