@@ -1014,6 +1014,7 @@ class CodeNode extends Node {
     toDOM(app, chapter, query, key) {
         return <div key={key} >
             <Code inline={false} language={this.language}>{this.code}</Code>
+            { this.language !== "plaintext" ? <div className="code-language">{this.language}</div> : null }
             <div className="figure-caption">{this.caption.toDOM(app, chapter, query)}</div>
         </div>
     }

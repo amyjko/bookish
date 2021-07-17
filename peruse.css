@@ -252,6 +252,14 @@ blockquote {
 	padding: 0em;
 }
 
+.code-language {
+	float: right;
+	margin-top: -2em;
+	font-size: small;
+	color: gray;
+	margin-right: 0.25em;
+}
+
 .editor {
 	position: fixed;
 	left: 0;
