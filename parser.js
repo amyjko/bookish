@@ -268,8 +268,8 @@ class Parser {
         // Parse and return a numbered list if it starts with a number
         else if(this.nextMatches(/^[0-9]+\.+/))
             return this.parseNumberedList(metadata);
-        // Parse and return a code block if it starts with `
-        else if(this.nextIs("`"))
+        // Parse and return a code block if it starts with `, some optional letters, some whitespace, and a newline
+        else if(this.nextMatches(/^`[a-zA-Z]*[ \t]*\n/))
             return this.parseCode(metadata);
         // Parse and return a quote block if it starts with "
         else if(this.nextMatches(/^"[ \t]*\n/))
