@@ -34,7 +34,7 @@ p {
 }
 
 /* Drop cap in the first paragraph's first letter. */
-.chapter > p:first-child::first-letter {
+.chapter > p:first-of-type::first-letter {
 	padding: 0 .25rem;
 	margin: 0 .25rem 0 0;
 	font-size: 4rem;
