@@ -358,8 +358,11 @@ class Parser {
                 if(currentLevel < lastLevel)
                     break;
                 // Otherwise, it's greater, and we should read another list.
-                else
+                else {
                     bullets.push(this.parseBulletedList(metadata));
+                    // Reset the current level to the last level, so we expect another bullet at the same level.
+                    currentLevel = lastLevel;
+                }
             }
 
             // Read trailing whitespace after the content.
@@ -402,7 +405,7 @@ class Parser {
                 currentLevel++;
             }
 
-            // If this is the first bullet, or its the same level, just parse content.
+            // If this is the first bullet, or its the same level, just parse another bullet.
             if(lastLevel === undefined || lastLevel === currentLevel) {
                 // Read the whitespace after the bullet.
                 this.readWhitespace();
@@ -429,8 +432,11 @@ class Parser {
                 if(currentLevel < lastLevel)
                     break;
                 // Otherwise, it's greater, and we should read another list.
-                else
+                else {
                     bullets.push(this.parseNumberedList(metadata));
+                    // Reset the current level to the last level, so we expect another bullet at the same level.
+                    currentLevel = lastLevel;
+                }
 
             }
 

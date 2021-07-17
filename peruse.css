@@ -44,8 +44,17 @@ p {
 	color: black;
 }
 
-li {
+ol li {
 	margin-bottom: 0.5em;
+	list-style-type: decimal;
+}
+
+ol ol li {
+	list-style-type: lower-alpha;
+}
+
+ol ol ol li {
+	list-style-type: upper-alpha;
 }
 
 .img-responsive, .embed-responsive {

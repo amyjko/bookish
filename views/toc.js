@@ -84,7 +84,7 @@ class TableOfContents extends React.Component {
 								let readingEstimate =
 									readingTime < 5 ? "<5 min read" :
 									readingTime < 60 ? "~" + Math.floor(readingTime / 5) * 5 + " min read" :
-									"~" + Math.floor(readingTime / 60 / 10) * 10 + "hour read";
+									"~" + Math.floor(10 * readingTime / 60) / 10 + " hour read";
 
 								return (
 									<tr key={"chapter" + index}>
