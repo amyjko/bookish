@@ -325,8 +325,6 @@ blockquote {
 }
 
 .outline {
-	margin-top: 1em;
-	margin-bottom: 1em;
 	font-size: 80%;
 	display: inline-block;
 }
@@ -335,6 +333,10 @@ blockquote {
 	display: block;
 	line-height: 1.4em;
 	color: grey;
+}
+
+.outline-header:before {
+	content: ": ";
 }
 
 .outline-header:hover {
