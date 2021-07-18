@@ -226,6 +226,7 @@ class Chapter extends React.Component {
 			let chapterAST = Parser.parseChapter(chapter.text);
 			let citations = chapterAST.getCitations();
 			let footnotes = chapterAST.getFootnotes();
+			let headers = chapterAST.getHeaders();
 			return (
 				<div className="chapter">
 					<Header 
@@ -255,6 +256,18 @@ class Chapter extends React.Component {
 					{ /* If there are chapter authors, map them to authors declared in the book title, otherwise use all the authors of the book */ }
 					<Authors authors={chapter.authors ? _map(chapter.authors, author => this.props.app.getAuthorByID(author)) : this.props.app.getAuthors()} />
 
+					{ /* Render the chapter outline */ }
+					<div className="outline">
+					{
+						_map(headers, (header, index) => 
+							// Only first and second level headers...
+							header.level > 2 ? 
+								null :
+								<NavHashLink key={"header-" + index} smooth to={"#header-" + index} className={"outline-header outline-header-level-" + header.level}>{header.toText()}</NavHashLink>)
+					}
+					</div>
+
+					{ /* Render the editor if we're editing */ }
 					{ this.state.editing ? this.renderEditor() : null }
 
 					<div onDoubleClick={this.handleDoubleClick}>

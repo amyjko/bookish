@@ -1,3 +1,7 @@
+"
+This is a quote. I'm using it to test how the outline floats around non-paragraph headers.
+" Amy J. Ko, Ph.D.
+
 Welcome to the Peruse example book! This introduction contains all of the features supported by the platform, and explanation of how they work.
 
 Let's go through each of the basic formatting features of book chapters. To begin, let's start with headers, all of which can be indicated by starting a line with the pound symbol #. For example, here's some code that starts a top-level header:

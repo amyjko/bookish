@@ -224,7 +224,8 @@ class Parser {
         // We pass this to all parsing functions to gather information strewn about the document.
         var metadata = {
             citations: {},
-            footnotes: []
+            footnotes: [],
+            headers: []
         };
 
         // While there's more text, parse a line.
@@ -304,8 +305,15 @@ class Parser {
         // Read any whitespace after the hashes.
         this.readWhitespace();
 
-        // Parse some content and then return a header.
-        return new HeaderNode(count, this.parseContent(metadata));
+        // Parse some content.
+        let content = this.parseContent(metadata);
+        let node = new HeaderNode(Math.min(3, count), content);
+        
+        if(metadata)
+            metadata.headers.push(node);
+
+        // Return a header node.
+        return node;
 
     }
     
@@ -775,7 +783,7 @@ class Parser {
 
         let node = new FootnoteNode(footnote);
 
-        // We won't necessarily be gathering this data.
+        // TODO We won't necessarily be gathering this data.
         // This does mean that if someone cites something in a non-chapter
         // it will silently fail.
         if(metadata)
@@ -852,6 +860,10 @@ class ChapterNode extends Node {
 
     getFootnotes() { 
         return this.metadata.footnotes; 
+    }
+
+    getHeaders() { 
+        return this.metadata.headers; 
     }
 
     getCitationNumber(citationID) { 
@@ -934,11 +946,11 @@ class HeaderNode extends Node {
     }
 
     toDOM(app, chapter, query, key) {
-        return this.level === 1 ?
-            <h2 key={key}>{this.content.toDOM(app, chapter, query)}</h2> :
-            this.level === 2 ?
-            <h3 key={key}>{this.content.toDOM(app, chapter, query)}</h3> :
-            <h4 key={key}>{this.content.toDOM(app, chapter, query)}</h4>
+        let id = "header-" + chapter.getHeaders().indexOf(this);
+
+        return this.level === 1 ? <h2 id={id} key={key}>{this.content.toDOM(app, chapter, query)}</h2> :
+            this.level === 2 ? <h3 id={id}  key={key}>{this.content.toDOM(app, chapter, query)}</h3> :
+            <h4  id={id} key={key}>{this.content.toDOM(app, chapter, query)}</h4>
     }
 
     toText() {

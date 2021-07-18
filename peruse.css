@@ -307,6 +307,10 @@ blockquote {
 	display: inline-block; /* For the section name */
 }
 
+.authors {
+	margin-bottom: 0.5em;
+}
+
 .section-name {
 	display: inline-block;
 	font-weight: normal;
@@ -318,4 +322,35 @@ blockquote {
 .footnote {
 	padding-left: 1em;
 	text-indent: -0.75em;
+}
+
+.outline {
+	margin-top: 1em;
+	margin-bottom: 1em;
+	font-size: 80%;
+	display: inline-block;
+}
+
+.outline-header {
+	display: block;
+	line-height: 1.4em;
+	color: grey;
+}
+
+.outline-header:hover {
+	color: grey;
+}
+
+.outline-header-level-1 {
+	font-size: 90%;
+}
+
+.outline-header-level-2 {
+	font-size: 80%;
+	margin-left: 1em;
+}
+
+.outline-header-level-3 {
+	font-size: 70%;
+	margin-left: 2em;
 }
