@@ -333,6 +333,8 @@ blockquote {
 	display: block;
 	line-height: 1.4em;
 	color: grey;
+	text-indent: -0.5em;
+    padding-left: 1em;
 }
 
 .outline-header:before {
