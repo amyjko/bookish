@@ -68,7 +68,7 @@ class TableOfContents extends React.Component {
 
 				{Parser.parseChapter(this.props.app.getDescription()).toDOM()}
 
-				<h2>Chapters <small><small className="text-muted"><em>{readingTime < 60 ? Math.max(5, (Math.floor(readingTime / 10) * 10)) + " minute read" : (new Number(readingTime / 60.0)).toPrecision(1) + " hour read" }</em></small></small></h2>
+				<h2>Chapters <small><small className="text-muted"><em>{readingTime < 60 ? Math.max(5, (Math.floor(readingTime / 10) * 10)) + " min read" : "~" + Math.round(readingTime / 60.0) + " hour read" }</em></small></small></h2>
 
 				<table className="table" id="toc">
 					<tbody>
@@ -84,7 +84,7 @@ class TableOfContents extends React.Component {
 								let readingEstimate =
 									readingTime < 5 ? "<5 min read" :
 									readingTime < 60 ? "~" + Math.floor(readingTime / 5) * 5 + " min read" :
-									"~" + Math.floor(10 * readingTime / 60) / 10 + " hour read";
+									"~" + Math.round(10 * readingTime / 60) / 10 + " hour read";
 
 								return (
 									<tr key={"chapter" + index}>
