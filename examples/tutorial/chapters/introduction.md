@@ -161,6 +161,16 @@ You can include captioned images like the one at the top of this chapter by usin
 
 |chapter1.jpg|A photograph of Boomy seeking nuzzles|A caption with a reference <ref1>.|Amy J. Ko|
 
+You can also nudge the image left and right by ending the embed with a \< or \>. (This only works if the viewing window is wide enough)
+
+`markdown
+|chapter1.jpg|A photograph of Boomy seeking nuzzles|A caption with a reference.|Amy J. Ko|<
+`
+
+Here's an image on the left.
+
+|chapter1.jpg|A photograph of Boomy seeking nuzzles|A caption with a reference.|Amy J. Ko|<
+
 If you cite something that doesn't appear in your book specification's reference list, you'll get an error like this: <thisisanunknowncitation>.
 
 You can also include footnotes{I'm a footnote}:

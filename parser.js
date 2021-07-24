@@ -664,7 +664,7 @@ class Parser {
 
         if(this.peek() !== "|") {
             this.readUntilNewLine();
-            return new ErrorNode("Missing '|' in embed");
+            return new ErrorNode("Missing '|' after URL in embed");
         }
 
         // Read a |
@@ -675,7 +675,7 @@ class Parser {
 
         if(this.peek() !== "|") {
             this.readUntilNewLine();
-            return new ErrorNode("Missing '|' in link");
+            return new ErrorNode("Missing '|' after description in embed");
         }
 
         // Read a |
@@ -685,7 +685,7 @@ class Parser {
 
         if(this.peek() !== "|") {
             this.readUntilNewLine();
-            return new ErrorNode("Missing '|' in link");
+            return new ErrorNode("Missing '|' after caption in embed");
         }
 
         // Read a |
@@ -694,15 +694,21 @@ class Parser {
         // Parse the credit
         var credit = this.parseContent(metadata, "|");
 
+        // Check for the closing delimeter
         if(this.peek() !== "|") {
             this.readUntilNewLine();
-            return new ErrorNode("Missing '|' in link");
+            return new ErrorNode("Missing '|' after credit in embed.");
         }
 
-        // Parse the closing bar
+        // Read a |
         this.read();
 
-        return new EmbedNode(url, description, caption, credit);
+        // Is there a position indicator?
+        let position = "|";
+        if(this.peek() === "<" || this.peek() === ">")
+            position = this.read();
+
+        return new EmbedNode(url, description, caption, credit, position);
 
     }
 
@@ -958,12 +964,13 @@ class ParagraphNode extends Node {
 }
 
 class EmbedNode extends Node {
-    constructor(url, description, caption, credit) {
+    constructor(url, description, caption, credit, position) {
         super();
         this.url = url;
         this.description = description;
         this.caption = caption;
         this.credit = credit;
+        this.position = position;
     }
 
     toDOM(app, chapter, query, key) {
@@ -972,6 +979,7 @@ class EmbedNode extends Node {
             alt={this.description}
             caption={this.caption.toDOM(app, chapter, query)}
             credit={this.credit.toDOM(app, chapter, query)}
+            position={this.position}
         />
     }
 
