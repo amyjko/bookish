@@ -307,3 +307,19 @@ We will also replace \-\- with em-dashes -- like the one in this sentence.
 You can also cite things <ref1,ref2> or just cite one thing <ref3>.
 
 When clicking on something in the index, the index word should be highlighted no matter how many times the index appears in a span of text and regardless of whether the *index word* is formatted.
+
+It's also possible to use basic subscripts and superscripts. To make a superscript, wrap text between `\^` characters, as in:
+
+`markdown
+x^2^
+`
+
+x^2^
+
+To make a subscript, start wrapping text with `\^v` and then close it with a `\^`, as in:
+
+`markdown
+x^v2^
+`
+
+x^v2^

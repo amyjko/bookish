@@ -181,6 +181,7 @@ class Parser {
             next === "_" ||
             next === "*" ||
             next === "`" ||
+            next === "^" ||
             next === "<" ||
             next === "{" ||
             (this.charBeforeNext() === " " && next === "%") ||
@@ -621,6 +622,9 @@ class Parser {
             // Parse a citation list
             else if(this.nextIs("<"))
                 segments.push(this.parseCitations(metadata));
+            // Parse sub/super scripts
+            else if(this.nextIs("^"))
+                segments.push(this.parseSubSuperscripts(metadata));
             // Parse a footnote
             else if(this.nextIs("{"))
                 segments.push(this.parseFootnote(metadata));
@@ -791,6 +795,30 @@ class Parser {
             });
 
         return new CitationsNode(citations);
+
+    }
+
+    parseSubSuperscripts(metadata, awaiting) {
+        
+        // Read the ^
+        this.read();
+
+        // Default to superscript.
+        let superscript = true;
+
+        // Is there a 'v', indicating subscript?
+        if(this.peek() === "v") {
+            this.read();
+            superscript = false;
+        }
+
+        // Parse the content
+        let content = this.parseContent(metadata, "^");
+
+        // Read the closing ^
+        this.read();
+
+        return new SubSuperscriptNode(superscript, content);
 
     }
 
@@ -1278,7 +1306,24 @@ class ContentNode extends Node {
     toText() {
         return _map(this.segments, segment => segment.toText()).join(" ");
     }
+}
 
+class SubSuperscriptNode extends Node {
+    constructor(superscript, content) {
+        super();
+        this.superscript = superscript;
+        this.content = content;
+    }
+
+    toDOM(app, chapter, query, key) {
+        return this.superscript?
+            <sup key={key}>{this.content.toDOM(app, chapter, query, "sup-")}</sup> :
+            <sub key={key}>{this.content.toDOM(app, chapter, query, "sub-")}</sub>;
+    }
+
+    toText() {
+        return this.content.toText();
+    }
 }
 
 class TextNode extends Node {
