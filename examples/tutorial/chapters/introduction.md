@@ -216,7 +216,15 @@ You can include comments in text by starting a line with the \% symbol:
 % This is a comment.
 `
 
-% This is a comment.
+You can also put comments in the middle of a paragraph by using an opening and closing \%.
+
+`markdown
+Hi, I'm a paragraph with a % This is a comment % comment but you can't see it.
+`
+
+Hi, I'm a paragraph with a % This is a comment % comment but you can't see it.
+
+Make sure the the opening \% has a space before it though; that's how we make possible to write 36% without having to escape the \% like 36\\%. You'll still have to escape a \% if you put the symbol by itself though.
 
 Text in comments won't be visible in the chapter. This is helpful for keeping notes about improvements to make, or rationale for a section of a chapter.
 

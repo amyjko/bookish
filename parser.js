@@ -153,6 +153,11 @@ class Parser {
         return this.text.substring(this.index);
     }
 
+    // The character before
+    charBeforeNext() {
+        return this.index === 0 ? null : this.text.charAt(this.index - 1);
+    }
+    
     // All the text until the next newline
     restOfLine() {
         var nextNewline = this.text.substring(this.index).indexOf("\n") + this.index;
@@ -178,6 +183,7 @@ class Parser {
             next === "`" ||
             next === "<" ||
             next === "{" ||
+            (this.charBeforeNext() === " " && next === "%") ||
             next === "[" ||
             next === "\\";
 
@@ -624,6 +630,9 @@ class Parser {
             // Parse a link
             else if(this.nextIs("["))
                segments.push(this.parseLink(metadata));
+            // Parse inline comments
+            else if(this.charBeforeNext() === " " && this.nextIs("%"))
+                this.parseComment(metadata);
             // Keep reading text until finding a delimiter.
             else {
                 let text = "";
@@ -690,6 +699,21 @@ class Parser {
         this.read();
 
         return new EmbedNode(url, description, caption, credit);
+
+    }
+
+    parseComment(metadata) {
+
+        // Consume the opening %
+        this.read();
+
+        // Consume everything until the next %.
+        while(this.more() && this.peek() !== "\n" && this.peek() !== "%")
+            this.read();
+
+        // Consume the closing %, if we didn't reach the end of input or a newline.
+        if(this.peek() === "%")
+            this.read();
 
     }
 
