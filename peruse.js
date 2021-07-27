@@ -146,6 +146,7 @@ class Peruse extends React.Component {
 	chaptersAreLoaded() { return Object.keys(this.state.chapters).length === this.getBook().chapters.length; }
 	getLicense() { return this.getBook().license; }
 	getCover() { return this.getBook().cover; }
+	getSymbols() { return this.getBook().symbols; }
 	getUnknown() { return this.getBook().unknown; }
 	getReferences() { return this.getBook().references; }
 
@@ -159,7 +160,7 @@ class Peruse extends React.Component {
 
 	}
 
-	computeIndex(text) {
+	computeIndex(text, symbols={}) {
 
 		// Build a list of common words
 		var commonWords = {};
@@ -189,7 +190,7 @@ class Peruse extends React.Component {
 			// • It shouldn't end in 'ly'
 			if(!(word in commonWords) && word.indexOf('\u2019') < 0 && (word.length > 2 && word.substring(word.length - 2, word.length) !== "ly")) {
 				
-				// If we haven't started a list of occurences, start one.
+				// If we haven't started a list of occurrences, start one.
 				if(!(word in index))
 					index[word] = [];
 				
@@ -198,7 +199,7 @@ class Peruse extends React.Component {
 					match: words[wordNumber],
 					right: words.slice(Math.min(words.length - 1, wordNumber + 1), Math.min(words.length - 1, wordNumber + 10) + 1).join("")
 				}
-				// Add the occurence
+				// Add the occurrence
 				index[word].push(match);
 			}
 		
@@ -315,7 +316,7 @@ class Peruse extends React.Component {
 							// Augment the chapter object with the text and other detail.
 							chapter.text = text;
 							chapter.wordCount = text.split(/\s+/).length;
-							chapter.index = this.computeIndex(text);
+							chapter.index = this.computeIndex(text, this.getSymbols());
 
 							// Update the chapter.
 							updatedChapters[chapter.id] = chapter;

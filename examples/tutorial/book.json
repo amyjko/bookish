@@ -40,5 +40,8 @@
 			"http://faculty.washington.edu/ajko/papers/Register2020PersonalData.pdf",
 			"Finds that teaching machine learning by tracing an algorithm with learners' personal data increases the extent to which they can identify bias in self-advocacy arguments."
 		]
+	},
+	"symbols": {
+		"hello": "Hi, I am _symbolic_ text."
 	}
 }

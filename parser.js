@@ -11,7 +11,8 @@ import { Code } from './views/code';
 // A simple recursive descent parser for this grammar.
 // Embeds a tokenizer, since the lexical grammar is simple.
 //
-// CHAPTER :: (BLOCK\n)*
+// CHAPTER :: SYMBOLS* (BLOCK\n)*
+// SYMBOLS :: @name: BLOCK
 // BLOCK :: (COMMENT | HEADER | RULE | EMBED | ORDERED | UNORDERED | CODE | QUOTE | PARAGRAPH)
 // COMMENT :: %.+
 // HEADER :: # CONTENT | ## CONTENT | ### CONTENT
@@ -24,7 +25,7 @@ import { Code } from './views/code';
 // TABLE :: ((,CONTENT)+\n)+
 // CODE :: `\nTEXT\n`
 // PARAGRAPH :: CONTENT
-// CONTENT :: FORMATTED | CITATIONS | ESCAPED | LINK | FOOTNOTE
+// CONTENT :: FORMATTED | CITATIONS | ESCAPED | LINK | FOOTNOTE | SYMBOL
 // FORMATTED :: *CONTENT* | _CONTENT_ | `CONTENT`
 // CITATIONS || <TEXT+,>
 // ESCAPED :: \[char]
@@ -47,8 +48,8 @@ class Parser {
 
     }
 
-    static parseChapter(text) {
-        return (new Parser(text)).parseChapter();
+    static parseChapter(text, symbols = {}) {
+        return (new Parser(text)).parseChapter(symbols);
     }
 
     static parseContent(text) {
@@ -181,6 +182,7 @@ class Parser {
             next === "_" ||
             next === "*" ||
             next === "`" ||
+            next === "@" ||
             next === "^" ||
             next === "<" ||
             next === "{" ||
@@ -224,16 +226,37 @@ class Parser {
         return text;
     }
 
-    parseChapter() {
+    parseChapter(symbols = {}) {
 
-        var blocks = [];
+        let blocks = [];
 
         // We pass this to all parsing functions to gather information strewn about the document.
-        var metadata = {
+        let metadata = {
             citations: {},
             footnotes: [],
-            headers: []
+            headers: [],
+            symbols: {}
         };
+
+        // Read any symbols declared for this chapter.
+        let errors = this.parseSymbols(metadata);
+
+        // Get the remaining text.
+        let declarations = this.text.substr(0, this.index);
+        let rest = this.rest();
+        
+        // First, replace any occurrences of the symbol with the symbol's text.
+        for(const [symbol, text] of Object.entries(metadata.symbols)) {
+            rest = rest.replace(new RegExp("([^\\\\])@" + symbol + "\\b", "g"), "$1" + text);
+        }
+
+        // Then replace any remaining symbols with any definitions given.
+        for(const [symbol, text] of Object.entries(symbols)) {
+            rest = rest.replace(new RegExp("([^\\\\])@" + symbol + "\\b", "g"), "$1" + text);
+        }
+        
+        // Replace the text with the pre-processed text.
+        this.text = declarations + rest;
 
         // While there's more text, parse a line.
         while(this.more()) {
@@ -247,7 +270,69 @@ class Parser {
                 this.read();
         }
 
-        return new ChapterNode(blocks, metadata);
+        return new ChapterNode(blocks, errors, metadata);
+
+    }
+
+    parseSymbols(metadata) {
+
+        let errors = [];
+
+        // Read whitespace before the symbols
+        this.readWhitespace();
+
+        // Keep reading symbols
+        while(this.nextIs("@")) {
+
+            // Read the @
+            this.read();
+
+            // Read the name.
+            let name = this.readUntilNewlineOr(":");
+
+            // Names need to be letter and numbers only.
+            if(!/^[a-zA-Z0-9]+$/.test(name)) {
+                this.readUntilNewLine();
+                errors.push(new ErrorNode(
+                    name.trim() === "" ? 
+                        "Did you mean to declare a symbol? Use an @ symbol, then a name of only numbers and letters, then a colon, then whatever content you want it to represent." :
+                        "'" + name + "' isn't a valid name for a symbol; letters and numbers only"
+                    ));
+                return errors;
+            }
+
+            // Read any whitespace until the colon.
+            this.readWhitespace();
+
+            // Name declarations need to be terminated with a colon before the block starts.
+            if(!this.nextIs(":")) {
+                this.readUntilNewLine();
+                errors.push(new ErrorNode("Symbol names ave to be followed by a ':'"));
+                return errors;
+            }
+
+            // Read the colon
+            this.read();
+
+            // Read any whitespace after the colon.
+            this.readWhitespace();
+
+            // Remember where the text starts
+            let startIndex = this.index;
+
+            // Parse a block, any block.
+            this.parseBlock(metadata);
+
+            // Remember the text we parsed.
+            metadata.symbols[name] = this.text.substring(startIndex, this.index).trim();
+
+            // Read whitespace until we find the next non-whitespace thing.
+            while(this.peek() === " " || this.peek() === "\t" || this.peek() === "\n")
+                this.read();
+        
+        }
+
+        return errors;
 
     }
 
@@ -637,6 +722,16 @@ class Parser {
             // Parse inline comments
             else if(this.charBeforeNext() === " " && this.nextIs("%"))
                 this.parseComment(metadata);
+            // Parse an unresolved symbol
+            else if(this.nextIs("@")) {
+
+                this.read();
+                let symbol = "";
+                while(/[a-zA-Z0-9]/.test(this.peek()))
+                    symbol = symbol + this.read();
+                segments.push(new ErrorNode("Couldn't find symbol @" + symbol));
+
+            }
             // Keep reading text until finding a delimiter.
             else {
                 let text = "";
@@ -901,11 +996,12 @@ class Node {
 }
 
 class ChapterNode extends Node {
-    constructor(blocks, metadata) {
+    constructor(blocks, errors, metadata) {
         super();
 
         // The AST of the chapter.
         this.blocks = blocks;
+        this.errors = errors;
 
         // Content extracted during parsing.
         this.metadata = metadata;
@@ -937,6 +1033,7 @@ class ChapterNode extends Node {
 
     toDOM(app, query) {
         return <div key="chapter" className="chapter">
+            {_map(this.errors, (error, index) => error.toDOM(app, this, query, "error-" + index))}
             {_map(this.blocks, (block, index) => block.toDOM(app, this, query, "block-" + index))}
         </div>;
     }

@@ -223,7 +223,7 @@ class Chapter extends React.Component {
 			let chapterSection = this.props.app.getChapterSection(this.props.id);
 			let nextChapter = this.props.app.getNextChapter(this.props.id);
 			let previousChapter = this.props.app.getPreviousChapter(this.props.id);
-			let chapterAST = Parser.parseChapter(chapter.text);
+			let chapterAST = Parser.parseChapter(chapter.text, this.props.app.getSymbols());
 			let citations = chapterAST.getCitations();
 			let footnotes = chapterAST.getFootnotes();
 			let headers = chapterAST.getHeaders();
