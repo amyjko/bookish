@@ -242,7 +242,7 @@ class Parser {
         let errors = this.parseSymbols(metadata);
 
         // Get the remaining text.
-        let declarations = this.text.substr(0, this.index);
+        let declarations = this.text.substring(0, this.index);
         let rest = this.rest();
         
         // First, replace any occurrences of the symbol with the symbol's text.
@@ -724,10 +724,11 @@ class Parser {
                 this.parseComment(metadata);
             // Parse an unresolved symbol
             else if(this.nextIs("@")) {
-
+                // Read the @, then the symbol name.
                 this.read();
                 let symbol = "";
-                while(/[a-zA-Z0-9]/.test(this.peek()))
+                // Stop at the end of the name or file.
+                while(this.more() && /[a-zA-Z0-9]/.test(this.peek()))
                     symbol = symbol + this.read();
                 segments.push(new ErrorNode("Couldn't find symbol @" + symbol));
 
