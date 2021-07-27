@@ -228,6 +228,8 @@ class Parser {
 
     parseChapter(symbols = {}) {
 
+        console.trace();
+
         let blocks = [];
 
         // We pass this to all parsing functions to gather information strewn about the document.

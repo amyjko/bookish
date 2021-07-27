@@ -17,8 +17,14 @@ class Chapter extends React.Component {
 		this.handleDoubleClick = this.handleDoubleClick.bind(this);
 		this.handleChange = this.handleChange.bind(this);
 
+		this.ast = null;
+
 		// Assume the chapter is loaded initially.
-		this.state = { loaded: true, editing: false, draft: null };
+		this.state = { 
+			loaded: true, 
+			editing: false, 
+			draft: null
+		};
 
 	}
 
@@ -139,6 +145,9 @@ class Chapter extends React.Component {
 		var chapter = this.props.app.getContent(this.props.id);
 		chapter.text = event.target.value;
 
+		// Invalidate the parse cache.
+		this.ast = null;
+
 		// What position should we scroll to?
 		let position = event.target.selectionStart;
 
@@ -219,11 +228,16 @@ class Chapter extends React.Component {
 			return <p className="alert alert-danger">Unable to load chapter.</p>;
 		}
 		else {
+
+			// Parse the chapter if necessary.
+			if(this.ast === null)
+				this.ast = Parser.parseChapter(chapter.text, this.props.app.getSymbols());
+
 			let chapterNumber = this.props.app.getChapterNumber(this.props.id);
 			let chapterSection = this.props.app.getChapterSection(this.props.id);
 			let nextChapter = this.props.app.getNextChapter(this.props.id);
 			let previousChapter = this.props.app.getPreviousChapter(this.props.id);
-			let chapterAST = Parser.parseChapter(chapter.text, this.props.app.getSymbols());
+			let chapterAST = this.ast;
 			let citations = chapterAST.getCitations();
 			let footnotes = chapterAST.getFootnotes();
 			let headers = chapterAST.getHeaders();
