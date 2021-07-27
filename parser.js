@@ -755,8 +755,15 @@ class Parser {
 
         // Read |
         this.read();
+
         // Read the URL
         var url = this.readUntilNewlineOr("|");
+
+        // Error if missing URL.
+        if(url === "") {
+            this.readUntilNewLine();
+            return new ErrorNode("Missing URL in embed.");
+        }
 
         if(this.peek() !== "|") {
             this.readUntilNewLine();
@@ -774,6 +781,12 @@ class Parser {
             return new ErrorNode("Missing '|' after description in embed");
         }
 
+        // Error if missing description.
+        if(description === "") {
+            this.readUntilNewLine();
+            return new ErrorNode("Missing image/video description in embed.");
+        }
+        
         // Read a |
         this.read();
         // Parse the caption
@@ -783,13 +796,19 @@ class Parser {
             this.readUntilNewLine();
             return new ErrorNode("Missing '|' after caption in embed");
         }
-
+        
         // Read a |
         this.read();
 
         // Parse the credit
         var credit = this.parseContent(metadata, "|");
 
+        // Error if missing credit.
+        if(credit.toText().trim() === "") {
+            this.readUntilNewLine();
+            return new ErrorNode("Missing credit in embed.");
+        }
+        
         // Check for the closing delimeter
         if(this.peek() !== "|") {
             this.readUntilNewLine();
