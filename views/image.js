@@ -4,7 +4,7 @@ class Figure extends React.Component {
 
 	render() {
 		return (
-			<div className={"figure figure-" + (this.props.position === "<" ? "left" : this.props.position === ">" ? "right" : "center")}>
+			<div className={"figure " + (this.props.position === "<" ? "marginal-left-inset" : this.props.position === ">" ? "marginal-right-inset" : "")}>
 				{
 					this.props.url.includes("https://www.youtube.com") || 
 					this.props.url.includes("https://youtu.be") || 

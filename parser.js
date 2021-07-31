@@ -583,11 +583,16 @@ class Parser {
         if(this.nextIs("`"))
             this.read();
 
+        let position = "|";
+        // Is there a position indicator?
+        if(this.nextIs("<") || this.nextIs(">"))
+            position = this.read();
+
         // Read the caption. Note that parsing inline content stops at a newline, 
         // so if there's a line break after the last row, there won't be a caption.
         var caption = this.parseContent(metadata);
 
-        return new CodeNode(code, language, caption);
+        return new CodeNode(code, language, caption, position);
 
     }
 
@@ -617,12 +622,19 @@ class Parser {
 
         // Read the closing " and the whitespace that follows.
         this.read();
+
+        // Is there a position indicator?
+        let position = "|";
+        if(this.nextIs("<") || this.nextIs(">"))
+            position = this.read();
+
+        // Read any whitespace after the position indicator.
         this.readWhitespace();
 
         // Read the credit.
         var credit = this.nextIs("\n") ? null : this.parseContent(metadata);
 
-        return new QuoteNode(blocks, credit);
+        return new QuoteNode(blocks, credit, position);
 
     }
 
@@ -651,11 +663,18 @@ class Parser {
                 this.read();
         }
 
-        // Read the closing = and the whitespace that follows.
+        // Read the closing =
         this.read();
+
+        // Is there a position indicator?
+        let position = "|";
+        if(this.nextIs("<") || this.nextIs(">"))
+            position = this.read();
+        
+        // Read whitespace that follows.
         this.readWhitespace();
 
-        return new CalloutNode(blocks);
+        return new CalloutNode(blocks, position);
 
     }
 
@@ -686,11 +705,16 @@ class Parser {
 
         }
 
+        // Read the position indicator if there is one.
+        let position = "|";
+        if(this.nextIs("<") || this.nextIs(">"))
+            position = this.read();
+
         // Read the caption. Note that parsing inline content stops at a newline, 
         // so if there's a line break after the last row, there won't be a caption.
         var caption = this.parseContent(metadata);
 
-        return new TableNode(rows, caption);
+        return new TableNode(rows, caption, position);
 
     }
 
@@ -1195,14 +1219,15 @@ class NumberedListNode extends Node {
 }
 
 class CodeNode extends Node {
-    constructor(code, language, caption) {
+    constructor(code, language, caption, position) {
         super();
         this.code = code;
         this.language = language ? language : "plaintext";
         this.caption = caption;
+        this.position = position;
     }
     toDOM(app, chapter, query, key) {
-        return <div key={key} >
+        return <div key={key} className={(this.position === "<" ? "marginal-left-inset" : this.position === ">" ? "marginal-right-inset" : "")}>
             <Code inline={false} language={this.language}>{this.code}</Code>
             { this.language !== "plaintext" ? <div className="code-language">{this.language}</div> : null }
             <div className="figure-caption">{this.caption.toDOM(app, chapter, query)}</div>
@@ -1217,15 +1242,16 @@ class CodeNode extends Node {
 
 class QuoteNode extends Node {
 
-    constructor(elements, credit) {
+    constructor(elements, credit, position) {
         super();
         this.elements = elements;
         this.credit = credit;
+        this.position = position;
     }
 
     toDOM(app, chapter, query, key) {
 
-        return <blockquote className="blockquote" key={key}>
+        return <blockquote className={"blockquote " + (this.position === "<" ? "marginal-left-inset" : this.position === ">" ? "marginal-right-inset" : "")} key={key}>
             {_map(this.elements, (element, index) => element.toDOM(app, chapter, query, "quote-" + index))}
             {this.credit ? <footer className="blockquote-footer"><cite>{this.credit.toDOM(app, chapter, query)}</cite></footer> : null }
         </blockquote>
@@ -1240,14 +1266,15 @@ class QuoteNode extends Node {
 
 class CalloutNode extends Node {
 
-    constructor(elements) {
+    constructor(elements, position) {
         super();
         this.elements = elements;
+        this.position = position;
     }
 
     toDOM(app, chapter, query, key) {
 
-        return <div className="callout" key={key}>
+        return <div className={"callout " + (this.position === "<" ? "marginal-left-inset" : this.position === ">" ? "marginal-right-inset" : "")} key={key}>
             {_map(this.elements, (element, index) => element.toDOM(app, chapter, query, "callout-" + index))}
         </div>
 
@@ -1261,16 +1288,17 @@ class CalloutNode extends Node {
 
 class TableNode extends Node {
 
-    constructor(rows, caption) {
+    constructor(rows, caption, position) {
         super();
         this.rows = rows;
         this.caption = caption;
+        this.position = position;
     }
 
     toDOM(app, chapter, query, key) {
 
         return (
-            <div className="figure" key={key}>
+            <div className={"figure " + (this.position === "<" ? "marginal-left-inset" : this.position === ">" ? "marginal-right-inset" : "")} key={key}>
                 <div className="rows">
                     <table className="table">
                         <tbody>

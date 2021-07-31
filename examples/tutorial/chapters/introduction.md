@@ -214,7 +214,7 @@ You can include code by wrapping any text with a backtick \`:
 This isn't any particular programming language
 It's just some English sentences
 It just gets formatted in plain text, fixed width format.
-` Yes, this is a haiku.
+`> Yes, this is a haiku.
 
 You can put a caption after the backtick.
 
@@ -271,6 +271,8 @@ To use any of the special symbols above, place a \\ a before it to mean that you
 
 The same is true of extra lines before and after paragraphs.
 
+# Quotes
+
 It's also possible to include quotes:
 
 `markdown
@@ -281,7 +283,9 @@ This is my quote
 
 "
 This is my quote
-" Me
+"< Me
+
+# Callouts
 
 It's also important to border text with a callout:
 
@@ -293,7 +297,9 @@ This is my callout
 
 =
 This is my callout
-=
+=>
+
+# Tables
 
 And if that's not enough, you can make tables with captions, with each
 
@@ -309,7 +315,7 @@ Which will render like this:
 ,this,is,[my|dfjdfdf],table
 ,the, next,row,is
 ,my,test,is,*_failing_*
-this is my caption
+> this is my caption
 
 Each cell can have inline formatting as in any other paragraph (but you can't put paragraph-level things in cells).
 
