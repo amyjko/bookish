@@ -10,6 +10,8 @@ This is a quote. I'm using it to test how the outline floats around non-paragrap
 
 Let's go through each of the basic formatting features of book chapters. To begin, let's start with headers, all of which can be indicated by starting a line with the pound symbol #. For example, here's some code that starts a top-level header:
 
+# Headers
+
 `markdown
 # This is a header
 `
@@ -30,6 +32,8 @@ You can put as many as three consecutive pounds for subheaders and sub-subheader
 ## _Sub_header
 ### _Subsub_header
 
+# Text Formatting
+
 There are many ways to format text.
 
 It can be _italic_ by wrapping text with the \_ symbol:
@@ -49,6 +53,8 @@ It can be both *_bold and italic_* by wrapping words with both \* and \_.
 `markdown
 It can be both *_bold and italic_* by wrapping words with both.
 `
+
+# Lists
 
 It can be in bullet form by starting a line with \*:
 
@@ -132,6 +138,7 @@ You can nest numbered lists by increasing or decreasing the number of \.'s:
 
 It doesn't matter how many \*'s there are exactly, just whether that number is more or less than the bullets before or after it.
 
+# Links
 
 You can include [links to content|http://amyjko.com] like this:
 
@@ -157,6 +164,8 @@ Visit [a chapter that doesn't exist|doesnotexist].
 
 Visit [a chapter that doesn't exist|doesnotexist].
 
+# Images
+
 You can include captioned images like the one at the top of this chapter by using this format, indicating the caption, description of the image, credit for the image, and the image file name:
 
 `markdown
@@ -175,6 +184,8 @@ Here's an image on the left.
 
 |chapter1.jpg|A photograph of Boomy seeking nuzzles|A caption with a reference.|Amy J. Ko|<
 
+# Citations and Footnotes
+
 If you cite something that doesn't appear in your book specification's reference list, you'll get an error like this: <thisisanunknowncitation>.
 
 You can also include footnotes{I'm a footnote}:
@@ -185,6 +196,8 @@ You can also include footnotes{I'm a footnote}{I'm also a footnote}:
 
 If you include more footnotes, Peruse will letter them accordingly{I'm also a footnote}.
 
+# Videos
+
 You can also include YouTube videos by using the same syntax as above, but just including a YouTube video in the URL instead.
 
 `markdown
@@ -192,6 +205,8 @@ You can also include YouTube videos by using the same syntax as above, but just 
 `
 
 |https://www.youtube.com/embed/v=317jz-PU7Mg|A video Amy made with her daughter back when Angry Birds was popular.|A YouTube video showing Angry Birds enacted in real life.|Amy J. Ko|
+
+# Code
 
 You can include code by wrapping any text with a backtick \`:
 
@@ -223,6 +238,8 @@ if two == 2:
 Supported languages are listed in [the HighlightJS documentation|https://github.com/highlightjs/highlight.js/blob/master/SUPPORTED_LANGUAGES.md].
 
 You can also include code inline by wrapping things in \`in backticks\`: `if two == 2: print "Truth"`, and by including the language name after the closing backtick, as in `\`if two == 2: print "Truth"\`python`markdown, you can language format inline code: `if two == 2: print "Truth"`python
+
+# Comments
 
 You can include comments in text by starting a line with the \% symbol:
 

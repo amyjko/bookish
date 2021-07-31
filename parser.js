@@ -1037,7 +1037,7 @@ class ChapterNode extends Node {
         return this.metadata.footnotes; 
     }
 
-    getHeaders() { 
+    getHeaders() {
         return this.metadata.headers; 
     }
 
@@ -1126,9 +1126,9 @@ class HeaderNode extends Node {
     toDOM(app, chapter, query, key) {
         let id = "header-" + chapter.getHeaders().indexOf(this);
 
-        return this.level === 1 ? <h2 id={id} key={key}>{this.content.toDOM(app, chapter, query)}</h2> :
-            this.level === 2 ? <h3 id={id}  key={key}>{this.content.toDOM(app, chapter, query)}</h3> :
-            <h4  id={id} key={key}>{this.content.toDOM(app, chapter, query)}</h4>
+        return this.level === 1 ? <h2 className="header" id={id} key={key}>{this.content.toDOM(app, chapter, query)}</h2> :
+            this.level === 2 ? <h3 className="header" id={id} key={key}>{this.content.toDOM(app, chapter, query)}</h3> :
+            <h4 className="header" id={id} key={key}>{this.content.toDOM(app, chapter, query)}</h4>
     }
 
     toText() {

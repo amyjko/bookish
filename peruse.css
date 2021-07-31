@@ -67,7 +67,7 @@ ol ol ol li {
 	width: 100%;
 }
 
-@media screen and (max-width: 992px) {
+@media screen and (max-width: 1200px) {
 
 	/* Fixed position for small screens. */
 	.marginal-right {
@@ -90,10 +90,14 @@ ol ol ol li {
 		display: none;
 	}
 
+	.outline {
+		position: static;
+	}
+
 }
 
 /* Only inset figures on large devices. */
-@media screen and (min-width: 992px) {
+@media screen and (min-width: 1200px) {
 
 	.figure-left {
 		float: left;
@@ -117,6 +121,14 @@ ol ol ol li {
 		width: 12em;
 		display: block;
 		margin-right: -15em;
+	}
+
+	.outline {
+		position: fixed;
+		top: 2em;
+		left: 2em;
+		width: 16em;
+		z-index: -1;
 	}
 
 }
@@ -430,4 +442,8 @@ blockquote {
 .outline-header-level-3 {
 	font-size: 70%;
 	margin-left: 2em;
+}
+
+.outline-header-active {
+	font-weight: bold;
 }

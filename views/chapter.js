@@ -23,7 +23,8 @@ class Chapter extends React.Component {
 		this.state = { 
 			loaded: true, 
 			editing: false, 
-			draft: null
+			draft: null,
+			headerIndex: null
 		};
 
 	}
@@ -124,8 +125,21 @@ class Chapter extends React.Component {
 		progress[this.props.id] = percent;
 		localStorage.setItem("chapterProgress", JSON.stringify(progress));
 
-		// Update the progress bar in the navigation bar.
-		this.forceUpdate();
+		// Find the header that we're past so we can update the outline.
+		let headers = document.getElementsByClassName("header");
+		let indexOfNearestHeaderAbove = 0;
+		for(let i = 0; i < headers.length; i++) {
+			let header = headers[i];
+			if(header.tagName === "H2" || header.tagName === "H3") {
+				let rect = header.getBoundingClientRect();
+				let headerTop = rect.y + top - rect.height;
+				if(top + window.innerHeight / 2 > headerTop)
+					indexOfNearestHeaderAbove = i;
+			}
+		}
+
+		// Update the outline and progress bar.
+		this.setState({ headerIndex: indexOfNearestHeaderAbove });
 
 	}
 
@@ -239,7 +253,6 @@ class Chapter extends React.Component {
 			let previousChapter = this.props.app.getPreviousChapter(this.props.id);
 			let chapterAST = this.ast;
 			let citations = chapterAST.getCitations();
-			let footnotes = chapterAST.getFootnotes();
 			let headers = chapterAST.getHeaders();
 			return (
 				<div className="chapter">
@@ -277,7 +290,13 @@ class Chapter extends React.Component {
 							// Only first and second level headers...
 							header.level > 2 ? 
 								null :
-								<NavHashLink key={"header-" + index} smooth to={"#header-" + index} className={"outline-header outline-header-level-" + header.level}>{header.toText()}</NavHashLink>)
+								<NavHashLink 
+									key={"header-" + index} 
+									smooth 
+									to={"#header-" + index} 
+									className={"outline-header outline-header-level-" + header.level + (this.state.headerIndex === index ? " outline-header-active" : "")}>{header.toText()}
+								</NavHashLink>
+						)
 					}
 					</div>
 
