@@ -5,6 +5,7 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { NavHashLink } from "react-router-hash-link";
 import { Figure } from './views/image';
+import { Marginal } from './views/marginal';
 import { Code } from './views/code';
 
 // TODO This grammar is slightly out of date.
@@ -227,8 +228,6 @@ class Parser {
     }
 
     parseChapter(symbols = {}) {
-
-        console.trace();
 
         let blocks = [];
 
@@ -1411,7 +1410,13 @@ class FootnoteNode extends Node {
         let number = chapter.getFootnotes().indexOf(this);
         let letter = app.getFootnoteSymbol(number);
 
-        return <span className="footnote-link" key={key}><NavHashLink smooth to={"#note-" + (number + 1)}><sup>{letter}</sup></NavHashLink></span>
+        return <span className="footnote-link" key={key}>
+            <Marginal 
+                interactor={<sup className="footnote-symbol">{letter}</sup>}
+                content={<span className="footnote"><sup className="footnote-symbol">{letter}</sup> {this.footnote.toDOM(app, chapter, query)}</span>} 
+            />
+        </span>
+
     }
 
     toText() {

@@ -67,8 +67,34 @@ ol ol ol li {
 	width: 100%;
 }
 
+@media screen and (max-width: 992px) {
+
+	/* Fixed position for small screens. */
+	.marginal-right {
+		background-color: white;
+		padding: 0.75em;
+		border: 1px solid lightGrey;
+		position: fixed;
+		width: auto;
+		left: 0;
+		right: 0;
+		bottom: 3.75em;
+		z-index: 1;
+	}
+
+	.marginal-right-interactor {
+		cursor: pointer;
+	}
+	
+	.marginal-right-hidden {
+		display: none;
+	}
+
+}
+
 /* Only inset figures on large devices. */
-@media (min-width: 992px) {
+@media screen and (min-width: 992px) {
+
 	.figure-left {
 		float: left;
 		clear: both;
@@ -84,7 +110,17 @@ ol ol ol li {
 		margin-right: -25%;
 		margin-left: 2em;
 	}
+
+	/* On larger screens, put marginal right things in the right margin. */
+	.marginal-right {
+		float: right;
+		width: 12em;
+		display: block;
+		margin-right: -15em;
+	}
+
 }
+
 
 .figure-caption {
 	text-align: center;
@@ -151,6 +187,7 @@ blockquote {
 	background-color:white;
 	padding: 1em;
 	text-shadow: 0px 0px #000000;
+	z-index: 1;
 }
 
 .progress {
@@ -344,8 +381,20 @@ blockquote {
 }
 
 .footnote {
-	padding-left: 1em;
+	display: block;
+	font-size: 80%;
+	color: black;
+	line-height: 1.5em;
+	padding-left: 0.75em;
 	text-indent: -0.75em;
+}
+
+.footnote-link {
+	position: relative;
+}
+
+.footnote-symbol {
+	color: rgb(14, 121, 209);
 }
 
 .outline {

@@ -290,17 +290,6 @@ class Chapter extends React.Component {
 					}
 					</div>
 					{
-						footnotes.length === 0 ? null :
-						<div>
-							<h1>Notes</h1>
-							{
-								_map(footnotes, (footnote, index) =>
-									<p id={"note-" + (index + 1)} className={noteHighlight === index + 1 ? "footnote content-highlight" : "footnote"} key={index}><sup>{this.props.app.getFootnoteSymbol(index)}</sup> {footnote.footnote.toDOM(this.props.app, chapterAST, this.props.match.params.word)}</p>
-								)
-							}
-						</div>
-					}
-					{
 						Object.keys(citations).length === 0 ? null :
 						<div>
 							<h1>References</h1>
