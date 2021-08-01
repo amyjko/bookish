@@ -1470,6 +1470,8 @@ class DefinitionNode extends Node {
 
         return <span className="terminology" key={key}>
             <Marginal
+                app={app}
+                id={"glossary-" + this.glossaryID}
                 interactor={this.phrase.toDOM(app, chapter, query)}
                 content={
                     <span className="definition">
@@ -1507,6 +1509,8 @@ class FootnoteNode extends Node {
 
         return <span className="footnote-link" key={key}>
             <Marginal 
+                app={app}
+                id={"footnote-" + number}
                 interactor={<sup className="footnote-symbol">{letter}</sup>}
                 content={<span className="footnote"><sup className="footnote-symbol">{letter}</sup> {this.footnote.toDOM(app, chapter, query)}</span>} 
             />

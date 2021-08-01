@@ -6,27 +6,30 @@ class Marginal extends React.Component {
 
 		super(props);
 
-		this.state = {
-			hidden: true
-		};
-
 		this.toggle = this.toggle.bind(this);
 
 	}
 
 	toggle() {
 
-		this.setState({hidden: !this.state.hidden});
+		if(this.props.app.getMarginal() === null || this.props.app.getMarginal() !== this.props.id) {
+			this.props.app.setMarginal(this.props.id);
+		} else {
+			this.props.app.setMarginal(null);
+		}
 
 	}
 
 	render() {
+
+		let hidden = this.props.app.getMarginal() === null || this.props.app.getMarginal() !== this.props.id;
+
 		return (
-			<span className={this.props.className}>
-				<span className={"marginal-right-interactor"} onClick={this.toggle}>
+			<span>
+				<span className={"marginal-interactor"} onClick={this.toggle}>
 					{this.props.interactor}
 				</span>
-	            <span className={"marginal-right" + (this.state.hidden ? " marginal-right-hidden" : "")}>
+	            <span className={"marginal" + (hidden ? " marginal-hidden" : "")} onClick={this.toggle}>
 					{this.props.content}
 				</span>
 			</span>

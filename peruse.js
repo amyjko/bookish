@@ -33,7 +33,8 @@ class Peruse extends React.Component {
 			book: undefined,
 			chapters: {},
 			errors: null,
-			loadingTime: undefined
+			loadingTime: undefined,
+			marginal: null // The currently selected marginal; we only do one at a time.
 		};
 		
 		// Fetch the JSON
@@ -300,6 +301,14 @@ class Peruse extends React.Component {
 		}
 		return null;
 
+	}
+
+	setMarginal(marginal) {
+		this.setState({ marginal: marginal });
+	}
+
+	getMarginal() {
+		return this.state.marginal;
 	}
 
 	fetchChapters() {
