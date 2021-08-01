@@ -14,6 +14,7 @@ class Chapter extends React.Component {
 		super(props);
 
 		this.handleScroll = this.handleScroll.bind(this);
+		this.handleResize = this.handleResize.bind(this);
 		this.handleDoubleClick = this.handleDoubleClick.bind(this);
 		this.handleChange = this.handleChange.bind(this);
 
@@ -32,6 +33,7 @@ class Chapter extends React.Component {
 	componentDidMount() {
 
 		window.addEventListener('scroll', this.handleScroll);
+		window.addEventListener('resize', this.handleResize);
 
 		// If the component renders after the chapter is loaded and rendered, scroll to the last location.
 		var chapter = this.props.app.getContent(this.props.id);
@@ -59,6 +61,9 @@ class Chapter extends React.Component {
 
 			this.scrollToLastLocation();
 		}
+
+		// Position the marginals.
+		this.layoutMarginals();
 
 	}
 
@@ -107,6 +112,14 @@ class Chapter extends React.Component {
 
 	}
 	
+	// When the window resizes, the responsive layout might cause the marginals to move to the footer.
+	// when this happens, we want to immediately remove all of the explicit positioning.
+	handleResize() {
+
+		this.layoutMarginals();
+
+	}
+
 	handleScroll() {
 
 		var top = window.scrollY;
@@ -215,6 +228,79 @@ class Chapter extends React.Component {
 			<button onClick={() => { this.removeHighlights(); this.setState({editing: false})}}>Done</button>
 		</div>
 
+	}
+
+	// After each render, we need to adjust the layout of marginals, which by default are floating from
+	// their little spans within the body of the text. We have to do two things:
+	//
+	// 1) Lay them out vertically so that they don't overlap.
+	// 2) Lay them out horizontally, so they're all left aligned with each other on the right margin of the text.
+	//
+	// We only want to do this if the marginals are floating; we exclude any marginals that are
+	// fixed in a fixed position.
+	layoutMarginals() {
+
+		// Get the chapter DOM node, so we can calculate margins.
+		let chapter = document.getElementsByClassName("chapter-body")[0];
+
+		// If there's no chapter rendered yet, stop.
+		if(chapter === undefined)
+			return;
+
+		let book = document.getElementsByClassName("book")[0];
+
+		// This is the grid line we'll aline all marginals too horizontally.
+		let margin = chapter.getBoundingClientRect().width;
+
+		// This will track the current leading bottom edge for laying out marginals.
+		let currentBottom = null;
+
+		// Layout all of the marginals vertically to prevent overlaps.
+		Array.from(document.getElementsByClassName("marginal")).forEach(el => {
+			if(window.getComputedStyle(el).getPropertyValue("position") !== "fixed") {
+
+				let containingMarginal = el.parentElement.closest(".marginal");
+				let inMarginal = containingMarginal !== null;
+
+				// Get the bounds of this marginal so we know it's size.
+				let elementBounds = el.getBoundingClientRect();
+
+				// Get the bounds of this marginal's parent so we know it's vertical position.
+				let parentBounds = el.parentElement.getBoundingClientRect();
+				let parentTop = parentBounds.top + window.scrollY - (book.getBoundingClientRect().top + window.scrollY);
+
+				// If it's inside a marginal, position it below the marginal.
+				if(inMarginal) {
+					el.style.left = 0;
+					el.style.top = (currentBottom - (containingMarginal.getBoundingClientRect().top + window.scrollY)) + "px";
+					currentBottom = currentBottom + elementBounds.height;
+				}
+				else {
+					// If we don't have a bottom yet, or the current above is above this element's parent,
+					// then set the current bottom to the bottom of this element.
+					if(currentBottom === null || currentBottom < parentTop) {
+						el.style.top = parentTop + "px";
+						currentBottom = parentTop + elementBounds.height;
+					}
+					// If this element's parent position is above the current bottom, 
+					// move it down, then set a new bottom based on the element's height.
+					else {
+						el.style.top = currentBottom + "px";
+						currentBottom = currentBottom + elementBounds.height;
+					}
+
+					// Reposition the marginal horizontally.
+					el.style.left = "calc(2rem + " + margin + "px)";
+				}
+				
+			}
+			// If it's fixed, remove any explicitly set inline values.
+			else {
+				el.style.removeProperty("top");
+				el.style.removeProperty("left");
+			}
+		});
+		
 	}
 
 	render() {

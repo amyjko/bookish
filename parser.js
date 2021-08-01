@@ -61,7 +61,7 @@ class Parser {
         return (new Parser(text)).parseEmbed();
     }
 
-    static parseReference(ref, app) {
+    static parseReference(ref, app, short=false) {
 
         var dom = null;
 
@@ -70,18 +70,30 @@ class Parser {
         else if(Array.isArray(ref)) {
             // APA Format. Could eventually suppport multiple formats.
             if(ref.length >= 4) {
-                var authors = ref[0];
-                var year = ref[1];
-                var title = ref[2];
-                var source = ref[3];
-                var url = ref.length === 5 ? ref[4] : null;
-                var summary = ref.length === 6 ? ref[5] : null;
+                let authors = ref[0];
+                let year = ref[1];
+                let title = ref[2];
+                let source = ref[3];
+                let url = ref.length === 5 ? ref[4] : null;
+                let summary = ref.length === 6 ? ref[5] : null;
+                // Convert sources using the source mapping. Yay consistency!
                 if(source.charAt(0) === "#") {
                     source = app.getSource(source);
                     if(source === null)
                         source = <span className="alert alert-danger">Unknown source <code>{ref[3]}</code></span>;
                 }
-                dom = <span>{authors} ({year}). {url === null ? title : <a href={url} target={"_blank"}>{title}</a>}{title.charAt(title.length - 1) === "?" ? "" : "."} <em>{source}</em>.{summary ? <span className="summary">{summary}</span> : null }</span>
+
+                // If a short version was requested, try to abbreviate the authors.
+                if(short) {
+                    authors = authors.split(",");
+                    if(authors.length > 1)
+                        authors = authors[0].trim() + ", et al.";
+                    else   
+                        authors = authors[0];
+                    dom = <span className="reference-text">{authors} ({year}). {url === null ? title : <a href={url} target={"_blank"}>{title}</a>}{title.charAt(title.length - 1) === "?" ? "" : "."} <em>{source}</em></span>
+                }
+                else
+                    dom = <span className="reference-text">{authors} ({year}). {url === null ? title : <a href={url} target={"_blank"}>{title}</a>}{title.charAt(title.length - 1) === "?" ? "" : "."} <em>{source}</em>.{summary ? <span className="summary">{summary}</span> : null }</span>
             }
             else
                 dom = <span className="alert alert-danger">Expected at least 4 items in the reference array, but found {ref.length}: <code>{ref.toString()}</code></span>
@@ -1105,7 +1117,7 @@ class ChapterNode extends Node {
     }
 
     toDOM(app, query) {
-        return <div key="chapter" className="chapter">
+        return <div key="chapter" className="chapter-body">
             {_map(this.errors, (error, index) => error.toDOM(app, this, query, "error-" + index))}
             {_map(this.blocks, (block, index) => block.toDOM(app, this, query, "block-" + index))}
         </div>;
@@ -1281,7 +1293,7 @@ class QuoteNode extends Node {
 
         return <blockquote className={"blockquote " + (this.position === "<" ? "marginal-left-inset" : this.position === ">" ? "marginal-right-inset" : "")} key={key}>
             {_map(this.elements, (element, index) => element.toDOM(app, chapter, query, "quote-" + index))}
-            {this.credit ? <footer className="blockquote-footer"><cite>{this.credit.toDOM(app, chapter, query)}</cite></footer> : null }
+            {this.credit ? <div className="blockquote-caption"><span>{this.credit.toDOM(app, chapter, query)}</span></div> : null }
         </blockquote>
 
     }
@@ -1409,39 +1421,69 @@ class CitationsNode extends Node {
     }
     toDOM(app, chapter, query, key) {
 
-        var segments = [];
+        let segments = [];
 
+        // If there's no chapter, there are no citations allowed.
         if(!chapter)
             return null;
 
+        // Sort citations numerically, however they're numbered.
+        let citations = this.citations.sort((a, b) => {
+            let aNumber = chapter.getCitationNumber(a);
+            let bNumber = chapter.getCitationNumber(b);
+            if(aNumber === null && bNumber === null) return 0;
+            else if(aNumber === null && bNumber !== null) return 1;
+            else if(aNumber !== null && bNumber === null) return -1;
+            else return aNumber - bNumber;
+        });
+
         // Convert each citation ID until a link.
         _each(
-            this.citations,
+            citations,
             (citationID, index) => {
                 // Find the citation number. There should always be one,
-                var citationNumber = chapter.getCitationNumber(citationID)
-                if(citationNumber !== null && citationID in app.getReferences()) 
+                let citationNumber = chapter.getCitationNumber(citationID)
+                if(citationNumber !== null && citationID in app.getReferences()) {
                     // Add a citation.
                     segments.push(
-                        <NavHashLink 
-                            smooth 
-                            key={"citation-" + index}
-                            to={"#ref-" + citationID}>
-                            <sup>{citationNumber}</sup>
-                        </NavHashLink>
-                    )
+                            <sup key={index} className="citation-symbol">{citationNumber}</sup>
+                    );
+                }
                 // If it's not a valid citation number, add an error.
                 else {
                     segments.push(<span className="alert alert-danger" key={"citation-error-" + index}>Unknown reference: <code>{citationID}</code></span>)
                 }
 
                 // If there's more than one citation and this isn't the last, add a comma.
-                if(this.citations.length > 1 && index < this.citations.length - 1)
+                if(citations.length > 1 && index < citations.length - 1)
                     segments.push(<sup key={"citation-comma-" + index}>,</sup>);
             }
         );
 
-        return <span className="citation" key={key}>{segments}</span>;
+        return <span className="citation" key={key}>
+            <Marginal
+                app={app}
+                id={"citation-" + citations.join("-")}
+                interactor={segments}
+                content={
+                    <span className="references">
+                        {_map(citations, (citationID, index) => {
+
+                            let citationNumber = chapter.getCitationNumber(citationID);
+
+                            return app.getReferences(citationID) ?
+                                <span 
+                                    key={index} 
+                                    className="reference">
+                                        <sup className="citation-symbol">{citationNumber}</sup>
+                                        {Parser.parseReference(app.getReferences()[citationID], app, true)}
+                                </span> :
+                                null
+                    })}
+                    </span>
+                }
+            />
+        </span>
 
     }
 

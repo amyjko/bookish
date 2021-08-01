@@ -86,6 +86,11 @@ ol ol ol li {
 		transition: transform 0.2s ease-in;
 	}
 
+	/* Handle nested marginals by just not showing them. */
+	.marginal .marginal {
+		display: none;
+	}
+
 	.marginal-interactor {
 		cursor: pointer;
 	}
@@ -94,9 +99,18 @@ ol ol ol li {
 		font-weight: bold;
 	}
 
+	.terminology .marginal-interactor:hover {
+		font-weight: normal;
+	}
+
+	.terminology:hover {
+		border-bottom-color: black !important;
+	}
+
 	.marginal-hidden {
 		transform: translateY(100%);
 		transition: transform 0.2s ease-out;
+		height: 0;
 	}
 
 	.outline {
@@ -127,22 +141,21 @@ ol ol ol li {
 	/* On larger screens, put marginal right things in the right margin. */
 	.marginal {
 		float: right;
-		width: 12em;
+		width: 12rem;
 		display: block;
-		margin-top: 0.25em;
-		margin-right: -15em;
+		padding-bottom: 0.5rem;
+		position: absolute;
 	}
 
 	.outline {
 		position: fixed;
 		top: 2em;
 		left: 2em;
-		width: 16em;
+		width: 12em;
 		z-index: -1;
 	}
 
 }
-
 
 .figure-caption {
 	text-align: center;
@@ -176,6 +189,11 @@ blockquote {
 	padding: 1em;
 	font-style: italic;
 	clear: both;
+}
+
+blockquote .blockquote-caption {
+	font-size: 12pt;
+	color: gray;
 }
 
 .callout {
@@ -402,21 +420,56 @@ blockquote {
 	color: gray;
 }
 
-.footnote {
-	display: block;
-	font-size: 80%;
+.footnote, .marginal .reference {
+	font-size: 0.8rem;
+	font-style: normal;
 	color: black;
-	line-height: 1.5em;
-	padding-left: 0.75em;
-	text-indent: -0.75em;
 }
 
-.footnote-link {
+.footnote-symbol, .citation-symbol {
+	color: rgb(14, 121, 209);
+}
+
+/* This enables us to layout the numbers and letters in a neat right-aligned floating grid. */
+.reference, .footnote {
 	position: relative;
 }
 
-.footnote-symbol {
-	color: rgb(14, 121, 209);
+.references .reference, .footnote {
+	display: block;
+	line-height: 1.2rem;
+	margin-left: 1rem;
+	margin-bottom: 1rem;
+	text-align: left;
+}
+
+.reference .citation-symbol, .footnote .footnote-symbol {
+	display: block;
+	float: left;
+	margin-top: 1em;
+	position: absolute;
+	left: -2.5rem;
+	text-align: right;
+	width: 2rem;
+}
+
+.terminology {
+	border-bottom: 2px solid lightGray;
+}
+
+.definition {
+	display: block;
+	border-left: 2px solid lightGray;
+	padding-left: 0.5rem;
+	margin-bottom: 1rem;
+	font-size: 10pt;
+	line-height: 1.25rem;
+	text-align: left;
+	margin-left: 0.5rem;
+}
+
+.definition em {
+	color: grey;
 }
 
 .outline {
@@ -456,20 +509,4 @@ blockquote {
 
 .outline-header-active {
 	font-weight: bold;
-}
-
-.terminology {
-	border-bottom: 2px solid lightGray;
-}
-
-.definition {
-	display: block;
-	border-left: 2px solid lightGray;
-	padding-left: 0.5em;
-	font-size: 80%;
-	line-height: 1.5em;
-}
-
-.definition em {
-	color: grey;
 }

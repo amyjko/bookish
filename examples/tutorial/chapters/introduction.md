@@ -169,10 +169,10 @@ Visit [a chapter that doesn't exist|doesnotexist].
 You can include captioned images like the one at the top of this chapter by using this format, indicating the caption, description of the image, credit for the image, and the image file name:
 
 `markdown
-|chapter1.jpg|A photograph of Boomy seeking nuzzles|A caption with a reference <ref1>.|Amy J. Ko|
+|chapter1.jpg|A photograph of Boomy seeking nuzzles|A caption with a reference.|Amy J. Ko|
 `
 
-|chapter1.jpg|A photograph of Boomy seeking nuzzles|A caption with a reference <ref1>.|Amy J. Ko|
+|chapter1.jpg|A photograph of Boomy seeking nuzzles|A caption with a reference.|Amy J. Ko|
 
 You can also nudge the image left and right by ending the embed with a \< or \>. (This only works if the viewing window is wide enough)
 
@@ -184,9 +184,13 @@ Here's an image on the left.
 
 |chapter1.jpg|A photograph of Boomy seeking nuzzles|A caption with a reference.|Amy J. Ko|<
 
-# Citations and Footnotes
+# Citations
+
+You can also cite things <ref1,ref2,ref3,ref4,ref5,ref6,ref7,ref8,ref9,ref10> or just cite one thing <ref3>, or cite another! <ref11>
 
 If you cite something that doesn't appear in your book specification's reference list, you'll get an error like this: <thisisanunknowncitation>.
+
+# Footnotes
 
 You can also include footnotes{I'm a footnote}:
 
@@ -341,8 +345,6 @@ This shouldn't "break for commas," either.
 
 We will also replace \-\- with em-dashes -- like the one in this sentence.
 
-You can also cite things <ref1,ref2> or just cite one thing <ref3>.
-
 When clicking on something in the index, the index word should be highlighted no matter how many times the index appears in a span of text and regardless of whether the *index word* is formatted.
 
 It's also possible to use basic subscripts and superscripts. To make a superscript, wrap text between `\^` characters, as in:
@@ -363,7 +365,7 @@ x^v2^
 
 # Glossary
 
-It's also possible to write a ~glossary~gloss and tag places in the text where the definitions should appear. Cite glossary phrase IDs with the \~ mark as follows:
+It's also possible to write a ~glossary~gloss and tag places<ref1> in the text where the definitions should appear. Cite glossary phrase IDs with the \~ mark as follows:
 
 `markdown
 ~the phrase you want to highlight~gloss
