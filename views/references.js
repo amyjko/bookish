@@ -37,4 +37,4 @@ class References extends React.Component {
 
 }
 
-export {References};
+export { References };

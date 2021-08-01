@@ -26,7 +26,7 @@ import { Code } from './views/code';
 // TABLE :: ((,CONTENT)+\n)+
 // CODE :: `\nTEXT\n`
 // PARAGRAPH :: CONTENT
-// CONTENT :: FORMATTED | CITATIONS | ESCAPED | LINK | FOOTNOTE | SYMBOL
+// CONTENT :: FORMATTED | CITATIONS | ESCAPED | LINK | FOOTNOTE | SYMBOL | DEFINITION
 // FORMATTED :: *CONTENT* | _CONTENT_ | `CONTENT`
 // CITATIONS || <TEXT+,>
 // ESCAPED :: \[char]
@@ -176,6 +176,7 @@ class Parser {
         return this.text.substring(this.index, this.index + string.length) === string;
     }
 
+    // A critical list that tells inline formatting parsers to stop being greedy.
     nextIsContentDelimiter() {
 
         var next = this.peek();
@@ -184,6 +185,7 @@ class Parser {
             next === "*" ||
             next === "`" ||
             next === "@" ||
+            next === "~" ||
             next === "^" ||
             next === "<" ||
             next === "{" ||
@@ -738,6 +740,9 @@ class Parser {
             // Parse a footnote
             else if(this.nextIs("{"))
                 segments.push(this.parseFootnote(metadata));
+            // Parse a definition
+            else if(this.nextIs("~"))
+                segments.push(this.parseDefinition(metadata));
             // Parse an escaped character
             else if(this.nextIs("\\"))
                 segments.push(this.parseEscaped(metadata));
@@ -986,6 +991,29 @@ class Parser {
         // it will silently fail.
         if(metadata)
             metadata.footnotes.push(node);
+
+        return node;
+
+    }
+
+    parseDefinition(metadata) {
+        
+        // Read the ~
+        this.read();
+
+        // Read the footnote content.
+        var text = this.parseContent(metadata, "~");
+
+        // Read the closing ~
+        this.read();
+
+        // Read the glossary entry ID
+        let glossaryID = "";
+        // Stop at the end of the name or file.
+        while(this.more() && /[a-zA-Z]/.test(this.peek()))
+            glossaryID = glossaryID + this.read();
+
+        let node = new DefinitionNode(text, glossaryID);
 
         return node;
 
@@ -1419,6 +1447,45 @@ class CitationsNode extends Node {
 
     toText() {
         return "";
+    }
+
+}
+
+class DefinitionNode extends Node {
+    constructor(phrase, glossaryID) {
+        super();
+        this.phrase = phrase;
+        this.glossaryID = glossaryID;
+    }
+
+    toDOM(app, chapter, query, key) {
+
+        // Find the definition.
+        let glossary = app.getGlossary();
+
+        if(!(this.glossaryID in glossary))
+            return <span key={key} className="alert alert-danger">Unknown glossary entry "{this.glossaryID}"</span>
+
+        let entry = glossary[this.glossaryID];
+
+        return <span className="terminology" key={key}>
+            <Marginal
+                interactor={this.phrase.toDOM(app, chapter, query)}
+                content={
+                    <span className="definition">
+                        <strong>{entry.phrase}</strong>: {entry.definition}
+                        {
+                            entry.synonyms.length > 0 ? <span><br/><br/><em>{entry.synonyms.join(", ")}</em></span> : null
+                        }
+                    </span>
+                }
+            />
+        </span>
+
+    }
+
+    toText() {
+        return this.phrase.toText();
     }
 
 }

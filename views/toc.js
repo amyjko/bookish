@@ -141,6 +141,14 @@ class TableOfContents extends React.Component {
 								<td></td>
 							</tr>
 						}
+						{
+							this.props.app.getGlossary() && Object.keys(this.props.app.getGlossary()).length > 0 ?
+							<tr key="glossary">
+								<td></td>
+								<td><Link to="/glossary">Glossary</Link><br/><small className="text-muted"><em>Definitions</em></small></td>
+								<td></td>
+							</tr> : null
+						}
 						<tr key="index">
 							<td></td>
 							<td><Link to="/index/a">Index</Link><br/><small className="text-muted"><em>Common words and where they are</em></small></td>

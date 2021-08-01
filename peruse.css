@@ -120,6 +120,7 @@ ol ol ol li {
 		float: right;
 		width: 12em;
 		display: block;
+		margin-top: 0.25em;
 		margin-right: -15em;
 	}
 
@@ -446,4 +447,20 @@ blockquote {
 
 .outline-header-active {
 	font-weight: bold;
+}
+
+.terminology {
+	border-bottom: 2px solid lightGray;
+}
+
+.definition {
+	display: block;
+	border-left: 2px solid lightGray;
+	padding-left: 0.5em;
+	font-size: 80%;
+	line-height: 1.5em;
+}
+
+.definition em {
+	color: grey;
 }

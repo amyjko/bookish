@@ -360,3 +360,11 @@ x^v2^
 `
 
 x^v2^
+
+# Glossary
+
+It's also possible to write a ~glossary~gloss and tag places in the text where the definitions should appear. Cite glossary phrase IDs with the \~ mark as follows:
+
+`markdown
+~the phrase you want to highlight~gloss
+`

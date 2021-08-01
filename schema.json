@@ -12,7 +12,7 @@
         "title", "authors", "cover", "unknown", "description",
         "chapters", "revisions", "license", "sources", "references"
     ],
-    "additionalProperties": false,
+    "additionalProperties": true,
 	"properties": {
         "title": { "type": "string" },
         "authors": {
@@ -77,7 +77,19 @@
             }
         },
         "symbols": {
-            "type": "object"
+            "type": "object",
+            "additionalProperties": { "type": "string" }
+        },
+        "glossary": {
+            "type": "object",
+            "additionalProperties": {
+                "type": "object",
+                "properties": {
+                    "phrase": { "type": "string" },
+                    "definition": { "type": "string" },
+                    "synonyms": { "type": "array", "items": { "type": "string" }}
+                }
+            }
         }
     }
 }

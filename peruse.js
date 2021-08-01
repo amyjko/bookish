@@ -17,6 +17,7 @@ import { Parser } from "./parser";
 import { Chapter } from "./views/chapter";
 import { TableOfContents } from "./views/toc";
 import { References } from "./views/references";
+import { Glossary } from "./views/glossary"
 import { Index } from "./views/index";
 import { Search } from "./views/search";
 import { Unknown } from "./views/unknown";
@@ -149,6 +150,7 @@ class Peruse extends React.Component {
 	getSymbols() { return this.getBook().symbols; }
 	getUnknown() { return this.getBook().unknown; }
 	getReferences() { return this.getBook().references; }
+	getGlossary() { return this.getBook().glossary; }
 
 	getFootnoteSymbol(number) {
 
@@ -379,6 +381,7 @@ class Peruse extends React.Component {
 									})
 								}
 								<Route path="/references" render={(props) => <References {...props} app={this} />} />
+								<Route path="/glossary" render={(props) => <Glossary {...props} app={this} />} />
 								<Route path="/index/:letter?" render={(props) => <Index {...props} app={this} />} />
 								<Route path="/search/" render={(props) => <Search {...props} app={this} />} />
 								<Route path="*" render={(props) => <Unknown {...props} message={<p>This URL doesn't exist for this book. Want to go back to the <Link to="/">Table of Contents?</Link></p>} app={this} />}/>
