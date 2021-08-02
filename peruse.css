@@ -147,6 +147,18 @@ ol ol ol li {
 		position: absolute;
 	}
 
+	.marginal-hovered .citation-symbol, .marginal-hovered .footnote-symbol {
+		font-weight: bold;
+	}
+
+	.terminology .marginal-interactor.marginal-hovered {
+		border-bottom-color: black !important;
+	}
+
+	.terminology .marginal.marginal-hovered .definition {
+		border-left-color: black !important;
+	}
+
 	.outline {
 		position: fixed;
 		top: 2em;
@@ -448,24 +460,24 @@ blockquote .blockquote-caption {
 	float: left;
 	margin-top: 1em;
 	position: absolute;
-	left: -2.5rem;
+	left: -1rem;
 	text-align: right;
-	width: 2rem;
+	width: 1em;
 }
 
-.terminology {
+.terminology .marginal-interactor {
 	border-bottom: 2px solid lightGray;
 }
 
 .definition {
 	display: block;
-	border-left: 2px solid lightGray;
 	padding-left: 0.5rem;
-	margin-bottom: 1rem;
 	font-size: 10pt;
 	line-height: 1.25rem;
 	text-align: left;
 	margin-left: 0.5rem;
+	margin-bottom: 1rem;
+	border-left: 2px solid lightGray;
 }
 
 .definition em {
