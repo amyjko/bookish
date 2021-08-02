@@ -364,10 +364,16 @@ class Chapter extends React.Component {
 								<span className="chapter-title">{chapter.title}</span>
 							</span>
 						}
-						content={null} 
+						tags={this.props.app.getTags()}
+						/* If there are chapter authors, map them to authors declared in the book title, otherwise use all the authors of the book */
+						content={
+							<Authors authors={
+									chapter.authors ? 
+										_map(chapter.authors, author => this.props.app.getAuthorByID(author)) : 
+										this.props.app.getAuthors()} 
+							/>
+						} 
 					/>
-					{ /* If there are chapter authors, map them to authors declared in the book title, otherwise use all the authors of the book */ }
-					<Authors authors={chapter.authors ? _map(chapter.authors, author => this.props.app.getAuthorByID(author)) : this.props.app.getAuthors()} />
 
 					{ /* Render the chapter outline */ }
 					<div className="outline">

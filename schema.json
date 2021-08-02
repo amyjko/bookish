@@ -54,6 +54,10 @@
                 "items": { "type": "string" }
             }
         },
+        "tags": { 
+            "type": "array",
+            "items": { "type": "string" }
+        },
         "license": { "type": "string" },
         "sources": { "type": "object", "additionalProperties": { "type": "string" } },
         "references": {

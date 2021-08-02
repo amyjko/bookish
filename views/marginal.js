@@ -7,6 +7,12 @@ class Marginal extends React.Component {
 		super(props);
 
 		this.toggle = this.toggle.bind(this);
+		this.handleEnter = this.handleEnter.bind(this);
+		this.handleExit = this.handleExit.bind(this);
+
+		this.state = {
+			hovered: false
+		}
 
 	}
 
@@ -20,16 +26,19 @@ class Marginal extends React.Component {
 
 	}
 
+	handleEnter() { this.setState({ hovered: true }); }
+	handleExit() { this.setState({ hovered: false }); }
+
 	render() {
 
 		let hidden = this.props.app.getMarginal() === null || this.props.app.getMarginal() !== this.props.id;
 
 		return (
 			<span>
-				<span className={"marginal-interactor"} onClick={this.toggle}>
+				<span className={"marginal-interactor" + (this.state.hovered ? " marginal-hovered" : "")} onClick={this.toggle} onMouseEnter={this.handleEnter} onMouseLeave={this.handleExit}>
 					{this.props.interactor}
 				</span>
-	            <span className={"marginal" + (hidden ? " marginal-hidden" : "")} onClick={this.toggle}>
+	            <span className={"marginal" + (hidden ? " marginal-hidden" : "") + (this.state.hovered ? " marginal-hovered" : "")} onClick={this.toggle} onMouseEnter={this.handleEnter} onMouseLeave={this.handleExit}>
 					{this.props.content}
 				</span>
 			</span>

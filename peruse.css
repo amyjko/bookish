@@ -153,10 +153,11 @@ ol ol ol li {
 
 	.terminology .marginal-interactor.marginal-hovered {
 		border-bottom-color: black !important;
+		border-bottom-width: 3px;
 	}
 
 	.terminology .marginal.marginal-hovered .definition {
-		border-left-color: black !important;
+		background: linear-gradient(to right, black 0px, black 3px, transparent 3px) no-repeat right
 	}
 
 	.outline {
@@ -471,13 +472,13 @@ blockquote .blockquote-caption {
 
 .definition {
 	display: block;
-	padding-left: 0.5rem;
+	padding-left: 0.75rem;
 	font-size: 10pt;
 	line-height: 1.25rem;
 	text-align: left;
-	margin-left: 0.5rem;
+	margin-left: 0.25rem;
 	margin-bottom: 1rem;
-	border-left: 2px solid lightGray;
+	background: linear-gradient(to right, lightGray 0px, lightGray 2px, transparent 2px) no-repeat right
 }
 
 .definition em {
@@ -521,4 +522,12 @@ blockquote .blockquote-caption {
 
 .outline-header-active {
 	font-weight: bold;
+}
+
+.tag {
+	font-size: 10pt;
+	display: inline-block;
+	background-color: lightGray;
+	padding: 0.1em 0.5em;
+	border-radius: 0.5em;
 }

@@ -152,6 +152,7 @@ class Peruse extends React.Component {
 	getUnknown() { return this.getBook().unknown; }
 	getReferences() { return this.getBook().references; }
 	getGlossary() { return this.getBook().glossary; }
+	getTags() { return "tags" in this.getBook() ? this.getBook().tags : []; }
 
 	getFootnoteSymbol(number) {
 
