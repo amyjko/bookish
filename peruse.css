@@ -200,6 +200,8 @@ blockquote {
 	border-top: 1px solid lightGray;
 	border-bottom: 1px solid lightGray;
 	padding: 1em;
+	margin-bottom: 1em;
+	margin-top: 1em;
 	font-style: italic;
 	clear: both;
 }
