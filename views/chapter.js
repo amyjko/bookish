@@ -25,7 +25,7 @@ class Chapter extends React.Component {
 			loaded: true, 
 			editing: false, 
 			draft: null,
-			headerIndex: null
+			headerIndex: -1
 		};
 
 	}
@@ -64,6 +64,9 @@ class Chapter extends React.Component {
 
 		// Position the marginals.
 		this.layoutMarginals();
+
+		// Position the outline based on the scroll position.
+		this.positionOutline();
 
 	}
 
@@ -117,6 +120,7 @@ class Chapter extends React.Component {
 	handleResize() {
 
 		this.layoutMarginals();
+		this.positionOutline();
 
 	}
 
@@ -140,19 +144,22 @@ class Chapter extends React.Component {
 
 		// Find the header that we're past so we can update the outline.
 		let headers = document.getElementsByClassName("header");
-		let indexOfNearestHeaderAbove = 0;
+		let indexOfNearestHeaderAbove = -1; // -1 represents the title
 		for(let i = 0; i < headers.length; i++) {
 			let header = headers[i];
 			if(header.tagName === "H2" || header.tagName === "H3") {
 				let rect = header.getBoundingClientRect();
 				let headerTop = rect.y + top - rect.height;
-				if(top + window.innerHeight / 2 > headerTop)
+				if(top > headerTop)
 					indexOfNearestHeaderAbove = i;
 			}
 		}
 
 		// Update the outline and progress bar.
 		this.setState({ headerIndex: indexOfNearestHeaderAbove });
+
+		// Position the outline based on the scroll position.
+		this.positionOutline();
 
 	}
 
@@ -228,6 +235,21 @@ class Chapter extends React.Component {
 			<button onClick={() => { this.removeHighlights(); this.setState({editing: false})}}>Done</button>
 		</div>
 
+	}
+
+	positionOutline() {
+
+		// Update the position of the floating outline
+		let outline = document.getElementsByClassName("outline")[0];
+		let title = document.getElementsByClassName("title")[0];
+		if(outline && title) {
+
+			let titleY = title.getBoundingClientRect().top + window.scrollY;
+			let titleX = title.getBoundingClientRect().left + window.scrollX;
+			outline.style.left = titleX + "px";
+
+		}
+		
 	}
 
 	// After each render, we need to adjust the layout of marginals, which by default are floating from
@@ -361,7 +383,7 @@ class Chapter extends React.Component {
 										<br/> : 
 										null 
 								}
-								<span className="chapter-title">{chapter.title}</span>
+								<span id="title" className="chapter-title">{chapter.title}</span>
 							</span>
 						}
 						tags={this.props.app.getTags()}
@@ -377,19 +399,25 @@ class Chapter extends React.Component {
 
 					{ /* Render the chapter outline */ }
 					<div className="outline">
-					{
-						_map(headers, (header, index) => 
-							// Only first and second level headers...
-							header.level > 2 ? 
-								null :
-								<NavHashLink 
-									key={"header-" + index} 
-									smooth 
-									to={"#header-" + index} 
-									className={"outline-header outline-header-level-" + header.level + (this.state.headerIndex === index ? " outline-header-active" : "")}>{header.toText()}
-								</NavHashLink>
-						)
-					}
+						<NavHashLink 
+							smooth 
+							to="#title" 
+							className={"outline-header outline-header-level-0" + (this.state.headerIndex < 0 ? " outline-header-active" : "")}>
+							{chapter.title}
+						</NavHashLink>
+						{
+							_map(headers, (header, index) => 
+								// Only first and second level headers...
+								header.level > 2 ? 
+									null :
+									<NavHashLink 
+										key={"header-" + index} 
+										smooth 
+										to={"#header-" + index} 
+										className={"outline-header outline-header-level-" + header.level + (this.state.headerIndex === index ? " outline-header-active" : "")}>{header.toText()}
+									</NavHashLink>
+							)
+						}
 					</div>
 
 					{ /* Render the editor if we're editing */ }

@@ -160,12 +160,16 @@ ol ol ol li {
 		background: linear-gradient(to right, black 0px, black 3px, transparent 3px) no-repeat right
 	}
 
+	/* The outline's right edge is positioned in JavaScript to the page margin. */
 	.outline {
 		position: fixed;
 		top: 2em;
-		left: 2em;
 		width: 12em;
 		z-index: -1;
+		border-right: 1px solid lightGray;
+		padding: 0.5em;
+		transform: translateX(-14em);
+		background-color: white;
 	}
 
 }
@@ -498,6 +502,8 @@ blockquote .blockquote-caption {
 	color: grey;
 	text-indent: -0.5em;
     padding-left: 1em;
+	padding-right: 1em;
+	margin-bottom: 0.75em;
 }
 
 .outline-header:before {
@@ -506,6 +512,10 @@ blockquote .blockquote-caption {
 
 .outline-header:hover {
 	color: grey;
+}
+
+.outline-header-level-1 {
+	font-size: 100%;
 }
 
 .outline-header-level-1 {
