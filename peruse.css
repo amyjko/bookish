@@ -516,6 +516,7 @@ blockquote .blockquote-caption {
     padding-left: 1em;
 	padding-right: 1em;
 	margin-bottom: 0.75em;
+	color: lightGrey;
 }
 
 .outline-header a, .navigation-footer a {
@@ -527,8 +528,8 @@ blockquote .blockquote-caption {
 	text-decoration: none;
 }
 
-.outline-header:hover {
-	color: grey;
+.outline-header-level-0 {
+	font-size: 11pt;
 }
 
 .outline-header-level-1 {

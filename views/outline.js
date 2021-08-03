@@ -32,7 +32,7 @@ class Outline extends React.Component {
 
 			if(inFooter) {
 				outline.style.removeProperty("left");
-                outline.style.transform = this.state.collapsed ? "translateY(-3em)" : "translateY(-100%)";
+                outline.style.transform = this.state.collapsed ? "translateY(-4em)" : "translateY(-100%)";
 			}
 			else {
                 outline.style.removeProperty("transform");
@@ -49,7 +49,7 @@ class Outline extends React.Component {
         return (
             <div className="outline" onClick={this.toggle} >
                 {/* Book navigation links */}
-                <div className="outline-header">
+                <div className="outline-header outline-header-level-0">
                     { this.props.previous ? <span><Link to={"/" + this.props.previous.id}>Prev</Link></span> : <span>Prev</span> }
                     &nbsp;&middot;&nbsp;
                     <Link to={"/"}>Home</Link>
