@@ -107,7 +107,10 @@ class Chapter extends React.Component {
 			var position = (progress / 100.0) * (Math.max(document.body.scrollHeight, document.body.offsetHeight) - window.innerHeight);
 
 			// Scroll the window to roughly the same position.
-			window.scrollTo(0, position);
+			// This is actually really annoying. Disabling it now that we have better outline navigation,
+			// and scrolling to the top instead.
+			// window.scrollTo(0, position);
+			window.scrollTo(0, 0);
 
 		}
 
