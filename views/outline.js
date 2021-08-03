@@ -21,6 +21,11 @@ class Outline extends React.Component {
         this.setState({ collapsed: !this.state.collapsed }, () => this.layout());
     }
 
+    // Position outline after first render.
+    componentDidMount() {
+        this.layout();
+    }
+
     layout() {
 
 		// Update the position of the floating outline
