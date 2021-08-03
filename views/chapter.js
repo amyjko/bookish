@@ -7,6 +7,7 @@ import { NavHashLink } from "react-router-hash-link";
 import { Parser } from "../parser";
 import { Header } from './header';
 import { Authors } from "./authors";
+import { Outline } from './outline';
 
 class Chapter extends React.Component {
 
@@ -65,9 +66,6 @@ class Chapter extends React.Component {
 		// Position the marginals.
 		this.layoutMarginals();
 
-		// Position the outline based on the scroll position.
-		this.positionOutline();
-
 	}
 
 	getProgress() {
@@ -120,7 +118,6 @@ class Chapter extends React.Component {
 	handleResize() {
 
 		this.layoutMarginals();
-		this.positionOutline();
 
 	}
 
@@ -157,9 +154,6 @@ class Chapter extends React.Component {
 
 		// Update the outline and progress bar.
 		this.setState({ headerIndex: indexOfNearestHeaderAbove });
-
-		// Position the outline based on the scroll position.
-		this.positionOutline();
 
 	}
 
@@ -235,21 +229,6 @@ class Chapter extends React.Component {
 			<button onClick={() => { this.removeHighlights(); this.setState({editing: false})}}>Done</button>
 		</div>
 
-	}
-
-	positionOutline() {
-
-		// Update the position of the floating outline
-		let outline = document.getElementsByClassName("outline")[0];
-		let title = document.getElementsByClassName("title")[0];
-		if(outline && title) {
-
-			let titleY = title.getBoundingClientRect().top + window.scrollY;
-			let titleX = title.getBoundingClientRect().left + window.scrollX;
-			outline.style.left = titleX + "px";
-
-		}
-		
 	}
 
 	// After each render, we need to adjust the layout of marginals, which by default are floating from
@@ -357,8 +336,6 @@ class Chapter extends React.Component {
 
 			let chapterNumber = this.props.app.getChapterNumber(this.props.id);
 			let chapterSection = this.props.app.getChapterSection(this.props.id);
-			let nextChapter = this.props.app.getNextChapter(this.props.id);
-			let previousChapter = this.props.app.getPreviousChapter(this.props.id);
 			let chapterAST = this.ast;
 			let citations = chapterAST.getCitations();
 			let headers = chapterAST.getHeaders();
@@ -397,28 +374,13 @@ class Chapter extends React.Component {
 						} 
 					/>
 
-					{ /* Render the chapter outline */ }
-					<div className="outline">
-						<NavHashLink 
-							smooth 
-							to="#title" 
-							className={"outline-header outline-header-level-0" + (this.state.headerIndex < 0 ? " outline-header-active" : "")}>
-							{chapter.title}
-						</NavHashLink>
-						{
-							_map(headers, (header, index) => 
-								// Only first and second level headers...
-								header.level > 2 ? 
-									null :
-									<NavHashLink 
-										key={"header-" + index} 
-										smooth 
-										to={"#header-" + index} 
-										className={"outline-header outline-header-level-" + header.level + (this.state.headerIndex === index ? " outline-header-active" : "")}>{header.toText()}
-									</NavHashLink>
-							)
-						}
-					</div>
+					<Outline
+						title={chapter.title}
+						headers={headers}
+						headerIndex={this.state.headerIndex}
+						previous={this.props.app.getPreviousChapter(this.props.id)}
+						next={this.props.app.getNextChapter(this.props.id)}
+					/>
 
 					{ /* Render the editor if we're editing */ }
 					{ this.state.editing ? this.renderEditor() : null }
@@ -452,18 +414,6 @@ class Chapter extends React.Component {
 							</ol>
 						</div>
 					}
-					<div className="navigation-footer">
-					{
-						previousChapter ? <span><Link to={"/" + previousChapter.id}>Previous</Link></span> : <span className="text-muted">Previous</span>				
-					}
-						<span> | </span>
-						<NavHashLink to={"/#toc"}>Table of Contents</NavHashLink>
-						<span> | </span>
-					{
-						nextChapter ? <Link to={"/" + nextChapter.id}>Next</Link> : <span className="text-muted">Next</span>
-					}
-						<div className="progress" style={{right: "" + (100 - this.getProgress()) + "%"}}></div>
-					</div>
 				</div>
 			);
 		}

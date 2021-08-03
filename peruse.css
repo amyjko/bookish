@@ -80,7 +80,7 @@ ol ol ol li {
 		height: auto;
 		left: 0;
 		right: 0;
-		bottom: 3.75em;
+		bottom: 2em;
 		z-index: 1;
 		cursor: pointer;
 		transform: translateY(0);
@@ -112,10 +112,22 @@ ol ol ol li {
 		transform: translateY(100%);
 		transition: transform 0.2s ease-out;
 		height: 0;
+		bottom: 0;
 	}
 
 	.outline {
-		display: none;
+		position: fixed;
+		top: 100%; /* Put it all the way off screen on the bottom, then let JS translate */
+		left: 0;
+		right: 0;
+		width: auto;
+		z-index: 2;
+		padding: 1em;
+		border-top: 1px solid lightGray;
+		background-color: white;
+		text-align: center;
+		transition: transform 0.2s ease-in;
+		cursor: pointer;
 	}
 
 }
@@ -246,7 +258,7 @@ blockquote .blockquote-caption {
 	text-align: center;
 	border: 1px solid lightGray;
 	background-color:white;
-	padding: 1em;
+	padding: 0.5em;
 	text-shadow: 0px 0px #000000;
 	z-index: 1;
 }
@@ -493,22 +505,26 @@ blockquote .blockquote-caption {
 	color: grey;
 }
 
-.outline {
-	font-size: 80%;
+.outline, .navigation-footer {
+	font-size: 10pt;
 }
 
 .outline-header {
 	display: block;
 	line-height: 1.4em;
-	color: grey;
 	text-indent: -0.5em;
     padding-left: 1em;
 	padding-right: 1em;
 	margin-bottom: 0.75em;
 }
 
-.outline-header:before {
-	content: ": ";
+.outline-header a, .navigation-footer a {
+	color: grey;
+}
+
+.outline-header a:hover, .navigation-footer a:hover {
+	font-weight: bold;
+	text-decoration: none;
 }
 
 .outline-header:hover {
@@ -516,21 +532,13 @@ blockquote .blockquote-caption {
 }
 
 .outline-header-level-1 {
-	font-size: 100%;
-}
-
-.outline-header-level-1 {
-	font-size: 90%;
+	font-size: 9pt;
 }
 
 .outline-header-level-2 {
-	font-size: 80%;
+	font-size: 8pt;
+	font-style: italic;
 	margin-left: 1em;
-}
-
-.outline-header-level-3 {
-	font-size: 70%;
-	margin-left: 2em;
 }
 
 .outline-header-active {
