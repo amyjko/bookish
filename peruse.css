@@ -139,7 +139,7 @@ ol ol ol li {
 		float: left;
 		clear: both;
 		width: 75%;
-		margin-left: -25% !important;
+		margin-left: -30% !important;
 		margin-right: 2em;
 	}
 
@@ -147,7 +147,7 @@ ol ol ol li {
 		float: right;
 		clear: both;
 		width: 75%;
-		margin-right: -25% !important;
+		margin-right: -30% !important;
 		margin-left: 2em;
 	}
 
