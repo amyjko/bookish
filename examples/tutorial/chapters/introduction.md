@@ -318,6 +318,7 @@ And if that's not enough, you can make tables with captions, with each
 Which will render like this:
 
 ,this|is|[my|dfjdfdf]|table
+,headerRow
 ,the|next|row|is
 ,my|test|is|*_failing_*
 > this is my caption

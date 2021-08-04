@@ -1367,6 +1367,9 @@ class TableNode extends Node {
 
     toDOM(app, chapter, query, key) {
 
+        // Determine the maximum number of columns so we can set the right colspan if necessary.
+        let maxColumns = this.rows.reduce((max, row) => Math.max(row.length, max), 0);
+
         return (
             <div className={"figure " + (this.position === "<" ? "marginal-left-inset" : this.position === ">" ? "marginal-right-inset" : "")} key={key}>
                 <div className="rows">
@@ -1375,7 +1378,11 @@ class TableNode extends Node {
                         {
                             _map(this.rows, (row, index) => 
                                 <tr key={"row-" + index}>
-                                    {_map(row, (cell, index) => <td key={"cell-" + index}>{cell.toDOM(app, chapter, query, "cell-" + index)}</td>)}
+                                    {
+                                        row.length === 1 ?
+                                            [<td key={"cell-" + index} colSpan={maxColumns}>{row[0].toDOM(app, chapter, query, "cell-" + index)}</td>] :
+                                            _map(row, (cell, index) => <td key={"cell-" + index}>{cell.toDOM(app, chapter, query, "cell-" + index)}</td>)
+                                    }
                                 </tr>
                             )
                         }
