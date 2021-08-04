@@ -106,10 +106,24 @@ class Peruse extends React.Component {
 	
 	getDescription() { return this.getBook().description; }
 	getRevisions() { return this.getBook().revisions; }
-	getChapterReadingTime(chapterID) { return chapterID in this.state.chapters ? Math.max(1, Math.round(this.state.chapters[chapterID].wordCount / 150)) : 0; }
-	getBookReadingTime() {
-		return _reduce(_map(Object.keys(this.state.chapters), chapterID => this.getChapterReadingTime(chapterID)), (total, count) => total + count);
+	
+	getChapterReadingTime(chapterID) { 
+		return this.chapterIsLoaded(chapterID) ? 
+			Math.max(1, Math.round(this.state.chapters[chapterID].wordCount / 150)) : 
+			undefined;
 	}
+	
+	getBookReadingTime() {
+		return _reduce(
+			_map(
+				Object.keys(this.state.chapters), 
+				chapterID => this.getChapterReadingTime(chapterID)
+			), 
+			(total, time) => time === undefined ? total : total + time,
+			0
+		);
+	}
+
 	getChapters() { return this.getBook().chapters; }
 
 	getChapterNumber(chapterID) {
@@ -145,6 +159,7 @@ class Peruse extends React.Component {
 	getChapterName(chapterID) { return chapterID in this.state.chapters ? this.state.chapters[chapterID].title : null;	}
 	getChapterSection(chapterID) { return chapterID in this.state.chapters && "section" in this.state.chapters[chapterID] ? this.state.chapters[chapterID].section : null;	}
 	getLoadedChapters() { return this.state.chapters; }
+	chapterIsLoaded(chapterID) { return chapterID in this.state.chapters && "text" in this.state.chapters[chapterID]; }
 	chaptersAreLoaded() { return Object.keys(this.state.chapters).length === this.getBook().chapters.length; }
 	getLicense() { return this.getBook().license; }
 	getCover() { return this.getBook().cover; }
@@ -338,7 +353,7 @@ class Peruse extends React.Component {
 					}
 					else {
 						var updatedChapters = _clone(this.state.chapters);
-						updatedChapters[chapter.id] = null;
+						updatedChapters[chapter.id] = chapter;
 						this.setState({ chapters: updatedChapters });
 					}
 				})

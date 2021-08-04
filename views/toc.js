@@ -83,6 +83,7 @@ class TableOfContents extends React.Component {
 
 								let readingTime = this.props.app.getChapterReadingTime(chapter.id);
 								let readingEstimate =
+									readingTime === undefined ? "Forthcoming" :
 									readingTime < 5 ? "<5 min read" :
 									readingTime < 60 ? "~" + Math.floor(readingTime / 5) * 5 + " min read" :
 									"~" + Math.round(10 * readingTime / 60) / 10 + " hour read";
@@ -98,29 +99,17 @@ class TableOfContents extends React.Component {
 											/>
 										</td>
 										<td>
-											{
-												// If it's not loaded, say so.
-												this.props.app.getContent(chapter.id) === undefined ?
-													<span>{chapter.title}</span> :
-												// If it failed to load, say so.
-												this.props.app.getContent(chapter.id) === null ?
-													<div>
-														<span>{chapter.title}</span> 
-														<br/>
-														<small>
-															<em>
-																Unable to load chapter.
-															</em>
-														</small>
-														
-													</div> :
-													// If it did load, link it!
-													<div>
-														{ chapterNumber === null ? null : <div className="chapter-number">{"Chapter " + chapterNumber}</div> }
-														<div><Link to={"/" + chapter.id}>{chapter.title}</Link></div>
-														{ section === null ? null : <div className="section-name">{section}</div> }
-													</div>
-											}
+											<div>
+												{ chapterNumber === null ? null : <div className="chapter-number">{"Chapter " + chapterNumber}</div> }
+												<div>
+													{
+														this.props.app.chapterIsLoaded(chapter.id) ? 
+															<Link to={"/" + chapter.id}>{chapter.title}</Link> :
+															<span>{chapter.title}</span>
+													}
+												</div>
+												{ section === null ? null : <div className="section-name">{section}</div> }
+											</div>
 										</td>
 										<td>
 											<small className="text-muted">
