@@ -1450,9 +1450,9 @@ class LinkNode extends Node {
     }
     toDOM(app, chapter, query, key) {
         return this.url.startsWith("http") ?
-            // If this is external, make an anchor that opens a new window.
+            // If this is external link, make an anchor that opens a new window.
             <a  key={key} href={this.url} target="_blank">{this.content.toDOM(app, chapter, query)}</a> :
-            // If this is internal, make a route link.
+            // If this is internal link, make a route link. TODO What if the chapter doesn't exist?
             <Link key={key} to={this.url}>{this.content.toDOM(app, chapter, query)}</Link>;
     }
 
