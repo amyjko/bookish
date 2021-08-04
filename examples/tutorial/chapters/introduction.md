@@ -39,13 +39,13 @@ There are many ways to format text.
 It can be _italic_ by wrapping text with the \_ symbol:
 
 `markdown
-It can be _italic_ by wrapping text with the \_ symbol:
+It can be _italic_ by wrapping text with the _ symbol:
 `
 
 It can be *bold* by wrapping text with the \* symbol.
 
 `markdown
-It can be *bold* by wrapping text with the \* symbol.
+It can be *bold* by wrapping text with the * symbol.
 `
 
 It can be both *_bold and italic_* by wrapping words with both \* and \_.
@@ -229,7 +229,8 @@ If you include a language name after the first backtick like this:
 two = 1 + 1
 if two == 2:
    print "Truth"
-\``
+\`
+`
 
 Peruse will try to highlight based on that language's syntax.
 
@@ -355,7 +356,7 @@ x^2^
 
 x^2^
 
-To make a subscript, start wrapping text with `\^v` and then close it with a `\^`, as in:
+To make a subscript, start wrapping text with `^v` and then close it with a `^`, as in:
 
 `markdown
 x^v2^

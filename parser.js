@@ -741,8 +741,12 @@ class Parser {
         // Read until hitting a delimiter.
         while(this.more() && !this.nextIs("\n")) {
             // Parse some formatted text
-            if(this.nextIs("_") || this.nextIs("*") || this.nextIs("`"))
+            if(this.nextIs("_") || this.nextIs("*"))
                 segments.push(this.parseFormatted(metadata, this.peek()));
+            // Parse unformatted text
+            else if(this.nextIs("`")) {
+                segments.push(this.parseInlineCode(metadata));
+            }
             // Parse a citation list
             else if(this.nextIs("<"))
                 segments.push(this.parseCitations(metadata));
@@ -920,18 +924,44 @@ class Parser {
         // If it wasn't closed, add an error
         else
             segments.push(new ErrorNode("Unclosed " + delimeter));
+        
+        return new FormattedNode(delimeter, segments);
+
+    }
+
+    parseInlineCode(metadata) {
+
+        // Parse the back tick
+        this.read();
+
+        // Read until we encounter a closing back tick.
+        var code = "";
+        while(this.more() && !this.nextIs("`")) {
+            var next = this.read(false);
+            if(next === "\\") {
+                if(this.nextIs("`")) {
+                    this.read();
+                    next = "`";
+                }
+            }
+            code = code + next;
+        }
+
+        // Read the backtick.
+        if(this.nextIs("`"))
+            this.read();
 
         // If there's a letter immediately after a backtick, it's a language for an inline code name
         let language = "";
-        if(delimeter === '`' && /^[a-z]$/.test(this.peek())) {
+        if(/^[a-z]$/.test(this.peek())) {
             do {
                 language = language + this.read();
             } while(/^[a-z]$/.test(this.peek()));
         } else
             language = "plaintext"
-        
-        return new FormattedNode(delimeter, segments, language);
 
+        return new InlineCodeNode(code, language);
+        
     }
 
     parseCitations(metadata) {
@@ -1390,6 +1420,24 @@ class FormattedNode extends Node {
 
     toText() {
         return _map(this.segments, segment => segment.toText()).join(" ");
+    }
+
+}
+
+class InlineCodeNode extends Node {
+
+    constructor(code, language) {
+        super();
+        this.code = code;
+        this.language = language;
+    }
+
+    toDOM(app, chapter, query, key) {
+        return <Code key={key} inline={true} language={this.language}>{this.code}</Code>;        
+    }
+
+    toText() {
+        return this.code;
     }
 
 }
