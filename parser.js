@@ -703,11 +703,11 @@ class Parser {
 
             while(this.more() && !this.nextIs("\n")) {
 
-                // Read the comma
+                // Read the starting , or next |
                 this.read();
 
-                // Read content until reaching a comma
-                row.push(this.parseContent(metadata, ","));
+                // Read content until reaching another | or the end of the line.
+                row.push(this.parseContent(metadata, "|"));
 
             }
 
