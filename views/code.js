@@ -9,7 +9,7 @@ class Code extends React.Component {
     constructor(props) {
 
         super(props)
-        this.setEl = this.setEl.bind(this)
+        this.setEl = this.setEl.bind(this);
 
     }
 
@@ -35,8 +35,12 @@ class Code extends React.Component {
 
     // Render some code, wrapping in a <pre> if it's a block.
     render() {
+
+        // There's no way to mute highlightjs warnings on missing languages, so we check here.
+        let lang = hljs.getLanguage(this.props.language) === undefined ? "text" : this.props.language;
+
         return <code 
-            className={"code " + (this.props.inline ? "code-inline" : "code-block") + " language-" + this.props.language} 
+            className={"code " + (this.props.inline ? "code-inline" : "code-block") + " language-" + lang} 
             ref={this.setEl}>
                 {this.props.children}
         </code>;
