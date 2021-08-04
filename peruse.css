@@ -542,8 +542,8 @@ blockquote .blockquote-caption {
 	margin-left: 1em;
 }
 
-.outline-header-active {
-	font-weight: bold;
+.outline-header-active a {
+	color: black;
 }
 
 .tag {
