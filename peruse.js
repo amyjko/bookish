@@ -28,6 +28,8 @@ class Peruse extends React.Component {
 
 		super(props);
 
+		console.log("Constructing Peruse...");
+
 		// Start data as undefined, rending a loading state until it changes.
 		this.state = {
 			book: undefined,

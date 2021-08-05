@@ -17,6 +17,11 @@ class Outline extends React.Component {
 
     }
 
+    componentWillUnmount() {
+		window.removeEventListener('scroll', this.layout);
+		window.removeEventListener('resize', this.layout);
+	}
+
     toggle() {
         this.setState({ collapsed: !this.state.collapsed }, () => this.layout());
     }

@@ -49,6 +49,7 @@ class Chapter extends React.Component {
 
 	componentWillUnmount() {
 		window.removeEventListener('scroll', this.handleScroll);
+		window.removeEventListener('resize', this.handleResize);
 	}
 
 	// If the chapter was rendered, and the chapter wasn't yet loaded, but now it is, scroll to the last location.
