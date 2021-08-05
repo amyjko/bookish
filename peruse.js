@@ -28,8 +28,6 @@ class Peruse extends React.Component {
 
 		super(props);
 
-		console.log("Constructing Peruse...");
-
 		// Start data as undefined, rending a loading state until it changes.
 		this.state = {
 			book: undefined,
@@ -336,6 +334,7 @@ class Peruse extends React.Component {
 
 			fetch("chapters/" + chapter.id + ".md")
 				.then((response) => {
+
 					// Uh oh, something bad happened. We couldn't load the chapter.
 					if(response.ok) {
 						response.text().then(text => {
