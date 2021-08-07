@@ -348,7 +348,7 @@ class Chapter extends React.Component {
 
 			// Parse the chapter if necessary.
 			if(this.ast === null)
-				this.ast = Parser.parseChapter(chapter.text, this.props.app.getSymbols());
+				this.ast = Parser.parseChapter(this.props.app, chapter.text);
 
 			let chapterNumber = this.props.app.getChapterNumber(this.props.id);
 			let chapterSection = this.props.app.getChapterSection(this.props.id);

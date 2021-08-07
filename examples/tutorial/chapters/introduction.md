@@ -148,10 +148,10 @@ You can include [links to content|http://amyjko.com].
 
 The \| separates the link text from the URL. All links will open new windows.
 
-You can add links to chapters by just using the chapter identifier given in the book's specification. For example, here's a link to [Chapter 1|chapter1].
+You can add links to chapters by just using the chapter identifier given in the book's specification. For example, here's a link to [the errors chapter|errors].
 
 `markdown
-Visit [Chapter 1|chapter1].
+Visit [Chapter 1|errors].
 `
 
 Chapter links won't open in new windows.
@@ -309,7 +309,7 @@ This is my callout
 And if that's not enough, you can make tables with captions, with each
 
 `markdown
-,this|is|[my|dfjdfdf]|table
+,this|is|[my|errors]|table
 ,the|next|row|is
 ,my|test|is|*_failing_*
 > this is my caption
@@ -317,7 +317,7 @@ And if that's not enough, you can make tables with captions, with each
 
 Which will render like this:
 
-,this|is|[my|dfjdfdf]|table
+,this|is|[my|errors]|table
 ,headerRow
 ,the|next|row|is
 ,my|test|is|*_failing_*

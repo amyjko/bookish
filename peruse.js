@@ -102,6 +102,12 @@ class Peruse extends React.Component {
 	getContent(chapterID) { return chapterID in this.state.chapters ? this.state.chapters[chapterID] : undefined; }
 	getTitle() { return this.getBook().title; }
 	getAuthors() { return this.getBook().authors; }
+
+	// See if there's a book chapter with the corresponding ID in the book specification.
+	hasChapter(chapterID) { 
+		return this.getBook() && this.getBook().chapters.findIndex(chapter => chapter.id === chapterID) >= 0; 
+	}
+	
 	getAuthorByID(id) { return _find(this.getAuthors(), { "id": id }); }
 	
 	getDescription() { return this.getBook().description; }
@@ -179,7 +185,7 @@ class Peruse extends React.Component {
 
 	}
 
-	computeIndex(text, symbols={}) {
+	computeIndex(book, text) {
 
 		// Build a list of common words
 		var commonWords = {};
@@ -187,7 +193,7 @@ class Peruse extends React.Component {
 			word => commonWords[word] = true);
 
 		// Get all the text in the chapter.
-        var text = Parser.parseChapter(text).toText();
+        var text = Parser.parseChapter(book, text).toText();
 		
 		// Split by word boundaries.
 		var words = text.split(/\b/);
@@ -339,13 +345,13 @@ class Peruse extends React.Component {
 					if(response.ok) {
 						response.text().then(text => {
 							// Notify the component that we got a new chapter.
-							var updatedChapters = _clone(this.state.chapters);
+							let updatedChapters = _clone(this.state.chapters);
 
 							// Augment the chapter object with the text and other detail.
 							chapter.text = text;
-							chapter.ast = Parser.parseChapter(text, this.getSymbols());
+							chapter.ast = Parser.parseChapter(this, text);
 							chapter.wordCount = text.split(/\s+/).length;
-							chapter.index = this.computeIndex(text, this.getSymbols());
+							chapter.index = this.computeIndex(this, text);
 
 							// Update the chapter.
 							updatedChapters[chapter.id] = chapter;

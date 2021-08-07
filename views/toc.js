@@ -67,7 +67,7 @@ class TableOfContents extends React.Component {
 					content={<Authors authors={this.props.app.getAuthors()} />}
 				/>
 
-				{Parser.parseChapter(this.props.app.getDescription()).toDOM()}
+				{Parser.parseChapter(this.props.app, this.props.app.getDescription()).toDOM()}
 
 				<h2>Chapters <small><small className="text-muted"><em>{readingTime < 60 ? Math.max(5, (Math.floor(readingTime / 10) * 10)) + " min read" : "~" + Math.round(readingTime / 60.0) + " hour read" }</em></small></small></h2>
 
@@ -77,7 +77,7 @@ class TableOfContents extends React.Component {
 							_map(this.props.app.getChapters(), (chapter, index) => {
 
 								// Get the image, chapter number, and section for rendering.
-								let image = Parser.parseEmbed(chapter.image).toJSON();
+								let image = Parser.parseEmbed(this.props.app, chapter.image).toJSON();
 								let chapterNumber = this.props.app.getChapterNumber(chapter.id);
 								let section = this.props.app.getChapterSection(chapter.id);
 
@@ -159,13 +159,13 @@ class TableOfContents extends React.Component {
 
 				<h2>License</h2>
 
-				<p>{this.props.app.getLicense() ? Parser.parseContent(this.props.app.getLicense()).toDOM() : "All rights reserved."}</p>
+				<p>{this.props.app.getLicense() ? Parser.parseContent(this.props.app, this.props.app.getLicense()).toDOM() : "All rights reserved."}</p>
 
 				<h2>Revisions</h2>
 				
 				<ul>
 					{_map(this.props.app.getRevisions(), (revision, index) => {
-						return <li key={"revision" + index}><em>{revision[0]}</em>. {Parser.parseContent(revision[1]).toDOM()}</li>;
+						return <li key={"revision" + index}><em>{revision[0]}</em>. {Parser.parseContent(this.props.app, revision[1]).toDOM()}</li>;
 					})}
 				</ul>
 

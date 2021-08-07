@@ -12,7 +12,7 @@ class Header extends React.Component {
 			<div>
 				{
 					this.props.image ?
-						Parser.parseEmbed(this.props.image).toDOM() :
+						Parser.parseEmbed(null, this.props.image).toDOM() :
 						null
 				}
 				<h1 className="title">{this.props.header}</h1>

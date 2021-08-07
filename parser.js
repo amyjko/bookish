@@ -49,16 +49,16 @@ class Parser {
 
     }
 
-    static parseChapter(text, symbols = {}) {
-        return (new Parser(text)).parseChapter(symbols);
+    static parseChapter(book, text) {
+        return (new Parser(text)).parseChapter(book);
     }
 
-    static parseContent(text) {
-        return (new Parser(text)).parseContent();
+    static parseContent(book, text) {
+        return (new Parser(text)).parseContent(book);
     }
 
-    static parseEmbed(text) {
-        return (new Parser(text)).parseEmbed();
+    static parseEmbed(book, text) {
+        return (new Parser(text)).parseEmbed(book);
     }
 
     static parseReference(ref, app, short=false) {
@@ -66,7 +66,7 @@ class Parser {
         var dom = null;
 
         if(typeof ref === "string")
-            dom = Parser.parseContent(ref).toDOM();
+            dom = Parser.parseContent(app, ref).toDOM();
         else if(Array.isArray(ref)) {
             // APA Format. Could eventually suppport multiple formats.
             if(ref.length >= 4) {
@@ -241,7 +241,7 @@ class Parser {
         return text;
     }
 
-    parseChapter(symbols = {}) {
+    parseChapter(book) {
 
         let blocks = [];
 
@@ -255,7 +255,7 @@ class Parser {
         };
 
         // Read any symbols declared for this chapter.
-        this.parseSymbols(metadata);
+        this.parseSymbols(book, metadata);
 
         // Get the remaining text.
         let declarations = this.text.substring(0, this.index);
@@ -267,8 +267,10 @@ class Parser {
         }
 
         // Then replace any remaining symbols with any definitions given.
-        for(const [symbol, text] of Object.entries(symbols)) {
-            rest = rest.replace(new RegExp("([^\\\\])@" + symbol + "\\b", "g"), "$1" + text);
+        if(book && book.getSymbols()) {
+            for(const [symbol, text] of Object.entries(book.getSymbols())) {
+                rest = rest.replace(new RegExp("([^\\\\])@" + symbol + "\\b", "g"), "$1" + text);
+            }
         }
         
         // Replace the text with the pre-processed text.
@@ -277,7 +279,7 @@ class Parser {
         // While there's more text, parse a line.
         while(this.more()) {
             // Read a block
-            var block = this.parseBlock(metadata);
+            var block = this.parseBlock(book, metadata);
             // Add it to the list if we parsed something.
             if(block !== null)
                 blocks.push(block);            
@@ -290,7 +292,7 @@ class Parser {
 
     }
 
-    parseSymbols(metadata) {
+    parseSymbols(book, metadata) {
 
         // Read whitespace before the symbols
         this.readWhitespace();
@@ -349,7 +351,7 @@ class Parser {
 
     }
 
-    parseBlock(metadata) {
+    parseBlock(book, metadata) {
 
         // Read whitespace before the block.
         this.readWhitespace();
@@ -361,44 +363,44 @@ class Parser {
         }
         // Parse and return a header if it starts with a hash
         else if(this.nextIs("#"))
-            return this.parseHeader(metadata);
+            return this.parseHeader(book, metadata);
         // Parse and return a horizontal rule if it starts with a dash
         else if(this.nextIs("-"))
-            return this.parseRule(metadata);
+            return this.parseRule(book, metadata);
         // Parse and return an embed if it starts with a bar
         else if(this.nextIs("|"))
-            return this.parseEmbed(metadata);
+            return this.parseEmbed(book, metadata);
         // Parse and return a bulleted list if it starts with a star and space
         else if(this.nextMatches(/^\*+\s+/))
-            return this.parseBulletedList(metadata);
+            return this.parseBulletedList(book, metadata);
         // Parse and return a numbered list if it starts with a number
         else if(this.nextMatches(/^[0-9]+\.+/))
-            return this.parseNumberedList(metadata);
+            return this.parseNumberedList(book, metadata);
         // Parse and return a code block if it starts with `, some optional letters, some whitespace, and a newline
         else if(this.nextMatches(/^`[a-zA-Z]*[ \t]*\n/))
-            return this.parseCode(metadata);
+            return this.parseCode(book, metadata);
         // Parse and return a quote block if it starts with "
         else if(this.nextMatches(/^"[ \t]*\n/))
-            return this.parseQuote(metadata);
+            return this.parseQuote(book, metadata);
         // Parse and return a callout if the line starts with =
         else if(this.nextMatches(/^=[ \t]*\n/))
-            return this.parseCallout(metadata);
+            return this.parseCallout(book, metadata);
         // Parse and return a table if the line starts with a ,
         else if(this.nextIs(","))
-            return this.parseTable(metadata);
+            return this.parseTable(book, metadata);
         // Parse the text as paragraph;
         else
-            return this.parseParagraph(metadata);
+            return this.parseParagraph(book, metadata);
 
     }
 
-    parseParagraph(metadata) {
+    parseParagraph(book, metadata) {
 
-        return new ParagraphNode(this.parseContent(metadata));
+        return new ParagraphNode(this.parseContent(book, metadata));
 
     }
 
-    parseHeader(metadata) {
+    parseHeader(book, metadata) {
 
         // Read a sequence of hashes
         var count = 0;
@@ -411,7 +413,7 @@ class Parser {
         this.readWhitespace();
 
         // Parse some content.
-        let content = this.parseContent(metadata);
+        let content = this.parseContent(book, metadata);
         let node = new HeaderNode(Math.min(3, count), content);
         
         if(metadata)
@@ -422,7 +424,7 @@ class Parser {
 
     }
     
-    parseRule(metadata) {
+    parseRule(book, metadata) {
 
         // Read until the end of the line. Ignore all text that follows.
         this.readUntilNewLine();
@@ -431,7 +433,7 @@ class Parser {
 
     }
 
-    parseBulletedList(metadata) {
+    parseBulletedList(book, metadata) {
 
         var bullets = [];
         let lastLevel = undefined;
@@ -455,7 +457,7 @@ class Parser {
                 // Read the whitespace after the bullet.
                 this.readWhitespace();
                 // Parse content after the bullet.
-                bullets.push(this.parseContent(metadata));
+                bullets.push(this.parseContent(book, metadata));
             }
             // Otherwise, unread the stars, then either stop parsing or parse nested list.
             else {
@@ -472,7 +474,7 @@ class Parser {
                     break;
                 // Otherwise, it's greater, and we should read another list.
                 else {
-                    bullets.push(this.parseBulletedList(metadata));
+                    bullets.push(this.parseBulletedList(book, metadata));
                     // Reset the current level to the last level, so we expect another bullet at the same level.
                     currentLevel = lastLevel;
                 }
@@ -494,7 +496,7 @@ class Parser {
 
     }
 
-    parseNumberedList(metadata) {
+    parseNumberedList(book, metadata) {
 
         var bullets = [];
         let lastLevel = undefined;
@@ -523,7 +525,7 @@ class Parser {
                 // Read the whitespace after the bullet.
                 this.readWhitespace();
                 // Parse content after the bullet.
-                bullets.push(this.parseContent(metadata));
+                bullets.push(this.parseContent(book, metadata));
             }
             // Otherwise, unread the stars, then either stop parsing or parse nested list.
             else {
@@ -546,7 +548,7 @@ class Parser {
                     break;
                 // Otherwise, it's greater, and we should read another list.
                 else {
-                    bullets.push(this.parseNumberedList(metadata));
+                    bullets.push(this.parseNumberedList(book, metadata));
                     // Reset the current level to the last level, so we expect another bullet at the same level.
                     currentLevel = lastLevel;
                 }
@@ -567,7 +569,7 @@ class Parser {
 
     }
 
-    parseCode(metadata) {
+    parseCode(book, metadata) {
 
         // Parse the back tick
         this.read();
@@ -602,13 +604,13 @@ class Parser {
 
         // Read the caption. Note that parsing inline content stops at a newline, 
         // so if there's a line break after the last row, there won't be a caption.
-        var caption = this.parseContent(metadata);
+        var caption = this.parseContent(book, metadata);
 
         return new CodeNode(code, language, caption, position);
 
     }
 
-    parseQuote(metadata) {
+    parseQuote(book, metadata) {
 
         var blocks = [];
 
@@ -623,7 +625,7 @@ class Parser {
 
         while(this.more() && !this.nextIs("\"")) {
             // Read a block
-            var block = this.parseBlock(metadata);
+            var block = this.parseBlock(book, metadata);
             // Add it to the list if we parsed something.
             if(block !== null)
                 blocks.push(block);
@@ -644,13 +646,13 @@ class Parser {
         this.readWhitespace();
 
         // Read the credit.
-        var credit = this.nextIs("\n") ? null : this.parseContent(metadata);
+        var credit = this.nextIs("\n") ? null : this.parseContent(book, metadata);
 
         return new QuoteNode(blocks, credit, position);
 
     }
 
-    parseCallout(metadata) {
+    parseCallout(book, metadata) {
 
         var blocks = [];
 
@@ -666,7 +668,7 @@ class Parser {
         // Then, read until we find a closing _
         while(this.more() && !this.nextIs("=")) {
             // Read a block
-            var block = this.parseBlock(metadata);
+            var block = this.parseBlock(book, metadata);
             // Add it to the list if we parsed something.
             if(block !== null)
                 blocks.push(block);
@@ -690,7 +692,7 @@ class Parser {
 
     }
 
-    parseTable(metadata) {
+    parseTable(book, metadata) {
 
         var rows = [];
 
@@ -705,7 +707,7 @@ class Parser {
                 this.read();
 
                 // Read content until reaching another | or the end of the line.
-                row.push(this.parseContent(metadata, "|"));
+                row.push(this.parseContent(book, metadata, "|"));
 
             }
 
@@ -724,7 +726,7 @@ class Parser {
 
         // Read the caption. Note that parsing inline content stops at a newline, 
         // so if there's a line break after the last row, there won't be a caption.
-        var caption = this.parseContent(metadata);
+        var caption = this.parseContent(book, metadata);
 
         return new TableNode(rows, caption, position);
 
@@ -732,7 +734,7 @@ class Parser {
 
     // The "awaiting" argument keeps track of upstream formatting. We don't need a stack here
     // because we don't allow infinite nesting of the same formatting type.
-    parseContent(metadata, awaiting) {
+    parseContent(book, metadata, awaiting) {
 
         var segments = [];
 
@@ -740,32 +742,32 @@ class Parser {
         while(this.more() && !this.nextIs("\n")) {
             // Parse some formatted text
             if(this.nextIs("_") || this.nextIs("*"))
-                segments.push(this.parseFormatted(metadata, this.peek()));
+                segments.push(this.parseFormatted(book, metadata, this.peek()));
             // Parse unformatted text
             else if(this.nextIs("`")) {
-                segments.push(this.parseInlineCode(metadata));
+                segments.push(this.parseInlineCode(book, metadata));
             }
             // Parse a citation list
             else if(this.nextIs("<"))
-                segments.push(this.parseCitations(metadata));
+                segments.push(this.parseCitations(book, metadata));
             // Parse sub/super scripts
             else if(this.nextIs("^"))
-                segments.push(this.parseSubSuperscripts(metadata));
+                segments.push(this.parseSubSuperscripts(book, metadata));
             // Parse a footnote
             else if(this.nextIs("{"))
-                segments.push(this.parseFootnote(metadata));
+                segments.push(this.parseFootnote(book, metadata));
             // Parse a definition
             else if(this.nextIs("~"))
-                segments.push(this.parseDefinition(metadata));
+                segments.push(this.parseDefinition(book, metadata));
             // Parse an escaped character
             else if(this.nextIs("\\"))
-                segments.push(this.parseEscaped(metadata));
+                segments.push(this.parseEscaped(book, metadata));
             // Parse a link
             else if(this.nextIs("["))
-               segments.push(this.parseLink(metadata));
+               segments.push(this.parseLink(book, metadata));
             // Parse inline comments
             else if(this.charBeforeNext() === " " && this.nextIs("%"))
-                this.parseComment(metadata);
+                this.parseComment(book, metadata);
             // Parse an unresolved symbol
             else if(this.nextIs("@")) {
                 // Read the @, then the symbol name.
@@ -795,7 +797,7 @@ class Parser {
 
     }
 
-    parseEmbed(metadata) {
+    parseEmbed(book, metadata) {
 
         // Read |
         this.read();
@@ -834,7 +836,7 @@ class Parser {
         // Read a |
         this.read();
         // Parse the caption
-        var caption = this.parseContent(metadata, "|");
+        var caption = this.parseContent(book, metadata, "|");
 
         if(this.peek() !== "|") {
             this.readUntilNewLine();
@@ -845,7 +847,7 @@ class Parser {
         this.read();
 
         // Parse the credit
-        var credit = this.parseContent(metadata, "|");
+        var credit = this.parseContent(book, metadata, "|");
 
         // Error if missing credit.
         if(credit.toText().trim() === "") {
@@ -871,7 +873,7 @@ class Parser {
 
     }
 
-    parseComment(metadata) {
+    parseComment(book, metadata) {
 
         // Consume the opening %
         this.read();
@@ -886,7 +888,7 @@ class Parser {
 
     }
 
-    parseFormatted(metadata, awaiting) {
+    parseFormatted(book, metadata, awaiting) {
 
         // Remember what we're matching.
         var delimeter = this.read();
@@ -902,7 +904,7 @@ class Parser {
                 if(text !== "")
                     segments.push(new TextNode(text, this.index));
                 // Parse the formatted content.
-                segments.push(this.parseContent(metadata, awaiting));
+                segments.push(this.parseContent(book, metadata, awaiting));
                 // Reset the accumulator.
                 text = "";
             }
@@ -927,7 +929,7 @@ class Parser {
 
     }
 
-    parseInlineCode(metadata) {
+    parseInlineCode(book, metadata) {
 
         // Parse the back tick
         this.read();
@@ -962,7 +964,7 @@ class Parser {
         
     }
 
-    parseCitations(metadata) {
+    parseCitations(book, metadata) {
         
         var citations = "";
 
@@ -989,7 +991,7 @@ class Parser {
 
     }
 
-    parseSubSuperscripts(metadata, awaiting) {
+    parseSubSuperscripts(book, metadata, awaiting) {
         
         // Read the ^
         this.read();
@@ -1004,7 +1006,7 @@ class Parser {
         }
 
         // Parse the content
-        let content = this.parseContent(metadata, "^");
+        let content = this.parseContent(book, metadata, "^");
 
         // Read the closing ^
         this.read();
@@ -1013,13 +1015,13 @@ class Parser {
 
     }
 
-    parseFootnote(metadata) {
+    parseFootnote(book, metadata) {
         
         // Read the {
         this.read();
 
         // Read the footnote content.
-        var footnote = this.parseContent(metadata, "}");
+        var footnote = this.parseContent(book, metadata, "}");
 
         // Read the closing }
         this.read();
@@ -1036,13 +1038,13 @@ class Parser {
 
     }
 
-    parseDefinition(metadata) {
+    parseDefinition(book, metadata) {
         
         // Read the ~
         this.read();
 
         // Read the footnote content.
-        var text = this.parseContent(metadata, "~");
+        var text = this.parseContent(book, metadata, "~");
 
         // Read the closing ~
         this.read();
@@ -1059,7 +1061,7 @@ class Parser {
 
     }
 
-    parseEscaped(metadata) {
+    parseEscaped(book, metadata) {
 
         // Skip the scape and just add the next character.
         this.read();
@@ -1067,12 +1069,12 @@ class Parser {
 
     }
     
-    parseLink(metadata) {
+    parseLink(book, metadata) {
  
         // Read the [
         this.read();
         // Read some content, awaiting |
-        var content = this.parseContent(metadata, "|");
+        var content = this.parseContent(book, metadata, "|");
 
         // Catch links with no label.
         if(content.segments.length === 0)
@@ -1098,7 +1100,11 @@ class Parser {
         // Read the ]
         this.read();
 
-        return new LinkNode(content, link);
+        // If it's internal, validate it.
+        if(!link.startsWith("http") && !book.hasChapter(link))
+            return new ErrorNode(metadata, "Unknown chapter name '" + link + "'");
+        else
+            return new LinkNode(content, link);
 
     }
 
