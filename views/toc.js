@@ -118,6 +118,11 @@ class TableOfContents extends React.Component {
 													{ this.getProgressDescription(chapter.id in progress ? progress[chapter.id] : null) }
 												</em>
 											</small>
+											{
+												chapter.ast && chapter.ast.getErrors().length > 0 ? 
+													<span><br/><small className="alert alert-danger">{chapter.ast.getErrors().length + " " + (chapter.ast.getErrors().length > 1 ? "errors" : "error")}</small></span> :
+													null
+											}
 										</td>
 									</tr>
 								)

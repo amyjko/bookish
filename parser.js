@@ -250,11 +250,12 @@ class Parser {
             citations: {},
             footnotes: [],
             headers: [],
-            symbols: {}
+            symbols: {},
+            errors: []
         };
 
         // Read any symbols declared for this chapter.
-        let errors = this.parseSymbols(metadata);
+        this.parseSymbols(metadata);
 
         // Get the remaining text.
         let declarations = this.text.substring(0, this.index);
@@ -285,13 +286,11 @@ class Parser {
                 this.read();
         }
 
-        return new ChapterNode(blocks, errors, metadata);
+        return new ChapterNode(blocks, metadata);
 
     }
 
     parseSymbols(metadata) {
-
-        let errors = [];
 
         // Read whitespace before the symbols
         this.readWhitespace();
@@ -308,12 +307,13 @@ class Parser {
             // Names need to be letter and numbers only.
             if(!/^[a-zA-Z0-9]+$/.test(name)) {
                 this.readUntilNewLine();
-                errors.push(new ErrorNode(
+                metadata.errors.push(new ErrorNode(
+                    metadata,
                     name.trim() === "" ? 
                         "Did you mean to declare a symbol? Use an @ symbol, then a name of only numbers and letters, then a colon, then whatever content you want it to represent." :
                         "'" + name + "' isn't a valid name for a symbol; letters and numbers only"
                     ));
-                return errors;
+                return;
             }
 
             // Read any whitespace until the colon.
@@ -322,8 +322,8 @@ class Parser {
             // Name declarations need to be terminated with a colon before the block starts.
             if(!this.nextIs(":")) {
                 this.readUntilNewLine();
-                errors.push(new ErrorNode("Symbol names ave to be followed by a ':'"));
-                return errors;
+                metadata.errors.push(new ErrorNode(metadata, "Symbol names ave to be followed by a ':'"));
+                return;
             }
 
             // Read the colon
@@ -346,8 +346,6 @@ class Parser {
                 this.read();
         
         }
-
-        return errors;
 
     }
 
@@ -776,7 +774,7 @@ class Parser {
                 // Stop at the end of the name or file.
                 while(this.more() && /[a-zA-Z0-9]/.test(this.peek()))
                     symbol = symbol + this.read();
-                segments.push(new ErrorNode("Couldn't find symbol @" + symbol));
+                segments.push(new ErrorNode(metadata, "Couldn't find symbol @" + symbol));
 
             }
             // Keep reading text until finding a delimiter.
@@ -808,12 +806,12 @@ class Parser {
         // Error if missing URL.
         if(url === "") {
             this.readUntilNewLine();
-            return new ErrorNode("Missing URL in embed.");
+            return new ErrorNode(metadata, "Missing URL in embed.");
         }
 
         if(this.peek() !== "|") {
             this.readUntilNewLine();
-            return new ErrorNode("Missing '|' after URL in embed");
+            return new ErrorNode(metadata, "Missing '|' after URL in embed");
         }
 
         // Read a |
@@ -824,13 +822,13 @@ class Parser {
 
         if(this.peek() !== "|") {
             this.readUntilNewLine();
-            return new ErrorNode("Missing '|' after description in embed");
+            return new ErrorNode(metadata, "Missing '|' after description in embed");
         }
 
         // Error if missing description.
         if(description === "") {
             this.readUntilNewLine();
-            return new ErrorNode("Missing image/video description in embed.");
+            return new ErrorNode(metadata, "Missing image/video description in embed.");
         }
         
         // Read a |
@@ -840,7 +838,7 @@ class Parser {
 
         if(this.peek() !== "|") {
             this.readUntilNewLine();
-            return new ErrorNode("Missing '|' after caption in embed");
+            return new ErrorNode(metadata, "Missing '|' after caption in embed");
         }
         
         // Read a |
@@ -852,13 +850,13 @@ class Parser {
         // Error if missing credit.
         if(credit.toText().trim() === "") {
             this.readUntilNewLine();
-            return new ErrorNode("Missing credit in embed.");
+            return new ErrorNode(metadata, "Missing credit in embed.");
         }
         
         // Check for the closing delimeter
         if(this.peek() !== "|") {
             this.readUntilNewLine();
-            return new ErrorNode("Missing '|' after credit in embed.");
+            return new ErrorNode(metadata, "Missing '|' after credit in embed.");
         }
 
         // Read a |
@@ -923,7 +921,7 @@ class Parser {
             this.read();
         // If it wasn't closed, add an error
         else
-            segments.push(new ErrorNode("Unclosed " + delimeter));
+            segments.push(new ErrorNode(metadata, "Unclosed " + delimeter));
         
         return new FormattedNode(delimeter, segments);
 
@@ -1078,12 +1076,12 @@ class Parser {
 
         // Catch links with no label.
         if(content.segments.length === 0)
-            return new ErrorNode("Unclosed link");
+            return new ErrorNode(metadata, "Unclosed link");
 
         // Catch missing bars
         if(this.peek() !== "|") {
             this.readUntilNewLine();
-            return new ErrorNode("Missing '|' in link");
+            return new ErrorNode(metadata, "Missing '|' in link");
         }
 
         // Read the |
@@ -1094,7 +1092,7 @@ class Parser {
         // Catch missing closing
         if(this.peek() !== "]") {
             this.readUntilNewLine();
-            return new ErrorNode("Missing ] in link");
+            return new ErrorNode(metadata, "Missing ] in link");
         }
 
         // Read the ]
@@ -1111,16 +1109,19 @@ class Node {
 }
 
 class ChapterNode extends Node {
-    constructor(blocks, errors, metadata) {
+    constructor(blocks, metadata) {
         super();
 
         // The AST of the chapter.
         this.blocks = blocks;
-        this.errors = errors;
 
         // Content extracted during parsing.
         this.metadata = metadata;
 
+    }
+
+    getErrors() {
+        return this.metadata.errors;
     }
 
     getCitations() { 
@@ -1148,7 +1149,10 @@ class ChapterNode extends Node {
 
     toDOM(app, query) {
         return <div key="chapter" className="chapter-body">
-            {_map(this.errors, (error, index) => error.toDOM(app, this, query, "error-" + index))}
+            {
+                this.metadata.errors.length === 0 ? 
+                    null : 
+                    <p><span className="alert alert-danger">{this.metadata.errors.length + " " + (this.metadata.errors.length > 1 ? "errors" : "error")} below</span></p>}
             {_map(this.blocks, (block, index) => block.toDOM(app, this, query, "block-" + index))}
         </div>;
     }
@@ -1707,9 +1711,12 @@ class TextNode extends Node {
 }
 
 class ErrorNode extends Node {
-    constructor(error) {
+    constructor(metadata, error) {
         super();
         this.error = error;
+
+        // Add the error to the give metadata object.
+        metadata.errors.push(this);
     }
 
     toDOM(app, chapter, query, key) {

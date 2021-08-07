@@ -343,6 +343,7 @@ class Peruse extends React.Component {
 
 							// Augment the chapter object with the text and other detail.
 							chapter.text = text;
+							chapter.ast = Parser.parseChapter(text, this.getSymbols());
 							chapter.wordCount = text.split(/\s+/).length;
 							chapter.index = this.computeIndex(text, this.getSymbols());
 
