@@ -395,7 +395,8 @@ class Peruse extends React.Component {
 		// Render the book
 		else 
 			return (
-				<div className="container" className="book">
+				// Bootstrap container with a single row and one big column.
+				<div className="container book">
 					<div className="row">
 						<div className="col-md-12">
 							<Switch>

@@ -1372,7 +1372,8 @@ class TableNode extends Node {
 
         return (
             <div className={"figure " + (this.position === "<" ? "marginal-left-inset" : this.position === ">" ? "marginal-right-inset" : "")} key={key}>
-                <div className="rows">
+                {/* Make the table responsive for small screens */}
+                <div className="rows table-responsive">
                     <table className="table">
                         <tbody>
                         {
