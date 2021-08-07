@@ -45,6 +45,9 @@ class Chapter extends React.Component {
 		else
 			this.setState({ loaded: false })
 
+		// Position the marginals, since there's new content.
+		this.layoutMarginals();
+
 	}
 
 	componentWillUnmount() {
@@ -52,10 +55,10 @@ class Chapter extends React.Component {
 		window.removeEventListener('resize', this.handleResize);
 	}
 
-	// If the chapter was rendered, and the chapter wasn't yet loaded, but now it is, scroll to the last location.
 	componentDidUpdate() {
 
-		var chapter = this.props.app.getContent(this.props.id);
+		// If the chapter was rendered, and the chapter wasn't yet loaded, but now it is, scroll to the last location.
+		let chapter = this.props.app.getContent(this.props.id);
 		if(!this.state.loaded && chapter) {
 
 			// Remember that it was loaded.
@@ -64,7 +67,7 @@ class Chapter extends React.Component {
 			this.scrollToLastLocation();
 		}
 
-		// Position the marginals.
+		// Position the marginals, since there's potentially new content.
 		this.layoutMarginals();
 
 	}
