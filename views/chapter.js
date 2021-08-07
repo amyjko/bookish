@@ -26,10 +26,14 @@ class Chapter extends React.Component {
 			loaded: true, 
 			editing: false, 
 			draft: null,
-			headerIndex: -1
+			headerIndex: -1,
+			outlineExpanded: false,
+			marginal: null // The currently selected marginal; we only do one at a time.
 		};
 
 	}
+
+	getApp() { return this.props.app; }
 
 	componentDidMount() {
 
@@ -247,6 +251,30 @@ class Chapter extends React.Component {
 
 	}
 
+	toggleOutline(expanded, after) {
+
+		// If the outline is being expanded, hide the marginal, otherwise leave it alone.
+		this.setState({ 
+			outlineExpanded: expanded, 
+			marginal: expanded ? null : this.state.marginal 
+		}, after);
+
+	}
+
+	getMarginal() {
+		return this.state.marginal;
+	}
+
+	setMarginal(marginal) {
+
+		// If the marginal is being shown, hide the outline, otherwise leave it alone.
+		this.setState({ 
+			marginal: marginal,
+			outlineExpanded: marginal !== null ? false : this.state.outlineExpanded
+		});
+
+	}
+
 	// After each render, we need to adjust the layout of marginals, which by default are floating from
 	// their little spans within the body of the text. We have to do two things:
 	//
@@ -392,12 +420,14 @@ class Chapter extends React.Component {
 					/>
 
 					<Outline
+						chapter={this}
 						title={chapter.title}
 						headers={headers}
 						headerIndex={this.state.headerIndex}
 						previous={this.props.app.getPreviousChapter(this.props.id)}
 						next={this.props.app.getNextChapter(this.props.id)}
 						references={hasReferences}
+						expanded={this.state.outlineExpanded}
 					/>
 
 					{ /* Render the editor if we're editing */ }
@@ -405,7 +435,7 @@ class Chapter extends React.Component {
 
 					<div onDoubleClick={this.handleDoubleClick}>
 					{
-						chapterAST.toDOM(this.props.app, this.props.match.params.word)
+						chapterAST.toDOM(this, this.props.match.params.word)
 					}
 					</div>
 					{

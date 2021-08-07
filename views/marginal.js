@@ -18,10 +18,10 @@ class Marginal extends React.Component {
 
 	toggle() {
 
-		if(this.props.app.getMarginal() === null || this.props.app.getMarginal() !== this.props.id) {
-			this.props.app.setMarginal(this.props.id);
+		if(this.props.chapter.getMarginal() === null || this.props.chapter.getMarginal() !== this.props.id) {
+			this.props.chapter.setMarginal(this.props.id);
 		} else {
-			this.props.app.setMarginal(null);
+			this.props.chapter.setMarginal(null);
 		}
 
 	}
@@ -31,7 +31,7 @@ class Marginal extends React.Component {
 
 	render() {
 
-		let hidden = this.props.app.getMarginal() === null || this.props.app.getMarginal() !== this.props.id;
+		let hidden = this.props.chapter.getMarginal() === null || this.props.chapter.getMarginal() !== this.props.id;
 
 		return (
 			<span>

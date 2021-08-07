@@ -1153,13 +1153,13 @@ class ChapterNode extends Node {
     
     }
 
-    toDOM(app, query) {
+    toDOM(view, query) {
         return <div key="chapter" className="chapter-body">
             {
                 this.metadata.errors.length === 0 ? 
                     null : 
                     <p><span className="alert alert-danger">{this.metadata.errors.length + " " + (this.metadata.errors.length > 1 ? "errors" : "error")} below</span></p>}
-            {_map(this.blocks, (block, index) => block.toDOM(app, this, query, "block-" + index))}
+            {_map(this.blocks, (block, index) => block.toDOM(view, this, query, "block-" + index))}
         </div>;
     }
 
@@ -1175,8 +1175,8 @@ class ParagraphNode extends Node {
         super();
         this.content = content;
     }
-    toDOM(app, chapter, query, key) {
-        return <p key={key}>{this.content.toDOM(app, chapter, query)}</p>;
+    toDOM(view, chapter, query, key) {
+        return <p key={key}>{this.content.toDOM(view, chapter, query)}</p>;
     }
 
     toText() {
@@ -1195,12 +1195,12 @@ class EmbedNode extends Node {
         this.position = position;
     }
 
-    toDOM(app, chapter, query, key) {
+    toDOM(view, chapter, query, key) {
         return <Figure key={key}
             url={this.url}
             alt={this.description}
-            caption={this.caption.toDOM(app, chapter, query)}
-            credit={this.credit.toDOM(app, chapter, query)}
+            caption={this.caption.toDOM(view, chapter, query)}
+            credit={this.credit.toDOM(view, chapter, query)}
             position={this.position}
         />
     }
@@ -1227,12 +1227,12 @@ class HeaderNode extends Node {
         this.content = content;
     }
 
-    toDOM(app, chapter, query, key) {
+    toDOM(view, chapter, query, key) {
         let id = "header-" + chapter.getHeaders().indexOf(this);
 
-        return this.level === 1 ? <h2 className="header" id={id} key={key}>{this.content.toDOM(app, chapter, query)}</h2> :
-            this.level === 2 ? <h3 className="header" id={id} key={key}>{this.content.toDOM(app, chapter, query)}</h3> :
-            <h4 className="header" id={id} key={key}>{this.content.toDOM(app, chapter, query)}</h4>
+        return this.level === 1 ? <h2 className="header" id={id} key={key}>{this.content.toDOM(view, chapter, query)}</h2> :
+            this.level === 2 ? <h3 className="header" id={id} key={key}>{this.content.toDOM(view, chapter, query)}</h3> :
+            <h4 className="header" id={id} key={key}>{this.content.toDOM(view, chapter, query)}</h4>
     }
 
     toText() {
@@ -1246,7 +1246,7 @@ class RuleNode extends Node {
         super();
     }
 
-    toDOM(app, chapter, query, key) { return <hr key={key} />; }
+    toDOM(view, chapter, query, key) { return <hr key={key} />; }
 
     toText() {
         return "";
@@ -1260,12 +1260,12 @@ class BulletedListNode extends Node {
         this.items = items;
     }
 
-    toDOM(app, chapter, query, key) {
+    toDOM(view, chapter, query, key) {
         return <ul key={key}>{
             _map(this.items, (item, index) =>
                 item instanceof BulletedListNode ?
-                    item.toDOM(app, chapter, query, "item-" + index) :
-                    <li key={"item-" + index}>{item.toDOM(app, chapter, query)}</li>
+                    item.toDOM(view, chapter, query, "item-" + index) :
+                    <li key={"item-" + index}>{item.toDOM(view, chapter, query)}</li>
             )}
         </ul>;
     }
@@ -1282,12 +1282,12 @@ class NumberedListNode extends Node {
         this.items = items;
     }
 
-    toDOM(app, chapter, query, key) {
+    toDOM(view, chapter, query, key) {
         return <ol key={key}>{
             _map(this.items, (item, index) =>
                 item instanceof NumberedListNode ?
-                    item.toDOM(app, chapter, query, "item-" + index) :
-                    <li key={"item-" + index}>{item.toDOM(app, chapter, query)}</li>
+                    item.toDOM(view, chapter, query, "item-" + index) :
+                    <li key={"item-" + index}>{item.toDOM(view, chapter, query)}</li>
             )}
         </ol>;
     }
@@ -1306,11 +1306,11 @@ class CodeNode extends Node {
         this.caption = caption;
         this.position = position;
     }
-    toDOM(app, chapter, query, key) {
+    toDOM(view, chapter, query, key) {
         return <div key={key} className={(this.position === "<" ? "marginal-left-inset" : this.position === ">" ? "marginal-right-inset" : "")}>
             <Code inline={false} language={this.language}>{this.code}</Code>
             { this.language !== "plaintext" ? <div className="code-language">{this.language}</div> : null }
-            <div className="figure-caption">{this.caption.toDOM(app, chapter, query)}</div>
+            <div className="figure-caption">{this.caption.toDOM(view, chapter, query)}</div>
         </div>
     }
 
@@ -1329,11 +1329,11 @@ class QuoteNode extends Node {
         this.position = position;
     }
 
-    toDOM(app, chapter, query, key) {
+    toDOM(view, chapter, query, key) {
 
         return <blockquote className={"blockquote " + (this.position === "<" ? "marginal-left-inset" : this.position === ">" ? "marginal-right-inset" : "")} key={key}>
-            {_map(this.elements, (element, index) => element.toDOM(app, chapter, query, "quote-" + index))}
-            {this.credit ? <div className="blockquote-caption"><span>{this.credit.toDOM(app, chapter, query)}</span></div> : null }
+            {_map(this.elements, (element, index) => element.toDOM(view, chapter, query, "quote-" + index))}
+            {this.credit ? <div className="blockquote-caption"><span>{this.credit.toDOM(view, chapter, query)}</span></div> : null }
         </blockquote>
 
     }
@@ -1352,10 +1352,10 @@ class CalloutNode extends Node {
         this.position = position;
     }
 
-    toDOM(app, chapter, query, key) {
+    toDOM(view, chapter, query, key) {
 
         return <div className={"callout " + (this.position === "<" ? "marginal-left-inset" : this.position === ">" ? "marginal-right-inset" : "")} key={key}>
-            {_map(this.elements, (element, index) => element.toDOM(app, chapter, query, "callout-" + index))}
+            {_map(this.elements, (element, index) => element.toDOM(view, chapter, query, "callout-" + index))}
         </div>
 
     }
@@ -1375,7 +1375,7 @@ class TableNode extends Node {
         this.position = position;
     }
 
-    toDOM(app, chapter, query, key) {
+    toDOM(view, chapter, query, key) {
 
         // Determine the maximum number of columns so we can set the right colspan if necessary.
         let maxColumns = this.rows.reduce((max, row) => Math.max(row.length, max), 0);
@@ -1391,8 +1391,8 @@ class TableNode extends Node {
                                 <tr key={"row-" + index}>
                                     {
                                         row.length === 1 ?
-                                            [<td key={"cell-" + index} colSpan={maxColumns}>{row[0].toDOM(app, chapter, query, "cell-" + index)}</td>] :
-                                            _map(row, (cell, index) => <td key={"cell-" + index}>{cell.toDOM(app, chapter, query, "cell-" + index)}</td>)
+                                            [<td key={"cell-" + index} colSpan={maxColumns}>{row[0].toDOM(view, chapter, query, "cell-" + index)}</td>] :
+                                            _map(row, (cell, index) => <td key={"cell-" + index}>{cell.toDOM(view, chapter, query, "cell-" + index)}</td>)
                                     }
                                 </tr>
                             )
@@ -1401,7 +1401,7 @@ class TableNode extends Node {
                     </table>
 
                 </div>
-                <div className="figure-caption">{this.caption.toDOM(app, chapter, query)}</div>
+                <div className="figure-caption">{this.caption.toDOM(view, chapter, query)}</div>
             </div>
         );
     }
@@ -1421,9 +1421,9 @@ class FormattedNode extends Node {
         this.language = language;
     }
 
-    toDOM(app, chapter, query, key) {
+    toDOM(view, chapter, query, key) {
         
-        var segmentDOMs = _map(this.segments, (segment, index) => segment.toDOM(app, chapter, query, "formatted-" + index));
+        var segmentDOMs = _map(this.segments, (segment, index) => segment.toDOM(view, chapter, query, "formatted-" + index));
 
         if(this.format === "*")
             return <strong key={key}>{segmentDOMs}</strong>;
@@ -1450,7 +1450,7 @@ class InlineCodeNode extends Node {
         this.language = language;
     }
 
-    toDOM(app, chapter, query, key) {
+    toDOM(view, chapter, query, key) {
         return <Code key={key} inline={true} language={this.language}>{this.code}</Code>;        
     }
 
@@ -1466,12 +1466,12 @@ class LinkNode extends Node {
         this.content = content;
         this.url = url;
     }
-    toDOM(app, chapter, query, key) {
+    toDOM(view, chapter, query, key) {
         return this.url.startsWith("http") ?
             // If this is external link, make an anchor that opens a new window.
-            <a  key={key} href={this.url} target="_blank">{this.content.toDOM(app, chapter, query)}</a> :
+            <a  key={key} href={this.url} target="_blank">{this.content.toDOM(view, chapter, query)}</a> :
             // If this is internal link, make a route link. TODO What if the chapter doesn't exist?
-            <Link key={key} to={this.url}>{this.content.toDOM(app, chapter, query)}</Link>;
+            <Link key={key} to={this.url}>{this.content.toDOM(view, chapter, query)}</Link>;
     }
 
     toText() {
@@ -1485,7 +1485,7 @@ class CitationsNode extends Node {
         super();
         this.citations = citations;
     }
-    toDOM(app, chapter, query, key) {
+    toDOM(view, chapter, query, key) {
 
         let segments = [];
 
@@ -1509,7 +1509,7 @@ class CitationsNode extends Node {
             (citationID, index) => {
                 // Find the citation number. There should always be one,
                 let citationNumber = chapter.getCitationNumber(citationID)
-                if(citationNumber !== null && citationID in app.getReferences()) {
+                if(citationNumber !== null && citationID in view.getApp().getReferences()) {
                     // Add a citation.
                     segments.push(
                             <sup key={index} className="citation-symbol">{citationNumber}</sup>
@@ -1528,7 +1528,7 @@ class CitationsNode extends Node {
 
         return <span className="citation" key={key}>
             <Marginal
-                app={app}
+                chapter={view}
                 id={"citation-" + citations.join("-")}
                 interactor={segments}
                 content={
@@ -1537,12 +1537,12 @@ class CitationsNode extends Node {
 
                             let citationNumber = chapter.getCitationNumber(citationID);
 
-                            return app.getReferences(citationID) ?
+                            return view.getApp().getReferences(citationID) ?
                                 <span 
                                     key={index} 
                                     className="reference">
                                         <sup className="citation-symbol">{citationNumber}</sup>
-                                        {Parser.parseReference(app.getReferences()[citationID], app, true)}
+                                        {Parser.parseReference(view.getApp().getReferences()[citationID], view.getApp(), true)}
                                 </span> :
                                 null
                     })}
@@ -1566,10 +1566,10 @@ class DefinitionNode extends Node {
         this.glossaryID = glossaryID;
     }
 
-    toDOM(app, chapter, query, key) {
+    toDOM(view, chapter, query, key) {
 
         // Find the definition.
-        let glossary = app.getGlossary();
+        let glossary = view.getApp().getGlossary();
 
         if(!(this.glossaryID in glossary))
             return <span key={key} className="alert alert-danger">Unknown glossary entry "{this.glossaryID}"</span>
@@ -1578,9 +1578,9 @@ class DefinitionNode extends Node {
 
         return <span className="terminology" key={key}>
             <Marginal
-                app={app}
+                chapter={view}
                 id={"glossary-" + this.glossaryID}
-                interactor={this.phrase.toDOM(app, chapter, query)}
+                interactor={this.phrase.toDOM(view, chapter, query)}
                 content={
                     <span className="definition">
                         <strong>{entry.phrase}</strong>: {entry.definition}
@@ -1605,7 +1605,7 @@ class FootnoteNode extends Node {
         super();
         this.footnote = footnote;
     }
-    toDOM(app, chapter, query, key) {
+    toDOM(view, chapter, query, key) {
 
         // If no chapter was provided, then don't render the footnote, since there's no context in which to render it.
         if(!chapter)
@@ -1613,14 +1613,14 @@ class FootnoteNode extends Node {
 
         // What footnote number is this?
         let number = chapter.getFootnotes().indexOf(this);
-        let letter = app.getFootnoteSymbol(number);
+        let letter = view.getApp().getFootnoteSymbol(number);
 
         return <span className="footnote-link" key={key}>
             <Marginal 
-                app={app}
+                chapter={view}
                 id={"footnote-" + number}
                 interactor={<sup className="footnote-symbol">{letter}</sup>}
-                content={<span className="footnote"><sup className="footnote-symbol">{letter}</sup> {this.footnote.toDOM(app, chapter, query)}</span>} 
+                content={<span className="footnote"><sup className="footnote-symbol">{letter}</sup> {this.footnote.toDOM(view, chapter, query)}</span>} 
             />
         </span>
 
@@ -1638,8 +1638,8 @@ class ContentNode extends Node {
         this.segments = segments;
     }
 
-    toDOM(app, chapter, query, key) {
-        return <span key={key}>{_map(this.segments, (segment, index) => segment.toDOM(app, chapter, query, "content-" + index))}</span>;
+    toDOM(view, chapter, query, key) {
+        return <span key={key}>{_map(this.segments, (segment, index) => segment.toDOM(view, chapter, query, "content-" + index))}</span>;
     }
 
     toText() {
@@ -1654,10 +1654,10 @@ class SubSuperscriptNode extends Node {
         this.content = content;
     }
 
-    toDOM(app, chapter, query, key) {
+    toDOM(view, chapter, query, key) {
         return this.superscript?
-            <sup key={key}>{this.content.toDOM(app, chapter, query, "sup-")}</sup> :
-            <sub key={key}>{this.content.toDOM(app, chapter, query, "sub-")}</sub>;
+            <sup key={key}>{this.content.toDOM(view, chapter, query, "sup-")}</sup> :
+            <sub key={key}>{this.content.toDOM(view, chapter, query, "sub-")}</sub>;
     }
 
     toText() {
@@ -1672,7 +1672,7 @@ class TextNode extends Node {
         this.position = position - text.length;
     }
 
-    toDOM(app, chapter, query, key) {
+    toDOM(view, chapter, query, key) {
         
         // Is there a query we're supposed to highlight? If so, highlight it.
         if(query) {
@@ -1725,7 +1725,7 @@ class ErrorNode extends Node {
         metadata.errors.push(this);
     }
 
-    toDOM(app, chapter, query, key) {
+    toDOM(view, chapter, query, key) {
         return <span key={key} className="alert alert-danger">Error: {this.error}</span>;
     }
 

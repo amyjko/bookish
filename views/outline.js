@@ -10,14 +10,12 @@ class Outline extends React.Component {
 
         this.toggle = this.toggle.bind(this);
 
-        this.state = { collapsed: true };
-
         this.layout = this.layout.bind(this);
 
     }
 
     toggle() {
-        this.setState({ collapsed: !this.state.collapsed }, () => this.layout());
+        this.props.chapter.toggleOutline(!this.props.expanded, this.layout);
     }
 
     // Position outline after first render.
@@ -47,17 +45,24 @@ class Outline extends React.Component {
 
 			if(inFooter) {
 				outline.style.removeProperty("left");
-                outline.style.transform = this.state.collapsed ? "translateY(-4em)" : "translateY(-100%)";
+                outline.style.transform = this.props.expanded ? "translateY(-100%)" : "translateY(-4em)";
 			}
 			else {
                 outline.style.removeProperty("transform");
 				let titleX = title.getBoundingClientRect().left + window.scrollX;
 				outline.style.left = titleX + "px";
-                this.setState({ collapsed: true });
+                this.props.chapter.toggleOutline(false);
 			}
 		}
 		
 	}
+
+    componentDidUpdate(prevProps) {
+
+        if(this.props.expanded !== prevProps.expanded)
+            this.layout();
+
+    }
 
 	render() {
 
