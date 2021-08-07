@@ -12,15 +12,9 @@ class Outline extends React.Component {
 
         this.state = { collapsed: true };
 
-        window.addEventListener('resize', this.layout.bind(this));
-		window.addEventListener('scroll', this.layout.bind(this));
+        this.layout = this.layout.bind(this);
 
     }
-
-    componentWillUnmount() {
-		window.removeEventListener('scroll', this.layout);
-		window.removeEventListener('resize', this.layout);
-	}
 
     toggle() {
         this.setState({ collapsed: !this.state.collapsed }, () => this.layout());
@@ -28,7 +22,18 @@ class Outline extends React.Component {
 
     // Position outline after first render.
     componentDidMount() {
+
+        window.addEventListener('resize', this.layout);
+		window.addEventListener('scroll', this.layout);
+
         this.layout();
+    }
+
+    componentWillUnmount() {
+
+		window.removeEventListener('scroll', this.layout);
+		window.removeEventListener('resize', this.layout);
+
     }
 
     layout() {

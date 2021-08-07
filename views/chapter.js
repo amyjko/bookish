@@ -51,8 +51,10 @@ class Chapter extends React.Component {
 	}
 
 	componentWillUnmount() {
+
 		window.removeEventListener('scroll', this.handleScroll);
 		window.removeEventListener('resize', this.handleResize);
+
 	}
 
 	componentDidUpdate() {
