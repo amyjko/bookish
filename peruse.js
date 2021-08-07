@@ -289,31 +289,31 @@ class Peruse extends React.Component {
 
 	}
 
+	// Given the current chapter, find the available chapter after it.
 	getNextChapter(id) {
 
-		var chapters = this.getChapters();
-		for(var i = 0; i < chapters.length; i++) {
-			if(chapters[i].id === id) {
-				if(i < chapters.length - 1)
-					return this.getContent(chapters[i + 1].id);
-				else
-					return null;
-			}
+		let chapters = this.getChapters();
+		let after = false;
+		for(let i = 0; i < chapters.length; i++) {
+			if(chapters[i].id === id)
+				after = true;
+			else if(after && this.chapterIsLoaded(chapters[i].id))
+				return this.getContent(chapters[i].id);
 		}
 		return null;
 
 	}
 
+	// Given a chapter id, find the available chapter before it.
 	getPreviousChapter(id) {
 
-		var chapters = this.getChapters();
-		for(var i = 0; i < chapters.length; i++) {
-			if(chapters[i].id === id) {
-				if(i > 0)
-					return this.getContent(chapters[i - 1].id);
-				else
-					return null;
-			}
+		let chapters = this.getChapters();
+		let before = false;
+		for(let i = chapters.length - 1; i >= 0; i--) {
+			if(chapters[i].id === id)
+				before = true;
+			else if(before && this.chapterIsLoaded(chapters[i].id))
+				return this.getContent(chapters[i].id);
 		}
 		return null;
 

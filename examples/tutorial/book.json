@@ -22,18 +22,18 @@
 			"image": "|unknown.jpg|A photo of skeptical Boomy|Time to learn about errors, huh?|Amy J. Ko|"
 		},
 		{
-			"id": "errors",
-			"title": "Errors",
-			"authors": ["ajko", "boomy"],
-			"image": "|unknown.jpg|A photo of skeptical Boomy|Time to learn about errors, huh?|Amy J. Ko|",
-			"section": "Part I"
-		},
-		{
 			"id": "unfinished",
 			"title": "Unfinished",
 			"authors": ["ajko"],
 			"image": "|unknown.jpg|A photo of skeptical Boomy|Time to learn about errors, huh?|Amy J. Ko|",
 			"section": "Part II"
+		},
+		{
+			"id": "errors",
+			"title": "Errors",
+			"authors": ["ajko", "boomy"],
+			"image": "|unknown.jpg|A photo of skeptical Boomy|Time to learn about errors, huh?|Amy J. Ko|",
+			"section": "Part I"
 		}
 	],
 	"tags": [ "draft" ],
