@@ -159,6 +159,13 @@ class Chapter extends React.Component {
 			}
 		}
 
+		let references = document.getElementById("references");
+		if(references) {
+			let rect = references.getBoundingClientRect();
+			if(top > rect.y + top - rect.height)
+				indexOfNearestHeaderAbove = headers.length;
+		}
+
 		// Update the outline and progress bar.
 		this.setState({ headerIndex: indexOfNearestHeaderAbove });
 
@@ -345,6 +352,7 @@ class Chapter extends React.Component {
 			let chapterSection = this.props.app.getChapterSection(this.props.id);
 			let chapterAST = this.ast;
 			let citations = chapterAST.getCitations();
+			let hasReferences = Object.keys(citations).length > 0;
 			let headers = chapterAST.getHeaders();
 			return (
 				<div className="chapter">
@@ -387,6 +395,7 @@ class Chapter extends React.Component {
 						headerIndex={this.state.headerIndex}
 						previous={this.props.app.getPreviousChapter(this.props.id)}
 						next={this.props.app.getNextChapter(this.props.id)}
+						references={hasReferences}
 					/>
 
 					{ /* Render the editor if we're editing */ }
@@ -398,16 +407,16 @@ class Chapter extends React.Component {
 					}
 					</div>
 					{
-						Object.keys(citations).length === 0 ? null :
+						!hasReferences ? null :
 						<div>
-							<h1>References</h1>
+							<h1 id="references">References</h1>
 
 							<ol>
 							{
 								_map(Object.keys(citations).sort(), citationID => {
-									var refs = this.props.app.getReferences();
+									let refs = this.props.app.getReferences();
 									if(citationID in refs) {
-										var ref = refs[citationID];
+										let ref = refs[citationID];
 										return <li key={"citation-" + citationID} className={citationID === citationHighlight ? "reference content-highlight" : "reference"} id={"ref-" + citationID}>
 											{Parser.parseReference(ref, this.props.app)}
 										</li>

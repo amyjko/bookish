@@ -88,6 +88,14 @@ class Outline extends React.Component {
                             </div>
                     )
                 }
+                {/* Link to references */ }
+                {
+                    this.props.references ? 
+                        <div className={"outline-header outline-header-level-0" + (this.props.headerIndex === this.props.headers.length ? " outline-header-active" : "")}>
+                            <NavHashLink smooth to="#references">References</NavHashLink>
+                        </div> :
+                        null
+                }
             </div>
         );
 	}
