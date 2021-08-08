@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,700;1,400;1,700&display=block');
+@import url('https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,700;1,400;1,700&family=Raleway:ital,wght@0,400;0,700;1,400;1,700&display=block');
 
 body {
 	max-width: 800px;
@@ -20,6 +20,7 @@ body {
 }
 
 .h1, .h2, .h3, .h4, .h5, .h6, h1, h2, h3, h4, h5, h6 {
+	font-family: "Raleway", serif;
 	font-weight: 700;
 }
 
@@ -308,7 +309,6 @@ blockquote .blockquote-caption {
 
 .alert-danger {
 	font-weight: 400;
-	font-family: "Lora", serif;
 	padding: .25em;
 }
 
@@ -465,6 +465,7 @@ blockquote .blockquote-caption {
 }
 
 .chapter-number {
+	font-family: "Raleway";
 	font-weight: normal;
 	font-style: italic;
 	color: gray;
