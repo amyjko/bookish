@@ -125,9 +125,39 @@ ol ol ol li {
 		padding: 1em;
 		border-top: 1px solid lightGray;
 		background-color: white;
-		text-align: center;
+		text-align: left;
 		transition: transform 0.2s ease-in;
 		cursor: pointer;
+	}
+
+	/* Make a little centered box to store the outline to preserve its left aligned structure, while making it easier to click. */
+	.outline-headers {
+		margin-left: auto;
+		margin-right: auto;
+		width: 12em;
+	}
+
+	/* Center the navigation buttons since they peek above when collapsed. */
+	.outline-header-nav {
+		text-align: center;
+	}
+
+	.outline-collapse-cue {
+		float: right;
+		transition: transform 0.2s ease-in;
+		margin-top: -.5em;
+	}
+
+	.outline-expanded .outline-collapse-cue {
+		transform: rotate(180deg);
+	}
+
+	.outline.outline-expanded {
+		transform: translateY(-100%);
+	}
+
+	.outline.outline-collapsed {
+		transform: translateY(-3.5em);
 	}
 
 }
@@ -184,6 +214,10 @@ ol ol ol li {
 		padding: 0.5em;
 		transform: translateX(-14em);
 		background-color: white;
+	}
+
+	.outline-collapse-cue {
+		display: none;
 	}
 
 }
