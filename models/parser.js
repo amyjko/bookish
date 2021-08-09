@@ -3,10 +3,9 @@ import _each from 'lodash/each';
 
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { NavHashLink } from "react-router-hash-link";
-import { Figure } from './views/image';
-import { Marginal } from './views/marginal';
-import { Code } from './views/code';
+import { Figure } from './../views/image';
+import { Marginal } from './../views/marginal';
+import { Code } from './../views/code';
 
 // TODO This grammar is slightly out of date.
 // A simple recursive descent parser for this grammar.
@@ -61,12 +60,12 @@ class Parser {
         return (new Parser(text)).parseEmbed(book);
     }
 
-    static parseReference(ref, app, short=false) {
+    static parseReference(ref, book, short=false) {
 
         var dom = null;
 
         if(typeof ref === "string")
-            dom = Parser.parseContent(app, ref).toDOM();
+            dom = Parser.parseContent(book, ref).toDOM();
         else if(Array.isArray(ref)) {
             // APA Format. Could eventually suppport multiple formats.
             if(ref.length >= 4) {
@@ -78,7 +77,7 @@ class Parser {
                 let summary = ref.length === 6 ? ref[5] : null;
                 // Convert sources using the source mapping. Yay consistency!
                 if(source.charAt(0) === "#") {
-                    source = app.getSource(source);
+                    source = book.getSource(source);
                     if(source === null)
                         source = <span className="alert alert-danger">Unknown source <code>{ref[3]}</code></span>;
                 }
@@ -1509,7 +1508,7 @@ class CitationsNode extends Node {
             (citationID, index) => {
                 // Find the citation number. There should always be one,
                 let citationNumber = chapter.getCitationNumber(citationID)
-                if(citationNumber !== null && citationID in view.getApp().getReferences()) {
+                if(citationNumber !== null && citationID in view.getBook().getReferences()) {
                     // Add a citation.
                     segments.push(
                             <sup key={index} className="citation-symbol">{citationNumber}</sup>
@@ -1537,12 +1536,12 @@ class CitationsNode extends Node {
 
                             let citationNumber = chapter.getCitationNumber(citationID);
 
-                            return view.getApp().getReferences(citationID) ?
+                            return view.getBook().getReferences(citationID) ?
                                 <span 
                                     key={index} 
                                     className="reference">
                                         <sup className="citation-symbol">{citationNumber}</sup>
-                                        {Parser.parseReference(view.getApp().getReferences()[citationID], view.getApp(), true)}
+                                        {Parser.parseReference(view.getBook().getReferences()[citationID], view.getBook(), true)}
                                 </span> :
                                 null
                     })}
@@ -1569,7 +1568,7 @@ class DefinitionNode extends Node {
     toDOM(view, chapter, query, key) {
 
         // Find the definition.
-        let glossary = view.getApp().getGlossary();
+        let glossary = view.getBook().getGlossary();
 
         if(!(this.glossaryID in glossary))
             return <span key={key} className="alert alert-danger">Unknown glossary entry "{this.glossaryID}"</span>
@@ -1613,7 +1612,7 @@ class FootnoteNode extends Node {
 
         // What footnote number is this?
         let number = chapter.getFootnotes().indexOf(this);
-        let letter = view.getApp().getFootnoteSymbol(number);
+        let letter = view.getBook().getFootnoteSymbol(number);
 
         return <span className="footnote-link" key={key}>
             <Marginal 

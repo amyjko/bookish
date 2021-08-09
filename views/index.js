@@ -1,4 +1,3 @@
-import _each from 'lodash/each';
 import _map from 'lodash/map';
 import React from 'react';
 import { Link } from 'react-router-dom';
@@ -8,7 +7,7 @@ class Index extends React.Component {
 
     shouldComponentUpdate() {
 
-        return this.props.app.chaptersAreLoaded();
+        return this.props.app.getBook().chaptersAreLoaded();
 
     }
 
@@ -18,17 +17,22 @@ class Index extends React.Component {
 
 	render() {
 
-        var bookIndex = this.props.app.getBookIndex();
+        let book = this.props.app.getBook();
+
+        if(!book.isSpecificationLoaded())
+            return null;
+
+        var bookIndex = book.getBookIndex();
 
         var rows = [];
         var currentLetter = undefined;
         var letters = {};
 
         // Build a list of words in alphabetical order.
-        _each(Object.keys(bookIndex).sort((a, b) => a.localeCompare(b)), (word, index) => {
+        Object.keys(bookIndex).sort((a, b) => a.localeCompare(b)).forEach((word, index) => {
 
             // This block of code renders headers for letter groups
-            var firstLetter = word.charAt(0).toLowerCase();
+            let firstLetter = word.charAt(0).toLowerCase();
 
             // Update the letter that we're on.
             if(currentLetter !== firstLetter) {
@@ -42,37 +46,38 @@ class Index extends React.Component {
                     <tr key={"entry-" + index}>
                         <td>{word}</td>
                         <td>
-                            {_map(
+                            {
                                 // Sort the chapters by chapter number
-                                bookIndex[word].sort((a, b) => {
-                                    let numberA = this.props.app.getChapterNumber(a);
-                                    let numberB = this.props.app.getChapterNumber(b);
-                                    if(numberA === null) return -1;
-                                    if(numberB === null) return 1;
-                                    return numberA - numberB;
-                                }), 
-                                (chapterID, index) => 
-                                    <span key={index}>
-                                        Chapter { this.props.app.getChapterNumber(chapterID) !== null ? <span> {this.props.app.getChapterNumber(chapterID)}. </span>: null}<Link to={"/" + chapterID + "/" + word}>{this.props.app.getChapterName(chapterID)}</Link>
-                                        {index < bookIndex[word].length - 1 ? <br/> : null}
-                                    </span>
+                                bookIndex[word]
+                                    .sort((a, b) => {
+                                        let numberA = book.getChapterNumber(a);
+                                        let numberB = book.getChapterNumber(b);
+                                        if(numberA === undefined) return -1;
+                                        if(numberB === undefined) return 1;
+                                        return numberA - numberB;
+                                    })
+                                    .map(
+                                        (chapterID, index) => 
+                                            <span key={index}>
+                                                Chapter { book.getChapterNumber(chapterID) !== undefined ? <span> {book.getChapterNumber(chapterID)}. </span> : null}<Link to={"/" + chapterID + "/" + word}>{book.getChapterName(chapterID)}</Link>
+                                                {index < bookIndex[word].length - 1 ? <br/> : null}
+                                            </span>
                             )}
                         </td>
                     </tr>
                 );
-        })
+        });
 
 		return (
 			<div>
 				<h1>Index</h1>
-                <NavHashLink to={"/#toc"}>Table of Contents</NavHashLink>
 
                 <p><em>This index includes all words, excluding common English words, words with apostrophes, and words ending in -ly.</em></p>
 
                 <p>Pick a letter to browse:</p>
 
                 <p>
-                    { _map("abcdefghijklmnopqrstuvwxyz".split(""), 
+                    { "abcdefghijklmnopqrstuvwxyz".split("").map( 
                         (letter, index) => 
                             <span key={index} style={{display: "inline-block"}}>
                                 {
@@ -95,7 +100,7 @@ class Index extends React.Component {
                     </tbody>
                 </table>
 				<div className="navigation-footer">
-					<Link to={"/"}>Table of Contents</Link>
+					<Link to={"/"}>Home</Link>
 				</div>
             </div>
 		);

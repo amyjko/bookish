@@ -1,8 +1,5 @@
-import _map from 'lodash/map';
 import React from 'react';
 import { Link } from 'react-router-dom';
-
-import { Parser } from "../parser.js";
 
 class Glossary extends React.Component {
 
@@ -13,10 +10,9 @@ class Glossary extends React.Component {
 
 	render() {
 
-        var glossary = this.props.app.getGlossary();
+        var glossary = this.props.app.getBook().getGlossary();
 		// Sort by canonical phrases
 		var keys = Object.keys(glossary).sort((a, b) => a.phrase.localeCompare(b.phrase));
-
 
 		return (
 			<div>
@@ -24,8 +20,8 @@ class Glossary extends React.Component {
 
 				<table className="table">
 					<tbody>
-					{ _map(keys, key => 
-						<tr>
+					{ keys.map((key, index) => 
+						<tr key={"definition" + index}>
 							<td><strong>{glossary[key].phrase}</strong></td>
 							<td>
 								{ glossary[key].definition }
@@ -37,7 +33,7 @@ class Glossary extends React.Component {
 				</table>
 
 				<div className="navigation-footer">
-					<Link to={"/"}>Table of Contents</Link>
+					<Link to={"/"}>Home</Link>
 				</div>
 			</div>
 		);

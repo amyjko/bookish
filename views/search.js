@@ -29,16 +29,18 @@ class Search extends React.Component {
 
 	render() {
 
+        let book = this.props.app.getBook();
+
         var results = [];
         var query = this.state.query.toLowerCase();
         var matchCount = 0;
 
         // Go through all the chapter indexes and find matches.
         if(query.length > 2)
-            _each(this.props.app.getChapters(), chapter => {
-                var chapterID = chapter.id;
-                var index = this.props.app.getChapterIndex(chapterID);
-                let chapterNumber = this.props.app.getChapterNumber(chapterID);
+            book.getChapters().forEach(chapter => {
+                let chapterID = chapter.id;
+                let index = book.getChapter(chapterID).getIndex();
+                let chapterNumber = book.getChapterNumber(chapterID);
 
                 // No index yet? Skip this chapter.
                 if(index === null)
@@ -59,7 +61,7 @@ class Search extends React.Component {
                 matchCount += chapterMatches.length;
 
                 if(chapterMatches.length > 0) {
-                    results.push(<h2 key={"header-" + chapterID}>Chapter{chapterNumber === null ? "" : " " + chapterNumber} - {chapter.title}</h2>);
+                    results.push(<h2 key={"header-" + chapterID}>Chapter{chapterNumber === undefined ? "" : " " + chapterNumber} - {chapter.title}</h2>);
                     _each(chapterMatches, (match, index) => {
                         // Only highlight the part of the word that matches.
                         var start = match.match.indexOf(query);
@@ -76,7 +78,6 @@ class Search extends React.Component {
 		return (
 			<div>
 				<h1>Search</h1>
-                <NavHashLink to={"/#toc"}>Table of Contents</NavHashLink>
 
                 <p>Type a word—just a single word—and we'll show its occurrences in this book:</p>
 
@@ -105,7 +106,7 @@ class Search extends React.Component {
                     )
                 }
 				<div className="navigation-footer">
-					<Link to={"/"}>Table of Contents</Link>
+					<Link to={"/"}>Home</Link>
 				</div>
             </div>
 		);

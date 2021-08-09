@@ -1,9 +1,8 @@
-import _map from 'lodash/map';
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { Header } from "./header";
 import { Authors } from "./authors";
-import { Parser } from "../parser";
+import { Parser } from "../models/parser";
 
 class TableOfContents extends React.Component {
 
@@ -37,6 +36,9 @@ class TableOfContents extends React.Component {
 
 	render() {
 
+		// Get the book being rendered.
+		let book = this.props.app.getBook();
+
 		// Get the chapter progress
 		var progress = localStorage.getItem("chapterProgress");
 		if(progress === null) {
@@ -45,10 +47,10 @@ class TableOfContents extends React.Component {
 			progress = JSON.parse(progress);
 		}
 
-		var readingTime = this.props.app.getBookReadingTime();
+		var readingTime = book.getBookReadingTime();
 
 		// Is there a colon? Let's make a subtitle
-		let title = this.props.app.getTitle();
+		let title = book.getTitle();
 		let subtitle = null;
 		let colon = title.indexOf(":");
 		if(colon >= 0) {
@@ -60,28 +62,28 @@ class TableOfContents extends React.Component {
 			<div className="toc">
 
 				<Header 
-					image={this.props.app.getCover()} 
+					image={book.getCover()} 
 					header={title}
 					subtitle={subtitle}
-					tags={this.props.app.getTags()}
-					content={<Authors authors={this.props.app.getAuthors()} />}
+					tags={book.getTags()}
+					content={<Authors authors={book.getAuthors()} />}
 				/>
 
-				{Parser.parseChapter(this.props.app, this.props.app.getDescription()).toDOM()}
+				{Parser.parseChapter(book, book.getDescription()).toDOM()}
 
 				<h2>Chapters <small><small className="text-muted"><em>{readingTime < 60 ? Math.max(5, (Math.floor(readingTime / 10) * 10)) + " min read" : "~" + Math.round(readingTime / 60.0) + " hour read" }</em></small></small></h2>
 
 				<table className="table" id="toc">
 					<tbody>
 						{
-							_map(this.props.app.getChapters(), (chapter, index) => {
+							book.getChapters().map((chapter, index) => {
 
 								// Get the image, chapter number, and section for rendering.
-								let image = Parser.parseEmbed(this.props.app, chapter.image).toJSON();
-								let chapterNumber = this.props.app.getChapterNumber(chapter.id);
-								let section = this.props.app.getChapterSection(chapter.id);
+								let image = Parser.parseEmbed(book, chapter.image).toJSON();
+								let chapterNumber = book.getChapterNumber(chapter.id);
+								let section = book.getChapterSection(chapter.id);
 
-								let readingTime = this.props.app.getChapterReadingTime(chapter.id);
+								let readingTime = book.getChapterReadingTime(chapter.id);
 								let readingEstimate =
 									readingTime === undefined ? "Forthcoming" :
 									readingTime < 5 ? "<5 min read" :
@@ -100,10 +102,10 @@ class TableOfContents extends React.Component {
 										</td>
 										<td>
 											<div>
-												{ chapterNumber === null ? null : <div className="chapter-number">{"Chapter " + chapterNumber}</div> }
+												{ chapterNumber === undefined ? null : <div className="chapter-number">{"Chapter " + chapterNumber}</div> }
 												<div>
 													{
-														this.props.app.chapterIsLoaded(chapter.id) ? 
+														book.chapterIsLoaded(chapter.id) ? 
 															<Link to={"/" + chapter.id}>{chapter.title}</Link> :
 															<span>{chapter.title}</span>
 													}
@@ -129,7 +131,7 @@ class TableOfContents extends React.Component {
 							})
 						}
 						{
-							this.props.app.getReferences() === null ? null :
+							book.getReferences() === null ? null :
 							<tr key="references">
 								<td></td>
 								<td><Link to="/references">References</Link><br/><small className="text-muted"><em>Everything cited</em></small></td>
@@ -137,7 +139,7 @@ class TableOfContents extends React.Component {
 							</tr>
 						}
 						{
-							this.props.app.getGlossary() && Object.keys(this.props.app.getGlossary()).length > 0 ?
+							book.getGlossary() && Object.keys(book.getGlossary()).length > 0 ?
 							<tr key="glossary">
 								<td></td>
 								<td><Link to="/glossary">Glossary</Link><br/><small className="text-muted"><em>Definitions</em></small></td>
@@ -159,13 +161,13 @@ class TableOfContents extends React.Component {
 
 				<h2>License</h2>
 
-				<p>{this.props.app.getLicense() ? Parser.parseContent(this.props.app, this.props.app.getLicense()).toDOM() : "All rights reserved."}</p>
+				<p>{book.getLicense() ? Parser.parseContent(book, book.getLicense()).toDOM() : "All rights reserved."}</p>
 
 				<h2>Revisions</h2>
 				
 				<ul>
-					{_map(this.props.app.getRevisions(), (revision, index) => {
-						return <li key={"revision" + index}><em>{revision[0]}</em>. {Parser.parseContent(this.props.app, revision[1]).toDOM()}</li>;
+					{book.getRevisions().map((revision, index) => {
+						return <li key={"revision" + index}><em>{revision[0]}</em>. {Parser.parseContent(book, revision[1]).toDOM()}</li>;
 					})}
 				</ul>
 

@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { Parser } from "../parser";
+import { Parser } from "../models/parser";
 
 class Header extends React.Component {
 

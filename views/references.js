@@ -2,7 +2,7 @@ import _map from 'lodash/map';
 import React from 'react';
 import { Link } from 'react-router-dom';
 
-import { Parser } from "../parser.js";
+import { Parser } from "../models/parser.js";
 
 class References extends React.Component {
 
@@ -13,7 +13,9 @@ class References extends React.Component {
 
 	render() {
 
-        var references = this.props.app.getReferences();
+		let book = this.props.app.getBook();
+
+        var references = book.getReferences();
         if(references && references.length === 0)
             references = null;
 
@@ -24,11 +26,11 @@ class References extends React.Component {
                     references === null ?
                         <p>This book has no references.</p> :
                         _map(Object.keys(references).sort(), (citationID) => {
-                            return <p key={citationID}>{Parser.parseReference(references[citationID], this.props.app)}</p>
+                            return <p key={citationID}>{Parser.parseReference(references[citationID], book)}</p>
                         })
                 }
 				<div className="navigation-footer">
-					<Link to={"/"}>Table of Contents</Link>
+					<Link to={"/"}>Home</Link>
 				</div>
 			</div>
 		);

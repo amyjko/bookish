@@ -7,7 +7,7 @@ class Unknown extends React.Component {
 	render() {
 
 		return <Header 
-			image={this.props.app.getBook() ? this.props.app.getUnknown() : null } 
+			image={this.props.app.getBook().getSpecification() ? this.props.app.getBook().getUnknown() : null } 
 			header="Uh oh."
 			content={this.props.message}
 		/>

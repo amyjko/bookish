@@ -4,7 +4,7 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { NavHashLink } from "react-router-hash-link";
 
-import { Parser } from "../parser";
+import { Parser } from "../models/parser";
 import { Header } from './header';
 import { Authors } from "./authors";
 import { Outline } from './outline';
@@ -19,8 +19,6 @@ class Chapter extends React.Component {
 		this.handleDoubleClick = this.handleDoubleClick.bind(this);
 		this.handleChange = this.handleChange.bind(this);
 
-		this.ast = null;
-
 		// Assume the chapter is loaded initially.
 		this.state = { 
 			loaded: true, 
@@ -34,6 +32,7 @@ class Chapter extends React.Component {
 	}
 
 	getApp() { return this.props.app; }
+	getBook() { return this.props.app.getBook(); }
 
 	componentDidMount() {
 
@@ -41,8 +40,7 @@ class Chapter extends React.Component {
 		window.addEventListener('resize', this.handleResize);
 
 		// If the component renders after the chapter is loaded and rendered, scroll to the last location.
-		var chapter = this.props.app.getContent(this.props.id);
-		if(chapter) {
+		if(this.props.app.getBook().chapterIsLoaded(this.props.id)) {
 			this.scrollToLastLocation();
 		}
 		// Otherwise, mark it as not loaded.
@@ -64,8 +62,7 @@ class Chapter extends React.Component {
 	componentDidUpdate() {
 
 		// If the chapter was rendered, and the chapter wasn't yet loaded, but now it is, scroll to the last location.
-		let chapter = this.props.app.getContent(this.props.id);
-		if(!this.state.loaded && chapter) {
+		if(!this.state.loaded && this.props.app.getBook().chapterIsLoaded(this.props.id)) {
 
 			// Remember that it was loaded.
 			this.setState({ loaded: true});
@@ -180,21 +177,16 @@ class Chapter extends React.Component {
 	handleDoubleClick(event) {
 
 		if(event.shiftKey) {
-
-			var chapter = this.props.app.getContent(this.props.id);
-
-			this.setState({ editing: true, draft: chapter.text })
+			this.setState({ editing: true, draft: this.props.app.getBook().getChapter(this.props.id).getText() })
 		}
 
 	}
 
 	handleChange(event) {
 
-		var chapter = this.props.app.getContent(this.props.id);
+		// TODO 
+		var chapter = this.props.app.getBook().getChapter(this.props.id).getText();
 		chapter.text = event.target.value;
-
-		// Invalidate the parse cache.
-		this.ast = null;
 
 		// What position should we scroll to?
 		let position = event.target.selectionStart;
@@ -243,7 +235,7 @@ class Chapter extends React.Component {
 			<textarea 
 				className="editor-text" 
 				onChange={this.handleChange} 
-				value={this.props.app.getContent(this.props.id).text}
+				value={this.props.app.getBook().getChapter(this.props.id).getText()}
 			>
 			</textarea>
 			<button onClick={() => { this.removeHighlights(); this.setState({editing: false})}}>Done</button>
@@ -350,7 +342,7 @@ class Chapter extends React.Component {
 
 	render() {
 
-		var chapter = this.props.app.getContent(this.props.id);
+		let book = this.props.app.getBook();
 
 		// Figure out if there's something to highlight.
 		var citationHighlight = null;
@@ -366,24 +358,17 @@ class Chapter extends React.Component {
 				noteHighlight = parseInt(id);
 		}
 
-		if(chapter === undefined) {
+		if(!book.chapterIsLoaded(this.props.id)) {
 			return null;
-		}
-		else if(chapter === null) {
-			return <p className="alert alert-danger">Unable to load chapter.</p>;
 		}
 		else {
 
-			// Parse the chapter if necessary.
-			if(this.ast === null)
-				this.ast = Parser.parseChapter(this.props.app, chapter.text);
-
-			let chapterNumber = this.props.app.getChapterNumber(this.props.id);
-			let chapterSection = this.props.app.getChapterSection(this.props.id);
-			let chapterAST = this.ast;
-			let citations = chapterAST.getCitations();
+			let chapter = book.getChapter(this.props.id);
+			let chapterNumber = book.getChapterNumber(this.props.id);
+			let chapterSection = book.getChapterSection(this.props.id);
+			let citations = chapter.getAST().getCitations();
 			let hasReferences = Object.keys(citations).length > 0;
-			let headers = chapterAST.getHeaders();
+			let headers = chapter.getAST().getHeaders();
 			return (
 				<div className="chapter">
 					<Header 
@@ -391,7 +376,7 @@ class Chapter extends React.Component {
 						header={
 							<span>
 								{
-									chapterNumber === null ? 
+									chapterNumber === undefined ? 
 										null : 
 										<span className="chapter-number">Chapter {chapterNumber}</span> 
 								}
@@ -408,13 +393,13 @@ class Chapter extends React.Component {
 								<span id="title" className="chapter-title">{chapter.title}</span>
 							</span>
 						}
-						tags={this.props.app.getTags()}
+						tags={book.getTags()}
 						/* If there are chapter authors, map them to authors declared in the book title, otherwise use all the authors of the book */
 						content={
 							<Authors authors={
 									chapter.authors ? 
-										_map(chapter.authors, author => this.props.app.getAuthorByID(author)) : 
-										this.props.app.getAuthors()} 
+										_map(chapter.authors, author => book.getAuthorByID(author)) : 
+										book.getAuthors()} 
 							/>
 						} 
 					/>
@@ -424,8 +409,8 @@ class Chapter extends React.Component {
 						title={chapter.title}
 						headers={headers}
 						headerIndex={this.state.headerIndex}
-						previous={this.props.app.getPreviousChapter(this.props.id)}
-						next={this.props.app.getNextChapter(this.props.id)}
+						previous={book.getPreviousChapterID(this.props.id)}
+						next={book.getNextChapterID(this.props.id)}
 						references={hasReferences}
 						expanded={this.state.outlineExpanded}
 					/>
@@ -433,9 +418,10 @@ class Chapter extends React.Component {
 					{ /* Render the editor if we're editing */ }
 					{ this.state.editing ? this.renderEditor() : null }
 
+					{/* Render the chapter body */}
 					<div onDoubleClick={this.handleDoubleClick}>
 					{
-						chapterAST.toDOM(this, this.props.match.params.word)
+						chapter.getAST().toDOM(this, this.props.match.params.word)
 					}
 					</div>
 					{
@@ -445,12 +431,12 @@ class Chapter extends React.Component {
 
 							<ol>
 							{
-								_map(Object.keys(citations).sort(), citationID => {
-									let refs = this.props.app.getReferences();
+								Object.keys(citations).sort().map(citationID => {
+									let refs = book.getReferences();
 									if(citationID in refs) {
 										let ref = refs[citationID];
 										return <li key={"citation-" + citationID} className={citationID === citationHighlight ? "reference content-highlight" : "reference"} id={"ref-" + citationID}>
-											{Parser.parseReference(ref, this.props.app)}
+											{Parser.parseReference(ref, book)}
 										</li>
 
 									}
