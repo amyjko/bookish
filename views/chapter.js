@@ -1,8 +1,5 @@
 import  _map from 'lodash/map';
-import  _each from 'lodash/each';
 import React from 'react';
-import { Link } from 'react-router-dom';
-import { NavHashLink } from "react-router-hash-link";
 
 import { Parser } from "../models/parser";
 import { Header } from './header';
@@ -221,8 +218,7 @@ class Chapter extends React.Component {
 	removeHighlights() {
 
 		// Which text node is closest?
-		var highlights = document.getElementsByClassName("content-highlight");
-		_each(highlights, highlight => highlight.classList.remove("content-highlight"));
+		document.getElementsByClassName("content-highlight").forEach(highlight => highlight.classList.remove("content-highlight"));
 		
 	}
 

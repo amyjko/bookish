@@ -1,5 +1,4 @@
 import _map from 'lodash/map';
-import _each from 'lodash/each';
 
 import React from 'react';
 import { Link } from 'react-router-dom';
@@ -982,7 +981,7 @@ class Parser {
         // it will silently fail.
         if(metadata)
             // Record each citation for later.
-            _each(citations, citation => {
+            citations.forEach(citation => {
                 metadata.citations[citation] = true;
             });
 
@@ -1503,8 +1502,7 @@ class CitationsNode extends Node {
         });
 
         // Convert each citation ID until a link.
-        _each(
-            citations,
+        citations.forEach(
             (citationID, index) => {
                 // Find the citation number. There should always be one,
                 let citationNumber = chapter.getCitationNumber(citationID)
