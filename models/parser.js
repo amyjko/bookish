@@ -1,5 +1,3 @@
-import _map from 'lodash/map';
-
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { Figure } from './../views/image';
@@ -974,7 +972,7 @@ class Parser {
             this.read();
 
         // Trim any whitespace, then split by commas.
-        citations = _map(citations.trim().split(","), citation => citation.trim());
+        citations = citations.trim().split(",").map(citation => citation.trim());
 
         // We won't necessarily be gathering this data.
         // This does mean that if someone cites something in a non-chapter
@@ -1157,12 +1155,12 @@ class ChapterNode extends Node {
                 this.metadata.errors.length === 0 ? 
                     null : 
                     <p><span className="alert alert-danger">{this.metadata.errors.length + " " + (this.metadata.errors.length > 1 ? "errors" : "error")} below</span></p>}
-            {_map(this.blocks, (block, index) => block.toDOM(view, this, query, "block-" + index))}
+            { this.blocks.map((block, index) => block.toDOM(view, this, query, "block-" + index)) }
         </div>;
     }
 
     toText() {
-        return _map(this.blocks, block => block.toText()).join(" ");
+        return this.blocks.map(block => block.toText()).join(" ");
     }
 
 }
@@ -1260,7 +1258,7 @@ class BulletedListNode extends Node {
 
     toDOM(view, chapter, query, key) {
         return <ul key={key}>{
-            _map(this.items, (item, index) =>
+            this.items.map((item, index) =>
                 item instanceof BulletedListNode ?
                     item.toDOM(view, chapter, query, "item-" + index) :
                     <li key={"item-" + index}>{item.toDOM(view, chapter, query)}</li>
@@ -1269,7 +1267,7 @@ class BulletedListNode extends Node {
     }
 
     toText() {
-        return _map(this.items, item => item.toText()).join(" ");
+        return this.items.map(item => item.toText()).join(" ");
     }
 
 }
@@ -1282,7 +1280,7 @@ class NumberedListNode extends Node {
 
     toDOM(view, chapter, query, key) {
         return <ol key={key}>{
-            _map(this.items, (item, index) =>
+            this.items.map((item, index) =>
                 item instanceof NumberedListNode ?
                     item.toDOM(view, chapter, query, "item-" + index) :
                     <li key={"item-" + index}>{item.toDOM(view, chapter, query)}</li>
@@ -1291,7 +1289,7 @@ class NumberedListNode extends Node {
     }
 
     toText() {
-        return _map(this.items, item => item.toText()).join(" ");
+        return this.items.map(item => item.toText()).join(" ");
     }
 
 }
@@ -1330,14 +1328,14 @@ class QuoteNode extends Node {
     toDOM(view, chapter, query, key) {
 
         return <blockquote className={"blockquote " + (this.position === "<" ? "marginal-left-inset" : this.position === ">" ? "marginal-right-inset" : "")} key={key}>
-            {_map(this.elements, (element, index) => element.toDOM(view, chapter, query, "quote-" + index))}
-            {this.credit ? <div className="blockquote-caption"><span>{this.credit.toDOM(view, chapter, query)}</span></div> : null }
+            { this.elements.map((element, index) => element.toDOM(view, chapter, query, "quote-" + index)) }
+            { this.credit ? <div className="blockquote-caption"><span>{this.credit.toDOM(view, chapter, query)}</span></div> : null }
         </blockquote>
 
     }
 
     toText() {
-        return _map(this.elements, element => element.toText()).join(" ") + (this.credit ? " " + this.credit.toText() : "");
+        return this.elements.map(element => element.toText()).join(" ") + (this.credit ? " " + this.credit.toText() : "");
     }
 
 }
@@ -1353,13 +1351,13 @@ class CalloutNode extends Node {
     toDOM(view, chapter, query, key) {
 
         return <div className={"callout " + (this.position === "<" ? "marginal-left-inset" : this.position === ">" ? "marginal-right-inset" : "")} key={key}>
-            {_map(this.elements, (element, index) => element.toDOM(view, chapter, query, "callout-" + index))}
+            { this.elements.map((element, index) => element.toDOM(view, chapter, query, "callout-" + index))}
         </div>
 
     }
 
     toText() {
-        return _map(this.elements, element => element.toText()).join(" ");
+        return this.elements.map(element => element.toText()).join(" ");
     }
 
 }
@@ -1385,12 +1383,12 @@ class TableNode extends Node {
                     <table className="table">
                         <tbody>
                         {
-                            _map(this.rows, (row, index) => 
+                            this.rows.map((row, index) => 
                                 <tr key={"row-" + index}>
                                     {
                                         row.length === 1 ?
                                             [<td key={"cell-" + index} colSpan={maxColumns}>{row[0].toDOM(view, chapter, query, "cell-" + index)}</td>] :
-                                            _map(row, (cell, index) => <td key={"cell-" + index}>{cell.toDOM(view, chapter, query, "cell-" + index)}</td>)
+                                            row.map((cell, index) => <td key={"cell-" + index}>{cell.toDOM(view, chapter, query, "cell-" + index)}</td>)
                                     }
                                 </tr>
                             )
@@ -1405,7 +1403,7 @@ class TableNode extends Node {
     }
 
     toText() {
-        return _map(this.rows, row => _map(row, cell => cell.toText()).join(", ")).join(", ");
+        return this.rows.map(row => row.map(cell => cell.toText()).join(", ")).join(", ");
     }
 
 }
@@ -1421,7 +1419,7 @@ class FormattedNode extends Node {
 
     toDOM(view, chapter, query, key) {
         
-        var segmentDOMs = _map(this.segments, (segment, index) => segment.toDOM(view, chapter, query, "formatted-" + index));
+        var segmentDOMs = this.segments.map((segment, index) => segment.toDOM(view, chapter, query, "formatted-" + index));
 
         if(this.format === "*")
             return <strong key={key}>{segmentDOMs}</strong>;
@@ -1435,7 +1433,7 @@ class FormattedNode extends Node {
     }
 
     toText() {
-        return _map(this.segments, segment => segment.toText()).join(" ");
+        return this.segments.map(segment => segment.toText()).join(" ");
     }
 
 }
@@ -1530,19 +1528,19 @@ class CitationsNode extends Node {
                 interactor={segments}
                 content={
                     <span className="references">
-                        {_map(citations, (citationID, index) => {
-
-                            let citationNumber = chapter.getCitationNumber(citationID);
-
-                            return view.getBook().getReferences(citationID) ?
-                                <span 
-                                    key={index} 
-                                    className="reference">
-                                        <sup className="citation-symbol">{citationNumber}</sup>
-                                        {Parser.parseReference(view.getBook().getReferences()[citationID], view.getBook(), true)}
-                                </span> :
-                                null
-                    })}
+                        {
+                            citations.map((citationID, index) => {
+                                let citationNumber = chapter.getCitationNumber(citationID);
+                                return view.getBook().getReferences(citationID) ?
+                                    <span 
+                                        key={index} 
+                                        className="reference">
+                                            <sup className="citation-symbol">{citationNumber}</sup>
+                                            {Parser.parseReference(view.getBook().getReferences()[citationID], view.getBook(), true)}
+                                    </span> :
+                                    null
+                            })
+                    }
                     </span>
                 }
             />
@@ -1636,11 +1634,11 @@ class ContentNode extends Node {
     }
 
     toDOM(view, chapter, query, key) {
-        return <span key={key}>{_map(this.segments, (segment, index) => segment.toDOM(view, chapter, query, "content-" + index))}</span>;
+        return <span key={key}>{ this.segments.map((segment, index) => segment.toDOM(view, chapter, query, "content-" + index))}</span>;
     }
 
     toText() {
-        return _map(this.segments, segment => segment.toText()).join(" ");
+        return this.segments.map(segment => segment.toText()).join(" ");
     }
 }
 

@@ -1,4 +1,3 @@
-import  _map from 'lodash/map';
 import React from 'react';
 
 import { Parser } from "../models/parser";
@@ -394,7 +393,7 @@ class Chapter extends React.Component {
 						content={
 							<Authors authors={
 									chapter.authors ? 
-										_map(chapter.authors, author => book.getAuthorByID(author)) : 
+										chapter.authors.map(author => book.getAuthorByID(author)) : 
 										book.getAuthors()} 
 							/>
 						} 

@@ -1,5 +1,4 @@
 import React from 'react';
-import _map from 'lodash/map';
 
 class Authors extends React.Component {
 
@@ -7,8 +6,7 @@ class Authors extends React.Component {
 		return (
             <div className="authors">
                 <em>by</em> {
-                    _map(
-                        this.props.authors, 
+                    this.props.authors.map( 
                         (author, index) => [
                             author.url ? <a key={"author-" + index} href={author.url} target="_blank">{author.name}</a> : author.name,
                             index < this.props.authors.length - 1 ? (", ") : null

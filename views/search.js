@@ -1,4 +1,3 @@
-import _map from 'lodash/map';
 import React from 'react';
 import { Link } from 'react-router-dom';
 
@@ -48,7 +47,7 @@ class Search extends React.Component {
                 var chapterMatches = [];
 
                 // What are all of the words in the index that match the query?
-                _map(Object.keys(index), word => {
+                Object.keys(index).forEach(word => {
                     if(query.length > 0 && word.indexOf(query) >= 0) {
                         index[word].forEach(match => {
                             chapterMatches.push(match);

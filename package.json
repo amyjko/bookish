@@ -32,7 +32,6 @@
 		"ajv": "^6.0",
 		"history": "^4.7.2",
 		"highlight.js": "11.1.0",
-		"lodash": "^4.17.10",
 		"react": "^16.3",
 		"react-dom": "^16.3",
 		"react-router-dom": "^5.2",

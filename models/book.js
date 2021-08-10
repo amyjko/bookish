@@ -1,6 +1,4 @@
 import Ajv from 'ajv';
-import _find from 'lodash/find';
-import _uniq from 'lodash/uniq';
 
 import { Chapter } from './chapter.js';
 
@@ -166,7 +164,7 @@ class Book {
 	getGlossary() { return this.getSpecification().glossary; }
 	getTags() { return "tags" in this.getSpecification() ? this.getSpecification().tags : []; }
 	getAuthors() { return this.getSpecification().authors; }	
-	getAuthorByID(id) { return _find(this.getAuthors(), { "id": id }); }
+	getAuthorByID(id) { return this.getAuthors().find(el => el.id === id); }
 	getDescription() { return this.getSpecification().description; }
 	getRevisions() { return this.getSpecification().revisions; }
 	
@@ -288,9 +286,9 @@ class Book {
 			}
 			if(duplicate) {				
 				duplicates.push(word);
-				// Merge any chapter occurrences
+				// Merge any chapter occurrences, removing duplicates using a set and spread.
 				if(Array.isArray(index[canonical]))
-					index[canonical] = _uniq(index[canonical].concat(index[word]));
+					index[canonical] = [...new Set(index[canonical].concat(index[word]))];
 			}
 		})
 		duplicates.forEach(word => {
