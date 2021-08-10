@@ -76,6 +76,10 @@ class Peruse extends React.Component {
 		}
 		// Render the book
 		else {
+
+			// Set the window title based on the specification.
+			document.title = book.getTitle();
+
 			return (
 				// Bootstrap container with a single row and one big column.
 				<div className="container book">
