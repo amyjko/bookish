@@ -9,10 +9,10 @@ class Header extends React.Component {
 		let tags = this.props.tags;
 
 		return (
-			<div>
+			<div className="chapter-header">
 				{
 					this.props.image ?
-						Parser.parseEmbed(null, this.props.image).toDOM() :
+						<div className="full-width">{ Parser.parseEmbed(null, this.props.image).toDOM() }</div> :
 						null
 				}
 				<h1 className="title">{this.props.header}</h1>
