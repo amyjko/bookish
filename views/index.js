@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { NavHashLink } from 'react-router-hash-link';
+import { Header } from "./header";
 
 class Index extends React.Component {
 
@@ -21,11 +21,11 @@ class Index extends React.Component {
         if(!book.isSpecificationLoaded())
             return null;
 
-        var bookIndex = book.getBookIndex();
+        let bookIndex = book.getBookIndex();
 
-        var rows = [];
-        var currentLetter = undefined;
-        var letters = {};
+        let rows = [];
+        let currentLetter = undefined;
+        let letters = {};
 
         // Build a list of words in alphabetical order.
         Object.keys(bookIndex).sort((a, b) => a.localeCompare(b)).forEach((word, index) => {
@@ -69,7 +69,13 @@ class Index extends React.Component {
 
 		return (
 			<div>
-				<h1>Index</h1>
+				<Header 
+					image={book.getImage("index")} 
+					header="Index"
+					subtitle={null}
+					tags={book.getTags()}
+					content={null}
+				/>
 
                 <p><em>This index includes all words, excluding common English words, words with apostrophes, and words ending in -ly.</em></p>
 

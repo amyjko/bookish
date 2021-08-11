@@ -9,8 +9,9 @@
         }
     },
 	"required": [
-        "title", "authors", "cover", "unknown", "description",
-        "chapters", "revisions", "license", "sources", "references"
+        "title", "authors", "description",
+        "chapters", "revisions", "license", "sources", "references",
+        "images"
     ],
     "additionalProperties": true,
 	"properties": {
@@ -29,6 +30,17 @@
         },
         "cover": { "$ref": "#/definitions/embed" },
         "unknown": { "$ref": "#/definitions/embed" },
+        "images": {
+            "type": "object",
+            "properties": {
+                "cover": { "$ref": "#/definitions/embed" },
+                "unknown": { "$ref": "#/definitions/embed" },
+                "index": { "$ref": "#/definitions/embed" },
+                "references": { "$ref": "#/definitions/embed" },
+                "glossary": { "$ref": "#/definitions/embed" },
+                "search": { "$ref": "#/definitions/embed" },
+            }    
+        },
         "description": { "type": "string" },
         "chapters": {
             "type": "array",

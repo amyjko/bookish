@@ -1,4 +1,5 @@
 import React from 'react';
+import { Header } from "./header";
 import { Link } from 'react-router-dom';
 
 class Search extends React.Component {
@@ -74,7 +75,13 @@ class Search extends React.Component {
 
 		return (
 			<div>
-				<h1>Search</h1>
+				<Header 
+					image={book.getImage("search")} 
+					header="Search"
+					subtitle={null}
+					tags={book.getTags()}
+					content={null}
+				/>
 
                 <p>Type a word—just a single word—and we'll show its occurrences in this book:</p>
 

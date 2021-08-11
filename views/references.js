@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-
+import { Header } from "./header";
 import { Parser } from "../models/parser.js";
 
 class References extends React.Component {
@@ -20,7 +20,13 @@ class References extends React.Component {
 
 		return (
 			<div>
-				<h1>References</h1>
+				<Header 
+					image={book.getImage("references")} 
+					header="References"
+					subtitle={null}
+					tags={book.getTags()}
+					content={null}
+				/>
 				{
                     references === null ?
                         <p>This book has no references.</p> :

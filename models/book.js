@@ -158,8 +158,6 @@ class Book {
     getChapter(chapterID) { return this.hasChapter(chapterID) ? this.chapters[chapterID] : null; }
     getSymbols() { return this.specification ? this.specification.symbols : {}; }
 	getLicense() { return this.getSpecification().license; }
-	getCover() { return this.getSpecification().cover; }
-	getUnknown() { return this.getSpecification().unknown; }
 	getReferences() { return this.getSpecification().references; }
 	getGlossary() { return this.getSpecification().glossary; }
 	getTags() { return "tags" in this.getSpecification() ? this.getSpecification().tags : []; }
@@ -167,7 +165,9 @@ class Book {
 	getAuthorByID(id) { return this.getAuthors().find(el => el.id === id); }
 	getDescription() { return this.getSpecification().description; }
 	getRevisions() { return this.getSpecification().revisions; }
-	
+
+    getImage(id) { return id in this.getSpecification().images ? this.getSpecification().images[id] : null; }
+
 	getChapterReadingTime(chapterID) { 
 		return this.chapterIsLoaded(chapterID) ? 
 			Math.max(1, Math.round(this.getChapter(chapterID).getWordCount() / 150)) : 

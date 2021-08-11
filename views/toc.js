@@ -34,6 +34,17 @@ class TableOfContents extends React.Component {
 
 	}
 
+	getImage(embed) {
+
+		if(embed === null)
+			return null;
+
+		let book = this.props.app.getBook();
+		let image = Parser.parseEmbed(book, embed).toJSON();
+		return <TableOfContentsImage url={image.url} alt={image.alt}/>
+
+	}
+
 	render() {
 
 		// Get the book being rendered.
@@ -62,7 +73,7 @@ class TableOfContents extends React.Component {
 			<div className="toc">
 
 				<Header 
-					image={book.getCover()} 
+					image={book.getImage("cover")} 
 					header={title}
 					subtitle={subtitle}
 					tags={book.getTags()}
@@ -79,7 +90,6 @@ class TableOfContents extends React.Component {
 							book.getChapters().map((chapter, index) => {
 
 								// Get the image, chapter number, and section for rendering.
-								let image = Parser.parseEmbed(book, chapter.image).toJSON();
 								let chapterNumber = book.getChapterNumber(chapter.id);
 								let section = book.getChapterSection(chapter.id);
 
@@ -93,12 +103,7 @@ class TableOfContents extends React.Component {
 								return (
 									<tr key={"chapter" + index}>
 										<td>
-											<img 
-												className="img-rounded" 
-												style={{width: "5em"}} 
-												src={image.url.startsWith("http") ? image.url : "images/" + image.url}
-												alt={chapter.alt}
-											/>
+											{ this.getImage(chapter.image) }
 										</td>
 										<td>
 											<div>
@@ -133,7 +138,7 @@ class TableOfContents extends React.Component {
 						{
 							book.getReferences() === null ? null :
 							<tr key="references">
-								<td></td>
+								<td>{ this.getImage(book.getImage("references")) }</td>
 								<td><Link to="/references">References</Link><br/><small className="text-muted"><em>Everything cited</em></small></td>
 								<td></td>
 							</tr>
@@ -141,18 +146,18 @@ class TableOfContents extends React.Component {
 						{
 							book.getGlossary() && Object.keys(book.getGlossary()).length > 0 ?
 							<tr key="glossary">
-								<td></td>
+								<td>{ this.getImage(book.getImage("glossary")) }</td>
 								<td><Link to="/glossary">Glossary</Link><br/><small className="text-muted"><em>Definitions</em></small></td>
 								<td></td>
 							</tr> : null
 						}
 						<tr key="index">
-							<td></td>
+							<td>{ this.getImage(book.getImage("index")) }</td>
 							<td><Link to="/index/a">Index</Link><br/><small className="text-muted"><em>Common words and where they are</em></small></td>
 							<td></td>
 						</tr>
 						<tr key="search">
-							<td></td>
+							<td>{ this.getImage(book.getImage("search")) }</td>
 							<td><Link to="/search">Search</Link><br/><small className="text-muted"><em>Find where words occur</em></small></td>
 							<td></td>
 						</tr>
@@ -178,4 +183,19 @@ class TableOfContents extends React.Component {
 
 }
 
-export {TableOfContents};
+class TableOfContentsImage extends React.Component {
+
+	render() {
+
+		return <img 
+			className="img-rounded" 
+			style={{width: "5em"}} 
+			src={this.props.url.startsWith("http") ? this.props.url : "images/" + this.props.url}
+			alt={this.props.alt}
+		/>
+
+	}
+
+}
+
+export { TableOfContents };
