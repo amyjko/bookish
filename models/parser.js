@@ -64,7 +64,7 @@ class Parser {
         if(typeof ref === "string")
             dom = Parser.parseContent(book, ref).toDOM();
         else if(Array.isArray(ref)) {
-            // APA Format. Could eventually suppport multiple formats.
+            // APA Format. Could eventually support multiple formats.
             if(ref.length >= 4) {
                 let authors = ref[0];
                 let year = ref[1];
