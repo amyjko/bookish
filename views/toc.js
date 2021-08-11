@@ -168,13 +168,19 @@ class TableOfContents extends React.Component {
 
 				<p>{book.getLicense() ? Parser.parseContent(book, book.getLicense()).toDOM() : "All rights reserved."}</p>
 
-				<h2>Revisions</h2>
-				
-				<ul>
-					{book.getRevisions().map((revision, index) => {
-						return <li key={"revision" + index}><em>{revision[0]}</em>. {Parser.parseContent(book, revision[1]).toDOM()}</li>;
-					})}
-				</ul>
+				{
+					book.getRevisions().length === 0 ? 
+						null :
+						<>
+							<h2>Revisions</h2>
+							<ul>
+								{book.getRevisions().map((revision, index) => {
+									return <li key={"revision" + index}><em>{revision[0]}</em>. {Parser.parseContent(book, revision[1]).toDOM()}</li>;
+								})}
+							</ul>
+						</>	
+				}
+
 
 			</div>
 		);
