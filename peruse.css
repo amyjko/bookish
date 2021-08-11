@@ -24,6 +24,11 @@ body {
 	font-weight: 700;
 }
 
+.outline {
+	font-family: "Raleway", serif;
+	font-weight: normal;
+}
+
 strong, b {
 	font-weight: 700;
 }
@@ -560,8 +565,7 @@ blockquote .blockquote-caption {
 }
 
 .outline-header a:hover, .navigation-footer a:hover {
-	font-weight: bold;
-	text-decoration: none;
+	text-decoration: underline;
 }
 
 .outline-header-level-0 {
