@@ -38,7 +38,7 @@
                 "index": { "$ref": "#/definitions/embed" },
                 "references": { "$ref": "#/definitions/embed" },
                 "glossary": { "$ref": "#/definitions/embed" },
-                "search": { "$ref": "#/definitions/embed" },
+                "search": { "$ref": "#/definitions/embed" }
             }    
         },
         "description": { "type": "string" },
