@@ -4,7 +4,7 @@
     "type": "object",
     "definitions": {
         "embed": {
-            "type": "string",
+            "type": ["string", "null"],
             "pattern": "^\\|.+\\|.+\\|.+\\|.+\\|$"
         }
     },
