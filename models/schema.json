@@ -42,6 +42,7 @@
             }    
         },
         "description": { "type": "string" },
+        "acknowledgements": { "type": "string" },
         "chapters": {
             "type": "array",
             "items": {

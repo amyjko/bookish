@@ -164,6 +164,7 @@ class Book {
 	getAuthors() { return this.getSpecification().authors; }	
 	getAuthorByID(id) { return this.getAuthors().find(el => el.id === id); }
 	getDescription() { return this.getSpecification().description; }
+	getAcknowledgements() { return this.getSpecification().acknowledgements; }
 	getRevisions() { return this.getSpecification().revisions; }
 
     getImage(id) { return id in this.getSpecification().images ? this.getSpecification().images[id] : null; }

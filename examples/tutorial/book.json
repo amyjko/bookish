@@ -13,6 +13,7 @@
 		"unknown": "|unknown.jpg|A photograph of Boomy the cat looking skeptical.|Boomy is worried that you're lost.|Amy J. Ko|"
 	},
 	"description": "This is an example book, intended for presentation with the Peruse framework. Don't let it's simplicity fool you: it demonstrates all of the features of peruse, so you should be able to copy and modify any of its content to help you write your book.",
+	"acknowledgements": "Thanks to Boomy for all her hard work.",
 	"chapters": [
 		{
 			"id": "introduction",

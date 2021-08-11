@@ -278,6 +278,7 @@ blockquote .blockquote-caption {
 	line-height: 1.4em;
 	border-top: 1px solid lightGray;
 	border-bottom: 1px solid lightGray;
+	margin-bottom: 1em;
 	clear: both;
 }
 

@@ -164,6 +164,15 @@ class TableOfContents extends React.Component {
 					</tbody>
 				</table>
 
+				{
+					book.getAcknowledgements() ?
+						<>
+							<h2>Acknowledgements</h2>
+							{ Parser.parseChapter(book, book.getAcknowledgements()).toDOM() }
+						</>
+						: null
+				}
+
 				<h2>License</h2>
 
 				<p>{book.getLicense() ? Parser.parseContent(book, book.getLicense()).toDOM() : "All rights reserved."}</p>
