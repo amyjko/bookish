@@ -126,10 +126,9 @@ ol ol ol li {
 		left: 0;
 		right: 0;
 		width: auto;
-		z-index: 2;
+		z-index: -1; /* Put it below everything to avoid overlapping content */
 		padding: 1em;
 		border-top: 1px solid lightGray;
-		background-color: white;
 		text-align: left;
 		transition: transform 0.2s ease-in;
 		cursor: pointer;
