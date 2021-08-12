@@ -175,7 +175,15 @@ class TableOfContents extends React.Component {
 
 				<h2>License</h2>
 
-				<p>{book.getLicense() ? Parser.parseContent(book, book.getLicense()).toDOM() : "All rights reserved."}</p>
+				<p>
+					{book.getLicense() ? Parser.parseContent(book, book.getLicense()).toDOM() : "All rights reserved."}
+				</p>
+
+				<h2>Citation</h2>
+
+				<p>
+					{ book.getAuthors().map(author => author.name).join(", ") } ({(new Date()).getFullYear() }). <em>{title}</em>. { location.protocol+'//'+location.host+location.pathname }, <em>retrieved { (new Date()).toLocaleDateString("en-US")}</em>.
+				</p>
 
 				{
 					book.getRevisions().length === 0 ? 
@@ -189,7 +197,6 @@ class TableOfContents extends React.Component {
 							</ul>
 						</>	
 				}
-
 
 			</div>
 		);
