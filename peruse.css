@@ -132,6 +132,7 @@ ol ol ol li {
 		text-align: left;
 		transition: transform 0.2s ease-in;
 		cursor: pointer;
+		background-color: white;
 	}
 
 	/* Make a little centered box to store the outline to preserve its left aligned structure, while making it easier to click. */
