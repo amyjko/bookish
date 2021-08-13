@@ -127,7 +127,7 @@ ol ol ol li {
 		left: 0;
 		right: 0;
 		width: auto;
-		z-index: 0; /* Put it below everything to avoid overlapping content */
+		z-index: 1; /* Put it above content when it's a sheet in the footer */
 		padding: 1em;
 		border-top: 1px solid lightGray;
 		text-align: left;
@@ -215,7 +215,7 @@ ol ol ol li {
 		display: inline-block;
 		top: 2em;
 		width: 12em;
-		z-index: -1;
+		z-index: -1; /* Put it below everything when it's in the margin. */
 		border-right: 1px solid lightGray;
 		padding: 0.5em;
 		transform: translateX(-14em);
