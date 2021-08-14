@@ -75,7 +75,7 @@ class Outline extends React.Component {
             let target = el;
             if(el.previousSibling && el.previousSibling.classList.contains("figure"))
                 target = el.previousSibling;
-            window.scrollTo({ top: target.getBoundingClientRect().top + window.pageYOffset, behavior: 'smooth' }); 
+            window.scrollTo({ top: Math.min(el.getBoundingClientRect().top, target.getBoundingClientRect().top) + window.pageYOffset, behavior: 'smooth' }); 
         }
 
         return (
