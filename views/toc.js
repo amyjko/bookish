@@ -127,7 +127,7 @@ class TableOfContents extends React.Component {
 											<small className="text-muted">
 												<em>
 													{ readingEstimate }
-													{ this.getProgressDescription(chapterID in progress ? progress[chapterID] : null) }
+													{ !chapter.isForthcoming() && this.getProgressDescription(chapterID in progress ? progress[chapterID] : null) }
 												</em>
 											</small>
 											{
