@@ -150,8 +150,8 @@ class Outline extends React.Component {
                             // Only first and second level headers...
                             header.level > 2 ? 
                                 null :
-                                <NavHashLink scroll={topThirdScroll}  to={"#header-" + index}>
-                                    <div key={"header-" + index} className={"outline-header outline-header-level-" + header.level + (this.state.headerIndex === index ? " outline-header-active" : "")}>
+                                <NavHashLink scroll={topThirdScroll} to={"#header-" + index} key={"header-" + index} >
+                                    <div className={"outline-header outline-header-level-" + header.level + (this.state.headerIndex === index ? " outline-header-active" : "")}>
                                         {header.toText()}
                                     </div>
                                 </NavHashLink>
@@ -160,7 +160,7 @@ class Outline extends React.Component {
                     {/* Link to references */ }
                     {
                         this.props.references ? 
-                            <NavHashLink scroll={topThirdScroll}  to="#references">
+                            <NavHashLink scroll={topThirdScroll} to="#references">
                                 <div className={"outline-header outline-header-level-0" + (this.state.headerIndex === this.props.headers.length ? " outline-header-active" : "")}>
                                     References
                                 </div>
