@@ -386,30 +386,30 @@ class Chapter extends React.Component {
 			return (
 				<div className="chapter">
 					<Header 
-						image={chapter.image} 
-						header={
+						image={chapter.image}
+						before={
 							<span>
-								{
-									chapterNumber === undefined ? 
-										null : 
-										<span className="chapter-number">Chapter {chapterNumber}</span> 
-								}
-								{ 
-									chapterSection === null ? 
-										null : 
-										<span className="section-name"> {chapterSection}</span>
-								}
-								{ 
-									chapterNumber || chapterSection ? 
-										<br/> : 
-										null 
-								}
-								<span id="title" className="chapter-title">{chapter.title}</span>
-							</span>
+							{
+								chapterNumber === undefined ? 
+									null : 
+									<span className="chapter-number">Chapter {chapterNumber}</span> 
+							}
+							{ 
+								chapterSection === null ? 
+									null : 
+									<span className="section-name"> {chapterSection}</span>
+							}
+							{ 
+								chapterNumber || chapterSection ? 
+									<br/> : 
+									null 
+							}
+							</span>						
 						}
+						header={chapter.title}
 						tags={book.getTags()}
 						/* If there are chapter authors, map them to authors declared in the book title, otherwise use all the authors of the book */
-						content={
+						after={
 							<Authors authors={
 									chapter.authors ? 
 										chapter.authors.map(author => book.getAuthorByID(author)) : 

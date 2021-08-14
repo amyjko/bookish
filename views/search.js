@@ -79,9 +79,7 @@ class Search extends React.Component {
 				<Header 
 					image={book.getImage("search")} 
 					header="Search"
-					subtitle={null}
 					tags={book.getTags()}
-					content={null}
 				/>
 
                 <Outline

@@ -21,9 +21,7 @@ class Glossary extends React.Component {
 				<Header 
 					image={book.getImage("glossary")} 
 					header="Glossary"
-					subtitle={null}
 					tags={book.getTags()}
-					content={null}
 				/>
 
 				<Outline

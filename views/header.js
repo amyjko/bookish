@@ -15,9 +15,10 @@ class Header extends React.Component {
 						<div className="full-width">{ Parser.parseEmbed(null, this.props.image).toDOM() }</div> :
 						null
 				}
+				{ this.props.before }
 				<h1 id="title" className="title header">{this.props.header}</h1>
 				{ this.props.subtitle ? <h2 className="subtitle">{this.props.subtitle}</h2> : null }
-				<div className="lead">{this.props.content}</div>
+				<div className="lead">{this.props.after}</div>
 				{ tags ? 
 					<div className="tag-list">{this.props.tags.map((tag, index) => <span key={"tag-" + index} className="tag">{tag}</span>)}</div> : 
 					null }

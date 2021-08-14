@@ -20,9 +20,7 @@ class Media extends React.Component {
 				<Header 
 					image={book.getImage("media")} 
 					header="Media"
-					subtitle={null}
 					tags={book.getTags()}
-					content={null}
 				/>
 
 				<Outline

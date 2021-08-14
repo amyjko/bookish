@@ -45,9 +45,7 @@ class References extends React.Component {
 				<Header 
 					image={book.getImage("references")} 
 					header="References"
-					subtitle={null}
 					tags={book.getTags()}
-					content={null}
 				/>
 
 				<Outline

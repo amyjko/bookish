@@ -80,9 +80,7 @@ class Index extends React.Component {
 				<Header 
 					image={book.getImage("index")} 
 					header="Index"
-					subtitle={null}
 					tags={book.getTags()}
-					content={null}
 				/>
 
                 <Outline
