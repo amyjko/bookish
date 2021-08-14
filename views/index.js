@@ -5,9 +5,9 @@ import { Outline } from './outline';
 
 class Index extends React.Component {
 
-    shouldComponentUpdate() {
+    onRouteChanged() {
 
-        return this.props.app.getBook().chaptersAreLoaded();
+        this.forceUpdate();
 
     }
 
@@ -96,7 +96,7 @@ class Index extends React.Component {
                                         <Link to={"/index/" + letter}>{letter}</Link> :
                                         <span>{this.props.match.params.letter === letter ? <strong><span style={{fontSize: "200%"}}>{letter}</span></strong> : <span className={"text-muted"}>{letter}</span>}</span>
                                 }
-                                { 
+                                {
                                     index < 26 - 1 ? 
                                         <span>&sdot;</span> : 
                                         null 
