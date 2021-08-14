@@ -93,32 +93,32 @@ class Outline extends React.Component {
                     </div>
 
                     {/* Title link */}
-                    <div className={"outline-header outline-header-level-0" + (this.props.headerIndex < 0 ? " outline-header-active" : "")}>
-                        <NavHashLink scroll={figureAwareScroll} to="#title">{this.props.title}</NavHashLink>
-                    </div>
-
+                    <NavHashLink scroll={figureAwareScroll} to="#title">
+                        <div className={"outline-header outline-header-level-0" + (this.props.headerIndex < 0 ? " outline-header-active" : "")}>
+                            {this.props.title}
+                        </div>
+                    </NavHashLink>
                     {/* Header links */}
                     {
                         this.props.headers.map((header, index) => 
                             // Only first and second level headers...
                             header.level > 2 ? 
                                 null :
-                                <div key={"header-" + index} className={"outline-header outline-header-level-" + header.level + (this.props.headerIndex === index ? " outline-header-active" : "")}>
-                                    <NavHashLink 
-                                        scroll={figureAwareScroll}  
-                                        to={"#header-" + index} 
-                                    >
-                                    {header.toText()}
-                                    </NavHashLink>
-                                </div>
+                                <NavHashLink scroll={figureAwareScroll}  to={"#header-" + index}>
+                                    <div key={"header-" + index} className={"outline-header outline-header-level-" + header.level + (this.props.headerIndex === index ? " outline-header-active" : "")}>
+                                        {header.toText()}
+                                    </div>
+                                </NavHashLink>
                         )
                     }
                     {/* Link to references */ }
                     {
                         this.props.references ? 
-                            <div className={"outline-header outline-header-level-0" + (this.props.headerIndex === this.props.headers.length ? " outline-header-active" : "")}>
-                                <NavHashLink scroll={figureAwareScroll}  to="#references">References</NavHashLink>
-                            </div> :
+                            <NavHashLink scroll={figureAwareScroll}  to="#references">
+                                <div className={"outline-header outline-header-level-0" + (this.props.headerIndex === this.props.headers.length ? " outline-header-active" : "")}>
+                                    References
+                                </div>
+                            </NavHashLink> :
                             null
                     }
                 </div>

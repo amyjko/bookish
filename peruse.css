@@ -561,11 +561,11 @@ blockquote .blockquote-caption {
 	color: lightGrey;
 }
 
-.outline-header a, .navigation-footer a {
+a .outline-header, .outline-header a, a .navigation-footer {
 	color: grey;
 }
 
-.outline-header a:hover, .navigation-footer a:hover {
+a:hover .outline-header , a:hover .navigation-footer {
 	text-decoration: underline;
 }
 
@@ -583,7 +583,7 @@ blockquote .blockquote-caption {
 	margin-left: 1em;
 }
 
-.outline-header-active a {
+a .outline-header-active {
 	color: black;
 }
 
