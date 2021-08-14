@@ -12,6 +12,7 @@ class Outline extends React.Component {
         this.layout = this.layout.bind(this);
 
 		this.state = { 
+            headers: null,
 			headerIndex: -1,
             expanded: false // This state gets overridden if a container is passed in to manage state.
         };
@@ -46,6 +47,18 @@ class Outline extends React.Component {
 
 		window.removeEventListener('scroll', this.layout);
 		window.removeEventListener('resize', this.layout);
+
+    }
+
+    // When this updates, see if the 
+    componentDidUpdate() {
+
+        let headers = "";
+        Array.from(document.getElementsByClassName("header")).forEach(el => headers += el.outerHTML);
+
+        // If the headers change, update the outline.
+        if(this.state.headers !== headers)
+            this.setState({ headers: headers});
 
     }
 

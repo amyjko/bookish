@@ -5,12 +5,6 @@ import { Outline } from './outline';
 
 class Index extends React.Component {
 
-    onRouteChanged() {
-
-        this.forceUpdate();
-
-    }
-
     componentDidMount() {
         window.scrollTo(0, 0);
     }
@@ -27,6 +21,7 @@ class Index extends React.Component {
         let rows = [];
         let currentLetter = undefined;
         let letters = {};
+        let count = undefined;
 
         // Build a list of words in alphabetical order.
         Object.keys(bookIndex).sort((a, b) => a.localeCompare(b)).forEach((word, index) => {
@@ -40,8 +35,17 @@ class Index extends React.Component {
                 letters[currentLetter] = true;
             }
 
-            // Or is this the selected letter?
-            if(this.props.match.params.letter === currentLetter)
+            // If this is the first letter, add an entry!
+            if(this.props.match.params.letter === currentLetter) {
+
+                if(count === undefined) {
+                    count = 0;
+                } 
+                else if(count >= 20) {
+                    count = 0;
+                    rows.push(<tr key={word}><td colSpan={2}><h2 className="header" id={"word-" + word}>{word}</h2></td></tr>)
+                }
+
                 rows.push(
                     <tr key={"entry-" + index}>
                         <td>{word}</td>
@@ -66,6 +70,9 @@ class Index extends React.Component {
                         </td>
                     </tr>
                 );
+                count++;
+             }
+
         });
 
 		return (

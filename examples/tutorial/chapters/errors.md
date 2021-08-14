@@ -12,7 +12,7 @@ Tabs in the middle of paragraphs        should be ignored
 
    # Spaces before headers shouldn't matter
 #Spaces after after headers shouldn't matter
-Sentences with hashes in the middle # shoudn't be headers.
+Sentences with hashes in the middle # shouldn't be headers.
 
 # Headers can be one of three depths
 ## Headers can be one of three depths
