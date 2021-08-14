@@ -167,27 +167,31 @@ class Chapter extends React.Component {
 
 		// Get the outline's bounds.
 		let outline = document.getElementsByClassName("outline")[0];
+		let threshold = 100;
 
 		// If the outline isn't affixed to the footer
 		if(window.getComputedStyle(outline).getPropertyValue("left") !== "0px") {
 
 			let outlineRect = outline.getBoundingClientRect();
-			let overlap = null;
+			let overlapRect = null;
 
-			// Find any marginal left inset things and hide the outline if they're colliding.
+			// Find the bottom-most left inset marginal within threshold of the outline.
 			Array.from(document.getElementsByClassName("marginal-left-inset")).forEach(el => {
 				let insetRect = el.getBoundingClientRect();
-				if(!(outlineRect.right < insetRect.left || 
-					outlineRect.left > insetRect.right || 
-					outlineRect.bottom < insetRect.top || 
-					outlineRect.top > insetRect.bottom))
-					overlap = insetRect;
+				if(!(outlineRect.bottom < insetRect.top - threshold || 
+					outlineRect.top > insetRect.bottom + threshold))
+					overlapRect = insetRect;
 			});
 
 			// If it overlaps, reduce opacity by the proportion of the vertical distance between two rectangles and the height of the marginal.
-			if(overlap) {
-				let distance = Math.abs((outlineRect.top + outlineRect.height / 2) - (overlap.top + overlap.height / 2));
-				let proportion = distance / (overlap.height / 2);
+			if(overlapRect) {
+				let distance = 
+					outlineRect.bottom < overlapRect.top ? threshold :
+					outlineRect.bottom < overlapRect.top + threshold ? threshold - (outlineRect.bottom - overlapRect.top) :
+					outlineRect.top > overlapRect.bottom - threshold ? threshold - (overlapRect.bottom - outlineRect.top) :
+					outlineRect.top > overlapRect.bottom ? threshold :
+					0;
+				let proportion = distance / threshold;
 				outline.style.opacity = proportion * proportion;
 			}
 			// Otherwise, remove the dimming.
