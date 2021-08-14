@@ -73,7 +73,8 @@ class Outline extends React.Component {
 
     position() {
 
-		// Left align the the floating outline with the left margin of the chapter.
+		// Left align the floating outline with the left margin of the chapter
+        // and the top of the title, unless we're past it.
 		let outline = document.getElementsByClassName("outline")[0];
 		let title = document.getElementsByClassName("title")[0];
 
@@ -86,11 +87,21 @@ class Outline extends React.Component {
             // If so, remove the inline position so the footer CSS applies.
 			if(inFooter) {
 				outline.style.removeProperty("left");
+				outline.style.removeProperty("top");
 			}
-            // If not, set the left position of the outline.
+            // If not, set the position of the outline.
 			else {
 				let titleX = title.getBoundingClientRect().left + window.scrollX;
+                let titleY = title.getBoundingClientRect().top + window.scrollY;
 				outline.style.left = titleX + "px";
+                // If the title is off screen, anchor it to the top of the window. (CSS is set to do this).
+                if(titleY - 50 < window.scrollY)
+                    outline.style.removeProperty("top");
+                // Otherwise, anchor it to the title position.
+                else
+                    outline.style.top = title.getBoundingClientRect().top + "px";
+
+                // Tell any listeners about the repositioning.
                 if(this.props.listener)
                     this.props.listener.call(this, false);
 			}

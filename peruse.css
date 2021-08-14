@@ -217,7 +217,7 @@ ol ol ol li {
 	.outline {
 		position: fixed;
 		display: inline-block;
-		top: 2em;
+		top: 50px;
 		width: 12em;
 		z-index: -1; /* Put it below everything when it's in the margin. */
 		border-right: 1px solid lightGray;
