@@ -2,7 +2,7 @@ import { Parser } from "./parser";
 
 class Chapter {
 
-    constructor(book, id, title, authors, image, numbered, section, text) {
+    constructor(book, id, title, authors, image, numbered, section, forthcoming, text) {
 
         this.book = book;
         this.id = id;
@@ -12,6 +12,7 @@ class Chapter {
         this.numbered = numbered;
         this.section = section;
         this.text = text;
+		this.forthcoming = forthcoming;
 
         // If the chapter has text, then parse it, count words, and compute an index.
         if(this.text !== null) {
@@ -23,15 +24,18 @@ class Chapter {
         else {
             this.ast = null;
             this.wordCount = 0;
-            this.index = null;    
+            this.index = null;
         }
 
     }
 
+	getID() { return this.id; }
     getSection() { return this.section; }
+    isForthcoming() { return this.forthcoming; }
     getText() { return this.text; }
     getWordCount() { return this.wordCount; }
     getTitle() { return this.title; }
+	getImage() { return this.image; }
     getIndex() { return this.index; }
     getAST() { return this.ast; }
 

@@ -73,6 +73,10 @@ ol ol ol li {
 	width: 100%;
 }
 
+.forthcoming {
+	opacity: 0.3;
+}
+
 /* Smaller windows with no margins */
 @media screen and (max-width: 1200px) {
 

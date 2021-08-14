@@ -54,7 +54,8 @@
                     "image": { "$ref": "#/definitions/embed" },
                     "numbered": { "type": "boolean", "default": "True by default" },
                     "section": { "type": "string" },
-                    "authors": { "type": "array", "items": { "type": "string" }}
+                    "authors": { "type": "array", "items": { "type": "string" }},
+                    "forthcoming": { "type": "boolean" }
                 }
             }
         },

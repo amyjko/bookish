@@ -33,7 +33,8 @@
 			"title": "Unfinished",
 			"authors": ["ajko"],
 			"image": "|unknown.jpg|A photo of skeptical Boomy|Time to learn about errors, huh?|Amy J. Ko|",
-			"section": "Part II"
+			"section": "Part II",
+			"forthcoming": true
 		},
 		{
 			"id": "errors",

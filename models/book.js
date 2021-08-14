@@ -58,8 +58,6 @@ class Book {
             })
             .then(data => {
 
-                this.loadedSpecification = true;
-
                 // Validate the book schema before we get started.
                 let ajv = new Ajv();
                 let valid = ajv.validate(schema, data);
@@ -77,6 +75,9 @@ class Book {
                 }
                 // Notify the progress handler.
                 this.progressHandler.call();
+
+                // Mark the specification as loaded.
+                this.loadedSpecification = true;
 
             })
             // If there was an error, print it to the console and set the errors.
@@ -110,17 +111,18 @@ class Book {
             // Create a chapter with no text by default.
             this.setChapter(chapter, null);
 
-            // Try to load the chapter.
-			fetch("chapters/" + chapter.id + ".md")
-				.then((response) => {
-                    // Remember that we got a response.
-                    this.chaptersLoaded++;
+            // Try to load the chapter if it's not forthcoming.
+            if(!chapter.forthcoming)
+                fetch("chapters/" + chapter.id + ".md")
+                    .then((response) => {
+                        // Remember that we got a response.
+                        this.chaptersLoaded++;
 
-					// If we got a reasonable response, process the chapter.
-					if(response.ok)
-						response.text().then(text => this.setChapter(chapter, text));
-                    
-				})
+                        // If we got a reasonable response, process the chapter.
+                        if(response.ok)
+                            response.text().then(text => this.setChapter(chapter, text));
+                        
+                    })
         });
 
 	}
@@ -136,6 +138,7 @@ class Book {
             chapter.image, 
             "numbered" in chapter ? chapter.numbered : false, 
             "section" in chapter ? chapter.section : null,
+            chapter.forthcoming === true,
             text
         );
 
@@ -170,9 +173,9 @@ class Book {
     getImage(id) { return id in this.getSpecification().images ? this.getSpecification().images[id] : null; }
 
 	getChapterReadingTime(chapterID) { 
-		return this.chapterIsLoaded(chapterID) ? 
-			Math.max(1, Math.round(this.getChapter(chapterID).getWordCount() / 150)) : 
-			undefined;
+		return !this.chapterIsLoaded(chapterID) ? undefined :
+                this.getChapter(chapterID).isForthcoming() ? undefined :
+			    Math.max(1, Math.round(this.getChapter(chapterID).getWordCount() / 150));
 	}
 	
 	getBookReadingTime() {

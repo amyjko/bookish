@@ -50,6 +50,9 @@ class TableOfContents extends React.Component {
 		// Get the book being rendered.
 		let book = this.props.app.getBook();
 
+		if(!book.isSpecificationLoaded())
+			return null;
+
 		// Get the chapter progress
 		var progress = localStorage.getItem("chapterProgress");
 		if(progress === null) {
@@ -87,32 +90,34 @@ class TableOfContents extends React.Component {
 				<table className="table" id="toc">
 					<tbody>
 						{
-							book.getChapters().map((chapter, index) => {
+							book.getChapters().map((chapterSpec, index) => {
 
 								// Get the image, chapter number, and section for rendering.
-								let chapterNumber = book.getChapterNumber(chapter.id);
-								let section = book.getChapterSection(chapter.id);
-
-								let readingTime = book.getChapterReadingTime(chapter.id);
-								let readingEstimate =
+								const chapterID = chapterSpec.id;
+								const chapter = book.getChapter(chapterID);
+								const chapterNumber = book.getChapterNumber(chapterID);
+								const section = chapter.getSection();
+								const readingTime = book.getChapterReadingTime(chapterID);
+								const readingEstimate =
 									readingTime === undefined ? "Forthcoming" :
 									readingTime < 5 ? "<5 min read" :
 									readingTime < 60 ? "~" + Math.floor(readingTime / 5) * 5 + " min read" :
 									"~" + Math.round(10 * readingTime / 60) / 10 + " hour read";
+								const isLoaded = book.chapterIsLoaded(chapterID);
 
 								return (
-									<tr key={"chapter" + index}>
+									<tr key={"chapter" + index} className={chapter.isForthcoming() ? "forthcoming" : ""}>
 										<td>
-											{ this.getImage(chapter.image) }
+											{ this.getImage(chapter.getImage()) }
 										</td>
 										<td>
 											<div>
 												{ chapterNumber === undefined ? null : <div className="chapter-number">{"Chapter " + chapterNumber}</div> }
 												<div>
 													{
-														book.chapterIsLoaded(chapter.id) ? 
-															<Link to={"/" + chapter.id}>{chapter.title}</Link> :
-															<span>{chapter.title}</span>
+														isLoaded && !chapter.isForthcoming() ? 
+															<Link to={"/" + chapterID}>{chapter.getTitle()}</Link> :
+															<span>{chapter.getTitle()}</span>
 													}
 												</div>
 												{ section === null ? null : <div className="section-name">{section}</div> }
@@ -122,12 +127,12 @@ class TableOfContents extends React.Component {
 											<small className="text-muted">
 												<em>
 													{ readingEstimate }
-													{ this.getProgressDescription(chapter.id in progress ? progress[chapter.id] : null) }
+													{ this.getProgressDescription(chapterID in progress ? progress[chapterID] : null) }
 												</em>
 											</small>
 											{
-												chapter.ast && chapter.ast.getErrors().length > 0 ? 
-													<span><br/><small className="alert alert-danger">{chapter.ast.getErrors().length + " " + (chapter.ast.getErrors().length > 1 ? "errors" : "error")}</small></span> :
+												isLoaded && chapter.getAST().getErrors().length > 0 ? 
+													<span><br/><small className="alert alert-danger">{chapter.getAST().getErrors().length + " " + (chapter.getAST().getErrors().length > 1 ? "errors" : "error")}</small></span> :
 													null
 											}
 										</td>
