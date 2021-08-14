@@ -50,9 +50,10 @@ class Outline extends React.Component {
 
     }
 
-    // When this updates, see if the 
     componentDidUpdate() {
 
+        // When this updates, generate a unique string for the current header outline.
+        // If it's different from the last rendered state, refresh.
         let headers = "";
         Array.from(document.getElementsByClassName("header")).forEach(el => headers += el.outerHTML);
 

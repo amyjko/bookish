@@ -159,7 +159,7 @@ class Chapter extends React.Component {
 		localStorage.setItem("chapterProgress", JSON.stringify(progress));
 
 		// Handle overlaps
-		this.hideOutlineIfObscured();
+		this.hideOutlineIfObscured();		
 
 	}
 
