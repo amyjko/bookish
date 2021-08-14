@@ -166,6 +166,11 @@ class TableOfContents extends React.Component {
 							<td><Link to="/search">Search</Link><br/><small className="text-muted"><em>Find where words occur</em></small></td>
 							<td></td>
 						</tr>
+						<tr key="media">
+							<td>{ this.getImage(book.getImage("media")) }</td>
+							<td><Link to="/media">Media</Link><br/><small className="text-muted"><em>Images and video in the book</em></small></td>
+							<td></td>
+						</tr>
 					</tbody>
 				</table>
 

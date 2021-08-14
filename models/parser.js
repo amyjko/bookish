@@ -247,6 +247,7 @@ class Parser {
             footnotes: [],
             headers: [],
             symbols: {},
+            embeds: [],
             errors: []
         };
 
@@ -865,7 +866,12 @@ class Parser {
         if(this.peek() === "<" || this.peek() === ">")
             position = this.read();
 
-        return new EmbedNode(url, description, caption, credit, position);
+        const embed = new EmbedNode(url, description, caption, credit, position);
+
+        if(metadata)
+            metadata.embeds.push(embed);
+
+        return embed;
 
     }
 
@@ -1122,21 +1128,11 @@ class ChapterNode extends Node {
 
     }
 
-    getErrors() {
-        return this.metadata.errors;
-    }
-
-    getCitations() { 
-        return this.metadata.citations; 
-    }
-
-    getFootnotes() { 
-        return this.metadata.footnotes; 
-    }
-
-    getHeaders() {
-        return this.metadata.headers; 
-    }
+    getErrors() { return this.metadata.errors; }
+    getCitations() { return this.metadata.citations; }
+    getFootnotes() { return this.metadata.footnotes; }
+    getHeaders() { return this.metadata.headers; }
+    getEmbeds() { return this.metadata.embeds; }
 
     getCitationNumber(citationID) { 
         

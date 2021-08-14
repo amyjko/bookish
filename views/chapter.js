@@ -382,7 +382,7 @@ class Chapter extends React.Component {
 			let chapterSection = book.getChapterSection(this.props.id);
 			let citations = chapter.getAST().getCitations();
 			let hasReferences = Object.keys(citations).length > 0;
-			let headers = chapter.getAST().getHeaders();
+			
 			return (
 				<div className="chapter">
 					<Header 

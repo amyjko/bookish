@@ -255,6 +255,11 @@ ol ol ol li {
 	margin-right: 1em;
 }
 
+.img-preview {
+	width: 10rem;
+	margin: 1em;
+}
+
 a {
 	color: rgb(14, 121, 209);
 }
@@ -594,6 +599,10 @@ a .outline-header-active {
 	position: relative;
 	right: 50%;
 	width: 100vw;
+}
+
+.chapter-header {
+	margin-top: 2em;
 }
 
 .chapter-header .figure {

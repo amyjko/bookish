@@ -1,5 +1,6 @@
 import Ajv from 'ajv';
 
+import { Parser } from "./parser";
 import { Chapter } from './chapter.js';
 
 let schema = require("./schema.json");
@@ -332,6 +333,34 @@ class Book {
 		return null;
 
 	}
+
+    // Get all of the embeds in the book
+    getMedia() {
+
+        let media = [];
+        let urls = new Set();
+		this.getChapters().forEach(c => {
+
+            let cover = c.image === null ? null : Parser.parseEmbed(this, c.image);
+            if(cover && !urls.has(cover.url)) {
+                media.push(cover);
+                urls.add(cover.url);
+            }
+
+            let chapter = this.getChapter(c.id);
+            let embeds = chapter?.getAST()?.getEmbeds();
+            if(embeds)
+                embeds.forEach(embed => {
+                    if(!urls.has(embed.url)) {
+                        media.push(embed);
+                        urls.add(embed.url);
+                    }
+                })
+
+        });        
+        return media;
+
+    }
 
 }
 

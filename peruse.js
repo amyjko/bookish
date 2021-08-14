@@ -9,6 +9,7 @@ import { References } from "./views/references";
 import { Glossary } from "./views/glossary"
 import { Index } from "./views/index";
 import { Search } from "./views/search";
+import { Media } from "./views/media";
 import { Unknown } from "./views/unknown";
 
 class Peruse extends React.Component {
@@ -97,6 +98,7 @@ class Peruse extends React.Component {
 								<Route path="/glossary" render={(props) => <Glossary {...props} app={this} />} />
 								<Route path="/index/:letter?" render={(props) => <Index {...props} app={this} />} />
 								<Route path="/search/" render={(props) => <Search {...props} app={this} />} />
+								<Route path="/media/" render={(props) => <Media {...props} app={this} />} />
 								<Route path="*" render={(props) => <Unknown {...props} message={<p>This URL doesn't exist for this book. Want to go back to the <Link to="/">Table of Contents?</Link></p>} app={this} />}/>
 							</Switch>
 						</div>
