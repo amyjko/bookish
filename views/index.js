@@ -1,6 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { Header } from "./header";
+import { Outline } from './outline';
 
 class Index extends React.Component {
 
@@ -77,6 +78,11 @@ class Index extends React.Component {
 					content={null}
 				/>
 
+                <Outline
+					previous={null}
+					next={null}
+				/>
+
                 <p><em>This index includes all words, excluding common English words, words with apostrophes, and words ending in -ly.</em></p>
 
                 <p>Pick a letter to browse:</p>
@@ -104,9 +110,7 @@ class Index extends React.Component {
                         {rows}
                     </tbody>
                 </table>
-				<div className="navigation-footer">
-					<Link to={"/"}>Home</Link>
-				</div>
+
             </div>
 		);
 

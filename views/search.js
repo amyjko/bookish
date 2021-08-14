@@ -1,5 +1,6 @@
 import React from 'react';
 import { Header } from "./header";
+import { Outline } from './outline';
 import { Link } from 'react-router-dom';
 
 class Search extends React.Component {
@@ -59,7 +60,7 @@ class Search extends React.Component {
                 matchCount += chapterMatches.length;
 
                 if(chapterMatches.length > 0) {
-                    results.push(<h2 key={"header-" + chapterID}>Chapter{chapterNumber === undefined ? "" : " " + chapterNumber} - {chapter.title}</h2>);
+                    results.push(<h2 key={"header-" + chapterID} className="header" id={"header-" + chapterID}>Chapter{chapterNumber === undefined ? "" : " " + chapterNumber} - {chapter.title}</h2>);
                     chapterMatches.forEach((match, index) => {
                         // Only highlight the part of the word that matches.
                         var start = match.match.toLowerCase().indexOf(query);
@@ -81,6 +82,11 @@ class Search extends React.Component {
 					subtitle={null}
 					tags={book.getTags()}
 					content={null}
+				/>
+
+                <Outline
+					previous={null}
+					next={null}
 				/>
 
                 <p>Type a word—just a single word—and we'll show its occurrences in this book:</p>
@@ -109,9 +115,7 @@ class Search extends React.Component {
                         </div>
                     )
                 }
-				<div className="navigation-footer">
-					<Link to={"/"}>Home</Link>
-				</div>
+
             </div>
 		);
 

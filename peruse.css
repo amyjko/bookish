@@ -296,19 +296,6 @@ blockquote .blockquote-caption {
 	font-style: italic;
 }
 
-.navigation-footer {
-	position: fixed;
-	left: 0;
-	bottom: 0;
-	width: 100%;
-	text-align: center;
-	border: 1px solid lightGray;
-	background-color:white;
-	padding: 0.5em;
-	text-shadow: 0px 0px #000000;
-	z-index: 1;
-}
-
 .progress {
 	position: absolute;
 	top: 0;
@@ -551,7 +538,7 @@ blockquote .blockquote-caption {
 	color: grey;
 }
 
-.outline, .navigation-footer {
+.outline {
 	font-size: 10pt;
 }
 
@@ -565,11 +552,11 @@ blockquote .blockquote-caption {
 	color: lightGrey;
 }
 
-a .outline-header, .outline-header a, a .navigation-footer {
+a .outline-header, .outline-header a {
 	color: grey;
 }
 
-a:hover .outline-header , a:hover .navigation-footer {
+a:hover .outline-header {
 	text-decoration: underline;
 }
 

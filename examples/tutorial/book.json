@@ -53,9 +53,9 @@
 		"ICER": "ACM International Computing Education Research Conference (ICER)"
 	},
 	"references": {
-		"ref1": "Amanda Swearngin, Chenglong Wang, Alannah Oleson, James Fogarty, Amy J. Ko (2020). [Scout: Rapid Exploration of Interface Layout Alternatives through High-Level Design Constraints|http://faculty.washington.edu/ajko/papers/Swearngin2020Scout.pdf]. _ACM SIGCHI Conference on Human Factors in Computing Systems_ (CHI), 1-13.",
-		"ref2": "Thomas D. LaToza, Maryam Arab, Dastyni Loksa, Amy J. Ko (2020). [Explicit Programming Strategies|http://faculty.washington.edu/ajko/papers/Latoza2020ExplicitProgrammingStrategies.pdf]. Empirical Software Engineering.",
-		"ref3": [
+		"swearngin20": "Amanda Swearngin, Chenglong Wang, Alannah Oleson, James Fogarty, Amy J. Ko (2020). [Scout: Rapid Exploration of Interface Layout Alternatives through High-Level Design Constraints|http://faculty.washington.edu/ajko/papers/Swearngin2020Scout.pdf]. _ACM SIGCHI Conference on Human Factors in Computing Systems_ (CHI), 1-13.",
+		"latoza20": "Thomas D. LaToza, Maryam Arab, Dastyni Loksa, Amy J. Ko (2020). [Explicit Programming Strategies|http://faculty.washington.edu/ajko/papers/Latoza2020ExplicitProgrammingStrategies.pdf]. Empirical Software Engineering.",
+		"register20": [
 			"Yim Register, Amy J. Ko", 
 			2020,
 			"Learning machine learning with personal data helps stakeholders ground advocacy arguments in model mechanics",
@@ -63,8 +63,8 @@
 			"http://faculty.washington.edu/ajko/papers/Register2020PersonalData.pdf",
 			"Finds that teaching machine learning by tracing an algorithm with learners' personal data increases the extent to which they can identify bias in self-advocacy arguments."
 		],
-		"ref10": "Stefania Druga, Amy J. Ko (2021). How Do Children’s Perceptions of Machine Intelligence Change when Training & Coding Smart Programs? ACM Interaction Design for Children.",
-		"ref11": "jdskfljsakdfjkdlsfj"
+		"druga21": "Stefania Druga, Amy J. Ko (2021). How Do Children’s Perceptions of Machine Intelligence Change when Training & Coding Smart Programs? ACM Interaction Design for Children.",
+		"jds": "jdskfljsakdfjkdlsfj"
 	},
 	"symbols": {
 		"hello": "Hi, I am _symbolic_ text."

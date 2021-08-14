@@ -20,7 +20,6 @@ class Chapter extends React.Component {
 			loaded: true, 
 			editing: false, 
 			draft: null,
-			outlineExpanded: false,
 			marginal: null // The currently selected marginal; we only do one at a time.
 		};
 
@@ -255,16 +254,6 @@ class Chapter extends React.Component {
 
 	}
 
-	toggleOutline(expanded, after) {
-
-		// If the outline is being expanded, hide the marginal, otherwise leave it alone.
-		this.setState({ 
-			outlineExpanded: expanded, 
-			marginal: expanded ? null : this.state.marginal 
-		}, after);
-
-	}
-
 	getMarginal() {
 		return this.state.marginal;
 	}
@@ -273,8 +262,7 @@ class Chapter extends React.Component {
 
 		// If the marginal is being shown, hide the outline, otherwise leave it alone.
 		this.setState({ 
-			marginal: marginal,
-			outlineExpanded: marginal !== null ? false : this.state.outlineExpanded
+			marginal: marginal
 		});
 
 	}
@@ -417,13 +405,16 @@ class Chapter extends React.Component {
 					/>
 
 					<Outline
-						chapter={this}
-						title={chapter.title}
-						headers={headers}
 						previous={book.getPreviousChapterID(this.props.id)}
 						next={book.getNextChapterID(this.props.id)}
-						references={hasReferences}
-						expanded={this.state.outlineExpanded}
+						listener={ (expanded, callback) =>
+							// If the outline is being expanded, hide the marginal, otherwise leave it alone.
+							this.setState({ 
+								marginal: expanded ? null : this.state.marginal 
+							}, callback)
+						}
+						// Collapse the outline if a marginal is selected.
+						collapse={this.state.marginal !== null}
 					/>
 
 					{ /* Render the editor if we're editing */ }
@@ -438,7 +429,7 @@ class Chapter extends React.Component {
 					{
 						!hasReferences ? null :
 						<div>
-							<h1 id="references">References</h1>
+							<h1 id="references" className="header">References</h1>
 
 							<ol>
 							{

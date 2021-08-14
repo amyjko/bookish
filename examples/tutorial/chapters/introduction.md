@@ -186,7 +186,7 @@ Here's an image on the left.
 
 # Citations
 
-You can also cite things <ref1,ref2,ref3,ref4,ref5,ref6,ref7,ref8,ref9,ref10> or just cite one thing <ref3>, or cite another! <ref11>
+You can also cite things <swearngin20,latoza20,register20,ref4,ref5,ref6,ref7,ref8,ref9,swearngin200> or just cite one thing <register20>, or cite another! <swearngin201>
 
 If you cite something that doesn't appear in your book specification's reference list, you'll get an error like this: <thisisanunknowncitation>.
 
@@ -342,7 +342,7 @@ This should be independent of "where periods are."
 This also works for 'single quotes'.
 Also independent of 'where periods are.' And what follows. 
 This shouldn't break for contractions, including 'those that appear'n in quotes a'nat' or sentences with 'multiple apostrophes'.
-This shouldn't break for "things followed by citations"<ref1>.
+This shouldn't break for "things followed by citations"<swearngin20>.
 This shouldn't "break for commas," either.
 
 We will also replace \-\- with em-dashes -- like the one in this sentence.
@@ -367,7 +367,7 @@ x^v2^
 
 # Glossary
 
-It's also possible to write a ~glossary~gloss and tag places<ref1> in the text where the definitions should appear. Cite glossary phrase IDs with the \~ mark as follows:
+It's also possible to write a ~glossary~gloss and tag places<swearngin20> in the text where the definitions should appear. Cite glossary phrase IDs with the \~ mark as follows:
 
 `markdown
 ~the phrase you want to highlight~gloss

@@ -12,13 +12,25 @@ class Outline extends React.Component {
         this.layout = this.layout.bind(this);
 
 		this.state = { 
-			headerIndex: -1
+			headerIndex: -1,
+            expanded: false // This state gets overridden if a container is passed in to manage state.
         };
-
+    
     }
 
     toggle() {
-        this.props.chapter.toggleOutline(!this.props.expanded, this.layout);
+
+        const newExpanded = !this.state.expanded;
+
+        // Toggle expanded state
+        this.setState({ 
+            expanded: newExpanded,
+        }, this.layout);
+
+        // Notify if given a listener.
+        if(this.props.listener)
+            this.props.listener.call(this, newExpanded, this.layout);
+    
     }
 
     // Position outline after first render.
@@ -66,7 +78,8 @@ class Outline extends React.Component {
 			else {
 				let titleX = title.getBoundingClientRect().left + window.scrollX;
 				outline.style.left = titleX + "px";
-                this.props.chapter.toggleOutline(false);
+                if(this.props.listener)
+                    this.props.listener.call(this, false);
 			}
 		}
 
@@ -82,7 +95,7 @@ class Outline extends React.Component {
 		let indexOfNearestHeaderAbove = -1; // -1 represents the title
 		for(let i = 0; i < headers.length; i++) {
 			let header = headers[i];
-			if(header.tagName === "H2" || header.tagName === "H3") {
+			if(header.tagName === "H1" || header.tagName === "H2" || header.tagName === "H3") {
 				let rect = header.getBoundingClientRect();
 				let headerTop = rect.y + top - rect.height;
 				if(top > headerTop - threshold)
@@ -90,22 +103,8 @@ class Outline extends React.Component {
 			}
 		}
 
-		let references = document.getElementById("references");
-		if(references) {
-			let rect = references.getBoundingClientRect();
-			if(top > rect.y + top - rect.height - threshold)
-				indexOfNearestHeaderAbove = headers.length;
-		}
-
         // Update the outline and progress bar.
 		this.setState({ headerIndex: indexOfNearestHeaderAbove });
-
-    }
-
-    componentDidUpdate(prevProps) {
-
-        if(this.props.expanded !== prevProps.expanded)
-            this.layout();
 
     }
 
@@ -124,11 +123,16 @@ class Outline extends React.Component {
             window.scrollTo({ top: el.getBoundingClientRect().top - window.innerHeight / 3 + window.pageYOffset, behavior: 'smooth' }); 
         }
 
+        // Scan for headers and put them into a stable list.
+        let headers = [];
+        Array.from(document.getElementsByClassName("header")).forEach(el => headers.push(el));
+
         return (
-            <div className={"outline " + (this.props.expanded ? "outline-expanded": "outline-collapsed")} onClick={this.toggle}>
+            <div className={"outline " + (!this.state.expanded || this.props.collapse ? "outline-collapsed": "outline-expanded")} onClick={this.toggle}>
                 {/* Visual cue of expandability, only visible in footer mode. */}
                 <div className="outline-collapse-cue">▲</div>
                 <div className="outline-headers">
+
                     {/* Book navigation links */}
                     <div className="outline-header outline-header-level-0 outline-header-nav">
                         { this.props.previous ? <span><Link to={"/" + this.props.previous}>Prev</Link></span> : <span>Prev</span> }
@@ -138,34 +142,23 @@ class Outline extends React.Component {
                         { this.props.next ? <Link to={"/" + this.props.next}>Next</Link> : <span>Next</span> }
                     </div>
 
-                    {/* Title link */}
-                    <NavHashLink scroll={topThirdScroll} to="#title">
-                        <div className={"outline-header outline-header-level-0" + (this.state.headerIndex < 0 ? " outline-header-active" : "")}>
-                            {this.props.title}
-                        </div>
-                    </NavHashLink>
-                    {/* Header links */}
                     {
-                        this.props.headers.map((header, index) => 
-                            // Only first and second level headers...
-                            header.level > 2 ? 
+                        // Scan through the headers and add a properly formatted link for each.
+                        headers.map((header, index) => {
+
+                            // Assumes that all headers have an H1, H2, etc. tag.
+                            const level = Number.parseInt(header.tagName.charAt(1));
+
+                            // Only h1, h2, and h3 headers...
+                            return level > 3 ? 
                                 null :
-                                <NavHashLink scroll={topThirdScroll} to={"#header-" + index} key={"header-" + index} >
-                                    <div className={"outline-header outline-header-level-" + header.level + (this.state.headerIndex === index ? " outline-header-active" : "")}>
-                                        {header.toText()}
+                                <NavHashLink scroll={topThirdScroll} to={"#" + header.id} key={"header-" + index} >
+                                    <div className={"outline-header outline-header-level-" + (level - 1) + (this.state.headerIndex === index ? " outline-header-active" : "")}>
+                                        {header.textContent}
                                     </div>
                                 </NavHashLink>
+                            }
                         )
-                    }
-                    {/* Link to references */ }
-                    {
-                        this.props.references ? 
-                            <NavHashLink scroll={topThirdScroll} to="#references">
-                                <div className={"outline-header outline-header-level-0" + (this.state.headerIndex === this.props.headers.length ? " outline-header-active" : "")}>
-                                    References
-                                </div>
-                            </NavHashLink> :
-                            null
                     }
                 </div>
             </div>

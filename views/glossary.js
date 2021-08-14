@@ -1,6 +1,6 @@
 import React from 'react';
 import { Header } from "./header";
-import { Link } from 'react-router-dom';
+import { Outline } from './outline';
 
 class Glossary extends React.Component {
 
@@ -25,6 +25,12 @@ class Glossary extends React.Component {
 					tags={book.getTags()}
 					content={null}
 				/>
+
+				<Outline
+					previous={null}
+					next={null}
+				/>
+
 				<br/>
 				<div className="table-responsive">
 					<table className="table">
@@ -40,10 +46,6 @@ class Glossary extends React.Component {
 						)}
 						</tbody>
 					</table>
-				</div>
-
-				<div className="navigation-footer">
-					<Link to={"/"}>Home</Link>
 				</div>
 			</div>
 		);
