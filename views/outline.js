@@ -69,6 +69,15 @@ class Outline extends React.Component {
 
 	render() {
 
+        // If there's a figure above the header, scroll to that instead, so people get the image too!
+        // Worst case scenario, an image is really tall and unrelated to the header, but that would be bad content.
+        let figureAwareScroll = (el) => {
+            let target = el;
+            if(el.previousSibling && el.previousSibling.classList.contains("figure"))
+                target = el.previousSibling;
+            window.scrollTo({ top: target.getBoundingClientRect().top + window.pageYOffset, behavior: 'smooth' }); 
+        }
+
         return (
             <div className={"outline " + (this.props.expanded ? "outline-expanded": "outline-collapsed")} onClick={this.toggle}>
                 {/* Visual cue of expandability, only visible in footer mode. */}
@@ -85,7 +94,7 @@ class Outline extends React.Component {
 
                     {/* Title link */}
                     <div className={"outline-header outline-header-level-0" + (this.props.headerIndex < 0 ? " outline-header-active" : "")}>
-                        <NavHashLink smooth to="#title">{this.props.title}</NavHashLink>
+                        <NavHashLink scroll={figureAwareScroll} to="#title">{this.props.title}</NavHashLink>
                     </div>
 
                     {/* Header links */}
@@ -96,7 +105,7 @@ class Outline extends React.Component {
                                 null :
                                 <div key={"header-" + index} className={"outline-header outline-header-level-" + header.level + (this.props.headerIndex === index ? " outline-header-active" : "")}>
                                     <NavHashLink 
-                                        smooth 
+                                        scroll={figureAwareScroll}  
                                         to={"#header-" + index} 
                                     >
                                     {header.toText()}
@@ -108,7 +117,7 @@ class Outline extends React.Component {
                     {
                         this.props.references ? 
                             <div className={"outline-header outline-header-level-0" + (this.props.headerIndex === this.props.headers.length ? " outline-header-active" : "")}>
-                                <NavHashLink smooth to="#references">References</NavHashLink>
+                                <NavHashLink scroll={figureAwareScroll}  to="#references">References</NavHashLink>
                             </div> :
                             null
                     }
