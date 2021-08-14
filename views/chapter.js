@@ -20,7 +20,6 @@ class Chapter extends React.Component {
 			loaded: true, 
 			editing: false, 
 			draft: null,
-			headerIndex: -1,
 			outlineExpanded: false,
 			marginal: null // The currently selected marginal; we only do one at a time.
 		};
@@ -129,13 +128,14 @@ class Chapter extends React.Component {
 
 	handleScroll() {
 
-		var top = window.scrollY;
 		// The ground truth location is the bottom of the window. (If we used the top of the window,
 		// it wouldn't be possible to get to 100%, which would be very annoying when giving feedback to
 		// readers about their progress!
-		var height = Math.max(document.body.scrollHeight, document.body.offsetHeight) - window.innerHeight;
-		var percent = Math.max(0, Math.round(100 * (top / height)));
-		
+		const top = window.scrollY;
+		const height = Math.max(document.body.scrollHeight, document.body.offsetHeight) - window.innerHeight;
+		const percent = Math.max(0, Math.round(100 * (top / height)));
+
+		// Remember the progress
 		var progress = localStorage.getItem("chapterProgress");
 		if(progress === null) {
 			progress = {};
@@ -144,29 +144,6 @@ class Chapter extends React.Component {
 		}
 		progress[this.props.id] = percent;
 		localStorage.setItem("chapterProgress", JSON.stringify(progress));
-
-		// Find the header that we're past so we can update the outline.
-		let headers = document.getElementsByClassName("header");
-		let indexOfNearestHeaderAbove = -1; // -1 represents the title
-		for(let i = 0; i < headers.length; i++) {
-			let header = headers[i];
-			if(header.tagName === "H2" || header.tagName === "H3") {
-				let rect = header.getBoundingClientRect();
-				let headerTop = rect.y + top - rect.height;
-				if(top > headerTop)
-					indexOfNearestHeaderAbove = i;
-			}
-		}
-
-		let references = document.getElementById("references");
-		if(references) {
-			let rect = references.getBoundingClientRect();
-			if(top > rect.y + top - rect.height)
-				indexOfNearestHeaderAbove = headers.length;
-		}
-
-		// Update the outline and progress bar.
-		this.setState({ headerIndex: indexOfNearestHeaderAbove });
 
 		// Handle overlaps
 		this.hideOutlineIfObscured();
@@ -443,7 +420,6 @@ class Chapter extends React.Component {
 						chapter={this}
 						title={chapter.title}
 						headers={headers}
-						headerIndex={this.state.headerIndex}
 						previous={book.getPreviousChapterID(this.props.id)}
 						next={book.getNextChapterID(this.props.id)}
 						references={hasReferences}

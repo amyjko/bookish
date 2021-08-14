@@ -9,8 +9,11 @@ class Outline extends React.Component {
         super(props);
 
         this.toggle = this.toggle.bind(this);
-
         this.layout = this.layout.bind(this);
+
+		this.state = { 
+			headerIndex: -1
+        };
 
     }
 
@@ -36,6 +39,15 @@ class Outline extends React.Component {
 
     layout() {
 
+		this.position();
+        this.highlight();
+
+	}
+
+    getHighlightThreshold() { return window.innerHeight / 3; }
+
+    position() {
+
 		// Left align the the floating outline with the left margin of the chapter.
 		let outline = document.getElementsByClassName("outline")[0];
 		let title = document.getElementsByClassName("title")[0];
@@ -57,8 +69,38 @@ class Outline extends React.Component {
                 this.props.chapter.toggleOutline(false);
 			}
 		}
-		
-	}
+
+    }
+
+    highlight() {
+
+		const top = window.scrollY;
+        const threshold = this.getHighlightThreshold();
+
+		// Find the header that we're past so we can update the outline.
+		let headers = document.getElementsByClassName("header");
+		let indexOfNearestHeaderAbove = -1; // -1 represents the title
+		for(let i = 0; i < headers.length; i++) {
+			let header = headers[i];
+			if(header.tagName === "H2" || header.tagName === "H3") {
+				let rect = header.getBoundingClientRect();
+				let headerTop = rect.y + top - rect.height;
+				if(top > headerTop - threshold)
+					indexOfNearestHeaderAbove = i;
+			}
+		}
+
+		let references = document.getElementById("references");
+		if(references) {
+			let rect = references.getBoundingClientRect();
+			if(top > rect.y + top - rect.height - threshold)
+				indexOfNearestHeaderAbove = headers.length;
+		}
+
+        // Update the outline and progress bar.
+		this.setState({ headerIndex: indexOfNearestHeaderAbove });
+
+    }
 
     componentDidUpdate(prevProps) {
 
@@ -69,13 +111,17 @@ class Outline extends React.Component {
 
 	render() {
 
-        // If there's a figure above the header, scroll to that instead, so people get the image too!
-        // Worst case scenario, an image is really tall and unrelated to the header, but that would be bad content.
-        let figureAwareScroll = (el) => {
-            let target = el;
-            if(el.previousSibling && el.previousSibling.classList.contains("figure"))
-                target = el.previousSibling;
-            window.scrollTo({ top: Math.min(el.getBoundingClientRect().top, target.getBoundingClientRect().top) + window.pageYOffset, behavior: 'smooth' }); 
+        // Scroll the window such that the header is at the top third of the window.
+        let topThirdScroll = (el) => {
+            // This previous behavior was pretty nice, but if an image is really tall and unrelated to the header, 
+            // it would scroll such that the header was out of view.
+            // let target = el;
+            // if(el.previousSibling && el.previousSibling.classList.contains("figure"))
+            //     target = el.previousSibling;
+            // window.scrollTo({ top: Math.min(el.getBoundingClientRect().top, target.getBoundingClientRect().top) + window.pageYOffset, behavior: 'smooth' }); 
+
+            // Top of the target minus a third of window height.
+            window.scrollTo({ top: el.getBoundingClientRect().top - window.innerHeight / 3 + window.pageYOffset, behavior: 'smooth' }); 
         }
 
         return (
@@ -93,8 +139,8 @@ class Outline extends React.Component {
                     </div>
 
                     {/* Title link */}
-                    <NavHashLink scroll={figureAwareScroll} to="#title">
-                        <div className={"outline-header outline-header-level-0" + (this.props.headerIndex < 0 ? " outline-header-active" : "")}>
+                    <NavHashLink scroll={topThirdScroll} to="#title">
+                        <div className={"outline-header outline-header-level-0" + (this.state.headerIndex < 0 ? " outline-header-active" : "")}>
                             {this.props.title}
                         </div>
                     </NavHashLink>
@@ -104,8 +150,8 @@ class Outline extends React.Component {
                             // Only first and second level headers...
                             header.level > 2 ? 
                                 null :
-                                <NavHashLink scroll={figureAwareScroll}  to={"#header-" + index}>
-                                    <div key={"header-" + index} className={"outline-header outline-header-level-" + header.level + (this.props.headerIndex === index ? " outline-header-active" : "")}>
+                                <NavHashLink scroll={topThirdScroll}  to={"#header-" + index}>
+                                    <div key={"header-" + index} className={"outline-header outline-header-level-" + header.level + (this.state.headerIndex === index ? " outline-header-active" : "")}>
                                         {header.toText()}
                                     </div>
                                 </NavHashLink>
@@ -114,8 +160,8 @@ class Outline extends React.Component {
                     {/* Link to references */ }
                     {
                         this.props.references ? 
-                            <NavHashLink scroll={figureAwareScroll}  to="#references">
-                                <div className={"outline-header outline-header-level-0" + (this.props.headerIndex === this.props.headers.length ? " outline-header-active" : "")}>
+                            <NavHashLink scroll={topThirdScroll}  to="#references">
+                                <div className={"outline-header outline-header-level-0" + (this.state.headerIndex === this.props.headers.length ? " outline-header-active" : "")}>
                                     References
                                 </div>
                             </NavHashLink> :
