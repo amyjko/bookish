@@ -527,9 +527,9 @@ blockquote .blockquote-caption {
 	float: left;
 	margin-top: 1em;
 	position: absolute;
-	left: -1rem;
+	left: -1.75em;
 	text-align: right;
-	width: 1em;
+	width: 1.5em; /* Just enough space for 2 digits, a bit of a hack */
 }
 
 .terminology .marginal-interactor {
