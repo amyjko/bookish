@@ -14,6 +14,7 @@ class Chapter extends React.Component {
 		this.handleResize = this.handleResize.bind(this);
 		this.handleDoubleClick = this.handleDoubleClick.bind(this);
 		this.handleChange = this.handleChange.bind(this);
+		this.rememberPosition = this.rememberPosition.bind(this);
 
 		// Assume the chapter is loaded initially.
 		this.state = { 
@@ -30,8 +31,12 @@ class Chapter extends React.Component {
 
 	componentDidMount() {
 
+		// Lay things out when the window or scroll changes.
 		window.addEventListener('scroll', this.handleScroll);
 		window.addEventListener('resize', this.handleResize);
+
+		// Remember the scroll position before a refresh.
+        window.addEventListener("beforeunload", this.rememberPosition);
 
 		// If the component renders after the chapter is loaded and rendered, scroll to the last location.
 		if(this.props.app.getBook().chapterIsLoaded(this.props.id)) {
@@ -50,6 +55,10 @@ class Chapter extends React.Component {
 
 		window.removeEventListener('scroll', this.handleScroll);
 		window.removeEventListener('resize', this.handleResize);
+		window.removeEventListener("beforeunload", this.rememberPosition);
+
+		// Delete the remembered position so that the next page scrolls to top.
+		localStorage.removeItem("scrollposition");
 
 	}
 
@@ -61,11 +70,19 @@ class Chapter extends React.Component {
 			// Remember that it was loaded.
 			this.setState({ loaded: true});
 
+			// Scroll to the position now that it's loaded and rendered.
 			this.scrollToLastLocation();
+
 		}
 
 		// Position the marginals, since there's potentially new content.
 		this.layoutMarginals();
+
+	}
+
+	rememberPosition() { 
+
+		localStorage.setItem('scrollposition', window.scrollY);
 
 	}
 
@@ -101,17 +118,14 @@ class Chapter extends React.Component {
 				});
 
 		} 
+		// Scroll to the last scroll position.
 		else {
-		
-			// Read the saved position.
-			var progress = this.getProgress();
-			var position = (progress / 100.0) * (Math.max(document.body.scrollHeight, document.body.offsetHeight) - window.innerHeight);
 
-			// Scroll the window to roughly the same position.
-			// This is actually really annoying. Disabling it now that we have better outline navigation,
-			// and scrolling to the top instead.
-			// window.scrollTo(0, position);
-			window.scrollTo(0, 0);
+			// Scroll to the previous position, if there was one, so that refresh preserves position.
+			let scrollPosition = localStorage.getItem('scrollposition');
+			if(scrollPosition === null)
+				scrollPosition = 0;
+			window.scrollTo(0, scrollPosition);
 
 		}
 
