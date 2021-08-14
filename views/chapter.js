@@ -15,22 +15,64 @@ class Chapter extends React.Component {
 		this.handleDoubleClick = this.handleDoubleClick.bind(this);
 		this.handleChange = this.handleChange.bind(this);
 		this.rememberPosition = this.rememberPosition.bind(this);
+		this.watchLoading = this.watchLoading.bind(this);
 
 		// Assume the chapter is loaded initially.
 		this.state = { 
-			loaded: true, 
 			editing: false, 
 			draft: null,
 			marginal: null // The currently selected marginal; we only do one at a time.
 		};
+
+		// Remember what the hash was before the outline on this page sets it.
+		this.initialHash = null;
+		if(window.location.hash.split("#").length > 2)
+			this.initialHash = window.location.hash.split("#")[2];
+
+		// Watch the height of the document and wait until it's been stable for a while before scrolling
+		// to any targets. We use the data below to monitor the document height over time.
+		this.loadingMonitor = {
+			lastHeight: undefined,
+			count: 0,
+			intervalID: setInterval(this.watchLoading, 50),
+		}
+		this.watchLoading();
 
 	}
 
 	getApp() { return this.props.app; }
 	getBook() { return this.props.app.getBook(); }
 
-	componentDidMount() {
+	imagesAreLoaded() {
 
+		let loaded = true;
+		Array.from(document.getElementsByTagName("img")).forEach(el => {
+			loaded = loaded & el.complete;
+		});
+		return loaded;
+
+	}
+
+	watchLoading() {
+
+		const bodyHeight = document.body.clientHeight;
+		if(this.loadingMonitor.lastHeight === document.body.clientHeight) {
+			this.loadingMonitor.count++;
+			this.loadingMonitor.lastHeight = document.body.clientHeight;
+			if(this.loadingMonitor.count >= 3 || this.imagesAreLoaded()) {
+				clearInterval(this.loadingMonitor.intervalID);
+				this.scrollToLastLocation();
+			}
+		}
+		else {
+			this.loadingMonitor.lastHeight = bodyHeight;
+			this.loadingMonitor.count = 0;
+		}
+
+	}
+
+	componentDidMount() {
+		
 		// Lay things out when the window or scroll changes.
 		window.addEventListener('scroll', this.handleScroll);
 		window.addEventListener('resize', this.handleResize);
@@ -38,16 +80,8 @@ class Chapter extends React.Component {
 		// Remember the scroll position before a refresh.
         window.addEventListener("beforeunload", this.rememberPosition);
 
-		// If the component renders after the chapter is loaded and rendered, scroll to the last location.
-		if(this.props.app.getBook().chapterIsLoaded(this.props.id)) {
-			this.scrollToLastLocation();
-		}
-		// Otherwise, mark it as not loaded.
-		else
-			this.setState({ loaded: false })
-
 		// Position the marginals, since there's new content.
-		this.layoutMarginals();
+		this.layoutMarginals();		
 
 	}
 
@@ -63,17 +97,6 @@ class Chapter extends React.Component {
 	}
 
 	componentDidUpdate() {
-
-		// If the chapter was rendered, and the chapter wasn't yet loaded, but now it is, scroll to the last location.
-		if(!this.state.loaded && this.props.app.getBook().chapterIsLoaded(this.props.id)) {
-
-			// Remember that it was loaded.
-			this.setState({ loaded: true});
-
-			// Scroll to the position now that it's loaded and rendered.
-			this.scrollToLastLocation();
-
-		}
 
 		// Position the marginals, since there's potentially new content.
 		this.layoutMarginals();
@@ -117,8 +140,17 @@ class Chapter extends React.Component {
 					block: "center"
 				});
 
-		} 
-		// Scroll to the last scroll position.
+		}
+		// If there's no word, is there a hash? If so, jump to it.
+		else if(this.initialHash !== null) {
+			const el = document.getElementById(this.initialHash);
+
+			if(el) {
+				window.scrollTo({ top: el.getBoundingClientRect().top + window.scrollY - window.innerHeight / 3, behavior: 'smooth' }); 
+			}
+
+		}
+		// If there's no word or hash, scroll to the last scroll position, if there is one.
 		else {
 
 			// Scroll to the previous position, if there was one, so that refresh preserves position.
@@ -364,7 +396,6 @@ class Chapter extends React.Component {
 
 		// Figure out if there's something to highlight.
 		var citationHighlight = null;
-		var noteHighlight = null;
 		var highlight = window.location.hash.split("#")[2];
 		if(highlight) {
 			let parts = highlight.split("-");

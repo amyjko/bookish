@@ -33,7 +33,7 @@
 		"history": "^4.7.2",
 		"highlight.js": "11.1.0",
 		"react": "^16.8",
-		"react-dom": "^16.3",
+		"react-dom": "^16.8",
 		"react-router-dom": "^5.2",
 		"react-router-hash-link": "^2.2.2"
 	}

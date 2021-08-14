@@ -116,20 +116,28 @@ class Outline extends React.Component {
         const threshold = this.getHighlightThreshold();
 
 		// Find the header that we're past so we can update the outline.
-		let headers = document.getElementsByClassName("header");
 		let indexOfNearestHeaderAbove = -1; // -1 represents the title
-		for(let i = 0; i < headers.length; i++) {
-			let header = headers[i];
-			if(header.tagName === "H1" || header.tagName === "H2" || header.tagName === "H3") {
+        let nearbyHeader = null;
+        Array.from(document.getElementsByClassName("header")).forEach((header, index) => {
+            // Is this a header we care about?
+            if(header.tagName === "H1" || header.tagName === "H2" || header.tagName === "H3") {
 				let rect = header.getBoundingClientRect();
 				let headerTop = rect.y + top - rect.height;
-				if(top > headerTop - threshold)
-					indexOfNearestHeaderAbove = i;
+                // Are we past this header?
+                if(top > headerTop - threshold)
+					indexOfNearestHeaderAbove = index;
+                // Are we within 
+                if(Math.abs(headerTop - top) < threshold)
+                    nearbyHeader = header;
 			}
-		}
+		});
 
         // Update the outline and progress bar.
 		this.setState({ headerIndex: indexOfNearestHeaderAbove });
+
+        // Get the current hash and modify it to reflect the current header position.
+        let currentHash = window.location.hash.split("#");
+        window.location.hash = "#" + currentHash[1] + (nearbyHeader ? "#" + nearbyHeader.id : "");
 
     }
 
