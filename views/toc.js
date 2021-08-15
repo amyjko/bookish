@@ -223,7 +223,8 @@ class TableOfContentsImage extends React.Component {
 		return <img 
 			className="img-rounded" 
 			style={{width: "5em"}} 
-			src={this.props.url.startsWith("http") ? this.props.url : "images/" + this.props.url}
+			// Load the small images. Big ones are too slow!
+			src={this.props.url.startsWith("http") ? this.props.url : "images/small/" + this.props.url}
 			alt={this.props.alt}
 		/>
 
