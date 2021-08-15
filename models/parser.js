@@ -5,6 +5,8 @@ import { Figure } from './../views/image';
 import { Marginal } from './../views/marginal';
 import { Code } from './../views/code';
 
+import { smoothlyScrollElementToEyeLevel } from './../views/scroll.js';
+
 // TODO This grammar is slightly out of date.
 // A simple recursive descent parser for this grammar.
 // Embeds a tokenizer, since the lexical grammar is simple.
@@ -1522,11 +1524,6 @@ class LinkNode extends Node {
     }
     toDOM(view, chapter, key) {
 
-        let topThirdScroll = (el) => {
-            // Top of the target minus a third of window height.
-            window.scrollTo({ top: el.getBoundingClientRect().top - window.innerHeight / 3 + window.pageYOffset, behavior: 'smooth' }); 
-        }
-
         // If this is external link, make an anchor that opens a new window.
         if(this.url.startsWith("http")) {
             return <a key={key} href={this.url} target="_blank">{this.content.toDOM(view, chapter)}</a>;
@@ -1536,9 +1533,9 @@ class LinkNode extends Node {
                 let [chapter, label] = this.url.split(":");
                 // If the chapter isn't specified, set to the current chapter's id.
                 if(chapter === "")
-                    return <NavHashLink key={key} smooth scroll={topThirdScroll} to={"#" + label}>{this.content.toDOM(view, chapter)}</NavHashLink>;
+                    return <NavHashLink key={key} smooth scroll={smoothlyScrollElementToEyeLevel} to={"#" + label}>{this.content.toDOM(view, chapter)}</NavHashLink>;
                 else
-                    return <NavHashLink key={key} smooth scroll={topThirdScroll} to={"/" + chapter + "#" + label}>{this.content.toDOM(view, chapter)}</NavHashLink>;
+                    return <NavHashLink key={key} smooth scroll={smoothlyScrollElementToEyeLevel} to={"/" + chapter + "#" + label}>{this.content.toDOM(view, chapter)}</NavHashLink>;
             }
             else {
                 // If this is internal link, make a route link to the chapter.

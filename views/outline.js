@@ -3,6 +3,8 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { NavHashLink } from "react-router-hash-link";
 
+import { smoothlyScrollElementToEyeLevel } from './../views/scroll.js';
+
 class Outline extends React.Component {
 
     constructor(props) {
@@ -153,12 +155,6 @@ class Outline extends React.Component {
 
 	render() {
 
-        // Scroll the window such that the header is at the top third of the window.
-        let topThirdScroll = (el) => {
-            // Top of the target minus a third of window height.
-            window.scrollTo({ top: el.getBoundingClientRect().top - window.innerHeight / 3 + window.pageYOffset, behavior: 'smooth' }); 
-        }
-
         // Scan for headers and put them into a stable list.
         let headers = [];
         Array.from(document.getElementsByClassName("header")).forEach(el => headers.push(el));
@@ -188,7 +184,7 @@ class Outline extends React.Component {
                             // Only h1, h2, and h3 headers...
                             return level > 3 ? 
                                 null :
-                                <NavHashLink scroll={topThirdScroll} to={"#" + header.id} key={"header-" + index} >
+                                <NavHashLink scroll={smoothlyScrollElementToEyeLevel} to={"#" + header.id} key={"header-" + index} >
                                     <div className={"outline-header outline-header-level-" + (level - 1) + (this.state.headerIndex === index ? " outline-header-active" : "")}>
                                         {header.textContent}
                                     </div>

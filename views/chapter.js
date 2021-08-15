@@ -5,6 +5,8 @@ import { Header } from './header';
 import { Authors } from "./authors";
 import { Outline } from './outline';
 
+import { smoothlyScrollElementToEyeLevel } from './../views/scroll.js';
+
 class Chapter extends React.Component {
 
 	constructor(props){
@@ -135,16 +137,15 @@ class Chapter extends React.Component {
 			var number = this.props.match.params.number && this.props.match.params.number < match.length ? this.props.match.params.number : 0;
 
 			if(match.length > 0)
-				window.scrollTo({ top: match[number].getBoundingClientRect().top + window.scrollY - window.innerHeight / 3, behavior: 'smooth' })
+				smoothlyScrollElementToEyeLevel(match[number]);
 
 		}
 		// If there's no word, is there a hash? If so, jump to it.
 		else if(this.initialHash !== null) {
 			const el = document.getElementById(this.initialHash);
 
-			if(el) {
-				window.scrollTo({ top: el.getBoundingClientRect().top + window.scrollY - window.innerHeight / 3, behavior: 'smooth' }); 
-			}
+			if(el)
+				smoothlyScrollElementToEyeLevel(el);
 
 		}
 		// If there's no word or hash, scroll to the last scroll position, if there is one.
