@@ -1,5 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import { NavHashLink } from "react-router-hash-link";
 import { Figure } from './../views/image';
 import { Marginal } from './../views/marginal';
 import { Code } from './../views/code';
@@ -181,6 +182,11 @@ class Parser {
     charBeforeNext() {
         return this.index === 0 ? null : this.text.charAt(this.index - 1);
     }
+
+    // The character after
+    charAfterNext() {
+        return this.index === this.text.length - 1 ? null : this.text.charAt(this.index + 1);
+    }
     
     // All the text until the next newline
     restOfLine() {
@@ -208,6 +214,7 @@ class Parser {
             next === "`" ||
             next === "@" ||
             next === "~" ||
+            (next === ":" && this.charAfterNext().match(/[a-z]/i)) ||
             next === "^" ||
             next === "<" ||
             next === "{" ||
@@ -262,6 +269,7 @@ class Parser {
             headers: [],
             symbols: {},
             embeds: [],
+            labels: [],
             errors: []
         };
 
@@ -743,7 +751,7 @@ class Parser {
     // because we don't allow infinite nesting of the same formatting type.
     parseContent(book, metadata, awaiting) {
 
-        var segments = [];
+        let segments = [];
 
         // Read until hitting a delimiter.
         while(this.more() && !this.nextIs("\n")) {
@@ -785,6 +793,10 @@ class Parser {
                     symbol = symbol + this.read();
                 segments.push(new ErrorNode(metadata, "Couldn't find symbol @" + symbol));
 
+            }
+            // Parse a label
+            else if(this.nextIs(":") && this.charAfterNext().match(/[a-z]/i)) {
+                segments.push(this.parseLabel(book, metadata));
             }
             // Keep reading text until finding a delimiter.
             else {
@@ -897,6 +909,30 @@ class Parser {
         // Consume the closing %, if we didn't reach the end of input or a newline.
         if(this.peek() === "%")
             this.read();
+
+    }
+
+    parseLabel(book, metadata) {
+
+        // Consume the :
+        this.read();
+
+        // Consume everything until it's not a letter.
+        let id = "";
+        while(this.more() && this.peek().match(/[a-z]/i))
+            id = id + this.read();
+
+        const label = new LabelNode(id);
+
+        if(metadata) {
+            let matches = metadata.labels.filter(label => label.getID() === id);
+            if(matches.length > 0)
+                return new ErrorNode("Duplicate label " + id);
+
+            metadata.labels.push(label);
+        }
+
+        return label;
 
     }
 
@@ -1101,7 +1137,7 @@ class Parser {
         // Read the |
         this.read();
         // Read the link
-        var link = this.readUntilNewlineOr("]");
+        let link = this.readUntilNewlineOr("]");
 
         // Catch missing closing
         if(this.peek() !== "]") {
@@ -1113,10 +1149,23 @@ class Parser {
         this.read();
 
         // If it's internal, validate it.
-        if(!link.startsWith("http") && !book.hasChapter(link))
-            return new ErrorNode(metadata, "Unknown chapter name '" + link + "'");
-        else
-            return new LinkNode(content, link);
+        if(!link.startsWith("http")) {
+
+            // Pull out any labels and just get the chapter name.
+            let chapter = link;
+            let label = null;
+            if(link.indexOf(":") >= 0) {
+                let parts = chapter.split(":");
+                chapter = parts[0];
+                label = parts[1];
+            }
+
+            if(chapter !== "" && !book.hasChapter(chapter))
+                return new ErrorNode(metadata, "Unknown chapter name '" + link + "'");
+
+        }
+
+        return new LinkNode(content, link);
 
     }
 
@@ -1469,11 +1518,24 @@ class LinkNode extends Node {
         this.url = url;
     }
     toDOM(view, chapter, query, key) {
-        return this.url.startsWith("http") ?
-            // If this is external link, make an anchor that opens a new window.
-            <a  key={key} href={this.url} target="_blank">{this.content.toDOM(view, chapter, query)}</a> :
-            // If this is internal link, make a route link. TODO What if the chapter doesn't exist?
-            <Link key={key} to={this.url}>{this.content.toDOM(view, chapter, query)}</Link>;
+        // If this is external link, make an anchor that opens a new window.
+        if(this.url.startsWith("http")) {
+            return <a key={key} href={this.url} target="_blank">{this.content.toDOM(view, chapter, query)}</a>;
+        }
+        else {
+            if(this.url.indexOf(":") >= 0) {
+                let [chapter, label] = this.url.split(":");
+                // If the chapter isn't specified, set to the current chapter's id.
+                if(chapter === "")
+                    return <NavHashLink key={key} to={"#" + label}>{this.content.toDOM(view, chapter, query)}</NavHashLink>;
+                else
+                    return <NavHashLink key={key} to={"/" + chapter + "#" + label}>{this.content.toDOM(view, chapter, query)}</NavHashLink>;
+            }
+            else {
+                // If this is internal link, make a route link to the chapter.
+                return <Link key={key} to={this.url}>{this.content.toDOM(view, chapter, query)}</Link>;
+            }
+        }
     }
 
     toText() {
@@ -1734,6 +1796,22 @@ class ErrorNode extends Node {
     toText() {
         return "";
     }
+
+}
+
+class LabelNode extends Node {
+    constructor(id) {
+        super();
+
+        this.id = id;
+
+    }
+
+    toDOM(view, chapter, query, key) {
+        return <span key={key} className="label" id={this.id}></span>
+    }
+
+    toText() { return ""; }
 
 }
 

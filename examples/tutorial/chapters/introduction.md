@@ -145,6 +145,7 @@ You can include [links to content|http://amyjko.com] like this:
 `markdown
 You can include [links to content|http://amyjko.com].
 `
+:linkexample
 
 The \| separates the link text from the URL. All links will open new windows.
 
@@ -372,3 +373,13 @@ It's also possible to write a ~glossary~gloss and tag places<swearngin20> in the
 `markdown
 ~the phrase you want to highlight~gloss
 `
+
+# Labels
+
+You can also insert labels anywhere in text in order to link to them within and between chapters. For example, I inserted a label up top called `:linkexample`, and I can [link to it|:linkexample] with code like this:
+
+`
+[link to it|:linkexample]
+`An example label label
+
+But I also linked to a label in [another chapter|marginals:leftexample].

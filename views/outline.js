@@ -150,23 +150,12 @@ class Outline extends React.Component {
         // Update the outline and progress bar.
 		this.setState({ headerIndex: indexOfNearestHeaderAbove });
 
-        // Get the current hash and modify it to reflect the current header position.
-        let currentHash = window.location.hash.split("#");
-        window.location.hash = "#" + currentHash[1] + (nearbyHeader ? "#" + nearbyHeader.id : "");
-
     }
 
 	render() {
 
         // Scroll the window such that the header is at the top third of the window.
         let topThirdScroll = (el) => {
-            // This previous behavior was pretty nice, but if an image is really tall and unrelated to the header, 
-            // it would scroll such that the header was out of view.
-            // let target = el;
-            // if(el.previousSibling && el.previousSibling.classList.contains("figure"))
-            //     target = el.previousSibling;
-            // window.scrollTo({ top: Math.min(el.getBoundingClientRect().top, target.getBoundingClientRect().top) + window.pageYOffset, behavior: 'smooth' }); 
-
             // Top of the target minus a third of window height.
             window.scrollTo({ top: el.getBoundingClientRect().top - window.innerHeight / 3 + window.pageYOffset, behavior: 'smooth' }); 
         }
