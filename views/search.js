@@ -77,6 +77,7 @@ class Search extends React.Component {
 		return (
 			<div>
 				<Header 
+                    book={book}
 					image={book.getImage("search")} 
 					header="Search"
 					tags={book.getTags()}

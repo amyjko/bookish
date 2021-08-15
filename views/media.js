@@ -18,6 +18,7 @@ class Media extends React.Component {
 		return (
 			<div>
 				<Header 
+					book={book}
 					image={book.getImage("media")} 
 					header="Media"
 					tags={book.getTags()}

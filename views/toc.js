@@ -76,6 +76,7 @@ class TableOfContents extends React.Component {
 			<div className="toc">
 
 				<Header 
+					book={book}
 					image={book.getImage("cover")} 
 					header={title}
 					subtitle={subtitle}

@@ -19,6 +19,7 @@ class Glossary extends React.Component {
 		return (
 			<div>
 				<Header 
+					book={book}
 					image={book.getImage("glossary")} 
 					header="Glossary"
 					tags={book.getTags()}

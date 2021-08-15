@@ -45,16 +45,30 @@ class Parser {
 
     }
 
+    static preprocessSymbols(book, text) {
+
+        // Replace any remaining symbols with any definitions given.
+        if(book && book.getSymbols()) {
+            for(const [symbol, definition] of Object.entries(book.getSymbols())) {
+                // Don't replace escaped at symbols. Otherwise, be liberal in replacing any matching symbol that starts with the symbol
+                // name and ends with a word boundary.
+                text = text.replace(new RegExp("([^\\\\])@" + symbol + "\\b", "g"), "$1" + definition);
+            }
+        }
+        return text;
+
+    }
+
     static parseChapter(book, text) {
-        return (new Parser(text)).parseChapter(book);
+        return (new Parser(Parser.preprocessSymbols(book, text))).parseChapter(book);
     }
 
     static parseContent(book, text) {
-        return (new Parser(text)).parseContent(book);
+        return (new Parser(Parser.preprocessSymbols(book, text))).parseContent(book);
     }
 
     static parseEmbed(book, text) {
-        return (new Parser(text)).parseEmbed(book);
+        return (new Parser(Parser.preprocessSymbols(book, text))).parseEmbed(book);
     }
 
     static parseReference(ref, book, short=false) {
@@ -263,12 +277,8 @@ class Parser {
             rest = rest.replace(new RegExp("([^\\\\])@" + symbol + "\\b", "g"), "$1" + text);
         }
 
-        // Then replace any remaining symbols with any definitions given.
-        if(book && book.getSymbols()) {
-            for(const [symbol, text] of Object.entries(book.getSymbols())) {
-                rest = rest.replace(new RegExp("([^\\\\])@" + symbol + "\\b", "g"), "$1" + text);
-            }
-        }
+        // Replace all of the remaining symbols using book symbol definitions.
+        rest = Parser.preprocessSymbols(book, rest);
         
         // Replace the text with the pre-processed text.
         this.text = declarations + rest;
@@ -321,7 +331,7 @@ class Parser {
             // Name declarations need to be terminated with a colon before the block starts.
             if(!this.nextIs(":")) {
                 this.readUntilNewLine();
-                metadata.errors.push(new ErrorNode(metadata, "Symbol names ave to be followed by a ':'"));
+                metadata.errors.push(new ErrorNode(metadata, "Symbol names are to be followed by a ':'"));
                 return;
             }
 
@@ -1713,7 +1723,8 @@ class ErrorNode extends Node {
         this.error = error;
 
         // Add the error to the give metadata object.
-        metadata.errors.push(this);
+        if(metadata)
+            metadata.errors.push(this);
     }
 
     toDOM(view, chapter, query, key) {

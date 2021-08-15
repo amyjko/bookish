@@ -43,6 +43,7 @@ class References extends React.Component {
 		return (
 			<div>
 				<Header 
+					book={book}
 					image={book.getImage("references")} 
 					header="References"
 					tags={book.getTags()}

@@ -78,7 +78,8 @@ class Index extends React.Component {
 		return (
 			<div>
 				<Header 
-					image={book.getImage("index")} 
+					book={book}
+                    image={book.getImage("index")} 
 					header="Index"
 					tags={book.getTags()}
 				/>

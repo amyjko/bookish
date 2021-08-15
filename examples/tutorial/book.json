@@ -5,13 +5,13 @@
 		{ "id": "boomy", "name" : "Boomy" }
 	],
 	"images": {
-		"cover": "|cover.jpg|A photograph of Boomy the cat sleeping|Boomy is excited that you're trying Peruse!|Amy J. Ko|",
-		"search": "|cover.jpg|A photograph of Boomy the cat sleeping|Boomy's looking for something...|Amy J. Ko|",
-		"media": "|cover.jpg|A photograph of Boomy the cat sleeping|Boomy's looking for something...|Amy J. Ko|",
-		"glossary": "|cover.jpg|A photograph of Boomy the cat looking skeptical.|Boomy doesn't know what you mean.|Amy J. Ko|",
-		"references": "|cover.jpg|A photograph of Boomy the cat sleeping|Boomy has some books for you!|Amy J. Ko|",
-		"index": "|cover.jpg|A photograph of Boomy the cat sleeping|Boomy's wondering what word you're curious about!|Amy J. Ko|",
-		"unknown": "|unknown.jpg|A photograph of Boomy the cat looking skeptical.|Boomy is worried that you're lost.|Amy J. Ko|"
+		"cover": "|cover.jpg|A photograph of Boomy the cat sleeping|Boomy is excited that you're trying Peruse!|@amyCredit|",
+		"search": "|cover.jpg|A photograph of Boomy the cat sleeping|Boomy's looking for something...|@amyCredit|",
+		"media": "|cover.jpg|A photograph of Boomy the cat sleeping|Boomy's looking for something...|@amyCredit|",
+		"glossary": "|cover.jpg|A photograph of Boomy the cat looking skeptical.|Boomy doesn't know what you mean.|@amyCredit|",
+		"references": "|cover.jpg|A photograph of Boomy the cat sleeping|Boomy has some books for you!|@amyCredit|",
+		"index": "|cover.jpg|A photograph of Boomy the cat sleeping|Boomy's wondering what word you're curious about!|@amyCredit|",
+		"unknown": "|unknown.jpg|A photograph of Boomy the cat looking skeptical.|Boomy is worried that you're lost.|@amyCredit|"
 	},
 	"description": "This is an example book, intended for presentation with the Peruse framework. Don't let it's simplicity fool you: it demonstrates all of the features of peruse, so you should be able to copy and modify any of its content to help you write your book.",
 	"acknowledgements": "Thanks to Boomy for all her hard work.",
@@ -20,20 +20,20 @@
 			"id": "introduction",
 			"title": "Introduction",
 			"authors": ["ajko"],
-			"image": "|chapter1.jpg|A photo of Boomy|Let's dive in!|Amy J. Ko|",
+			"image": "|chapter1.jpg|A photo of Boomy|Let's dive in!|@amyCredit|",
 			"numbered": false
 		},
 		{
 			"id": "marginals",
 			"title": "Marginals",
 			"authors": ["ajko"],
-			"image": "|unknown.jpg|A photo of skeptical Boomy|Time to learn about errors, huh?|Amy J. Ko|"
+			"image": "|unknown.jpg|A photo of skeptical Boomy|Time to learn about errors, huh?|@amyCredit|"
 		},
 		{
 			"id": "unfinished",
 			"title": "Unfinished",
 			"authors": ["ajko"],
-			"image": "|unknown.jpg|A photo of skeptical Boomy|Time to learn about errors, huh?|Amy J. Ko|",
+			"image": "|unknown.jpg|A photo of skeptical Boomy|Time to learn about errors, huh?|@amyCredit|",
 			"section": "Part II",
 			"forthcoming": true
 		},
@@ -41,7 +41,7 @@
 			"id": "errors",
 			"title": "Errors",
 			"authors": ["ajko", "boomy"],
-			"image": "|unknown.jpg|A photo of skeptical Boomy|Time to learn about errors, huh?|Amy J. Ko|",
+			"image": "|unknown.jpg|A photo of skeptical Boomy|Time to learn about errors, huh?|@amyCredit|",
 			"section": "Part I"
 		}
 	],
@@ -68,6 +68,7 @@
 		"jds": "jdskfljsakdfjkdlsfj"
 	},
 	"symbols": {
+		"amyCredit": "Amy J. Ko",
 		"hello": "Hi, I am _symbolic_ text."
 	},
 	"glossary": {

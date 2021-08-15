@@ -421,6 +421,7 @@ class Chapter extends React.Component {
 			return (
 				<div className="chapter">
 					<Header 
+						book={book}
 						image={chapter.image}
 						before={
 							<span>
