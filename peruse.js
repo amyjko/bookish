@@ -12,6 +12,10 @@ import { Search } from "./views/search";
 import { Media } from "./views/media";
 import { Unknown } from "./views/unknown";
 
+import smoothscroll from 'smoothscroll-polyfill';
+
+smoothscroll.polyfill();
+
 class Peruse extends React.Component {
 
 	constructor(props) {
@@ -109,6 +113,8 @@ class Peruse extends React.Component {
 	}
 	
 }
+
+
 
 var PeruseWithRouter = withRouter(Peruse);
 
