@@ -135,10 +135,7 @@ class Chapter extends React.Component {
 			var number = this.props.match.params.number && this.props.match.params.number < match.length ? this.props.match.params.number : 0;
 
 			if(match.length > 0)
-				match[number].scrollIntoView({
-					behavior: "smooth",
-					block: "center"
-				});
+				window.scrollTo({ top: match[number].getBoundingClientRect().top + window.scrollY - window.innerHeight / 3, behavior: 'smooth' })
 
 		}
 		// If there's no word, is there a hash? If so, jump to it.
