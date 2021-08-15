@@ -136,7 +136,7 @@ You can nest numbered lists by increasing or decreasing the number of \.'s:
 3. Item _3_
 4. Item _4_
 
-It doesn't matter how many \*'s there are exactly, just whether that number is more or less than the bullets before or after it.
+It doesn't matter how many \*'s there are exactly:linkexample, just whether that number is more or less than the bullets before or after it.
 
 # Links
 
@@ -145,7 +145,6 @@ You can include [links to content|http://amyjko.com] like this:
 `markdown
 You can include [links to content|http://amyjko.com].
 `
-:linkexample
 
 The \| separates the link text from the URL. All links will open new windows.
 

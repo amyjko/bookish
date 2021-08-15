@@ -130,7 +130,7 @@ class Chapter extends React.Component {
 		// Scroll to the first match.
 		if(this.props.match.params.word) {
 
-			var match = document.getElementsByClassName("content-highlight");
+			var match = document.getElementsByClassName("text content-highlight");
 
 			var number = this.props.match.params.number && this.props.match.params.number < match.length ? this.props.match.params.number : 0;
 
@@ -314,6 +314,15 @@ class Chapter extends React.Component {
 		this.setState({ 
 			marginal: marginal
 		});
+
+	}
+
+	getHighlightedWord() { return this.props.match.params.word; }
+
+	getHighlightedID() {
+
+		let parts = window.location.hash.split("#");
+		return parts.length > 2 ? parts[2] : null;		
 
 	}
 

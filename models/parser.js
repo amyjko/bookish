@@ -1204,13 +1204,13 @@ class ChapterNode extends Node {
     
     }
 
-    toDOM(view, query) {
+    toDOM(view) {
         return <div key="chapter" className="chapter-body">
             {
                 this.metadata.errors.length === 0 ? 
                     null : 
                     <p><span className="alert alert-danger">{this.metadata.errors.length + " " + (this.metadata.errors.length > 1 ? "errors" : "error")} below</span></p>}
-            { this.blocks.map((block, index) => block.toDOM(view, this, query, "block-" + index)) }
+            { this.blocks.map((block, index) => block.toDOM(view, this, "block-" + index)) }
         </div>;
     }
 
@@ -1226,8 +1226,8 @@ class ParagraphNode extends Node {
         super();
         this.content = content;
     }
-    toDOM(view, chapter, query, key) {
-        return <p key={key}>{this.content.toDOM(view, chapter, query)}</p>;
+    toDOM(view, chapter, key) {
+        return <p key={key}>{this.content.toDOM(view, chapter)}</p>;
     }
 
     toText() {
@@ -1246,12 +1246,12 @@ class EmbedNode extends Node {
         this.position = position;
     }
 
-    toDOM(view, chapter, query, key) {
+    toDOM(view, chapter, key) {
         return <Figure key={key}
             url={this.url}
             alt={this.description}
-            caption={this.caption.toDOM(view, chapter, query)}
-            credit={this.credit.toDOM(view, chapter, query)}
+            caption={this.caption.toDOM(view, chapter)}
+            credit={this.credit.toDOM(view, chapter)}
             position={this.position}
         />
     }
@@ -1278,12 +1278,15 @@ class HeaderNode extends Node {
         this.content = content;
     }
 
-    toDOM(view, chapter, query, key) {
+    toDOM(view, chapter, key) {
+        
+        let query = view.getHighlightedID();
         let id = "header-" + chapter.getHeaders().indexOf(this);
+        let classes = "header" + (query === id ? " content-highlight" : "");
 
-        return this.level === 1 ? <h2 className="header" id={id} key={key}>{this.content.toDOM(view, chapter, query)}</h2> :
-            this.level === 2 ? <h3 className="header" id={id} key={key}>{this.content.toDOM(view, chapter, query)}</h3> :
-            <h4 className="header" id={id} key={key}>{this.content.toDOM(view, chapter, query)}</h4>
+        return this.level === 1 ? <h2 className={classes} id={id} key={key}>{this.content.toDOM(view, chapter)}</h2> :
+            this.level === 2 ? <h3 className={classes} id={id} key={key}>{this.content.toDOM(view, chapter)}</h3> :
+            <h4 className={classes} id={id} key={key}>{this.content.toDOM(view, chapter)}</h4>
     }
 
     toText() {
@@ -1297,7 +1300,7 @@ class RuleNode extends Node {
         super();
     }
 
-    toDOM(view, chapter, query, key) { return <hr key={key} />; }
+    toDOM(view, chapter, key) { return <hr key={key} />; }
 
     toText() {
         return "";
@@ -1311,12 +1314,12 @@ class BulletedListNode extends Node {
         this.items = items;
     }
 
-    toDOM(view, chapter, query, key) {
+    toDOM(view, chapter, key) {
         return <ul key={key}>{
             this.items.map((item, index) =>
                 item instanceof BulletedListNode ?
-                    item.toDOM(view, chapter, query, "item-" + index) :
-                    <li key={"item-" + index}>{item.toDOM(view, chapter, query)}</li>
+                    item.toDOM(view, chapter, "item-" + index) :
+                    <li key={"item-" + index}>{item.toDOM(view, chapter)}</li>
             )}
         </ul>;
     }
@@ -1333,12 +1336,12 @@ class NumberedListNode extends Node {
         this.items = items;
     }
 
-    toDOM(view, chapter, query, key) {
+    toDOM(view, chapter, key) {
         return <ol key={key}>{
             this.items.map((item, index) =>
                 item instanceof NumberedListNode ?
-                    item.toDOM(view, chapter, query, "item-" + index) :
-                    <li key={"item-" + index}>{item.toDOM(view, chapter, query)}</li>
+                    item.toDOM(view, chapter, "item-" + index) :
+                    <li key={"item-" + index}>{item.toDOM(view, chapter)}</li>
             )}
         </ol>;
     }
@@ -1357,11 +1360,11 @@ class CodeNode extends Node {
         this.caption = caption;
         this.position = position;
     }
-    toDOM(view, chapter, query, key) {
+    toDOM(view, chapter, key) {
         return <div key={key} className={(this.position === "<" ? "marginal-left-inset" : this.position === ">" ? "marginal-right-inset" : "")}>
             <Code inline={false} language={this.language}>{this.code}</Code>
             { this.language !== "plaintext" ? <div className="code-language">{this.language}</div> : null }
-            <div className="figure-caption">{this.caption.toDOM(view, chapter, query)}</div>
+            <div className="figure-caption">{this.caption.toDOM(view, chapter)}</div>
         </div>
     }
 
@@ -1380,11 +1383,11 @@ class QuoteNode extends Node {
         this.position = position;
     }
 
-    toDOM(view, chapter, query, key) {
+    toDOM(view, chapter, key) {
 
         return <blockquote className={"blockquote " + (this.position === "<" ? "marginal-left-inset" : this.position === ">" ? "marginal-right-inset" : "")} key={key}>
-            { this.elements.map((element, index) => element.toDOM(view, chapter, query, "quote-" + index)) }
-            { this.credit ? <div className="blockquote-caption"><span>{this.credit.toDOM(view, chapter, query)}</span></div> : null }
+            { this.elements.map((element, index) => element.toDOM(view, chapter, "quote-" + index)) }
+            { this.credit ? <div className="blockquote-caption"><span>{this.credit.toDOM(view, chapter)}</span></div> : null }
         </blockquote>
 
     }
@@ -1403,10 +1406,10 @@ class CalloutNode extends Node {
         this.position = position;
     }
 
-    toDOM(view, chapter, query, key) {
+    toDOM(view, chapter, key) {
 
         return <div className={"callout " + (this.position === "<" ? "marginal-left-inset" : this.position === ">" ? "marginal-right-inset" : "")} key={key}>
-            { this.elements.map((element, index) => element.toDOM(view, chapter, query, "callout-" + index))}
+            { this.elements.map((element, index) => element.toDOM(view, chapter, "callout-" + index))}
         </div>
 
     }
@@ -1426,7 +1429,7 @@ class TableNode extends Node {
         this.position = position;
     }
 
-    toDOM(view, chapter, query, key) {
+    toDOM(view, chapter, key) {
 
         // Determine the maximum number of columns so we can set the right colspan if necessary.
         let maxColumns = this.rows.reduce((max, row) => Math.max(row.length, max), 0);
@@ -1442,8 +1445,8 @@ class TableNode extends Node {
                                 <tr key={"row-" + index}>
                                     {
                                         row.length === 1 ?
-                                            [<td key={"cell-" + index} colSpan={maxColumns}>{row[0].toDOM(view, chapter, query, "cell-" + index)}</td>] :
-                                            row.map((cell, index) => <td key={"cell-" + index}>{cell.toDOM(view, chapter, query, "cell-" + index)}</td>)
+                                            [<td key={"cell-" + index} colSpan={maxColumns}>{row[0].toDOM(view, chapter, "cell-" + index)}</td>] :
+                                            row.map((cell, index) => <td key={"cell-" + index}>{cell.toDOM(view, chapter, "cell-" + index)}</td>)
                                     }
                                 </tr>
                             )
@@ -1452,7 +1455,7 @@ class TableNode extends Node {
                     </table>
 
                 </div>
-                <div className="figure-caption">{this.caption.toDOM(view, chapter, query)}</div>
+                <div className="figure-caption">{this.caption.toDOM(view, chapter)}</div>
             </div>
         );
     }
@@ -1472,9 +1475,9 @@ class FormattedNode extends Node {
         this.language = language;
     }
 
-    toDOM(view, chapter, query, key) {
+    toDOM(view, chapter, key) {
         
-        var segmentDOMs = this.segments.map((segment, index) => segment.toDOM(view, chapter, query, "formatted-" + index));
+        var segmentDOMs = this.segments.map((segment, index) => segment.toDOM(view, chapter, "formatted-" + index));
 
         if(this.format === "*")
             return <strong key={key}>{segmentDOMs}</strong>;
@@ -1501,7 +1504,7 @@ class InlineCodeNode extends Node {
         this.language = language;
     }
 
-    toDOM(view, chapter, query, key) {
+    toDOM(view, chapter, key) {
         return <Code key={key} inline={true} language={this.language}>{this.code}</Code>;        
     }
 
@@ -1517,23 +1520,29 @@ class LinkNode extends Node {
         this.content = content;
         this.url = url;
     }
-    toDOM(view, chapter, query, key) {
+    toDOM(view, chapter, key) {
+
+        let topThirdScroll = (el) => {
+            // Top of the target minus a third of window height.
+            window.scrollTo({ top: el.getBoundingClientRect().top - window.innerHeight / 3 + window.pageYOffset, behavior: 'smooth' }); 
+        }
+
         // If this is external link, make an anchor that opens a new window.
         if(this.url.startsWith("http")) {
-            return <a key={key} href={this.url} target="_blank">{this.content.toDOM(view, chapter, query)}</a>;
+            return <a key={key} href={this.url} target="_blank">{this.content.toDOM(view, chapter)}</a>;
         }
         else {
             if(this.url.indexOf(":") >= 0) {
                 let [chapter, label] = this.url.split(":");
                 // If the chapter isn't specified, set to the current chapter's id.
                 if(chapter === "")
-                    return <NavHashLink key={key} to={"#" + label}>{this.content.toDOM(view, chapter, query)}</NavHashLink>;
+                    return <NavHashLink key={key} smooth scroll={topThirdScroll} to={"#" + label}>{this.content.toDOM(view, chapter)}</NavHashLink>;
                 else
-                    return <NavHashLink key={key} to={"/" + chapter + "#" + label}>{this.content.toDOM(view, chapter, query)}</NavHashLink>;
+                    return <NavHashLink key={key} smooth scroll={topThirdScroll} to={"/" + chapter + "#" + label}>{this.content.toDOM(view, chapter)}</NavHashLink>;
             }
             else {
                 // If this is internal link, make a route link to the chapter.
-                return <Link key={key} to={this.url}>{this.content.toDOM(view, chapter, query)}</Link>;
+                return <Link key={key} to={this.url}>{this.content.toDOM(view, chapter)}</Link>;
             }
         }
     }
@@ -1549,7 +1558,7 @@ class CitationsNode extends Node {
         super();
         this.citations = citations;
     }
-    toDOM(view, chapter, query, key) {
+    toDOM(view, chapter, key) {
 
         let segments = [];
 
@@ -1629,7 +1638,7 @@ class DefinitionNode extends Node {
         this.glossaryID = glossaryID;
     }
 
-    toDOM(view, chapter, query, key) {
+    toDOM(view, chapter, key) {
 
         // Find the definition.
         let glossary = view.getBook().getGlossary();
@@ -1643,7 +1652,7 @@ class DefinitionNode extends Node {
             <Marginal
                 chapter={view}
                 id={"glossary-" + this.glossaryID}
-                interactor={this.phrase.toDOM(view, chapter, query)}
+                interactor={this.phrase.toDOM(view, chapter)}
                 content={
                     <span className="definition">
                         <strong>{entry.phrase}</strong>: {entry.definition}
@@ -1668,7 +1677,7 @@ class FootnoteNode extends Node {
         super();
         this.footnote = footnote;
     }
-    toDOM(view, chapter, query, key) {
+    toDOM(view, chapter, key) {
 
         // If no chapter was provided, then don't render the footnote, since there's no context in which to render it.
         if(!chapter)
@@ -1683,7 +1692,7 @@ class FootnoteNode extends Node {
                 chapter={view}
                 id={"footnote-" + number}
                 interactor={<sup className="footnote-symbol">{letter}</sup>}
-                content={<span className="footnote"><sup className="footnote-symbol">{letter}</sup> {this.footnote.toDOM(view, chapter, query)}</span>} 
+                content={<span className="footnote"><sup className="footnote-symbol">{letter}</sup> {this.footnote.toDOM(view, chapter)}</span>} 
             />
         </span>
 
@@ -1701,8 +1710,8 @@ class ContentNode extends Node {
         this.segments = segments;
     }
 
-    toDOM(view, chapter, query, key) {
-        return <span key={key}>{ this.segments.map((segment, index) => segment.toDOM(view, chapter, query, "content-" + index))}</span>;
+    toDOM(view, chapter, key) {
+        return <span key={key}>{ this.segments.map((segment, index) => segment.toDOM(view, chapter, "content-" + index))}</span>;
     }
 
     toText() {
@@ -1717,10 +1726,10 @@ class SubSuperscriptNode extends Node {
         this.content = content;
     }
 
-    toDOM(view, chapter, query, key) {
+    toDOM(view, chapter, key) {
         return this.superscript?
-            <sup key={key}>{this.content.toDOM(view, chapter, query, "sup-")}</sup> :
-            <sub key={key}>{this.content.toDOM(view, chapter, query, "sub-")}</sub>;
+            <sup key={key}>{this.content.toDOM(view, chapter, "sup-")}</sup> :
+            <sub key={key}>{this.content.toDOM(view, chapter, "sub-")}</sub>;
     }
 
     toText() {
@@ -1735,12 +1744,13 @@ class TextNode extends Node {
         this.position = position - text.length;
     }
 
-    toDOM(view, chapter, query, key) {
+    toDOM(view, chapter, key) {
         
         // Is there a query we're supposed to highlight? If so, highlight it.
-        if(query) {
-            var text = this.text;
-            var lowerText = text.toLowerCase();
+        if(view && view.getHighlightedWord()) {
+            let query = view.getHighlightedWord();
+            let text = this.text;
+            let lowerText = text.toLowerCase();
             // Does this text contain the query? Highlight it.
             if(lowerText.indexOf(query) >= 0) {
 
@@ -1757,7 +1767,7 @@ class TextNode extends Node {
                 for(var i = 0; i < indices.length; i++) {
                     // Push the text from the end of the last match or the start of the string.
                     segments.push(text.substring(i === 0 ? 0 : indices[i - 1] + query.length, indices[i]));
-                    segments.push(<span key={"match-" + i} className="content-highlight">{text.substring(indices[i], indices[i] + query.length)}</span>);
+                    segments.push(<span key={"match-" + i} className="text content-highlight">{text.substring(indices[i], indices[i] + query.length)}</span>);
                 }
                 if(indices[indices.length - 1] < text.length - 1)
                     segments.push(text.substring(indices[indices.length - 1] + query.length, text.length));
@@ -1789,7 +1799,7 @@ class ErrorNode extends Node {
             metadata.errors.push(this);
     }
 
-    toDOM(view, chapter, query, key) {
+    toDOM(view, chapter, key) {
         return <span key={key} className="alert alert-danger">Error: {this.error}</span>;
     }
 
@@ -1807,8 +1817,9 @@ class LabelNode extends Node {
 
     }
 
-    toDOM(view, chapter, query, key) {
-        return <span key={key} className="label" id={this.id}></span>
+    toDOM(view, chapter, key) {
+        let query = view.getHighlightedID();
+        return <span key={key} className={"label" + (query === this.id ? " content-highlight" : "")} id={this.id}></span>
     }
 
     toText() { return ""; }

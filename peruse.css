@@ -331,10 +331,30 @@ blockquote .blockquote-caption {
 }
 
 .content-highlight {
-	background-color: rgb(247, 244, 157);
-	border: 1px solid lightGray;
-	border-radius: 5px;
-	padding: .25em;
+	border-radius: 2px;
+	animation: pulse 5s 1;
+}
+
+@keyframes pulse {
+	0% { background-color: rgb(255, 255, 255); }
+	10% { background-color: rgb(179, 219, 251); }
+	20% { background-color: rgb(255, 255, 255); }
+	30% { background-color: rgb(179, 219, 251); }
+	40% { background-color: rgb(255, 255, 255); }
+	50% { background-color: rgb(179, 219, 251); }
+	100% { background-color: rgb(255, 255, 255); }
+}
+
+/* A little circle at the point of the annotation */
+.label.content-highlight {
+	display: inline-block;
+	width: 3em;
+	height: 3em;
+	border-radius: 3em;
+	position: absolute;
+	z-index: -1;
+	margin-left: -1em;
+	margin-top: -0.5em;
 }
 
 .reference .summary {
@@ -345,7 +365,6 @@ blockquote .blockquote-caption {
 	margin-top: 1em;
 	font-style: italic;
 }
-
 
 /* Highlight JS colors */
 
