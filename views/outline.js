@@ -91,7 +91,7 @@ class Outline extends React.Component {
 		// Left align the floating outline with the left margin of the chapter
         // and the top of the title, unless we're past it.
 		let outline = document.getElementsByClassName("outline")[0];
-		let title = document.getElementsByClassName("title")[0];
+		let title = document.getElementsByClassName("chapter-header-text")[0];
 
         // If we found them both...
         if(outline && title) {
@@ -103,7 +103,6 @@ class Outline extends React.Component {
             // If not, set the position of the outline.
 			else {
                 let titleY = title.getBoundingClientRect().top + window.scrollY;
-				// outline.style.left = titleX + "px";
                 // If the title is off screen, anchor it to the top of the window. (CSS is set to do this).
                 if(titleY - 50 < window.scrollY) {
                     outline.style.removeProperty("margin-top");
