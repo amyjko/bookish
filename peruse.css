@@ -18,6 +18,10 @@ body {
 	color: black;
 }
 
+.book {
+	position: relative; /* This helps position things absolutely relative to the book */
+}
+
 .h1, .h2, .h3, .h4, .h5, .h6, h1, h2, h3, h4, h5, h6 {
 	font-family: "Raleway", serif;
 	font-weight: 700;
@@ -213,17 +217,28 @@ ol ol ol li {
 		background: linear-gradient(to right, black 0px, black 3px, transparent 3px) no-repeat right
 	}
 
-	/* The outline's right edge is positioned in JavaScript to the page margin. */
 	.outline {
-		position: fixed;
-		display: inline-block;
-		top: 50px;
 		width: 12em;
 		z-index: -1; /* Put it below everything when it's in the margin. */
 		border-right: 1px solid lightGray;
 		padding: 0.5em;
-		transform: translateX(-14em);
 		background-color: white;
+	}
+
+	/* When the outline is fixed to the left, it's translated by it's width (with some padding). */
+	/* It's left position is set outline.js. This class is set by outline.js. */
+	.outline.outline-fixed-left {
+		position: fixed;
+		display: inline-block;
+		top: 50px;
+		transform: translateX(-14em);
+	}
+
+	/* When the outline is fixed to title, it's positioned absolutely relative to the book container. */
+	/* We set a margin appropriate for it's width above. This class is set by outline.js. */
+	.outline.outline-title-left {
+		position: absolute;
+		margin-left: -14em;
 	}
 
 	.outline-collapse-cue {

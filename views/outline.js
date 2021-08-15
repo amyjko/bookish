@@ -21,6 +21,10 @@ class Outline extends React.Component {
 
     toggle() {
 
+        // Don't toggle when in margin mode.
+        if(!this.inFooter())
+            return;
+
         const newExpanded = !this.state.expanded;
 
         // Toggle expanded state
@@ -32,6 +36,16 @@ class Outline extends React.Component {
         if(this.props.listener)
             this.props.listener.call(this, newExpanded, this.layout);
     
+    }
+
+    inFooter() {
+
+        let outline = document.getElementsByClassName("outline")[0];
+        if(outline)
+            return window.getComputedStyle(outline).getPropertyValue("cursor") === "pointer";
+        else
+            return false;
+
     }
 
     // Position outline after first render.
@@ -82,25 +96,26 @@ class Outline extends React.Component {
         // If we found them both...
         if(outline && title) {
 
-            // Determine if we're in footer mode. This is a horrible hack dependency on style.
-            let inFooter = window.getComputedStyle(outline).getPropertyValue("cursor") === "pointer";
-
             // If so, remove the inline position so the footer CSS applies.
-			if(inFooter) {
-				outline.style.removeProperty("left");
-				outline.style.removeProperty("top");
+			if(this.inFooter()) {
+                outline.style.removeProperty("margin-top");
 			}
             // If not, set the position of the outline.
 			else {
-				let titleX = title.getBoundingClientRect().left + window.scrollX;
                 let titleY = title.getBoundingClientRect().top + window.scrollY;
-				outline.style.left = titleX + "px";
+				// outline.style.left = titleX + "px";
                 // If the title is off screen, anchor it to the top of the window. (CSS is set to do this).
-                if(titleY - 50 < window.scrollY)
-                    outline.style.removeProperty("top");
+                if(titleY - 50 < window.scrollY) {
+                    outline.style.removeProperty("margin-top");
+                    outline.classList.add("outline-fixed-left");
+                    outline.classList.remove("outline-title-left");
+                }
                 // Otherwise, anchor it to the title position.
-                else
-                    outline.style.top = title.getBoundingClientRect().top + "px";
+                else {
+                    outline.style.marginTop = "-" + document.getElementsByClassName("chapter-header-text")[0].getBoundingClientRect().height + "px"
+                    outline.classList.remove("outline-fixed-left");
+                    outline.classList.add("outline-title-left");
+                }
 
                 // Tell any listeners about the repositioning.
                 if(this.props.listener)
