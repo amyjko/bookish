@@ -88,92 +88,94 @@ class TableOfContents extends React.Component {
 
 				<h2>Chapters <small><small className="text-muted"><em>{readingTime < 60 ? Math.max(5, (Math.floor(readingTime / 10) * 10)) + " min read" : "~" + Math.round(readingTime / 60.0) + " hour read" }</em></small></small></h2>
 
-				<table className="table" id="toc">
-					<tbody>
-						{
-							book.getChapters().map((chapterSpec, index) => {
+				<div class="table-responsive">
+					<table className="table" id="toc">
+						<tbody>
+							{
+								book.getChapters().map((chapterSpec, index) => {
 
-								// Get the image, chapter number, and section for rendering.
-								const chapterID = chapterSpec.id;
-								const chapter = book.getChapter(chapterID);
-								const chapterNumber = book.getChapterNumber(chapterID);
-								const section = chapter.getSection();
-								const readingTime = book.getChapterReadingTime(chapterID);
-								const readingEstimate =
-									readingTime === undefined ? "Forthcoming" :
-									readingTime < 5 ? "<5 min read" :
-									readingTime < 60 ? "~" + Math.floor(readingTime / 5) * 5 + " min read" :
-									"~" + Math.round(10 * readingTime / 60) / 10 + " hour read";
-								const isLoaded = book.chapterIsLoaded(chapterID);
+									// Get the image, chapter number, and section for rendering.
+									const chapterID = chapterSpec.id;
+									const chapter = book.getChapter(chapterID);
+									const chapterNumber = book.getChapterNumber(chapterID);
+									const section = chapter.getSection();
+									const readingTime = book.getChapterReadingTime(chapterID);
+									const readingEstimate =
+										readingTime === undefined ? "Forthcoming" :
+										readingTime < 5 ? "<5 min read" :
+										readingTime < 60 ? "~" + Math.floor(readingTime / 5) * 5 + " min read" :
+										"~" + Math.round(10 * readingTime / 60) / 10 + " hour read";
+									const isLoaded = book.chapterIsLoaded(chapterID);
 
-								return (
-									<tr key={"chapter" + index} className={chapter.isForthcoming() ? "forthcoming" : ""}>
-										<td>
-											{ this.getImage(chapter.getImage()) }
-										</td>
-										<td>
-											<div>
-												{ chapterNumber === undefined ? null : <div className="chapter-number">{"Chapter " + chapterNumber}</div> }
+									return (
+										<tr key={"chapter" + index} className={chapter.isForthcoming() ? "forthcoming" : ""}>
+											<td>
+												{ this.getImage(chapter.getImage()) }
+											</td>
+											<td>
 												<div>
-													{
-														isLoaded && !chapter.isForthcoming() ? 
-															<Link to={"/" + chapterID}>{chapter.getTitle()}</Link> :
-															<span>{chapter.getTitle()}</span>
-													}
+													{ chapterNumber === undefined ? null : <div className="chapter-number">{"Chapter " + chapterNumber}</div> }
+													<div>
+														{
+															isLoaded && !chapter.isForthcoming() ? 
+																<Link to={"/" + chapterID}>{chapter.getTitle()}</Link> :
+																<span>{chapter.getTitle()}</span>
+														}
+													</div>
+													{ section === null ? null : <div className="section-name">{section}</div> }
 												</div>
-												{ section === null ? null : <div className="section-name">{section}</div> }
-											</div>
-										</td>
-										<td>
-											<small className="text-muted">
-												<em>
-													{ readingEstimate }
-													{ !chapter.isForthcoming() && this.getProgressDescription(chapterID in progress ? progress[chapterID] : null) }
-												</em>
-											</small>
-											{
-												isLoaded && chapter.getAST().getErrors().length > 0 ? 
-													<span><br/><small className="alert alert-danger">{chapter.getAST().getErrors().length + " " + (chapter.getAST().getErrors().length > 1 ? "errors" : "error")}</small></span> :
-													null
-											}
-										</td>
-									</tr>
-								)
-							})
-						}
-						{
-							book.getReferences() === null ? null :
-							<tr key="references">
-								<td>{ this.getImage(book.getImage("references")) }</td>
-								<td><Link to="/references">References</Link><br/><small className="text-muted"><em>Everything cited</em></small></td>
+											</td>
+											<td>
+												<small className="text-muted">
+													<em>
+														{ readingEstimate }
+														{ !chapter.isForthcoming() && this.getProgressDescription(chapterID in progress ? progress[chapterID] : null) }
+													</em>
+												</small>
+												{
+													isLoaded && chapter.getAST().getErrors().length > 0 ? 
+														<span><br/><small className="alert alert-danger">{chapter.getAST().getErrors().length + " " + (chapter.getAST().getErrors().length > 1 ? "errors" : "error")}</small></span> :
+														null
+												}
+											</td>
+										</tr>
+									)
+								})
+							}
+							{
+								book.getReferences() === null ? null :
+								<tr key="references">
+									<td>{ this.getImage(book.getImage("references")) }</td>
+									<td><Link to="/references">References</Link><br/><small className="text-muted"><em>Everything cited</em></small></td>
+									<td></td>
+								</tr>
+							}
+							{
+								book.getGlossary() && Object.keys(book.getGlossary()).length > 0 ?
+								<tr key="glossary">
+									<td>{ this.getImage(book.getImage("glossary")) }</td>
+									<td><Link to="/glossary">Glossary</Link><br/><small className="text-muted"><em>Definitions</em></small></td>
+									<td></td>
+								</tr> : null
+							}
+							<tr key="index">
+								<td>{ this.getImage(book.getImage("index")) }</td>
+								<td><Link to="/index/a">Index</Link><br/><small className="text-muted"><em>Common words and where they are</em></small></td>
 								<td></td>
 							</tr>
-						}
-						{
-							book.getGlossary() && Object.keys(book.getGlossary()).length > 0 ?
-							<tr key="glossary">
-								<td>{ this.getImage(book.getImage("glossary")) }</td>
-								<td><Link to="/glossary">Glossary</Link><br/><small className="text-muted"><em>Definitions</em></small></td>
+							<tr key="search">
+								<td>{ this.getImage(book.getImage("search")) }</td>
+								<td><Link to="/search">Search</Link><br/><small className="text-muted"><em>Find where words occur</em></small></td>
 								<td></td>
-							</tr> : null
-						}
-						<tr key="index">
-							<td>{ this.getImage(book.getImage("index")) }</td>
-							<td><Link to="/index/a">Index</Link><br/><small className="text-muted"><em>Common words and where they are</em></small></td>
-							<td></td>
-						</tr>
-						<tr key="search">
-							<td>{ this.getImage(book.getImage("search")) }</td>
-							<td><Link to="/search">Search</Link><br/><small className="text-muted"><em>Find where words occur</em></small></td>
-							<td></td>
-						</tr>
-						<tr key="media">
-							<td>{ this.getImage(book.getImage("media")) }</td>
-							<td><Link to="/media">Media</Link><br/><small className="text-muted"><em>Images and video in the book</em></small></td>
-							<td></td>
-						</tr>
-					</tbody>
-				</table>
+							</tr>
+							<tr key="media">
+								<td>{ this.getImage(book.getImage("media")) }</td>
+								<td><Link to="/media">Media</Link><br/><small className="text-muted"><em>Images and video in the book</em></small></td>
+								<td></td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
 
 				{
 					book.getAcknowledgements() ?
