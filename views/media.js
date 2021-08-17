@@ -2,6 +2,7 @@ import React from 'react';
 
 import { Header } from "./header";
 import { Outline } from './outline';
+import { Book } from '../models/book.js';
 
 class Media extends React.Component {
 
@@ -19,14 +20,14 @@ class Media extends React.Component {
 			<div>
 				<Header 
 					book={book}
-					image={book.getImage("media")} 
+					image={book.getImage(Book.MediaID)} 
 					header="Media"
 					tags={book.getTags()}
 				/>
 
 				<Outline
-					previous={null}
-					next={null}
+					previous={book.getPreviousChapterID(Book.MediaID)}
+					next={book.getNextChapterID(Book.MediaID)}
 				/>
 
 				<p>These images appear in the text.</p>

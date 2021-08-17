@@ -2,6 +2,7 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { Header } from "./header";
 import { Outline } from './outline';
+import { Book } from '../models/book.js';
 
 class Index extends React.Component {
 
@@ -79,14 +80,14 @@ class Index extends React.Component {
 			<div>
 				<Header 
 					book={book}
-                    image={book.getImage("index")} 
+                    image={book.getImage(Book.IndexID)} 
 					header="Index"
 					tags={book.getTags()}
 				/>
 
                 <Outline
-					previous={null}
-					next={null}
+					previous={book.getPreviousChapterID(Book.IndexID)}
+					next={book.getNextChapterID(Book.IndexID)}
 				/>
 
                 <p><em>This index includes all words, excluding common English words, words with apostrophes, and words ending in -ly.</em></p>

@@ -167,11 +167,11 @@ class Outline extends React.Component {
 
                     {/* Book navigation links */}
                     <div className="outline-header outline-header-level-0 outline-header-nav">
-                        { this.props.previous ? <span><Link to={"/" + this.props.previous}>Prev</Link></span> : <span>Prev</span> }
+                        { this.props.previous !== null ? <span><Link to={"/" + this.props.previous}>Prev</Link></span> : <span>Prev</span> }
                         &nbsp;&middot;&nbsp;
                         <Link to={"/"}>Home</Link>
                         &nbsp;&middot;&nbsp;
-                        { this.props.next ? <Link to={"/" + this.props.next}>Next</Link> : <span>Next</span> }
+                        { this.props.next !== null ? <Link to={"/" + this.props.next}>Next</Link> : <span>Next</span> }
                     </div>
 
                     {

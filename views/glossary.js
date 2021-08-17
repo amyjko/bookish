@@ -1,6 +1,7 @@
 import React from 'react';
 import { Header } from "./header";
 import { Outline } from './outline';
+import { Book } from '../models/book.js';
 
 class Glossary extends React.Component {
 
@@ -20,14 +21,14 @@ class Glossary extends React.Component {
 			<div>
 				<Header 
 					book={book}
-					image={book.getImage("glossary")} 
+					image={book.getImage(Book.GlossaryID)} 
 					header="Glossary"
 					tags={book.getTags()}
 				/>
 
 				<Outline
-					previous={null}
-					next={null}
+					previous={book.getPreviousChapterID(Book.GlossaryID)}
+					next={book.getNextChapterID(Book.GlossaryID)}
 				/>
 
 				<br/>

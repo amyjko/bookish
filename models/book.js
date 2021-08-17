@@ -7,6 +7,13 @@ let schema = require("./schema.json");
 
 class Book {
 
+    static TableOfContentsID = "";
+    static ReferencesID = "references";
+    static SearchID = "search";
+	static MediaID = "media";
+    static IndexID = "index";
+	static GlossaryID = "glossary";
+
     // Given a URL of a book.json object, downloads it and all of it's chapters.
     constructor(url, progressHandler) {
 
@@ -305,32 +312,64 @@ class Book {
 	}
 
 	// Given the current chapter, find the available chapter after it.
-	getNextChapterID(chapterID) {
+    getNextChapterID(chapterID) {
 
-		let chapters = this.getChapters();
-		let after = false;
-		for(let i = 0; i < chapters.length; i++) {
-			if(chapters[i].id === chapterID)
-				after = true;
-			else if(after && this.chapterIsLoaded(chapters[i].id))
-				return chapters[i].id;
-		}
-		return null;
+        // Handle back matter chapters.
+        switch(chapterID) {
+            case Book.ReferencesID: return Book.GlossaryID;
+            case Book.GlossaryID: return Book.IndexID;
+            case Book.IndexID: return Book.SearchID;
+            case Book.SearchID: return Book.MediaID;
+            case Book.MediaID: return Book.TableOfContentsID;
+            default:
+                let chapters = this.getChapters();
+                let after = false;
+                for(let i = 0; i < chapters.length; i++) {
+                    if(chapters[i].id === chapterID)
+                        after = true;
+                    // If we're after the given chapter and it's not forthcoming.
+                    else if(after && !this.getChapter(chapters[i].id).isForthcoming())
+                        return chapters[i].id;
+                }
+                // If the given ID was the last chapter, go to the next back matter chapter.
+                if(after)
+                    return Book.ReferencesID;
+                // Otherwise, it wasn't a valid ID
+                else
+                    return null;
+        }
 
 	}
 
 	// Given a chapter id, find the available chapter before it.
 	getPreviousChapterID(chapterID) {
 
-		let chapters = this.getChapters();
-		let before = false;
-		for(let i = chapters.length - 1; i >= 0; i--) {
-			if(chapters[i].id === chapterID)
-				before = true;
-			else if(before && this.chapterIsLoaded(chapters[i].id))
-				return chapters[i].id;
-		}
-		return null;
+        let chapters = this.getChapters();
+
+        switch(chapterID) {
+
+            // Handle back matter chapters.
+            case Book.ReferencesID: return chapters[chapters.length - 1].id; // Last chapter of the book
+            case Book.GlossaryID: return Book.ReferencesID;
+            case Book.IndexID: return Book.GlossaryID;
+            case Book.SearchID: return Book.IndexID;
+            case Book.MediaID: return Book.SearchID;
+            default:
+                let before = false;
+                for(let i = chapters.length - 1; i >= 0; i--) {
+                    if(chapters[i].id === chapterID)
+                        before = true;
+                    // If we're before the given chapter and it's not forthcoming.
+                    else if(before && !this.getChapter(chapters[i].id).isForthcoming())
+                        return chapters[i].id;
+                }
+                // If the given ID was the last chapter, go to the next back matter chapter.
+                if(before)
+                    return Book.TableOfContentsID;
+                // Otherwise, it wasn't a valid ID
+                else
+                    return null;
+        }
 
 	}
 

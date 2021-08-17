@@ -2,6 +2,7 @@ import React from 'react';
 import { Header } from "./header";
 import { Outline } from './outline';
 import { Link } from 'react-router-dom';
+import { Book } from '../models/book.js';
 
 class Search extends React.Component {
 
@@ -78,14 +79,14 @@ class Search extends React.Component {
 			<div>
 				<Header 
                     book={book}
-					image={book.getImage("search")} 
+					image={book.getImage(Book.SearchID)} 
 					header="Search"
 					tags={book.getTags()}
 				/>
 
                 <Outline
-					previous={null}
-					next={null}
+                    previous={book.getPreviousChapterID(Book.SearchID)}
+                    next={book.getNextChapterID(Book.SearchID)}
 				/>
 
                 <p>Type a word—just a single word—and we'll show its occurrences in this book:</p>

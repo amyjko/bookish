@@ -5,6 +5,7 @@ import { Header } from "./header";
 import { Outline } from './outline';
 
 import { Parser } from "../models/parser.js";
+import { Book } from '../models/book.js';
 
 class References extends React.Component {
 
@@ -44,14 +45,14 @@ class References extends React.Component {
 			<div>
 				<Header 
 					book={book}
-					image={book.getImage("references")} 
+					image={book.getImage(Book.ReferencesID)} 
 					header="References"
 					tags={book.getTags()}
 				/>
 
 				<Outline
-					previous={null}
-					next={null}
+					previous={book.getPreviousChapterID(Book.ReferencesID)}
+					next={book.getNextChapterID(Book.ReferencesID)}
 				/>
 
 				{

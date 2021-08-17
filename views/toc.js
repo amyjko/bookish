@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { Header } from "./header";
 import { Authors } from "./authors";
 import { Parser } from "../models/parser";
+import { Book } from '../models/book.js';
 
 class TableOfContents extends React.Component {
 
@@ -88,7 +89,7 @@ class TableOfContents extends React.Component {
 
 				<h2>Chapters <small><small className="text-muted"><em>{readingTime < 60 ? Math.max(5, (Math.floor(readingTime / 10) * 10)) + " min read" : "~" + Math.round(readingTime / 60.0) + " hour read" }</em></small></small></h2>
 
-				<div class="table-responsive">
+				<div className="table-responsive">
 					<table className="table" id="toc">
 						<tbody>
 							{
@@ -145,7 +146,7 @@ class TableOfContents extends React.Component {
 							{
 								book.getReferences() === null ? null :
 								<tr key="references">
-									<td>{ this.getImage(book.getImage("references")) }</td>
+									<td>{ this.getImage(book.getImage(Book.ReferencesID)) }</td>
 									<td><Link to="/references">References</Link><br/><small className="text-muted"><em>Everything cited</em></small></td>
 									<td></td>
 								</tr>
@@ -153,23 +154,23 @@ class TableOfContents extends React.Component {
 							{
 								book.getGlossary() && Object.keys(book.getGlossary()).length > 0 ?
 								<tr key="glossary">
-									<td>{ this.getImage(book.getImage("glossary")) }</td>
+									<td>{ this.getImage(book.getImage(Book.GlossaryID)) }</td>
 									<td><Link to="/glossary">Glossary</Link><br/><small className="text-muted"><em>Definitions</em></small></td>
 									<td></td>
 								</tr> : null
 							}
 							<tr key="index">
-								<td>{ this.getImage(book.getImage("index")) }</td>
+								<td>{ this.getImage(book.getImage(Book.IndexID)) }</td>
 								<td><Link to="/index/a">Index</Link><br/><small className="text-muted"><em>Common words and where they are</em></small></td>
 								<td></td>
 							</tr>
 							<tr key="search">
-								<td>{ this.getImage(book.getImage("search")) }</td>
+								<td>{ this.getImage(book.getImage(Book.SearchID)) }</td>
 								<td><Link to="/search">Search</Link><br/><small className="text-muted"><em>Find where words occur</em></small></td>
 								<td></td>
 							</tr>
 							<tr key="media">
-								<td>{ this.getImage(book.getImage("media")) }</td>
+								<td>{ this.getImage(book.getImage(Book.MediaID)) }</td>
 								<td><Link to="/media">Media</Link><br/><small className="text-muted"><em>Images and video in the book</em></small></td>
 								<td></td>
 							</tr>
