@@ -464,12 +464,16 @@ class Chapter extends React.Component {
 					<Outline
 						previous={book.getPreviousChapterID(this.props.id)}
 						next={book.getNextChapterID(this.props.id)}
-						listener={ (expanded, callback) =>
+						listener={ (expanded, callback) =>{
 							// If the outline is being expanded, hide the marginal, otherwise leave it alone.
 							this.setState({ 
 								marginal: expanded ? null : this.state.marginal 
-							}, callback)
-						}
+							}, callback);
+
+							// Check if we need to hide the outline after positioning.
+							this.hideOutlineIfObscured();
+
+						}}
 						// Collapse the outline if a marginal is selected.
 						collapse={this.state.marginal !== null}
 					/>
