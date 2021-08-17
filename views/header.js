@@ -12,7 +12,10 @@ class Header extends React.Component {
 			<div className="chapter-header">
 				{
 					this.props.image ?
-						<div className="full-width">{ Parser.parseEmbed(this.props.book, this.props.image).toDOM() }</div> :
+						<div className="full-width">
+							{ Parser.parseEmbed(this.props.book, this.props.image).toDOM() }
+							<div id="scroll-reminder"></div>
+						</div> :
 						// Add a bit of space to account for the lack of an image.
 						<p>&nbsp;</p>
 				}

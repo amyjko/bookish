@@ -35,11 +35,34 @@ class Peruse extends React.Component {
 		// Lookup table for optimization
 		this.chapterNumbers = {};
 
+		this.layout = this.layout.bind(this);
+
+	}
+
+	layout() {
+
+		this.showScrollReminder();
+
+	}
+
+	showScrollReminder() {
+
+		// Tag things "past-title" if we're past it, so they can react to position.
+		let title = document.getElementById("title");
+		let reminder = document.getElementById("scroll-reminder");
+		if(title && reminder) {
+			if(window.scrollY + window.innerHeight > title.getBoundingClientRect().top + window.scrollY)
+				reminder.classList.add("past-title");
+			else
+				reminder.classList.remove("past-title");
+		}
+
 	}
 
 	componentDidMount() {
 
-		// Set the window title to the title of the book.
+		window.addEventListener('scroll', this.layout);
+		window.addEventListener('resize', this.layout);
 
 		// Keep track of how long it's been since we started loading the book, so we can show feedback
 		// if it's been more than a certain period of time. We'll check every 100 milliseconds.
@@ -52,6 +75,19 @@ class Peruse extends React.Component {
 			}
 
 		}, 100);
+
+	}
+
+	componentWillUnmount() {
+
+		window.removeEventListener('scroll', this.layout);
+		window.addEventListener('resize', this.layout);
+
+	}
+
+	componentDidUpdate() {
+
+		this.showScrollReminder();
 
 	}
 
