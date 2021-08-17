@@ -103,7 +103,7 @@ class Peruse extends React.Component {
 								<Route path="/index/:letter?" render={(props) => <Index {...props} app={this} />} />
 								<Route path="/search/" render={(props) => <Search {...props} app={this} />} />
 								<Route path="/media/" render={(props) => <Media {...props} app={this} />} />
-								<Route path="*" render={(props) => <Unknown {...props} message={<p>This URL doesn't exist for this book. Want to go back to the <Link to="/">Table of Contents?</Link></p>} app={this} />}/>
+								<Route path="*" render={(props) => <Unknown {...props} message={<p>This URL doesn't exist for this book.</p>} app={this} />}/>
 							</Switch>
 						</div>
 					</div>
