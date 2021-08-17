@@ -151,9 +151,9 @@ ol ol ol li {
 		width: 20em;
 	}
 
-	/* Center the navigation buttons since they peek above when collapsed. */
 	.outline-header-nav {
 		text-align: center;
+		text-indent: 0 !important; /* Override header default */
 	}
 
 	.outline-collapse-cue {
@@ -643,6 +643,7 @@ a .outline-header-active {
 	animation-timing-function: ease;
 	width: 0; 
 	height: 0;
+	margin-left: -1rem;
 	border-left: 1rem solid transparent;
 	border-right: 1rem solid transparent;
 	border-top: 1rem solid white;
