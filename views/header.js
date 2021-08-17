@@ -13,7 +13,8 @@ class Header extends React.Component {
 				{
 					this.props.image ?
 						<div className="full-width">{ Parser.parseEmbed(this.props.book, this.props.image).toDOM() }</div> :
-						null
+						// Add a bit of space to account for the lack of an image.
+						<p>&nbsp;</p>
 				}
 				<div className="chapter-header-text">
 					{ this.props.before }
