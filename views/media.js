@@ -38,7 +38,7 @@ class Media extends React.Component {
 							null :
 							<img 
 								key={"image" + index}
-								className={"img-preview"}
+								className={"figure-preview"}
 								src={"images/" + embed.url} 
 								alt={embed.alt}
 							/>

@@ -1,11 +1,16 @@
+/* CUSTOM FONTS */
+
 @import url('https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,700;1,400;1,700&family=Raleway:ital,wght@0,400;0,700;1,400;1,700&display=block');
+
+/* PAGE LAYOUT */
 
 body {
 	max-width: 800px;
 
-	/* To make room for navigation footer*/
+	/* To make room for navigation footer. Without this, the page is too short to show it. */
 	padding-bottom: 5em;
 
+	/* Center the application in the viewport */
 	margin-left: auto;
 	margin-right: auto;
 
@@ -14,37 +19,87 @@ body {
 	font-size: 14pt;
 	line-height: 1.75em;
 
-	background-color: white;
-	color: black;
 }
 
 .book {
-	position: relative; /* This helps position things absolutely relative to the book */
-}
-
-.h1, .h2, .h3, .h4, .h5, .h6, h1, h2, h3, h4, h5, h6 {
-	font-family: "Raleway", serif;
-	font-weight: 700;
-}
-
-.outline {
-	font-family: "Raleway", serif;
-	font-weight: normal;
-	font-size: 12pt;
-}
-
-strong, b {
-	font-weight: 700;
+	/* This helps absolute position things relative to the book */
+	position: relative; 
 }
 
 p {
 	margin-top: 1.5em;
 	margin-bottom: 1.5em;
 	margin-right: 1.5em;
+
+	/* Allow paragraphs to break on words to support small screens. */
 	word-break: break-word;
 }
 
-/* Drop cap in the first paragraph's first letter. */
+strong, b {
+	font-weight: 700;
+}
+
+/* COLORS */
+
+body {
+	/* Customizable colors */
+	background-color: white;
+	color: black;
+}
+
+/* HEADERS */
+
+.h1, .h2, .h3, .h4, .h5, .h6, h1, h2, h3, h4, h5, h6 {
+	font-family: "Raleway", serif;
+	font-weight: 700;
+}
+
+.title {
+	margin-bottom: 0;
+}
+
+.subtitle {
+	margin-top: 0;
+	font-weight: normal;
+	font-style: italic;
+}
+
+.title .chapter-number {
+	font-size: 18pt;
+	display: inline-block; /* For the section name */
+}
+
+.chapter-number {
+	font-family: "Raleway";
+	font-weight: normal;
+	font-style: italic;
+	color: gray;
+	margin-right: 0.35em;
+}
+
+.authors {
+	margin-bottom: 0.5em;
+}
+
+.section-name {
+	display: inline-block;
+	font-weight: normal;
+	font-size: 12pt;
+	font-style: normal;
+	color: gray;
+}
+
+.tag {
+	font-size: 10pt;
+	display: inline-block;
+	background-color: lightGray;
+	padding: 0.1em 0.5em;
+	border-radius: 0.5em;
+}
+
+/* FLOURISHES */
+
+/* This implements aa drop cap in the first letter of the first paragraph of each chapter on the page. */
 .chapter > p:first-of-type::first-letter {
 	padding: 0 .25rem;
 	margin: 0 .25rem 0 0;
@@ -54,6 +109,8 @@ p {
 	line-height: 1;
 	color: black;
 }
+
+/* LISTS */
 
 ol li {
 	margin-bottom: 0.5em;
@@ -68,9 +125,7 @@ ol ol ol li {
 	list-style-type: upper-alpha;
 }
 
-.img-responsive, .embed-responsive {
-	border-radius: 4px;
-}
+/* IMAGES */
 
 .figure {
 	margin-top: 1em;
@@ -78,11 +133,278 @@ ol ol ol li {
 	width: 100%;
 }
 
+.figure-caption {
+	text-align: center;
+	color: #535351;
+	line-height: 1.5em;
+	font-size: 12pt;
+	margin-top: 0.1em;
+	margin-bottom: 1em;
+}
+
+.figure-img {
+	border-radius: 3px;
+	width: 100%;
+	margin-bottom: 0;
+}
+
+.figure-credit {
+	display: block;
+	text-align: right;
+	font-style: italic;
+	font-size: 8pt;
+	margin-right: 1em;
+}
+
+.figure-preview {
+	width: 10rem;
+	margin: 1em;
+}
+
+.figure-full {
+	left: 50%;
+	margin-left: -50vw;
+	margin-right: -50vw;
+	max-width: 100vw;
+	position: relative;
+	right: 50%;
+	width: 100vw;
+}
+
+#scroll-reminder {
+	position: fixed;
+	bottom: 4em;
+	left: 50%;
+	animation: bounce 3s infinite;
+	animation-timing-function: ease;
+	width: 0; 
+	height: 0;
+	margin-left: -1rem;
+	border-left: 1rem solid transparent;
+	border-right: 1rem solid transparent;
+	border-top: 1rem solid white;
+	mix-blend-mode: difference;
+}
+
+#scroll-reminder.past-title {
+	display: none;
+}
+
+@keyframes bounce {
+	0% { bottom: 4em; }
+	50% { bottom: 5em; }
+	100% { bottom: 4em; }
+}
+
+.chapter-header .figure {
+	margin-top: 0;
+}
+
+/* EMBEDS */
+
+.embed-responsive {
+	border-radius: 4px;
+}
+
+/* LINKS */
+
+a {
+	color: rgb(14, 121, 209);
+}
+
+/* TABLE OF CONTENTS */
+
 .forthcoming {
 	opacity: 0.5;
 }
 
-/* Smaller windows with no margins */
+/* BLOCK QUOTES */
+
+blockquote {
+	border-top: 1px solid lightGray;
+	border-bottom: 1px solid lightGray;
+	padding: 1em;
+	margin-bottom: 1em;
+	margin-top: 1em;
+	font-style: italic;
+	clear: both;
+}
+
+blockquote .blockquote-caption {
+	font-size: 12pt;
+	color: gray;
+}
+
+/* CALLOUTS */
+
+.callout {
+	border: 1px solid lightGray;
+	margin-bottom: 1em;
+	margin-top: 1em;
+	padding-left: 1em;
+	padding-right: 1em;
+	margin-right: 1em;
+	clear: both;
+}
+
+/* TABLES */
+
+.table {
+	line-height: 1.4em;
+	border-top: 1px solid lightGray;
+	border-bottom: 1px solid lightGray;
+	margin-bottom: 1em;
+	clear: both;
+}
+
+.rows center {
+	font-style: italic;
+}
+
+/* ERRORS */
+
+.alert-danger {
+	font-weight: 400;
+	padding: .25em;
+}
+
+/* HIGHLIGHTS */
+
+.content-highlight {
+	border-radius: 2px;
+	animation: pulse 5s 1;
+}
+
+/* A little circle at the point of the annotation */
+.label.content-highlight {
+	display: inline-block;
+	width: 3em;
+	height: 3em;
+	border-radius: 3em;
+	position: absolute;
+	z-index: -1;
+	margin-left: -1em;
+	margin-top: -0.5em;
+}
+
+@keyframes pulse {
+	0% { background-color: rgb(255, 255, 255); }
+	10% { background-color: rgb(179, 219, 251); }
+	20% { background-color: rgb(255, 255, 255); }
+	30% { background-color: rgb(179, 219, 251); }
+	40% { background-color: rgb(255, 255, 255); }
+	50% { background-color: rgb(179, 219, 251); }
+	100% { background-color: rgb(255, 255, 255); }
+}
+
+/* REFERENCES, FOOTNOTES, and GLOSSARY */
+
+.reference .summary {
+	font-size: 80%;
+	padding-left: 1em;
+	display: inline-block;
+	border-left: 4px solid rgb(220,220,220);
+	margin-top: 1em;
+	font-style: italic;
+}
+
+.footnote, .marginal .reference {
+	font-size: 0.8rem;
+	font-style: normal;
+	color: black;
+}
+
+.footnote-symbol, .citation-symbol {
+	color: rgb(14, 121, 209);
+}
+
+/* This enables us to layout the numbers and letters in a neat right-aligned floating grid. */
+.reference, .footnote {
+	position: relative;
+}
+
+.references .reference, .footnote {
+	display: block;
+	line-height: 1.2rem;
+	margin-left: 1rem;
+	margin-bottom: 1rem;
+	text-align: left;
+}
+
+.reference .citation-symbol, .footnote .footnote-symbol {
+	display: block;
+	float: left;
+	margin-top: 1em;
+	position: absolute;
+	left: -1.75em;
+	text-align: right;
+	width: 1.5em; /* Just enough space for 2 digits, a bit of a hack */
+}
+
+.terminology .marginal-interactor {
+	border-bottom: 2px solid lightGray;
+}
+
+.definition {
+	display: block;
+	padding-left: 0.75rem;
+	font-size: 10pt;
+	line-height: 1.25rem;
+	text-align: left;
+	margin-left: 0.25rem;
+	margin-bottom: 1rem;
+	background: linear-gradient(to right, lightGray 0px, lightGray 2px, transparent 2px) no-repeat right
+}
+
+.definition em {
+	color: grey;
+}
+
+/* MARGINALS */
+
+.outline {
+	font-family: "Raleway", serif;
+	font-weight: normal;
+	font-size: 12pt;
+}
+
+.outline-header {
+	display: block;
+	line-height: 1.4rem;
+	text-indent: -0.5rem;
+    padding-left: 1rem;
+	padding-right: 1rem;
+	margin-bottom: 0.75rem;
+	color: lightGrey;
+}
+
+.outline-header-level-0 {
+	font-size: 1rem;
+}
+
+.outline-header-level-1 {
+	font-size: 0.9rem;
+}
+
+.outline-header-level-2 {
+	font-size: 0.8rem;
+	font-style: italic;
+	margin-left: 1em;
+}
+
+a .outline-header, .outline-header a {
+	color: grey;
+}
+
+a:hover .outline-header {
+	text-decoration: underline;
+}
+
+a .outline-header-active {
+	color: black;
+}
+
+/* Mobile */
 @media screen and (max-width: 1200px) {
 
 	/* Fixed position for small screens. */
@@ -182,7 +504,7 @@ ol ol ol li {
 
 }
 
-/* Large windows with ample margins. */
+/* Desktop */
 @media screen and (min-width: 1200px) {
 
 	.marginal-left-inset {
@@ -253,126 +575,41 @@ ol ol ol li {
 
 }
 
-.figure-caption {
-	text-align: center;
-	color: #535351;
-	line-height: 1.5em;
-	font-size: 12pt;
-	margin-top: 0.1em;
-	margin-bottom: 1em;
-}
+/* SYNTAX HIGHLIGHTING */
 
-.figure-img {
-	border-radius: 3px;
-	width: 100%;
-	margin-bottom: 0;
-}
-
-.figure-credit {
-	display: block;
-	text-align: right;
-	font-style: italic;
-	font-size: 8pt;
-	margin-right: 1em;
-}
-
-.img-preview {
-	width: 10rem;
-	margin: 1em;
-}
-
-a {
-	color: rgb(14, 121, 209);
-}
-
-blockquote {
-	border-top: 1px solid lightGray;
-	border-bottom: 1px solid lightGray;
-	padding: 1em;
-	margin-bottom: 1em;
-	margin-top: 1em;
-	font-style: italic;
-	clear: both;
-}
-
-blockquote .blockquote-caption {
-	font-size: 12pt;
-	color: gray;
-}
-
-.callout {
-	border: 1px solid lightGray;
-	margin-bottom: 1em;
-	margin-top: 1em;
-	padding-left: 1em;
-	padding-right: 1em;
-	margin-right: 1em;
-	clear: both;
-}
-
-.table {
-	line-height: 1.4em;
-	border-top: 1px solid lightGray;
-	border-bottom: 1px solid lightGray;
-	margin-bottom: 1em;
-	clear: both;
-}
-
-.rows center {
-	font-style: italic;
-}
-
-.progress {
-	position: absolute;
-	top: 0;
-	left: 0;
-	height: 100%;
-	background-color: #F7F7F7;
-	z-index: -1;
-}
-
-.alert-danger {
-	font-weight: 400;
-	padding: .25em;
-}
-
-.content-highlight {
-	border-radius: 2px;
-	animation: pulse 5s 1;
-}
-
-@keyframes pulse {
-	0% { background-color: rgb(255, 255, 255); }
-	10% { background-color: rgb(179, 219, 251); }
-	20% { background-color: rgb(255, 255, 255); }
-	30% { background-color: rgb(179, 219, 251); }
-	40% { background-color: rgb(255, 255, 255); }
-	50% { background-color: rgb(179, 219, 251); }
-	100% { background-color: rgb(255, 255, 255); }
-}
-
-/* A little circle at the point of the annotation */
-.label.content-highlight {
-	display: inline-block;
-	width: 3em;
-	height: 3em;
-	border-radius: 3em;
-	position: absolute;
-	z-index: -1;
-	margin-left: -1em;
-	margin-top: -0.5em;
-}
-
-.reference .summary {
+.code {
 	font-size: 80%;
-	padding-left: 1em;
-	display: inline-block;
-	border-left: 4px solid rgb(220,220,220);
-	margin-top: 1em;
-	font-style: italic;
+	white-space: pre-wrap;	
+	border: 1px solid #EAEAEA;
+	color: gray;
+	background-color: #FCFAFA;
+	clear: both;
 }
 
-/* Highlight JS colors */
+.code-block {
+	display: block;
+	padding: 1em;
+	line-height: 1.5em;
+	border-radius: 3px;
+}
+
+.code-inline {
+	display: inline;
+	padding: 0.1em;
+}
+
+.code-inline code {
+	display: inline;	
+	padding: 0em;
+}
+
+.code-language {
+	float: right;
+	margin-top: -2em;
+	font-size: small;
+	color: gray;
+	margin-right: 0.25em;
+}
 
 /* Comment */
 .hljs-comment,
@@ -437,39 +674,7 @@ blockquote .blockquote-caption {
   font-weight: bold;
 }
 
-.code {
-	font-size: 80%;
-	white-space: pre-wrap;	
-	border: 1px solid #EAEAEA;
-	color: gray;
-	background-color: #FCFAFA;
-	clear: both;
-}
-
-.code-block {
-	display: block;
-	padding: 1em;
-	line-height: 1.5em;
-	border-radius: 3px;
-}
-
-.code-inline {
-	display: inline;
-	padding: 0.1em;
-}
-
-.code-inline code {
-	display: inline;	
-	padding: 0em;
-}
-
-.code-language {
-	float: right;
-	margin-top: -2em;
-	font-size: small;
-	color: gray;
-	margin-right: 0.25em;
-}
+/* EDITOR */
 
 .editor {
 	position: fixed;
@@ -487,181 +692,4 @@ blockquote .blockquote-caption {
 	width: 100%;
 	height: 15em;
 	padding: 1em;
-}
-
-.text.highlight {
-	background-color: rgb(255,255,200)
-}
-
-.title {
-	margin-bottom: 0;
-}
-
-.subtitle {
-	margin-top: 0;
-	font-weight: normal;
-	font-style: italic;
-}
-
-.title .chapter-number {
-	font-size: 18pt;
-}
-
-.chapter-number {
-	font-family: "Raleway";
-	font-weight: normal;
-	font-style: italic;
-	color: gray;
-	margin-right: 0.35em;
-}
-
-.title .chapter-number {
-	display: inline-block; /* For the section name */
-}
-
-.authors {
-	margin-bottom: 0.5em;
-}
-
-.section-name {
-	display: inline-block;
-	font-weight: normal;
-	font-size: 12pt;
-	font-style: normal;
-	color: gray;
-}
-
-.footnote, .marginal .reference {
-	font-size: 0.8rem;
-	font-style: normal;
-	color: black;
-}
-
-.footnote-symbol, .citation-symbol {
-	color: rgb(14, 121, 209);
-}
-
-/* This enables us to layout the numbers and letters in a neat right-aligned floating grid. */
-.reference, .footnote {
-	position: relative;
-}
-
-.references .reference, .footnote {
-	display: block;
-	line-height: 1.2rem;
-	margin-left: 1rem;
-	margin-bottom: 1rem;
-	text-align: left;
-}
-
-.reference .citation-symbol, .footnote .footnote-symbol {
-	display: block;
-	float: left;
-	margin-top: 1em;
-	position: absolute;
-	left: -1.75em;
-	text-align: right;
-	width: 1.5em; /* Just enough space for 2 digits, a bit of a hack */
-}
-
-.terminology .marginal-interactor {
-	border-bottom: 2px solid lightGray;
-}
-
-.definition {
-	display: block;
-	padding-left: 0.75rem;
-	font-size: 10pt;
-	line-height: 1.25rem;
-	text-align: left;
-	margin-left: 0.25rem;
-	margin-bottom: 1rem;
-	background: linear-gradient(to right, lightGray 0px, lightGray 2px, transparent 2px) no-repeat right
-}
-
-.definition em {
-	color: grey;
-}
-
-.outline-header {
-	display: block;
-	line-height: 1.4rem;
-	text-indent: -0.5rem;
-    padding-left: 1rem;
-	padding-right: 1rem;
-	margin-bottom: 0.75rem;
-	color: lightGrey;
-}
-
-a .outline-header, .outline-header a {
-	color: grey;
-}
-
-a:hover .outline-header {
-	text-decoration: underline;
-}
-
-.outline-header-level-0 {
-	font-size: 1rem;
-}
-
-.outline-header-level-1 {
-	font-size: 0.9rem;
-}
-
-.outline-header-level-2 {
-	font-size: 0.8rem;
-	font-style: italic;
-	margin-left: 1em;
-}
-
-a .outline-header-active {
-	color: black;
-}
-
-.tag {
-	font-size: 10pt;
-	display: inline-block;
-	background-color: lightGray;
-	padding: 0.1em 0.5em;
-	border-radius: 0.5em;
-}
-
-.full-width {
-	left: 50%;
-	margin-left: -50vw;
-	margin-right: -50vw;
-	max-width: 100vw;
-	position: relative;
-	right: 50%;
-	width: 100vw;
-}
-
-#scroll-reminder {
-	position: fixed;
-	bottom: 4em;
-	left: 50%;
-	animation: bounce 3s infinite;
-	animation-timing-function: ease;
-	width: 0; 
-	height: 0;
-	margin-left: -1rem;
-	border-left: 1rem solid transparent;
-	border-right: 1rem solid transparent;
-	border-top: 1rem solid white;
-	mix-blend-mode: difference;
-}
-
-#scroll-reminder.past-title {
-	display: none;
-}
-
-@keyframes bounce {
-	0% { bottom: 4em; }
-	50% { bottom: 5em; }
-	100% { bottom: 4em; }
-}
-
-.chapter-header .figure {
-	margin-top: 0;
 }
