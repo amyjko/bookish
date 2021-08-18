@@ -155,8 +155,9 @@ class Outline extends React.Component {
 
 	render() {
 
-        let previous = "<";
-        let next = ">";
+        let previous = "\u25C0\uFE0E";
+        let next = "\u25B6\uFE0E";
+        let expand = "\u25B2\uFE0E";
 
         // Scan for headers and put them into a stable list.
         let headers = [];
@@ -165,7 +166,7 @@ class Outline extends React.Component {
         return (
             <div className={"outline " + (!this.state.expanded || this.props.collapse ? "outline-collapsed": "outline-expanded")} onClick={this.toggle}>
                 {/* Visual cue of expandability, only visible in footer mode. */}
-                <div className="outline-collapse-cue">▲</div>
+                <div className="outline-collapse-cue">{expand}</div>
                 <div className="outline-headers">
 
                     {/* Book navigation links */}
