@@ -272,7 +272,8 @@ blockquote .blockquote-caption {
 
 .content-highlight {
 	border-radius: 2px;
-	animation: pulse 5s 1;
+	animation: pulse .75s 3;
+	animation-fill-mode: forwards;
 }
 
 /* A little circle at the point of the annotation */
@@ -289,10 +290,6 @@ blockquote .blockquote-caption {
 
 @keyframes pulse {
 	0% { background-color: rgb(255, 255, 255); }
-	10% { background-color: rgb(179, 219, 251); }
-	20% { background-color: rgb(255, 255, 255); }
-	30% { background-color: rgb(179, 219, 251); }
-	40% { background-color: rgb(255, 255, 255); }
 	50% { background-color: rgb(179, 219, 251); }
 	100% { background-color: rgb(255, 255, 255); }
 }
@@ -366,6 +363,15 @@ blockquote .blockquote-caption {
 	font-family: "Raleway", serif;
 	font-weight: normal;
 	font-size: 12pt;
+	color: grey;
+}
+
+.outline-header-nav {
+	display: inline-block;
+	margin-bottom: 0.75rem;
+	width: 100%;
+	padding-left: 1rem;
+	padding-right: 1rem;
 }
 
 .outline-header {
@@ -375,7 +381,6 @@ blockquote .blockquote-caption {
     padding-left: 1rem;
 	padding-right: 1rem;
 	margin-bottom: 0.75rem;
-	color: lightGrey;
 }
 
 .outline-header-level-0 {
@@ -392,12 +397,13 @@ blockquote .blockquote-caption {
 	margin-left: 1em;
 }
 
-a .outline-header, .outline-header a {
+.outline a {
 	color: grey;
 }
 
-a:hover .outline-header {
-	text-decoration: underline;
+.outline a:hover {
+	text-decoration: none;
+	color: black;
 }
 
 a .outline-header-active {
@@ -472,9 +478,8 @@ a .outline-header-active {
 
 	/* Make a little centered box to store the outline to preserve its left aligned structure, while making it easier to click. */
 	.outline-headers {
-		margin-left: auto;
-		margin-right: auto;
 		width: 20em;
+		margin: auto;
 	}
 
 	.outline-header-nav {
@@ -484,9 +489,10 @@ a .outline-header-active {
 	}
 
 	.outline-collapse-cue {
-		float: right;
+		position: absolute;
+		top: 1rem;
+		right: 1rem;
 		transition: transform 0.2s ease-in;
-		margin-top: -.25rem;
 		font-size: 1.25em !important;
 	}
 
@@ -499,7 +505,7 @@ a .outline-header-active {
 	}
 
 	.outline.outline-collapsed {
-		transform: translateY(-3.5rem);
+		transform: translateY(-4rem);
 	}
 
 }

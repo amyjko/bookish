@@ -373,7 +373,7 @@ It's also possible to write a ~glossary~gloss and tag places<swearngin20> in the
 ~the phrase you want to highlight~gloss
 `
 
-# Labels
+# Labels, labels, and more labels
 
 You can also insert labels anywhere in text in order to link to them within and between chapters. For example, I inserted a label up top called `:linkexample`, and I can [link to it|:linkexample] with code like this:
 
