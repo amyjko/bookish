@@ -399,11 +399,18 @@ blockquote .blockquote-caption {
 
 .outline a {
 	color: grey;
+	text-decoration: none;
 }
 
 .outline a:hover {
 	text-decoration: none;
-	color: black;
+}
+
+/* Only apply this on devices with hover abilities. */
+@media (hover: hover) {
+	.outline a:hover {
+		color: black;
+	}
 }
 
 a .outline-header-active {
