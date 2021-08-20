@@ -45,7 +45,10 @@ class Chapter extends React.Component {
 		window.addEventListener('resize', this.handleResize);
 
 		// Remember the scroll position before a refresh.
+		// We have to do all of these because browser support varies.
         window.addEventListener("beforeunload", this.rememberPosition);
+        window.addEventListener("visibilitychange", this.rememberPosition);
+        window.addEventListener("pagehide", this.rememberPosition);
 
 		// Position the marginals, since there's new content.
 		this.layoutMarginals();
@@ -56,7 +59,11 @@ class Chapter extends React.Component {
 
 		window.removeEventListener('scroll', this.handleScroll);
 		window.removeEventListener('resize', this.handleResize);
+
+		// Stop listening to page visibility changes.
 		window.removeEventListener("beforeunload", this.rememberPosition);
+        window.removeEventListener("visibilitychange", this.rememberPosition);
+        window.removeEventListener("pagehide", this.rememberPosition);
 
 		// Delete the remembered position so that the next page scrolls to top.
 		localStorage.removeItem("scrollposition");
