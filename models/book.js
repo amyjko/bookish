@@ -180,7 +180,8 @@ class Book {
 	getAcknowledgements() { return this.getSpecification().acknowledgements; }
 	getRevisions() { return this.getSpecification().revisions; }
 
-    getImage(id) { return id in this.getSpecification().images ? this.getSpecification().images[id] : null; }
+    hasImage(id) { return id in this.getSpecification().images; }
+    getImage(id) { return this.hasImage(id) ? this.getSpecification().images[id] : null; }
 
 	getChapterReadingTime(chapterID) { 
 		return !this.chapterIsLoaded(chapterID) ? undefined :
@@ -379,7 +380,12 @@ class Book {
     getMedia() {
 
         let media = [];
-        let urls = new Set();
+        let urls = new Set(); // This just prevents duplicates.
+
+        // Add the book cover
+        media.push(Parser.parseEmbed(this, this.getImage("cover")));
+
+        // Add the cover and images from each chapter.
 		this.getChapters().forEach(c => {
 
             let cover = c.image === null ? null : Parser.parseEmbed(this, c.image);
@@ -398,7 +404,20 @@ class Book {
                     }
                 })
 
-        });        
+        });
+
+        // Add the back matter covers
+        let backmatter = ["references", "glossary", "index", "search", "media"];
+        backmatter.forEach(id => {
+            if(this.hasImage(id)) {
+                let image = Parser.parseEmbed(this, this.getImage(id));
+                if(!urls.has(image.url)) {
+                    media.push(image);
+                    urls.add(image.url);
+                }    
+            }
+        });
+
         return media;
 
     }
