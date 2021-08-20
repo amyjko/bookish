@@ -1,6 +1,7 @@
 import React from 'react';
 import { Header } from "./header";
 import { Outline } from './outline';
+import { Page } from './page';
 import { Book } from '../models/book.js';
 
 class Glossary extends React.Component {
@@ -15,10 +16,10 @@ class Glossary extends React.Component {
 		let book = this.props.app.getBook();
         let glossary = book.getGlossary();
 		// Sort by canonical phrases
-		let keys = Object.keys(glossary).sort((a, b) => a.phrase.localeCompare(b.phrase));
+		let keys = glossary === undefined ? null : Object.keys(glossary).sort((a, b) => a.phrase.localeCompare(b.phrase));
 
 		return (
-			<div>
+			<Page>
 				<Header 
 					book={book}
 					image={book.getImage(Book.GlossaryID)} 
@@ -31,23 +32,29 @@ class Glossary extends React.Component {
 					next={book.getNextChapterID(Book.GlossaryID)}
 				/>
 
-				<br/>
-				<div className="table-responsive">
-					<table className="table">
-						<tbody>
-						{ keys.map((key, index) => 
-							<tr key={"definition" + index}>
-								<td><strong>{glossary[key].phrase}</strong></td>
-								<td>
-									{ glossary[key].definition }
-									{ glossary[key].synonyms.length > 0 ? <span><br/><br/><em>{glossary[key].synonyms.join(", ")}</em></span> : null }
-								</td>
-							</tr>
-						)}
-						</tbody>
-					</table>
-				</div>
-			</div>
+				{
+					keys === null ? 
+						<p>This book has no glossary.</p> :
+					<div>
+						<br/>
+						<div className="table-responsive">
+							<table className="table">
+								<tbody>
+								{ keys.map((key, index) => 
+									<tr key={"definition" + index}>
+										<td><strong>{glossary[key].phrase}</strong></td>
+										<td>
+											{ glossary[key].definition }
+											{ glossary[key].synonyms.length > 0 ? <span><br/><br/><em>{glossary[key].synonyms.join(", ")}</em></span> : null }
+										</td>
+									</tr>
+								)}
+								</tbody>
+							</table>
+						</div>
+					</div>
+				}
+			</Page>
 		);
 
 	}
