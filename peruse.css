@@ -149,6 +149,8 @@ ol ol ol li {
 	font-size: 12pt;
 	margin-top: 0.1em;
 	margin-bottom: 1em;
+	margin-left: 1em;
+	margin-right: 1em;
 }
 
 .figure-img {
