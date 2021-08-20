@@ -146,12 +146,13 @@ class TableOfContents extends React.Component {
 									})
 								}
 								{
-									book.getReferences() === null ? null :
-									<tr key="references">
-										<td>{ this.getImage(book.getImage(Book.ReferencesID)) }</td>
-										<td><Link to="/references">References</Link><br/><small className="text-muted"><em>Everything cited</em></small></td>
-										<td></td>
-									</tr>
+									!book.hasReferences() ? 
+										null :
+										<tr key="references">
+											<td>{ this.getImage(book.getImage(Book.ReferencesID)) }</td>
+											<td><Link to="/references">References</Link><br/><small className="text-muted"><em>Everything cited</em></small></td>
+											<td></td>
+										</tr>
 								}
 								{
 									book.getGlossary() && Object.keys(book.getGlossary()).length > 0 ?

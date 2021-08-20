@@ -169,7 +169,9 @@ class Book {
     getChapter(chapterID) { return this.hasChapter(chapterID) ? this.chapters[chapterID] : null; }
     getSymbols() { return this.specification ? this.specification.symbols : {}; }
 	getLicense() { return this.getSpecification().license; }
+    hasReferences() { return this.getReferences() !== undefined && Object.keys(this.getReferences()).length > 0; }
 	getReferences() { return this.getSpecification().references; }
+    hasGlossary() { return this.getGlossary() !== undefined && Object.keys(this.getGlossary()).length > 0; }
 	getGlossary() { return this.getSpecification().glossary; }
 	getTags() { return "tags" in this.getSpecification() ? this.getSpecification().tags : []; }
 	getAuthors() { return this.getSpecification().authors; }	
@@ -316,7 +318,7 @@ class Book {
 
         // Handle back matter chapters.
         switch(chapterID) {
-            case Book.ReferencesID: return Book.GlossaryID;
+            case Book.ReferencesID: return this.hasGlossary() ? Book.GlossaryID : Book.IndexID;
             case Book.GlossaryID: return Book.IndexID;
             case Book.IndexID: return Book.SearchID;
             case Book.SearchID: return Book.MediaID;
@@ -333,7 +335,7 @@ class Book {
                 }
                 // If the given ID was the last chapter, go to the next back matter chapter.
                 if(after)
-                    return Book.ReferencesID;
+                    return this.hasReferences() ? Book.ReferencesID : this.hasGlossary() ? Book.GlossaryID : Book.IndexID;
                 // Otherwise, it wasn't a valid ID
                 else
                     return null;
@@ -350,8 +352,8 @@ class Book {
 
             // Handle back matter chapters.
             case Book.ReferencesID: return chapters[chapters.length - 1].id; // Last chapter of the book
-            case Book.GlossaryID: return Book.ReferencesID;
-            case Book.IndexID: return Book.GlossaryID;
+            case Book.GlossaryID: return this.hasReferences() ? Book.ReferencesID : chapters[chapters.length - 1].id;
+            case Book.IndexID: return this.hasGlossary() ? Book.GlossaryID : this.hasReferences() ? Book.ReferencesID : chapters[chapters.length - 1].id;
             case Book.SearchID: return Book.IndexID;
             case Book.MediaID: return Book.SearchID;
             default:

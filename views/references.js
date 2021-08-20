@@ -18,11 +18,11 @@ class References extends React.Component {
 	render() {
 
 		const book = this.props.app.getBook();
-        const references = book.getReferences();
+        const references = book.hasReferences() ? book.getReferences() : null;
 		const renderedReferences = [];
 
 		// Does this book have any references
-		if(!references || references.length === 0) {
+		if(!book.hasReferences()) {
 			references = null;
 		} 
 		// Otherwise, map references to a list with letter headers.
@@ -58,9 +58,9 @@ class References extends React.Component {
 					/>
 
 					{
-						references === null ?
-							<p>This book has no references.</p> : 
-							renderedReferences
+						book.hasReferences() ?
+							renderedReferences :
+							<p>This book has no references.</p>
 					}
 				</div>
 			</Page>
