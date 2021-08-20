@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 
 import { Header } from "./header";
 import { Outline } from './outline';
+import { Page } from './page';
 
 import { Parser } from "../models/parser.js";
 import { Book } from '../models/book.js';
@@ -42,25 +43,27 @@ class References extends React.Component {
 		}
 
 		return (
-			<div>
-				<Header 
-					book={book}
-					image={book.getImage(Book.ReferencesID)} 
-					header="References"
-					tags={book.getTags()}
-				/>
+			<Page>
+				<div>
+					<Header 
+						book={book}
+						image={book.getImage(Book.ReferencesID)} 
+						header="References"
+						tags={book.getTags()}
+					/>
 
-				<Outline
-					previous={book.getPreviousChapterID(Book.ReferencesID)}
-					next={book.getNextChapterID(Book.ReferencesID)}
-				/>
+					<Outline
+						previous={book.getPreviousChapterID(Book.ReferencesID)}
+						next={book.getNextChapterID(Book.ReferencesID)}
+					/>
 
-				{
-                    references === null ?
-                        <p>This book has no references.</p> : 
-						renderedReferences
-                }
-			</div>
+					{
+						references === null ?
+							<p>This book has no references.</p> : 
+							renderedReferences
+					}
+				</div>
+			</Page>
 		);
 
 	}

@@ -2,6 +2,8 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { Header } from "./header";
 import { Outline } from './outline';
+import { Page } from './page';
+
 import { Book } from '../models/book.js';
 
 class Index extends React.Component {
@@ -77,7 +79,7 @@ class Index extends React.Component {
         });
 
 		return (
-			<div>
+			<Page>
 				<Header 
 					book={book}
                     image={book.getImage(Book.IndexID)} 
@@ -118,7 +120,7 @@ class Index extends React.Component {
                     </tbody>
                 </table>
 
-            </div>
+            </Page>
 		);
 
 	}

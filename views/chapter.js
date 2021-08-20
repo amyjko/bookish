@@ -4,6 +4,8 @@ import { Parser } from "../models/parser";
 import { Header } from './header';
 import { Authors } from "./authors";
 import { Outline } from './outline';
+import { Page } from './page';
+import { Loading } from './loading';
 
 import { smoothlyScrollElementToEyeLevel } from './../views/scroll.js';
 
@@ -17,10 +19,10 @@ class Chapter extends React.Component {
 		this.handleDoubleClick = this.handleDoubleClick.bind(this);
 		this.handleChange = this.handleChange.bind(this);
 		this.rememberPosition = this.rememberPosition.bind(this);
-		this.watchLoading = this.watchLoading.bind(this);
+		this.scrollToLastLocation = this.scrollToLastLocation.bind(this);
 
 		// Assume the chapter is loaded initially.
-		this.state = { 
+		this.state = {
 			editing: false, 
 			draft: null,
 			marginal: null // The currently selected marginal; we only do one at a time.
@@ -31,47 +33,10 @@ class Chapter extends React.Component {
 		if(window.location.hash.split("#").length > 2)
 			this.initialHash = window.location.hash.split("#")[2];
 
-		// Watch the height of the document and wait until it's been stable for a while before scrolling
-		// to any targets. We use the data below to monitor the document height over time.
-		this.loadingMonitor = {
-			lastHeight: undefined,
-			count: 0,
-			intervalID: setInterval(this.watchLoading, 50),
-		}
-		this.watchLoading();
-
 	}
 
 	getApp() { return this.props.app; }
 	getBook() { return this.props.app.getBook(); }
-
-	imagesAreLoaded() {
-
-		let loaded = true;
-		Array.from(document.getElementsByTagName("img")).forEach(el => {
-			loaded = loaded & el.complete;
-		});
-		return loaded;
-
-	}
-
-	watchLoading() {
-
-		const bodyHeight = document.body.clientHeight;
-		if(this.loadingMonitor.lastHeight === document.body.clientHeight) {
-			this.loadingMonitor.count++;
-			this.loadingMonitor.lastHeight = document.body.clientHeight;
-			if(this.loadingMonitor.count >= 3 || this.imagesAreLoaded()) {
-				clearInterval(this.loadingMonitor.intervalID);
-				this.scrollToLastLocation();
-			}
-		}
-		else {
-			this.loadingMonitor.lastHeight = bodyHeight;
-			this.loadingMonitor.count = 0;
-		}
-
-	}
 
 	componentDidMount() {
 		
@@ -83,7 +48,7 @@ class Chapter extends React.Component {
         window.addEventListener("beforeunload", this.rememberPosition);
 
 		// Position the marginals, since there's new content.
-		this.layoutMarginals();		
+		this.layoutMarginals();
 
 	}
 
@@ -107,7 +72,7 @@ class Chapter extends React.Component {
 
 	rememberPosition() { 
 
-		localStorage.setItem('scrollposition', window.scrollY);
+		localStorage.setItem('scrollposition', "" + window.scrollY);
 
 	}
 
@@ -288,7 +253,7 @@ class Chapter extends React.Component {
 	renderEditor() {
 		
 		return <div className="editor">
-			<em>You've found editing mode (shift+double click). This is useful for editing the underlying markup of the chapter and previewing your changes, which you can then copy and save elsehwere. This does not save the text of the chapter on this server, nor does it save between page reloads.</em>
+			<em>You've found editing mode (shift+double click). This is useful for editing the underlying markup of the chapter and previewing your changes, which you can then copy and save elsewhere. This does not save the text of the chapter on this server, nor does it save between page reloads.</em>
 			<br/>
 			<br/>
 			<textarea 
@@ -415,7 +380,7 @@ class Chapter extends React.Component {
 		}
 
 		if(!book.chapterIsLoaded(this.props.id)) {
-			return null;
+			return <Loading/>;
 		}
 		else {
 
@@ -426,92 +391,94 @@ class Chapter extends React.Component {
 			let hasReferences = Object.keys(citations).length > 0;
 			
 			return (
-				<div className="chapter">
-					<Header 
-						book={book}
-						image={chapter.image}
-						before={
-							<span>
-							{
-								chapterNumber === undefined ? 
-									null : 
-									<span className="chapter-number">Chapter {chapterNumber}</span> 
+				<Page loaded={this.scrollToLastLocation}>
+					<div className="chapter">
+						<Header 
+							book={book}
+							image={chapter.image}
+							before={
+								<span>
+								{
+									chapterNumber === undefined ? 
+										null : 
+										<span className="chapter-number">Chapter {chapterNumber}</span> 
+								}
+								{ 
+									chapterSection === null ? 
+										null : 
+										<span className="section-name"> {chapterSection}</span>
+								}
+								{ 
+									chapterNumber || chapterSection ? 
+										<br/> : 
+										null 
+								}
+								</span>						
 							}
-							{ 
-								chapterSection === null ? 
-									null : 
-									<span className="section-name"> {chapterSection}</span>
-							}
-							{ 
-								chapterNumber || chapterSection ? 
-									<br/> : 
-									null 
-							}
-							</span>						
+							header={chapter.title}
+							tags={book.getTags()}
+							/* If there are chapter authors, map them to authors declared in the book title, otherwise use all the authors of the book */
+							after={
+								<Authors authors={
+										chapter.authors ? 
+											chapter.authors.map(author => book.getAuthorByID(author)) : 
+											book.getAuthors()} 
+								/>
+							} 
+						/>
+
+						<Outline
+							previous={book.getPreviousChapterID(this.props.id)}
+							next={book.getNextChapterID(this.props.id)}
+							listener={ (expanded, callback) =>{
+								// If the outline is being expanded, hide the marginal, otherwise leave it alone.
+								this.setState({ 
+									marginal: expanded ? null : this.state.marginal 
+								}, callback);
+
+								// Check if we need to hide the outline after positioning.
+								this.hideOutlineIfObscured();
+
+							}}
+							// Collapse the outline if a marginal is selected.
+							collapse={this.state.marginal !== null}
+						/>
+
+						{ /* Render the editor if we're editing */ }
+						{ this.state.editing ? this.renderEditor() : null }
+
+						{/* Render the chapter body */}
+						<div onDoubleClick={this.handleDoubleClick}>
+						{
+							chapter.getAST().toDOM(this, this.props.match.params.word)
 						}
-						header={chapter.title}
-						tags={book.getTags()}
-						/* If there are chapter authors, map them to authors declared in the book title, otherwise use all the authors of the book */
-						after={
-							<Authors authors={
-									chapter.authors ? 
-										chapter.authors.map(author => book.getAuthorByID(author)) : 
-										book.getAuthors()} 
-							/>
-						} 
-					/>
-
-					<Outline
-						previous={book.getPreviousChapterID(this.props.id)}
-						next={book.getNextChapterID(this.props.id)}
-						listener={ (expanded, callback) =>{
-							// If the outline is being expanded, hide the marginal, otherwise leave it alone.
-							this.setState({ 
-								marginal: expanded ? null : this.state.marginal 
-							}, callback);
-
-							// Check if we need to hide the outline after positioning.
-							this.hideOutlineIfObscured();
-
-						}}
-						// Collapse the outline if a marginal is selected.
-						collapse={this.state.marginal !== null}
-					/>
-
-					{ /* Render the editor if we're editing */ }
-					{ this.state.editing ? this.renderEditor() : null }
-
-					{/* Render the chapter body */}
-					<div onDoubleClick={this.handleDoubleClick}>
-					{
-						chapter.getAST().toDOM(this, this.props.match.params.word)
-					}
-					</div>
-					{
-						!hasReferences ? null :
-						<div>
-							<h1 id="references" className="header">References</h1>
-
-							<ol>
-							{
-								Object.keys(citations).sort().map(citationID => {
-									let refs = book.getReferences();
-									if(citationID in refs) {
-										let ref = refs[citationID];
-										return <li key={"citation-" + citationID} className={citationID === citationHighlight ? "reference content-highlight" : "reference"} id={"ref-" + citationID}>
-											{Parser.parseReference(ref, book)}
-										</li>
-
-									}
-									else {
-										return <li className="alert alert-danger" key={"citation-" + citationID}>Unknown reference: <code>{citationID}</code></li>;
-									}
-								})
-							}
-							</ol>
 						</div>
-					}
-				</div>
+						{
+							!hasReferences ? null :
+							<div>
+								<h1 id="references" className="header">References</h1>
+
+								<ol>
+								{
+									Object.keys(citations).sort().map(citationID => {
+										let refs = book.getReferences();
+										if(citationID in refs) {
+											let ref = refs[citationID];
+											return <li key={"citation-" + citationID} className={citationID === citationHighlight ? "reference content-highlight" : "reference"} id={"ref-" + citationID}>
+												{Parser.parseReference(ref, book)}
+											</li>
+
+										}
+										else {
+											return <li className="alert alert-danger" key={"citation-" + citationID}>Unknown reference: <code>{citationID}</code></li>;
+										}
+									})
+								}
+								</ol>
+							</div>
+						}
+					</div>
+				</Page>
 			);
 		}
 

@@ -2,12 +2,13 @@ import React from 'react';
 
 import { Header } from "./header";
 import { Outline } from './outline';
+import { Page } from './page';
 
 class Unknown extends React.Component {
 
 	render() {
 		return (
-			<div>
+			<Page>
 				<Header 
 					book={this.props.app.getBook()}
 					image={this.props.app.getBook().getSpecification() ? this.props.app.getBook().getImage("unknown") : null } 
@@ -18,7 +19,7 @@ class Unknown extends React.Component {
 					previous={null}
 					next={null}
 				/>
-			</div>
+			</Page>
 		);
 	}
 

@@ -1,6 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import { Link, Route, HashRouter, Switch, withRouter } from 'react-router-dom';
+import { Route, HashRouter, Switch, withRouter } from 'react-router-dom';
 
 import { Book } from "./models/book";
 import { Chapter } from "./views/chapter";
@@ -11,6 +11,7 @@ import { Index } from "./views/index";
 import { Search } from "./views/search";
 import { Media } from "./views/media";
 import { Unknown } from "./views/unknown";
+import { Loading } from "./views/loading";
 
 import smoothscroll from 'smoothscroll-polyfill';
 
@@ -99,10 +100,7 @@ class Peruse extends React.Component {
 		
 		// If it's loading, show loading feedback
 		if(book.getSpecification() === undefined) {
-			if(this.state.loadingTime === undefined || this.state.loadingTime < 500)
-				return null;
-			else
-				return <div className="text-center text-muted" style={{position: "fixed", left: "50%", top: "50%", transform: "translate(-50%, 0)"}}> Loading book...</div>;
+			return <Loading/>;
 		} 
 		// If it failed to load, provide some feedback.
 		else if(book.getSpecification() === null) {

@@ -2,6 +2,7 @@ import React from 'react';
 
 import { Header } from "./header";
 import { Outline } from './outline';
+
 import { Book } from '../models/book.js';
 
 class Media extends React.Component {

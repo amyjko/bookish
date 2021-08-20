@@ -2,6 +2,7 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { Header } from "./header";
 import { Authors } from "./authors";
+import { Page } from './page';
 import { Parser } from "../models/parser";
 import { Book } from '../models/book.js';
 
@@ -74,145 +75,147 @@ class TableOfContents extends React.Component {
 		}
 
 		return (
-			<div className="toc">
+			<Page loaded={this.afterLoad}>
+				<div className="toc">
 
-				<Header 
-					book={book}
-					image={book.getImage("cover")} 
-					header={title}
-					subtitle={subtitle}
-					tags={book.getTags()}
-					content={<Authors authors={book.getAuthors()} />}
-				/>
+					<Header 
+						book={book}
+						image={book.getImage("cover")} 
+						header={title}
+						subtitle={subtitle}
+						tags={book.getTags()}
+						content={<Authors authors={book.getAuthors()} />}
+					/>
 
-				{Parser.parseChapter(book, book.getDescription()).toDOM()}
+					{Parser.parseChapter(book, book.getDescription()).toDOM()}
 
-				<h2>Chapters <small><small className="text-muted"><em>{readingTime < 60 ? Math.max(5, (Math.floor(readingTime / 10) * 10)) + " min read" : "~" + Math.round(readingTime / 60.0) + " hour read" }</em></small></small></h2>
+					<h2>Chapters <small><small className="text-muted"><em>{readingTime < 60 ? Math.max(5, (Math.floor(readingTime / 10) * 10)) + " min read" : "~" + Math.round(readingTime / 60.0) + " hour read" }</em></small></small></h2>
 
-				<div className="table-responsive">
-					<table className="table" id="toc">
-						<tbody>
-							{
-								book.getChapters().map((chapterSpec, index) => {
+					<div className="table-responsive">
+						<table className="table" id="toc">
+							<tbody>
+								{
+									book.getChapters().map((chapterSpec, index) => {
 
-									// Get the image, chapter number, and section for rendering.
-									const chapterID = chapterSpec.id;
-									const chapter = book.getChapter(chapterID);
-									const chapterNumber = book.getChapterNumber(chapterID);
-									const section = chapter.getSection();
-									const readingTime = book.getChapterReadingTime(chapterID);
-									const readingEstimate =
-										readingTime === undefined ? "Forthcoming" :
-										readingTime < 5 ? "<5 min read" :
-										readingTime < 60 ? "~" + Math.floor(readingTime / 5) * 5 + " min read" :
-										"~" + Math.round(10 * readingTime / 60) / 10 + " hour read";
-									const isLoaded = book.chapterIsLoaded(chapterID);
+										// Get the image, chapter number, and section for rendering.
+										const chapterID = chapterSpec.id;
+										const chapter = book.getChapter(chapterID);
+										const chapterNumber = book.getChapterNumber(chapterID);
+										const section = chapter.getSection();
+										const readingTime = book.getChapterReadingTime(chapterID);
+										const readingEstimate =
+											readingTime === undefined ? "Forthcoming" :
+											readingTime < 5 ? "<5 min read" :
+											readingTime < 60 ? "~" + Math.floor(readingTime / 5) * 5 + " min read" :
+											"~" + Math.round(10 * readingTime / 60) / 10 + " hour read";
+										const isLoaded = book.chapterIsLoaded(chapterID);
 
-									return (
-										<tr key={"chapter" + index} className={chapter.isForthcoming() ? "forthcoming" : ""}>
-											<td>
-												{ this.getImage(chapter.getImage()) }
-											</td>
-											<td>
-												<div>
-													{ chapterNumber === undefined ? null : <div className="chapter-number">{"Chapter " + chapterNumber}</div> }
+										return (
+											<tr key={"chapter" + index} className={chapter.isForthcoming() ? "forthcoming" : ""}>
+												<td>
+													{ this.getImage(chapter.getImage()) }
+												</td>
+												<td>
 													<div>
-														{
-															isLoaded && !chapter.isForthcoming() ? 
-																<Link to={"/" + chapterID}>{chapter.getTitle()}</Link> :
-																<span>{chapter.getTitle()}</span>
-														}
+														{ chapterNumber === undefined ? null : <div className="chapter-number">{"Chapter " + chapterNumber}</div> }
+														<div>
+															{
+																isLoaded && !chapter.isForthcoming() ? 
+																	<Link to={"/" + chapterID}>{chapter.getTitle()}</Link> :
+																	<span>{chapter.getTitle()}</span>
+															}
+														</div>
+														{ section === null ? null : <div className="section-name">{section}</div> }
 													</div>
-													{ section === null ? null : <div className="section-name">{section}</div> }
-												</div>
-											</td>
-											<td>
-												<small className="text-muted">
-													<em>
-														{ readingEstimate }
-														{ !chapter.isForthcoming() && this.getProgressDescription(chapterID in progress ? progress[chapterID] : null) }
-													</em>
-												</small>
-												{
-													isLoaded && chapter.getAST().getErrors().length > 0 ? 
-														<span><br/><small className="alert alert-danger">{chapter.getAST().getErrors().length + " " + (chapter.getAST().getErrors().length > 1 ? "errors" : "error")}</small></span> :
-														null
-												}
-											</td>
-										</tr>
-									)
-								})
-							}
-							{
-								book.getReferences() === null ? null :
-								<tr key="references">
-									<td>{ this.getImage(book.getImage(Book.ReferencesID)) }</td>
-									<td><Link to="/references">References</Link><br/><small className="text-muted"><em>Everything cited</em></small></td>
+												</td>
+												<td>
+													<small className="text-muted">
+														<em>
+															{ readingEstimate }
+															{ !chapter.isForthcoming() && this.getProgressDescription(chapterID in progress ? progress[chapterID] : null) }
+														</em>
+													</small>
+													{
+														isLoaded && chapter.getAST().getErrors().length > 0 ? 
+															<span><br/><small className="alert alert-danger">{chapter.getAST().getErrors().length + " " + (chapter.getAST().getErrors().length > 1 ? "errors" : "error")}</small></span> :
+															null
+													}
+												</td>
+											</tr>
+										)
+									})
+								}
+								{
+									book.getReferences() === null ? null :
+									<tr key="references">
+										<td>{ this.getImage(book.getImage(Book.ReferencesID)) }</td>
+										<td><Link to="/references">References</Link><br/><small className="text-muted"><em>Everything cited</em></small></td>
+										<td></td>
+									</tr>
+								}
+								{
+									book.getGlossary() && Object.keys(book.getGlossary()).length > 0 ?
+									<tr key="glossary">
+										<td>{ this.getImage(book.getImage(Book.GlossaryID)) }</td>
+										<td><Link to="/glossary">Glossary</Link><br/><small className="text-muted"><em>Definitions</em></small></td>
+										<td></td>
+									</tr> : null
+								}
+								<tr key="index">
+									<td>{ this.getImage(book.getImage(Book.IndexID)) }</td>
+									<td><Link to="/index/a">Index</Link><br/><small className="text-muted"><em>Common words and where they are</em></small></td>
 									<td></td>
 								</tr>
-							}
-							{
-								book.getGlossary() && Object.keys(book.getGlossary()).length > 0 ?
-								<tr key="glossary">
-									<td>{ this.getImage(book.getImage(Book.GlossaryID)) }</td>
-									<td><Link to="/glossary">Glossary</Link><br/><small className="text-muted"><em>Definitions</em></small></td>
+								<tr key="search">
+									<td>{ this.getImage(book.getImage(Book.SearchID)) }</td>
+									<td><Link to="/search">Search</Link><br/><small className="text-muted"><em>Find where words occur</em></small></td>
 									<td></td>
-								</tr> : null
-							}
-							<tr key="index">
-								<td>{ this.getImage(book.getImage(Book.IndexID)) }</td>
-								<td><Link to="/index/a">Index</Link><br/><small className="text-muted"><em>Common words and where they are</em></small></td>
-								<td></td>
-							</tr>
-							<tr key="search">
-								<td>{ this.getImage(book.getImage(Book.SearchID)) }</td>
-								<td><Link to="/search">Search</Link><br/><small className="text-muted"><em>Find where words occur</em></small></td>
-								<td></td>
-							</tr>
-							<tr key="media">
-								<td>{ this.getImage(book.getImage(Book.MediaID)) }</td>
-								<td><Link to="/media">Media</Link><br/><small className="text-muted"><em>Images and video in the book</em></small></td>
-								<td></td>
-							</tr>
-						</tbody>
-					</table>
+								</tr>
+								<tr key="media">
+									<td>{ this.getImage(book.getImage(Book.MediaID)) }</td>
+									<td><Link to="/media">Media</Link><br/><small className="text-muted"><em>Images and video in the book</em></small></td>
+									<td></td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+
+					{
+						book.getAcknowledgements() ?
+							<>
+								<h2>Acknowledgements</h2>
+								{ Parser.parseChapter(book, book.getAcknowledgements()).toDOM() }
+							</>
+							: null
+					}
+
+					<h2>License</h2>
+
+					<p>
+						{book.getLicense() ? Parser.parseContent(book, book.getLicense()).toDOM() : "All rights reserved."}
+					</p>
+
+					<h2>Citation</h2>
+
+					<p>
+						{ book.getAuthors().map(author => author.name).join(", ") } ({(new Date()).getFullYear() }). <em>{title}</em>. { location.protocol+'//'+location.host+location.pathname }, <em>retrieved { (new Date()).toLocaleDateString("en-US")}</em>.
+					</p>
+
+					{
+						book.getRevisions().length === 0 ? 
+							null :
+							<>
+								<h2>Revisions</h2>
+								<ul>
+									{book.getRevisions().map((revision, index) => {
+										return <li key={"revision" + index}><em>{revision[0]}</em>. {Parser.parseContent(book, revision[1]).toDOM()}</li>;
+									})}
+								</ul>
+							</>	
+					}
+
 				</div>
-
-				{
-					book.getAcknowledgements() ?
-						<>
-							<h2>Acknowledgements</h2>
-							{ Parser.parseChapter(book, book.getAcknowledgements()).toDOM() }
-						</>
-						: null
-				}
-
-				<h2>License</h2>
-
-				<p>
-					{book.getLicense() ? Parser.parseContent(book, book.getLicense()).toDOM() : "All rights reserved."}
-				</p>
-
-				<h2>Citation</h2>
-
-				<p>
-					{ book.getAuthors().map(author => author.name).join(", ") } ({(new Date()).getFullYear() }). <em>{title}</em>. { location.protocol+'//'+location.host+location.pathname }, <em>retrieved { (new Date()).toLocaleDateString("en-US")}</em>.
-				</p>
-
-				{
-					book.getRevisions().length === 0 ? 
-						null :
-						<>
-							<h2>Revisions</h2>
-							<ul>
-								{book.getRevisions().map((revision, index) => {
-									return <li key={"revision" + index}><em>{revision[0]}</em>. {Parser.parseContent(book, revision[1]).toDOM()}</li>;
-								})}
-							</ul>
-						</>	
-				}
-
-			</div>
+			</Page>
 		);
 
 	}
