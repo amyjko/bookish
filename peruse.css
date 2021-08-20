@@ -168,8 +168,15 @@ ol ol ol li {
 }
 
 .figure-preview {
+	display: inline-block;
 	width: 10rem;
 	margin: 1em;
+	vertical-align: bottom;
+}
+
+.figure-preview img {
+	width: 100%;
+	height: auto;
 }
 
 .figure-full {

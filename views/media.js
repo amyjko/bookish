@@ -31,18 +31,19 @@ class Media extends React.Component {
 					next={book.getNextChapterID(Book.MediaID)}
 				/>
 
-				<p>These images appear in the text.</p>
+				<p>These are the images in the book:</p>
 
 				{
 					media.map((embed, index) =>
 						embed.url.indexOf("http") === 0 ?
 							null :
-							<img 
-								key={"image" + index}
-								className={"figure-preview"}
-								src={"images/" + embed.url} 
-								alt={embed.alt}
-							/>
+							<span className={"figure-preview"} key={"image" + index}>
+								<img 
+									src={"images/" + embed.url} 
+									alt={embed.alt}
+								/>
+								<div className="figure-credit">{embed.credit.toDOM(null, null)}</div>
+							</span>
 					)
 				}
 
