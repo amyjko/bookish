@@ -715,6 +715,7 @@ a .outline-header-active {
 	border: 1px solid lightGray;
 	width: 10%;
 	height: 3rem;
+	padding: 0;
 	display: inline-block;
 	vertical-align: top;
 }
