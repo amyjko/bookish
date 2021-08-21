@@ -4,6 +4,7 @@ import { NavHashLink } from "react-router-hash-link";
 import { Figure } from './../views/image';
 import { Marginal } from './../views/marginal';
 import { Code } from './../views/code';
+import { Python } from './../views/python.js'
 
 import { smoothlyScrollElementToEyeLevel } from './../views/scroll.js';
 
@@ -393,8 +394,8 @@ class Parser {
         // Parse and return a numbered list if it starts with a number
         else if(this.nextMatches(/^[0-9]+\.+/))
             return this.parseNumberedList(book, metadata);
-        // Parse and return a code block if it starts with `, some optional letters, some whitespace, and a newline
-        else if(this.nextMatches(/^`[a-zA-Z]*[ \t]*\n/))
+        // Parse and return a code block if it starts with `, some optional letters or a !, some whitespace, and a newline
+        else if(this.nextMatches(/^`[a-zA-Z!]*[ \t]*\n/))
             return this.parseCode(book, metadata);
         // Parse and return a quote block if it starts with "
         else if(this.nextMatches(/^"[ \t]*\n/))
@@ -592,7 +593,7 @@ class Parser {
         this.read();
 
         // Parse through the next new line
-        var language = this.readUntilNewLine();
+        let language = this.readUntilNewLine();
 
         // Read the newline
         this.read();
@@ -1357,15 +1358,27 @@ class NumberedListNode extends Node {
 class CodeNode extends Node {
     constructor(code, language, caption, position) {
         super();
+
         this.code = code;
-        this.language = language ? language : "plaintext";
         this.caption = caption;
         this.position = position;
+        this.language = language ? language : "plaintext";
+        this.executable = language.charAt(language.length - 1) === "!";
+
+        if(this.executable)
+            this.language = this.language.slice(0, -1);
+
     }
     toDOM(view, chapter, key) {
         return <div key={key} className={(this.position === "<" ? "marginal-left-inset" : this.position === ">" ? "marginal-right-inset" : "")}>
-            <Code inline={false} language={this.language}>{this.code}</Code>
-            { this.language !== "plaintext" ? <div className="code-language">{this.language}</div> : null }
+            {
+                this.language === "python" && this.executable ? 
+                    <Python code={this.code}></Python> :
+                    <div>
+                        <Code inline={false} language={this.language}>{this.code}</Code>
+                        { this.language !== "plaintext" ? <div className="code-language">{this.language}</div> : null }
+                    </div>
+            }
             <div className="figure-caption">{this.caption.toDOM(view, chapter)}</div>
         </div>
     }

@@ -612,7 +612,7 @@ a .outline-header-active {
 /* SYNTAX HIGHLIGHTING */
 
 .code {
-	font-size: 80%;
+	font-size: 11pt;
 	white-space: pre-wrap;	
 	border: 1px solid #EAEAEA;
 	color: gray;
@@ -639,10 +639,10 @@ a .outline-header-active {
 
 .code-language {
 	float: right;
-	margin-top: -2em;
+	margin-top: -2rem;
 	font-size: small;
 	color: gray;
-	margin-right: 0.25em;
+	margin-right: 0.5rem;
 }
 
 /* Comment */
@@ -706,6 +706,30 @@ a .outline-header-active {
 
 .hljs-strong {
   font-weight: bold;
+}
+
+/* PYTHON SUPPORT */
+
+.python button {
+	background: rgb(240,240,240);
+	border: 1px solid lightGray;
+	width: 10%;
+	height: 3rem;
+	display: inline-block;
+	vertical-align: top;
+}
+
+.python .python-output {
+	width: 90%;
+	border: 1px solid lightGray;
+	padding: 0.5rem;
+	height: 3rem;
+	overflow-y: scroll;
+	display: inline-block;
+	vertical-align: top;
+	color: grey;
+	font-family: "SFMono-Regular","Menlo","Monaco","Consolas","Liberation Mono","Courier New",monospace;
+	font-size: 11pt;
 }
 
 /* EDITOR */

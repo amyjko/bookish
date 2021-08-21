@@ -228,7 +228,7 @@ If you include a language name after the first backtick like this:
 \`python
 two = 1 + 1
 if two == 2:
-   print "Truth"
+   print("Truth")
 \`
 `
 
@@ -236,11 +236,28 @@ Peruse will try to highlight based on that language's syntax.
 
 `python
 two = 1 + 1
-if two == 2:
-   print "Truth"
+if two == 2 / 0:
+   print("Truth")
 ` Look, syntax highlighting!
 
 Supported languages are listed in [the HighlightJS documentation|https://github.com/highlightjs/highlight.js/blob/master/SUPPORTED_LANGUAGES.md].
+
+If you put a ! after the language name (and that language is Python), then it'll also add a run button to run the code.
+
+`markdown
+\`python!
+two = 1 + 1
+if two == 2:
+   print("Truth")
+\`
+`
+
+`python!
+two = 1 + 1
+if two == 2 / 0:
+   print("Truth")
+` Look, syntax highlighting!
+
 
 You can also include code inline by wrapping things in \`in backticks\`: `if two == 2: print "Truth"`, and by including the language name after the closing backtick, as in `\`if two == 2: print "Truth"\`python`markdown, you can language format inline code: `if two == 2: print "Truth"`python
 
