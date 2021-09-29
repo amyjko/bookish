@@ -16,7 +16,7 @@ class Glossary extends React.Component {
 		let book = this.props.app.getBook();
         let glossary = book.getGlossary();
 		// Sort by canonical phrases
-		let keys = glossary === undefined ? null : Object.keys(glossary).sort((a, b) => a.phrase.localeCompare(b.phrase));
+		let keys = glossary === undefined ? null : Object.keys(glossary).sort((a, b) => glossary[a].phrase.localeCompare(glossary[b].phrase));
 
 		return (
 			<Page>
