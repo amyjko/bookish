@@ -401,3 +401,9 @@ You can also insert labels anywhere in text in order to link to them within and 
 `An example label label
 
 But I also linked to a label in [another chapter|marginals:leftexample].
+
+Be careful with non-label text that contains colons followed by letters, such as `not:a label`. You'll need to escape the colon if don't want it to be parsed as a label.
+
+`
+This is not\:a label
+`

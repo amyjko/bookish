@@ -928,7 +928,7 @@ class Parser {
         const label = new LabelNode(id);
 
         if(metadata) {
-            let matches = metadata.labels.filter(label => label.getID() === id);
+            let matches = metadata.labels.filter(lab => lab.getID() === id);
             if(matches.length > 0)
                 return new ErrorNode("Duplicate label " + id);
 
@@ -1826,6 +1826,8 @@ class LabelNode extends Node {
         this.id = id;
 
     }
+
+    getID() { return this.id; }
 
     toDOM(view, chapter, key) {
         let query = view.getHighlightedID();
