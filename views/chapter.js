@@ -29,9 +29,9 @@ class Chapter extends React.Component {
 		};
 
 		// Remember what the hash was before the outline on this page sets it.
-		this.initialHash = null;
-		if(window.location.hash.split("#").length > 2)
-			this.initialHash = window.location.hash.split("#")[2];
+		this.currentHash = null;
+		this.currentHashScrolled = false;
+		this.handleHashChange();
 
 	}
 
@@ -101,7 +101,7 @@ class Chapter extends React.Component {
 
 	scrollToLastLocation() {
 
-		// Scroll to the first match.
+		// If there's a word we're trying to highlight, scroll to the first match.
 		if(this.props.match.params.word) {
 
 			var match = document.getElementsByClassName("text content-highlight");
@@ -112,12 +112,14 @@ class Chapter extends React.Component {
 				smoothlyScrollElementToEyeLevel(match[number]);
 
 		}
-		// If there's no word, is there a hash? If so, jump to it.
-		else if(this.initialHash !== null) {
-			const el = document.getElementById(this.initialHash);
+		// If there's no word, is there an element ID? If so, jump to it.
+		else if(this.currentHash !== null) {
+			const el = document.getElementById(this.currentHash);
 
-			if(el)
+			// If we found the element, remove the hash any time after a few seconds. See handleScroll for the removal logic.
+			if(el) {
 				smoothlyScrollElementToEyeLevel(el);
+			}
 
 		}
 		// If there's no word or hash, scroll to the last scroll position, if there is one.
@@ -129,6 +131,19 @@ class Chapter extends React.Component {
 				scrollPosition = 0;
 			window.scrollTo(0, scrollPosition);
 
+		}
+
+	}
+
+	handleHashChange() {
+
+		let parts = window.location.hash.split("#");
+		let id = parts.length > 2 ? parts[2] : null;
+		if(this.currentHash !== id) {
+			this.currentHash = id;
+			this.currentHashScrolled = false;
+			setTimeout(() => this.currentHashScrolled = true, 2000);
+			console.log("Updated hash to " + this.currentHash);
 		}
 
 	}
@@ -161,8 +176,25 @@ class Chapter extends React.Component {
 		localStorage.setItem("chapterProgress", JSON.stringify(progress));
 
 		// Handle overlaps
-		this.hideOutlineIfObscured();		
+		this.hideOutlineIfObscured();
 
+		// See if the hash has changed.
+		this.handleHashChange();
+
+		// If there was a hash and it's still there and the target is no longer in view, remove the hash from the URL so that refreshes go to the current position, not the hash.
+		if(this.currentHash !== null && this.currentHashScrolled) {
+			const el = document.getElementById(this.currentHash);
+			const rect = el.getBoundingClientRect();
+			// If it's outside the window, remove the hash.
+			if(rect.bottom < 0 || rect.top > window.innerHeight) {
+				const url = new URL(document.location.href);
+				url.hash = "#" + window.location.hash.split("#")[1];
+				history.pushState({}, "", url.pathname + url.hash);
+				this.currentHash = null;
+				this.currentHashScrolled = false;
+			}
+		}
+		
 	}
 
 	hideOutlineIfObscured() {
@@ -289,12 +321,7 @@ class Chapter extends React.Component {
 
 	getHighlightedWord() { return this.props.match.params.word; }
 
-	getHighlightedID() {
-
-		let parts = window.location.hash.split("#");
-		return parts.length > 2 ? parts[2] : null;		
-
-	}
+	getHighlightedID() { return this.currentHash; }
 
 	// After each render, we need to adjust the layout of marginals, which by default are floating from
 	// their little spans within the body of the text. We have to do two things:
