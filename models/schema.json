@@ -13,7 +13,7 @@
         "chapters", "revisions", "license", "sources", "references",
         "images"
     ],
-    "additionalProperties": true,
+    "additionalProperties": false,
 	"properties": {
         "title": { "type": "string" },
         "authors": {
@@ -106,7 +106,9 @@
                     "phrase": { "type": "string" },
                     "definition": { "type": "string" },
                     "synonyms": { "type": "array", "items": { "type": "string" }}
-                }
+                },
+                "additionalProperties": false,
+                "required": ["phrase", "definition"]
             }
         }
     }
