@@ -45,7 +45,7 @@ class Glossary extends React.Component {
 										<td><strong>{glossary[key].phrase}</strong></td>
 										<td>
 											{ glossary[key].definition }
-											{ glossary[key].synonyms.length > 0 ? <span><br/><br/><em>{glossary[key].synonyms.join(", ")}</em></span> : null }
+											{ glossary[key].synonyms && glossary[key].synonyms.length > 0 ? <span><br/><br/><em>{glossary[key].synonyms.join(", ")}</em></span> : null }
 										</td>
 									</tr>
 								)}

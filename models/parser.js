@@ -1667,7 +1667,7 @@ class DefinitionNode extends Node {
                     <span className="definition">
                         <strong>{entry.phrase}</strong>: {entry.definition}
                         {
-                            entry.synonyms.length > 0 ? <span><br/><br/><em>{entry.synonyms.join(", ")}</em></span> : null
+                            entry.synonyms && entry.synonyms.length > 0 ? <span><br/><br/><em>{entry.synonyms.join(", ")}</em></span> : null
                         }
                     </span>
                 }
