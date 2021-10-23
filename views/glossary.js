@@ -3,6 +3,7 @@ import { Header } from "./header";
 import { Outline } from './outline';
 import { Page } from './page';
 import { Book } from '../models/book.js';
+import { Parser } from '../models/parser'
 
 class Glossary extends React.Component {
 
@@ -44,7 +45,7 @@ class Glossary extends React.Component {
 									<tr key={"definition" + index}>
 										<td><strong>{glossary[key].phrase}</strong></td>
 										<td>
-											{ glossary[key].definition }
+											{ Parser.parseContent(book, glossary[key].definition).toDOM(null, null, "definition") }
 											{ glossary[key].synonyms && glossary[key].synonyms.length > 0 ? <span><br/><br/><em>{glossary[key].synonyms.join(", ")}</em></span> : null }
 										</td>
 									</tr>

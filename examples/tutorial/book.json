@@ -74,7 +74,7 @@
 	"glossary": {
 		"gloss": {
 			"phrase": "glossary",
-			"definition": "An alphabetical list of terms or words found in or relating to a specific subject, text, or dialect, with explanations; a brief dictionary.",
+			"definition": "An alphabetical list of *terms* or *words* found in or relating to a specific subject, text, or dialect, with explanations; a brief dictionary.",
 			"synonyms": ["dictionary"]
 		},
 		"mouse": {

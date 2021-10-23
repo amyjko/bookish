@@ -1665,7 +1665,7 @@ class DefinitionNode extends Node {
                 interactor={this.phrase.toDOM(view, chapter)}
                 content={
                     <span className="definition">
-                        <strong>{entry.phrase}</strong>: {entry.definition}
+                        <strong>{entry.phrase}</strong>: {Parser.parseContent(view.getBook(), entry.definition).toDOM(view, chapter, "definition")}
                         {
                             entry.synonyms && entry.synonyms.length > 0 ? <span><br/><br/><em>{entry.synonyms.join(", ")}</em></span> : null
                         }
