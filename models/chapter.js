@@ -14,10 +14,10 @@ class Chapter {
         this.text = text;
 		this.forthcoming = forthcoming;
 
-        // If the chapter has text, then parse it, count words, and compute an index.
+        // If the chapter has text, then parse it, count searchable words, and compute an index.
         if(this.text !== null) {
-            this.wordCount = text.split(/\s+/).length;
             this.ast = Parser.parseChapter(this.book, text);
+            this.wordCount = this.ast.toText().split(/\s+/).length;
             this.index = this.computeIndex();
         }
         // Otherwise, set them all to null.
