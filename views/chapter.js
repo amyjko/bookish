@@ -348,6 +348,9 @@ class Chapter extends React.Component {
 		// This will track the current leading bottom edge for laying out marginals.
 		let currentBottom = null;
 
+		// Are there any marginal right inset images that might overlap?
+		let rightInsets = document.getElementsByClassName("marginal-right-inset");
+
 		// Layout all of the marginals vertically to prevent overlaps.
 		Array.from(document.getElementsByClassName("marginal")).forEach(el => {
 			if(window.getComputedStyle(el).getPropertyValue("position") !== "fixed") {
@@ -369,17 +372,42 @@ class Chapter extends React.Component {
 					currentBottom = currentBottom + elementBounds.height;
 				}
 				else {
-					// If we don't have a bottom yet, or the current above is above this element's parent,
-					// then set the current bottom to the bottom of this element.
+					// If we don't have a bottom yet, or the current above is above the parent's top,
+					// then set the current bottom to the bottom of the parent.
 					if(currentBottom === null || currentBottom < parentTop) {
 						el.style.top = parentTop + "px";
 						currentBottom = parentTop + elementBounds.height;
 					}
-					// If this element's parent position is above the current bottom, 
-					// move it down, then set a new bottom based on the element's height.
+					// Otherwise, put the marginal below the last marginal's bottom.
 					else {
 						el.style.top = currentBottom + "px";
 						currentBottom = currentBottom + elementBounds.height;
+					}
+
+					// If there are any right insets, do any intersect with this marginal?
+					// If so, move the marginal below them.
+					if(rightInsets.length > 0) {
+						Array.from(rightInsets).forEach(inset => {
+							// Compute the global positions of the marginal and the potential inset.
+							let insetBounds = inset.getBoundingClientRect();
+							let insetTop = insetBounds.top + window.scrollY;
+							let insetBottom = insetTop + insetBounds.height;
+							let elementTop = el.getBoundingClientRect().top + window.scrollY;
+							let elementBottom = elementTop + elementBounds.height;
+
+							// If they overlap...
+							if((elementTop <= insetTop && elementBottom >= insetTop) ||
+							   (elementTop <= insetBottom && elementBottom >= insetBottom) ||
+							   (elementTop >= insetTop && elementBottom <= insetBottom)) {
+								// Calculate the new position based on the preferred position, minus the element's height (which was added above), plus the overlap between the inset and the marginal.
+								let newTop = currentBottom - elementBounds.height + (insetBottom - elementTop);
+								// Reposition the marginal.
+								el.style.top = newTop + "px";
+								// Update the new bottom.
+								currentBottom = newTop + elementBounds.height;
+
+							}
+						});
 					}
 
 					// Reposition the marginal horizontally.

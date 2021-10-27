@@ -177,16 +177,16 @@ You can include captioned images like the one at the top of this chapter by usin
 You can also nudge the image left and right by ending the embed with a \< or \>. (This only works if the viewing window is wide enough)
 
 `markdown
-|chapter1.jpg|A photograph of Boomy seeking nuzzles|A caption with a reference.|Amy J. Ko|<
+|chapter1.jpg|A photograph of Boomy seeking nuzzles|A caption with a reference.|Amy J. Ko|>
 `
 
-Here's an image on the left.
+Here's an image on the right.
 
-|chapter1.jpg|A photograph of Boomy seeking nuzzles|A caption with a reference.|Amy J. Ko|<
+|chapter1.jpg|A photograph of Boomy seeking nuzzles|A caption with a reference.|Amy J. Ko|>
 
 # Citations
 
-You can also cite things <swearngin20,latoza20,register20,ref4,ref5,ref6,ref7,ref8,ref9,swearngin200> or just cite one thing <register20>, or cite another! <swearngin201>
+You can also cite things <swearngin20> or just cite one thing <register20>, or cite another! <swearngin201>
 
 If you cite something that doesn't appear in your book specification's reference list, you'll get an error like this: <thisisanunknowncitation>.
 
