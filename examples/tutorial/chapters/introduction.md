@@ -254,8 +254,9 @@ if two == 2:
 
 `python!
 two = 1 + 1
-if two == 2 / 0:
+if two == 2:
    print("Truth")
+print("Done")
 ` Look, syntax highlighting!
 
 
