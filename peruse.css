@@ -371,8 +371,9 @@ blockquote .blockquote-caption {
 	background: linear-gradient(to right, lightGray 0px, lightGray 2px, transparent 2px) no-repeat right
 }
 
-.definition em {
+.definition .definition-synonyms {
 	color: grey;
+	font-style: italic;
 }
 
 /* MARGINALS */
