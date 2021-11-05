@@ -100,10 +100,15 @@ class Parser {
                 // If a short version was requested, try to abbreviate the authors.
                 if(short) {
                     authors = authors.split(",");
-                    if(authors.length > 1)
-                        authors = authors[0].trim() + ", et al.";
-                    else   
+                    if(authors.length === 1) {
                         authors = authors[0];
+                    }
+                    else if(authors.length === 2) {
+                        authors = authors[0].trim() + " & " + authors[1].trim();
+                    }
+                    else {
+                        authors = authors[0].trim() + ", et al.";
+                    }
                     dom = <span className="reference-text">{authors} ({year}). {url === null ? title : <a href={url} target={"_blank"}>{title}</a>}{title.charAt(title.length - 1) === "?" ? "" : "."} <em>{source}</em></span>
                 }
                 else
