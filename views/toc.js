@@ -84,7 +84,7 @@ class TableOfContents extends React.Component {
 						header={title}
 						subtitle={subtitle}
 						tags={book.getTags()}
-						content={<Authors authors={book.getAuthors()} />}
+						after={<Authors authors={book.getAuthors()} />}
 					/>
 
 					{Parser.parseChapter(book, book.getDescription()).toDOM()}

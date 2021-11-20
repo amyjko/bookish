@@ -165,7 +165,7 @@ class Book {
         else return this.specification.chapters; 
     }
 
-    hasChapter(chapterID) { return chapterID in this.chapters; }
+    hasChapter(chapterID) { return chapterID in this.chapters || ["references", "glossary", "index", "search", "media"].includes(chapterID); }
     getChapter(chapterID) { return this.hasChapter(chapterID) ? this.chapters[chapterID] : null; }
     getSymbols() { return this.specification ? this.specification.symbols : {}; }
 	getLicense() { return this.getSpecification().license; }
