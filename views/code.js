@@ -10,6 +10,7 @@ class Code extends React.Component {
 
         super(props)
         this.setEl = this.setEl.bind(this);
+        this.handleChange = this.handleChange.bind(this);
 
     }
 
@@ -33,6 +34,12 @@ class Code extends React.Component {
         this.el = el;
     };
 
+    handleChange() {
+
+        this.props.edited.call(null, this.el.innerText);
+
+    }
+
     // Render some code, wrapping in a <pre> if it's a block.
     render() {
 
@@ -40,7 +47,10 @@ class Code extends React.Component {
         let lang = hljs.getLanguage(this.props.language) === undefined ? "text" : this.props.language;
 
         return <code 
+            contentEditable={this.props.editable}
+            suppressContentEditableWarning={true}
             className={"code " + (this.props.inline ? "code-inline" : "code-block") + " language-" + lang} 
+            onBlur={this.handleChange}
             ref={this.setEl}>
                 {this.props.children}
         </code>;

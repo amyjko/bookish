@@ -714,7 +714,7 @@ a .outline-header-active {
 .python button {
 	background: rgb(240,240,240);
 	border: 1px solid lightGray;
-	width: 10%;
+	width: 5%;
 	height: 3rem;
 	padding: 0;
 	display: inline-block;
