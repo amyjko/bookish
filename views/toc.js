@@ -199,7 +199,7 @@ class TableOfContents extends React.Component {
 					<h2>Citation</h2>
 
 					<p>
-						{ book.getAuthors().map(author => author.name).join(", ") } ({(new Date()).getFullYear() }). <em>{title}</em>. { location.protocol+'//'+location.host+location.pathname }, <em>retrieved { (new Date()).toLocaleDateString("en-US")}</em>.
+						{ book.getAuthors().map(author => author.name).join(", ") } ({(new Date()).getFullYear() }). <em>{book.getTitle()}</em>. { location.protocol+'//'+location.host+location.pathname }, <em>retrieved { (new Date()).toLocaleDateString("en-US")}</em>.
 					</p>
 
 					{
