@@ -14,7 +14,7 @@ class Header extends React.Component {
 					this.props.image ?
 						<div className="figure-full">
 							{ Parser.parseEmbed(this.props.book, this.props.image).toDOM() }
-							<div id="scroll-reminder"></div>
+							{ this.props.print ? null : <div id="scroll-reminder"></div> }
 						</div> :
 						// Add a bit of space to account for the lack of an image.
 						<p>&nbsp;</p>

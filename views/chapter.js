@@ -102,7 +102,7 @@ class Chapter extends React.Component {
 	scrollToLastLocation() {
 
 		// If there's a word we're trying to highlight, scroll to the first match.
-		if(this.props.match.params.word) {
+		if(this.props.match && this.props.match.params.word) {
 
 			var match = document.getElementsByClassName("text content-highlight");
 
@@ -201,6 +201,12 @@ class Chapter extends React.Component {
 
 		// Get the outline's bounds.
 		let outline = document.getElementsByClassName("outline")[0];
+
+		// If there's no outline, don't bother.
+		if(!outline)
+			return
+
+		// Set a threshold for hiding
 		let threshold = 100;
 
 		// If the outline isn't affixed to the footer
@@ -319,7 +325,7 @@ class Chapter extends React.Component {
 
 	}
 
-	getHighlightedWord() { return this.props.match.params.word; }
+	getHighlightedWord() { return this.props.match ? this.props.match.params.word : null; }
 
 	getHighlightedID() { return this.currentHash; }
 
@@ -442,7 +448,7 @@ class Chapter extends React.Component {
 		}
 
 		if(!book.chapterIsLoaded(this.props.id)) {
-			return <Loading/>;
+			return this.props.print ? null : <Loading/>;
 		}
 		else {
 
@@ -458,6 +464,7 @@ class Chapter extends React.Component {
 						<Header 
 							book={book}
 							image={chapter.image}
+							print={this.props.print}
 							before={
 								<span>
 								{
@@ -489,22 +496,26 @@ class Chapter extends React.Component {
 							} 
 						/>
 
-						<Outline
-							previous={book.getPreviousChapterID(this.props.id)}
-							next={book.getNextChapterID(this.props.id)}
-							listener={ (expanded, callback) =>{
-								// If the outline is being expanded, hide the marginal, otherwise leave it alone.
-								this.setState({ 
-									marginal: expanded ? null : this.state.marginal 
-								}, callback);
+						{
+							this.props.print ? 
+							null :
+							<Outline
+								previous={book.getPreviousChapterID(this.props.id)}
+								next={book.getNextChapterID(this.props.id)}
+								listener={ (expanded, callback) =>{
+									// If the outline is being expanded, hide the marginal, otherwise leave it alone.
+									this.setState({ 
+										marginal: expanded ? null : this.state.marginal 
+									}, callback);
 
-								// Check if we need to hide the outline after positioning.
-								this.hideOutlineIfObscured();
+									// Check if we need to hide the outline after positioning.
+									this.hideOutlineIfObscured();
 
-							}}
-							// Collapse the outline if a marginal is selected.
-							collapse={this.state.marginal !== null}
-						/>
+								}}
+								// Collapse the outline if a marginal is selected.
+								collapse={this.state.marginal !== null}
+							/>
+						}
 
 						{ /* Render the editor if we're editing */ }
 						{ this.state.editing ? this.renderEditor() : null }
@@ -512,7 +523,7 @@ class Chapter extends React.Component {
 						{/* Render the chapter body */}
 						<div onDoubleClick={this.handleDoubleClick}>
 						{
-							chapter.getAST().toDOM(this, this.props.match.params.word)
+							chapter.getAST().toDOM(this, this.props.match ? this.props.match.params.word : null)
 						}
 						</div>
 						{

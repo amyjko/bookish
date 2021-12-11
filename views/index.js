@@ -39,7 +39,7 @@ class Index extends React.Component {
             }
 
             // If this is the first letter, add an entry!
-            if(this.props.match.params.letter === currentLetter) {
+            if(this.props.match && this.props.match.params.letter === currentLetter) {
 
                 if(count === undefined) {
                     count = 0;
@@ -101,9 +101,9 @@ class Index extends React.Component {
                         (letter, index) => 
                             <span key={index} style={{display: "inline-block"}}>
                                 {
-                                    letter in letters && this.props.match.params.letter !== letter ? 
+                                    letter in letters && this.props.match && this.props.match.params.letter !== letter ? 
                                         <Link to={"/index/" + letter}>{letter}</Link> :
-                                        <span>{this.props.match.params.letter === letter ? <strong><span style={{fontSize: "200%"}}>{letter}</span></strong> : <span className={"text-muted"}>{letter}</span>}</span>
+                                        <span>{this.props.match && this.props.match.params.letter === letter ? <strong><span style={{fontSize: "200%"}}>{letter}</span></strong> : <span className={"text-muted"}>{letter}</span>}</span>
                                 }
                                 {
                                     index < 26 - 1 ? 

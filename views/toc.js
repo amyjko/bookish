@@ -196,6 +196,12 @@ class TableOfContents extends React.Component {
 						{book.getLicense() ? Parser.parseContent(book, book.getLicense()).toDOM() : "All rights reserved."}
 					</p>
 
+					<h2>Print</h2>
+
+					<p>
+						Want to print this book or generate a PDF? See <Link to="/print">all chapters on a single page</Link> and then print or export.
+					</p>
+
 					<h2>Citation</h2>
 
 					<p>

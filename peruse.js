@@ -12,6 +12,7 @@ import { Search } from "./views/search";
 import { Media } from "./views/media";
 import { Unknown } from "./views/unknown";
 import { Loading } from "./views/loading";
+import { Print } from "./views/print"
 
 import smoothscroll from 'smoothscroll-polyfill';
 
@@ -137,6 +138,7 @@ class Peruse extends React.Component {
 								<Route path="/index/:letter?" render={(props) => <Index {...props} app={this} />} />
 								<Route path="/search/" render={(props) => <Search {...props} app={this} />} />
 								<Route path="/media/" render={(props) => <Media {...props} app={this} />} />
+								<Route path="/print/" render={(props) => <Print {...props} app={this} />} />
 								<Route path="*" render={(props) => <Unknown {...props} message={<p>This URL doesn't exist for this book.</p>} app={this} />}/>
 							</Switch>
 						</div>
