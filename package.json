@@ -13,7 +13,9 @@
 		"test": "npm run clean; npm run build-assets; npm run build-test",
 		"sync": "rsync -avz --delete build/ ajko@ovid.u.washington.edu:~/public_html/peruse/",
 		"build-prod": "browserify -g uglifyify -t [ babelify --presets [ @babel/preset-env @babel/preset-react ] ] peruse.js | terser --compress --mangle > build/peruse.js",
-		"ship": "set -e -o pipefail; npm run clean; npm run build-assets; npm run build-prod; npm run sync"
+		"ship": "set -e -o pipefail; npm run clean; npm run build-assets; npm run build-prod; npm run sync",
+		"build-app": "node ./esbuild.config.js; cp src/index.html public/; cp -R src/images public/; cp -R src/style public/",
+		"watch": "watch 'npm run build-app' ./src"
 	},
 	"devDependencies": {
 		"@babel/cli": "^7.11.6",
@@ -22,6 +24,7 @@
 		"@babel/preset-react": "^7",
 		"babelify": "^10",
 		"browserify": "^16.5.2",
+		"esbuild": "^0.14.0",
 		"http-server": "^0.12.3",
 		"npm": "^6.13.4",
 		"terser": "^5.3.4",
@@ -30,12 +33,17 @@
 	},
 	"dependencies": {
 		"ajv": "^6.0",
+		"bootstrap": "^5.1.3",
+		"dotenv": "^10.0.0",
+		"firebase": "^9.5.0",
 		"highlight.js": "11.1.0",
 		"history": "^4.7.2",
 		"react": "^16.8",
+		"react-bootstrap": "^2.0.3",
 		"react-dom": "^16.8",
 		"react-router-dom": "^5.2",
 		"react-router-hash-link": "^2.2.2",
-		"smoothscroll-polyfill": "^0.4.4"
+		"smoothscroll-polyfill": "^0.4.4",
+		"watch": "^1.0.2"
 	}
 }
