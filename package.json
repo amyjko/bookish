@@ -10,7 +10,7 @@
 		"build-assets": "cp peruse.css build/; cp icons/* build/",
 		"book": "sh scripts/book.sh",
 		"sync": "rsync -avz --delete build/ ajko@ovid.u.washington.edu:~/public_html/peruse/",
-		"ship": "set -e -o pipefail; npm run clean; npm run build-assets; npm run build-prod; npm run sync",
+		"ship": "set -e -o pipefail; npm run clean; npm run build-assets; npm run build; npm run sync",
 		"build-app": "node ./esbuild.backend.js; cp src/index.html public/; cp -R src/images public/; cp -R src/style public/",
 		"build": "rm build/*; node ./esbuild.frontend.js | terser --compress --mangle > build/peruse.js; npm run build-assets",
 		"watch": "watch 'npm run build-app' ./src"
