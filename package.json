@@ -8,28 +8,18 @@
 		"postinstall": "mkdir build/",
 		"clean": "rm build/*",
 		"build-assets": "cp peruse.css build/; cp icons/* build/",
-		"build-test": "rm build/*; browserify -g [ babelify --presets [ @babel/preset-env @babel/preset-react ] ] peruse.js | terser > build/peruse.js; npm run build-assets",
 		"book": "sh scripts/book.sh",
-		"test": "npm run clean; npm run build-assets; npm run build-test",
 		"sync": "rsync -avz --delete build/ ajko@ovid.u.washington.edu:~/public_html/peruse/",
-		"build-prod": "browserify -g uglifyify -t [ babelify --presets [ @babel/preset-env @babel/preset-react ] ] peruse.js | terser --compress --mangle > build/peruse.js",
 		"ship": "set -e -o pipefail; npm run clean; npm run build-assets; npm run build-prod; npm run sync",
-		"build-app": "node ./esbuild.config.js; cp src/index.html public/; cp -R src/images public/; cp -R src/style public/",
+		"build-app": "node ./esbuild.backend.js; cp src/index.html public/; cp -R src/images public/; cp -R src/style public/",
+		"build": "rm build/*; node ./esbuild.frontend.js | terser --compress --mangle > build/peruse.js; npm run build-assets",
 		"watch": "watch 'npm run build-app' ./src"
 	},
 	"devDependencies": {
-		"@babel/cli": "^7.11.6",
-		"@babel/core": "^7.11.6",
-		"@babel/preset-env": "^7.11.5",
-		"@babel/preset-react": "^7",
-		"babelify": "^10",
-		"browserify": "^16.5.2",
-		"esbuild": "^0.14.0",
-		"http-server": "^0.12.3",
 		"npm": "^6.13.4",
+		"esbuild": "^0.14.0",
 		"terser": "^5.3.4",
-		"uglify-js": "^3.11.2",
-		"uglifyify": "^5.0.2"
+		"http-server": "^0.12.3"
 	},
 	"dependencies": {
 		"ajv": "^6.0",

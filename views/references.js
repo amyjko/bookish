@@ -21,12 +21,8 @@ class References extends React.Component {
         const references = book.hasReferences() ? book.getReferences() : null;
 		const renderedReferences = [];
 
-		// Does this book have any references
-		if(!book.hasReferences()) {
-			references = null;
-		} 
 		// Otherwise, map references to a list with letter headers.
-		else {
+		if(references !== null) {
 
 			renderedReferences.push(<p key="description"><em>Sorted by last name of first author.</em></p>)
 

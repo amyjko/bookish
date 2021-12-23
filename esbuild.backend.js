@@ -3,7 +3,7 @@ const { build } = require("esbuild")
 // Load environment variables from .env file
 require('dotenv').config()
 
-// Build a dictionary of the evironment variables to pass to esbuild
+// Build a dictionary of the environment variables to pass to esbuild
 const define = {}
 for (const k in process.env) {
   define[`process.env.${k}`] = JSON.stringify(process.env[k])
@@ -13,7 +13,7 @@ const options = {
   // the entry point file described above
   entryPoints: ['src/App.jsx'],
   // the build folder location described above
-outfile: 'public/app.js',
+  outfile: 'public/app.js',
   bundle: true,
   // Replace with the browser versions you need to target
   target: ['chrome60', 'firefox60', 'safari11', 'edge20'],
