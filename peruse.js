@@ -152,7 +152,7 @@ class Peruse extends React.Component {
 
 
 
-var PeruseWithRouter = withRouter(Peruse);
+const PeruseWithRouter = withRouter(Peruse);
 
 window.peruse = function(url) {
 	ReactDOM.render((

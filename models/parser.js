@@ -77,7 +77,7 @@ class Parser {
 
     static parseReference(ref, book, short=false) {
 
-        var dom = null;
+        let dom = null;
 
         if(typeof ref === "string")
             dom = Parser.parseContent(book, ref).toDOM();
@@ -139,7 +139,7 @@ class Parser {
 		if(!this.more())
             return null;
         
-        var char = this.text.charAt(this.index);
+        let char = this.text.charAt(this.index);
 
         if(smarten) {
             if(char === "\n")
@@ -198,7 +198,7 @@ class Parser {
     
     // All the text until the next newline
     restOfLine() {
-        var nextNewline = this.text.substring(this.index).indexOf("\n") + this.index;
+        const nextNewline = this.text.substring(this.index).indexOf("\n") + this.index;
         if(nextNewline < 0)
             return this.text.substring(this.index);
         else  
@@ -215,7 +215,7 @@ class Parser {
     // A critical list that tells inline formatting parsers to stop being greedy.
     nextIsContentDelimiter() {
 
-        var next = this.peek();
+        const next = this.peek();
         return next === "\n" ||
             next === "_" ||
             next === "*" ||
@@ -252,7 +252,7 @@ class Parser {
 
     // Read until the end of the line.
     readUntilNewLine() {
-        var text = "";
+        let text = "";
         while(this.more() && this.peek() !== "\n")
             text = text + this.read();
         return text;
@@ -260,7 +260,7 @@ class Parser {
 
     // Read until encountering the given string and return the read text.
     readUntilNewlineOr(string) {
-        var text = "";
+        let text = "";
         while(this.more() && !this.nextIs("\n") && !this.nextIs(string))
             text = text + this.read();
         return text;
@@ -302,7 +302,7 @@ class Parser {
         // While there's more text, parse a line.
         while(this.more()) {
             // Read a block
-            var block = this.parseBlock(book, metadata);
+            const block = this.parseBlock(book, metadata);
             // Add it to the list if we parsed something.
             if(block !== null)
                 blocks.push(block);            
@@ -426,7 +426,7 @@ class Parser {
     parseHeader(book, metadata) {
 
         // Read a sequence of hashes
-        var count = 0;
+        let count = 0;
         while(this.nextIs("#")) {
             this.read();
             count++;
@@ -458,7 +458,7 @@ class Parser {
 
     parseBulletedList(book, metadata) {
 
-        var bullets = [];
+        const bullets = [];
         let lastLevel = undefined;
         let currentLevel = undefined;
 
@@ -521,7 +521,7 @@ class Parser {
 
     parseNumberedList(book, metadata) {
 
-        var bullets = [];
+        const bullets = [];
         let lastLevel = undefined;
         let currentLevel = undefined;
 
@@ -604,9 +604,9 @@ class Parser {
         this.read();
 
         // Read until we encounter a closing back tick.
-        var code = "";
+        let code = "";
         while(this.more() && !this.nextIs("`")) {
-            var next = this.read(false);
+            let next = this.read(false);
             if(next === "\\") {
                 if(this.nextIs("`")) {
                     this.read();
@@ -627,7 +627,7 @@ class Parser {
 
         // Read the caption. Note that parsing inline content stops at a newline, 
         // so if there's a line break after the last row, there won't be a caption.
-        var caption = this.parseContent(book, metadata);
+        const caption = this.parseContent(book, metadata);
 
         return new CodeNode(code, language, caption, position);
 
@@ -635,7 +635,7 @@ class Parser {
 
     parseQuote(book, metadata) {
 
-        var blocks = [];
+        const blocks = [];
 
         // Parse the ", then any whitespace, then the newline
         this.read();
@@ -648,7 +648,7 @@ class Parser {
 
         while(this.more() && !this.nextIs("\"")) {
             // Read a block
-            var block = this.parseBlock(book, metadata);
+            const block = this.parseBlock(book, metadata);
             // Add it to the list if we parsed something.
             if(block !== null)
                 blocks.push(block);
@@ -669,7 +669,7 @@ class Parser {
         this.readWhitespace();
 
         // Read the credit.
-        var credit = this.nextIs("\n") ? null : this.parseContent(book, metadata);
+        const credit = this.nextIs("\n") ? null : this.parseContent(book, metadata);
 
         return new QuoteNode(blocks, credit, position);
 
@@ -677,7 +677,7 @@ class Parser {
 
     parseCallout(book, metadata) {
 
-        var blocks = [];
+        const blocks = [];
 
         // Parse the = ...
         this.read();
@@ -691,7 +691,7 @@ class Parser {
         // Then, read until we find a closing _
         while(this.more() && !this.nextIs("=")) {
             // Read a block
-            var block = this.parseBlock(book, metadata);
+            const block = this.parseBlock(book, metadata);
             // Add it to the list if we parsed something.
             if(block !== null)
                 blocks.push(block);
@@ -717,7 +717,7 @@ class Parser {
 
     parseTable(book, metadata) {
 
-        var rows = [];
+        const rows = [];
 
         // Parse rows until the lines stop starting with ,
         while(this.more() && this.nextIs(",")) {
@@ -749,7 +749,7 @@ class Parser {
 
         // Read the caption. Note that parsing inline content stops at a newline, 
         // so if there's a line break after the last row, there won't be a caption.
-        var caption = this.parseContent(book, metadata);
+        const caption = this.parseContent(book, metadata);
 
         return new TableNode(rows, caption, position);
 
@@ -830,7 +830,7 @@ class Parser {
         this.read();
 
         // Read the URL
-        var url = this.readUntilNewlineOr("|");
+        const url = this.readUntilNewlineOr("|");
 
         // Error if missing URL.
         if(url === "") {
@@ -847,7 +847,7 @@ class Parser {
         this.read();
 
         // Read the description
-        var description = this.readUntilNewlineOr("|");
+        const description = this.readUntilNewlineOr("|");
 
         if(this.peek() !== "|") {
             this.readUntilNewLine();
@@ -862,8 +862,9 @@ class Parser {
         
         // Read a |
         this.read();
+
         // Parse the caption
-        var caption = this.parseContent(book, metadata, "|");
+        const caption = this.parseContent(book, metadata, "|");
 
         if(this.peek() !== "|") {
             this.readUntilNewLine();
@@ -874,7 +875,7 @@ class Parser {
         this.read();
 
         // Parse the credit
-        var credit = this.parseContent(book, metadata, "|");
+        const credit = this.parseContent(book, metadata, "|");
 
         // Error if missing credit.
         if(credit.toText().trim() === "") {
@@ -947,9 +948,9 @@ class Parser {
     parseFormatted(book, metadata, awaiting) {
 
         // Remember what we're matching.
-        var delimeter = this.read();
-        var segments = [];
-        var text = "";
+        const delimeter = this.read();
+        const segments = [];
+        let text = "";
 
         // Read some content until reaching the delimiter or the end of the line
         while(this.more() && this.peek() !== delimeter && !this.nextIs("\n")) {
@@ -991,9 +992,9 @@ class Parser {
         this.read();
 
         // Read until we encounter a closing back tick.
-        var code = "";
+        let code = "";
         while(this.more() && !this.nextIs("`")) {
-            var next = this.read(false);
+            let next = this.read(false);
             if(next === "\\") {
                 if(this.nextIs("`")) {
                     this.read();
@@ -1022,12 +1023,12 @@ class Parser {
 
     parseCitations(book, metadata) {
         
-        var citations = "";
+        let citations = "";
 
         // Read the <
         this.read();
         // Read the citations.
-        var citations = this.readUntilNewlineOr(">");
+        citations = this.readUntilNewlineOr(">");
         if(this.peek() === ">")
             this.read();
 
@@ -1077,7 +1078,7 @@ class Parser {
         this.read();
 
         // Read the footnote content.
-        var footnote = this.parseContent(book, metadata, "}");
+        const footnote = this.parseContent(book, metadata, "}");
 
         // Read the closing }
         this.read();
@@ -1100,7 +1101,7 @@ class Parser {
         this.read();
 
         // Read the footnote content.
-        var text = this.parseContent(book, metadata, "~");
+        const text = this.parseContent(book, metadata, "~");
 
         // Read the closing ~
         this.read();
@@ -1130,7 +1131,7 @@ class Parser {
         // Read the [
         this.read();
         // Read some content, awaiting |
-        var content = this.parseContent(book, metadata, "|");
+        const content = this.parseContent(book, metadata, "|");
 
         // Catch links with no label.
         if(content.segments.length === 0)
@@ -1203,7 +1204,7 @@ class ChapterNode extends Node {
 
     getCitationNumber(citationID) { 
         
-        var index = Object.keys(this.getCitations()).sort().indexOf(citationID);
+        const index = Object.keys(this.getCitations()).sort().indexOf(citationID);
 
         if(index < 0)
             return null;
@@ -1497,7 +1498,7 @@ class FormattedNode extends Node {
 
     toDOM(view, chapter, key) {
         
-        var segmentDOMs = this.segments.map((segment, index) => segment.toDOM(view, chapter, "formatted-" + index));
+        const segmentDOMs = this.segments.map((segment, index) => segment.toDOM(view, chapter, "formatted-" + index));
 
         if(this.format === "*")
             return <strong key={key}>{segmentDOMs}</strong>;
@@ -1770,16 +1771,16 @@ class TextNode extends Node {
             if(lowerText.indexOf(query) >= 0) {
 
                 // Find all the matches
-                var indices = [];
-                for(var i = 0; i < text.length; ++i) {
+                const indices = [];
+                for(let i = 0; i < text.length; ++i) {
                     if (lowerText.substring(i, i + query.length) === query) {
                         indices.push(i);
                     }
                 }
 
                 // Go through each one and construct contents for the span to return.
-                var segments = [];
-                for(var i = 0; i < indices.length; i++) {
+                const segments = [];
+                for(let i = 0; i < indices.length; i++) {
                     // Push the text from the end of the last match or the start of the string.
                     segments.push(text.substring(i === 0 ? 0 : indices[i - 1] + query.length, indices[i]));
                     segments.push(<span key={"match-" + i} className="text content-highlight">{text.substring(indices[i], indices[i] + query.length)}</span>);

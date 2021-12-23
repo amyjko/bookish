@@ -85,7 +85,7 @@ class Chapter extends React.Component {
 
 	getProgress() {
 
-		var progress = localStorage.getItem("chapterProgress");
+		let progress = localStorage.getItem("chapterProgress");
 		if(progress === null) {
 			progress = {};
 		} else {
@@ -93,7 +93,7 @@ class Chapter extends React.Component {
 		}
 
 		// If we don't have an entry for this chapter, treat it as 0.
-		var progress = (this.props.id in progress) ? progress[this.props.id] : 0;
+		progress = (this.props.id in progress) ? progress[this.props.id] : 0;
 		
 		return progress;
 
@@ -104,9 +104,9 @@ class Chapter extends React.Component {
 		// If there's a word we're trying to highlight, scroll to the first match.
 		if(this.props.match && this.props.match.params.word) {
 
-			var match = document.getElementsByClassName("text content-highlight");
+			const match = document.getElementsByClassName("text content-highlight");
 
-			var number = this.props.match.params.number && this.props.match.params.number < match.length ? this.props.match.params.number : 0;
+			const number = this.props.match.params.number && this.props.match.params.number < match.length ? this.props.match.params.number : 0;
 
 			if(match.length > 0)
 				smoothlyScrollElementToEyeLevel(match[number]);
@@ -166,7 +166,7 @@ class Chapter extends React.Component {
 		const percent = Math.max(0, Math.round(100 * (top / height)));
 
 		// Remember the progress
-		var progress = localStorage.getItem("chapterProgress");
+		let progress = localStorage.getItem("chapterProgress");
 		if(progress === null) {
 			progress = {};
 		} else {
@@ -255,7 +255,7 @@ class Chapter extends React.Component {
 	handleChange(event) {
 
 		// TODO 
-		var chapter = this.props.app.getBook().getChapter(this.props.id).getText();
+		const chapter = this.props.app.getBook().getChapter(this.props.id).getText();
 		chapter.text = event.target.value;
 
 		// What position should we scroll to?
@@ -267,8 +267,8 @@ class Chapter extends React.Component {
 			this.removeHighlights();
 
 			// Which text node is closest?
-			var textNodes = document.getElementsByClassName("text");
-			for(var i = 0; i < textNodes.length; i++) {
+			const textNodes = document.getElementsByClassName("text");
+			for(let i = 0; i < textNodes.length; i++) {
 				if(textNodes[i].dataset.position > position)
 					break;
 			}
@@ -435,8 +435,8 @@ class Chapter extends React.Component {
 		let book = this.props.app.getBook();
 
 		// Figure out if there's something to highlight.
-		var citationHighlight = null;
-		var highlight = window.location.hash.split("#")[2];
+		let citationHighlight = null;
+		const highlight = window.location.hash.split("#")[2];
 		if(highlight) {
 			let parts = highlight.split("-");
 			let kind = parts[0];

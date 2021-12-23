@@ -257,7 +257,7 @@ class Book {
 
     getBookIndex() {
 
-		var bookIndex = {};
+		const bookIndex = {};
 
 		// Construct the index by building a dictionary of chapters in which each word appears.
 		Object.values(this.chapters).forEach(chapter => {
@@ -287,10 +287,10 @@ class Book {
 		// * upper case versions of words if they appear in lower case,
 		// * plural versions of words if they appear in singular
 		// as a heuristic for detecting non-proper nounds.
-		var duplicates = [];
+		const duplicates = [];
 		Object.keys(index).forEach(word => {
-			var duplicate = false;
-			var canonical = null;
+			let duplicate = false;
+			let canonical = null;
 			if((word.charAt(0) === word.charAt(0).toUpperCase() && word.toLowerCase() in index)) {
 				duplicate = true;
 				canonical = word.toLowerCase();

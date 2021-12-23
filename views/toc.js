@@ -56,14 +56,14 @@ class TableOfContents extends React.Component {
 			return null;
 
 		// Get the chapter progress
-		var progress = localStorage.getItem("chapterProgress");
+		let progress = localStorage.getItem("chapterProgress");
 		if(progress === null) {
 			progress = {};
 		} else {
 			progress = JSON.parse(progress);
 		}
 
-		var readingTime = book.getBookReadingTime();
+		const readingTime = book.getBookReadingTime();
 
 		// Is there a colon? Let's make a subtitle
 		let title = book.getTitle();

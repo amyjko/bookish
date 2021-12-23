@@ -51,10 +51,10 @@ class Chapter {
         let text = this.ast.toText();
 		
 		// Split by word boundaries.
-		var words = text.split(/\b/);
+		const words = text.split(/\b/);
 
 		// Index the words
-		var index = {};
+		const index = {};
 		words.forEach((word, wordNumber) => {
 
 			// Skip non words. We keep them for search results.
@@ -74,7 +74,7 @@ class Chapter {
 				if(!(word in index))
 					index[word] = [];
 				
-				var match = {
+				let match = {
 					left: words.slice(Math.max(0, wordNumber - 10), Math.max(0, wordNumber - 1) + 1).join(""),
 					match: words[wordNumber],
 					right: words.slice(Math.min(words.length - 1, wordNumber + 1), Math.min(words.length - 1, wordNumber + 10) + 1).join("")

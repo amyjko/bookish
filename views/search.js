@@ -33,9 +33,9 @@ class Search extends React.Component {
 
         let book = this.props.app.getBook();
 
-        var results = [];
-        var query = this.state.query.toLowerCase();
-        var matchCount = 0;
+        const results = [];
+        const query = this.state.query.toLowerCase();
+        let matchCount = 0;
 
         // Go through all the chapter indexes and find matches.
         if(query.length > 2)
@@ -49,7 +49,7 @@ class Search extends React.Component {
                     return;
 
                 // Build a DOM to render matches.
-                var chapterMatches = [];
+                const chapterMatches = [];
 
                 // What are all of the words in the index that match the query?
                 Object.keys(index).forEach(word => {
@@ -66,10 +66,10 @@ class Search extends React.Component {
                     results.push(<h2 key={"header-" + chapterID} className="header" id={"header-" + chapterID}>Chapter{chapterNumber === undefined ? "" : " " + chapterNumber} - {chapter.title}</h2>);
                     chapterMatches.forEach((match, index) => {
                         // Only highlight the part of the word that matches.
-                        var start = match.match.toLowerCase().indexOf(query);
-                        var left = match.left + match.match.substring(0, start);
-                        var wordMatch = <span className="content-highlight">{match.match.substring(start, start + query.length)}</span>;
-                        var right = match.match.substring(start + query.length) + match.right;
+                        const start = match.match.toLowerCase().indexOf(query);
+                        const left = match.left + match.match.substring(0, start);
+                        const wordMatch = <span className="content-highlight">{match.match.substring(start, start + query.length)}</span>;
+                        const right = match.match.substring(start + query.length) + match.right;
 
                         results.push(<p key={"header-" + chapterID + "-" + index}><Link to={"/" + chapterID + "/" + match.match.toLowerCase() + "/" + index}>...{left}{wordMatch}{right}...</Link></p>);
                     })
