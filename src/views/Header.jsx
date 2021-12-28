@@ -19,7 +19,7 @@ export default function Header() {
 	return <Navbar bg="light" expand="sm">
 		<Container fluid>
 			<Navbar.Brand as={Link} to="/">
-				<img src="/images/icon.png" style={{height: "1em"}} /> Bookish
+				<img src="/images/icons/icon.png" style={{height: "1em"}} /> Bookish
 			</Navbar.Brand>
 			<Navbar.Toggle aria-controls="basic-navbar-nav" />
 			<Navbar.Collapse className="me-auto">

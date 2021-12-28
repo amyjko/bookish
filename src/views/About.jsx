@@ -52,7 +52,5 @@ export default function About() {
             Write <a href="mailto:ajko@uw.edu">Amy</a> if you'd like to collaborate, or <a href="https://github.com/amyjko/bookish/issues" target="_blank">submit an issue</a> or <a href="https://github.com/amyjko/bookish/pulls" target="_blank">pull request</a> directly.
         </p>
 
-		<small>Icon by <a href="https://thenounproject.com/search/?q=book&i=1749824" target="_blank">Richard</a> from Noun Project.</small>
-
     </>
 }

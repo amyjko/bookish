@@ -6,8 +6,8 @@
 	"repository": "https://github.com/amyjko/bookish.git",
 	"scripts": {
 		"postinstall": "mkdir build/",
-		"clean": "rm build/*",
-		"build-assets": "cp bookish.css build/; cp icons/* build/",
+		"clean": "rm -R build/*",
+		"build-assets": "cp bookish.css build/; cp -R src/images build/",
 		"book": "sh scripts/book.sh",
 		"sync": "rsync -avz --delete build/ ajko@ovid.u.washington.edu:~/public_html/bookish/",
 		"ship": "set -e -o pipefail; npm run clean; npm run build-assets; npm run build; npm run sync",
