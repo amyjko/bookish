@@ -1,4 +1,4 @@
-@welcome: Welcome to the Peruse example book! This introduction contains all of the features supported by the platform, and explanation of how they work.
+@welcome: Welcome to the Bookish example book! This introduction contains all of the features supported by the platform, and explanation of how they work.
 
 "
 This is a quote. I'm using it to test how the outline floats around non-paragraph headers.
@@ -198,7 +198,7 @@ You can also include footnotes{I'm a footnote}:
 You can also include footnotes{I'm a footnote}{I'm also a footnote}:
 `
 
-If you include more footnotes, Peruse will letter them accordingly{I'm also a footnote}.
+If you include more footnotes, Bookish will letter them accordingly{I'm also a footnote}.
 
 # Videos
 
@@ -232,7 +232,7 @@ if two == 2:
 \`
 `
 
-Peruse will try to highlight based on that language's syntax.
+Bookish will try to highlight based on that language's syntax.
 
 `python
 two = 1 + 1

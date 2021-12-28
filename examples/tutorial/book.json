@@ -1,11 +1,11 @@
 {
-	"title": "Peruse Tutorial: An placeholder for better documentation",
+	"title": "Bookish Tutorial: An placeholder for better documentation",
 	"authors": [
 		{ "id": "ajko", "name": "Amy J. Ko", "url": "https://faculty.washington.edu/ajko/" },
 		{ "id": "boomy", "name" : "Boomy" }
 	],
 	"images": {
-		"cover": "|cover.jpg|A photograph of Boomy the cat sleeping|Boomy is excited that you're trying Peruse!|@amyCredit|",
+		"cover": "|cover.jpg|A photograph of Boomy the cat sleeping|Boomy is excited that you're trying Bookish!|@amyCredit|",
 		"search": "|cover.jpg|A photograph of Boomy the cat sleeping|Boomy's looking for something...|@amyCredit|",
 		"media": "|cover.jpg|A photograph of Boomy the cat sleeping|Boomy's looking for something...|@amyCredit|",
 		"glossary": "|cover.jpg|A photograph of Boomy the cat looking skeptical.|Boomy doesn't know what you mean.|@amyCredit|",
@@ -13,7 +13,7 @@
 		"index": "|cover.jpg|A photograph of Boomy the cat sleeping|Boomy's wondering what word you're curious about!|@amyCredit|",
 		"unknown": "|unknown.jpg|A photograph of Boomy the cat looking skeptical.|Boomy is worried that you're lost.|@amyCredit|"
 	},
-	"description": "This is an example book, intended for presentation with the Peruse framework. Don't let it's simplicity fool you: it demonstrates all of the features of peruse, so you should be able to copy and modify any of its content to help you write your book.",
+	"description": "This is an example book, intended for presentation with the Bookish framework. Don't let it's simplicity fool you: it demonstrates all of the features of Bookish, so you should be able to copy and modify any of its content to help you write your book.",
 	"acknowledgements": "Thanks to Boomy for all her hard work.",
 	"chapters": [
 		{

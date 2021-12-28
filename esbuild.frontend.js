@@ -11,7 +11,7 @@ for (const k in process.env) {
 
 const options = {
   // the entry point file described above
-  entryPoints: ['peruse.js'],
+  entryPoints: ['bookish.js'],
   loader: { '.js': 'jsx' },
   bundle: true,
   minify: true,

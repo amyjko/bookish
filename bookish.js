@@ -18,7 +18,7 @@ import smoothscroll from 'smoothscroll-polyfill';
 
 smoothscroll.polyfill();
 
-class Peruse extends React.Component {
+class Bookish extends React.Component {
 
 	constructor(props) {
 
@@ -152,12 +152,12 @@ class Peruse extends React.Component {
 
 
 
-const PeruseWithRouter = withRouter(Peruse);
+const BookishWithRouter = withRouter(Bookish);
 
-window.peruse = function(url) {
+window.bookish = function(url) {
 	ReactDOM.render((
 		<HashRouter>
-			<Route path="/" render={(props) => <PeruseWithRouter {...props} book={url} /> } />
+			<Route path="/" render={(props) => <BookishWithRouter {...props} book={url} /> } />
 		</HashRouter>
 	), document.body.appendChild(document.createElement("div")));
 }

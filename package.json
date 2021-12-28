@@ -1,18 +1,18 @@
 {
-	"name": "peruse",
-	"version": "0.6.1",
-	"description": "A simple platform for creating highly readable single-page client-side online books.",
+	"name": "bookish",
+	"version": "0.7.0",
+	"description": "A simple platform for creating readable, accessible online books.",
 	"license": "MIT",
-	"repository": "https://github.com/amyjko/peruse.git",
+	"repository": "https://github.com/amyjko/bookish.git",
 	"scripts": {
 		"postinstall": "mkdir build/",
 		"clean": "rm build/*",
-		"build-assets": "cp peruse.css build/; cp icons/* build/",
+		"build-assets": "cp bookish.css build/; cp icons/* build/",
 		"book": "sh scripts/book.sh",
-		"sync": "rsync -avz --delete build/ ajko@ovid.u.washington.edu:~/public_html/peruse/",
+		"sync": "rsync -avz --delete build/ ajko@ovid.u.washington.edu:~/public_html/bookish/",
 		"ship": "set -e -o pipefail; npm run clean; npm run build-assets; npm run build; npm run sync",
 		"build-app": "node ./esbuild.backend.js; cp src/index.html public/; cp -R src/images public/; cp -R src/style public/",
-		"build": "rm build/*; node ./esbuild.frontend.js | terser --compress --mangle > build/peruse.js; npm run build-assets",
+		"build": "rm build/*; node ./esbuild.frontend.js | terser --compress --mangle > build/bookish.js; npm run build-assets",
 		"watch": "watch 'npm run build-app' ./src"
 	},
 	"devDependencies": {
