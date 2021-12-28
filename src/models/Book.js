@@ -1,9 +1,9 @@
 import Ajv from 'ajv';
 
-import { Parser } from "./parser";
-import { Chapter } from './chapter.js';
+import { Parser } from "./Parser.js";
+import { Chapter } from './Chapter.js';
 
-let schema = require("./schema.json");
+let schema = require("../schemas/book.json");
 
 class Book {
 

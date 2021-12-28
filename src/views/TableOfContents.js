@@ -1,10 +1,10 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Header } from "./header";
-import { Authors } from "./authors";
-import { Page } from './page';
-import { Parser } from "../models/parser";
-import { Book } from '../models/book.js';
+import { ChapterHeader } from "./ChapterHeader";
+import { Authors } from "./Authors";
+import { Page } from './Page';
+import { Parser } from "../models/Parser";
+import { Book } from '../models/Book';
 
 class TableOfContents extends React.Component {
 
@@ -78,7 +78,7 @@ class TableOfContents extends React.Component {
 			<Page loaded={this.afterLoad}>
 				<div className="toc">
 
-					<Header 
+					<ChapterHeader 
 						book={book}
 						image={book.getImage("cover")} 
 						header={title}

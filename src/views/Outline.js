@@ -3,7 +3,7 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { NavHashLink } from "react-router-hash-link";
 
-import { smoothlyScrollElementToEyeLevel } from './../views/scroll.js';
+import { smoothlyScrollElementToEyeLevel } from './Scroll.js';
 
 class Outline extends React.Component {
 

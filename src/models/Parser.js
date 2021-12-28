@@ -1,12 +1,12 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { NavHashLink } from "react-router-hash-link";
-import { Figure } from './../views/image';
-import { Marginal } from './../views/marginal';
-import { Code } from './../views/code';
-import { Python } from './../views/python.js'
+import { Figure } from '../views/Figure';
+import { Marginal } from '../views/Marginal';
+import { Code } from '../views/Code';
+import { Python } from '../views/Python.js'
 
-import { smoothlyScrollElementToEyeLevel } from './../views/scroll.js';
+import { smoothlyScrollElementToEyeLevel } from '../views/Scroll.js';
 
 // TODO This grammar is slightly out of date.
 // A simple recursive descent parser for this grammar.

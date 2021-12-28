@@ -1,13 +1,13 @@
 import React from 'react';
 
-import { Parser } from "../models/parser";
-import { Header } from './header';
-import { Authors } from "./authors";
-import { Outline } from './outline';
-import { Page } from './page';
-import { Loading } from './loading';
+import { Parser } from "../models/Parser";
+import { ChapterHeader } from './ChapterHeader';
+import { Authors } from "./Authors";
+import { Outline } from './Outline';
+import { Page } from './Page';
+import { Loading } from './Loading';
 
-import { smoothlyScrollElementToEyeLevel } from './../views/scroll.js';
+import { smoothlyScrollElementToEyeLevel } from './Scroll.js';
 
 class Chapter extends React.Component {
 
@@ -396,7 +396,7 @@ class Chapter extends React.Component {
 			return (
 				<Page loaded={this.scrollToLastLocation}>
 					<div className="chapter">
-						<Header 
+						<ChapterHeader 
 							book={book}
 							image={chapter.image}
 							print={this.props.print}

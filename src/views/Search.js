@@ -1,10 +1,10 @@
 import React from 'react';
-import { Header } from "./header";
-import { Outline } from './outline';
-import { Page } from './page';
+import { ChapterHeader } from "./ChapterHeader";
+import { Outline } from './Outline';
+import { Page } from './Page';
 
 import { Link } from 'react-router-dom';
-import { Book } from '../models/book.js';
+import { Book } from '../models/Book.js';
 
 class Search extends React.Component {
 
@@ -79,7 +79,7 @@ class Search extends React.Component {
 
 		return (
 			<Page>
-				<Header 
+				<ChapterHeader 
                     book={book}
 					image={book.getImage(Book.SearchID)} 
 					header="Search"

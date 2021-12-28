@@ -1,15 +1,15 @@
 import React from 'react';
 
-import { Header } from "./header";
-import { Outline } from './outline';
-import { Page } from './page';
+import { ChapterHeader } from "./ChapterHeader";
+import { Outline } from './Outline';
+import { Page } from './Page';
 
 class Unknown extends React.Component {
 
 	render() {
 		return (
 			<Page>
-				<Header 
+				<ChapterHeader 
 					book={this.props.app.getBook()}
 					image={this.props.app.getBook().getSpecification() ? this.props.app.getBook().getImage("unknown") : null } 
 					header="Oops."

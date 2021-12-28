@@ -2,17 +2,17 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import { Route, HashRouter, Switch, withRouter } from 'react-router-dom';
 
-import { Book } from "./models/book";
-import { Chapter } from "./views/chapter";
-import { TableOfContents } from "./views/toc";
-import { References } from "./views/references";
-import { Glossary } from "./views/glossary"
-import { Index } from "./views/index";
-import { Search } from "./views/search";
-import { Media } from "./views/media";
-import { Unknown } from "./views/unknown";
-import { Loading } from "./views/loading";
-import { Print } from "./views/print"
+import { Book } from "./models/Book";
+import { Chapter } from "./views/Chapter";
+import { TableOfContents } from "./views/TableOfContents";
+import { References } from "./views/References";
+import { Glossary } from "./views/Glossary"
+import { Index } from "./views/Index";
+import { Search } from "./views/Search";
+import { Media } from "./views/Media";
+import { Unknown } from "./views/Unknown";
+import { Loading } from "./views/Loading";
+import { Print } from "./views/Print"
 
 import smoothscroll from 'smoothscroll-polyfill';
 

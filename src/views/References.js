@@ -1,12 +1,11 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
 
-import { Header } from "./header";
-import { Outline } from './outline';
-import { Page } from './page';
+import { ChapterHeader } from "./ChapterHeader";
+import { Outline } from './Outline';
+import { Page } from './Page';
 
-import { Parser } from "../models/parser.js";
-import { Book } from '../models/book.js';
+import { Parser } from "../models/Parser.js";
+import { Book } from '../models/Book.js';
 
 class References extends React.Component {
 
@@ -41,7 +40,7 @@ class References extends React.Component {
 		return (
 			<Page>
 				<div>
-					<Header 
+					<ChapterHeader 
 						book={book}
 						image={book.getImage(Book.ReferencesID)} 
 						header="References"

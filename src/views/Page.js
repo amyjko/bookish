@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { Loading } from './loading';
+import { Loading } from './Loading';
 
 class Page extends React.Component {
 

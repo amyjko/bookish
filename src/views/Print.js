@@ -1,6 +1,5 @@
 import React from 'react'
-import { TableOfContents } from "./toc"
-import { Chapter } from "./chapter"
+import { Chapter } from "./Chapter"
 
 class Print extends React.Component {
 

@@ -1,9 +1,9 @@
 import React from 'react';
-import { Header } from "./header";
-import { Outline } from './outline';
-import { Page } from './page';
-import { Book } from '../models/book.js';
-import { Parser } from '../models/parser'
+import { ChapterHeader } from "./ChapterHeader";
+import { Outline } from './Outline';
+import { Page } from './Page';
+import { Book } from '../models/Book.js';
+import { Parser } from '../models/Parser'
 
 class Glossary extends React.Component {
 
@@ -21,7 +21,7 @@ class Glossary extends React.Component {
 
 		return (
 			<Page>
-				<Header 
+				<ChapterHeader 
 					book={book}
 					image={book.getImage(Book.GlossaryID)} 
 					header="Glossary"

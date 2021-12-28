@@ -1,8 +1,8 @@
 import React from 'react';
 
-import { Parser } from "../models/parser";
+import { Parser } from "../models/Parser";
 
-class Header extends React.Component {
+class ChapterHeader extends React.Component {
 
 	render() {
 
@@ -35,4 +35,4 @@ class Header extends React.Component {
 
 }
 
-export {Header};
+export { ChapterHeader };

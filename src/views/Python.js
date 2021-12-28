@@ -1,5 +1,5 @@
 import React from 'react';
-import { Code } from './../views/code';
+import { Code } from './Code';
 
 class Python extends React.Component {
 

@@ -1,10 +1,10 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Header } from "./header";
-import { Outline } from './outline';
-import { Page } from './page';
+import { ChapterHeader } from "./ChapterHeader";
+import { Outline } from './Outline';
+import { Page } from './Page';
 
-import { Book } from '../models/book.js';
+import { Book } from '../models/Book.js';
 
 class Index extends React.Component {
 
@@ -80,7 +80,7 @@ class Index extends React.Component {
 
 		return (
 			<Page>
-				<Header 
+				<ChapterHeader 
 					book={book}
                     image={book.getImage(Book.IndexID)} 
 					header="Index"

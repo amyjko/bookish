@@ -1,9 +1,9 @@
 import React from 'react';
 
-import { Header } from "./header";
-import { Outline } from './outline';
+import { ChapterHeader } from "./ChapterHeader";
+import { Outline } from './Outline';
 
-import { Book } from '../models/book.js';
+import { Book } from '../models/Book.js';
 
 class Media extends React.Component {
 
@@ -19,7 +19,7 @@ class Media extends React.Component {
 
 		return (
 			<div>
-				<Header 
+				<ChapterHeader 
 					book={book}
 					image={book.getImage(Book.MediaID)} 
 					header="Media"
