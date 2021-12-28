@@ -16,15 +16,11 @@ class Chapter extends React.Component {
 
 		this.handleScroll = this.handleScroll.bind(this);
 		this.handleResize = this.handleResize.bind(this);
-		this.handleDoubleClick = this.handleDoubleClick.bind(this);
-		this.handleChange = this.handleChange.bind(this);
 		this.rememberPosition = this.rememberPosition.bind(this);
 		this.scrollToLastLocation = this.scrollToLastLocation.bind(this);
 
 		// Assume the chapter is loaded initially.
 		this.state = {
-			editing: false, 
-			draft: null,
 			marginal: null // The currently selected marginal; we only do one at a time.
 		};
 
@@ -244,72 +240,11 @@ class Chapter extends React.Component {
 
 	}
 
-	handleDoubleClick(event) {
-
-		if(event.shiftKey) {
-			this.setState({ editing: true, draft: this.props.app.getBook().getChapter(this.props.id).getText() })
-		}
-
-	}
-
-	handleChange(event) {
-
-		// TODO 
-		const chapter = this.props.app.getBook().getChapter(this.props.id).getText();
-		chapter.text = event.target.value;
-
-		// What position should we scroll to?
-		let position = event.target.selectionStart;
-
-		// Update, then try to find the position.
-		this.forceUpdate(() => {
-
-			this.removeHighlights();
-
-			// Which text node is closest?
-			const textNodes = document.getElementsByClassName("text");
-			for(let i = 0; i < textNodes.length; i++) {
-				if(textNodes[i].dataset.position > position)
-					break;
-			}
-
-			let match = textNodes[i - 1];
-
-			// Highlight the match
-			match.classList.add("content-highlight");
-
-			// Scroll to the node.
-			match.scrollIntoView({
-				behavior: "smooth",
-				block: "center"
-			});
-			
-		});
-
-	}
-
 	removeHighlights() {
 
 		// Which text node is closest?
 		document.getElementsByClassName("content-highlight").forEach(highlight => highlight.classList.remove("content-highlight"));
 		
-	}
-
-	renderEditor() {
-		
-		return <div className="editor">
-			<em>You've found editing mode (shift+double click). This is useful for editing the underlying markup of the chapter and previewing your changes, which you can then copy and save elsewhere. This does not save the text of the chapter on this server, nor does it save between page reloads.</em>
-			<br/>
-			<br/>
-			<textarea 
-				className="editor-text" 
-				onChange={this.handleChange} 
-				value={this.props.app.getBook().getChapter(this.props.id).getText()}
-			>
-			</textarea>
-			<button onClick={() => { this.removeHighlights(); this.setState({editing: false})}}>Done</button>
-		</div>
-
 	}
 
 	getMarginal() {
@@ -517,11 +452,8 @@ class Chapter extends React.Component {
 							/>
 						}
 
-						{ /* Render the editor if we're editing */ }
-						{ this.state.editing ? this.renderEditor() : null }
-
 						{/* Render the chapter body */}
-						<div onDoubleClick={this.handleDoubleClick}>
+						<div>
 						{
 							chapter.getAST().toDOM(this, this.props.match ? this.props.match.params.word : null)
 						}
