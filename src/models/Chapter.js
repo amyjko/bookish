@@ -11,8 +11,8 @@ class Chapter {
         this.image = image;
         this.numbered = numbered;
         this.section = section;
-        this.text = text;
 		this.forthcoming = forthcoming;
+        this.text = text;
 
         // If the chapter has text, then parse it, count searchable words, and compute an index.
         if(this.text !== null) {

@@ -1,9 +1,5 @@
-import Ajv from 'ajv';
-
 import { Parser } from "./Parser.js";
 import { Chapter } from './Chapter.js';
-
-let schema = require("../schemas/book.json");
 
 class Book {
 
@@ -14,144 +10,33 @@ class Book {
     static IndexID = "index";
 	static GlossaryID = "glossary";
 
-    // Given a URL of a book.json object, downloads it and all of it's chapters.
-    constructor(url, progressHandler) {
-
-        // A string that points to a book specification file.
-        this.url = url;
-
-        // A list of strings indicating schema violations.
-        this.errors = [];
+    // Given an object with a valid specification and an object mapping chapter IDs to chapter text,
+    // construct an object representing a book.
+    constructor(specification, chapters) {
 
         // If undefined, it's not loaded; if null, it failed to load; otherwise, an object with a book specification.
-        this.specification = undefined;
+        this.specification = specification;
 
-        // This function is called when some loading progress happens.
-        this.progressHandler = progressHandler;
-
-        // A dictionary of Chapter objects.
+        // Create a dictionary of Chapter objects.
         this.chapters = {};
-
-        // Keep track of loading status.
-        this.loadedSpecification = false;
-        this.chaptersLoaded = 0;
+        // Create a chapter and add it to our dictionary of chapters.
+        this.specification.chapters.forEach(chapter => {
+            this.chapters[chapter.id] = new Chapter(
+                this,
+                chapter.id, 
+                chapter.title, 
+                chapter.authors, 
+                chapter.image, 
+                "numbered" in chapter ? chapter.numbered : false, 
+                "section" in chapter ? chapter.section : null,
+                chapter.forthcoming === true,
+                chapter.forthcoming ? null : chapters[chapter.id]
+            )
+        }
+        )
 
         // Lookup table for optimization
 		this.chapterNumbers = {};
-
-        // Load the book.
-        this.loadSpecification();
-
-    }
-
-    isSpecificationLoaded() { return this.loadedSpecification; }
-    getErrors() { return this.errors; }
-
-    // Loads the book specification.
-    loadSpecification() {        
-
-        // Fetch the JSON
-        fetch(this.url)
-            .then(response => {
-
-                // If it's a valid status, parse the text as JSON.
-                if (response.status >= 200 && response.status <= 299) {
-                    return response.json();
-                } 
-                // Otherwise, return an error.
-                else {
-                    throw Error(response.statusText);
-                }
-
-            })
-            .then(data => {
-
-                // Validate the book schema before we get started.
-                let ajv = new Ajv();
-                let valid = ajv.validate(schema, data);
-
-                // Did the specification have schema errors?
-                // Initialize the book as null and set the errors.
-                if (!valid) {
-                    this.specification = null;
-                    this.errors = ajv.errors.map(error => this.url + error.dataPath + " " + error.message);
-                } 
-                // If it is valid, then set the specification and load the chapters.
-                else {
-                    this.specification = data;
-                    this.loadChapters();
-                }
-                // Notify the progress handler.
-                this.progressHandler.call();
-
-                // Mark the specification as loaded.
-                this.loadedSpecification = true;
-
-            })
-            // If there was an error, print it to the console and set the errors.
-            .catch(err => {
-
-                this.loadedSpecification = true;
-
-                console.error(err);
-                // Uh oh, something bad happened. Set data to null to render an error.
-                this.specification = null;
-                this.errors = ["Wasn't able to load the file " + this.url + ": " + err.message];
-
-                // Notify the progress handler.
-                this.progressHandler.call();
-
-            });
- 
-    }
-
-    // Fetch each chapter using it's ID, process the text if we get it, and notify the progress handler.
-	loadChapters() {
-
-        if(this.getSpecification() === undefined)
-            throw "Specification isn't done loading, can't fetch chapters.";
-        else if(this.getSpecification() === null)
-            throw "Specification failed to load, can't fetch chapters";
-
-		// Request all of the chapter content...
-		this.getChapters().forEach(chapter => {
-
-            // Create a chapter with no text by default.
-            this.setChapter(chapter, null);
-
-            // Try to load the chapter if it's not forthcoming.
-            if(!chapter.forthcoming)
-                fetch("chapters/" + chapter.id + ".md")
-                    .then((response) => {
-                        // Remember that we got a response.
-                        this.chaptersLoaded++;
-
-                        // If we got a reasonable response, process the chapter.
-                        if(response.ok)
-                            response.text().then(text => this.setChapter(chapter, text));
-                        
-                    })
-        });
-
-	}
-
-    setChapter(chapter, text) {
-
-        // Create a chapter and add it to our dictionary of chapters.
-        this.chapters[chapter.id] = new Chapter(
-            this,
-            chapter.id, 
-            chapter.title, 
-            chapter.authors, 
-            chapter.image, 
-            "numbered" in chapter ? chapter.numbered : false, 
-            "section" in chapter ? chapter.section : null,
-            chapter.forthcoming === true,
-            text
-        );
-
-        // Notify the progress handler about the processed. chapter.
-        this.progressHandler.call();
 
     }
 
@@ -184,8 +69,7 @@ class Book {
     getImage(id) { return this.hasImage(id) ? this.getSpecification().images[id] : null; }
 
 	getChapterReadingTime(chapterID) { 
-		return !this.chapterIsLoaded(chapterID) ? undefined :
-                this.getChapter(chapterID).isForthcoming() ? undefined :
+		return this.getChapter(chapterID).isForthcoming() ? undefined :
 			    Math.max(1, Math.round(this.getChapter(chapterID).getWordCount() / 150));
 	}
 	
@@ -240,10 +124,6 @@ class Book {
 	getChapterName(chapterID) { return this.hasChapter(chapterID) ? this.getChapter(chapterID).getTitle() : null; }
 
     getChapterSection(chapterID) { return this.hasChapter(chapterID) ? this.chapters[chapterID].getSection() : null; }
-	
-    chapterIsLoaded(chapterID) { return this.hasChapter(chapterID) ? this.chapters[chapterID].getText() !== null : false; }
-	
-    chaptersAreLoaded() { return Object.keys(this.getSpecification().chapters).length === this.chaptersLoaded; }
 
 	getFootnoteSymbol(number) {
 
@@ -424,4 +304,4 @@ class Book {
 
 }
 
-export { Book };
+export default Book

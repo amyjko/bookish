@@ -2,7 +2,7 @@ import React from 'react';
 import { ChapterHeader } from "./ChapterHeader";
 import { Outline } from './Outline';
 import { Page } from './Page';
-import { Book } from '../models/Book.js';
+import Book from '../models/Book.js';
 import { Parser } from '../models/Parser'
 
 class Glossary extends React.Component {

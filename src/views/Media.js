@@ -3,7 +3,7 @@ import React from 'react';
 import { ChapterHeader } from "./ChapterHeader";
 import { Outline } from './Outline';
 
-import { Book } from '../models/Book.js';
+import Book from '../models/Book.js';
 
 class Media extends React.Component {
 

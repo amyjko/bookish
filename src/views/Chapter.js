@@ -382,110 +382,104 @@ class Chapter extends React.Component {
 				noteHighlight = parseInt(id);
 		}
 
-		if(!book.chapterIsLoaded(this.props.id)) {
-			return this.props.print ? null : <Loading/>;
-		}
-		else {
-
-			let chapter = book.getChapter(this.props.id);
-			let chapterNumber = book.getChapterNumber(this.props.id);
-			let chapterSection = book.getChapterSection(this.props.id);
-			let citations = chapter.getAST().getCitations();
-			let hasReferences = Object.keys(citations).length > 0;
-			
-			return (
-				<Page loaded={this.scrollToLastLocation}>
-					<div className="chapter">
-						<ChapterHeader 
-							book={book}
-							image={chapter.image}
-							print={this.props.print}
-							before={
-								<span>
-								{
-									chapterNumber === undefined ? 
-										null : 
-										<span className="chapter-number">Chapter {chapterNumber}</span> 
-								}
-								{ 
-									chapterSection === null ? 
-										null : 
-										<span className="section-name"> {chapterSection}</span>
-								}
-								{ 
-									chapterNumber || chapterSection ? 
-										<br/> : 
-										null 
-								}
-								</span>						
+		let chapter = book.getChapter(this.props.id);
+		let chapterNumber = book.getChapterNumber(this.props.id);
+		let chapterSection = book.getChapterSection(this.props.id);
+		let citations = chapter.getAST().getCitations();
+		let hasReferences = Object.keys(citations).length > 0;
+		
+		return (
+			<Page loaded={this.scrollToLastLocation}>
+				<div className="chapter">
+					<ChapterHeader 
+						book={book}
+						image={chapter.image}
+						print={this.props.print}
+						before={
+							<span>
+							{
+								chapterNumber === undefined ? 
+									null : 
+									<span className="chapter-number">Chapter {chapterNumber}</span> 
 							}
-							header={chapter.title}
-							tags={book.getTags()}
-							/* If there are chapter authors, map them to authors declared in the book title, otherwise use all the authors of the book */
-							after={
-								<Authors authors={
-										chapter.authors ? 
-											chapter.authors.map(author => book.getAuthorByID(author)) : 
-											book.getAuthors()} 
-								/>
-							} 
-						/>
-
-						{
-							this.props.print ? 
-							null :
-							<Outline
-								previous={book.getPreviousChapterID(this.props.id)}
-								next={book.getNextChapterID(this.props.id)}
-								listener={ (expanded, callback) =>{
-									// If the outline is being expanded, hide the marginal, otherwise leave it alone.
-									this.setState({ 
-										marginal: expanded ? null : this.state.marginal 
-									}, callback);
-
-									// Check if we need to hide the outline after positioning.
-									this.hideOutlineIfObscured();
-
-								}}
-								// Collapse the outline if a marginal is selected.
-								collapse={this.state.marginal !== null}
+							{ 
+								chapterSection === null ? 
+									null : 
+									<span className="section-name"> {chapterSection}</span>
+							}
+							{ 
+								chapterNumber || chapterSection ? 
+									<br/> : 
+									null 
+							}
+							</span>						
+						}
+						header={chapter.title}
+						tags={book.getTags()}
+						/* If there are chapter authors, map them to authors declared in the book title, otherwise use all the authors of the book */
+						after={
+							<Authors authors={
+									chapter.authors ? 
+										chapter.authors.map(author => book.getAuthorByID(author)) : 
+										book.getAuthors()} 
 							/>
-						}
+						} 
+					/>
 
-						{/* Render the chapter body */}
-						<div>
-						{
-							chapter.getAST().toDOM(this, this.props.match ? this.props.match.params.word : null)
-						}
-						</div>
-						{
-							!hasReferences ? null :
-							<div>
-								<h1 id="references" className="header">References</h1>
+					{
+						this.props.print ? 
+						null :
+						<Outline
+							previous={book.getPreviousChapterID(this.props.id)}
+							next={book.getNextChapterID(this.props.id)}
+							listener={ (expanded, callback) =>{
+								// If the outline is being expanded, hide the marginal, otherwise leave it alone.
+								this.setState({ 
+									marginal: expanded ? null : this.state.marginal 
+								}, callback);
 
-								<ol>
-								{
-									Object.keys(citations).sort().map(citationID => {
-										let refs = book.getReferences();
-										if(citationID in refs) {
-											let ref = refs[citationID];
-											return <li key={"citation-" + citationID} className={citationID === citationHighlight ? "reference content-highlight" : "reference"} id={"ref-" + citationID}>
-												{Parser.parseReference(ref, book)}
-											</li>
+								// Check if we need to hide the outline after positioning.
+								this.hideOutlineIfObscured();
 
-										}
-										else {
-											return <li className="alert alert-danger" key={"citation-" + citationID}>Unknown reference: <code>{citationID}</code></li>;
-										}
-									})
-								}
-								</ol>
-							</div>
-						}
+							}}
+							// Collapse the outline if a marginal is selected.
+							collapse={this.state.marginal !== null}
+						/>
+					}
+
+					{/* Render the chapter body */}
+					<div>
+					{
+						chapter.getAST().toDOM(this, this.props.match ? this.props.match.params.word : null)
+					}
 					</div>
-				</Page>
-			);
-		}
+					{
+						!hasReferences ? null :
+						<div>
+							<h1 id="references" className="header">References</h1>
+
+							<ol>
+							{
+								Object.keys(citations).sort().map(citationID => {
+									let refs = book.getReferences();
+									if(citationID in refs) {
+										let ref = refs[citationID];
+										return <li key={"citation-" + citationID} className={citationID === citationHighlight ? "reference content-highlight" : "reference"} id={"ref-" + citationID}>
+											{Parser.parseReference(ref, book)}
+										</li>
+
+									}
+									else {
+										return <li className="alert alert-danger" key={"citation-" + citationID}>Unknown reference: <code>{citationID}</code></li>;
+									}
+								})
+							}
+							</ol>
+						</div>
+					}
+				</div>
+			</Page>
+		)
 
 	}
 

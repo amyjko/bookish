@@ -4,7 +4,7 @@ import { ChapterHeader } from "./ChapterHeader";
 import { Outline } from './Outline';
 import { Page } from './Page';
 
-import { Book } from '../models/Book.js';
+import Book from '../models/Book';
 
 class Index extends React.Component {
 
@@ -15,9 +15,6 @@ class Index extends React.Component {
 	render() {
 
         let book = this.props.app.getBook();
-
-        if(!book.isSpecificationLoaded())
-            return null;
 
         let bookIndex = book.getBookIndex();
 

@@ -5,7 +5,7 @@ import { Outline } from './Outline';
 import { Page } from './Page';
 
 import { Parser } from "../models/Parser.js";
-import { Book } from '../models/Book.js';
+import Book from '../models/Book';
 
 class References extends React.Component {
 

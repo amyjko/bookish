@@ -4,7 +4,7 @@ import { Outline } from './Outline';
 import { Page } from './Page';
 
 import { Link } from 'react-router-dom';
-import { Book } from '../models/Book.js';
+import Book from '../models/Book';
 
 class Search extends React.Component {
 

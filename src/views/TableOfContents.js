@@ -4,7 +4,7 @@ import { ChapterHeader } from "./ChapterHeader";
 import { Authors } from "./Authors";
 import { Page } from './Page';
 import { Parser } from "../models/Parser";
-import { Book } from '../models/Book';
+import Book from '../models/Book';
 
 class TableOfContents extends React.Component {
 
@@ -51,9 +51,6 @@ class TableOfContents extends React.Component {
 
 		// Get the book being rendered.
 		let book = this.props.app.getBook();
-
-		if(!book.isSpecificationLoaded())
-			return null;
 
 		// Get the chapter progress
 		let progress = localStorage.getItem("chapterProgress");
@@ -108,7 +105,6 @@ class TableOfContents extends React.Component {
 											readingTime < 5 ? "<5 min read" :
 											readingTime < 60 ? "~" + Math.floor(readingTime / 5) * 5 + " min read" :
 											"~" + Math.round(10 * readingTime / 60) / 10 + " hour read";
-										const isLoaded = book.chapterIsLoaded(chapterID);
 
 										return (
 											<tr key={"chapter" + index} className={chapter.isForthcoming() ? "forthcoming" : ""}>
@@ -120,7 +116,7 @@ class TableOfContents extends React.Component {
 														{ chapterNumber === undefined ? null : <div className="chapter-number">{"Chapter " + chapterNumber}</div> }
 														<div>
 															{
-																isLoaded && !chapter.isForthcoming() ? 
+																!chapter.isForthcoming() ? 
 																	<Link to={"/" + chapterID}>{chapter.getTitle()}</Link> :
 																	<span>{chapter.getTitle()}</span>
 															}
@@ -136,7 +132,7 @@ class TableOfContents extends React.Component {
 														</em>
 													</small>
 													{
-														isLoaded && chapter.getAST().getErrors().length > 0 ? 
+														!chapter.isForthcoming() && chapter.getAST().getErrors().length > 0 ? 
 															<span><br/><small className="alert alert-danger">{chapter.getAST().getErrors().length + " " + (chapter.getAST().getErrors().length > 1 ? "errors" : "error")}</small></span> :
 															null
 													}
@@ -223,7 +219,7 @@ class TableOfContents extends React.Component {
 
 				</div>
 			</Page>
-		);
+		)
 
 	}
 
