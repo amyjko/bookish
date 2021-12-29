@@ -92,14 +92,13 @@ class TableOfContents extends React.Component {
 						<table className="table" id="toc">
 							<tbody>
 								{
-									book.getChapters().map((chapterSpec, index) => {
+									book.getChapters().map((chapter, index) => {
 
 										// Get the image, chapter number, and section for rendering.
-										const chapterID = chapterSpec.id;
-										const chapter = book.getChapter(chapterID);
+										const chapterID = chapter.getID();
 										const chapterNumber = book.getChapterNumber(chapterID);
 										const section = chapter.getSection();
-										const readingTime = book.getChapterReadingTime(chapterID);
+										const readingTime = chapter.getReadingTime();
 										const readingEstimate =
 											readingTime === undefined ? "Forthcoming" :
 											readingTime < 5 ? "<5 min read" :

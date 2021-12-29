@@ -14,91 +14,75 @@ class Book {
     // construct an object representing a book.
     constructor(specification, chapters) {
 
+        if(typeof specification !== "object")
+            throw Error("Expected a book specification object.")
+
+        if(typeof chapters !== "object")
+            throw Error("Expected an object mapping chapter IDs to chapter text")
+
         // If undefined, it's not loaded; if null, it failed to load; otherwise, an object with a book specification.
         this.specification = specification;
 
-        // Create a dictionary of Chapter objects.
-        this.chapters = {};
-        // Create a chapter and add it to our dictionary of chapters.
+        // Create a list and dictionary of Chapter objects.
+        this.chapters = []
+        this.chaptersByID = {}
         this.specification.chapters.forEach(chapter => {
-            this.chapters[chapter.id] = new Chapter(
+            this.chaptersByID[chapter.id] = new Chapter(
                 this,
-                chapter.id, 
-                chapter.title, 
-                chapter.authors, 
-                chapter.image, 
-                "numbered" in chapter ? chapter.numbered : false, 
-                "section" in chapter ? chapter.section : null,
-                chapter.forthcoming === true,
+                chapter,
                 chapter.forthcoming ? null : chapters[chapter.id]
             )
-        }
-        )
+            this.chapters.push(this.chaptersByID[chapter.id])
+        })
 
         // Lookup table for optimization
 		this.chapterNumbers = {};
 
     }
 
-    getSpecification() { return this.specification; }
-    
-    getTitle() { return this.getSpecification().title; }
-    
-    getChapters() { 
-        if(this.specification === null) throw "The specification failed to load, can't get chapters.";
-        else if(this.specification === undefined) throw "The specification hasn't loaded yet, can't get chapters";
-        else return this.specification.chapters; 
-    }
-
-    hasChapter(chapterID) { return chapterID in this.chapters || ["references", "glossary", "index", "search", "media"].includes(chapterID); }
-    getChapter(chapterID) { return this.hasChapter(chapterID) ? this.chapters[chapterID] : null; }
+    getTitle() { return this.specification.title; }
+    getChapters() { return this.chapters }
+    hasChapter(chapterID) { return chapterID in this.chaptersByID || ["references", "glossary", "index", "search", "media"].includes(chapterID); }
+    getChapter(chapterID) { return this.hasChapter(chapterID) ? this.chaptersByID[chapterID] : null; }
     getSymbols() { return this.specification ? this.specification.symbols : {}; }
-	getLicense() { return this.getSpecification().license; }
+	getLicense() { return this.specification.license; }
     hasReferences() { return this.getReferences() !== undefined && Object.keys(this.getReferences()).length > 0; }
-	getReferences() { return this.getSpecification().references; }
+	getReferences() { return this.specification.references; }
     hasGlossary() { return this.getGlossary() !== undefined && Object.keys(this.getGlossary()).length > 0; }
-	getGlossary() { return this.getSpecification().glossary; }
-	getTags() { return "tags" in this.getSpecification() ? this.getSpecification().tags : []; }
-	getAuthors() { return this.getSpecification().authors; }	
+	getGlossary() { return this.specification.glossary; }
+	getTags() { return "tags" in this.specification ? this.specification.tags : []; }
+	getAuthors() { return this.specification.authors; }	
 	getAuthorByID(id) { return this.getAuthors().find(el => el.id === id); }
-	getDescription() { return this.getSpecification().description; }
-	getAcknowledgements() { return this.getSpecification().acknowledgements; }
-	getRevisions() { return this.getSpecification().revisions; }
+	getDescription() { return this.specification.description; }
+	getAcknowledgements() { return this.specification.acknowledgements; }
+	getRevisions() { return this.specification.revisions; }
 
-    hasImage(id) { return id in this.getSpecification().images; }
-    getImage(id) { return this.hasImage(id) ? this.getSpecification().images[id] : null; }
+    hasImage(id) { return id in this.specification.images; }
+    getImage(id) { return this.hasImage(id) ? this.specification.images[id] : null; }
 
-	getChapterReadingTime(chapterID) { 
-		return this.getChapter(chapterID).isForthcoming() ? undefined :
-			    Math.max(1, Math.round(this.getChapter(chapterID).getWordCount() / 150));
-	}
 	
 	getBookReadingTime() {
-		return Object.keys(this.chapters)
-                .map(chapterID => this.getChapterReadingTime(chapterID))
+		return this.chapters
+                .map(chapter => chapter.getReadingTime())
                 .reduce((total, time) => time === undefined ? total : total + time, 0);
 	}
 
 	getChapterNumber(chapterID) {
 
-        // If we haven't loaded or failed to load, this is undefined.
-        if(!this.specification)
-            return undefined;
-
 		// If we haven't cached it yet, compute it.
 		if(!(chapterID in this.chapterNumbers)) {
 			let chapterNumber = 1;
 			let match = null;
-			this.getChapters().forEach(chapter => {
+			this.chapters.forEach(chapter => {
 				// If we found a match...
-				if(chapter.id === chapterID) {
+				if(chapter.getID() === chapterID) {
 					match = chapterNumber;
 					// And it's an unnumbered chapter, set to null.
-					if("numbered" in chapter && chapter.numbered === false)
+					if(!chapter.isNumbered())
                         match = null;
 				} 
 				// Otherwise, increment if it's numbered.
-				else if(!("numbered" in chapter) || chapter.numbered === true)
+				else if(chapter.isNumbered())
 					chapterNumber++;
 			});
 			// Remember the number if we found it.
@@ -123,7 +107,7 @@ class Book {
 
 	getChapterName(chapterID) { return this.hasChapter(chapterID) ? this.getChapter(chapterID).getTitle() : null; }
 
-    getChapterSection(chapterID) { return this.hasChapter(chapterID) ? this.chapters[chapterID].getSection() : null; }
+    getChapterSection(chapterID) { return this.hasChapter(chapterID) ? this.chaptersByID[chapterID].getSection() : null; }
 
 	getFootnoteSymbol(number) {
 
@@ -140,7 +124,7 @@ class Book {
 		const bookIndex = {};
 
 		// Construct the index by building a dictionary of chapters in which each word appears.
-		Object.values(this.chapters).forEach(chapter => {
+		this.chapters.forEach(chapter => {
             let index = chapter.getIndex();
             if(index)
 			    Object.keys(index).forEach(word => {
@@ -205,14 +189,14 @@ class Book {
             case Book.SearchID: return Book.MediaID;
             case Book.MediaID: return Book.TableOfContentsID;
             default:
-                let chapters = this.getChapters();
                 let after = false;
-                for(let i = 0; i < chapters.length; i++) {
-                    if(chapters[i].id === chapterID)
+                for(let i = 0; i < this.chapters.length; i++) {
+                    let chapter = this.chapters[i];
+                    if(chapter.getID() === chapterID)
                         after = true;
                     // If we're after the given chapter and it's not forthcoming.
-                    else if(after && !this.getChapter(chapters[i].id).isForthcoming())
-                        return chapters[i].id;
+                    else if(after && !chapter.isForthcoming())
+                        return chapter.getID();
                 }
                 // If the given ID was the last chapter, go to the next back matter chapter.
                 if(after)
@@ -227,24 +211,23 @@ class Book {
 	// Given a chapter id, find the available chapter before it.
 	getPreviousChapterID(chapterID) {
 
-        let chapters = this.getChapters();
-
         switch(chapterID) {
 
             // Handle back matter chapters.
-            case Book.ReferencesID: return chapters[chapters.length - 1].id; // Last chapter of the book
-            case Book.GlossaryID: return this.hasReferences() ? Book.ReferencesID : chapters[chapters.length - 1].id;
-            case Book.IndexID: return this.hasGlossary() ? Book.GlossaryID : this.hasReferences() ? Book.ReferencesID : chapters[chapters.length - 1].id;
+            case Book.ReferencesID: return this.chapters[this.chapters.length - 1].id; // Last chapter of the book
+            case Book.GlossaryID: return this.hasReferences() ? Book.ReferencesID : this.chapters[this.chapters.length - 1].id;
+            case Book.IndexID: return this.hasGlossary() ? Book.GlossaryID : this.hasReferences() ? Book.ReferencesID : this.chapters[chapters.length - 1].id;
             case Book.SearchID: return Book.IndexID;
             case Book.MediaID: return Book.SearchID;
             default:
                 let before = false;
-                for(let i = chapters.length - 1; i >= 0; i--) {
-                    if(chapters[i].id === chapterID)
+                for(let i = this.chapters.length - 1; i >= 0; i--) {
+                    let chapter = this.chapters[i];
+                    if(chapter.getID() === chapterID)
                         before = true;
                     // If we're before the given chapter and it's not forthcoming.
-                    else if(before && !this.getChapter(chapters[i].id).isForthcoming())
-                        return chapters[i].id;
+                    else if(before && !chapter.isForthcoming())
+                        return chapter.getID();
                 }
                 // If the given ID was the last chapter, go to the next back matter chapter.
                 if(before)
@@ -268,14 +251,13 @@ class Book {
         // Add the cover and images from each chapter.
 		this.getChapters().forEach(c => {
 
-            let cover = c.image === null ? null : Parser.parseEmbed(this, c.image);
+            let cover = c.getImage() === null ? null : Parser.parseEmbed(this, c.getImage());
             if(cover && !urls.has(cover.url)) {
                 media.push(cover);
                 urls.add(cover.url);
             }
 
-            let chapter = this.getChapter(c.id);
-            let embeds = chapter?.getAST()?.getEmbeds();
+            let embeds = c?.getAST()?.getEmbeds();
             if(embeds)
                 embeds.forEach(embed => {
                     if(!urls.has(embed.url)) {

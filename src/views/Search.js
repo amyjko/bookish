@@ -40,8 +40,8 @@ class Search extends React.Component {
         // Go through all the chapter indexes and find matches.
         if(query.length > 2)
             book.getChapters().forEach(chapter => {
-                let chapterID = chapter.id;
-                let index = book.getChapter(chapterID).getIndex();
+                let chapterID = chapter.getID();
+                let index = chapter.getIndex();
                 let chapterNumber = book.getChapterNumber(chapterID);
 
                 // No index yet? Skip this chapter.
@@ -63,7 +63,7 @@ class Search extends React.Component {
                 matchCount += chapterMatches.length;
 
                 if(chapterMatches.length > 0) {
-                    results.push(<h2 key={"header-" + chapterID} className="header" id={"header-" + chapterID}>Chapter{chapterNumber === undefined ? "" : " " + chapterNumber} - {chapter.title}</h2>);
+                    results.push(<h2 key={"header-" + chapterID} className="header" id={"header-" + chapterID}>Chapter{chapterNumber === undefined ? "" : " " + chapterNumber} - {chapter.getTitle()}</h2>);
                     chapterMatches.forEach((match, index) => {
                         // Only highlight the part of the word that matches.
                         const start = match.match.toLowerCase().indexOf(query);

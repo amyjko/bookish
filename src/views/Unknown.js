@@ -11,7 +11,7 @@ class Unknown extends React.Component {
 			<Page>
 				<ChapterHeader 
 					book={this.props.app.getBook()}
-					image={this.props.app.getBook().getSpecification() ? this.props.app.getBook().getImage("unknown") : null } 
+					image={this.props.app.getBook().getImage("unknown") } 
 					header="Oops."
 					after={this.props.message}
 				/>

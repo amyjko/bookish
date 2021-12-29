@@ -114,7 +114,7 @@ class Bookish extends React.Component {
 								{
 									// Map all the book chapters to routes
 									this.state.book.getChapters().map((chapter, index) => {
-										return <Route key={"chapter" + index} path={"/" + chapter.id + "/:word?/:number?"} render={(props) => <Chapter {...props} id={chapter.id} app={this} />} />
+										return <Route key={"chapter" + index} path={"/" + chapter.getID() + "/:word?/:number?"} render={(props) => <Chapter {...props} chapter={chapter} app={this} />} />
 									})
 								}
 								<Route path="/references" render={(props) => <References {...props} app={this} />} />

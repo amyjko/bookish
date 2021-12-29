@@ -12,7 +12,7 @@ class Print extends React.Component {
             {
                 // Render all of the chapters
                 this.props.app.getBook().getChapters().map(
-                    (chapter, index) => <Chapter key={index} id={chapter.id} app={this.props.app} print />
+                    (chapter, index) => <Chapter key={index} chapter={chapter} app={this.props.app} print />
                 )
             }
         </>

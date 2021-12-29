@@ -89,7 +89,7 @@ class Chapter extends React.Component {
 		}
 
 		// If we don't have an entry for this chapter, treat it as 0.
-		progress = (this.props.id in progress) ? progress[this.props.id] : 0;
+		progress = (this.props.chapter.getID() in progress) ? progress[this.props.chapter.getID()] : 0;
 		
 		return progress;
 
@@ -168,7 +168,7 @@ class Chapter extends React.Component {
 		} else {
 			progress = JSON.parse(progress);
 		}
-		progress[this.props.id] = percent;
+		progress[this.props.chapter.getID()] = percent;
 		localStorage.setItem("chapterProgress", JSON.stringify(progress));
 
 		// Handle overlaps
@@ -382,18 +382,19 @@ class Chapter extends React.Component {
 				noteHighlight = parseInt(id);
 		}
 
-		let chapter = book.getChapter(this.props.id);
-		let chapterNumber = book.getChapterNumber(this.props.id);
-		let chapterSection = book.getChapterSection(this.props.id);
-		let citations = chapter.getAST().getCitations();
-		let hasReferences = Object.keys(citations).length > 0;
+		const chapter = this.props.chapter;
+		const chapterID = chapter.getID();
+		const chapterNumber = book.getChapterNumber(chapterID);
+		const chapterSection = book.getChapterSection(chapterID);
+		const citations = chapter.getAST().getCitations();
+		const hasReferences = Object.keys(citations).length > 0;
 		
 		return (
 			<Page loaded={this.scrollToLastLocation}>
 				<div className="chapter">
 					<ChapterHeader 
 						book={book}
-						image={chapter.image}
+						image={chapter.getImage()}
 						print={this.props.print}
 						before={
 							<span>
@@ -414,13 +415,13 @@ class Chapter extends React.Component {
 							}
 							</span>						
 						}
-						header={chapter.title}
+						header={chapter.getTitle()}
 						tags={book.getTags()}
 						/* If there are chapter authors, map them to authors declared in the book title, otherwise use all the authors of the book */
 						after={
 							<Authors authors={
-									chapter.authors ? 
-										chapter.authors.map(author => book.getAuthorByID(author)) : 
+									chapter.getAuthors() ? 
+										chapter.getAuthors().map(author => book.getAuthorByID(author)) : 
 										book.getAuthors()} 
 							/>
 						} 
@@ -430,8 +431,8 @@ class Chapter extends React.Component {
 						this.props.print ? 
 						null :
 						<Outline
-							previous={book.getPreviousChapterID(this.props.id)}
-							next={book.getNextChapterID(this.props.id)}
+							previous={book.getPreviousChapterID(chapterID)}
+							next={book.getNextChapterID(chapterID)}
 							listener={ (expanded, callback) =>{
 								// If the outline is being expanded, hide the marginal, otherwise leave it alone.
 								this.setState({ 

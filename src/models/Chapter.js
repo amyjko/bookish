@@ -2,16 +2,16 @@ import { Parser } from "./Parser";
 
 class Chapter {
 
-    constructor(book, id, title, authors, image, numbered, section, forthcoming, text) {
+    constructor(book, metadata, text) {
 
         this.book = book;
-        this.id = id;
-        this.title = title;
-        this.authors = authors;
-        this.image = image;
-        this.numbered = numbered;
-        this.section = section;
-		this.forthcoming = forthcoming;
+        this.id = metadata.id;
+        this.title = metadata.title;
+        this.authors = metadata.authors;
+        this.image = metadata.image;
+        this.numbered = "numbered" in metadata ? metadata.numbered : false;
+        this.section = "section" in metadata ? metadata.section : null;
+		this.forthcoming = metadata.forthcoming === true;
         this.text = text;
 
         // If the chapter has text, then parse it, count searchable words, and compute an index.
@@ -32,12 +32,17 @@ class Chapter {
 	getID() { return this.id; }
     getSection() { return this.section; }
     isForthcoming() { return this.forthcoming; }
+	isNumbered() { return this.numbered; }
     getText() { return this.text; }
     getWordCount() { return this.wordCount; }
+	getAuthors() { return this.authors; }
     getTitle() { return this.title; }
 	getImage() { return this.image; }
     getIndex() { return this.index; }
     getAST() { return this.ast; }
+
+	// Utility function
+	getReadingTime(chapterID) { return this.isForthcoming() ? undefined : Math.max(1, Math.round(this.getWordCount() / 150)); }
 
 	computeIndex() {
 
