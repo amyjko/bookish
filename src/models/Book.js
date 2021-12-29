@@ -1,4 +1,4 @@
-import { Parser } from "./Parser.js";
+import Parser from "./Parser";
 import { Chapter } from './Chapter.js';
 
 class Book {
@@ -37,6 +37,8 @@ class Book {
         // Create a list and dictionary of Chapter objects.
         this.chapters = []
         this.chaptersByID = {}
+        // Initialize the chapters since parsing depends on hasChapter in links
+        specification.chapters.forEach(chapter => this.chaptersByID[chapter.id] = null)
         specification.chapters.forEach(chapter => {
             this.chaptersByID[chapter.id] = new Chapter(
                 this,

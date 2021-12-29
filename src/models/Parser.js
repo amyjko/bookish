@@ -1,13 +1,3 @@
-import React from 'react';
-import { Link } from 'react-router-dom';
-import { NavHashLink } from "react-router-hash-link";
-import { Figure } from '../views/Figure';
-import { Marginal } from '../views/Marginal';
-import { Code } from '../views/Code';
-import { Python } from '../views/Python.js'
-
-import { smoothlyScrollElementToEyeLevel } from '../views/Scroll.js';
-
 // TODO This grammar is slightly out of date.
 // A simple recursive descent parser for this grammar.
 // Embeds a tokenizer, since the lexical grammar is simple.
@@ -77,10 +67,8 @@ class Parser {
 
     static parseReference(ref, book, short=false) {
 
-        let dom = null;
-
         if(typeof ref === "string")
-            dom = Parser.parseContent(book, ref).toDOM();
+            return Parser.parseContent(book, ref);
         else if(Array.isArray(ref)) {
             // APA Format. Could eventually support multiple formats.
             if(ref.length >= 4) {
@@ -90,37 +78,22 @@ class Parser {
                 let source = ref[3];
                 let url = ref.length === 5 ? ref[4] : null;
                 let summary = ref.length === 6 ? ref[5] : null;
-                // Convert sources using the source mapping. Yay consistency!
+
                 if(source.charAt(0) === "#") {
-                    source = book.getSource(source);
-                    if(source === null)
-                        source = <span className="alert alert-danger">Unknown source <code>{ref[3]}</code></span>;
+                    let src = book.getSource(source)
+                    if(src === null)
+                        return new ErrorNode(null, "Unknown source " + source)
+                    else
+                        source = src
                 }
 
-                // If a short version was requested, try to abbreviate the authors.
-                if(short) {
-                    authors = authors.split(",");
-                    if(authors.length === 1) {
-                        authors = authors[0];
-                    }
-                    else if(authors.length === 2) {
-                        authors = authors[0].trim() + " & " + authors[1].trim();
-                    }
-                    else {
-                        authors = authors[0].trim() + ", et al.";
-                    }
-                    dom = <span className="reference-text">{authors} ({year}). {url === null ? title : <a href={url} target={"_blank"}>{title}</a>}{title.charAt(title.length - 1) === "?" ? "" : "."} <em>{source}</em></span>
-                }
-                else
-                    dom = <span className="reference-text">{authors} ({year}). {url === null ? title : <a href={url} target={"_blank"}>{title}</a>}{title.charAt(title.length - 1) === "?" ? "" : "."} <em>{source}</em>.{summary ? <span className="summary">{summary}</span> : null }</span>
+                return new ReferenceNode(authors, year, title, source, url, summary, short)
             }
             else
-                dom = <span className="alert alert-danger">Expected at least 4 items in the reference array, but found {ref.length}: <code>{ref.toString()}</code></span>
+                return new ErrorNode(null, "Expected at least 4 items in the reference array, but found " + ref.length + ": " + ref.toString())
         }
         else
-            dom = <span className="alert alert-danger">Invalid reference: <code>{"" + ref}</code></span>
-
-        return dom;
+            return new ErrorNode(null, "Invalid reference: " + ref)
 
     }
 
@@ -1181,12 +1154,18 @@ class Parser {
 }
 
 class Node {
-    constructor() {}
+    // Given a string representing the type of node.
+    constructor(type) {
+
+        if(typeof type !== "string" || type.length === 0)
+            throw new Error("All nodes require a type string.")
+        this.type = type
+    }
 }
 
 class ChapterNode extends Node {
     constructor(blocks, metadata) {
-        super();
+        super("chapter");
 
         // The AST of the chapter.
         this.blocks = blocks;
@@ -1213,16 +1192,6 @@ class ChapterNode extends Node {
     
     }
 
-    toDOM(view) {
-        return <div key="chapter" className="chapter-body">
-            {
-                this.metadata.errors.length === 0 ? 
-                    null : 
-                    <p><span className="alert alert-danger">{this.metadata.errors.length + " " + (this.metadata.errors.length > 1 ? "errors" : "error")} below</span></p>}
-            { this.blocks.map((block, index) => block.toDOM(view, this, "block-" + index)) }
-        </div>;
-    }
-
     toText() {
         return this.blocks.map(block => block.toText()).join(" ");
     }
@@ -1232,11 +1201,9 @@ class ChapterNode extends Node {
 class ParagraphNode extends Node {
 
     constructor(content) {
-        super();
+        super("paragraph");
         this.content = content;
-    }
-    toDOM(view, chapter, key) {
-        return <p key={key}>{this.content.toDOM(view, chapter)}</p>;
+
     }
 
     toText() {
@@ -1247,22 +1214,12 @@ class ParagraphNode extends Node {
 
 class EmbedNode extends Node {
     constructor(url, description, caption, credit, position) {
-        super();
+        super("embed");
         this.url = url;
         this.description = description;
         this.caption = caption;
         this.credit = credit;
         this.position = position;
-    }
-
-    toDOM(view, chapter, key) {
-        return <Figure key={key}
-            url={this.url}
-            alt={this.description}
-            caption={this.caption.toDOM(view, chapter)}
-            credit={this.credit.toDOM(view, chapter)}
-            position={this.position}
-        />
     }
 
     toText() {
@@ -1282,20 +1239,9 @@ class EmbedNode extends Node {
 
 class HeaderNode extends Node {
     constructor(level, content) {
-        super();
+        super("header");
         this.level = level;
         this.content = content;
-    }
-
-    toDOM(view, chapter, key) {
-        
-        let query = view.getHighlightedID();
-        let id = "header-" + chapter.getHeaders().indexOf(this);
-        let classes = "header" + (query === id ? " content-highlight" : "");
-
-        return this.level === 1 ? <h2 className={classes} id={id} key={key}>{this.content.toDOM(view, chapter)}</h2> :
-            this.level === 2 ? <h3 className={classes} id={id} key={key}>{this.content.toDOM(view, chapter)}</h3> :
-            <h4 className={classes} id={id} key={key}>{this.content.toDOM(view, chapter)}</h4>
     }
 
     toText() {
@@ -1306,10 +1252,8 @@ class HeaderNode extends Node {
 
 class RuleNode extends Node {
     constructor() {
-        super();
+        super("rule");
     }
-
-    toDOM(view, chapter, key) { return <hr key={key} />; }
 
     toText() {
         return "";
@@ -1319,18 +1263,8 @@ class RuleNode extends Node {
 
 class BulletedListNode extends Node {
     constructor(items) {
-        super();
+        super("bulleted");
         this.items = items;
-    }
-
-    toDOM(view, chapter, key) {
-        return <ul key={key}>{
-            this.items.map((item, index) =>
-                item instanceof BulletedListNode ?
-                    item.toDOM(view, chapter, "item-" + index) :
-                    <li key={"item-" + index}>{item.toDOM(view, chapter)}</li>
-            )}
-        </ul>;
     }
 
     toText() {
@@ -1341,18 +1275,8 @@ class BulletedListNode extends Node {
 
 class NumberedListNode extends Node {
     constructor(items) {
-        super();
+        super("numbered");
         this.items = items;
-    }
-
-    toDOM(view, chapter, key) {
-        return <ol key={key}>{
-            this.items.map((item, index) =>
-                item instanceof NumberedListNode ?
-                    item.toDOM(view, chapter, "item-" + index) :
-                    <li key={"item-" + index}>{item.toDOM(view, chapter)}</li>
-            )}
-        </ol>;
     }
 
     toText() {
@@ -1363,7 +1287,7 @@ class NumberedListNode extends Node {
 
 class CodeNode extends Node {
     constructor(code, language, caption, position) {
-        super();
+        super("code");
 
         this.code = code;
         this.caption = caption;
@@ -1375,19 +1299,6 @@ class CodeNode extends Node {
             this.language = this.language.slice(0, -1);
 
     }
-    toDOM(view, chapter, key) {
-        return <div key={key} className={(this.position === "<" ? "marginal-left-inset" : this.position === ">" ? "marginal-right-inset" : "")}>
-            {
-                this.language === "python" && this.executable ? 
-                    <Python code={this.code}></Python> :
-                    <div>
-                        <Code inline={false} language={this.language}>{this.code}</Code>
-                        { this.language !== "plaintext" ? <div className="code-language">{this.language}</div> : null }
-                    </div>
-            }
-            <div className="figure-caption">{this.caption.toDOM(view, chapter)}</div>
-        </div>
-    }
 
     toText() {
         return "";
@@ -1398,19 +1309,10 @@ class CodeNode extends Node {
 class QuoteNode extends Node {
 
     constructor(elements, credit, position) {
-        super();
+        super("quote");
         this.elements = elements;
         this.credit = credit;
         this.position = position;
-    }
-
-    toDOM(view, chapter, key) {
-
-        return <blockquote className={"blockquote " + (this.position === "<" ? "marginal-left-inset" : this.position === ">" ? "marginal-right-inset" : "")} key={key}>
-            { this.elements.map((element, index) => element.toDOM(view, chapter, "quote-" + index)) }
-            { this.credit ? <div className="blockquote-caption"><span>{this.credit.toDOM(view, chapter)}</span></div> : null }
-        </blockquote>
-
     }
 
     toText() {
@@ -1422,17 +1324,9 @@ class QuoteNode extends Node {
 class CalloutNode extends Node {
 
     constructor(elements, position) {
-        super();
+        super("callout");
         this.elements = elements;
         this.position = position;
-    }
-
-    toDOM(view, chapter, key) {
-
-        return <div className={"callout " + (this.position === "<" ? "marginal-left-inset" : this.position === ">" ? "marginal-right-inset" : "")} key={key}>
-            { this.elements.map((element, index) => element.toDOM(view, chapter, "callout-" + index))}
-        </div>
-
     }
 
     toText() {
@@ -1444,41 +1338,10 @@ class CalloutNode extends Node {
 class TableNode extends Node {
 
     constructor(rows, caption, position) {
-        super();
+        super("table");
         this.rows = rows;
         this.caption = caption;
         this.position = position;
-    }
-
-    toDOM(view, chapter, key) {
-
-        // Determine the maximum number of columns so we can set the right colspan if necessary.
-        let maxColumns = this.rows.reduce((max, row) => Math.max(row.length, max), 0);
-
-        return (
-            <div className={"figure " + (this.position === "<" ? "marginal-left-inset" : this.position === ">" ? "marginal-right-inset" : "")} key={key}>
-                {/* Make the table responsive for small screens */}
-                <div className="rows table-responsive">
-                    <table className="table">
-                        <tbody>
-                        {
-                            this.rows.map((row, index) => 
-                                <tr key={"row-" + index}>
-                                    {
-                                        row.length === 1 ?
-                                            [<td key={"cell-" + index} colSpan={maxColumns}>{row[0].toDOM(view, chapter, "cell-" + index)}</td>] :
-                                            row.map((cell, index) => <td key={"cell-" + index}>{cell.toDOM(view, chapter, "cell-" + index)}</td>)
-                                    }
-                                </tr>
-                            )
-                        }
-                        </tbody>
-                    </table>
-
-                </div>
-                <div className="figure-caption">{this.caption.toDOM(view, chapter)}</div>
-            </div>
-        );
     }
 
     toText() {
@@ -1490,25 +1353,10 @@ class TableNode extends Node {
 class FormattedNode extends Node {
 
     constructor(format, segments, language) {
-        super();
+        super("formatted");
         this.format = format;
         this.segments = segments;
         this.language = language;
-    }
-
-    toDOM(view, chapter, key) {
-        
-        const segmentDOMs = this.segments.map((segment, index) => segment.toDOM(view, chapter, "formatted-" + index));
-
-        if(this.format === "*")
-            return <strong key={key}>{segmentDOMs}</strong>;
-        else if(this.format === "_")
-            return <em key={key}>{segmentDOMs}</em>;
-        else if(this.format === "`")
-            return <Code key={key} inline={true} language={this.language}>{segmentDOMs}</Code>;
-        else
-            return <span key={key}>{segmentDOMs}</span>;
-        
     }
 
     toText() {
@@ -1520,13 +1368,9 @@ class FormattedNode extends Node {
 class InlineCodeNode extends Node {
 
     constructor(code, language) {
-        super();
+        super("inline-code");
         this.code = code;
         this.language = language;
-    }
-
-    toDOM(view, chapter, key) {
-        return <Code key={key} inline={true} language={this.language}>{this.code}</Code>;        
     }
 
     toText() {
@@ -1537,30 +1381,9 @@ class InlineCodeNode extends Node {
 
 class LinkNode extends Node {
     constructor(content, url) {
-        super();
+        super("link");
         this.content = content;
         this.url = url;
-    }
-    toDOM(view, chapter, key) {
-
-        // If this is external link, make an anchor that opens a new window.
-        if(this.url.startsWith("http")) {
-            return <a key={key} href={this.url} target="_blank">{this.content.toDOM(view, chapter)}</a>;
-        }
-        else {
-            if(this.url.indexOf(":") >= 0) {
-                let [chapter, label] = this.url.split(":");
-                // If the chapter isn't specified, set to the current chapter's id.
-                if(chapter === "")
-                    return <NavHashLink key={key} smooth scroll={smoothlyScrollElementToEyeLevel} to={"#" + label}>{this.content.toDOM(view, chapter)}</NavHashLink>;
-                else
-                    return <NavHashLink key={key} smooth scroll={smoothlyScrollElementToEyeLevel} to={"/" + chapter + "#" + label}>{this.content.toDOM(view, chapter)}</NavHashLink>;
-            }
-            else {
-                // If this is internal link, make a route link to the chapter.
-                return <Link key={key} to={this.url}>{this.content.toDOM(view, chapter)}</Link>;
-            }
-        }
     }
 
     toText() {
@@ -1571,74 +1394,8 @@ class LinkNode extends Node {
 
 class CitationsNode extends Node {
     constructor(citations) {
-        super();
+        super("citations");
         this.citations = citations;
-    }
-    toDOM(view, chapter, key) {
-
-        let segments = [];
-
-        // If there's no chapter, there are no citations allowed.
-        if(!chapter)
-            return null;
-
-        // Sort citations numerically, however they're numbered.
-        let citations = this.citations.sort((a, b) => {
-            let aNumber = chapter.getCitationNumber(a);
-            let bNumber = chapter.getCitationNumber(b);
-            if(aNumber === null && bNumber === null) return 0;
-            else if(aNumber === null && bNumber !== null) return 1;
-            else if(aNumber !== null && bNumber === null) return -1;
-            else return aNumber - bNumber;
-        });
-
-        // Convert each citation ID until a link.
-        citations.forEach(
-            (citationID, index) => {
-                // Find the citation number. There should always be one,
-                let citationNumber = chapter.getCitationNumber(citationID)
-                if(citationNumber !== null && citationID in view.getBook().getReferences()) {
-                    // Add a citation.
-                    segments.push(
-                            <sup key={index} className="citation-symbol">{citationNumber}</sup>
-                    );
-                }
-                // If it's not a valid citation number, add an error.
-                else {
-                    segments.push(<span className="alert alert-danger" key={"citation-error-" + index}>Unknown reference: <code>{citationID}</code></span>)
-                }
-
-                // If there's more than one citation and this isn't the last, add a comma.
-                if(citations.length > 1 && index < citations.length - 1)
-                    segments.push(<sup key={"citation-comma-" + index}>,</sup>);
-            }
-        );
-
-        return <span className="citation" key={key}>
-            <Marginal
-                chapter={view}
-                id={"citation-" + citations.join("-")}
-                interactor={segments}
-                content={
-                    <span className="references">
-                        {
-                            citations.map((citationID, index) => {
-                                let citationNumber = chapter.getCitationNumber(citationID);
-                                return view.getBook().getReferences(citationID) ?
-                                    <span 
-                                        key={index} 
-                                        className="reference">
-                                            <sup className="citation-symbol">{citationNumber}</sup>
-                                            {Parser.parseReference(view.getBook().getReferences()[citationID], view.getBook(), true)}
-                                    </span> :
-                                    null
-                            })
-                    }
-                    </span>
-                }
-            />
-        </span>
-
     }
 
     toText() {
@@ -1649,37 +1406,9 @@ class CitationsNode extends Node {
 
 class DefinitionNode extends Node {
     constructor(phrase, glossaryID) {
-        super();
+        super("definition");
         this.phrase = phrase;
         this.glossaryID = glossaryID;
-    }
-
-    toDOM(view, chapter, key) {
-
-        // Find the definition.
-        let glossary = view.getBook().getGlossary();
-
-        if(!(this.glossaryID in glossary))
-            return <span key={key} className="alert alert-danger">Unknown glossary entry "{this.glossaryID}"</span>
-
-        let entry = glossary[this.glossaryID];
-
-        return <span className="terminology" key={key}>
-            <Marginal
-                chapter={view}
-                id={"glossary-" + this.glossaryID}
-                interactor={this.phrase.toDOM(view, chapter)}
-                content={
-                    <span className="definition">
-                        <strong className="definition-phrase">{entry.phrase}</strong>: {Parser.parseContent(view.getBook(), entry.definition).toDOM(view, chapter, "definition")}
-                        {
-                            entry.synonyms && entry.synonyms.length > 0 ? <span className="definition-synonyms"><br/><br/>{entry.synonyms.join(", ")}</span> : null
-                        }
-                    </span>
-                }
-            />
-        </span>
-
     }
 
     toText() {
@@ -1690,28 +1419,8 @@ class DefinitionNode extends Node {
 
 class FootnoteNode extends Node {
     constructor(footnote) {
-        super();
+        super("footnote");
         this.footnote = footnote;
-    }
-    toDOM(view, chapter, key) {
-
-        // If no chapter was provided, then don't render the footnote, since there's no context in which to render it.
-        if(!chapter)
-            return null;
-
-        // What footnote number is this?
-        let number = chapter.getFootnotes().indexOf(this);
-        let letter = view.getBook().getFootnoteSymbol(number);
-
-        return <span className="footnote-link" key={key}>
-            <Marginal 
-                chapter={view}
-                id={"footnote-" + number}
-                interactor={<sup className="footnote-symbol">{letter}</sup>}
-                content={<span className="footnote"><sup className="footnote-symbol">{letter}</sup> {this.footnote.toDOM(view, chapter)}</span>} 
-            />
-        </span>
-
     }
 
     toText() {
@@ -1722,12 +1431,8 @@ class FootnoteNode extends Node {
 
 class ContentNode extends Node {
     constructor(segments) {
-        super();
+        super("content");
         this.segments = segments;
-    }
-
-    toDOM(view, chapter, key) {
-        return <span key={key}>{ this.segments.map((segment, index) => segment.toDOM(view, chapter, "content-" + index))}</span>;
     }
 
     toText() {
@@ -1737,15 +1442,9 @@ class ContentNode extends Node {
 
 class SubSuperscriptNode extends Node {
     constructor(superscript, content) {
-        super();
+        super("script");
         this.superscript = superscript;
         this.content = content;
-    }
-
-    toDOM(view, chapter, key) {
-        return this.superscript?
-            <sup key={key}>{this.content.toDOM(view, chapter, "sup-")}</sup> :
-            <sub key={key}>{this.content.toDOM(view, chapter, "sub-")}</sub>;
     }
 
     toText() {
@@ -1755,48 +1454,9 @@ class SubSuperscriptNode extends Node {
 
 class TextNode extends Node {
     constructor(text, position) {
-        super();
+        super("text");
         this.text = text;
         this.position = position - text.length;
-    }
-
-    toDOM(view, chapter, key) {
-        
-        // Is there a query we're supposed to highlight? If so, highlight it.
-        if(view && view.getHighlightedWord()) {
-            let query = view.getHighlightedWord();
-            let text = this.text;
-            let lowerText = text.toLowerCase();
-            // Does this text contain the query? Highlight it.
-            if(lowerText.indexOf(query) >= 0) {
-
-                // Find all the matches
-                const indices = [];
-                for(let i = 0; i < text.length; ++i) {
-                    if (lowerText.substring(i, i + query.length) === query) {
-                        indices.push(i);
-                    }
-                }
-
-                // Go through each one and construct contents for the span to return.
-                const segments = [];
-                for(let i = 0; i < indices.length; i++) {
-                    // Push the text from the end of the last match or the start of the string.
-                    segments.push(text.substring(i === 0 ? 0 : indices[i - 1] + query.length, indices[i]));
-                    segments.push(<span key={"match-" + i} className="text content-highlight">{text.substring(indices[i], indices[i] + query.length)}</span>);
-                }
-                if(indices[indices.length - 1] < text.length - 1)
-                    segments.push(text.substring(indices[indices.length - 1] + query.length, text.length));
-
-                return <span key={key}>{segments}</span>;
-
-            }
-            else return this.text;
-
-        } 
-        // Otherwise, just return the text.
-        else return <span key={key} className="text" data-position={this.position}>{this.text}</span>;
-
     }
 
     toText() {
@@ -1807,16 +1467,12 @@ class TextNode extends Node {
 
 class ErrorNode extends Node {
     constructor(metadata, error) {
-        super();
+        super("error");
         this.error = error;
 
         // Add the error to the give metadata object.
         if(metadata)
             metadata.errors.push(this);
-    }
-
-    toDOM(view, chapter, key) {
-        return <span key={key} className="alert alert-danger">Error: {this.error}</span>;
     }
 
     toText() {
@@ -1827,7 +1483,7 @@ class ErrorNode extends Node {
 
 class LabelNode extends Node {
     constructor(id) {
-        super();
+        super("label");
 
         this.id = id;
 
@@ -1835,13 +1491,22 @@ class LabelNode extends Node {
 
     getID() { return this.id; }
 
-    toDOM(view, chapter, key) {
-        let query = view.getHighlightedID();
-        return <span key={key} className={"label" + (query === this.id ? " content-highlight" : "")} id={this.id}></span>
-    }
-
     toText() { return ""; }
 
 }
 
-export {Parser};
+class ReferenceNode extends Node {
+    constructor(authors, year, title, source, url, summary, short) {
+        super("reference")
+
+        this.authors = authors
+        this.year = year
+        this.title = title
+        this.source = source
+        this.url = url
+        this.summary = summary
+        this.short = short
+    }
+}
+
+export default Parser

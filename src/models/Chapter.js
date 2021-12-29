@@ -1,4 +1,4 @@
-import { Parser } from "./Parser";
+import Parser from "./Parser";
 
 class Chapter {
 
@@ -14,19 +14,19 @@ class Chapter {
 		this.forthcoming = metadata.forthcoming === true;
         this.text = text;
 
-        // If the chapter has text, then parse it, count searchable words, and compute an index.
-        if(this.text !== null) {
-            this.ast = Parser.parseChapter(this.book, text);
-            this.wordCount = this.ast.toText().split(/\s+/).length;
-            this.index = this.computeIndex();
-        }
-        // Otherwise, set them all to null.
-        else {
-            this.ast = null;
-            this.wordCount = 0;
-            this.index = null;
-        }
-
+		// If the chapter has text, then parse it, count searchable words, and compute an index.
+		if(this.text !== null) {
+			this.ast = Parser.parseChapter(this.book, text);
+			this.wordCount = this.ast.toText().split(/\s+/).length;
+			this.index = this.computeIndex();
+		}
+		// Otherwise, set them all to null.
+		else {
+			this.ast = null;
+			this.wordCount = 0;
+			this.index = null;
+		}
+		
     }
 
 	getID() { return this.id; }

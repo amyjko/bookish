@@ -314,7 +314,7 @@ blockquote .blockquote-caption {
 
 /* REFERENCES, FOOTNOTES, and GLOSSARY */
 
-.reference .summary {
+.reference-text .summary {
 	font-size: 80%;
 	padding-left: 1em;
 	display: inline-block;
