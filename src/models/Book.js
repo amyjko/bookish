@@ -20,13 +20,24 @@ class Book {
         if(typeof chapters !== "object")
             throw Error("Expected an object mapping chapter IDs to chapter text")
 
-        // If undefined, it's not loaded; if null, it failed to load; otherwise, an object with a book specification.
-        this.specification = specification;
+        // Copy all of the specification metadata to fields.
+        this.title = specification.title
+        this.symbols = "symbols" in specification ? specification.symbols : {}
+        this.tags = "tags" in specification ? specification.tags : []
+        this.license = specification.license
+        this.references = "references" in specification ? specification.references : {}
+        this.glossary = specification.glossary
+        this.authors = specification.authors
+        this.description = specification.description
+        this.acknowledgements = specification.acknowledgements
+        this.revisions = specification.revisions
+        this.images = specification.images
+        this.sources = "sources" in specification ? specification.sources : {}
 
         // Create a list and dictionary of Chapter objects.
         this.chapters = []
         this.chaptersByID = {}
-        this.specification.chapters.forEach(chapter => {
+        specification.chapters.forEach(chapter => {
             this.chaptersByID[chapter.id] = new Chapter(
                 this,
                 chapter,
@@ -40,26 +51,25 @@ class Book {
 
     }
 
-    getTitle() { return this.specification.title; }
+    getTitle() { return this.title; }
     getChapters() { return this.chapters }
     hasChapter(chapterID) { return chapterID in this.chaptersByID || ["references", "glossary", "index", "search", "media"].includes(chapterID); }
     getChapter(chapterID) { return this.hasChapter(chapterID) ? this.chaptersByID[chapterID] : null; }
-    getSymbols() { return this.specification ? this.specification.symbols : {}; }
-	getLicense() { return this.specification.license; }
-    hasReferences() { return this.getReferences() !== undefined && Object.keys(this.getReferences()).length > 0; }
-	getReferences() { return this.specification.references; }
-    hasGlossary() { return this.getGlossary() !== undefined && Object.keys(this.getGlossary()).length > 0; }
-	getGlossary() { return this.specification.glossary; }
-	getTags() { return "tags" in this.specification ? this.specification.tags : []; }
-	getAuthors() { return this.specification.authors; }	
-	getAuthorByID(id) { return this.getAuthors().find(el => el.id === id); }
-	getDescription() { return this.specification.description; }
-	getAcknowledgements() { return this.specification.acknowledgements; }
-	getRevisions() { return this.specification.revisions; }
+    getSymbols() { return this.symbols }
+	getLicense() { return this.license; }
+    hasReferences() { return Object.keys(this.references).length > 0; }
+	getReferences() { return this.references; }
+    hasGlossary() { return Object.keys(this.glossary).length > 0 }
+	getGlossary() { return this.glossary }
+	getTags() { return this.tags }
+	getAuthors() { return this.authors; }	
+	getAuthorByID(id) { return this.authors.find(el => el.id === id); }
+	getDescription() { return this.description; }
+	getAcknowledgements() { return this.acknowledgements; }
+	getRevisions() { return this.revisions; }
 
-    hasImage(id) { return id in this.specification.images; }
-    getImage(id) { return this.hasImage(id) ? this.specification.images[id] : null; }
-
+    hasImage(id) { return id in this.images; }
+    getImage(id) { return this.hasImage(id) ? this.images[id] : null; }
 	
 	getBookReadingTime() {
 		return this.chapters
@@ -100,8 +110,8 @@ class Book {
 	}
 
 	getSource(sourceID) { 
-		return sourceID.charAt(0) === "#" && sourceID.substring(1) in this.specification.sources ? 
-            this.specification.sources[sourceID.substring(1)] : 
+		return sourceID.charAt(0) === "#" && sourceID.substring(1) in this.sources ? 
+            this.sources[sourceID.substring(1)] : 
             null;
 	}
 
