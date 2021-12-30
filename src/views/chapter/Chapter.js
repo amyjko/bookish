@@ -407,11 +407,6 @@ class Chapter extends React.Component {
 									null : 
 									<span className="bookish-section-name"> {chapterSection}</span>
 							}
-							{ 
-								chapterNumber || chapterSection ? 
-									<br/> : 
-									null 
-							}
 							</span>						
 						}
 						header={chapter.getTitle()}

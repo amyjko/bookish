@@ -45,8 +45,8 @@
 	--bookish-bullet-font-weight: 500;
 
 	/* Line heights */
-	--bookish-paragraph-line-height: 1.8rem;
-	--bookish-paragraph-line-height-tight: 1.4rem;
+	--bookish-paragraph-line-height: 1.8em;
+	--bookish-paragraph-line-height-tight: 1.4em;
 	--bookish-header-line-height: 2em;
 
 	/* Spacing */
@@ -250,14 +250,14 @@ h4 {
 }
 
 .bookish-title {
-	margin-top: calc(var(--bookish-title-font-size) * 0.5);
-	margin-bottom: calc(var(--bookish-title-font-size) * 0.5);
+	margin-top: 0;
+	margin-bottom: 0;
 }
 
 .bookish-subtitle {
 	font-weight: normal;
 	font-style: italic;
-	margin-top: calc(var(--bookish-title-font-size) * 0.5);
+	margin-top: 0; /* Shouldn't have any space below title */
 	margin-bottom: calc(var(--bookish-title-font-size) * 0.5);
 }
 
@@ -272,6 +272,7 @@ h4 {
 	font-weight: normal;
 	font-style: normal;
 	color: var(--bookish-muted-color);
+	line-height: 1em;
 }
 
 .bookish-tag {
@@ -367,7 +368,7 @@ ul li::before {
     color: var(--bookish-bullet-color);
     display: inline-block;
     width: 1rem;
-    margin-left: -1.5rem;
+    margin-left: -1rem;
     font-family: var(--bookish-bullet-font-family);
 	font-weight: var(--bookish-bullet-font-weight);
 }
@@ -1066,10 +1067,10 @@ code {
 
 .bookish-code-language {
 	float: right;
-	margin-top: -2rem;
+	margin-top: -3em;
 	font-size: small;
 	color: gray;
-	margin-right: 0.5rem;
+	margin-right: 0.5em;
 }
 
 /* Default color */
