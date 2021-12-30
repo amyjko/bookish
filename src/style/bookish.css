@@ -287,7 +287,7 @@ h4 {
 .bookish-authors {
     font-family: var(--bookish-paragraph-font-family);
     font-style: italic;
-    margin-top: var(--bookish-paragraph-spacing);
+    margin-top: 0;
     margin-bottom: var(--bookish-paragraph-spacing);
 }
 
