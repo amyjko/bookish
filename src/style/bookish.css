@@ -944,7 +944,7 @@ a .bookish-outline-header-active {
 	}
 
 	.bookish-outline.bookish-outline-collapsed {
-		transform: translateY(-4rem);
+		transform: translateY(-3em);
 	}
 
 }

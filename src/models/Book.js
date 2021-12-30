@@ -59,9 +59,9 @@ class Book {
     getChapter(chapterID) { return this.hasChapter(chapterID) ? this.chaptersByID[chapterID] : null; }
     getSymbols() { return this.symbols }
 	getLicense() { return this.license; }
-    hasReferences() { return Object.keys(this.references).length > 0; }
+    hasReferences() { return this.references && Object.keys(this.references).length > 0; }
 	getReferences() { return this.references; }
-    hasGlossary() { return Object.keys(this.glossary).length > 0 }
+    hasGlossary() { return this.glossary && Object.keys(this.glossary).length > 0 }
 	getGlossary() { return this.glossary }
 	getTags() { return this.tags }
 	getAuthors() { return this.authors; }	

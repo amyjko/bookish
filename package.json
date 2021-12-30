@@ -10,7 +10,7 @@
 		"build-assets": "cp src/style/bookish.css build/; cp -R src/images build/",
 		"book": "sh scripts/book.sh",
 		"sync": "rsync -avz --delete build/ ajko@ovid.u.washington.edu:~/public_html/bookish/",
-		"ship": "set -e -o pipefail; npm run sync",
+		"ship": "set -e -o pipefail; npm run build; npm run sync",
 		"build-app": "node ./esbuild.backend.js; cp src/index.html public/; cp -R src/images public/; cp -R src/style public/",
 		"build": "npm run clean; npm run build-assets; node ./esbuild.frontend.js | terser --compress --mangle > build/bookish.js",
 		"watch": "watch 'npm run build-app' ./src"
