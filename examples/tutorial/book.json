@@ -21,7 +21,7 @@
 			"title": "Introduction",
 			"authors": ["ajko"],
 			"image": "|chapter1.jpg|A photo of Boomy|OMG this is the longest caption ever OMG this is the longest caption ever OMG this is the longest caption ever OMG this is the longest caption ever OMG this is the longest caption ever OMG this is the longest caption ever |@amyCredit|",
-			"numbered": false
+			"numbered": true
 		},
 		{
 			"id": "marginals",

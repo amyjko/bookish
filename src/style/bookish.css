@@ -1,0 +1,1137 @@
+/* FONTS */
+
+/* VARIABLES */
+:root {
+	/* Background colors */
+	--bookish-background-color: #FFFFFF;
+	--bookish-block-background-color: #FCFAFA;
+	--bookish-error-background-color: #F8D7DA;
+
+	/* Border colors */
+	--bookish-border-color-light: #E0E0E0;
+	--bookish-border-color-bold: #000000;
+
+	/* Foreground colors */
+	--bookish-paragraph-color: #000000;
+	--bookish-muted-color: #9AA1A7;
+	--bookish-highlight-color: #E8AF22;
+	--bookish-comment-color: #257F31;
+	--bookish-error-color: #721C24;
+	--bookish-link-color: #1B499C;
+	--bookish-bullet-color: #EB2C27;
+
+	/* Fonts */
+	--bookish-paragraph-font-family: "Georgia", serif;
+	--bookish-paragraph-font-weight: 400;
+
+	--bookish-header-font-family: "Verdana", serif;
+	--bookish-header-font-weight: 700;
+
+	--bookish-code-font-family: "Courier New", monospace;
+	--bookish-code-font-weight: 400;
+
+	--bookish-bullet-font-family: "Verdana";
+	--bookish-bullet-font-weight: 500;
+
+	/* Font sizes */
+	--bookish-paragraph-font-size: 14pt;
+	--bookish-block-font-size: 11pt;
+	--bookish-small-font-size: 9pt;
+	--bookish-title-font-size: 2.4rem;
+	--bookish-header-1-font-size: 2rem;
+	--bookish-header-2-font-size: 1.5rem;
+	--bookish-header-3-font-size: 1rem;
+	--bookish-code-font-size: 11pt;
+
+	/* Line heights */
+	--bookish-paragraph-line-height: 1.8rem;
+	--bookish-paragraph-line-height-tight: 1.4rem;
+
+	/* Spacing */
+	--bookish-paragraph-spacing: 1.8rem;
+	--bookish-header-spacing: 2rem;
+	--bookish-roundedness: 5px;
+	--bookish-indent: 10%;
+	--bookish-inline-padding: 0.25rem;
+	--bookish-block-padding: 1rem;
+}
+
+.bookish-dark {
+	--bookish-background-color: #000000;
+	--bookish-block-background-color: #333333;
+	--bookish-error-background-color: #721C24;
+	--bookish-border-color-light: #444444;
+	--bookish-border-color-bold: #FFFFFF;
+	--bookish-paragraph-color: #FFFFFF;
+	--bookish-muted-color: #CCCCCC;
+	--bookish-highlight-color: #5c4d28;
+	--bookish-comment-color: #1c4722;
+	--bookish-error-color: #F8D7DA;
+	--bookish-link-color: #73a3fa;
+	--bookish-bullet-color: #721C24;
+}
+
+/* WINDOW AND PAGES */
+body {
+	max-width: 720px;
+
+	/* To make room for navigation footer. Without this, the page is too short to show it. */
+	padding-bottom: 5em;
+
+	/* Center the application in the viewport */
+	margin-top: 0;
+	margin-left: auto;
+	margin-right: auto;
+
+	font-weight: var(--bookish-paragraph-font-weight);
+	font-family: var(--bookish-paragraph-font-family);
+	font-size: var(--bookish-paragraph-font-size);
+	line-height: var(--bookish-paragraph-line-height);
+
+	background-color: var(--bookish-background-color);
+	color: var(--bookish-paragraph-color);
+}
+
+/* The root container for a book */
+.bookish {
+	/* This helps absolute position things relative to the book */
+	position: relative;
+	padding-left: var(--bookish-block-padding);
+	padding-right: var(--bookish-block-padding);
+}
+
+/* A page, such as table of contents, chapter, or references */
+.bookish-page {
+	/* Hidden by default until tagged as loaded */
+	opacity: 0;
+	transition: opacity 0.25s ease-in;
+}
+
+.bookish-page-loaded {
+	opacity: 1;
+}
+
+/* LOADING */
+
+.bookish-loading {
+	position: fixed;
+	width: 80px;
+	height: 80px;
+	left: 50%;
+	top: 50%;
+	margin-left: -40px;
+	margin-top: -40px;
+	z-index: 1;
+}
+
+.bookish-loading div {
+	position: absolute;
+	width: 16px;
+	height: 16px;
+	border-radius: 50%;
+	background: var(--bookish-muted-color);
+	animation: bookish-loading 1.2s linear infinite;
+}
+
+.bookish-loading div:nth-child(1) {
+	top: 8px;
+	left: 8px;
+	animation-delay: 0s;
+}
+.bookish-loading div:nth-child(2) {
+	top: 8px;
+	left: 32px;
+	animation-delay: -0.4s;
+}
+.bookish-loading div:nth-child(3) {
+	top: 8px;
+	left: 56px;
+	animation-delay: -0.8s;
+}
+.bookish-loading div:nth-child(4) {
+	top: 32px;
+	left: 8px;
+	animation-delay: -0.4s;
+}
+.bookish-loading div:nth-child(5) {
+	top: 32px;
+	left: 32px;
+	animation-delay: -0.8s;
+}
+.bookish-loading div:nth-child(6) {
+	top: 32px;
+	left: 56px;
+	animation-delay: -1.2s;
+}
+.bookish-loading div:nth-child(7) {
+	top: 56px;
+	left: 8px;
+	animation-delay: -0.8s;
+}
+.bookish-loading div:nth-child(8) {
+	top: 56px;
+	left: 32px;
+	animation-delay: -1.2s;
+}
+.bookish-loading div:nth-child(9) {
+	top: 56px;
+	left: 56px;
+	animation-delay: -1.6s;
+}
+
+@keyframes bookish-loading {
+	0%, 100% {
+		opacity: 1;
+	}
+	50% {
+		opacity: 0.5;
+	}
+}
+
+/* TYPOGRAPHY */
+.bookish-muted {
+	color: var(--bookish-muted-color);
+	font-weight: normal;
+}
+
+p {
+	font-family: var(--bookish-paragraph-font-family);
+	font-size: var(--bookish-paragraph-font-size);
+	color: var(--bookish-paragraph-color);
+
+	margin-top: var(--bookish-paragraph-spacing);
+	margin-bottom: var(--bookish-paragraph-spacing);
+
+	/* Allow paragraphs to break on words to support small screens. */
+	word-break: break-word;
+}
+
+strong, b {
+	font-weight: 700;
+}
+
+/* HEADERS */
+
+h1, h2, h3, h4, h5, h6 {
+	font-family: var(--bookish-header-font-family);
+	font-weight: var(--bookish-header-font-weight);
+	margin-top: var(--bookish-header-spacing);
+	margin-bottom: var(--bookish-header-spacing);
+}
+
+h1 {
+	font-size: var(--bookish-title-font-size);
+}
+
+h2 {
+	font-size: var(--bookish-header-1-font-size);
+}
+
+h3 {
+	font-size: var(--bookish-header-2-font-size);
+}
+
+h4 {
+	font-size: var(--bookish-header-3-font-size);
+	font-style: italic;
+}
+
+.bookish-chapter-number {
+	font-family: var(--bookish-header-font-family);
+	font-weight: normal;
+	font-style: italic;
+}
+
+.bookish-title {
+	margin-top: calc(var(--bookish-title-font-size) * 0.5);
+	margin-bottom: calc(var(--bookish-title-font-size) * 0.5);
+}
+
+.bookish-subtitle {
+	font-weight: normal;
+	font-style: italic;
+	margin-top: calc(var(--bookish-title-font-size) * 0.5);
+	margin-bottom: calc(var(--bookish-title-font-size) * 0.5);
+}
+
+.bookish-figure {
+	margin-bottom: var(--bookish-paragraph-spacing);
+}
+
+.bookish-section-name {
+	display: inline-block;
+	font-family: var(--bookish-paragraph-font-family);
+	font-size: var(--bookish-small-font-size);
+	font-weight: normal;
+	font-style: normal;
+	color: var(--bookish-muted-color);
+}
+
+.bookish-tag {
+	font-size: var(--bookish-small-font-size);
+	display: inline-block;
+	padding: var(--bookish-inline-padding) calc(2 * var(--bookish-inline-padding));
+	border-radius: var(--bookish-roundedness);
+	background-color: var(--bookish-border-color-light);
+    font-weight: bold;
+    text-transform: uppercase;
+}
+
+.bookish-authors {
+    font-family: var(--bookish-paragraph-font-family);
+    font-style: italic;
+    margin-top: var(--bookish-paragraph-spacing);
+    margin-bottom: var(--bookish-paragraph-spacing);
+}
+
+/* INPUT */
+
+input[type="text"] {
+	font-family: var(--bookish-paragraph-font-family);
+	font-size: var(--bookish-paragraph-font-size);
+	padding: var(--bookish-inline-padding) calc(2 * var(--bookish-inline-padding));
+	width: 100%;
+}
+
+/* FLOURISHES */
+
+/* This implements aa drop cap in the first letter of the first paragraph of each chapter on the page. */
+.bookish-chapter > p:first-of-type::first-letter {
+	padding: 0 .25rem;
+	margin: 0 .25rem 0 0;
+	font-size: 4rem;
+	font-weight: 700;
+	float: left;
+	line-height: 1;
+	color: var(--bookish-paragraph-color);
+}
+
+/* LISTS */
+
+ol {
+    list-style: none;
+    counter-reset: item;
+}
+
+ol li {
+    counter-increment: item;
+}
+
+ol li {
+	list-style-type: none;
+}
+
+ol ol li {
+	list-style-type: none;
+}
+
+ol ol ol li {
+	list-style-type: none;
+}
+
+ol li::before {
+    content: counter(item) ". ";
+    color: var(--bookish-bullet-color);
+    display: inline-block;
+    width: 1em;
+    margin-left: -1.5rem;
+    margin-right: .5rem;
+    text-align: right;
+}
+
+ol ol li::before {
+    content: counter(item, lower-alpha) ". ";
+}
+
+ol ol ol li:before {
+    content: counter(item, upper-alpha) ". ";
+}
+
+li {
+	margin-bottom: calc(0.5 * var(--bookish-paragraph-spacing));
+}
+
+ul li {
+    list-style: none;
+}
+
+ul li::before {
+    content: "*";
+    color: var(--bookish-bullet-color);
+    display: inline-block;
+    width: 1rem;
+    margin-left: -1.5rem;
+    font-family: var(--bookish-bullet-font-family);
+	font-weight: var(--bookish-bullet-font-weight);
+}
+
+/* RULES. */
+
+hr {
+    border: none;
+    border-bottom: 1px solid var(--bookish-border-color-light);
+    margin-top: calc(var(--bookish-paragraph-spacing) * 3);
+    margin-bottom: calc(var(--bookish-paragraph-spacing) * 3);
+}
+
+/* FIGURES. Responsive images and iframes */
+
+.bookish-figure {
+	margin-top: var(--bookish-paragraph-spacing);
+	margin-bottom: var(--bookish-paragraph-spacing);
+	width: 100%;
+}
+
+.bookish-figure-image {
+	border-radius: var(--bookish-roundedness);
+	max-width: 100%;
+	width: 100%;
+	height: auto;
+	margin-bottom: 0;
+}
+
+.bookish-figure-caption {
+	text-align: center;
+	color: var(--bookish-muted-color);
+	line-height: var(--bookish-paragraph-line-height-tight);
+	font-size: var(--bookish-block-font-size);
+	margin-top: 0;
+	margin-bottom: var(--bookish-paragraph-spacing);
+	margin-left: var(--bookish-paragraph-spacing);
+	margin-right: var(--bookish-paragraph-spacing);
+}
+
+.bookish-figure-credit {
+	display: block;
+	text-align: right;
+	font-style: italic;
+	font-size: var(--bookish-small-font-size);
+}
+
+.bookish-figure-preview {
+	display: inline-block;
+	width: 10rem;
+	margin: 1em;
+	vertical-align: bottom;
+}
+
+.bookish-figure-preview img {
+	width: 100%;
+	height: auto;
+}
+
+.bookish-figure-embed {
+	position: relative;
+	display: block;
+	width: 100%;
+	padding: 0;
+	overflow: hidden;
+	border-radius: var(--bookish-roundedness);
+}
+
+.bookish-figure-embed::before {
+	/* Make the embed 16:9 */
+	padding-top: 56.25%;
+	display: block;
+	content: "";
+}
+
+.bookish-figure-frame {
+	/* Fill the container */
+	position: absolute;
+	top: 0;
+	bottom: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	border: 0;
+}
+
+.bookish-figure-full {
+	left: 50%;
+	margin-left: -50vw;
+	margin-right: -50vw;
+	max-width: 100vw;
+	position: relative;
+	right: 50%;
+	width: 100vw;
+}
+
+.bookish-figure-full .bookish-figure {
+	/* No margin above full figures, which tend to come first in a page. */
+	margin-top: 0;
+}
+
+#bookish-scroll-reminder {
+	position: fixed;
+	bottom: 4em;
+	left: 50%;
+	animation: bookish-bounce 3s infinite;
+	animation-timing-function: ease;
+	width: 0;
+	height: 0;
+	margin-left: -1rem;
+	border-left: 1rem solid transparent;
+	border-right: 1rem solid transparent;
+	border-top: 1rem solid white;
+	mix-blend-mode: difference;
+}
+
+#bookish-scroll-reminder.past-title {
+	display: none;
+}
+
+@keyframes bookish-bounce {
+	0% { bottom: 4em; }
+	50% { bottom: 5em; }
+	100% { bottom: 4em; }
+}
+
+/* LINKS */
+
+a {
+	color: var(--bookish-link-color);
+	text-decoration: none;
+}
+
+a:hover {
+	text-decoration: underline;
+}
+
+/* TABLE OF CONTENTS */
+
+.bookish-forthcoming {
+	opacity: 0.5;
+}
+
+/* BLOCK QUOTES */
+
+.bookish-blockquote {
+	clear: both;
+
+	border: none;
+    font-family: var(--bookish-header-font-family);
+    font-weight: 400;
+    font-style: italic;
+    padding: 0;
+    margin-top: var(--bookish-paragraph-spacing);
+    margin-bottom: var(--bookish-paragraph-spacing);
+    margin-left: var(--bookish-indent);
+    margin-right: var(--bookish-indent);
+
+}
+
+.bookish-blockquote > p {
+    margin: 0;
+    padding: 0;
+}
+
+.bookish-blockquote .bookish-blockquote-caption {
+    margin-top: 0.5em;
+    text-align: right;
+    font-family: var(--bookish-header-font-family);
+    font-style: italic;
+    color: var(--bookish-muted-color);
+}
+
+.bookish-blockquote:before {
+    content: "\201C";
+    position: relative;
+    top: 80pt;
+    left: -40pt;
+    font-family: "Modum Extra";
+    font-size: 120pt;
+    font-weight: bold;
+    color: var(--bookish-highlight-color);
+    z-index: -1;
+}
+
+.bookish-blockquote-caption:before {
+    content: "--";
+    margin-right: 0.25em;
+}
+
+/* CALLOUTS */
+
+.bookish-callout {
+    border: none;
+    border-top: 2px solid var(--bookish-border-color-bold);
+    border-bottom: 2px solid var(--bookish-border-color-bold);
+    margin: var(--bookish-paragraph-spacing);
+    padding-left: 0;
+    padding-right: 0;
+    padding-top: var(--bookish-paragraph-spacing);
+    padding-bottom: var(--bookish-paragraph-spacing);
+    line-height: var(--bookish-paragraph-line-height-tight);
+	clear: both;
+}
+
+.bookish-callout h2, .bookish-callout h3, .bookish-callout h4 {
+    margin-top: 0;
+}
+
+.bookish-callout ol, .bookish-callout ul {
+    padding-left: 1rem;
+}
+
+/* TABLES */
+
+.bookish-table {
+	display: block;
+	width: 100%;
+	overflow-x: auto;
+}
+
+.bookish-table table {
+	width: 100%;
+	line-height: var(--bookish-paragraph-line-height-tight);
+	margin-bottom: var(--bookish-paragraph-spacing);
+	border-collapse: collapse;
+	clear: both;
+}
+
+.bookish-table td {
+	padding: var(--bookish-block-padding);
+	vertical-align: top;
+	border-top: 1px solid var(--bookish-border-color-light);
+}
+
+.bookish-chapter .bookish-table {
+    border-collapse: separate;
+    border-radius: var(--bookish-roundedness);
+    border-spacing: 0;
+}
+
+.bookish-chapter .bookish-table tbody tr:first-child {
+    border: 0;
+    background-color: var(--bookish-border-color-light);
+}
+
+.bookish-chapter .bookish-table tbody tr:first-child td {
+    font-weight: bold;
+    border: 0;
+    border-bottom: 1px solid var(--bookish-border-color-light);
+}
+
+.bookish-chapter .bookish-table tbody tr:nth-child(even) {
+    background-color: var(--bookish-block-background-color);
+}
+
+.bookish-chapter table tr:last-child td:first-child {
+    border-bottom-left-radius: var(--bookish-roundedness);
+}
+.bookish-chapter table tr:last-child td:last-child {
+    border-bottom-right-radius: var(--bookish-roundedness);
+}
+.bookish-chapter table tr:first-child td:first-child {
+    border-top-left-radius: var(--bookish-roundedness);
+}
+.bookish-chapter table tr:first-child td:last-child {
+    border-top-right-radius: var(--bookish-roundedness);
+}
+
+.bookish-chapter .bookish-table td {
+    font-size: var(--bookish-block-font-size);
+    border: 0;
+}
+
+/* ERRORS */
+
+.bookish-error {
+	background-color: var(--bookish-error-background-color);
+	color: var(--bookish-error-color);
+	border-radius: var(--bookish-roundedness);
+	font-weight: 400;
+	padding: var(--bookish-inline-padding) calc(2 * var(--bookish-inline-padding));
+}
+
+/* HIGHLIGHTS */
+
+.bookish-content-highlight {
+	border: none;
+	border-radius: var(--bookish-roundedness);
+	animation: bookish-pulse 0.75s 3;
+	animation-fill-mode: forwards;
+}
+
+/* A little circle at the point of the annotation */
+.bookish-label.bookish-content-highlight {
+	display: inline-block;
+	width: 3em;
+	height: 3em;
+	border-radius: 3em;
+	position: absolute;
+	z-index: -1;
+	margin-left: -1em;
+	margin-top: -0.5em;
+}
+
+@keyframes bookish-pulse {
+	0% { background-color: var(--bookish-background-color); }
+	50% { background-color: var(--bookish-highlight-color); }
+	100% { background-color: var(--bookish-background-color); }
+}
+
+/* REFERENCES, FOOTNOTES, and GLOSSARY */
+
+.bookish-reference {
+    font-family: var(--bookish-paragraph-font-family);
+    list-style-position: outside;
+}
+
+.bookish-footnote {
+	font-family: "Epilogue";
+    font-weight: 300;
+    font-size: var(--bookish-small-font-size);
+    line-height: 1.5em;
+}
+
+ol li.bookish-reference::before {
+    color: var(--bookish-paragraph-color);
+}
+
+.bookish-reference-text .bookish-reference-summary {
+	font-size: var(--bookish-small-font-size);
+	padding-left: var(--bookish-indent);
+	display: inline-block;
+	border-left: 1px solid var(--bookish-border-color-light);
+	margin-top: 1em;
+	font-style: italic;
+}
+
+.bookish-footnote, .bookish-marginal .bookish-reference {
+	font-size: var(--bookish-small-font-size);
+	font-style: normal;
+	color: var(--bookish-paragraph-color);
+}
+
+.bookish-footnote-symbol, .bookish-citation-symbol {
+	font-family: var(--bookish-paragraph-font-family);
+    font-weight: normal;
+    color: var(--bookish-link-color);
+}
+
+/* This enables us to layout the numbers and letters in a neat right-aligned floating grid. */
+.bookish-reference, .bookish-footnote {
+	position: relative;
+}
+
+.bookish-references .bookish-reference, .bookish-footnote {
+	display: block;
+	line-height: var(--bookish-paragraph-line-height-tight);
+	margin-left: 1rem;
+	margin-bottom: 1rem;
+	text-align: left;
+}
+
+.bookish-reference .bookish-citation-symbol, .bookish-footnote .bookish-footnote-symbol {
+	display: block;
+	float: left;
+	margin-top: -0.5em;
+	position: absolute;
+	left: -1.75em;
+	text-align: right;
+	width: 1.5em; /* Just enough space for 2 digits, a bit of a hack */
+}
+
+.bookish-definition .bookish-marginal-interactor {
+	border-bottom: 2px solid var(--bookish-link-color);
+}
+
+.bookish-definition-entry {
+	display: block;
+	padding-left: 0.75rem;
+	font-size: var(--bookish-small-font-size);
+	line-height: var(--bookish-paragraph-line-height-tight);
+	text-align: left;
+	margin-left: 0.25rem;
+	margin-bottom: 1rem;
+	background: linear-gradient(to right, var(--bookish-link-color) 0px, var(--bookish-link-color) 2px, transparent 2px) no-repeat right;
+}
+
+.bookish-definition-entry .bookish-definition-entry-synonyms {
+	color: var(--bookish-muted-color);
+	font-style: italic;
+}
+
+/* MARGINALS */
+
+.bookish-outline {
+	font-family: var(--bookish-header-font-family);
+	font-weight: normal;
+	font-size: var(--bookish-paragraph-font-size);
+	color: var(--bookish-muted-color);
+}
+
+.bookish-outline-header-nav {
+	display: inline-block;
+	margin-bottom: 0.75rem;
+	width: 100%;
+	padding-left: 1rem;
+	padding-right: 1rem;
+}
+
+.bookish-outline-header {
+	display: block;
+	line-height: var(--bookish-paragraph-line-height-tight);
+	text-indent: 0;
+    padding-left: 1rem;
+	padding-right: 1rem;
+	margin-bottom: 0.75rem;
+}
+
+.bookish-outline-header-level-0 {
+	font-size: 1rem;
+}
+
+.bookish-outline-header-level-1 {
+	font-size: 0.9rem;
+}
+
+.bookish-outline-header-level-2 {
+	font-size: 0.8rem;
+	font-style: italic;
+	margin-left: 1em;
+}
+
+a .bookish-outline-header, .bookish-outline-header-nav a {
+    color: var(--bookish-muted-color);
+}
+
+a .bookish-outline-header-active, a:hover .bookish-outline-header {
+	color: var(--bookish-paragraph-color);
+}
+
+.bookish-outline a:hover {
+	text-decoration: none;
+}
+
+/* Only apply this on devices with hover abilities. */
+@media (hover: hover) {
+	.bookish-outline a:hover {
+		color: var(--bookish-paragraph-color);
+	}
+}
+
+a .bookish-outline-header-active {
+	color: var(--bookish-paragraph-color);
+}
+
+/* Mobile */
+@media screen and (max-width: 1200px) {
+
+	/* Fixed position for small screens. */
+	.bookish-marginal {
+		background-color: var(--bookish-background-color);
+		padding: 0.75em;
+		border: 1px solid var(--bookish-border-color-light);
+		position: fixed;
+		width: auto;
+		height: auto;
+		left: 0;
+		right: 0;
+		bottom: 0;
+		z-index: 1;
+		cursor: pointer;
+		transform: translateY(0);
+		transition: transform 0.2s ease-in;
+	}
+
+	/* Handle nested marginals by just not showing them. */
+	.bookish-marginal .bookish-marginal {
+		display: none;
+	}
+
+	.bookish-marginal-interactor {
+		cursor: pointer;
+	}
+
+	.bookish-marginal-interactor:hover {
+		font-weight: bold;
+	}
+
+	.bookish-definition .bookish-marginal-interactor:hover {
+		font-weight: normal;
+	}
+
+	.bookish-definition:hover {
+		border-bottom-color: var(--bookish-border-color-bold) !important;
+	}
+
+	.bookish-marginal-hidden {
+		transform: translateY(100%);
+		transition: transform 0.2s ease-out;
+		height: 0;
+		bottom: 0;
+	}
+
+	.bookish-outline {
+		position: fixed;
+		top: 100%; /* Put it all the way off screen on the bottom, then let JS translate */
+		left: 0;
+		right: 0;
+		width: auto;
+		z-index: 1; /* Put it above content when it's a sheet in the footer */
+		padding: 1em;
+		border-top: 1px solid var(--bookish-border-color-light);
+		text-align: left;
+		transition: transform 0.2s ease-in;
+		cursor: pointer;
+		background-color: var(--bookish-background-color);
+		box-shadow: 0px -1px 2px rgba(0,0,0,.25);
+		backdrop-filter: blur(10px);
+		-webkit-backdrop-filter: blur(10px);
+		/* Cap height at window size. If the content is too tall, scroll it. */
+		max-height: 100%;
+		overflow-y: scroll;
+	}
+
+	/* Make a little centered box to store the outline to preserve its left aligned structure, while making it easier to click. */
+	.bookish-outline-headers {
+		width: 20em;
+		margin: auto;
+	}
+
+	.bookish-outline-header-nav {
+		text-align: center;
+		text-indent: 0 !important; /* Override header default */
+		font-size: 1.25rem !important;
+	}
+
+	.bookish-outline-collapse-cue {
+		position: absolute;
+		top: 1rem;
+		right: 1rem;
+		transition: transform 0.2s ease-in;
+		font-size: 1.25em !important;
+	}
+
+	.bookish-outline-expanded .bookish-outline-collapse-cue {
+		transform: rotate(180deg);
+	}
+
+	.bookish-outline.bookish-outline-expanded {
+		transform: translateY(-100%);
+	}
+
+	.bookish-outline.bookish-outline-collapsed {
+		transform: translateY(-4rem);
+	}
+
+}
+
+/* Desktop */
+@media screen and (min-width: 1200px) {
+
+	.bookish-marginal-left-inset {
+		float: left;
+		clear: both;
+		width: 75%;
+		margin-left: -30% !important;
+		margin-right: 2em;
+	}
+
+	.bookish-marginal-right-inset {
+		float: right;
+		clear: both;
+		width: 75%;
+		margin-right: -30% !important;
+		margin-left: 2em;
+	}
+
+	/* On larger screens, put marginal right things in the right margin. */
+	.bookish-marginal {
+		float: right;
+		width: 12rem;
+		display: block;
+		padding-bottom: 0.5rem;
+		position: absolute;
+	}
+
+	.bookish-marginal-hovered .bookish-citation-symbol, .bookish-marginal-hovered .bookish-footnote-symbol {
+		font-weight: bold;
+	}
+
+	.bookish-definition .bookish-marginal-interactor.bookish-marginal-hovered {
+		border-bottom-color: var(--bookish-link-color) !important;
+		border-bottom-width: 3px;	
+	}
+
+	.bookish-definition .bookish-marginal.bookish-marginal-hovered .bookish-definition-entry {
+		background: linear-gradient(to right, var(--bookish-link-color) 0px, var(--bookish-link-color) 3px, transparent 3px) no-repeat right;
+	}
+
+	.bookish-outline {
+		width: 12em;
+		z-index: -1; /* Put it below everything when it's in the margin. */
+		border-right: 1px solid var(--bookish-border-color-light);
+		padding: 0.5em;
+		background-color: var(--bookish-background-color);
+	}
+
+	/* When the outline is fixed to the left, it's translated by it's width (with some padding). */
+	/* It's left position is set outline.js. This class is set by outline.js. */
+	.bookish-outline.bookish-outline-fixed-left {
+		position: fixed;
+		display: inline-block;
+		top: 50px;
+		transform: translateX(-14em);
+	}
+
+	/* When the outline is fixed to title, it's positioned absolutely relative to the book container. */
+	/* We set a margin appropriate for it's width above. This class is set by outline.js. */
+	.bookish-outline.bookish-outline-title-left {
+		position: absolute;
+		margin-left: -14em;
+	}
+
+	.bookish-outline-collapse-cue {
+		display: none;
+	}
+
+}
+
+/* SYNTAX HIGHLIGHTING */
+
+.bookish-code {
+	font-family: var(--bookish-code-font-family);
+	font-weight: var(--bookish-code-font-weight);
+	font-size: var(--bookish-code-font-size);
+	white-space: pre-wrap;	
+	border: 1px solid var(--bookish-border-color-light);
+	color: var(--bookish-muted-color);
+	background-color: var(--bookish-block-background-color);
+	clear: both;
+}
+
+code {
+	font-family: var(--bookish-code-font-family);
+	font-weight: var(--bookish-code-font-weight);
+	font-size: var(--bookish-code-font-size);	
+}
+
+.bookish-code-block {
+	display: block;
+	padding: var(--bookish-block-padding);
+	line-height: var(--bookish-paragraph-line-height-tight);
+	border-radius: var(--bookish-roundedness);
+}
+
+.bookish-code-inline {
+	display: inline;
+	padding: calc(1.5 * var(--bookish-inline-padding)) var(--bookish-inline-padding);
+}
+
+.bookish-code-inline code {
+	display: inline;	
+	padding: 0em;
+}
+
+.bookish-code-language {
+	float: right;
+	margin-top: -2rem;
+	font-size: small;
+	color: gray;
+	margin-right: 0.5rem;
+}
+
+/* Default color */
+.hljs,
+.hljs-title,
+.hljs-params,
+.hljs-section {
+    color: var(--bookish-paragraph-color);
+}
+
+/* Comment */
+.hljs-comment,
+.hljs-quote {
+  color: var(--bookish-comment-color);
+}
+
+.hljs-variable,
+.hljs-template-variable,
+.hljs-tag,
+.hljs-name,
+.hljs-selector-id,
+.hljs-selector-class,
+.hljs-regexp,
+.hljs-deletion {
+  color: var(--bookish-error-color);
+}
+
+.hljs-number,
+.hljs-built_in,
+.hljs-builtin-name,
+.hljs-literal,
+.hljs-string,
+.hljs-symbol,
+.hljs-meta,
+.hljs-link
+.hljs-bullet,
+.hljs-addition {
+    color: var(--bookish-link-color);
+}
+
+.hljs-type,
+.hljs-attribute,
+.hljs-keyword,
+.hljs-selector-tag {
+  color: var(--bookish-highlight-color);
+}
+
+.hljs-emphasis {
+  font-style: italic;
+}
+
+.hljs-strong {
+  font-weight: bold;
+}
+
+/* PYTHON SUPPORT */
+
+.bookish-python button {
+	background: var(--bookish-block-background-color);
+	border: 1px solid var(--bookish-border-color-light);
+	width: 5%;
+	height: 3rem;
+	padding: 0;
+	display: inline-block;
+	vertical-align: top;
+	box-sizing: border-box;
+}
+
+.bookish-python .bookish-python-output {
+	width: 90%;
+	border: 1px solid lightGray;
+	padding: 0.5rem;
+	height: 3rem;
+	overflow-y: scroll;
+	display: inline-block;
+	vertical-align: top;
+	color: var(--bookish-paragraph-color);
+	font-family: var(--bookish-code-font-family);
+	font-weight: var(--bookish-code-font-weight);
+	font-size: var(--bookish-block-font-size);
+	box-sizing: border-box;
+}
+
+@media print {
+
+	.bookish-chapter-header {
+		break-before: page;
+	}
+
+	body {
+		font-size: 16pt;
+	}
+	
+	@page {
+		margin: 1in;
+	}
+	
+	h1, h2, h3, h4, h5, h6 {
+		break-after: avoid !important;
+	}
+	
+}

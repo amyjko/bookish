@@ -3,7 +3,7 @@ import { renderNode, renderPosition } from './Renderer'
 
 function Callout(props) {
 
-    return <div key={props.key} className={"callout " + renderPosition(props.node.position)}>
+    return <div key={props.key} className={"bookish-callout " + renderPosition(props.node.position)}>
         { props.node.elements.map((element, index) => renderNode(element, props.context, "callout-" + index))}
     </div>
 

@@ -38,12 +38,12 @@ class Media extends React.Component {
 					media.map((embed, index) =>
 						embed.url.indexOf("http") === 0 ?
 							null :
-							<span className={"figure-preview"} key={"image" + index}>
+							<span className={"bookish-figure-preview"} key={"image" + index}>
 								<img 
 									src={"images/" + embed.url} 
 									alt={embed.alt}
 								/>
-								<div className="figure-credit">{renderNode(embed.credit)}</div>
+								<div className="bookish-figure-credit">{renderNode(embed.credit)}</div>
 							</span>
 					)
 				}

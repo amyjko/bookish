@@ -226,6 +226,7 @@ If you include a language name after the first backtick like this:
 
 `markdown
 \`python
+# Add things
 two = 1 + 1
 if two == 2:
    print("Truth")
@@ -235,6 +236,7 @@ if two == 2:
 Bookish will try to highlight based on that language's syntax.
 
 `python
+# Add things
 two = 1 + 1
 if two == 2 / 0:
    print("Truth")
@@ -330,7 +332,7 @@ And if that's not enough, you can make tables with captions, with each
 ,this|is|[my|errors]|table
 ,the|next|row|is
 ,my|test|is|*_failing_*
-> this is my caption
+this is my caption
 `
 
 Which will render like this:
@@ -339,7 +341,7 @@ Which will render like this:
 ,headerRow
 ,the|next|row|is
 ,my|test|is|*_failing_*
-> this is my caption
+this is my caption
 
 Each cell can have inline formatting as in any other paragraph (but you can't put paragraph-level things in cells).
 

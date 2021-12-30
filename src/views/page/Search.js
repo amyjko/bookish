@@ -1,6 +1,6 @@
 import React from 'react';
 
-import ChapterHeader from "./Header";
+import Header from "./Header";
 import Outline from './Outline';
 import Page from './Page';
 
@@ -64,12 +64,12 @@ class Search extends React.Component {
                 matchCount += chapterMatches.length;
 
                 if(chapterMatches.length > 0) {
-                    results.push(<h2 key={"header-" + chapterID} className="header" id={"header-" + chapterID}>Chapter{chapterNumber === undefined ? "" : " " + chapterNumber} - {chapter.getTitle()}</h2>);
+                    results.push(<h2 key={"header-" + chapterID} id={"header-" + chapterID}>Chapter{chapterNumber === undefined ? "" : " " + chapterNumber} - {chapter.getTitle()}</h2>);
                     chapterMatches.forEach((match, index) => {
                         // Only highlight the part of the word that matches.
                         const start = match.match.toLowerCase().indexOf(query);
                         const left = match.left + match.match.substring(0, start);
-                        const wordMatch = <span className="content-highlight">{match.match.substring(start, start + query.length)}</span>;
+                        const wordMatch = <span className="bookish-content-highlight">{match.match.substring(start, start + query.length)}</span>;
                         const right = match.match.substring(start + query.length) + match.right;
 
                         results.push(<p key={"header-" + chapterID + "-" + index}><Link to={"/" + chapterID + "/" + match.match.toLowerCase() + "/" + index}>...{left}{wordMatch}{right}...</Link></p>);
@@ -80,7 +80,7 @@ class Search extends React.Component {
 
 		return (
 			<Page>
-				<ChapterHeader 
+				<Header 
                     book={book}
 					image={book.getImage(Book.SearchID)} 
 					header="Search"
@@ -96,7 +96,6 @@ class Search extends React.Component {
 
                 <p>
                     <input 
-                        className="form-control" 
                         type="text" 
                         name="query" 
                         value={this.state.value} 

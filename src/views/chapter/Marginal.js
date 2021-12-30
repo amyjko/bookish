@@ -35,10 +35,10 @@ class Marginal extends React.Component {
 
 		return (
 			<span>
-				<span className={"marginal-interactor" + (this.state.hovered ? " marginal-hovered" : "")} onClick={this.toggle} onMouseEnter={this.handleEnter} onMouseLeave={this.handleExit}>
+				<span className={"bookish-marginal-interactor" + (this.state.hovered ? " bookish-marginal-hovered" : "")} onClick={this.toggle} onMouseEnter={this.handleEnter} onMouseLeave={this.handleExit}>
 					{this.props.interactor}
 				</span>
-	            <span className={"marginal" + (hidden ? " marginal-hidden" : "") + (this.state.hovered ? " marginal-hovered" : "")} onClick={this.toggle} onMouseEnter={this.handleEnter} onMouseLeave={this.handleExit}>
+	            <span className={"bookish-marginal" + (hidden ? " bookish-marginal-hidden" : "") + (this.state.hovered ? " bookish-marginal-hovered" : "")} onClick={this.toggle} onMouseEnter={this.handleEnter} onMouseLeave={this.handleExit}>
 					{this.props.content}
 				</span>
 			</span>

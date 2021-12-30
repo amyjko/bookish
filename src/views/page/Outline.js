@@ -42,7 +42,7 @@ class Outline extends React.Component {
 
     inFooter() {
 
-        let outline = document.getElementsByClassName("outline")[0];
+        let outline = document.getElementsByClassName("bookish-outline")[0];
         if(outline)
             return window.getComputedStyle(outline).getPropertyValue("cursor") === "pointer";
         else
@@ -71,7 +71,7 @@ class Outline extends React.Component {
         // When this updates, generate a unique string for the current header outline.
         // If it's different from the last rendered state, refresh.
         let headers = "";
-        Array.from(document.getElementsByClassName("header")).forEach(el => headers += el.outerHTML);
+        Array.from(document.getElementsByClassName("bookish-header")).forEach(el => headers += el.outerHTML);
 
         // If the headers change, update the outline.
         if(this.state.headers !== headers)
@@ -92,8 +92,8 @@ class Outline extends React.Component {
 
 		// Left align the floating outline with the left margin of the chapter
         // and the top of the title, unless we're past it.
-		let outline = document.getElementsByClassName("outline")[0];
-		let title = document.getElementsByClassName("chapter-header-text")[0];
+		let outline = document.getElementsByClassName("bookish-outline")[0];
+		let title = document.getElementsByClassName("bookish-chapter-header-text")[0];
 
         // If we found them both...
         if(outline && title) {
@@ -108,14 +108,14 @@ class Outline extends React.Component {
                 // If the title is off screen, anchor it to the top of the window. (CSS is set to do this).
                 if(titleY - 50 < window.scrollY) {
                     outline.style.removeProperty("margin-top");
-                    outline.classList.add("outline-fixed-left");
-                    outline.classList.remove("outline-title-left");
+                    outline.classList.add("bookish-outline-fixed-left");
+                    outline.classList.remove("bookish-outline-title-left");
                 }
                 // Otherwise, anchor it to the title position.
                 else {
-                    outline.style.marginTop = "-" + document.getElementsByClassName("chapter-header-text")[0].getBoundingClientRect().height + "px"
-                    outline.classList.remove("outline-fixed-left");
-                    outline.classList.add("outline-title-left");
+                    outline.style.marginTop = "-" + document.getElementsByClassName("bookish-chapter-header-text")[0].getBoundingClientRect().height + "px"
+                    outline.classList.remove("bookish-outline-fixed-left");
+                    outline.classList.add("bookish-outline-title-left");
                 }
 
                 // Tell any listeners about the repositioning.
@@ -134,7 +134,7 @@ class Outline extends React.Component {
 		// Find the header that we're past so we can update the outline.
 		let indexOfNearestHeaderAbove = -1; // -1 represents the title
         let nearbyHeader = null;
-        Array.from(document.getElementsByClassName("header")).forEach((header, index) => {
+        Array.from(document.getElementsByClassName("bookish-header")).forEach((header, index) => {
             // Is this a header we care about?
             if(header.tagName === "H1" || header.tagName === "H2" || header.tagName === "H3") {
 				let rect = header.getBoundingClientRect();
@@ -161,16 +161,16 @@ class Outline extends React.Component {
 
         // Scan for headers and put them into a stable list.
         let headers = [];
-        Array.from(document.getElementsByClassName("header")).forEach(el => headers.push(el));
+        Array.from(document.getElementsByClassName("bookish-header")).forEach(el => headers.push(el));
 
         return (
-            <div className={"outline " + (!this.state.expanded || this.props.collapse ? "outline-collapsed": "outline-expanded")} onClick={this.toggle}>
+            <div className={"bookish-outline " + (!this.state.expanded || this.props.collapse ? "bookish-outline-collapsed": "bookish-outline-expanded")} onClick={this.toggle}>
                 {/* Visual cue of expandability, only visible in footer mode. */}
-                <div className="outline-collapse-cue">{expand}</div>
-                <div className="outline-headers">
+                <div className="bookish-outline-collapse-cue">{expand}</div>
+                <div className="bookish-outline-headers">
 
                     {/* Book navigation links */}
-                    <div className="outline-header-nav">
+                    <div className="bookish-outline-header-nav">
                         { this.props.previous !== null ? <Link to={"/" + this.props.previous}>{previous}</Link> : <span>{previous}</span> }
                         &nbsp;&middot;&nbsp;
                         <Link to={"/"}>Home</Link>
@@ -189,7 +189,7 @@ class Outline extends React.Component {
                             return level > 3 ? 
                                 null :
                                 <NavHashLink scroll={smoothlyScrollElementToEyeLevel} to={"#" + header.id} key={"header-" + index} >
-                                    <div className={"outline-header outline-header-level-" + (level - 1) + (this.state.headerIndex === index ? " outline-header-active" : "")}>
+                                    <div className={"bookish-outline-header bookish-outline-header-level-" + (level - 1) + (this.state.headerIndex === index ? " bookish-outline-header-active" : "")}>
                                         {header.textContent}
                                     </div>
                                 </NavHashLink>

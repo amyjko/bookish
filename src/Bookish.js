@@ -52,7 +52,7 @@ class Bookish extends React.Component {
 
 		// Tag things "past-title" if we're past it, so they can react to position.
 		let title = document.getElementById("title");
-		let reminder = document.getElementById("scroll-reminder");
+		let reminder = document.getElementById("bookish-scroll-reminder");
 		if(title && reminder) {
 			if(window.scrollY + window.innerHeight > title.getBoundingClientRect().top + window.scrollY)
 				reminder.classList.add("past-title");
@@ -90,7 +90,7 @@ class Bookish extends React.Component {
 		if(this.state.error) {
 			return <div>
 				<p>Wasn't able to load the book. Here are the errors we found:</p>
-				<p className="alert alert-danger">{this.state.error.message}</p>
+				<p className="bookish-error">{this.state.error.message}</p>
 			</div>
 		}
 		// If the book isn't loaded yet, show loading feedback
@@ -105,28 +105,23 @@ class Bookish extends React.Component {
 
 			// Render the book
 			return (
-				// Bootstrap container with a single row and one big column.
-				<div className="container book">
-					<div className="row">
-						<div className="col-md-12">
-							<Switch>
-								<Route exact path="/" render={(props) => <TableOfContents {...props} app={this} />} />
-								{
-									// Map all the book chapters to routes
-									this.state.book.getChapters().map((chapter, index) => {
-										return <Route key={"chapter" + index} path={"/" + chapter.getID() + "/:word?/:number?"} render={(props) => <Chapter {...props} chapter={chapter} app={this} />} />
-									})
-								}
-								<Route path="/references" render={(props) => <References {...props} app={this} />} />
-								<Route path="/glossary" render={(props) => <Glossary {...props} app={this} />} />
-								<Route path="/index/:letter?" render={(props) => <Index {...props} app={this} />} />
-								<Route path="/search/" render={(props) => <Search {...props} app={this} />} />
-								<Route path="/media/" render={(props) => <Media {...props} app={this} />} />
-								<Route path="/print/" render={(props) => <Print {...props} app={this} />} />
-								<Route path="*" render={(props) => <Unknown {...props} message={<p>This URL doesn't exist for this book.</p>} app={this} />}/>
-							</Switch>
-						</div>
-					</div>
+				<div className="bookish">
+					<Switch>
+						<Route exact path="/" render={(props) => <TableOfContents {...props} app={this} />} />
+						{
+							// Map all the book chapters to routes
+							this.state.book.getChapters().map((chapter, index) => {
+								return <Route key={"chapter" + index} path={"/" + chapter.getID() + "/:word?/:number?"} render={(props) => <Chapter {...props} chapter={chapter} app={this} />} />
+							})
+						}
+						<Route path="/references" render={(props) => <References {...props} app={this} />} />
+						<Route path="/glossary" render={(props) => <Glossary {...props} app={this} />} />
+						<Route path="/index/:letter?" render={(props) => <Index {...props} app={this} />} />
+						<Route path="/search/" render={(props) => <Search {...props} app={this} />} />
+						<Route path="/media/" render={(props) => <Media {...props} app={this} />} />
+						<Route path="/print/" render={(props) => <Print {...props} app={this} />} />
+						<Route path="*" render={(props) => <Unknown {...props} message={<p>This URL doesn't exist for this book.</p>} app={this} />}/>
+					</Switch>
 				</div>
 			);
 		}

@@ -49,7 +49,7 @@ class Code extends React.Component {
         return <code 
             contentEditable={this.props.editable}
             suppressContentEditableWarning={true}
-            className={"code " + (this.props.inline ? "code-inline" : "code-block") + " language-" + lang} 
+            className={"bookish-code " + (this.props.inline ? "bookish-code-inline" : "bookish-code-block") + " language-" + lang} 
             onBlur={this.handleChange}
             ref={this.setEl}>
                 {this.props.children}

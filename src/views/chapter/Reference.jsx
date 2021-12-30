@@ -16,10 +16,10 @@ function Reference(props) {
         else {
             authors = authors[0].trim() + ", et al.";
         }
-        return <span className="reference-text">{authors} ({node.year}). {node.url === null ? node.title : <a href={node.url} target={"_blank"}>{node.title}</a>}{node.title.charAt(node.title.length - 1) === "?" ? "" : "."} <em>{node.source}</em></span>
+        return <span className="bookish-reference-text">{authors} ({node.year}). {node.url === null ? node.title : <a href={node.url} target={"_blank"}>{node.title}</a>}{node.title.charAt(node.title.length - 1) === "?" ? "" : "."} <em>{node.source}</em></span>
     }
     else
-        return <span className="reference-text">{node.authors} ({node.year}). {node.url === null ? node.title : <a href={node.url} target={"_blank"}>{node.title}</a>}{node.title.charAt(node.title.length - 1) === "?" ? "" : "."} <em>{node.source}</em>.{node.summary ? <span className="summary">{node.summary}</span> : null }</span>
+        return <span className="bookish-reference-text">{node.authors} ({node.year}). {node.url === null ? node.title : <a href={node.url} target={"_blank"}>{node.title}</a>}{node.title.charAt(node.title.length - 1) === "?" ? "" : "."} <em>{node.source}</em>.{node.summary ? <span className="bookish-reference-summary">{node.summary}</span> : null }</span>
     
 }
 

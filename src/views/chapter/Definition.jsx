@@ -15,20 +15,20 @@ function Definition(props) {
     let glossary = context.app.getBook().getGlossary();
 
     if(!(node.glossaryID in glossary))
-        return <span key={key} className="alert alert-danger">Unknown glossary entry "{ node.glossaryID }"</span>
+        return <span key={key} className="bookish-error">Unknown glossary entry "{ node.glossaryID }"</span>
 
     let entry = glossary[node.glossaryID];
 
-    return <span className="terminology" key={key}>
+    return <span className="bookish-definition" key={key}>
         <Marginal
             chapter={context.app}
             id={"glossary-" + node.glossaryID}
             interactor={renderNode(node.phrase, context)}
             content={
-                <span className="definition">
-                    <strong className="definition-phrase">{entry.phrase}</strong>: { renderNode(Parser.parseContent(context.app.getBook(), entry.definition), context, "definition") }
+                <span className="bookish-definition-entry">
+                    <strong className="bookish-definition-entry-phrase">{entry.phrase}</strong>: { renderNode(Parser.parseContent(context.app.getBook(), entry.definition), context, "definition") }
                     {
-                        entry.synonyms && entry.synonyms.length > 0 ? <span className="definition-synonyms"><br/><br/>{entry.synonyms.join(", ")}</span> : null
+                        entry.synonyms && entry.synonyms.length > 0 ? <span className="bookish-definition-entry-synonyms"><br/><br/>{entry.synonyms.join(", ")}</span> : null
                     }
                 </span>
             }

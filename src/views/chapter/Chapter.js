@@ -100,7 +100,7 @@ class Chapter extends React.Component {
 		// If there's a word we're trying to highlight, scroll to the first match.
 		if(this.props.match && this.props.match.params.word) {
 
-			const match = document.getElementsByClassName("text content-highlight");
+			const match = document.getElementsByClassName("text bookish-content-highlight");
 
 			const number = this.props.match.params.number && this.props.match.params.number < match.length ? this.props.match.params.number : 0;
 
@@ -139,7 +139,6 @@ class Chapter extends React.Component {
 			this.currentHash = id;
 			this.currentHashScrolled = false;
 			setTimeout(() => this.currentHashScrolled = true, 2000);
-			console.log("Updated hash to " + this.currentHash);
 		}
 
 	}
@@ -196,7 +195,7 @@ class Chapter extends React.Component {
 	hideOutlineIfObscured() {
 
 		// Get the outline's bounds.
-		let outline = document.getElementsByClassName("outline")[0];
+		let outline = document.getElementsByClassName("bookish-outline")[0];
 
 		// If there's no outline, don't bother.
 		if(!outline)
@@ -212,7 +211,7 @@ class Chapter extends React.Component {
 			let overlapRect = null;
 
 			// Find the bottom-most left inset marginal within threshold of the outline.
-			Array.from(document.getElementsByClassName("marginal-left-inset")).forEach(el => {
+			Array.from(document.getElementsByClassName("bookish-marginal-left-inset")).forEach(el => {
 				let insetRect = el.getBoundingClientRect();
 				if(!(outlineRect.bottom < insetRect.top - threshold || 
 					outlineRect.top > insetRect.bottom + threshold))
@@ -243,7 +242,7 @@ class Chapter extends React.Component {
 	removeHighlights() {
 
 		// Which text node is closest?
-		document.getElementsByClassName("content-highlight").forEach(highlight => highlight.classList.remove("content-highlight"));
+		document.getElementsByClassName("bookish-content-highlight").forEach(highlight => highlight.classList.remove("bookish-content-highlight"));
 		
 	}
 
@@ -275,13 +274,13 @@ class Chapter extends React.Component {
 	layoutMarginals() {
 
 		// Get the chapter DOM node, so we can calculate margins.
-		let chapter = document.getElementsByClassName("chapter-body")[0];
+		let chapter = document.getElementsByClassName("bookish-chapter-body")[0];
 
 		// If there's no chapter rendered yet, stop.
 		if(chapter === undefined)
 			return;
 
-		let book = document.getElementsByClassName("book")[0];
+		let book = document.getElementsByClassName("bookish")[0];
 
 		// This is the grid line we'll aline all marginals too horizontally.
 		let margin = chapter.getBoundingClientRect().width;
@@ -290,13 +289,13 @@ class Chapter extends React.Component {
 		let currentBottom = null;
 
 		// Are there any marginal right inset images that might overlap?
-		let rightInsets = document.getElementsByClassName("marginal-right-inset");
+		let rightInsets = document.getElementsByClassName("bookish-marginal-right-inset");
 
 		// Layout all of the marginals vertically to prevent overlaps.
-		Array.from(document.getElementsByClassName("marginal")).forEach(el => {
+		Array.from(document.getElementsByClassName("bookish-marginal")).forEach(el => {
 			if(window.getComputedStyle(el).getPropertyValue("position") !== "fixed") {
 
-				let containingMarginal = el.parentElement.closest(".marginal");
+				let containingMarginal = el.parentElement.closest(".bookish-marginal");
 				let inMarginal = containingMarginal !== null;
 
 				// Get the bounds of this marginal so we know it's size.
@@ -391,7 +390,7 @@ class Chapter extends React.Component {
 		
 		return (
 			<Page loaded={this.scrollToLastLocation}>
-				<div className="chapter">
+				<div className="bookish-chapter">
 					<Header 
 						book={book}
 						image={chapter.getImage()}
@@ -401,12 +400,12 @@ class Chapter extends React.Component {
 							{
 								chapterNumber === undefined ? 
 									null : 
-									<span className="chapter-number">Chapter {chapterNumber}</span> 
+									<span className="bookish-chapter-number">Chapter {chapterNumber}</span> 
 							}
 							{ 
 								chapterSection === null ? 
 									null : 
-									<span className="section-name"> {chapterSection}</span>
+									<span className="bookish-section-name"> {chapterSection}</span>
 							}
 							{ 
 								chapterNumber || chapterSection ? 
@@ -457,7 +456,7 @@ class Chapter extends React.Component {
 					{
 						!hasReferences ? null :
 						<div>
-							<h1 id="references" className="header">References</h1>
+							<h1 id="references" className="bookish-header">References</h1>
 
 							<ol>
 							{
@@ -465,13 +464,13 @@ class Chapter extends React.Component {
 									let refs = book.getReferences();
 									if(citationID in refs) {
 										let ref = refs[citationID];
-										return <li key={"citation-" + citationID} className={citationID === citationHighlight ? "reference content-highlight" : "reference"} id={"ref-" + citationID}>
+										return <li key={"citation-" + citationID} className={"bookish-reference " + (citationID === citationHighlight ? "bookish-content-highlight" : "")} id={"ref-" + citationID}>
 											{ renderNode(Parser.parseReference(ref, book), { app: this, chapter: chapter}) }
 										</li>
 
 									}
 									else {
-										return <li className="alert alert-danger" key={"citation-" + citationID}>Unknown reference: <code>{citationID}</code></li>;
+										return <li className="bookish-error" key={"citation-" + citationID}>Unknown reference: <code>{citationID}</code></li>;
 									}
 								})
 							}

@@ -7,16 +7,16 @@ function CaptionedCode(props) {
 
     const { node, context, key } = props
 
-    return <div key={key} className={renderPosition(node.position)}>
+    return <div key={key} className={"bookish-figure " + renderPosition(node.position)}>
         {
             node.language === "python" && node.executable ? 
                 <Python code={node.code}></Python> :
                 <div>
                     <Code inline={false} language={node.language}>{node.code}</Code>
-                    { node.language !== "plaintext" ? <div className="code-language">{node.language}</div> : null }
+                    { node.language !== "plaintext" ? <div className="bookish-code-language">{node.language}</div> : null }
                 </div>
         }
-        <div className="figure-caption">{renderNode(node.caption, context)}</div>
+        <div className="bookish-figure-caption">{renderNode(node.caption, context)}</div>
     </div>
 
 }

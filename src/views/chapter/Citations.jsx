@@ -35,12 +35,12 @@ function Citations(props) {
             if(citationNumber !== null && citationID in book.getReferences()) {
                 // Add a citation.
                 segments.push(
-                    <sup key={index} className="citation-symbol">{citationNumber}</sup>
+                    <sup key={index} className="bookish-citation-symbol">{citationNumber}</sup>
                 );
             }
             // If it's not a valid citation number, add an error.
             else {
-                segments.push(<span className="alert alert-danger" key={"citation-error-" + index}>Unknown reference: <code>{citationID}</code></span>)
+                segments.push(<span className="bookish-error" key={"citation-error-" + index}>Unknown reference: <code>{citationID}</code></span>)
             }
 
             // If there's more than one citation and this isn't the last, add a comma.
@@ -49,21 +49,21 @@ function Citations(props) {
         }
     );
     
-    return <span className="citation" key={key}>
+    return <span className="bookish-citation" key={key}>
         <Marginal
             chapter={app}
             id={"citation-" + citations.join("-")}
             interactor={segments}
             content={
-                <span className="references">
+                <span className="bookish-references">
                     {
                         citations.map((citationID, index) => {
                             let citationNumber = chapter.getCitationNumber(citationID);
                             return book.getReferences(citationID) ?
                                 <span 
                                     key={index} 
-                                    className="reference">
-                                        <sup className="citation-symbol">{citationNumber}</sup>
+                                    className="bookish-reference">
+                                        <sup className="bookish-citation-symbol">{citationNumber}</sup>
                                         { renderNode(Parser.parseReference(book.getReferences()[citationID], context.app.getBook(), true), context) }
                                 </span> :
                                 null

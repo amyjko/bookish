@@ -26,7 +26,7 @@ function Text(props) {
             for(let i = 0; i < indices.length; i++) {
                 // Push the text from the end of the last match or the start of the string.
                 segments.push(text.substring(i === 0 ? 0 : indices[i - 1] + query.length, indices[i]));
-                segments.push(<span key={"match-" + i} className="text content-highlight">{text.substring(indices[i], indices[i] + query.length)}</span>);
+                segments.push(<span key={"match-" + i} className="text bookish-content-highlight">{text.substring(indices[i], indices[i] + query.length)}</span>);
             }
             if(indices[indices.length - 1] < text.length - 1)
                 segments.push(text.substring(indices[indices.length - 1] + query.length, text.length));

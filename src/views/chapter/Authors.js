@@ -4,7 +4,7 @@ class Authors extends React.Component {
 
 	render() {
 		return (
-            <div className="authors">
+            <div className="bookish-authors">
                 <em>by</em> {
                     this.props.authors.map( 
                         (author, index) => [

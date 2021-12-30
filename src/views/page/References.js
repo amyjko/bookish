@@ -32,7 +32,7 @@ class References extends React.Component {
 			sorted.forEach((citationID) => {
 				if(letter === undefined || citationID.charAt(0) !== letter) {
 					letter = citationID.charAt(0);
-					renderedReferences.push(<h2 key={"letter-" + letter} className="header" id={"references-" + letter}>{letter.toUpperCase()}</h2>);
+					renderedReferences.push(<h2 key={"letter-" + letter} id={"references-" + letter}>{letter.toUpperCase()}</h2>);
 				}
 				renderedReferences.push(<p key={citationID}>{renderNode(Parser.parseReference(references[citationID], book))}</p>);
 			})

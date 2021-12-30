@@ -10,23 +10,23 @@ class Header extends React.Component {
 		let tags = this.props.tags;
 
 		return (
-			<div className="chapter-header">
+			<div className="bookish-chapter-header">
 				{
 					this.props.image ?
-						<div className="figure-full">
+						<div className="bookish-figure-full">
 							{ renderNode(Parser.parseEmbed(this.props.book, this.props.image)) }
-							{ this.props.print ? null : <div id="scroll-reminder"></div> }
+							{ this.props.print ? null : <div id="bookish-scroll-reminder"></div> }
 						</div> :
 						// Add a bit of space to account for the lack of an image.
 						<p>&nbsp;</p>
 				}
-				<div className="chapter-header-text">
+				<div className="bookish-chapter-header-text">
 					{ this.props.before }
-					<h1 id="title" className="title header">{this.props.header}</h1>
-					{ this.props.subtitle ? <h2 className="subtitle">{this.props.subtitle}</h2> : null }
-					<div className="lead">{this.props.after}</div>
+					<h1 id="title" className="bookish-title">{this.props.header}</h1>
+					{ this.props.subtitle ? <h2 className="bookish-subtitle">{this.props.subtitle}</h2> : null }
+					{ this.props.after }
 					{ tags ? 
-						<div className="tag-list">{this.props.tags.map((tag, index) => <span key={"tag-" + index} className="tag">{tag}</span>)}</div> : 
+						<div>{this.props.tags.map((tag, index) => <span key={"tag-" + index} className="bookish-tag">{tag}</span>)}</div> : 
 						null }
 				</div>
 			</div>

@@ -44,7 +44,7 @@ class Python extends React.Component {
     componentDidUpdate() {
 
         if(this.ref.current) {
-            let output = this.ref.current.querySelector(".python-output");
+            let output = this.ref.current.querySelector(".bookish-python-output");
             output.scrollTop = output.scrollHeight;
         }
 
@@ -105,13 +105,13 @@ class Python extends React.Component {
         let lines = this.state.output.split("\n");
         lines = lines.map((line, index) => <span className="python-output-line" key={index}>{line}{index < lines.length - 1 ? <br/> : null}</span>)
 
-        return <div className="python" ref={this.ref}>
+        return <div className="bookish-python" ref={this.ref}>
             <Code inline={false} language={"python"} editable edited={this.handleEdit}>{this.state.code}</Code>
-            <div className="code-language">{"python"}</div>
+            <div className="bookish-code-language">{"python"}</div>
             <div>
                 <button disabled={this.state.code === this.props.code } onClick={this.reset}>{"\u21BB"}</button>
                 <button disabled={!this.state.loaded} onClick={this.start}>{"\u25B6\uFE0E"}</button>
-                <div className="python-output">{lines}</div>
+                <div className="bookish-python-output">{lines}</div>
             </div>
         </div>
 

@@ -61,6 +61,6 @@ const renderNode = (node, context, key) => {
     return React.createElement(renderers[node.type], { node: node, context: context, key: key })
 }
 
-const renderPosition = (position) => position === "<" ? "marginal-left-inset" : position === ">" ? "marginal-right-inset" : ""
+const renderPosition = (position) => position === "<" ? "bookish-marginal-left-inset" : position === ">" ? "bookish-marginal-right-inset" : ""
 
 export { renderNode, renderPosition }

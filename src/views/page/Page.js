@@ -71,7 +71,7 @@ class Page extends React.Component {
 
         return <div>
             { this.state.loaded ? null : <Loading/> }
-            <div className={"page" + (this.state.loaded ? " page-loaded": "")}>
+            <div className={"bookish-page" + (this.state.loaded ? " bookish-page-loaded": "")}>
                 { this.props.children }
             </div>
         </div>

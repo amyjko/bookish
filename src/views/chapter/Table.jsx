@@ -6,10 +6,10 @@ function Table(props) {
 
     const { node, context, key } = props
 
-    return <div key={key} className={"figure " + renderPosition(node.position)}>
+    return <div key={key} className={"bookish-figure " + renderPosition(node.position)}>
         {/* Make the table responsive for small screens */}
-        <div className="rows table-responsive">
-            <table className="table">
+        <div className="bookish-table">
+            <table>
                 <tbody>
                 {
                     node.rows.map((row, index) => 
@@ -25,7 +25,7 @@ function Table(props) {
                 </tbody>
             </table>
         </div>
-        <div className="figure-caption">{renderNode(node.caption, context)}</div>
+        <div className="bookish-figure-caption">{renderNode(node.caption, context)}</div>
     </div>
 
 }

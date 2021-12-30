@@ -7,7 +7,7 @@
 	"scripts": {
 		"postinstall": "mkdir build/",
 		"clean": "rm -R build/*",
-		"build-assets": "cp bookish.css build/; cp -R src/images build/",
+		"build-assets": "cp src/style/bookish.css build/; cp -R src/images build/",
 		"book": "sh scripts/book.sh",
 		"sync": "rsync -avz --delete build/ ajko@ovid.u.washington.edu:~/public_html/bookish/",
 		"ship": "set -e -o pipefail; npm run sync",

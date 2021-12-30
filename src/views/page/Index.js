@@ -44,7 +44,7 @@ class Index extends React.Component {
                 } 
                 else if(count >= 20) {
                     count = 0;
-                    rows.push(<tr key={word}><td colSpan={2}><h2 className="header" id={"word-" + word}>{word}</h2></td></tr>)
+                    rows.push(<tr key={word}><td colSpan={2}><h2 id={"word-" + word}>{word}</h2></td></tr>)
                 }
 
                 rows.push(
@@ -101,7 +101,7 @@ class Index extends React.Component {
                                 {
                                     letter in letters && this.props.match && this.props.match.params.letter !== letter ? 
                                         <Link to={"/index/" + letter}>{letter}</Link> :
-                                        <span>{this.props.match && this.props.match.params.letter === letter ? <strong><span style={{fontSize: "200%"}}>{letter}</span></strong> : <span className={"text-muted"}>{letter}</span>}</span>
+                                        <span>{this.props.match && this.props.match.params.letter === letter ? <strong><span style={{fontSize: "200%"}}>{letter}</span></strong> : <span className={"bookish-muted"}>{letter}</span>}</span>
                                 }
                                 {
                                     index < 26 - 1 ? 
@@ -112,12 +112,13 @@ class Index extends React.Component {
                     )}
                 </p>
 
-                <table className="table">
-                    <tbody>
-                        {rows}
-                    </tbody>
-                </table>
-
+                <div className="bookish-table">
+                    <table>
+                        <tbody>
+                            {rows}
+                        </tbody>
+                    </table>
+                </div>
             </Page>
 		);
 

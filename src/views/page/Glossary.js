@@ -41,8 +41,8 @@ class Glossary extends React.Component {
 						<p>This book has no glossary.</p> :
 					<div>
 						<br/>
-						<div className="table-responsive">
-							<table className="table">
+						<div className="bookish-table">
+							<table>
 								<tbody>
 								{ keys.map((key, index) => 
 									<tr key={"definition" + index}>
