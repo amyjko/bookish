@@ -47,6 +47,7 @@
 	/* Line heights */
 	--bookish-paragraph-line-height: 1.8rem;
 	--bookish-paragraph-line-height-tight: 1.4rem;
+	--bookish-header-line-height: 2em;
 
 	/* Spacing */
 	--bookish-paragraph-spacing: 1.8rem;
@@ -222,6 +223,7 @@ h1, h2, h3, h4, h5, h6 {
 	font-weight: var(--bookish-header-font-weight);
 	margin-top: var(--bookish-header-spacing);
 	margin-bottom: var(--bookish-header-spacing);
+	line-height: var(--bookish-header-line-height);
 }
 
 h1 {
