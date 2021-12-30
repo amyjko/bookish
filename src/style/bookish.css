@@ -57,12 +57,12 @@
 }
 
 .bookish-dark {
-	--bookish-background-color: #000000;
+	--bookish-background-color: #1C1C1C;
 	--bookish-block-background-color: #333333;
 	--bookish-error-background-color: #721C24;
 	--bookish-border-color-light: #444444;
-	--bookish-border-color-bold: #FFFFFF;
-	--bookish-paragraph-color: #FFFFFF;
+	--bookish-border-color-bold: #DADADA;
+	--bookish-paragraph-color: #DADADA;
 	--bookish-muted-color: #CCCCCC;
 	--bookish-highlight-color: #5c4d28;
 	--bookish-comment-color: #1c4722;
@@ -392,6 +392,10 @@ hr {
 	width: 100%;
 	height: auto;
 	margin-bottom: 0;
+}
+
+.bookish-dark .bookish-figure-image {
+	filter: brightness(50%);
 }
 
 .bookish-figure-caption {
@@ -820,6 +824,17 @@ a .bookish-outline-header-active {
 	color: var(--bookish-paragraph-color);
 }
 
+.bookish-outline-reading-mode {
+	font-size: 1.25em !important;
+	transition: transform 0.2s ease-in;
+}
+
+.bookish-outline-reading-mode:hover {
+	cursor: pointer;
+	transform: scale(1.25, 1.25);
+	color: var(--bookish-paragraph-color);
+}
+
 /* Mobile */
 @media screen and (max-width: 1200px) {
 
@@ -878,7 +893,6 @@ a .bookish-outline-header-active {
 		border-top: 1px solid var(--bookish-border-color-light);
 		text-align: left;
 		transition: transform 0.2s ease-in;
-		cursor: pointer;
 		background-color: var(--bookish-background-color);
 		box-shadow: 0px -1px 2px rgba(0,0,0,.25);
 		backdrop-filter: blur(10px);
@@ -900,12 +914,23 @@ a .bookish-outline-header-active {
 		font-size: 1.25rem !important;
 	}
 
+	.bookish-outline-reading-mode {
+		position: absolute;
+		top: 1rem;
+		left: 1rem;
+	}
+
 	.bookish-outline-collapse-cue {
 		position: absolute;
 		top: 1rem;
 		right: 1rem;
-		transition: transform 0.2s ease-in;
 		font-size: 1.25em !important;
+		transition: transform 0.2s ease-in;
+	}
+
+	.bookish-outline-collapse-cue:hover {
+		cursor: pointer;
+		color: var(--bookish-paragraph-color);
 	}
 
 	.bookish-outline-expanded .bookish-outline-collapse-cue {
@@ -989,6 +1014,12 @@ a .bookish-outline-header-active {
 
 	.bookish-outline-collapse-cue {
 		display: none;
+	}
+
+	.bookish-outline-reading-mode {
+		position: absolute;
+		top: 1.5rem;
+		right: 1rem;
 	}
 
 }

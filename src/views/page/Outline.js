@@ -10,18 +10,20 @@ class Outline extends React.Component {
     constructor(props) {
         super(props);
 
-        this.toggle = this.toggle.bind(this);
+        this.toggleExpanded = this.toggleExpanded.bind(this);
         this.layout = this.layout.bind(this);
+        this.toggleReadingMode = this.toggleReadingMode.bind(this);
 
 		this.state = { 
             headers: null,
 			headerIndex: -1,
+            dark: false,
             expanded: false // This state gets overridden if a container is passed in to manage state.
         };
     
     }
 
-    toggle() {
+    toggleExpanded() {
 
         // Don't toggle when in margin mode.
         if(!this.inFooter())
@@ -40,11 +42,24 @@ class Outline extends React.Component {
     
     }
 
+    toggleReadingMode() {
+
+        this.setState({ dark: !this.state.dark }, () => {
+
+            if(this.state.dark)
+                document.body.classList.add("bookish-dark")
+            else
+                document.body.classList.remove("bookish-dark")
+
+        });
+
+    }
+
     inFooter() {
 
         let outline = document.getElementsByClassName("bookish-outline")[0];
         if(outline)
-            return window.getComputedStyle(outline).getPropertyValue("cursor") === "pointer";
+            return window.getComputedStyle(outline).getPropertyValue("z-index") === "1";
         else
             return false;
 
@@ -158,15 +173,35 @@ class Outline extends React.Component {
         let previous = "\u25C0\uFE0E";
         let next = "\u25B6\uFE0E";
         let expand = "\u25B2\uFE0E";
+        let light = "\u263C";
+        let dark = "\u263E";
 
         // Scan for headers and put them into a stable list.
         let headers = [];
         Array.from(document.getElementsByClassName("bookish-header")).forEach(el => headers.push(el));
 
         return (
-            <div className={"bookish-outline " + (!this.state.expanded || this.props.collapse ? "bookish-outline-collapsed": "bookish-outline-expanded")} onClick={this.toggle}>
+            <div 
+                className={"bookish-outline " + (!this.state.expanded || this.props.collapse ? "bookish-outline-collapsed": "bookish-outline-expanded")}
+            >
+                {/* Dark/light mode toggle */}
+                <div 
+                    className="bookish-outline-reading-mode" 
+                    role="button"
+                    aria-label={this.state.dark ? "Switch to light mode" : "Switch to dark mode"}
+                    onClick={this.toggleReadingMode}
+                >
+                    {this.state.dark ? dark : light}
+                </div>
                 {/* Visual cue of expandability, only visible in footer mode. */}
-                <div className="bookish-outline-collapse-cue">{expand}</div>
+                <div 
+                    className="bookish-outline-collapse-cue"
+                    role="button" 
+                    aria-label={this.state.expanded ? "Collapse navigation menu" : "Expand navigation menu"}
+                    onClick={this.toggleExpanded}
+                >
+                    {expand}
+                </div>
                 <div className="bookish-outline-headers">
 
                     {/* Book navigation links */}
