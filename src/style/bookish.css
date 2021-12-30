@@ -22,16 +22,9 @@
 
 	/* Fonts */
 	--bookish-paragraph-font-family: "Georgia", serif;
-	--bookish-paragraph-font-weight: 400;
-
 	--bookish-header-font-family: "Verdana", serif;
-	--bookish-header-font-weight: 700;
-
 	--bookish-code-font-family: "Courier New", monospace;
-	--bookish-code-font-weight: 400;
-
 	--bookish-bullet-font-family: "Verdana";
-	--bookish-bullet-font-weight: 500;
 
 	/* Font sizes */
 	--bookish-paragraph-font-size: 14pt;
@@ -42,6 +35,14 @@
 	--bookish-header-2-font-size: 1.5rem;
 	--bookish-header-3-font-size: 1rem;
 	--bookish-code-font-size: 11pt;
+
+	/* Font weights */
+	--bookish-paragraph-font-weight: 400;
+	--bookish-bold-font-weight: 700;
+	--bookish-link-font-weight: 400;
+	--bookish-header-font-weight: 700;
+	--bookish-code-font-weight: 400;
+	--bookish-bullet-font-weight: 500;
 
 	/* Line heights */
 	--bookish-paragraph-line-height: 1.8rem;
@@ -211,7 +212,7 @@ p {
 }
 
 strong, b {
-	font-weight: 700;
+	font-weight: var(--bookish-bold-font-weight);
 }
 
 /* HEADERS */
@@ -499,6 +500,7 @@ hr {
 
 a {
 	color: var(--bookish-link-color);
+	font-weight: var(--bookish-link-font-weight);
 	text-decoration: none;
 }
 
