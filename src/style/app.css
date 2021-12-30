@@ -1,0 +1,64 @@
+:root {
+
+    --bookish-app-chrome-background: lightGray;
+    --bookish-app-chrome-color: black;
+    --bookish-app-chrome-border-color: darkGray;
+    --bookish-app-error-background: rgb(255, 231, 231);
+    --bookish-app-error-color: rgb(191, 15, 15);
+
+    --bookish-app-chrome-padding: 0.5em;
+    --bookish-app-chrome-roundedness: 5px;
+    --bookish-app-chrome-font-size: 11pt;
+}
+
+.bookish-app {
+    text-align: center;
+    margin-top: 3em;
+}
+
+.bookish-app-header a {
+    display: inline-block;
+    margin-left: 0.5em;
+    margin-right: 0.5em;
+}
+
+.bookish-app-header img {
+    height: 1em;
+    vertical-align: middle;
+}
+
+.bookish-app-text {
+    text-align: left;
+}
+
+.bookish-app-book-preview {
+    display: inline-block;
+    width: auto;
+    border: 1px solid var(--bookish-app-chrome-border-color);
+    padding: var(--bookish-app-chrome-padding);
+    margin-right: var(--bookish-app-chrome-padding);
+    margin-bottom: var(--bookish-app-chrome-padding);
+    border-radius: 5px;
+}
+
+.bookish-app-alert {
+    background-color: var(--bookish-app-error-background);
+    color: var(--bookish-app-error-color);
+    padding: var(--bookish-app-chrome-padding);
+}
+
+input[type="email"], input[type="text"] {
+    padding: var(--bookish-app-chrome-padding);
+    border-radius: var(--bookish-app-chrome-roundedness);
+    font-size: var(--bookish-app-chrome-font-size);
+    border: 1px solid var(--bookish-app-chrome-border-color);
+}
+
+button {
+    background-color: var(--bookish-app-chrome-background);
+    color: var(--bookish-app-chrome-color);
+    padding: var(--bookish-app-chrome-padding);
+    border-radius: var(--bookish-app-chrome-roundedness);
+    font-size: var(--bookish-app-chrome-font-size);
+    border: 1px solid var(--bookish-app-chrome-border-color);
+}

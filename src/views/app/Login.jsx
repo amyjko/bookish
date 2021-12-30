@@ -1,6 +1,5 @@
-import { Form, Button, Card, Alert } from 'react-bootstrap'
 import React, { useRef, useState } from "react"
-import { useAuth, AuthProvider } from "../contexts/AuthContext"
+import { useAuth } from "./AuthContext"
 
 export default function Login() {
 
@@ -34,28 +33,21 @@ export default function Login() {
 	}
 
 	return <>
-		<Card>
-			<Card.Body>
 
-				<h2>Login</h2>
-				<p>We'll send you an email to login, no password required.</p>
+		<h1>Ready to write?</h1>
 
-				{/* Show errors if there are any */}
-				{ error && <Alert variant="danger">{error}</Alert> }
+		<p>We'll send you an email to login, no password required.</p>
 
-				{/* Show feedback if there is any */}
-				{ feedback && <Alert>{feedback}</Alert> }
+		{/* Show errors if there are any */}
+		{ error && <div className="bookish-app-alert">{error}</div> }
 
-				<Form onSubmit={handleSubmit}>
-					<Form.Group id="email">
-						<Form.Label>Email</Form.Label>
-						<Form.Control type="email" ref={emailRef} required />
-					</Form.Group>
-					<Button type="submit" disabled={loading}>Login</Button>
-				</Form>
+		{/* Show feedback if there is any */}
+		{ feedback && <div className="bookish-app-alert">{feedback}</div> }
 
-			</Card.Body>
-		</Card>
+		<form onSubmit={handleSubmit}>
+			<input type="email" placeholder="email" ref={emailRef} required />
+			<button type="submit" disabled={loading}>Login</button>
+		</form>
 	</>
 
 }

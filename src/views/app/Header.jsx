@@ -1,6 +1,5 @@
 import React from "react"
-import { Nav, Navbar, Container } from "react-bootstrap"
-import { useAuth } from "../../contexts/AuthContext"
+import { useAuth } from "./AuthContext"
 import { Link } from "react-router-dom"
 
 export default function Header() {
@@ -16,25 +15,17 @@ export default function Header() {
 		}
 	}
 	
-	return <Navbar bg="light" expand="sm">
-		<Container fluid>
-			<Navbar.Brand as={Link} to="/">
-				<img src="/images/icons/icon.png" style={{height: "1em"}} /> Bookish
-			</Navbar.Brand>
-			<Navbar.Toggle aria-controls="basic-navbar-nav" />
-			<Navbar.Collapse className="me-auto">
-				<Nav.Link as={Link} to="/browse">Browse</Nav.Link>
-				<Nav.Link as={Link} to="/about">About</Nav.Link>
-				{
-					currentUser === null ?
-						<Nav.Link as={Link} to="/login">Login</Nav.Link> :
-						<>
-							<Nav.Link as={Link} to="/dashboard">Dashboard</Nav.Link>
-							<Nav.Link as={Link} to="/" onClick={handleLogout}>Logout</Nav.Link>
-						</>
-				}
-				<small>{ currentUser && currentUser.email }</small>
-			</Navbar.Collapse>
-		</Container>
-	</Navbar>
+	return <div className="bookish-app-header">
+		<img src="/images/icons/icon.png"/>
+		<Link to="/"> Home</Link>
+		<Link to="/read">Read</Link>
+		<Link to="/write">Write</Link>
+		<Link to="/about">About</Link>
+		{
+			currentUser === null ?
+				<Link to="/login">Login</Link> :
+				<Link to="/" onClick={handleLogout}>Logout</Link>		
+		}
+		<small>{ currentUser && currentUser.email }</small>
+	</div>
 }

@@ -1,11 +1,9 @@
 import React, { useState, useEffect } from "react"
-import { useAuth } from "../../contexts/AuthContext"
-import { Button, Alert } from "react-bootstrap"
+import { useAuth } from "./AuthContext"
 import { createBook, getUserBooks } from '../../models/Database'
 import BookPreview from './BookPreview'
 import { Link } from "react-router-dom"
 import { useHistory } from "react-router-dom"
-import { Breadcrumb } from 'react-bootstrap'
 
 export default function Dashboard() {
 
@@ -42,10 +40,6 @@ export default function Dashboard() {
 	
 	return <>
 
-		<Breadcrumb>
-            <Breadcrumb.Item active>Dashboard</Breadcrumb.Item>
-        </Breadcrumb>
-
 		<h1>Your Books</h1>
 
 		<p>
@@ -53,11 +47,11 @@ export default function Dashboard() {
 		</p>
 
 		<p>
-			<Button onClick={newBook}>Create book</Button>
+			<button onClick={newBook}>Create book</button>
 		</p>
 
 		{ 
-			error ? <Alert variant="danger">{error}</Alert> :
+			error ? <div className="bookish-app-error">{error}</div> :
 			loading ? <p>Loading books...</p> : 
 				books.map(book => <Link key={book.id} to={/book/ + book.id}><BookPreview book={book}/></Link>)
 		}

@@ -1,9 +1,7 @@
 import React from "react"
 import { useState, useEffect } from "react"
-import { Alert } from 'react-bootstrap'
 import { getBooks } from '../../models/Database'
 import BookPreview from './BookPreview'
-import { Breadcrumb } from 'react-bootstrap'
 
 export default function Browse() {
 
@@ -24,11 +22,7 @@ export default function Browse() {
 
 	return <>
 
-		<Breadcrumb>
-            <Breadcrumb.Item active>Books</Breadcrumb.Item>
-        </Breadcrumb>
-
-		<h1>The Bookish Library</h1>
+		<h1>Want to read?</h1>
 
 		<p>Here are all of the books in the Bookish library.</p>
 		{ 
