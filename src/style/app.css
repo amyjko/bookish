@@ -1,14 +1,28 @@
+/* Custom fonts for app */
+@import url('https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,600;1,400&family=Kite+One&display=swap');
+
 :root {
 
-    --bookish-app-chrome-background: lightGray;
+    /* Bookish app theme customizations */
+    --bookish-paragraph-font-family: "EB Garamond", serif;
+	--bookish-header-font-family: "Kite One", serif;
+	--bookish-bullet-font-family: "Verdana";
+
+    /* Define some UI defaults not used in the Bookish theme. */
+    --bookish-app-chrome-background: rgb(244, 244, 244);
     --bookish-app-chrome-color: black;
     --bookish-app-chrome-border-color: darkGray;
+    --bookish-app-chrome-hover-background: #E8AF22;
+    --bookish-app-chrome-hover-color: #FFFFFF;
+
     --bookish-app-error-background: rgb(255, 231, 231);
     --bookish-app-error-color: rgb(191, 15, 15);
 
     --bookish-app-chrome-padding: 0.5em;
     --bookish-app-chrome-roundedness: 5px;
     --bookish-app-chrome-font-size: 11pt;
+    --bookish-app-chrome-spacing: 0.5em;
+
 }
 
 .bookish-app {
@@ -18,8 +32,8 @@
 
 .bookish-app-header a {
     display: inline-block;
-    margin-left: 0.5em;
-    margin-right: 0.5em;
+    margin-left: var(--bookish-app-chrome-spacing);
+    margin-right: var(--bookish-app-chrome-spacing);
 }
 
 .bookish-app-header img {
@@ -47,6 +61,12 @@
     padding: var(--bookish-app-chrome-padding);
 }
 
+input, button {
+    font-family: var(--bookish-header-font-family);
+    font-size: var(--bookish-app-chrome-font-size);
+    color: var(--bookish-app-chrome-color);
+}
+
 input[type="email"], input[type="text"] {
     padding: var(--bookish-app-chrome-padding);
     border-radius: var(--bookish-app-chrome-roundedness);
@@ -56,9 +76,16 @@ input[type="email"], input[type="text"] {
 
 button {
     background-color: var(--bookish-app-chrome-background);
-    color: var(--bookish-app-chrome-color);
     padding: var(--bookish-app-chrome-padding);
-    border-radius: var(--bookish-app-chrome-roundedness);
-    font-size: var(--bookish-app-chrome-font-size);
+    border-top-right-radius: var(--bookish-app-chrome-roundedness);
+    border-top-left-radius: 0;
+    border-bottom-right-radius: 0;
+    border-bottom-left-radius: var(--bookish-app-chrome-roundedness);
     border: 1px solid var(--bookish-app-chrome-border-color);
+}
+
+button:hover {
+    background-color: var(--bookish-app-chrome-hover-background);
+    color: var(--bookish-app-chrome-hover-color);
+    cursor: pointer;
 }

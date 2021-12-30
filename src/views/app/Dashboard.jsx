@@ -40,7 +40,7 @@ export default function Dashboard() {
 	
 	return <>
 
-		<h1>Your Books</h1>
+		<h1>Your books</h1>
 
 		<p>
 			Here are all of your books. Click to edit them.
