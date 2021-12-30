@@ -71,6 +71,10 @@
 	--bookish-bullet-color: #721C24;
 }
 
+* {
+	box-sizing: border-box;
+}
+
 /* WINDOW AND PAGES */
 body {
 	max-width: 720px;
@@ -767,8 +771,7 @@ ol li.bookish-reference::before {
 	display: inline-block;
 	margin-bottom: 0.75rem;
 	width: 100%;
-	padding-left: 1rem;
-	padding-right: 1rem;
+	padding-top: 1rem;
 }
 
 .bookish-outline-header {
@@ -870,9 +873,8 @@ a .bookish-outline-header-active {
 		top: 100%; /* Put it all the way off screen on the bottom, then let JS translate */
 		left: 0;
 		right: 0;
-		width: auto;
+		width: 100%;
 		z-index: 1; /* Put it above content when it's a sheet in the footer */
-		padding: 1em;
 		border-top: 1px solid var(--bookish-border-color-light);
 		text-align: left;
 		transition: transform 0.2s ease-in;
@@ -1098,7 +1100,6 @@ code {
 	padding: 0;
 	display: inline-block;
 	vertical-align: top;
-	box-sizing: border-box;
 }
 
 .bookish-python .bookish-python-output {
@@ -1113,7 +1114,6 @@ code {
 	font-family: var(--bookish-code-font-family);
 	font-weight: var(--bookish-code-font-weight);
 	font-size: var(--bookish-block-font-size);
-	box-sizing: border-box;
 }
 
 @media print {
