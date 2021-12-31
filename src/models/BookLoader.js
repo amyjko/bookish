@@ -49,7 +49,7 @@ async function loadBookFromURL(url) {
 
             // Map all non-forthcoming chapters to a list of fetch promises
             return Promise.all(book.chapters.filter(chapter => !chapter.forthcoming).map(chapter => 
-                fetch("chapters/" + chapter.id + ".md")
+                fetch(url + "/chapters/" + chapter.id + ".md")
                     .then((response) => {
 
                         // If we got a reasonable response, process the chapter.
@@ -59,7 +59,9 @@ async function loadBookFromURL(url) {
                             throw Error("Unable to load chapter named '" + chapter.id + "'. Make sure the chapter ID and chapter file name match.")
 
                     })
-                    .then((text) => chapters[chapter.id] = text)
+                    .then((text) => {
+                        chapters[chapter.id] = text
+                    })
             ))
         })
         .then(() => {

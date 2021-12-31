@@ -1,6 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import { Route, HashRouter, Switch, withRouter } from 'react-router-dom';
+import { BrowserRouter, Route, Switch, withRouter } from 'react-router-dom';
 
 import Chapter from "./views/chapter/Chapter";
 import TableOfContents from "./views/page/TableOfContents";
@@ -36,7 +36,7 @@ class Bookish extends React.Component {
 		}
 
 		// Load the book
-		loadBookFromURL(this.props.url)
+		loadBookFromURL(BOOKISH_BASENAME ? BOOKISH_BASENAME : "")
 			.then(book => this.setState({ book: book }))
 			.catch(error => this.setState({ error: error }))
 
@@ -103,6 +103,11 @@ class Bookish extends React.Component {
 			// Set the window title based on the specification.
 			document.title = this.state.book.getTitle();
 
+			// Redirect old hash routes by simply replacing their hash before routing.
+			const { history } = this.props
+			if (location.hash.startsWith('#/'))
+				history.push(location.hash.replace('#', ''))
+
 			// Render the book
 			return (
 				<div className="bookish">
@@ -120,7 +125,7 @@ class Bookish extends React.Component {
 						<Route path="/search/" render={(props) => <Search {...props} app={this} />} />
 						<Route path="/media/" render={(props) => <Media {...props} app={this} />} />
 						<Route path="/print/" render={(props) => <Print {...props} app={this} />} />
-						<Route path="*" render={(props) => <Unknown {...props} message={<p>This URL doesn't exist for this book.</p>} app={this} />}/>
+						<Route path="*" render={(props) => <Unknown {...props} message={<p>The path {location.pathname} doesn't exist for this book.</p>} app={this} />}/>
 					</Switch>
 				</div>
 			);
@@ -128,13 +133,14 @@ class Bookish extends React.Component {
 	}
 	
 }
-
 const BookishWithRouter = withRouter(Bookish);
 
-window.bookish = function() {
-	ReactDOM.render((
-		<HashRouter>
-			<Route path="/" render={(props) => <BookishWithRouter {...props} url="./" /> } />
-		</HashRouter>
-	), document.body.appendChild(document.createElement("div")));
+window.bookish = function(root) {
+	BOOKISH_BASENAME = root
+	ReactDOM.render(
+		<BrowserRouter basename={root}>
+			<BookishWithRouter/>
+		</BrowserRouter>, 
+		document.body.appendChild(document.createElement("div"))
+	)
 }

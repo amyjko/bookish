@@ -40,8 +40,8 @@ class Book {
         this.chapters = []
         this.chaptersByID = {}
 
-        // Initialize the chapters dictionary since parsing depends this index to detect whether a chapter exists.
-        if(chapters.length > 0) {
+        if(specification.chapters.length > 0) {
+            // Initialize the chapters dictionary since parsing depends this index to detect whether a chapter exists.
             specification.chapters.forEach(chapter => this.chaptersByID[chapter.id] = null)
             specification.chapters.forEach(chapter => {
                 this.chaptersByID[chapter.id] = new Chapter(
