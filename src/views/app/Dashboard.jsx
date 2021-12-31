@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react"
 import { useAuth } from "./AuthContext"
-import { createBook, getUserBooks } from '../../models/Database'
+import { createBook, getUserBooks } from '../../models/Firestore'
 import BookPreview from './BookPreview'
 import { Link } from "react-router-dom"
 import { useHistory } from "react-router-dom"
@@ -35,6 +35,7 @@ export default function Dashboard() {
 		const bookID = 
 			createBook(currentUser.uid)
 				.then(bookID => history.push("/book/" + bookID))
+				.catch(error => setError("Couldn't create a book: " + error))
 
 	}
 	
@@ -51,7 +52,7 @@ export default function Dashboard() {
 		</p>
 
 		{ 
-			error ? <div className="bookish-app-error">{error}</div> :
+			error ? <div className="bookish-app-alert">{error}</div> :
 			loading ? <p>Loading books...</p> : 
 				books.map(book => <Link key={book.id} to={/book/ + book.id}><BookPreview book={book}/></Link>)
 		}

@@ -1,6 +1,6 @@
 import React from "react"
 import { useState, useEffect } from "react"
-import { getBooks } from '../../models/Database'
+import { getBooks } from '../../models/Firestore'
 import BookPreview from './BookPreview'
 
 export default function Browse() {

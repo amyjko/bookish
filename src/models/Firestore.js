@@ -1,5 +1,6 @@
 import { db } from "../firebase"
 import { collection, getDocs, getDoc, doc, addDoc, query, where } from "firebase/firestore"
+import Book from "./Book"
 
 const booksCollection = collection(db, "books")
 
@@ -33,43 +34,17 @@ export const getBook = async (bookID) => {
         return book.data()
     } catch(err) {
         console.error(err)
-        return null
+        return undefined
     }
 
 }
 
 export const createBook = async (userID) => {
 
-    const defaultBook = {
-    	"title": "My new book",
-	    "authors": [],
-        "uids": [ userID ],
-        "images": {
-            "cover": null,
-            "search": null,
-            "media": null,
-            "glossary": null,
-            "references": null,
-            "index": null,
-            "unknown": null
-        },
-        "description": "What's your book about?",
-        "acknowledgements": "Anyone to thank?",
-        "chapters": [],
-    	"tags": [],
-        "revisions": [],
-    	"license": "",
-	    "sources": {},
-	    "references": {},
-    	"symbols": {},
-    	"glossary": {}
-    }
-
-    try {
-        const bookRef = await addDoc(booksCollection, defaultBook)
-        return bookRef.id
-    } catch(err) {
-        return null
-    }
+    // Make a new empty book, add this user, and store it.
+    const newBook = new Book({}, [])
+    newBook.addUserID(userID)
+    const bookRef = await addDoc(booksCollection, newBook.toObject())
+    return bookRef.id
 
 }

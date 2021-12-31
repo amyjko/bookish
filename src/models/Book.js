@@ -21,35 +21,68 @@ class Book {
             throw Error("Expected an object mapping chapter IDs to chapter text")
 
         // Copy all of the specification metadata to fields.
-        this.title = specification.title
+        // Choose suitable defaults if the spec is empty.
+        this.title = "title" in specification ? specification.title : "Untitled"
         this.symbols = "symbols" in specification ? specification.symbols : {}
         this.tags = "tags" in specification ? specification.tags : []
-        this.license = specification.license
+        this.license = "license" in specification ? specification.license : "This work is licensed under [http://creativecommons.org/licenses/by-nd/4.0/|Attribution-NoDerivatives 4.0 International]",
         this.references = "references" in specification ? specification.references : {}
-        this.glossary = specification.glossary
-        this.authors = specification.authors
-        this.description = specification.description
-        this.acknowledgements = specification.acknowledgements
-        this.revisions = specification.revisions
-        this.images = specification.images
+        this.glossary = "glossary" in specification ? specification.glossary : {}
+        this.authors = "authors" in specification ? specification.authors : []
+        this.description = "description" in specification ? specification.description : "What's your book about?"
+        this.acknowledgements = "acknowledgements" in specification ? specification.acknowledgements : "Anyone to thank?"
+        this.revisions = "revisions" in specification ? specification.revisions : []
+        this.images = "images" in specification ? specification.images : {}
         this.sources = "sources" in specification ? specification.sources : {}
+        this.uids = "uids" in specification ? specification.sources : []
 
         // Create a list and dictionary of Chapter objects.
         this.chapters = []
         this.chaptersByID = {}
-        // Initialize the chapters since parsing depends on hasChapter in links
-        specification.chapters.forEach(chapter => this.chaptersByID[chapter.id] = null)
-        specification.chapters.forEach(chapter => {
-            this.chaptersByID[chapter.id] = new Chapter(
-                this,
-                chapter,
-                chapter.forthcoming ? null : chapters[chapter.id]
-            )
-            this.chapters.push(this.chaptersByID[chapter.id])
-        })
+
+        // Initialize the chapters dictionary since parsing depends this index to detect whether a chapter exists.
+        if(chapters.length > 0) {
+            specification.chapters.forEach(chapter => this.chaptersByID[chapter.id] = null)
+            specification.chapters.forEach(chapter => {
+                this.chaptersByID[chapter.id] = new Chapter(
+                    this,
+                    chapter,
+                    chapter.forthcoming ? null : chapters[chapter.id]
+                )
+                this.chapters.push(this.chaptersByID[chapter.id])
+            })
+        }
 
         // Lookup table for optimization
 		this.chapterNumbers = {};
+
+    }
+
+    // Convert the book back into JSON for storage. Deep copies arrays and objects to avoid other code mutating this object.
+    toObject() {
+
+        return {
+            title: this.title,
+            authors: JSON.parse(JSON.stringify(this.authors)),
+            uids: JSON.parse(JSON.stringify(this.uids)),
+            images: JSON.parse(JSON.stringify(this.images)),
+            description: this.description,
+            acknowledgements: this.acknowledgements,
+            chapters: this.chapters.map(chapter => chapter.toJSON()),
+            tags: JSON.parse(JSON.stringify(this.tags)),
+            revisions: JSON.parse(JSON.stringify(this.revisions)),
+            license: this.license,
+            sources: JSON.parse(JSON.stringify(this.sources)),
+            references: JSON.parse(JSON.stringify(this.references)),
+            symbols: JSON.parse(JSON.stringify(this.symbols)),
+            glossary: JSON.parse(JSON.stringify(this.glossary))
+        }
+
+    }
+
+    addUserID(uid) {
+
+        this.uids.push(uid);
 
     }
 

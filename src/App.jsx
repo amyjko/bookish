@@ -11,7 +11,7 @@ import PrivateRoute from "./views/app/PrivateRoute"
 import Dashboard from "./views/app/Dashboard"
 import Header from "./views/app/Header"
 import Footer from "./views/app/Footer"
-import Book from "./views/app/Book"
+import Editor from "./views/app/Editor"
 import About from "./views/app/About"
 
 function App() {
@@ -26,7 +26,7 @@ function App() {
               <Route exact path="/finishlogin" component={FinishLogin} />
               <Route exact path="/read" component={Browse} />
               <Route exact path="/about" component={About} />
-              <Route path="/book/:id" component={Book} />
+              <Route path="/book/:id" component={Editor} />
             </Switch>
             <Footer />
           </AuthProvider>

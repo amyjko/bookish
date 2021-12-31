@@ -38,7 +38,7 @@
 
 .bookish-app-header img {
     height: 1em;
-    vertical-align: middle;
+    vertical-align: baseline;
 }
 
 .bookish-app-text {

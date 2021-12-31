@@ -28,8 +28,6 @@
                 }
             }
         },
-        "cover": { "$ref": "#/definitions/embed" },
-        "unknown": { "$ref": "#/definitions/embed" },
         "images": {
             "type": "object",
             "properties": {
