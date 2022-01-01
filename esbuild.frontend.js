@@ -3,7 +3,7 @@ const { build } = require("esbuild")
 // Load environment variables from .env file
 require('dotenv').config()
 
-// Build a dictionary of the evironment variables to pass to esbuild
+// Build a dictionary of the environment variables to pass to esbuild
 const define = {}
 for (const k in process.env) {
   define[`process.env.${k}`] = JSON.stringify(process.env[k])
@@ -11,7 +11,7 @@ for (const k in process.env) {
 
 const options = {
   // the entry point file described above
-  entryPoints: ['src/Bookish.js'],
+  entryPoints: ['src/Reader.jsx'],
   loader: { '.js': 'jsx' },
   bundle: true,
   minify: true,

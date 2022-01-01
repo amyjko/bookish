@@ -1,26 +1,26 @@
 import React from 'react';
-import ReactDOM from 'react-dom';
-import { BrowserRouter, Route, Routes, useNavigate, useLocation } from 'react-router-dom';
+import { Route, Routes, useNavigate, useLocation } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 
-import Chapter from "./views/chapter/Chapter";
-import TableOfContents from "./views/page/TableOfContents";
-import References from "./views/page/References";
-import Glossary from "./views/page/Glossary"
-import Index from "./views/page/Index";
-import Search from "./views/page/Search";
-import Media from "./views/page/Media";
-import Unknown from "./views/page/Unknown";
-import Loading from "./views/page/Loading";
-import Print from "./views/page/Print"
+import Chapter from "../chapter/Chapter";
+import TableOfContents from "./TableOfContents";
+import References from "./References";
+import Glossary from "./Glossary"
+import Index from "./Index";
+import Search from "./Search";
+import Media from "./Media";
+import Unknown from "./Unknown";
+import Loading from "./Loading";
+import Print from "./Print"
+
+import { loadBookFromURL } from "../../models/BookLoader"
 
 import smoothscroll from 'smoothscroll-polyfill';
 
-import { loadBookFromURL } from "./models/BookLoader"
-
+// Poly fill smooth scrolling for Safari.
 smoothscroll.polyfill();
 
-function Bookish(props) {
+export default function Book(props) {
 
 	const [ book, setBook ] = useState(null)
 	const [ error, setError ] = useState(null)
@@ -93,13 +93,4 @@ function Bookish(props) {
 	
 	}
 	
-}
-
-window.bookish = function(root) {
-	ReactDOM.render(
-		<BrowserRouter basename={root}>
-			<Bookish base={root} />
-		</BrowserRouter>, 
-		document.body.appendChild(document.createElement("div"))
-	)
 }
