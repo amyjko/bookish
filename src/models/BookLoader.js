@@ -8,7 +8,7 @@ let schema = require("../schemas/book.json");
 //   2) a "chapters" folder with .md files corresponding to the chapter IDs in the spec,
 // resolves to a Book object with all of the book data.
 // If any errors are encountered, throws an Error.
-async function loadBookFromURL(url) {
+export default async function loadBookFromURL(url) {
 
     let specification = null
     let chapters = {}
@@ -72,5 +72,3 @@ async function loadBookFromURL(url) {
         })
 
 }
-
-export { loadBookFromURL }
