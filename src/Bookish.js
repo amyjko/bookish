@@ -20,20 +20,6 @@ import { loadBookFromURL } from "./models/BookLoader"
 
 smoothscroll.polyfill();
 
-function showScrollReminder() {
-
-	// Tag things "past-title" if we're past it, so they can react to position.
-	let title = document.getElementById("title");
-	let reminder = document.getElementById("bookish-scroll-reminder");
-	if(title && reminder) {
-		if(window.scrollY + window.innerHeight > title.getBoundingClientRect().top + window.scrollY)
-			reminder.classList.add("past-title");
-		else
-			reminder.classList.remove("past-title");
-	}
-
-}
-
 function Bookish(props) {
 
 	const [ book, setBook ] = useState(null)
@@ -48,26 +34,12 @@ function Bookish(props) {
 	
 	useEffect(() => {
 		
-		// Listen for window changes to show a scroll reminder
-		window.addEventListener('scroll', showScrollReminder);
-		window.addEventListener('resize', showScrollReminder);
-
 		// Load the book
 		loadBookFromURL(props.base ? props.base : "")
 			.then(book => setBook(book))
 			.catch(err => setError(err))
-	
-		return () => {
-			window.removeEventListener('scroll', showScrollReminder);
-			window.removeEventListener('resize', showScrollReminder);	
-		}
 
 	}, [])
-
-	// When the location changes, update the scroll reminder.
-	useEffect(() => {
-		showScrollReminder()
-	}, [ location ])
 
 	// If there's an error, show the error.
 	if(error) {
