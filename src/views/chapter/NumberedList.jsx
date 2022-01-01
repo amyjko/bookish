@@ -3,7 +3,7 @@ import { renderNode } from './Renderer'
 
 function NumberedList(props) {
 
-    return <ol key={props.key}>{
+    return <ol>{
         props.node.items.map((item, index) =>
             item.type === "numbered" ?
                 renderNode(item, "item-" + index) :

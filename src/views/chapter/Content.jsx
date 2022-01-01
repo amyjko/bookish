@@ -3,9 +3,9 @@ import { renderNode } from './Renderer'
 
 function Content(props) {
 
-    const { node, key } = props
+    const { node } = props
 
-    return <span key={key}>{ node.segments.map((segment, index) => renderNode(segment, "content-" + index))}</span>
+    return <span>{ node.segments.map((segment, index) => renderNode(segment, "content-" + index))}</span>
 
 }
 

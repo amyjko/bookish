@@ -1,7 +1,7 @@
 import React from 'react';
 
 import { Link } from 'react-router-dom';
-import { NavHashLink } from "react-router-hash-link";
+import { HashLink } from "react-router-hash-link";
 
 import smoothlyScrollElementToEyeLevel from '../util/Scroll';
 
@@ -223,11 +223,11 @@ class Outline extends React.Component {
                             // Only h1, h2, and h3 headers...
                             return level > 3 ? 
                                 null :
-                                <NavHashLink scroll={smoothlyScrollElementToEyeLevel} to={"#" + header.id} key={"header-" + index} >
+                                <HashLink scroll={smoothlyScrollElementToEyeLevel} to={"#" + header.id} key={"header-" + index} >
                                     <div className={"bookish-outline-header bookish-outline-header-level-" + (level - 1) + (this.state.headerIndex === index ? " bookish-outline-header-active" : "")}>
                                         {header.textContent}
                                     </div>
-                                </NavHashLink>
+                                </HashLink>
                             }
                         )
                     }

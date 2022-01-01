@@ -3,9 +3,9 @@ import Code from './Code'
 
 function InlineCode(props) {
 
-    const { node, key } = props
+    const { node } = props
 
-    return <Code key={key} inline={true} language={node.language}>{node.code}</Code>
+    return <Code inline={true} language={node.language}>{node.code}</Code>
 
 }
 

@@ -3,10 +3,10 @@ import { renderNode, renderPosition } from './Renderer';
 
 function Figure(props) {
 
-	const { node, key} = props
+	const { node } = props
 
 	return (
-		<div key={key} className={"bookish-figure" + renderPosition(node.position)}>
+		<div className={"bookish-figure" + renderPosition(node.position)}>
 			{
 				node.url.includes("https://www.youtube.com") || 
 				node.url.includes("https://youtu.be") || 

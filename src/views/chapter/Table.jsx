@@ -4,9 +4,9 @@ import { renderNode, renderPosition } from './Renderer'
 
 function Table(props) {
 
-    const { node, key } = props
+    const { node } = props
 
-    return <div key={key} className={"bookish-figure " + renderPosition(node.position)}>
+    return <div className={"bookish-figure " + renderPosition(node.position)}>
         {/* Make the table responsive for small screens */}
         <div className="bookish-table">
             <table>

@@ -3,7 +3,7 @@ import { ChapterContext } from './Chapter';
 
 function Text(props) {
 
-    const { node, key } = props
+    const { node } = props
     const context = useContext(ChapterContext)
 
     // Is there a query we're supposed to highlight? If so, highlight it.
@@ -32,14 +32,14 @@ function Text(props) {
             if(indices[indices.length - 1] < text.length - 1)
                 segments.push(text.substring(indices[indices.length - 1] + query.length, text.length));
 
-            return <span key={key}>{segments}</span>;
+            return <span>{segments}</span>;
 
         }
         else return node.text;
 
     } 
     // Otherwise, just return the text as a span with metadata.
-    else return <span key={key} className="bookish-text" data-position={node.position}>{node.text}</span>;
+    else return <span className="bookish-text" data-position={node.position}>{node.text}</span>;
 
 }
 

@@ -6,7 +6,7 @@ import { ChapterContext } from './Chapter'
 
 function Citations(props) {
 
-    const { node, key } = props
+    const { node } = props
 
     const context = useContext(ChapterContext)
 
@@ -51,7 +51,7 @@ function Citations(props) {
         }
     );
     
-    return <span className="bookish-citation" key={key}>
+    return <span className="bookish-citation">
         <Marginal
             id={"citation-" + citations.join("-")}
             interactor={segments}

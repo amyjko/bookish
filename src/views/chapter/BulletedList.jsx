@@ -3,7 +3,7 @@ import { renderNode } from './Renderer'
 
 function BulletedList(props) {
 
-    return <ul key={props.key}>{
+    return <ul>{
         props.node.items.map((item, index) =>
             item.type === "bulleted" ?
                 renderNode(item, "item-" + index) :

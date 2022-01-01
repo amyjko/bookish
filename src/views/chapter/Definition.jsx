@@ -6,7 +6,7 @@ import { ChapterContext } from './Chapter'
 
 function Definition(props) {
 
-    const { node, key } = props
+    const { node } = props
     const context = useContext(ChapterContext)
 
     // If there's no context, render nothing.
@@ -17,11 +17,11 @@ function Definition(props) {
     let glossary = context.book.getGlossary();
 
     if(!(node.glossaryID in glossary))
-        return <span key={key} className="bookish-error">Unknown glossary entry "{ node.glossaryID }"</span>
+        return <span className="bookish-error">Unknown glossary entry "{ node.glossaryID }"</span>
 
     let entry = glossary[node.glossaryID];
 
-    return <span className="bookish-definition" key={key}>
+    return <span className="bookish-definition">
         <Marginal
             id={"glossary-" + node.glossaryID}
             interactor={renderNode(node.phrase)}

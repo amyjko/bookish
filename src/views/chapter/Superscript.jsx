@@ -1,14 +1,12 @@
 import React from 'react'
 import { renderNode } from './Renderer'
 
-function Superscript(props) {
+export default function Superscript(props) {
 
-    const { node, key } = props
+    const { node } = props
 
     return node.superscript ?
-        <sup key={key}>{renderNode(node.content)}</sup> :
-        <sub key={key}>{renderNode(node.content)}</sub>
+        <sup>{renderNode(node.content)}</sup> :
+        <sub>{renderNode(node.content)}</sub>
 
 }
-
-export default Superscript

@@ -2,7 +2,7 @@ import React from 'react'
 
 function Error(props) {
 
-    return <span key={props.key} className="bookish-error">Error: {props.node.error}</span>
+    return <span className="bookish-error">Error: {props.node.error}</span>
 
 }
 

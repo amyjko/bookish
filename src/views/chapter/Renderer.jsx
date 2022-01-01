@@ -52,12 +52,16 @@ const renderers = {
     "reference": Reference
 }
 
-// Given a node and an optional key to distinguish children in lists
+// Given a node and an optional ID to distinguish children in lists
 // find the function below to render it, call it, and return its value.
 const renderNode = (node, key) => {
+    
     if(!(node.type in renderers))
         throw Error("Couldn't find a renderer for AST node type '" + node.type)
+        
+    // Note: key is a React reserve name, so it's not actually passed as a prop to the element.
     return React.createElement(renderers[node.type], { node: node, key: key })
+
 }
 
 const renderPosition = (position) => position === "<" ? "bookish-marginal-left-inset" : position === ">" ? "bookish-marginal-right-inset" : ""

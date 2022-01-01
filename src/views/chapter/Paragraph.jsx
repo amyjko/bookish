@@ -1,10 +1,8 @@
 import React from 'react'
 import { renderNode } from './Renderer'
 
-function Paragraph(props) {
+export default function Paragraph(props) {
 
-    return <p key={props.key}>{renderNode(props.node.content)}</p>
+    return <p>{renderNode(props.node.content)}</p>
 
 }
-
-export default Paragraph

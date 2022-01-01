@@ -1,8 +1,8 @@
 import React from 'react'
 
-function Rule(props) {
+function Rule() {
 
-    return <hr key={props.key} />
+    return <hr/>
 
 }
 

@@ -4,18 +4,18 @@ import { renderNode } from './Renderer'
 
 function Formatted(props) {
 
-    const { node, key } = props
+    const { node } = props
     
     const segmentDOMs = node.segments.map((segment, index) => renderNode(segment, "formatted-" + index));
 
     if(node.format === "*")
-        return <strong key={key}>{segmentDOMs}</strong>;
+        return <strong>{segmentDOMs}</strong>;
     else if(node.format === "_")
-        return <em key={key}>{segmentDOMs}</em>;
+        return <em>{segmentDOMs}</em>;
     else if(node.format === "`")
-        return <Code key={key} inline={true} language={node.language}>{segmentDOMs}</Code>;
+        return <Code inline={true} language={node.language}>{segmentDOMs}</Code>;
     else
-        return <span key={key}>{segmentDOMs}</span>;
+        return <span>{segmentDOMs}</span>;
 
 }
 

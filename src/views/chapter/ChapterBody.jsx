@@ -6,7 +6,7 @@ function ChapterBody(props) {
     const { node } = props
     const errors = node.metadata.errors
 
-    return <div key="chapter" className="bookish-chapter-body">
+    return <div className="bookish-chapter-body">
         {
             errors.length === 0 ? 
                 null : 
