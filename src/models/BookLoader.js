@@ -27,7 +27,7 @@ export default async function loadBookFromURL(url) {
 
         })
         .catch(error => {
-            throw Error("There's a JSON syntax error in the book specification.")
+            throw Error("The book.json file that we received doesn't appear to be a JSON-formatted document.")
         })
         // After getting the JSON, verify that it's a valid book specification.
         .then(book => {

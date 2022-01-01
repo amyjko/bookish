@@ -27,10 +27,14 @@ window.bookish = function(base) {
 		})
 		// If not, show an error.
 		.catch(err => {
-			const span = document.createElement("span")
-			span.classList.addClass("bookish-error")
-			span.innerText = `Oh my, we couldn't load the book. Here's why: ${err}`
-			document.body.appendChild(span)
+			ReactDOM.render(
+				<div>
+					<h1>Oh noes.</h1>
+					<p className="bookish-error">We couldn't load the book. Here's the potentially cryptic reason:</p>
+					<code>{"" + err}</code>
+				</div>,
+				root
+			)			
 		})
 
 }
