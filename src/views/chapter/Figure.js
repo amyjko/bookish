@@ -3,7 +3,7 @@ import { renderNode, renderPosition } from './Renderer';
 
 function Figure(props) {
 
-	const { node, context, key} = props
+	const { node, key} = props
 
 	return (
 		<div key={key} className={"bookish-figure" + renderPosition(node.position)}>
@@ -26,7 +26,7 @@ function Figure(props) {
 						alt={node.description}
 					/>
 			}
-			<div className="bookish-figure-caption"><div className="bookish-figure-credit">{renderNode(node.credit, context)}</div>{renderNode(node.caption, context)}</div>
+			<div className="bookish-figure-caption"><div className="bookish-figure-credit">{renderNode(node.credit)}</div>{renderNode(node.caption)}</div>
 		</div>
 	)
 

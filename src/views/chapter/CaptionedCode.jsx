@@ -5,7 +5,7 @@ import Python from './Python'
 
 function CaptionedCode(props) {
 
-    const { node, context, key } = props
+    const { node, key } = props
 
     return <div key={key} className={"bookish-figure " + renderPosition(node.position)}>
         {
@@ -16,7 +16,7 @@ function CaptionedCode(props) {
                     { node.language !== "plaintext" ? <div className="bookish-code-language">{node.language}</div> : null }
                 </div>
         }
-        <div className="bookish-figure-caption">{renderNode(node.caption, context)}</div>
+        <div className="bookish-figure-caption">{renderNode(node.caption)}</div>
     </div>
 
 }

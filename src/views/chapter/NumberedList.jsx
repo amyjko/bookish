@@ -6,8 +6,8 @@ function NumberedList(props) {
     return <ol key={props.key}>{
         props.node.items.map((item, index) =>
             item.type === "numbered" ?
-                renderNode(item, props.context, "item-" + index) :
-                <li key={"item-" + index}>{renderNode(item, props.context)}</li>
+                renderNode(item, "item-" + index) :
+                <li key={"item-" + index}>{renderNode(item)}</li>
         )}
     </ol>
 }

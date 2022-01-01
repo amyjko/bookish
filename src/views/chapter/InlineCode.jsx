@@ -3,7 +3,7 @@ import Code from './Code'
 
 function InlineCode(props) {
 
-    const { node, context, key } = props
+    const { node, key } = props
 
     return <Code key={key} inline={true} language={node.language}>{node.code}</Code>
 

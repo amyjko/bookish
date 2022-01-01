@@ -1,55 +1,40 @@
-import React from 'react';
+import React, { useState, useContext } from 'react';
+import { ChapterContext } from './Chapter';
 
-class Marginal extends React.Component {
 
-	constructor(props) {
+export default function Marginal(props) {
 
-		super(props);
-
-		this.toggle = this.toggle.bind(this);
-		this.handleEnter = this.handleEnter.bind(this);
-		this.handleExit = this.handleExit.bind(this);
-
-		this.state = {
-			hovered: false
-		}
-
-	}
+	let [ hovered, setHovered ] = useState(false)
+	const context = useContext(ChapterContext)
 
 	// If there's no marginal selected or this is different from the current selection, this is hidden.
-	isHidden() { 
-		return this.props.context.marginalID === null || this.props.context.marginalID !== this.props.id
+	function isHidden() { 
+		return context.marginalID === null || context.marginalID !== props.id
 	}
 
-	toggle() {
+	function toggle() {
 
-		if(this.isHidden()) {
-			this.props.context.setMarginal(this.props.id);
+		if(isHidden()) {
+			context.setMarginal(props.id);
 		} 
 		// Otherwise, deselect.
 		else {
-			this.props.context.setMarginal(null);
+			context.setMarginal(null);
 		}
 
 	}
 
-	handleEnter() { this.setState({ hovered: true }); }
-	handleExit() { this.setState({ hovered: false }); }
+	const handleEnter = () => setHovered(true)
+	const handleExit = () => setHovered(false)
 
-	render() {
-
-		return (
-			<span>
-				<span className={"bookish-marginal-interactor" + (this.state.hovered ? " bookish-marginal-hovered" : "")} onClick={this.toggle} onMouseEnter={this.handleEnter} onMouseLeave={this.handleExit}>
-					{this.props.interactor}
-				</span>
-	            <span className={"bookish-marginal" + (this.isHidden() ? " bookish-marginal-hidden" : "") + (this.state.hovered ? " bookish-marginal-hovered" : "")} onClick={this.toggle} onMouseEnter={this.handleEnter} onMouseLeave={this.handleExit}>
-					{this.props.content}
-				</span>
+	return (
+		<span>
+			<span className={"bookish-marginal-interactor" + (hovered ? " bookish-marginal-hovered" : "")} onClick={toggle} onMouseEnter={handleEnter} onMouseLeave={handleExit}>
+				{props.interactor}
 			</span>
-		)
-	}
-
+			<span className={"bookish-marginal" + (isHidden() ? " bookish-marginal-hidden" : "") + (hovered ? " bookish-marginal-hovered" : "")} onClick={toggle} onMouseEnter={handleEnter} onMouseLeave={handleExit}>
+				{props.content}
+			</span>
+		</span>
+	)
 }
-
-export default Marginal;

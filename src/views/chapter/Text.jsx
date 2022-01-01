@@ -1,8 +1,10 @@
-import React from 'react'
+import React, { useContext } from 'react'
+import { ChapterContext } from './Chapter';
 
 function Text(props) {
 
-    const { node, context, key } = props
+    const { node, key } = props
+    const context = useContext(ChapterContext)
 
     // Is there a query we're supposed to highlight? If so, highlight it.
     if(context && context.highlightedWord) {

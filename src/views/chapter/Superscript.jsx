@@ -3,11 +3,11 @@ import { renderNode } from './Renderer'
 
 function Superscript(props) {
 
-    const { node, context, key } = props
+    const { node, key } = props
 
     return node.superscript ?
-        <sup key={key}>{renderNode(node.content, context)}</sup> :
-        <sub key={key}>{renderNode(node.content, context)}</sub>
+        <sup key={key}>{renderNode(node.content)}</sup> :
+        <sub key={key}>{renderNode(node.content)}</sub>
 
 }
 

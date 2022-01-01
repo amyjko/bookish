@@ -3,7 +3,7 @@ import { renderNode } from './Renderer'
 
 function ChapterBody(props) {
 
-    const { node, context } = props
+    const { node } = props
     const errors = node.metadata.errors
 
     return <div key="chapter" className="bookish-chapter-body">
@@ -14,7 +14,7 @@ function ChapterBody(props) {
                     <span className="bookish-error">{errors.length + " " + (errors.length > 1 ? "errors" : "error")} below</span>
                 </p>
         }
-        { node.blocks.map((block, index) => renderNode(block, context, "block-" + index)) }
+        { node.blocks.map((block, index) => renderNode(block, "block-" + index)) }
     </div>
 
 }

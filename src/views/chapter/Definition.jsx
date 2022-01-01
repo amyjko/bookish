@@ -1,14 +1,16 @@
-import React from 'react'
+import React, { useContext } from 'react'
 import Marginal  from './Marginal'
 import { renderNode } from './Renderer'
 import Parser from '../../models/Parser'
+import { ChapterContext } from './Chapter'
 
 function Definition(props) {
 
-    const { node, context, key } = props
+    const { node, key } = props
+    const context = useContext(ChapterContext)
 
     // If there's no context, render nothing.
-    if(!context)
+    if(!context || !context.book)
         return null
 
     // Find the definition.
@@ -21,12 +23,11 @@ function Definition(props) {
 
     return <span className="bookish-definition" key={key}>
         <Marginal
-            context={context}
             id={"glossary-" + node.glossaryID}
-            interactor={renderNode(node.phrase, context)}
+            interactor={renderNode(node.phrase)}
             content={
                 <span className="bookish-definition-entry">
-                    <strong className="bookish-definition-entry-phrase">{entry.phrase}</strong>: { renderNode(Parser.parseContent(context.book, entry.definition), context, "definition") }
+                    <strong className="bookish-definition-entry-phrase">{entry.phrase}</strong>: { renderNode(Parser.parseContent(context.book, entry.definition), "definition") }
                     {
                         entry.synonyms && entry.synonyms.length > 0 ? <span className="bookish-definition-entry-synonyms"><br/><br/>{entry.synonyms.join(", ")}</span> : null
                     }

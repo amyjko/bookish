@@ -1,15 +1,18 @@
-import React from 'react'
+import React, { useContext } from 'react'
 import Marginal  from './Marginal'
 import Parser from '../../models/Parser'
 import { renderNode } from './Renderer'
+import { ChapterContext } from './Chapter'
 
 function Citations(props) {
 
-    const { node, context, key } = props
+    const { node, key } = props
+
+    const context = useContext(ChapterContext)
 
     let segments = [];
 
-    // If there's no chapter, then render nothing.
+    // If there's no context or chapter, then render nothing.
     if(!context || !context.chapter)
         return null;
 
@@ -50,7 +53,6 @@ function Citations(props) {
     
     return <span className="bookish-citation" key={key}>
         <Marginal
-            context={context}
             id={"citation-" + citations.join("-")}
             interactor={segments}
             content={
@@ -63,7 +65,7 @@ function Citations(props) {
                                     key={index} 
                                     className="bookish-reference">
                                         <sup className="bookish-citation-symbol">{citationNumber}</sup>
-                                        { renderNode(Parser.parseReference(book.getReferences()[citationID], context.book, true), context) }
+                                        { renderNode(Parser.parseReference(book.getReferences()[citationID], context.book, true)) }
                                 </span> :
                                 null
                         })

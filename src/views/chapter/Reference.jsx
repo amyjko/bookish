@@ -2,7 +2,7 @@ import React from 'react'
 
 function Reference(props) {
 
-    const { node, context, key } = props
+    const { node } = props
 
     // If a short version was requested, try to abbreviate the authors.
     if(node.short) {

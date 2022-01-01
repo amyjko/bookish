@@ -11,6 +11,7 @@ import Page from '../page/Page'
 import smoothlyScrollElementToEyeLevel from '../util/Scroll';
 import { renderNode } from './Renderer'
 
+export const ChapterContext = React.createContext({})
 
 export default function Chapter(props) {
 
@@ -224,8 +225,17 @@ export default function Chapter(props) {
 					/>
 				}
 
-				{ /* Render the chapter body */ }
-				<div>
+				{ /* Render the chapter body, passing some context */ }
+				<ChapterContext.Provider 
+					value={{
+							book: book, 
+							chapter: chapter.getAST(), 
+							highlightedWord: word,
+							highlightedID: highlightedID,
+							marginalID: marginal,
+							setMarginal: setMarginal
+					}}
+				>
 				{
 					renderNode(
 						chapter.getAST(), 
@@ -239,7 +249,7 @@ export default function Chapter(props) {
 						}
 					)
 				}
-				</div>
+				</ChapterContext.Provider>
 				{
 					!hasReferences ? null :
 					<div>
@@ -252,7 +262,7 @@ export default function Chapter(props) {
 								if(citationID in refs) {
 									let ref = refs[citationID];
 									return <li key={"citation-" + citationID} className={"bookish-reference"} id={"ref-" + citationID}>
-										{ renderNode(Parser.parseReference(ref, book), { book: book, chapter: chapter}) }
+										{ renderNode(Parser.parseReference(ref, book)) }
 									</li>
 
 								}

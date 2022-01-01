@@ -52,13 +52,12 @@ const renderers = {
     "reference": Reference
 }
 
-// Given a node, a key for components that appear in lists, 
-// and a context object { book: [React.Component], chapter: [Chapter], and various other state },
+// Given a node and an optional key to distinguish children in lists
 // find the function below to render it, call it, and return its value.
-const renderNode = (node, context, key) => {
+const renderNode = (node, key) => {
     if(!(node.type in renderers))
         throw Error("Couldn't find a renderer for AST node type '" + node.type)
-    return React.createElement(renderers[node.type], { node: node, context: context, key: key })
+    return React.createElement(renderers[node.type], { node: node, key: key })
 }
 
 const renderPosition = (position) => position === "<" ? "bookish-marginal-left-inset" : position === ">" ? "bookish-marginal-right-inset" : ""

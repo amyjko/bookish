@@ -4,9 +4,9 @@ import { renderNode } from './Renderer'
 
 function Formatted(props) {
 
-    const { node, context, key } = props
+    const { node, key } = props
     
-    const segmentDOMs = node.segments.map((segment, index) => renderNode(segment, context, "formatted-" + index));
+    const segmentDOMs = node.segments.map((segment, index) => renderNode(segment, "formatted-" + index));
 
     if(node.format === "*")
         return <strong key={key}>{segmentDOMs}</strong>;
