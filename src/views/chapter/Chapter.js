@@ -97,8 +97,9 @@ export default function Chapter(props) {
 		// Position the marginals, since there's new content.
 		layoutMarginals()
 
-		// On cleanup, unsubscribe from the above.
+		// On cleanup, unsubscribe from everything above.
 		return () => {
+
 			window.removeEventListener('scroll', handleScroll)
 			window.removeEventListener('resize', handleResize)
 	

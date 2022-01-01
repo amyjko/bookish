@@ -64,6 +64,11 @@ function Bookish(props) {
 
 	}, [])
 
+	// When the location changes, update the scroll reminder.
+	useEffect(() => {
+		showScrollReminder()
+	}, [ location ])
+
 	// If there's an error, show the error.
 	if(error) {
 		return <div>
@@ -89,18 +94,18 @@ function Bookish(props) {
 					// Map all the book chapters to a bare route
 					book.getChapters().map((chapter, index) => {
 						return <Route 
-								key={"chapter" + index} 
+								key={"chapter-route-" + chapter.getID()} 
 								path={"/" + chapter.getID()} 
-								element={<Chapter chapter={chapter} book={book} />} />
+								element={<Chapter key={"chapter-" + chapter.getID()} chapter={chapter} book={book} />} />
 					})
 				}
 				{
 					// Map all the book chapters a route with word and number to highlight
 					book.getChapters().map((chapter, index) => {
 						return <Route 
-								key={"chapter-highlighted-" + index}
+								key={"chapter-route-" + chapter.getID() + "-highlighted"}
 								path={"/" + chapter.getID() + "/:word/:number"}
-								element={<Chapter chapter={chapter} book={book} />} />
+								element={<Chapter key={"chapter-" + chapter.getID() + "-highlighted"} chapter={chapter} book={book} />} />
 					})
 				}
 				<Route path="/references" element={<References book={book} />} />
