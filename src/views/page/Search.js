@@ -32,7 +32,7 @@ class Search extends React.Component {
 
 	render() {
 
-        let book = this.props.app.getBook();
+        let book = this.props.book;
 
         const results = [];
         const query = this.state.query.toLowerCase();

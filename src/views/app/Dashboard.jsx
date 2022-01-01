@@ -3,14 +3,14 @@ import { useAuth } from "./AuthContext"
 import { createBook, getUserBooks } from '../../models/Firestore'
 import BookPreview from './BookPreview'
 import { Link } from "react-router-dom"
-import { useHistory } from "react-router-dom"
+import { useNavigate } from "react-router-dom"
 
 export default function Dashboard() {
 
 	const [ books, setBooks ] = useState([])
 	const [ loading, setLoading ] = useState(true)
 	const [ error, setError ] = useState('')
-	const history = useHistory()
+	const navigate = useNavigate()
 
 	const { currentUser } = useAuth()
 
@@ -34,7 +34,7 @@ export default function Dashboard() {
 		// Make the book, then go to its page
 		const bookID = 
 			createBook(currentUser.uid)
-				.then(bookID => history.push("/book/" + bookID))
+				.then(bookID => navigate("/book/" + bookID))
 				.catch(error => setError("Couldn't create a book: " + error))
 
 	}

@@ -18,7 +18,7 @@ class References extends React.Component {
 
 	render() {
 
-		const book = this.props.app.getBook();
+		const book = this.props.book;
         const references = book.hasReferences() ? book.getReferences() : null;
 		const renderedReferences = [];
 

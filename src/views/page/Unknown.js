@@ -10,8 +10,8 @@ class Unknown extends React.Component {
 		return (
 			<Page>
 				<Header 
-					book={this.props.app.getBook()}
-					image={this.props.app.getBook().getImage("unknown") } 
+					book={this.props.book}
+					image={this.props.book.getImage("unknown") } 
 					header="Oops."
 					after={this.props.message}
 				/>

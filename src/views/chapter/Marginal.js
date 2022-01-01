@@ -16,12 +16,19 @@ class Marginal extends React.Component {
 
 	}
 
+	// If there's no marginal selected or this is different from the current selection, this is hidden.
+	isHidden() { 
+		return this.props.context.marginalID === null || this.props.context.marginalID !== this.props.id
+	}
+
 	toggle() {
 
-		if(this.props.chapter.getMarginal() === null || this.props.chapter.getMarginal() !== this.props.id) {
-			this.props.chapter.setMarginal(this.props.id);
-		} else {
-			this.props.chapter.setMarginal(null);
+		if(this.isHidden()) {
+			this.props.context.setMarginal(this.props.id);
+		} 
+		// Otherwise, deselect.
+		else {
+			this.props.context.setMarginal(null);
 		}
 
 	}
@@ -31,14 +38,12 @@ class Marginal extends React.Component {
 
 	render() {
 
-		let hidden = this.props.chapter.getMarginal() === null || this.props.chapter.getMarginal() !== this.props.id;
-
 		return (
 			<span>
 				<span className={"bookish-marginal-interactor" + (this.state.hovered ? " bookish-marginal-hovered" : "")} onClick={this.toggle} onMouseEnter={this.handleEnter} onMouseLeave={this.handleExit}>
 					{this.props.interactor}
 				</span>
-	            <span className={"bookish-marginal" + (hidden ? " bookish-marginal-hidden" : "") + (this.state.hovered ? " bookish-marginal-hovered" : "")} onClick={this.toggle} onMouseEnter={this.handleEnter} onMouseLeave={this.handleExit}>
+	            <span className={"bookish-marginal" + (this.isHidden() ? " bookish-marginal-hidden" : "") + (this.state.hovered ? " bookish-marginal-hovered" : "")} onClick={this.toggle} onMouseEnter={this.handleEnter} onMouseLeave={this.handleExit}>
 					{this.props.content}
 				</span>
 			</span>

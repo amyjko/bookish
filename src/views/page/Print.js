@@ -5,13 +5,13 @@ class Print extends React.Component {
 
 	render() {
 
-        if(!this.props.app.getBook())
+        if(!this.props.book)
             return <>Loading...</>
 
         return <>
             {
                 // Render all of the chapters
-                this.props.app.getBook().getChapters().map(
+                this.props.book.getChapters().map(
                     (chapter, index) => <Chapter key={index} chapter={chapter} app={this.props.app} print />
                 )
             }

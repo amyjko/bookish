@@ -42,7 +42,7 @@ class TableOfContents extends React.Component {
 		if(embed === null)
 			return null;
 
-		let book = this.props.app.getBook();
+		let book = this.props.book;
 		let image = Parser.parseEmbed(book, embed).toJSON();
 		return <TableOfContentsImage url={image.url} alt={image.alt}/>
 
@@ -51,7 +51,7 @@ class TableOfContents extends React.Component {
 	render() {
 
 		// Get the book being rendered.
-		let book = this.props.app.getBook();
+		let book = this.props.book;
 
 		// Get the chapter progress
 		let progress = localStorage.getItem("chapterProgress");

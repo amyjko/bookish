@@ -15,7 +15,7 @@ class Media extends React.Component {
 
 	render() {
 
-		const book = this.props.app.getBook();
+		const book = this.props.book;
 		const media = book.getMedia();
 
 		return (

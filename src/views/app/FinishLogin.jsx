@@ -1,10 +1,10 @@
 import React from "react"
 import { getAuth, isSignInWithEmailLink, signInWithEmailLink } from "firebase/auth"
-import { useHistory } from "react-router-dom"
+import { useNavigate } from "react-router-dom"
 
 export default function FinishLogin() {
 
-	const history = useHistory()
+	const navigate = useNavigate()
 	const auth = getAuth();
 
 	if (isSignInWithEmailLink(auth, window.location.href)) {
@@ -33,8 +33,8 @@ export default function FinishLogin() {
 				// You can check if the user is new or existing:
 				// result.additionalUserInfo.isNewUser
 
-				// Redirect to the home page.
-				history.push("/dashboard")
+				// Navigate to the home page.
+				navigate.push("/dashboard")
 
 			})
 			.catch((error) => {

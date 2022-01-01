@@ -53,7 +53,7 @@ const renderers = {
 }
 
 // Given a node, a key for components that appear in lists, 
-// and a context object { app: [React.Component], chapter: [Chapter] },
+// and a context object { book: [React.Component], chapter: [Chapter], and various other state },
 // find the function below to render it, call it, and return its value.
 const renderNode = (node, context, key) => {
     if(!(node.type in renderers))

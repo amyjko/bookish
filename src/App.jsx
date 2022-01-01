@@ -20,13 +20,13 @@ function App() {
           <AuthProvider>
             <Header/>
             <Switch>
-              <Route exact path="/" component={Home} />
-              <Route exact path="/login" component={Login} />
-              <PrivateRoute exact path="/write" component={Dashboard} />
-              <Route exact path="/finishlogin" component={FinishLogin} />
-              <Route exact path="/read" component={Browse} />
-              <Route exact path="/about" component={About} />
-              <Route path="/book/:id" component={Editor} />
+              <Route exact path="/" children={<Home/>} />
+              <Route exact path="/login" children={<Login/>} />
+              <PrivateRoute exact path="/write" children={<Dashboard/>} />
+              <Route exact path="/finishlogin" children={<FinishLogin/>} />
+              <Route exact path="/read" children={<Browse/>} />
+              <Route exact path="/about" children={<About/>} />
+              <Route path="/book/:id" children={<Editor/>} />
             </Switch>
             <Footer />
           </AuthProvider>

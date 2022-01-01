@@ -14,8 +14,7 @@ function Citations(props) {
         return null;
 
     const chapter = context.chapter
-    const app = context.app
-    const book = app.getBook()
+    const book = context.book
 
     // Sort citations numerically, however they're numbered.
     let citations = node.citations.sort((a, b) => {
@@ -51,7 +50,7 @@ function Citations(props) {
     
     return <span className="bookish-citation" key={key}>
         <Marginal
-            chapter={app}
+            context={context}
             id={"citation-" + citations.join("-")}
             interactor={segments}
             content={
@@ -64,7 +63,7 @@ function Citations(props) {
                                     key={index} 
                                     className="bookish-reference">
                                         <sup className="bookish-citation-symbol">{citationNumber}</sup>
-                                        { renderNode(Parser.parseReference(book.getReferences()[citationID], context.app.getBook(), true), context) }
+                                        { renderNode(Parser.parseReference(book.getReferences()[citationID], context.book, true), context) }
                                 </span> :
                                 null
                         })

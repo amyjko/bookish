@@ -1,6 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import { BrowserRouter, Route, Switch, withRouter } from 'react-router-dom';
+import { BrowserRouter, Route, Routes, useNavigate, useLocation, useParams } from 'react-router-dom';
+import { useEffect, useState } from 'react';
 
 import Chapter from "./views/chapter/Chapter";
 import TableOfContents from "./views/page/TableOfContents";
@@ -19,127 +20,108 @@ import { loadBookFromURL } from "./models/BookLoader"
 
 smoothscroll.polyfill();
 
-class Bookish extends React.Component {
+function showScrollReminder() {
 
-	constructor(props) {
+	// Tag things "past-title" if we're past it, so they can react to position.
+	let title = document.getElementById("title");
+	let reminder = document.getElementById("bookish-scroll-reminder");
+	if(title && reminder) {
+		if(window.scrollY + window.innerHeight > title.getBoundingClientRect().top + window.scrollY)
+			reminder.classList.add("past-title");
+		else
+			reminder.classList.remove("past-title");
+	}
 
-		super(props);
+}
 
-		// Bind event handlers
-		this.layout = this.layout.bind(this)
+function Bookish(props) {
 
-		// Setup state
-		this.state = {
-			// Make a Book instance to load the book. When something loads, update.
-			book: null,
-			error: null
-		}
+	const [ book, setBook ] = useState(null)
+	const [ error, setError ] = useState(null)
+
+	const location = useLocation()
+
+	// Redirect old hash routes by simply replacing their hash before routing.
+	const navigate = useNavigate()
+	if(location.hash.startsWith('#/'))
+		navigate(location.hash.replace('#', ''))
+	
+	useEffect(() => {
+		
+		// Listen for window changes to show a scroll reminder
+		window.addEventListener('scroll', showScrollReminder);
+		window.addEventListener('resize', showScrollReminder);
 
 		// Load the book
-		loadBookFromURL(BOOKISH_BASENAME ? BOOKISH_BASENAME : "")
-			.then(book => this.setState({ book: book }))
-			.catch(error => this.setState({ error: error }))
-
-	}
-
-	layout() {
-
-		this.showScrollReminder();
-
-	}
-
-	showScrollReminder() {
-
-		// Tag things "past-title" if we're past it, so they can react to position.
-		let title = document.getElementById("title");
-		let reminder = document.getElementById("bookish-scroll-reminder");
-		if(title && reminder) {
-			if(window.scrollY + window.innerHeight > title.getBoundingClientRect().top + window.scrollY)
-				reminder.classList.add("past-title");
-			else
-				reminder.classList.remove("past-title");
-		}
-
-	}
-
-	componentDidMount() {
-
-		window.addEventListener('scroll', this.layout);
-		window.addEventListener('resize', this.layout);
-
-	}
-
-	componentWillUnmount() {
-
-		window.removeEventListener('scroll', this.layout);
-		window.addEventListener('resize', this.layout);
-
-	}
-
-	componentDidUpdate() {
-
-		this.showScrollReminder();
-
-	}
-
-	getBook() { return this.state.book; }
+		loadBookFromURL(props.base ? props.base : "")
+			.then(book => setBook(book))
+			.catch(err => setError(err))
 	
-	render() {
-		
-		// If there's an error, show the error.
-		if(this.state.error) {
-			return <div>
-				<p>Wasn't able to load the book. Here are the errors we found:</p>
-				<p className="bookish-error">{this.state.error.message}</p>
-			</div>
+		return () => {
+			window.removeEventListener('scroll', showScrollReminder);
+			window.removeEventListener('resize', showScrollReminder);	
 		}
-		// If the book isn't loaded yet, show loading feedback
-		else if(!this.state.book) {
-			return <Loading/>;
-		} 
-		// Render the loaded book
-		else {
 
-			// Set the window title based on the specification.
-			document.title = this.state.book.getTitle();
+	}, [])
 
-			// Redirect old hash routes by simply replacing their hash before routing.
-			const { history } = this.props
-			if (location.hash.startsWith('#/'))
-				history.push(location.hash.replace('#', ''))
+	// If there's an error, show the error.
+	if(error) {
+		return <div>
+			<p>Wasn't able to load the book. Here are the errors we found:</p>
+			<p className="bookish-error">{error.message}</p>
+		</div>
+	}
+	// If the book isn't loaded yet, show loading feedback
+	else if(!book) {
+		return <Loading/>;
+	} 
+	// Render the loaded book
+	else {
 
-			// Render the book
-			return (
-				<div className="bookish">
-					<Switch>
-						<Route exact path="/" render={(props) => <TableOfContents {...props} app={this} />} />
-						{
-							// Map all the book chapters to routes
-							this.state.book.getChapters().map((chapter, index) => {
-								return <Route key={"chapter" + index} path={"/" + chapter.getID() + "/:word?/:number?"} render={(props) => <Chapter {...props} chapter={chapter} app={this} />} />
-							})
-						}
-						<Route path="/references" render={(props) => <References {...props} app={this} />} />
-						<Route path="/glossary" render={(props) => <Glossary {...props} app={this} />} />
-						<Route path="/index/:letter?" render={(props) => <Index {...props} app={this} />} />
-						<Route path="/search/" render={(props) => <Search {...props} app={this} />} />
-						<Route path="/media/" render={(props) => <Media {...props} app={this} />} />
-						<Route path="/print/" render={(props) => <Print {...props} app={this} />} />
-						<Route path="*" render={(props) => <Unknown {...props} message={<p>The path {location.pathname} doesn't exist for this book.</p>} app={this} />}/>
-					</Switch>
-				</div>
-			);
-		}
+		// Set the window title based on the specification.
+		document.title = book.getTitle();
+
+		// Render the book
+		return <div className="bookish">
+			<Routes>
+				<Route exact path="/" element={<TableOfContents book={book} />} />
+				{
+					// Map all the book chapters to a bare route
+					book.getChapters().map((chapter, index) => {
+						return <Route 
+								key={"chapter" + index} 
+								path={"/" + chapter.getID()} 
+								element={<Chapter chapter={chapter} book={book} />} />
+					})
+				}
+				{
+					// Map all the book chapters a route with word and number to highlight
+					book.getChapters().map((chapter, index) => {
+						return <Route 
+								key={"chapter-highlighted-" + index}
+								path={"/" + chapter.getID() + "/:word/:number"}
+								element={<Chapter chapter={chapter} book={book} />} />
+					})
+				}
+				<Route path="/references" element={<References book={book} />} />
+				<Route path="/glossary" element={<Glossary book={book} />} />
+				<Route path="/index" element={<Index book={book} />} />
+				<Route path="/index/:letter" element={<Index book={book} />} />
+				<Route path="/search" element={<Search book={book} />} />
+				<Route path="/media" element={<Media book={book} />} />
+				<Route path="/print" element={<Print book={book} />} />
+				<Route path="*" element={<Unknown message={<p>The path {location.pathname} doesn't exist for this book.</p>} book={book} />}/>
+			</Routes>
+		</div>
+	
 	}
 	
 }
-const BookishWithRouter = withRouter(Bookish);
 
 window.bookish = function(root) {
-	BOOKISH_BASENAME = root
 	ReactDOM.render(
 		<BrowserRouter basename={root}>
-			<BookishWithRouter/>
+			<Bookish base={root} />
 		</BrowserRouter>, 
 		document.body.appendChild(document.createElement("div"))
 	)
