@@ -1,6 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import { BrowserRouter, Route, Routes, useNavigate, useLocation, useParams } from 'react-router-dom';
+import { BrowserRouter, Route, Routes, useNavigate, useLocation } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 
 import Chapter from "./views/chapter/Chapter";
