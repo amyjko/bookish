@@ -34,8 +34,7 @@ export default function Book(props) {
 	// Set the window title based on the specification.
 	document.title = book.getTitle();
 
-	// When dark mode changes, manage the DOM accordingly.
-	useEffect(() => {
+	const updateDarkMode = () => {
 		if(darkMode) {
             document.body.classList.add("bookish-dark")
             localStorage.setItem("bookish-dark", "true")
@@ -44,8 +43,13 @@ export default function Book(props) {
             document.body.classList.remove("bookish-dark")
             localStorage.setItem("bookish-dark", "false")
         }
-    }, [ darkMode ])
+	}
 
+	// Update immediately before rendering.
+	updateDarkMode()
+
+	// When dark mode changes, update dark mode.
+	useEffect(updateDarkMode, [ darkMode ])
 
 	// Render the book
 	return <div className="bookish">

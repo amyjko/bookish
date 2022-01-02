@@ -665,10 +665,9 @@ a:hover {
 /* HIGHLIGHTS */
 
 .bookish-content-highlight {
-	border: none;
-	border-radius: var(--bookish-roundedness);
-	animation: bookish-pulse 0.75s 3;
+	animation: bookish-pulse 1s 5;
 	animation-fill-mode: forwards;
+	border-bottom: 2px dotted transparent;
 }
 
 /* A little circle at the point of the annotation */
@@ -684,9 +683,9 @@ a:hover {
 }
 
 @keyframes bookish-pulse {
-	0% { background-color: var(--bookish-background-color); }
-	50% { background-color: var(--bookish-highlight-color); }
-	100% { background-color: var(--bookish-background-color); }
+	0% { border-color: var(--bookish-highlight-color); }
+	50% { border-color: var(--bookish-background-color); }
+	100% { border-color: var(--bookish-highlight-color); }
 }
 
 /* REFERENCES, FOOTNOTES, and GLOSSARY */
