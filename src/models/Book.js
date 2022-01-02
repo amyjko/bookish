@@ -204,10 +204,11 @@ class Book {
 				duplicate = true;
 				canonical = word.toLowerCase();
 			}
-			if(word.charAt(word.length - 1) === "s" && word.toLowerCase().substring(0, word.length - 1) in index) {
-				duplicate = true;
-				canonical = word.toLowerCase().substring(0, word.length - 1);
-			}
+            // TODO This breaks the highlighting behavior because it tries to find exact matches
+			// if(word.charAt(word.length - 1) === "s" && word.toLowerCase().substring(0, word.length - 1) in index) {
+			// 	duplicate = true;
+			// 	canonical = word.toLowerCase().substring(0, word.length - 1);
+			// }
 			if(duplicate) {				
 				duplicates.push(word);
 				// Merge any chapter occurrences, removing duplicates using a set and spread.

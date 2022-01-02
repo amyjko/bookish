@@ -140,8 +140,9 @@ export default function Chapter(props) {
 		// If there's a word we're trying to highlight in the URL path, scroll to the corresponding match.
 		if(word) {
 			const match = document.getElementsByClassName("bookish-text bookish-content-highlight")
-			if(match.length > 0)
-				smoothlyScrollElementToEyeLevel(match[number])
+			const num = parseInt(number)
+			if(match.length > 0 && num < match.length && num >= 0)
+				smoothlyScrollElementToEyeLevel(match[num])
 		}
 		// Otherwise, if there's an ID in the URL, jump to it.
 		else if(highlightedID !== null) {
