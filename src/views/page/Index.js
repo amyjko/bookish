@@ -80,11 +80,12 @@ export default function Index(props) {
             image={book.getImage(Book.IndexID)} 
             header="Index"
             tags={book.getTags()}
-        />
-
-        <Outline
-            previous={book.getPreviousChapterID(Book.IndexID)}
-            next={book.getNextChapterID(Book.IndexID)}
+            outline={
+                <Outline
+                    previous={book.getPreviousChapterID(Book.IndexID)}
+                    next={book.getNextChapterID(Book.IndexID)}
+                />
+            }
         />
 
         <p><em>This index includes all words, excluding common English words, words with apostrophes, and words ending in -ly.</em></p>

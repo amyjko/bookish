@@ -466,6 +466,7 @@ hr {
 	left: 50%;
 	margin-left: -50vw;
 	margin-right: -50vw;
+	margin-bottom: 3em;
 	max-width: 100vw;
 	position: relative;
 	right: 50%;

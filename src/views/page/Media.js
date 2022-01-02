@@ -25,11 +25,12 @@ class Media extends React.Component {
 					image={book.getImage(Book.MediaID)} 
 					header="Media"
 					tags={book.getTags()}
-				/>
-
-				<Outline
-					previous={book.getPreviousChapterID(Book.MediaID)}
-					next={book.getNextChapterID(Book.MediaID)}
+					outline={
+						<Outline
+							previous={book.getPreviousChapterID(Book.MediaID)}
+							next={book.getNextChapterID(Book.MediaID)}
+						/>
+					}
 				/>
 
 				<p>These are the images in the book:</p>

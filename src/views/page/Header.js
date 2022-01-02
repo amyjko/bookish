@@ -49,6 +49,7 @@ export default function Header(props) {
 					// Add a bit of space to account for the lack of an image.
 					<p>&nbsp;</p>
 			}
+			{ props.outline }
 			<div className="bookish-chapter-header-text">
 				{ props.before }
 				<h1 id="title" className="bookish-title">{props.header}</h1>

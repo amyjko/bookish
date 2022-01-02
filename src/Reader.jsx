@@ -8,6 +8,8 @@ import loadBookFromURL from "./models/BookLoader"
 // Install the mounting function.
 window.bookish = function(base) {
 
+	base = base ? base : "";
+
 	const root = document.createElement("div")
 	document.body.appendChild(root)
 
@@ -15,7 +17,7 @@ window.bookish = function(base) {
 	ReactDOM.render(<Loading/>, root)
 
 	// Load the book
-	loadBookFromURL(base ? base : "")
+	loadBookFromURL(base)
 		// If we were successful, show the book!
 		.then(book => {
 		ReactDOM.render(

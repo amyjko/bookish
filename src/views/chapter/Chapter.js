@@ -179,6 +179,27 @@ export default function Chapter(props) {
 					book={book}
 					image={chapter.getImage()}
 					print={props.print}
+					outline=
+					{
+						props.print ? 
+						null :
+						<Outline
+							previous={book.getPreviousChapterID(chapterID)}
+							next={book.getNextChapterID(chapterID)}
+							listener={ (expanded, callback) =>{
+	
+								// If the outline is being expanded, hide the marginal, otherwise leave it alone.
+								if(expanded)
+									setMarginal(null)
+	
+								// Check if we need to hide the outline after positioning.
+								hideOutlineIfObscured();
+	
+							}}
+							// Collapse the outline if a marginal is selected.
+							collapse={marginal !== null}
+						/>
+					}
 					before={
 						<span>
 						{
@@ -204,27 +225,6 @@ export default function Chapter(props) {
 						/>
 					} 
 				/>
-
-				{
-					props.print ? 
-					null :
-					<Outline
-						previous={book.getPreviousChapterID(chapterID)}
-						next={book.getNextChapterID(chapterID)}
-						listener={ (expanded, callback) =>{
-
-							// If the outline is being expanded, hide the marginal, otherwise leave it alone.
-							if(expanded)
-								setMarginal(null)
-
-							// Check if we need to hide the outline after positioning.
-							hideOutlineIfObscured();
-
-						}}
-						// Collapse the outline if a marginal is selected.
-						collapse={marginal !== null}
-					/>
-				}
 
 				{ /* Render the chapter body, passing some context */ }
 				<ChapterContext.Provider 

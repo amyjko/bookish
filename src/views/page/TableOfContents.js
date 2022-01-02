@@ -85,11 +85,12 @@ class TableOfContents extends React.Component {
 					subtitle={subtitle}
 					tags={book.getTags()}
 					after={<Authors authors={book.getAuthors()} />}
-				/>
-
-				<Outline
-					previous={null}
-					next={book.getNextChapterID("")}
+					outline={
+						<Outline
+							previous={null}
+							next={book.getNextChapterID("")}
+						/>
+					}
 				/>
 
 				<div className="bookish-description">

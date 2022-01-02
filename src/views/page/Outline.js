@@ -73,13 +73,11 @@ export default function Outline(props) {
                 let titleY = title.getBoundingClientRect().top + window.scrollY;
                 // If the title is off screen, anchor it to the top of the window. (CSS is set to do this).
                 if(titleY - 50 < window.scrollY) {
-                    outline.style.removeProperty("margin-top");
                     outline.classList.add("bookish-outline-fixed-left");
                     outline.classList.remove("bookish-outline-title-left");
                 }
                 // Otherwise, anchor it to the title position.
                 else {
-                    outline.style.marginTop = "-" + document.getElementsByClassName("bookish-chapter-header-text")[0].getBoundingClientRect().height + "px"
                     outline.classList.remove("bookish-outline-fixed-left");
                     outline.classList.add("bookish-outline-title-left");
                 }

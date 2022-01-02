@@ -85,11 +85,12 @@ class Search extends React.Component {
 					image={book.getImage(Book.SearchID)} 
 					header="Search"
 					tags={book.getTags()}
-				/>
-
-                <Outline
-                    previous={book.getPreviousChapterID(Book.SearchID)}
-                    next={book.getNextChapterID(Book.SearchID)}
+                    outline={
+                        <Outline
+                            previous={book.getPreviousChapterID(Book.SearchID)}
+                            next={book.getNextChapterID(Book.SearchID)}
+                        />    
+                    }
 				/>
 
                 <p>Type a word—just a single word—and we'll show its occurrences in this book:</p>

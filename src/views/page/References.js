@@ -47,11 +47,12 @@ class References extends React.Component {
 						image={book.getImage(Book.ReferencesID)} 
 						header="References"
 						tags={book.getTags()}
-					/>
-
-					<Outline
-						previous={book.getPreviousChapterID(Book.ReferencesID)}
-						next={book.getNextChapterID(Book.ReferencesID)}
+						outline={
+							<Outline
+								previous={book.getPreviousChapterID(Book.ReferencesID)}
+								next={book.getNextChapterID(Book.ReferencesID)}
+							/>
+						}
 					/>
 
 					{

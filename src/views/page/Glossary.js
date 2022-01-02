@@ -29,11 +29,12 @@ class Glossary extends React.Component {
 					image={book.getImage(Book.GlossaryID)} 
 					header="Glossary"
 					tags={book.getTags()}
-				/>
-
-				<Outline
-					previous={book.getPreviousChapterID(Book.GlossaryID)}
-					next={book.getNextChapterID(Book.GlossaryID)}
+					outline={
+						<Outline
+							previous={book.getPreviousChapterID(Book.GlossaryID)}
+							next={book.getNextChapterID(Book.GlossaryID)}
+						/>
+					}
 				/>
 
 				{
