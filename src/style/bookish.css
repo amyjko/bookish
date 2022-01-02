@@ -69,7 +69,7 @@
 	--bookish-border-color-bold: #DADADA;
 	--bookish-paragraph-color: #DADADA;
 	--bookish-muted-color: #CCCCCC;
-	--bookish-highlight-color: #5c4d28;
+	--bookish-highlight-color: #c5a248;
 	--bookish-comment-color: #1c4722;
 	--bookish-error-color: #F8D7DA;
 	--bookish-link-color: #73a3fa;
@@ -665,9 +665,7 @@ a:hover {
 /* HIGHLIGHTS */
 
 .bookish-content-highlight {
-	animation: bookish-pulse 1s 5;
-	animation-fill-mode: forwards;
-	border-bottom: 2px dotted transparent;
+	position: relative;
 }
 
 /* A little circle at the point of the annotation */
@@ -679,14 +677,44 @@ a:hover {
 	position: absolute;
 	z-index: -1;
 	margin-left: -1em;
-	margin-top: -0.5em;
 }
 
-@keyframes bookish-pulse {
-	0% { border-color: var(--bookish-highlight-color); }
-	50% { border-color: var(--bookish-background-color); }
-	100% { border-color: var(--bookish-highlight-color); }
-}
+.bookish-content-highlight:before {
+	content: "";
+	z-index: -1;
+	left: -0.5em;
+	top: -0.1em;
+	border-width: 5px;
+	border-style: solid;
+	border-color: var(--bookish-highlight-color);
+	position: absolute;
+	border-right-color: transparent;
+	width: 100%;
+	height: 1em;
+	transform: rotate(2deg);
+	opacity: 0.7;
+	border-radius: 50%;
+	padding: 0.1em 0.25em;
+  }
+  
+.bookish-content-highlight:after{
+	content: "";
+	z-index: -1;
+	left: -0.5em;
+	top: 0.1em;
+	padding: 0.1em 0.25em;
+	border-width: 5px;
+	border-style: solid;
+	border-color: var(--bookish-highlight-color);
+	border-left-color: transparent;
+	border-top-color: transparent;
+	position: absolute;
+	width: 100%;
+	height: 1em;
+	transform: rotate(-1deg);
+	opacity: 0.7;
+	border-radius: 50%;
+  }
 
 /* REFERENCES, FOOTNOTES, and GLOSSARY */
 
