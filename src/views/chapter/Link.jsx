@@ -25,7 +25,7 @@ function Link(props) {
         }
         else {
             // If this is internal link, make a route link to the chapter.
-            return <RouterLink to={node.url}>{renderNode(node.content)}</RouterLink>
+            return <RouterLink to={"/" + node.url}>{renderNode(node.content)}</RouterLink>
         }
     }
 
