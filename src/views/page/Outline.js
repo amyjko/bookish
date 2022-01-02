@@ -1,61 +1,41 @@
-import React from 'react';
+import React, { useState, useContext, useEffect } from 'react';
 
 import { Link } from 'react-router-dom';
 import { HashLink } from "react-router-hash-link";
 
 import smoothlyScrollElementToEyeLevel from '../util/Scroll';
+import { DarkModeContext } from './Book';
 
-class Outline extends React.Component {
+export default function Outline(props) {
 
-    constructor(props) {
-        super(props);
+    let [ headerString, setHeaderString ] = useState(null)
+    let [ headerIndex, setHeaderIndex ] = useState(-1)
+    let [ expanded, setExpanded ] = useState(false)
+    let { darkMode, setDarkMode } = useContext(DarkModeContext)
 
-        this.toggleExpanded = this.toggleExpanded.bind(this);
-        this.layout = this.layout.bind(this);
-        this.toggleReadingMode = this.toggleReadingMode.bind(this);
-
-		this.state = { 
-            headers: null,
-			headerIndex: -1,
-            dark: false,
-            expanded: false // This state gets overridden if a container is passed in to manage state.
-        };
-    
-    }
-
-    toggleExpanded() {
+    function toggleExpanded() {
 
         // Don't toggle when in margin mode.
-        if(!this.inFooter())
+        if(!inFooter())
             return;
 
-        const newExpanded = !this.state.expanded;
+        const newExpanded = !expanded;
 
         // Toggle expanded state
-        this.setState({ 
-            expanded: newExpanded,
-        }, this.layout);
+        setExpanded(newExpanded)
 
-        // Notify if given a listener.
-        if(this.props.listener)
-            this.props.listener.call(this, newExpanded, this.layout);
+        if(props.listener)
+            props.listener.call(this, newExpanded, layout);
     
     }
 
-    toggleReadingMode() {
+    function toggleReadingMode() {
 
-        this.setState({ dark: !this.state.dark }, () => {
-
-            if(this.state.dark)
-                document.body.classList.add("bookish-dark")
-            else
-                document.body.classList.remove("bookish-dark")
-
-        });
+        setDarkMode(!darkMode)
 
     }
 
-    inFooter() {
+    function inFooter() {
 
         let outline = document.getElementsByClassName("bookish-outline")[0];
         if(outline)
@@ -65,45 +45,16 @@ class Outline extends React.Component {
 
     }
 
-    // Position outline after first render.
-    componentDidMount() {
+    function layout() {
 
-        window.addEventListener('resize', this.layout);
-		window.addEventListener('scroll', this.layout);
-
-        this.layout();
-    }
-
-    componentWillUnmount() {
-
-		window.removeEventListener('scroll', this.layout);
-		window.removeEventListener('resize', this.layout);
-
-    }
-
-    componentDidUpdate() {
-
-        // When this updates, generate a unique string for the current header outline.
-        // If it's different from the last rendered state, refresh.
-        let headers = "";
-        Array.from(document.getElementsByClassName("bookish-header")).forEach(el => headers += el.outerHTML);
-
-        // If the headers change, update the outline.
-        if(this.state.headers !== headers)
-            this.setState({ headers: headers});
-
-    }
-
-    layout() {
-
-		this.position();
-        this.highlight();
+		position();
+        highlight();
 
 	}
 
-    getHighlightThreshold() { return window.innerHeight / 3; }
+    function getHighlightThreshold() { return window.innerHeight / 3; }
 
-    position() {
+    const position = () => {
 
 		// Left align the floating outline with the left margin of the chapter
         // and the top of the title, unless we're past it.
@@ -114,7 +65,7 @@ class Outline extends React.Component {
         if(outline && title) {
 
             // If so, remove the inline position so the footer CSS applies.
-			if(this.inFooter()) {
+			if(inFooter()) {
                 outline.style.removeProperty("margin-top");
 			}
             // If not, set the position of the outline.
@@ -134,17 +85,17 @@ class Outline extends React.Component {
                 }
 
                 // Tell any listeners about the repositioning.
-                if(this.props.listener)
-                    this.props.listener.call(this, false);
+                if(props.listener)
+                    props.listener.call(this, false);
 			}
 		}
 
     }
 
-    highlight() {
+    const highlight = () => {
 
 		const top = window.scrollY;
-        const threshold = this.getHighlightThreshold();
+        const threshold = getHighlightThreshold();
 
 		// Find the header that we're past so we can update the outline.
 		let indexOfNearestHeaderAbove = -1; // -1 represents the title
@@ -164,78 +115,103 @@ class Outline extends React.Component {
 		});
 
         // Update the outline and progress bar.
-		this.setState({ headerIndex: indexOfNearestHeaderAbove });
+		setHeaderIndex(indexOfNearestHeaderAbove)
 
     }
 
-	render() {
+    useEffect(() => {
 
-        let previous = "\u25C0\uFE0E";
-        let next = "\u25B6\uFE0E";
-        let expand = "\u2630";
-        let light = "\u263C";
-        let dark = "\u263E";
+        window.addEventListener('resize', layout);
+		window.addEventListener('scroll', layout);
 
-        // Scan for headers and put them into a stable list.
-        let headers = [];
-        Array.from(document.getElementsByClassName("bookish-header")).forEach(el => headers.push(el));
+        // Position outline after first render.
+        layout();
 
-        return (
+        // Stop listening!
+        return () => {
+
+            window.removeEventListener('scroll', layout);
+            window.removeEventListener('resize', layout);
+    
+        }
+
+    }, [])
+
+    useEffect(() => {
+
+        // When the outline updates (due to the page its on updating), generate a unique string for the current header outline.
+        // If it's different from the last rendered state, refresh.
+        let newHeaderString = "";
+        Array.from(document.getElementsByClassName("bookish-header")).forEach(el => newHeaderString += el.outerHTML);
+
+        // If the headers change, update the outline.
+        if(headerString !== newHeaderString)
+            setHeaderString(newHeaderString)
+
+    })
+    
+    let previous = "\u25C0\uFE0E";
+    let next = "\u25B6\uFE0E";
+    let expand = "\u2630";
+    let light = "\u263C";
+    let dark = "\u263E";
+
+    // Scan for headers and put them into a stable list.
+    let headers = [];
+    Array.from(document.getElementsByClassName("bookish-header")).forEach(el => headers.push(el));
+
+    return (
+        <div 
+            className={"bookish-outline " + (!expanded || props.collapse ? "bookish-outline-collapsed": "bookish-outline-expanded")}
+        >
+            {/* Dark/light mode toggle */}
             <div 
-                className={"bookish-outline " + (!this.state.expanded || this.props.collapse ? "bookish-outline-collapsed": "bookish-outline-expanded")}
+                className="bookish-outline-reading-mode" 
+                role="button"
+                aria-label={darkMode ? "Switch to light mode" : "Switch to dark mode"}
+                onClick={toggleReadingMode}
             >
-                {/* Dark/light mode toggle */}
-                <div 
-                    className="bookish-outline-reading-mode" 
-                    role="button"
-                    aria-label={this.state.dark ? "Switch to light mode" : "Switch to dark mode"}
-                    onClick={this.toggleReadingMode}
-                >
-                    {this.state.dark ? dark : light}
-                </div>
-                {/* Visual cue of expandability, only visible in footer mode. */}
-                <div 
-                    className={"bookish-outline-collapse-cue" + (headers.length === 0 ? " bookish-outline-collapse-cue-disabled" : "") }
-                    role="button" 
-                    aria-label={this.state.expanded ? "Collapse navigation menu" : "Expand navigation menu"}
-                    onClick={headers.length > 0 ? this.toggleExpanded : null}
-                >
-                    { expand }
-                </div>
-                <div className="bookish-outline-headers">
-
-                    {/* Book navigation links */}
-                    <div className="bookish-outline-header-nav">
-                        { this.props.previous !== null ? <Link to={"/" + this.props.previous}>{previous}</Link> : <span className="bookish-outline-header-nav-disabled">{previous}</span> }
-                        &nbsp;&middot;&nbsp;
-                        <Link to={"/"}>Home</Link>
-                        &nbsp;&middot;&nbsp;
-                        { this.props.next !== null ? <Link to={"/" + this.props.next}>{next}</Link> : <span className="bookish-outline-header-nav-disabled">{next}</span> }
-                    </div>
-
-                    {
-                        // Scan through the headers and add a properly formatted link for each.
-                        headers.map((header, index) => {
-
-                            // Assumes that all headers have an H1, H2, etc. tag.
-                            const level = Number.parseInt(header.tagName.charAt(1));
-
-                            // Only h1, h2, and h3 headers...
-                            return level > 3 ? 
-                                null :
-                                <HashLink scroll={smoothlyScrollElementToEyeLevel} to={"#" + header.id} key={"header-" + index} >
-                                    <div className={"bookish-outline-header bookish-outline-header-level-" + (level - 1) + (this.state.headerIndex === index ? " bookish-outline-header-active" : "")}>
-                                        {header.textContent}
-                                    </div>
-                                </HashLink>
-                            }
-                        )
-                    }
-                </div>
+                {darkMode ? dark : light}
             </div>
-        );
-	}
+            {/* Visual cue of expandability, only visible in footer mode. */}
+            <div 
+                className={"bookish-outline-collapse-cue" + (headers.length === 0 ? " bookish-outline-collapse-cue-disabled" : "") }
+                role="button" 
+                aria-label={expanded ? "Collapse navigation menu" : "Expand navigation menu"}
+                onClick={headers.length > 0 ? toggleExpanded : null}
+            >
+                { expand }
+            </div>
+            <div className="bookish-outline-headers">
 
+                {/* Book navigation links */}
+                <div className="bookish-outline-header-nav">
+                    { props.previous !== null ? <Link to={"/" + props.previous}>{previous}</Link> : <span className="bookish-outline-header-nav-disabled">{previous}</span> }
+                    &nbsp;&middot;&nbsp;
+                    <Link to={"/"}>Home</Link>
+                    &nbsp;&middot;&nbsp;
+                    { props.next !== null ? <Link to={"/" + props.next}>{next}</Link> : <span className="bookish-outline-header-nav-disabled">{next}</span> }
+                </div>
+
+                {
+                    // Scan through the headers and add a properly formatted link for each.
+                    headers.map((header, index) => {
+
+                        // Assumes that all headers have an H1, H2, etc. tag.
+                        const level = Number.parseInt(header.tagName.charAt(1));
+
+                        // Only h1, h2, and h3 headers...
+                        return level > 3 ? 
+                            null :
+                            <HashLink scroll={smoothlyScrollElementToEyeLevel} to={"#" + header.id} key={"header-" + index} >
+                                <div className={"bookish-outline-header bookish-outline-header-level-" + (level - 1) + (headerIndex === index ? " bookish-outline-header-active" : "")}>
+                                    {header.textContent}
+                                </div>
+                            </HashLink>
+                        }
+                    )
+                }
+            </div>
+        </div>
+    );
 }
-
-export default Outline
