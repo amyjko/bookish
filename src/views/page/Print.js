@@ -1,23 +1,15 @@
 import React from 'react'
 import Chapter from "../chapter/Chapter"
 
-class Print extends React.Component {
+export default function Print(props) {
 
-	render() {
-
-        if(!this.props.book)
-            return <>Loading...</>
-
-        return <>
-            {
-                // Render all of the chapters
-                this.props.book.getChapters().map(
-                    (chapter, index) => <Chapter key={index} chapter={chapter} app={this.props.app} print />
-                )
-            }
-        </>
-    }
+    return <>
+        {
+            // Render all of the chapters
+            props.book.getChapters().filter(chapter => !chapter.isForthcoming()).map(
+                (chapter, index) => <Chapter key={index} book={props.book} chapter={chapter} print />
+            )
+        }
+    </>
 
 }
-
-export default Print
