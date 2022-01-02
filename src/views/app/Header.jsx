@@ -16,7 +16,7 @@ export default function Header() {
 	}
 	
 	return <div className="bookish-app-header">
-		<img src="/images/icons/icon.png"/>
+		<img src="images/icons/icon.png"/>
 		<Link to="/"> Home</Link>
 		<Link to="/read">Read</Link>
 		<Link to="/write">Write</Link>
