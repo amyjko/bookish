@@ -22,7 +22,7 @@ function Figure(props) {
 					</div> :
 					<img 
 						className={"bookish-figure-image"}
-						src={node.url.startsWith("http") ? node.url : "images/" + node.url} 
+						src={node.url.startsWith("http") ? node.url : "/images/" + node.url} 
 						alt={node.description}
 					/>
 			}
