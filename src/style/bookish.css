@@ -56,6 +56,9 @@
 	--bookish-indent: 10%;
 	--bookish-inline-padding: 0.25rem;
 	--bookish-block-padding: 1rem;
+	--bookish-outline-width: 12em;
+	--bookish-outline-padding: 1em;
+	--bookish-outline-offset: calc(-1 * (var(--bookish-outline-width) + 2 * var(--bookish-outline-padding)));
 }
 
 .bookish-dark {
@@ -779,6 +782,7 @@ ol li.bookish-reference::before {
 .bookish-outline-header-nav {
 	display: inline-block;
 	width: 100%;
+	padding-bottom: var(--bookish-outline-padding);
 }
 
 .bookish-outline-header {
@@ -832,7 +836,6 @@ a .bookish-outline-header-active {
 }
 
 .bookish-outline-reading-mode {
-	font-size: 1.25em !important;
 	transition: transform 0.2s ease-in;
 }
 
@@ -1003,10 +1006,10 @@ a .bookish-outline-header-active {
 	}
 
 	.bookish-outline {
-		width: 12em;
+		width: var(--bookish-outline-width);
 		z-index: -1; /* Put it below everything when it's in the margin. */
 		border-right: 1px solid var(--bookish-border-color-light);
-		padding: 0.5em;
+		padding: var(--bookish-outline-padding);
 		background-color: var(--bookish-background-color);
 	}
 
@@ -1016,14 +1019,14 @@ a .bookish-outline-header-active {
 		position: fixed;
 		display: inline-block;
 		top: 50px;
-		transform: translateX(-14em);
+		transform: translateX(var(--bookish-outline-offset));
 	}
 
 	/* When the outline is fixed to title, it's positioned absolutely relative to the book container. */
 	/* We set a margin appropriate for it's width above. This class is set by outline.js. */
 	.bookish-outline.bookish-outline-title-left {
 		position: absolute;
-		margin-left: -14em;
+		margin-left: var(--bookish-outline-offset);
 	}
 
 	.bookish-outline-collapse-cue {
@@ -1032,8 +1035,8 @@ a .bookish-outline-header-active {
 
 	.bookish-outline-reading-mode {
 		position: absolute;
-		top: 0.5em;
-		right: 0.5em;
+		top: calc(var(--bookish-outline-padding));
+		right: calc(var(--bookish-outline-padding));
 	}
 
 }
