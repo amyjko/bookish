@@ -64,7 +64,7 @@ class Search extends React.Component {
                 matchCount += chapterMatches.length;
 
                 if(chapterMatches.length > 0) {
-                    results.push(<h2 key={"header-" + chapterID} id={"header-" + chapterID}>Chapter{chapterNumber === undefined ? "" : " " + chapterNumber} - {chapter.getTitle()}</h2>);
+                    results.push(<h2 key={"header-" + chapterID} className="bookish-header" id={"header-" + chapterID}>Chapter{chapterNumber === undefined ? "" : " " + chapterNumber} - {chapter.getTitle()}</h2>);
                     chapterMatches.forEach((match, index) => {
                         // Only highlight the part of the word that matches.
                         const start = match.match.toLowerCase().indexOf(query);

@@ -233,6 +233,7 @@ class Book {
             case Book.IndexID: return Book.SearchID;
             case Book.SearchID: return Book.MediaID;
             case Book.MediaID: return Book.TableOfContentsID;
+            case Book.TableOfContentsID: return this.chapters.length > 0 ? this.chapters[0].getID() : null;
             default:
                 let after = false;
                 for(let i = 0; i < this.chapters.length; i++) {

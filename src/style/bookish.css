@@ -778,9 +778,7 @@ ol li.bookish-reference::before {
 
 .bookish-outline-header-nav {
 	display: inline-block;
-	margin-bottom: 0.75rem;
 	width: 100%;
-	padding-top: 1rem;
 }
 
 .bookish-outline-header {
@@ -812,6 +810,10 @@ a .bookish-outline-header, .bookish-outline-header-nav a {
 
 a .bookish-outline-header-active, a:hover .bookish-outline-header {
 	color: var(--bookish-paragraph-color);
+}
+
+.bookish-outline-header-nav-disabled {
+	opacity: 0.3;
 }
 
 .bookish-outline a:hover {
@@ -915,31 +917,38 @@ a .bookish-outline-header-active {
 
 	.bookish-outline-header-nav {
 		text-align: center;
+		padding-top: 0.5em; /* Add some spacing when in the footer */
+		padding-bottom: 0.5em;
 		text-indent: 0 !important; /* Override header default */
 		font-size: 1.25rem !important;
 	}
 
 	.bookish-outline-reading-mode {
 		position: absolute;
-		top: 1rem;
-		left: 1rem;
+		top: 0.5em;
+		left: 1em;
 	}
 
 	.bookish-outline-collapse-cue {
 		position: absolute;
-		top: 1rem;
-		right: 1rem;
-		font-size: 1.25em !important;
+		top: 0.5em;
+		right: 1em;
+		font-size: 1em !important;
 		transition: transform 0.2s ease-in;
 	}
 
 	.bookish-outline-collapse-cue:hover {
 		cursor: pointer;
+		transform: scale(1.25, 1.25);
 		color: var(--bookish-paragraph-color);
 	}
 
+	.bookish-outline-collapse-cue-disabled {
+		display: none;
+	}
+
 	.bookish-outline-expanded .bookish-outline-collapse-cue {
-		transform: rotate(180deg);
+		transform: rotate(90deg);
 	}
 
 	.bookish-outline.bookish-outline-expanded {
@@ -1023,8 +1032,8 @@ a .bookish-outline-header-active {
 
 	.bookish-outline-reading-mode {
 		position: absolute;
-		top: 1.5rem;
-		right: 1rem;
+		top: 0.5em;
+		right: 0.5em;
 	}
 
 }

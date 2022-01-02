@@ -42,7 +42,7 @@ export default function Index(props) {
             } 
             else if(count >= 20) {
                 count = 0;
-                rows.push(<tr key={word}><td colSpan={2}><h2 id={"word-" + word}>{word}</h2></td></tr>)
+                rows.push(<tr key={word}><td colSpan={2}><h2 className="bookish-header" id={"word-" + word}>{word}</h2></td></tr>)
             }
 
             rows.push(

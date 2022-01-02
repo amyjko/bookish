@@ -1,13 +1,14 @@
 import React from 'react'
 import { Link } from 'react-router-dom'
 
-import ChapterHeader from "./Header"
+import Header from "./Header"
 import Authors from "../chapter/Authors"
 import Page from './Page'
 import { renderNode } from '../chapter/Renderer'
 
 import Parser from "../../models/Parser"
 import Book from '../../models/Book'
+import Outline from '../page/Outline'
 
 class TableOfContents extends React.Component {
 
@@ -62,6 +63,9 @@ class TableOfContents extends React.Component {
 		}
 
 		const readingTime = book.getBookReadingTime();
+		const readingTimeDescription = 
+			readingTime < 60 ? Math.max(5, (Math.floor(readingTime / 10) * 10)) + " min read" : 
+			"~" + Math.round(readingTime / 60.0) + " hour read"
 
 		// Is there a colon? Let's make a subtitle
 		let title = book.getTitle();
@@ -74,7 +78,7 @@ class TableOfContents extends React.Component {
 
 		return (
 			<Page loaded={this.afterLoad}>
-				<ChapterHeader 
+				<Header 
 					book={book}
 					image={book.getImage("cover")} 
 					header={title}
@@ -83,12 +87,16 @@ class TableOfContents extends React.Component {
 					after={<Authors authors={book.getAuthors()} />}
 				/>
 
+				<Outline
+					previous={null}
+					next={book.getNextChapterID("")}
+				/>
+
 				<div className="bookish-description">
 					{ renderNode(Parser.parseChapter(book, book.getDescription())) }
 				</div>
 
-				<h2>Chapters <small><small className="bookish-muted"><em>{readingTime < 60 ? Math.max(5, (Math.floor(readingTime / 10) * 10)) + " min read" : "~" + Math.round(readingTime / 60.0) + " hour read" }</em></small></small></h2>
-
+				<h2 className="bookish-header" id="chapters">Chapters</h2>
 				<div className="bookish-table">
 					<table id="toc">
 						<tbody>
@@ -180,25 +188,25 @@ class TableOfContents extends React.Component {
 				{
 					book.getAcknowledgements() ?
 						<>
-							<h2>Acknowledgements</h2>
+							<h2 className="bookish-header" id="acknowledgements">Acknowledgements</h2>
 							{ renderNode(Parser.parseChapter(book, book.getAcknowledgements())) }
 						</>
 						: null
 				}
 
-				<h2>License</h2>
+				<h2 className="bookish-header" id="license">License</h2>
 
 				<p>
 					{ book.getLicense() ? renderNode(Parser.parseContent(book, book.getLicense())) : "All rights reserved." }
 				</p>
 
-				<h2>Print</h2>
+				<h2 className="bookish-header" id="print">Print</h2>
 
 				<p>
 					Want to print this book or generate a PDF? See <Link to="/print">all chapters on a single page</Link> and then print or export.
 				</p>
 
-				<h2>Citation</h2>
+				<h2 className="bookish-header" id="citation">Citation</h2>
 
 				<p>
 					{ book.getAuthors().map(author => author.name).join(", ") } ({(new Date()).getFullYear() }). <em>{book.getTitle()}</em>. { location.protocol+'//'+location.host+location.pathname }, <em>retrieved { (new Date()).toLocaleDateString("en-US")}</em>.
@@ -208,7 +216,7 @@ class TableOfContents extends React.Component {
 					book.getRevisions().length === 0 ? 
 						null :
 						<>
-							<h2>Revisions</h2>
+							<h2 className="bookish-header" id="revisions">Revisions</h2>
 							<ul>
 								{book.getRevisions().map((revision, index) => {
 									return <li key={"revision" + index}><em>{revision[0]}</em>. { renderNode(Parser.parseContent(book, revision[1])) }</li>;

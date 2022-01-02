@@ -172,7 +172,7 @@ class Outline extends React.Component {
 
         let previous = "\u25C0\uFE0E";
         let next = "\u25B6\uFE0E";
-        let expand = "\u25B2\uFE0E";
+        let expand = "\u2630";
         let light = "\u263C";
         let dark = "\u263E";
 
@@ -195,22 +195,22 @@ class Outline extends React.Component {
                 </div>
                 {/* Visual cue of expandability, only visible in footer mode. */}
                 <div 
-                    className="bookish-outline-collapse-cue"
+                    className={"bookish-outline-collapse-cue" + (headers.length === 0 ? " bookish-outline-collapse-cue-disabled" : "") }
                     role="button" 
                     aria-label={this.state.expanded ? "Collapse navigation menu" : "Expand navigation menu"}
-                    onClick={this.toggleExpanded}
+                    onClick={headers.length > 0 ? this.toggleExpanded : null}
                 >
-                    {expand}
+                    { expand }
                 </div>
                 <div className="bookish-outline-headers">
 
                     {/* Book navigation links */}
                     <div className="bookish-outline-header-nav">
-                        { this.props.previous !== null ? <Link to={"/" + this.props.previous}>{previous}</Link> : <span>{previous}</span> }
+                        { this.props.previous !== null ? <Link to={"/" + this.props.previous}>{previous}</Link> : <span className="bookish-outline-header-nav-disabled">{previous}</span> }
                         &nbsp;&middot;&nbsp;
                         <Link to={"/"}>Home</Link>
                         &nbsp;&middot;&nbsp;
-                        { this.props.next !== null ? <Link to={"/" + this.props.next}>{next}</Link> : <span>{next}</span> }
+                        { this.props.next !== null ? <Link to={"/" + this.props.next}>{next}</Link> : <span className="bookish-outline-header-nav-disabled">{next}</span> }
                     </div>
 
                     {
