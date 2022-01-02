@@ -14,7 +14,7 @@ export default async function loadBookFromURL(url) {
     let chapters = {}
 
     // Fetch the JSON from the given URL
-    return fetch(url + "/book.json")
+    return fetch(url + "book.json")
         // If there's a valid response, get the JSON
         .then(response => {
 
@@ -49,7 +49,7 @@ export default async function loadBookFromURL(url) {
 
             // Map all non-forthcoming chapters to a list of fetch promises
             return Promise.all(book.chapters.filter(chapter => !chapter.forthcoming).map(chapter => 
-                fetch(url + "/chapters/" + chapter.id + ".md")
+                fetch(url + "chapters/" + chapter.id + ".md")
                     .then((response) => {
 
                         // If we got a reasonable response, process the chapter.
