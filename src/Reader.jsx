@@ -18,7 +18,7 @@ window.bookish = function(base) {
 	loadBookFromURL(base ? base : "")
 		// If we were successful, show the book!
 		.then(book => {
-			ReactDOM.render(
+		ReactDOM.render(
 				<BrowserRouter basename={base}>
 					<Book base={base} book={book}/>
 				</BrowserRouter>,

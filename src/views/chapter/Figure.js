@@ -1,9 +1,11 @@
-import React from 'react';
+import React, { useContext } from 'react';
+import { BaseContext } from '../page/Book';
 import { renderNode, renderPosition } from './Renderer';
 
 function Figure(props) {
 
 	const { node } = props
+	const base = useContext(BaseContext)
 
 	return (
 		<div className={"bookish-figure" + renderPosition(node.position)}>
@@ -22,7 +24,7 @@ function Figure(props) {
 					</div> :
 					<img 
 						className={"bookish-figure-image"}
-						src={node.url.startsWith("http") ? node.url : "/images/" + node.url} 
+						src={node.url.startsWith("http") ? node.url : base + "/images/" + node.url} 
 						alt={node.description}
 					/>
 			}

@@ -16,6 +16,7 @@ import smoothscroll from 'smoothscroll-polyfill';
 smoothscroll.polyfill();
 
 export const DarkModeContext = React.createContext({})
+export const BaseContext = React.createContext("")
 
 export default function Book(props) {
 
@@ -48,6 +49,7 @@ export default function Book(props) {
 
 	// Render the book
 	return <div className="bookish">
+		<BaseContext.Provider value={props.base}>
 		<DarkModeContext.Provider value={{ darkMode, setDarkMode}}>
 			<Routes>
 				<Route exact path="/" element={<TableOfContents book={book} />} />
@@ -79,6 +81,7 @@ export default function Book(props) {
 				<Route path="*" element={<Unknown message={<p>The path {location.pathname} doesn't exist for this book.</p>} book={book} />}/>
 			</Routes>
 		</DarkModeContext.Provider>
+		</BaseContext.Provider>
 	</div>
 	
 }
