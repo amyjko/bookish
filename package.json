@@ -5,34 +5,32 @@
 	"license": "MIT",
 	"repository": "https://github.com/amyjko/bookish.git",
 	"scripts": {
-		"postinstall": "mkdir build/",
+		"postinstall": "mkdir public/",
 		"book": "sh scripts/book.sh",
-		"clean": "rm -R build/*",
-		"build-assets": "cp src/style/bookish.css build/; cp -R src/images build/",
-		"ship-assets": "cp src/style/bookish.css public/; cp -R src/images public/",
-		"build-reader": "npm run clean; npm run build-assets; node ./esbuild.frontend.js",
-		"ship-reader": "set -e -o pipefail; npm run build-reader; terser build/bookish.js -m -c -o public/bookish.js; npm run ship-assets; firebase deploy",
-		"sync": "rsync -avz --delete build/ ajko@ovid.u.washington.edu:~/public_html/bookish/",
-		"build-app": "node ./esbuild.backend.js; cp src/index.html public/; cp -R src/images public/; cp -R src/style public/",
-		"watch-reader": "watch 'npm run build-reader' ./src",
-		"watch-app": "watch 'npm run build-app' ./src"
+		"build-clean": "rm -r public/*",
+		"build-assets": "cp src/style/*.css public/; cp -r src/images public/; cp src/index.html public/",
+		"build-scripts": "node ./esbuild.js",
+		"build-minify": "terser public/bookish.js -m -c -o public/bookish.js; terser public/app.js -m -c -o public/app.js;",
+		"build": "npm run build-clean; npm run build-assets; npm run build-scripts",
+		"deploy": "npm run build; npm run build-minify; firebase deploy",
+		"watch": "watch 'npm run build-scripts' ./src"
 	},
 	"devDependencies": {
+		"dotenv": "^10.0.0",
 		"esbuild": "^0.14.0",
-		"http-server": "^0.12.3",
-		"npm": "^6.13.4",
-		"terser": "^5.3.4"
+		"http-server": "^14.0.0",
+		"npm": "^7.20.6",
+		"terser": "^5.3.4",
+		"watch": "^0.13.0"
 	},
 	"dependencies": {
 		"ajv": "^6.0",
-		"dotenv": "^10.0.0",
 		"firebase": "^9.5.0",
 		"highlight.js": "11.1.0",
 		"react": "^16.8",
 		"react-dom": "^16.8",
 		"react-router-dom": "^6.2.1",
 		"react-router-hash-link": "^2.4.3",
-		"smoothscroll-polyfill": "^0.4.4",
-		"watch": "^1.0.2"
+		"smoothscroll-polyfill": "^0.4.4"
 	}
 }
