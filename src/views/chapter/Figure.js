@@ -6,7 +6,7 @@ function Figure(props) {
 	const { node } = props
 
 	return (
-		<div className={"bookish-figure" + renderPosition(node.position)}>
+		<div className={"bookish-figure " + renderPosition(node.position)}>
 			{
 				node.url.includes("https://www.youtube.com") || 
 				node.url.includes("https://youtu.be") || 
