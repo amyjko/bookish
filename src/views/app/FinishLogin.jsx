@@ -34,7 +34,7 @@ export default function FinishLogin() {
 				// result.additionalUserInfo.isNewUser
 
 				// Navigate to the home page.
-				navigate.push("/dashboard")
+				navigate("/dashboard")
 
 			})
 			.catch((error) => {

@@ -9,6 +9,9 @@ for (const k in process.env) {
   define[`process.env.${k}`] = JSON.stringify(process.env[k])
 }
 
+// Dev or prod?
+define["process.env.dev"] = process.argv[2] === "dev"
+
 // Build the app with the environment variables.
 const appOptions = {
   // the entry point file described above

@@ -8,12 +8,14 @@
 		"postinstall": "mkdir public/",
 		"book": "sh scripts/book.sh",
 		"build-clean": "rm -r public/*",
-		"build-assets": "cp src/style/*.css public/; cp -r src/images public/; cp src/index.html public/",
-		"build-scripts": "node ./esbuild.js",
-		"build-minify": "terser public/bookish.js -m -c -o public/bookish.js; terser public/app.js -m -c -o public/app.js;",
-		"build": "npm run build-clean; npm run build-assets; npm run build-scripts",
-		"deploy": "npm run build; npm run build-minify; firebase deploy",
-		"watch": "watch 'npm run build-scripts' ./src"
+		"build-assets": "cp src/style/* public/; cp -r src/images public/; cp src/index.html public/",
+		"build-scripts-dev": "node ./esbuild.js dev",
+		"build-scripts-prod": "node ./esbuild.js prod; terser public/bookish.js -m -c -o public/bookish.js; terser public/app.js -m -c -o public/app.js;",
+		"build-dev": "npm run build-clean; npm run build-assets; npm run build-scripts-dev",
+		"build-prod": "npm run build-clean; npm run build-assets; npm run build-scripts-prod",
+		"deploy": "npm run build-prod; firebase deploy",
+		"test": "firebase emulators:start",
+		"watch": "watch 'npm run build-dev' ./src"
 	},
 	"devDependencies": {
 		"dotenv": "^10.0.0",
