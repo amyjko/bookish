@@ -101,6 +101,8 @@ body {
 
 	width: 100%;
 
+	z-index: 0;
+
 }
 
 /* A page, such as table of contents, chapter, or references */
@@ -125,6 +127,8 @@ body {
 	/* Hidden by default until tagged as loaded */
 	opacity: 0;
 	transition: opacity 0.25s ease-in;
+
+	z-index: 1;
 }
 
 .bookish-page-loaded {
@@ -146,7 +150,7 @@ body {
 	top: 50%;
 	margin-left: -40px;
 	margin-top: -40px;
-	z-index: 1;
+	z-index: 2;
 }
 
 .bookish-loading-animation div {
@@ -691,7 +695,7 @@ a:hover {
 	height: 3em;
 	border-radius: 3em;
 	position: absolute;
-	z-index: -1;
+	z-index: 2;
 	margin-left: -1em;
 }
 
@@ -903,7 +907,7 @@ a .bookish-outline-header-active {
 		left: 0;
 		right: 0;
 		bottom: 0;
-		z-index: 1;
+		z-index: 2;
 		cursor: pointer;
 		transform: translateY(0);
 		transition: transform 0.2s ease-in;
@@ -943,7 +947,7 @@ a .bookish-outline-header-active {
 		left: 0;
 		right: 0;
 		width: 100%;
-		z-index: 1; /* Put it above content when it's a sheet in the footer */
+		z-index: 2; /* Put it above content when it's a sheet in the footer */
 		border-top: 1px solid var(--bookish-border-color-light);
 		text-align: left;
 		transition: transform 0.2s ease-in;

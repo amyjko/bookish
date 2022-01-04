@@ -39,7 +39,7 @@ export default function Outline(props) {
 
         let outline = document.getElementsByClassName("bookish-outline")[0];
         if(outline)
-            return window.getComputedStyle(outline).getPropertyValue("z-index") === "1";
+            return window.getComputedStyle(outline).getPropertyValue("z-index") === "2";
         else
             return false;
 

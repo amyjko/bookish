@@ -5,25 +5,25 @@ import { renderNode } from '../chapter/Renderer'
 
 export default function Header(props) {
 
+	function updateScrollReminder() {
+		let title = document.getElementById("bookish-title");
+		let reminder = document.getElementById("bookish-scroll-reminder");
+		if(title && reminder) {
+			// If the bottom of the window is below the top of the title, hide the reminder.
+			if(window.scrollY + window.innerHeight > title.getBoundingClientRect().top + window.scrollY)
+				reminder.classList.add("bookish-past-title");
+			else
+				reminder.classList.remove("bookish-past-title");
+		}
+	}
+
     useEffect(() => {
 
 		// When the title becomes visible or hidden, update the scroll reminder.
-		const intersectionObserver = new IntersectionObserver((entries) => {
-		
-			let title = document.getElementById("bookish-title");
-			let reminder = document.getElementById("bookish-scroll-reminder");
-			if(title && reminder) {
-				// If the bottom of the window is below the top of the title, hide the reminder.
-				if(window.scrollY + window.innerHeight > title.getBoundingClientRect().top + window.scrollY)
-					reminder.classList.add("bookish-past-title");
-				else
-					reminder.classList.remove("bookish-past-title");
-			}
-			
-		})
+		const intersectionObserver = new IntersectionObserver((entries) => updateScrollReminder())
 		const title = document.getElementById("bookish-title")
-		if(title)
-			intersectionObserver.observe(title)
+		if(title) intersectionObserver.observe(title)
+		updateScrollReminder()
 
 		return () => {
 			intersectionObserver.unobserve(title)
