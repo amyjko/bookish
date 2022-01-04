@@ -69,12 +69,12 @@ class Page extends React.Component {
 
     render() {
 
-        return <div>
+        return <>
             { this.state.loaded ? null : <Loading/> }
             <div className={"bookish-page" + (this.state.loaded ? " bookish-page-loaded": "")}>
                 { this.props.children }
             </div>
-        </div>
+        </>
 
     }
 

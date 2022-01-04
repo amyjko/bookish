@@ -35,11 +35,9 @@ export default function Book(props) {
 
 	const updateDarkMode = () => {
 		if(darkMode) {
-            document.body.classList.add("bookish-dark")
             localStorage.setItem("bookish-dark", "true")
         }
         else {
-            document.body.classList.remove("bookish-dark")
             localStorage.setItem("bookish-dark", "false")
         }
 	}
@@ -51,7 +49,7 @@ export default function Book(props) {
 	useEffect(updateDarkMode, [ darkMode ])
 
 	// Render the book
-	return <div className="bookish">
+	return <div className={"bookish"  + (darkMode ? " bookish-dark" : "")}>
 		<DarkModeContext.Provider value={{ darkMode, setDarkMode}}>
 			<Routes>
 				<Route exact path="/" element={<TableOfContents book={book} />} />

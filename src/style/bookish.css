@@ -68,7 +68,7 @@
 	--bookish-border-color-light: #444444;
 	--bookish-border-color-bold: #DADADA;
 	--bookish-paragraph-color: #DADADA;
-	--bookish-muted-color: #CCCCCC;
+	--bookish-muted-color: #666666;
 	--bookish-highlight-color: #c5a248;
 	--bookish-comment-color: #1c4722;
 	--bookish-error-color: #F8D7DA;
@@ -82,15 +82,12 @@
 
 /* WINDOW AND PAGES */
 body {
-	max-width: 720px;
+	margin: 0;
+	padding: 0;
+}
 
-	/* To make room for navigation footer. Without this, the page is too short to show it. */
-	padding-bottom: 5em;
-
-	/* Center the application in the viewport */
-	margin-top: 0;
-	margin-left: auto;
-	margin-right: auto;
+/* The root container for a book */
+.bookish {
 
 	font-weight: var(--bookish-paragraph-font-weight);
 	font-family: var(--bookish-paragraph-font-family);
@@ -99,18 +96,29 @@ body {
 
 	background-color: var(--bookish-background-color);
 	color: var(--bookish-paragraph-color);
-}
 
-/* The root container for a book */
-.bookish {
-	/* This helps absolute position things relative to the book */
-	position: relative;
-	padding-left: var(--bookish-block-padding);
-	padding-right: var(--bookish-block-padding);
+	width: 100%;
+
 }
 
 /* A page, such as table of contents, chapter, or references */
 .bookish-page {
+
+	max-width: 720px;
+
+	/* This helps marginals relative to the page */
+	position: relative;
+
+
+	/* To make room for navigation footer. Without this, the page is too short to show it. */
+	padding: var(--bookish-block-padding);
+	padding-bottom: 5em;
+
+	/* Center the application in the viewport */
+	margin-top: 0;
+	margin-left: auto;
+	margin-right: auto;
+
 	/* Hidden by default until tagged as loaded */
 	opacity: 0;
 	transition: opacity 0.25s ease-in;
@@ -123,6 +131,11 @@ body {
 /* LOADING */
 
 .bookish-loading {
+	width: 100vw;
+	height: 100vh;
+}
+
+.bookish-loading-animation {
 	position: fixed;
 	width: 80px;
 	height: 80px;
@@ -133,7 +146,7 @@ body {
 	z-index: 1;
 }
 
-.bookish-loading div {
+.bookish-loading-animation div {
 	position: absolute;
 	width: 16px;
 	height: 16px;
@@ -142,47 +155,47 @@ body {
 	animation: bookish-loading 1.2s linear infinite;
 }
 
-.bookish-loading div:nth-child(1) {
+.bookish-loading-animation div:nth-child(1) {
 	top: 8px;
 	left: 8px;
 	animation-delay: 0s;
 }
-.bookish-loading div:nth-child(2) {
+.bookish-loading-animation div:nth-child(2) {
 	top: 8px;
 	left: 32px;
 	animation-delay: -0.4s;
 }
-.bookish-loading div:nth-child(3) {
+.bookish-loading-animation div:nth-child(3) {
 	top: 8px;
 	left: 56px;
 	animation-delay: -0.8s;
 }
-.bookish-loading div:nth-child(4) {
+.bookish-loading-animation div:nth-child(4) {
 	top: 32px;
 	left: 8px;
 	animation-delay: -0.4s;
 }
-.bookish-loading div:nth-child(5) {
+.bookish-loading-animation div:nth-child(5) {
 	top: 32px;
 	left: 32px;
 	animation-delay: -0.8s;
 }
-.bookish-loading div:nth-child(6) {
+.bookish-loading-animation div:nth-child(6) {
 	top: 32px;
 	left: 56px;
 	animation-delay: -1.2s;
 }
-.bookish-loading div:nth-child(7) {
+.bookish-loading-animation div:nth-child(7) {
 	top: 56px;
 	left: 8px;
 	animation-delay: -0.8s;
 }
-.bookish-loading div:nth-child(8) {
+.bookish-loading-animation div:nth-child(8) {
 	top: 56px;
 	left: 32px;
 	animation-delay: -1.2s;
 }
-.bookish-loading div:nth-child(9) {
+.bookish-loading-animation div:nth-child(9) {
 	top: 56px;
 	left: 56px;
 	animation-delay: -1.6s;
@@ -1035,7 +1048,7 @@ a .bookish-outline-header-active {
 
 	.bookish-outline {
 		width: var(--bookish-outline-width);
-		z-index: -1; /* Put it below everything when it's in the margin. */
+		z-index: 0; /* Put it below everything when it's in the margin. */
 		border-right: 1px solid var(--bookish-border-color-light);
 		padding: var(--bookish-outline-padding);
 		background-color: var(--bookish-background-color);
