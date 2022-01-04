@@ -5,33 +5,28 @@ import { renderNode } from '../chapter/Renderer'
 
 export default function Header(props) {
 
-    function showScrollReminder() {
-
-        // Tag things "past-title" if we're past it, so they can react to position.
-        let title = document.getElementById("title");
-        let reminder = document.getElementById("bookish-scroll-reminder");
-        if(title && reminder) {
-            if(window.scrollY + window.innerHeight > title.getBoundingClientRect().top + window.scrollY)
-                reminder.classList.add("past-title");
-            else
-                reminder.classList.remove("past-title");
-        }
-    
-    }
-
-	// When mounted, start listening to scrolling and resizing to position the scroll reminder.
     useEffect(() => {
-		
-		// Listen for window changes to show a scroll reminder
-		window.addEventListener('scroll', showScrollReminder);
-		window.addEventListener('resize', showScrollReminder);
 
-		// Position the scroll reminder.
-		showScrollReminder()
+		// When the title becomes visible or hidden, update the scroll reminder.
+		const intersectionObserver = new IntersectionObserver((entries) => {
+		
+			let title = document.getElementById("bookish-title");
+			let reminder = document.getElementById("bookish-scroll-reminder");
+			if(title && reminder) {
+				// If the bottom of the window is below the top of the title, hide the reminder.
+				if(window.scrollY + window.innerHeight > title.getBoundingClientRect().top + window.scrollY)
+					reminder.classList.add("bookish-past-title");
+				else
+					reminder.classList.remove("bookish-past-title");
+			}
+			
+		})
+		const title = document.getElementById("bookish-title")
+		if(title)
+			intersectionObserver.observe(title)
 
 		return () => {
-			window.removeEventListener('scroll', showScrollReminder);
-			window.removeEventListener('resize', showScrollReminder);	
+			intersectionObserver.unobserve(title)
 		}
 
 	}, [])
@@ -52,7 +47,7 @@ export default function Header(props) {
 			{ props.outline }
 			<div className="bookish-chapter-header-text">
 				{ props.before }
-				<h1 id="title" className="bookish-title">{props.header}</h1>
+				<h1 id="bookish-title" className="bookish-title">{props.header}</h1>
 				{ props.subtitle ? <h2 className="bookish-subtitle">{props.subtitle}</h2> : null }
 				{ props.after }
 				{ tags ? 
