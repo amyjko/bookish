@@ -35,9 +35,11 @@ export default function Book(props) {
 
 	const updateDarkMode = () => {
 		if(darkMode) {
+            document.body.classList.add("bookish-dark")
             localStorage.setItem("bookish-dark", "true")
         }
         else {
+            document.body.classList.remove("bookish-dark")
             localStorage.setItem("bookish-dark", "false")
         }
 	}

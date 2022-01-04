@@ -84,6 +84,8 @@
 body {
 	margin: 0;
 	padding: 0;
+
+	background-color: var(--bookish-background-color);
 }
 
 /* The root container for a book */
@@ -111,7 +113,8 @@ body {
 
 
 	/* To make room for navigation footer. Without this, the page is too short to show it. */
-	padding: var(--bookish-block-padding);
+	padding-left: var(--bookish-block-padding);
+	padding-right: var(--bookish-block-padding);
 	padding-bottom: 5em;
 
 	/* Center the application in the viewport */
