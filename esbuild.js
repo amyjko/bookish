@@ -1,4 +1,5 @@
 const { build } = require("esbuild")
+const svgrPlugin = require("esbuild-plugin-svgr")
 
 // Load environment variables from .env file
 require('dotenv').config()
@@ -18,6 +19,7 @@ const appOptions = {
   entryPoints: ['src/App.jsx'],
   // the build folder location described above
   outfile: 'public/app.js',
+  plugins: [ svgrPlugin() ],
   bundle: true,
   // Replace with the browser versions you need to target
   target: ['chrome60', 'firefox60', 'safari11', 'edge20'],
@@ -34,6 +36,7 @@ const readerOptions = {
   // the entry point file described above
   entryPoints: ['src/Reader.jsx'],
   loader: { '.js': 'jsx' },
+  plugins: [ svgrPlugin() ],
   bundle: true,
   minify: false,
   outfile: 'public/bookish.js',

@@ -8,8 +8,9 @@ import Authors from "./Authors"
 import Outline from '../page/Outline'
 import Page from '../page/Page'
 
-import smoothlyScrollElementToEyeLevel from '../util/Scroll';
+import smoothlyScrollElementToEyeLevel from '../util/Scroll'
 import { renderNode } from './Renderer'
+import Marker from "../svg/marker.svg"
 
 export const ChapterContext = React.createContext({})
 
@@ -225,7 +226,7 @@ export default function Chapter(props) {
 						/>
 					} 
 				/>
-
+				<Marker/>
 				{ /* Render the chapter body, passing some context */ }
 				<ChapterContext.Provider 
 					value={{

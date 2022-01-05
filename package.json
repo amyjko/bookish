@@ -20,6 +20,7 @@
 	"devDependencies": {
 		"dotenv": "^10.0.0",
 		"esbuild": "^0.14.0",
+		"esbuild-plugin-svgr": "^1.0.0",
 		"http-server": "^14.0.0",
 		"npm": "^7.20.6",
 		"terser": "^5.3.4",

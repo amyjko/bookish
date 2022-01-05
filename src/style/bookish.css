@@ -695,47 +695,37 @@ a:hover {
 	height: 3em;
 	border-radius: 3em;
 	position: absolute;
-	z-index: 2;
+	z-index: -1;
 	margin-left: -1em;
+}
+
+.bookish-marginal-interactor.bookish-marginal-hovered .bookish-citation-symbol:before, .bookish-marginal-interactor.bookish-marginal-hovered .bookish-footnote-symbol:before {
+	content: "";
+	width: 3em;
+	height: 3em;
+	border-radius: 3em;
+	position: absolute;
+	z-index: -1;
+	opacity: 0.7;
+	top: -1em;
+	left: -1.25em;
+	background-color: var(--bookish-highlight-color);
 }
 
 .bookish-content-highlight:before {
 	content: "";
 	z-index: -1;
 	left: -0.5em;
-	top: -0.1em;
-	border-width: 5px;
-	border-style: solid;
-	border-color: var(--bookish-highlight-color);
+	top: -0.5em;
 	position: absolute;
-	border-right-color: transparent;
 	width: 100%;
-	height: 1em;
-	transform: rotate(2deg);
+	height: 2em;
 	opacity: 0.7;
-	border-radius: 50%;
 	padding: 0.1em 0.25em;
-  }
+	background-color: var(--bookish-highlight-color);
+	filter: url(#marker);
+}
   
-.bookish-content-highlight:after{
-	content: "";
-	z-index: -1;
-	left: -0.5em;
-	top: 0.1em;
-	padding: 0.1em 0.25em;
-	border-width: 5px;
-	border-style: solid;
-	border-color: var(--bookish-highlight-color);
-	border-left-color: transparent;
-	border-top-color: transparent;
-	position: absolute;
-	width: 100%;
-	height: 1em;
-	transform: rotate(-1deg);
-	opacity: 0.7;
-	border-radius: 50%;
-  }
-
 /* REFERENCES, FOOTNOTES, and GLOSSARY */
 
 .bookish-reference {
@@ -773,6 +763,7 @@ ol li.bookish-reference::before {
 	font-family: var(--bookish-paragraph-font-family);
     font-weight: normal;
     color: var(--bookish-link-color);
+	position: relative;
 }
 
 /* This enables us to layout the numbers and letters in a neat right-aligned floating grid. */
@@ -1038,10 +1029,6 @@ a .bookish-outline-header-active {
 		display: block;
 		padding-bottom: 0.5rem;
 		position: absolute;
-	}
-
-	.bookish-marginal-hovered .bookish-citation-symbol, .bookish-marginal-hovered .bookish-footnote-symbol {
-		font-weight: bold;
 	}
 
 	.bookish-definition .bookish-marginal-interactor.bookish-marginal-hovered {
