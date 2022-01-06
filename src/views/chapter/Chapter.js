@@ -239,17 +239,7 @@ export default function Chapter(props) {
 					}}
 				>
 				{
-					renderNode(
-						chapter.getAST(), 
-						{ 
-							book: book, 
-							chapter: chapter.getAST(), 
-							highlightedWord: word,
-							highlightedID: highlightedID,
-							marginalID: marginal,
-							setMarginal: setMarginal
-						}
-					)
+					renderNode(chapter.getAST())
 				}
 				</ChapterContext.Provider>
 				{
