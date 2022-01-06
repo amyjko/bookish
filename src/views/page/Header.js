@@ -1,19 +1,20 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useRef } from 'react';
 
 import Parser from "../../models/Parser";
 import { renderNode } from '../chapter/Renderer'
 
 export default function Header(props) {
 
+	const title = useRef(null)
+	const reminder = useRef(null)
+
 	function updateScrollReminder() {
-		let title = document.getElementById("bookish-title");
-		let reminder = document.getElementById("bookish-scroll-reminder");
-		if(title && reminder) {
+		if(title.current && reminder.current) {
 			// If the bottom of the window is below the top of the title, hide the reminder.
-			if(window.scrollY + window.innerHeight > title.getBoundingClientRect().top + window.scrollY)
-				reminder.classList.add("bookish-past-title");
+			if(window.scrollY + window.innerHeight > title.current.getBoundingClientRect().top + window.scrollY)
+				reminder.current.classList.add("bookish-past-title");
 			else
-				reminder.classList.remove("bookish-past-title");
+				reminder.current.classList.remove("bookish-past-title");
 		}
 	}
 
@@ -21,12 +22,12 @@ export default function Header(props) {
 
 		// When the title becomes visible or hidden, update the scroll reminder.
 		const intersectionObserver = new IntersectionObserver((entries) => updateScrollReminder())
-		const title = document.getElementById("bookish-title")
-		if(title) intersectionObserver.observe(title)
+		if(title.current) intersectionObserver.observe(title.current)
 		updateScrollReminder()
 
 		return () => {
-			intersectionObserver.unobserve(title)
+			if(title.current)
+				intersectionObserver.unobserve(title.current)
 		}
 
 	}, [])
@@ -39,7 +40,7 @@ export default function Header(props) {
 				props.image ?
 					<div className="bookish-figure-full">
 						{ renderNode(Parser.parseEmbed(props.book, props.image)) }
-						{ props.print ? null : <div id="bookish-scroll-reminder"></div> }
+						{ props.print ? null : <div ref={reminder} className="bookish-scroll-reminder"></div> }
 					</div> :
 					// Add a bit of space to account for the lack of an image.
 					<p>&nbsp;</p>
@@ -47,7 +48,7 @@ export default function Header(props) {
 			{ props.outline }
 			<div className="bookish-chapter-header-text">
 				{ props.before }
-				<h1 id="bookish-title" className="bookish-title">{props.header}</h1>
+				<h1 ref={title} className="bookish-title">{props.header}</h1>
 				{ props.subtitle ? <h2 className="bookish-subtitle">{props.subtitle}</h2> : null }
 				{ props.after }
 				{ tags ? 

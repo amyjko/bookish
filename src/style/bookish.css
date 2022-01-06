@@ -498,7 +498,7 @@ hr {
 	margin-top: 0;
 }
 
-#bookish-scroll-reminder {
+.bookish-scroll-reminder {
 	position: fixed;
 	bottom: 4em;
 	left: 50%;
@@ -513,7 +513,7 @@ hr {
 	mix-blend-mode: difference;
 }
 
-#bookish-scroll-reminder.bookish-past-title {
+.bookish-scroll-reminder.bookish-past-title {
 	display: none;
 }
 
