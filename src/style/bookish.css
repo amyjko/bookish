@@ -699,19 +699,36 @@ a:hover {
 	margin-left: -1em;
 }
 
-.bookish-marginal-interactor.bookish-marginal-hovered .bookish-citation-symbol:before, .bookish-marginal-interactor.bookish-marginal-hovered .bookish-footnote-symbol:before {
+.bookish-marginal-interactor .bookish-citation-symbol:before,
+.bookish-marginal-interactor .bookish-footnote-symbol:before {
 	content: "";
 	width: 3em;
 	height: 3em;
+	top: -1em;
+	left: -1.25em;
 	border-radius: 3em;
 	position: absolute;
 	z-index: -1;
-	opacity: 0.7;
-	top: -1em;
-	left: -1.25em;
+	opacity: 0.0;
 	background-color: var(--bookish-highlight-color);
+	transition: opacity .2s;
 }
 
+/* A little circle around the citation and footer symbols, when hovered on a device that supports hovering. */
+@media (hover: hover) {
+	.bookish-marginal-interactor.bookish-marginal-hovered .bookish-citation-symbol:before,
+	.bookish-marginal-interactor.bookish-marginal-hovered .bookish-footnote-symbol:before {
+		opacity: 0.3;
+	}
+}
+
+/* A little circle around the citation and footer symbols, when hovered */
+.bookish-marginal-interactor.bookish-marginal-selected .bookish-citation-symbol:before,
+.bookish-marginal-interactor.bookish-marginal-selected .bookish-footnote-symbol:before {
+	opacity: 0.7;
+}
+
+/* A rectangular highlight like a highlighter marker over highlighted text */
 .bookish-content-highlight:before {
 	content: "";
 	z-index: -1;
