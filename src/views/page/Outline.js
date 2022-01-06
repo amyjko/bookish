@@ -1,4 +1,4 @@
-import React, { useState, useContext, useEffect } from 'react';
+import React, { useState, useContext, useEffect, useRef } from 'react';
 
 import { Link } from 'react-router-dom';
 import { HashLink } from "react-router-hash-link";
@@ -12,6 +12,7 @@ export default function Outline(props) {
     let [ headerIndex, setHeaderIndex ] = useState(-1)
     let [ expanded, setExpanded ] = useState(false)
     let { darkMode, setDarkMode } = useContext(DarkModeContext)
+    let outline = useRef(null)
 
     function toggleExpanded() {
 
@@ -37,11 +38,7 @@ export default function Outline(props) {
 
     function inFooter() {
 
-        let outline = document.getElementsByClassName("bookish-outline")[0];
-        if(outline)
-            return window.getComputedStyle(outline).getPropertyValue("z-index") === "2";
-        else
-            return false;
+        return window.matchMedia("screen and (max-width: 1200px)").matches
 
     }
 
@@ -58,28 +55,27 @@ export default function Outline(props) {
 
 		// Left align the floating outline with the left margin of the chapter
         // and the top of the title, unless we're past it.
-		let outline = document.getElementsByClassName("bookish-outline")[0];
 		let title = document.getElementsByClassName("bookish-chapter-header-text")[0];
 
         // If we found them both...
-        if(outline && title) {
+        if(outline.current && title) {
 
             // If so, remove the inline position so the footer CSS applies.
 			if(inFooter()) {
-                outline.style.removeProperty("margin-top");
+                outline.current.style.removeProperty("margin-top");
 			}
             // If not, set the position of the outline.
 			else {
                 let titleY = title.getBoundingClientRect().top + window.scrollY;
                 // If the title is off screen, anchor it to the top of the window. (CSS is set to do this).
                 if(titleY - 50 < window.scrollY) {
-                    outline.classList.add("bookish-outline-fixed-left");
-                    outline.classList.remove("bookish-outline-title-left");
+                    outline.current.classList.add("bookish-outline-fixed-left");
+                    outline.current.classList.remove("bookish-outline-title-left");
                 }
                 // Otherwise, anchor it to the title position.
                 else {
-                    outline.classList.remove("bookish-outline-fixed-left");
-                    outline.classList.add("bookish-outline-title-left");
+                    outline.current.classList.remove("bookish-outline-fixed-left");
+                    outline.current.classList.add("bookish-outline-title-left");
                 }
 
                 // Tell any listeners about the repositioning.
@@ -160,6 +156,7 @@ export default function Outline(props) {
 
     return (
         <div 
+            ref={outline}
             className={"bookish-outline " + (!expanded || props.collapse ? "bookish-outline-collapsed": "bookish-outline-expanded")}
         >
             {/* Dark/light mode toggle */}
