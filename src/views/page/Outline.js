@@ -4,6 +4,7 @@ import { Link } from 'react-router-dom';
 import { HashLink } from "react-router-hash-link";
 
 import smoothlyScrollElementToEyeLevel from '../util/Scroll';
+import { isMobile } from '../util/isMobile';
 import { DarkModeContext } from './Book';
 
 export default function Outline(props) {
@@ -17,7 +18,7 @@ export default function Outline(props) {
     function toggleExpanded() {
 
         // Don't toggle when in margin mode.
-        if(!inFooter())
+        if(!isMobile())
             return;
 
         const newExpanded = !expanded;
@@ -33,12 +34,6 @@ export default function Outline(props) {
     function toggleReadingMode() {
 
         setDarkMode(!darkMode)
-
-    }
-
-    function inFooter() {
-
-        return window.matchMedia("screen and (max-width: 1200px)").matches
 
     }
 
@@ -61,7 +56,7 @@ export default function Outline(props) {
         if(outline.current && title) {
 
             // If so, remove the inline position so the footer CSS applies.
-			if(inFooter()) {
+			if(isMobile()) {
                 outline.current.style.removeProperty("margin-top");
 			}
             // If not, set the position of the outline.

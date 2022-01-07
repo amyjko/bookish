@@ -1,6 +1,7 @@
-import React, { useState, useContext } from 'react';
+import React, { useEffect, useState, useContext } from 'react';
 import { ChapterContext } from './Chapter';
 
+import { isMobile, watchMobile } from '../util/isMobile';
 
 export default function Marginal(props) {
 
@@ -14,18 +15,27 @@ export default function Marginal(props) {
 
 	function toggle() {
 
-		if(isHidden()) {
+		if(isMobile() && isHidden())
 			context.setMarginal(props.id);
-		} 
 		// Otherwise, deselect.
-		else {
+		else
 			context.setMarginal(null);
-		}
 
 	}
 
 	const handleEnter = () => setHovered(true)
 	const handleExit = () => setHovered(false)
+
+	useEffect(() => {
+
+		const mediaWatch = watchMobile()
+		mediaWatch.addEventListener("change", toggle)
+
+		return () => {
+			mediaWatch.removeEventListener("change", toggle)
+		}
+
+	}, [])
 
 	return (
 		<span>
