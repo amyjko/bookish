@@ -984,15 +984,16 @@ a .bookish-outline-header-active {
 
 	.bookish-outline-reading-mode {
 		position: absolute;
-		top: 0.5em;
-		left: 1em;
+		top: 0.25em;
+		left: 0.5em;
+		font-size: 2em;
 	}
 
 	.bookish-outline-collapse-cue {
 		position: absolute;
-		top: 0.5em;
-		right: 1em;
-		font-size: 1em !important;
+		top: 0.25em;
+		right: 0.5em;
+		font-size: 2em;
 		transition: transform 0.2s ease-in;
 	}
 
