@@ -705,7 +705,7 @@ a:hover {
 	width: 3em;
 	height: 3em;
 	top: -1em;
-	left: -1.25em;
+	left: calc(-1.5em + 50%); /* Centered plus half of the span width */
 	border-radius: 3em;
 	position: absolute;
 	z-index: -1;
