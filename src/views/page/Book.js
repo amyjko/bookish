@@ -23,7 +23,10 @@ export default function Book(props) {
 	const location = useLocation()
 
 	// Default dark mode to whatever's stored in local storage, if anything.
-	let [ darkMode, setDarkMode ] = useState(localStorage.getItem("bookish-dark") === "true")
+	let [ darkMode, setDarkMode ] = useState(
+		localStorage.getItem("bookish-dark") === "true" || // A previous setting
+		window.matchMedia("(prefers-color-scheme: dark)").matches // Operating system is set to dark
+	)
 
 	// Redirect old hash routes by simply replacing their hash before routing.
 	const navigate = useNavigate()
