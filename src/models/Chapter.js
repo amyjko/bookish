@@ -2,21 +2,21 @@ import Parser from "./Parser";
 
 class Chapter {
 
-    constructor(book, metadata, text) {
+    constructor(book, spec) {
 
         this.book = book;
-        this.id = metadata.id;
-        this.title = metadata.title;
-        this.authors = metadata.authors;
-        this.image = metadata.image;
-        this.numbered = "numbered" in metadata ? metadata.numbered : false;
-        this.section = "section" in metadata ? metadata.section : null;
-		this.forthcoming = metadata.forthcoming === true;
-        this.text = text;
+        this.id = spec.id;
+        this.title = spec.title;
+        this.authors = spec.authors;
+        this.image = spec.image;
+        this.numbered = "numbered" in spec ? spec.numbered : false;
+        this.section = "section" in spec ? spec.section : null;
+		this.forthcoming = spec.forthcoming === true;
+        this.text = "text" in spec ? spec.text : null;
 
 		// If the chapter has text, then parse it, count searchable words, and compute an index.
 		if(this.text !== null) {
-			this.ast = Parser.parseChapter(this.book, text);
+			this.ast = Parser.parseChapter(this.book, this.text);
 			this.wordCount = this.ast.toText().split(/\s+/).length;
 			this.index = this.computeIndex();
 		}
@@ -28,6 +28,20 @@ class Chapter {
 		}
 		
     }
+
+	toObject() {
+		return {
+			id: this.id,
+			title: this.title,
+			authors: [...this.authors],
+			image: this.image,
+			numbered: this.numbered,
+			section: this.section,
+			forthcoming: this.forthcoming,
+			text: this.text
+		}
+
+	}
 
 	getID() { return this.id; }
     getSection() { return this.section; }

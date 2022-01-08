@@ -12,6 +12,7 @@ import Dashboard from "./views/app/Dashboard"
 import Header from "./views/app/Header"
 import Footer from "./views/app/Footer"
 import Editor from "./views/app/Editor"
+import Reader from "./views/app/Reader"
 import About from "./views/app/About"
 
 function App() {
@@ -38,9 +39,10 @@ function App() {
             <Route path="/write" element={<Private><Dashboard/></Private>} />
             <Route path="/finishlogin" element={<FinishLogin/>} />
             <Route path="/read" element={<Browse/>} />
+            <Route path="/read/:id/*" element={<Reader/>} />
             <Route path="/about" element={<About/>} />
-            <Route path="/book/:id" element={<Editor/>} />
-            <Route path="*" element={<p>Oops, the path <code>{location.pathname}</code> doesn't exist.</p>} />
+            <Route path="/write/:id/*" element={<Editor/>} />
+            <Route path="*" element={<p>Oops, this page doesn't exist.</p>} />
           </Routes>
           <Footer />
         </Router>

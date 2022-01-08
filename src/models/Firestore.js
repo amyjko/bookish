@@ -29,20 +29,20 @@ export const getUserBooks = async (userID) => {
 
 export const getBook = async (bookID) => {
 
-    try {
-        const book = await getDoc(doc(db, "books", bookID))
-        return book.data()
-    } catch(err) {
-        console.error(err)
-        return undefined
-    }
+    const book = await getDoc(doc(db, "books", bookID))
+    if(book.exists())
+        return new Book(book.data())
+    else
+        console.error("" + bookID + " doesn't exist")
+
+    throw Error("This book doesn't exist. Maybe the link is wrong?")
 
 }
 
 export const createBook = async (userID) => {
 
     // Make a new empty book, add this user, and store it.
-    const newBook = new Book({}, [])
+    const newBook = new Book()
     newBook.addUserID(userID)
     const bookRef = await addDoc(booksCollection, newBook.toObject())
     return bookRef.id

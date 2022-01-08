@@ -17,6 +17,7 @@ define["process.env.dev"] = process.argv[2] === "dev"
 const appOptions = {
   // the entry point file described above
   entryPoints: ['src/App.jsx'],
+  loader: { '.js': 'jsx' },
   // the build folder location described above
   outfile: 'public/app.js',
   plugins: [ svgrPlugin() ],

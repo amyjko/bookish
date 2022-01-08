@@ -1,22 +1,22 @@
 import React from 'react';
 
-class Authors extends React.Component {
+export default function Authors(props) {
 
-	render() {
-		return (
-            <div className="bookish-authors">
-                <em>by</em> {
-                    this.props.authors.map( 
-                        (author, index) => [
-                            author.url ? <a key={"author-" + index} href={author.url} target="_blank">{author.name}</a> : author.name,
-                            index < this.props.authors.length - 1 ? (", ") : null
-                        ]
-                    )
-                }
-            </div>
-        );
-	}
+    const { authors } = props
 
+    return <div className="bookish-authors">
+        {
+            authors.length === 0 ? 
+                "No authors listed" : 
+                <em>by </em> 
+        }
+        {
+            authors.map( 
+                (author, index) => [
+                    author.url ? <a key={"author-" + index} href={author.url} target="_blank">{author.name}</a> : author.name,
+                    index < authors.length - 1 ? (", ") : null
+                ]
+            )
+        }
+    </div>
 }
-
-export default Authors

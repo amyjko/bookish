@@ -1,14 +1,16 @@
-import React from 'react'
+import React, { useContext } from 'react'
 
 import { Link as RouterLink } from 'react-router-dom';
 import { HashLink } from "react-router-hash-link"
 
 import { renderNode } from './Renderer';
 import smoothlyScrollElementToEyeLevel from '../util/Scroll'
+import { BaseContext } from '../page/Book';
 
 function Link(props) {
 
     const { node } = props
+    const { base } = useContext(BaseContext)
 
     // If this is external link, make an anchor that opens a new window.
     if(node.url.startsWith("http")) {
@@ -25,7 +27,7 @@ function Link(props) {
         }
         else {
             // If this is internal link, make a route link to the chapter.
-            return <RouterLink to={"/" + node.url}>{renderNode(node.content)}</RouterLink>
+            return <RouterLink to={base + "/" + node.url}>{renderNode(node.content)}</RouterLink>
         }
     }
 

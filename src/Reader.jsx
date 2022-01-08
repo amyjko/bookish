@@ -22,14 +22,15 @@ loadBookFromURL(baseURL)
 				<Book book={book}/>
 			</BrowserRouter>,
 			root
-		)		
+		)
 	})
 	// If not, show an error.
 	.catch(err => {
+		console.error(err)
 		ReactDOM.render(
 			<div>
 				<h1>Oh noes.</h1>
-				<p className="bookish-error">We couldn't load the book. Here's the potentially cryptic reason:</p>
+				<p className="bookish-error">Unable to load the book. Here's the potentially cryptic reason:</p>
 				<code>{"" + err}</code>
 			</div>,
 			root

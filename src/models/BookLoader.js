@@ -26,10 +26,11 @@ export default async function loadBookFromURL(url) {
                 throw Error(response.statusText)
 
         })
+        // If the JSON doesn't parse...
         .catch(error => {
             throw Error("The book.json file that we received doesn't appear to be a JSON-formatted document.")
         })
-        // After getting the JSON, verify that it's a valid book specification.
+        // Validate the specification and then load its chapters...
         .then(book => {
 
             // Validate the book schema before we get started.
@@ -59,15 +60,21 @@ export default async function loadBookFromURL(url) {
                             throw Error("Unable to load chapter named '" + chapter.id + "'. Make sure the chapter ID and chapter file name match.")
 
                     })
+                    // Set the text field of the chapter object in the specification
                     .then((text) => {
-                        chapters[chapter.id] = text
+                        chapter.text = text
+                    })
+                    // If there's an error, set chapter text to null.
+                    .catch(() => {
+                        chapter.text = undefined
                     })
             ))
         })
+        // After all the chapter loading promises are done, make the book.
         .then(() => {
 
             // Construct a Book object given the spec and chapter text
-            return new Book(specification, chapters)
+            return new Book(specification)
 
         })
 

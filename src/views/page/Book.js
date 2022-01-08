@@ -16,11 +16,18 @@ import smoothscroll from 'smoothscroll-polyfill';
 smoothscroll.polyfill();
 
 export const DarkModeContext = React.createContext({})
+export const BaseContext = React.createContext({})
 
 export default function Book(props) {
 
 	const { book } = props
 	const location = useLocation()
+
+	// The base path allows links to adjust to different routing contexts in which a book is placed.
+	// For example, when the book is hosted alone, all routes might start with the bare root "/", 
+	// but when the book is being viewed or edited in the Bookish app, it needs a prefix for the
+	// route in the app.
+	const base = "base" in props ? props.base : ""
 
 	// Default dark mode to whatever's stored in local storage, if anything.
 	let [ darkMode, setDarkMode ] = useState(
@@ -56,6 +63,7 @@ export default function Book(props) {
 	// Render the book
 	return <div className={"bookish"  + (darkMode ? " bookish-dark" : "")}>
 		<DarkModeContext.Provider value={{ darkMode, setDarkMode}}>
+		<BaseContext.Provider value={{ base }}>
 			<Routes>
 				<Route exact path="/" element={<TableOfContents book={book} />} />
 				{
@@ -72,19 +80,20 @@ export default function Book(props) {
 					book.getChapters().map((chapter, index) => {
 						return <Route 
 								key={"chapter-route-" + chapter.getID() + "-highlighted"}
-								path={"/" + chapter.getID() + "/:word/:number"}
+								path={chapter.getID() + "/:word/:number"}
 								element={<Chapter key={"chapter-" + chapter.getID() + "-highlighted"} chapter={chapter} book={book} />} />
 					})
 				}
-				<Route path="/references" element={<References book={book} />} />
-				<Route path="/glossary" element={<Glossary book={book} />} />
-				<Route path="/index" element={<Index book={book} />} />
-				<Route path="/index/:letter" element={<Index book={book} />} />
-				<Route path="/search" element={<Search book={book} />} />
-				<Route path="/media" element={<Media book={book} />} />
-				<Route path="/print" element={<Print book={book} />} />
-				<Route path="*" element={<Unknown message={<p>The path {location.pathname} doesn't exist for this book.</p>} book={book} />}/>
+				<Route path="references" element={<References book={book} />} />
+				<Route path="glossary" element={<Glossary book={book} />} />
+				<Route path="index" element={<Index book={book} />} />
+				<Route path="index/:letter" element={<Index book={book} />} />
+				<Route path="search" element={<Search book={book} />} />
+				<Route path="media" element={<Media book={book} />} />
+				<Route path="print" element={<Print book={book} />} />
+				<Route path="*" element={<Unknown message={<p>This page doesn't exist.</p>} book={book} />}/>
 			</Routes>
+		</BaseContext.Provider>
 		</DarkModeContext.Provider>
 	</div>
 	

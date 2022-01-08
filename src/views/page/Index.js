@@ -1,5 +1,4 @@
-import React from 'react'
-import { useEffect } from 'react';
+import React, { useContext } from 'react'
 import { Link, useParams } from 'react-router-dom';
 
 import Header from "./Header";
@@ -7,11 +6,13 @@ import Outline from './Outline';
 import Page from './Page';
 
 import Book from '../../models/Book';
+import { BaseContext } from './Book';
 
 export default function Index(props) {
 
     // What letter are we matching?
     const { letter } = useParams()
+    const { base } = useContext(BaseContext)
 
     let book = props.book;
 
@@ -62,7 +63,7 @@ export default function Index(props) {
                                 .map(
                                     (chapterID, index) => 
                                         <span key={index}>
-                                            Chapter { book.getChapterNumber(chapterID) !== undefined ? <span> {book.getChapterNumber(chapterID)}. </span> : null}<Link to={"/" + chapterID + "/" + word}>{book.getChapterName(chapterID)}</Link>
+                                            Chapter { book.getChapterNumber(chapterID) !== undefined ? <span> {book.getChapterNumber(chapterID)}. </span> : null}<Link to={base + "/" + chapterID + "/" + word}>{book.getChapterName(chapterID)}</Link>
                                             {index < bookIndex[word].length - 1 ? <br/> : null}
                                         </span>
                         )}
@@ -98,7 +99,7 @@ export default function Index(props) {
                     <span key={index} style={{display: "inline-block"}}>
                         {
                             symbol in letters && letter !== symbol ? 
-                                <Link to={"/index/" + symbol}>{symbol}</Link> :
+                                <Link to={base + "/index/" + symbol}>{symbol}</Link> :
                                 <span>
                                     {
                                         letter === symbol ? 

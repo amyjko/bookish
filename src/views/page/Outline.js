@@ -6,6 +6,7 @@ import { HashLink } from "react-router-hash-link";
 import smoothlyScrollElementToEyeLevel from '../util/Scroll';
 import { isMobile } from '../util/isMobile';
 import { DarkModeContext } from './Book';
+import { BaseContext } from './Book';
 
 export default function Outline(props) {
 
@@ -13,6 +14,7 @@ export default function Outline(props) {
     let [ headerIndex, setHeaderIndex ] = useState(-1)
     let [ expanded, setExpanded ] = useState(false)
     let { darkMode, setDarkMode } = useContext(DarkModeContext)
+    const { base } = useContext(BaseContext)
     let outline = useRef(null)
 
     function toggleExpanded() {
@@ -176,11 +178,11 @@ export default function Outline(props) {
 
                 {/* Book navigation links */}
                 <div className="bookish-outline-header-nav">
-                    { props.previous !== null ? <Link to={"/" + props.previous}>{previous}</Link> : <span className="bookish-outline-header-nav-disabled">{previous}</span> }
+                    { props.previous !== null ? <Link to={base + "/" + props.previous}>{previous}</Link> : <span className="bookish-outline-header-nav-disabled">{previous}</span> }
                     &nbsp;&middot;&nbsp;
-                    <Link to={"/"}>Home</Link>
+                    <Link to={base + "/"}>Home</Link>
                     &nbsp;&middot;&nbsp;
-                    { props.next !== null ? <Link to={"/" + props.next}>{next}</Link> : <span className="bookish-outline-header-nav-disabled">{next}</span> }
+                    { props.next !== null ? <Link to={base + "/" + props.next}>{next}</Link> : <span className="bookish-outline-header-nav-disabled">{next}</span> }
                 </div>
 
                 {

@@ -34,8 +34,8 @@ export default function Dashboard() {
 		// Make the book, then go to its page
 		const bookID = 
 			createBook(currentUser.uid)
-				.then(bookID => navigate("/book/" + bookID))
-				.catch(error => setError("Couldn't create a book: " + error))
+				.then(bookID => navigate("/write/" + bookID))
+				.catch(error => { console.error(error); setError("Couldn't create a book: " + error)})
 
 	}
 	
@@ -54,7 +54,7 @@ export default function Dashboard() {
 		{ 
 			error ? <div className="bookish-app-alert">{error}</div> :
 			loading ? <p>Loading books...</p> : 
-				books.map(book => <Link key={book.id} to={/book/ + book.id}><BookPreview book={book}/></Link>)
+				books.map(book => <BookPreview key={book.id} book={book}/>)
 		}
 
 	</>
