@@ -14,15 +14,15 @@
 		"build-dev": "npm run test; npm run build-clean; npm run build-assets; npm run build-scripts-dev",
 		"build-prod": "npm run build-clean; npm run build-assets; npm run build-scripts-prod",
 		"deploy": "npm run build-prod; firebase deploy",
-		"test": "jest",
+		"test": "jest --coverage",
 		"run": "firebase emulators:start",
 		"watch": "watch 'npm run build-dev' ./src"
 	},
 	"jest": {
 		"transform": {
 		  "^.+\\.jsx?$": "esbuild-jest"
-		}  
-	},  
+		}
+	},
 	"devDependencies": {
 		"dotenv": "^10.0.0",
 		"esbuild": "^0.14.0",
