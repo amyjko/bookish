@@ -11,17 +11,24 @@
 		"build-assets": "cp src/style/* public/; cp -r src/images public/; cp src/index.html public/",
 		"build-scripts-dev": "node ./esbuild.js dev",
 		"build-scripts-prod": "node ./esbuild.js prod; terser public/bookish.js -m -c -o public/bookish.js; terser public/app.js -m -c -o public/app.js;",
-		"build-dev": "npm run build-clean; npm run build-assets; npm run build-scripts-dev",
+		"build-dev": "npm run test; npm run build-clean; npm run build-assets; npm run build-scripts-dev",
 		"build-prod": "npm run build-clean; npm run build-assets; npm run build-scripts-prod",
 		"deploy": "npm run build-prod; firebase deploy",
-		"test": "firebase emulators:start",
+		"test": "jest",
+		"run": "firebase emulators:start",
 		"watch": "watch 'npm run build-dev' ./src"
 	},
+	"jest": {
+		"transform": {
+		  "^.+\\.jsx?$": "esbuild-jest"
+		}  
+	},  
 	"devDependencies": {
 		"dotenv": "^10.0.0",
 		"esbuild": "^0.14.0",
 		"esbuild-plugin-svgr": "^1.0.0",
 		"http-server": "^14.0.0",
+		"jest": "^27.4.7",
 		"npm": "^7.20.6",
 		"terser": "^5.3.4",
 		"watch": "^0.13.0"
