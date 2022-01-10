@@ -1,7 +1,35 @@
-import Parser from "./Parser";
+import Parser, { EmbedNode } from "./Parser";
 import { Chapter } from './Chapter.js';
+import { ArrayBindingOrAssignmentElement } from "typescript";
 
-class Book {
+export type ChapterSpecification = {
+    id: string;
+    title: string;
+    authors: Array<string>;
+    image: string;
+    numbered?: boolean;
+    forthcoming?: boolean;
+    section?: string;
+}
+
+export type BookSpecification = {
+    title: string;
+    authors: Array<{ id: string, name: string, url?: string }>;
+    images: Record<string, string>;
+    description: string;
+    chapters: Array<ChapterSpecification>;
+    license: string;
+    acknowledgements?: string;
+    tags?: Array<string>;
+    revisions?: Array<[string, string]>;
+    sources?: Record<string, string>;
+    references?: Record<string, string | Array<string>>;
+    symbols?: Record<string, string>;
+    glossary?: Record<string, { phrase: string, definition: string, synonyms?: Array<string>}>;
+    uids?: Array<string>;
+}
+
+export default class Book {
 
     static TableOfContentsID = "";
     static ReferencesID = "references";
@@ -10,9 +38,26 @@ class Book {
     static IndexID = "index";
 	static GlossaryID = "glossary";
 
+    title: string;
+    symbols: Record<string, string>;
+    tags: Array<string>;
+    license: string;
+    references: Record<string, string | Array<string>>;
+    glossary: Record<string, { phrase: string, definition: string, synonyms?: Array<string>}>;
+    authors: Array<{ id: string, name: string, url?: string}>;
+    description: string;
+    acknowledgements: string;
+    revisions: Array<[string, string]>;
+    images: Record<string, string>;
+    sources: Record<string, string>;
+    uids: Array<string>;
+    chapters: Array<Chapter>;
+    chaptersByID: Record<string, Chapter>;
+    chapterNumbers: Record<string, number>;
+
     // Given an object with a valid specification and an object mapping chapter IDs to chapter text,
     // construct an object representing a book.
-    constructor(specification) {
+    constructor(specification?: BookSpecification) {
 
         if(typeof specification !== "object" && specification !== undefined)
             throw Error("Expected a book specification object, but received " + specification)
@@ -31,7 +76,7 @@ class Book {
         this.revisions = specification && "revisions" in specification ? specification.revisions : []
         this.images = specification && "images" in specification ? specification.images : {}
         this.sources = specification && "sources" in specification ? specification.sources : {}
-        this.uids = specification && "uids" in specification ? specification.sources : []
+        this.uids = specification && "uids" in specification ? specification.uids : []
 
         // Create a list and dictionary of Chapter objects.
         this.chapters = []
@@ -294,7 +339,7 @@ class Book {
 		this.getChapters().forEach(c => {
 
             let cover = c.getImage() === null ? null : Parser.parseEmbed(this, c.getImage());
-            if(cover && !urls.has(cover.url)) {
+            if(cover && cover instanceof EmbedNode && !urls.has(cover.url)) {
                 media.push(cover);
                 urls.add(cover.url);
             }
@@ -315,7 +360,7 @@ class Book {
         backmatter.forEach(id => {
             if(this.hasImage(id)) {
                 let image = Parser.parseEmbed(this, this.getImage(id));
-                if(!urls.has(image.url)) {
+                if(image instanceof EmbedNode && !urls.has(image.url)) {
                     media.push(image);
                     urls.add(image.url);
                 }    
@@ -327,5 +372,3 @@ class Book {
     }
 
 }
-
-export default Book

@@ -1,6 +1,6 @@
 import { db } from "../firebase"
 import { collection, getDocs, getDoc, doc, addDoc, query, where } from "firebase/firestore"
-import Book from "./Book"
+import Book, { BookSpecification } from "./Book"
 
 const booksCollection = collection(db, "books")
 
@@ -31,7 +31,7 @@ export const getBook = async (bookID) => {
 
     const book = await getDoc(doc(db, "books", bookID))
     if(book.exists())
-        return new Book(book.data())
+        return new Book(book.data() as BookSpecification)
     else
         console.error("" + bookID + " doesn't exist")
 

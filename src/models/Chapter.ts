@@ -1,8 +1,27 @@
-import Parser from "./Parser";
+import Parser, { ChapterNode } from "./Parser";
+import Book from "./Book"
+
+type Match = {
+	left: string,
+	match: string,
+	right: string
+}
 
 class Chapter {
+	book: Book;
+	id: string;
+	title: string;
+	authors: Array<string>;
+	image: string;
+	numbered: boolean;
+	section: string | null;
+	forthcoming: boolean;
+	text: string;
+	ast: ChapterNode | null;
+	index: Record<string, Array<Match>> | null;
+	wordCount: number;
 
-    constructor(book, spec) {
+    constructor(book: Book, spec) {
 
         this.book = book;
         this.id = spec.id;
@@ -56,9 +75,9 @@ class Chapter {
     getAST() { return this.ast; }
 
 	// Utility function
-	getReadingTime(chapterID) { return this.isForthcoming() ? undefined : Math.max(1, Math.round(this.getWordCount() / 150)); }
+	getReadingTime() { return this.isForthcoming() ? undefined : Math.max(1, Math.round(this.getWordCount() / 150)); }
 
-	computeIndex() {
+	computeIndex(): Record<string, Array<Match>> {
 
 		// Build a list of common words
 		let commonWords = {};
