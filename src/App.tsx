@@ -41,7 +41,7 @@ function App() {
             <Route path="/read" element={<Browse/>} />
             <Route path="/read/:id/*" element={<Reader/>} />
             <Route path="/about" element={<About/>} />
-            <Route path="/write/:id/*" element={<Editor/>} />
+            <Route path="/write/:id/*" element={<Private><Editor/></Private>} />
             <Route path="*" element={<p>Oops, this page doesn't exist.</p>} />
           </Routes>
           <Footer />

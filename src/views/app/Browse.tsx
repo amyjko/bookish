@@ -29,7 +29,7 @@ export default function Browse() {
 		{ 
 			error ? <div className=".bookish-app-alert">{error}</div> :
 			loading ? <p>Loading books...</p> : 
-				books.map((book) => { return <BookPreview key={book.id} book={book} />})
+				books.map((book) => { return <BookPreview key={book.id} book={book} write={false} />})
 		}
 	</>
 
