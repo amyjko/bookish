@@ -16,7 +16,7 @@ type HeaderProps = {
 	outline: React.ReactNode;
 }
 
- const Header = (props: HeaderProps) => {
+const Header = (props: HeaderProps) => {
 
 	const title = useRef<HTMLHeadingElement | null>(null)
 	const reminder = useRef<HTMLDivElement>(null)
