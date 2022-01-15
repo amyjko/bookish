@@ -49,8 +49,8 @@ const Page = (props: { afterLoaded?: Function, children: React.ReactNode | React
 
         // Watch the height of the document and wait until it's been stable for a while before scrolling
 		// to any targets. We use the data below to monitor the document height over time.
-		setIntervalID(setInterval(() => setCount(count + 1), 50))
-	
+		setIntervalID(setInterval(() => setCount(count => count + 1), 50))
+		
 		return () => stopWatching();
 
 	}, [])
