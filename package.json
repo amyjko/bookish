@@ -11,21 +11,23 @@
 		"build-assets": "cp src/style/* public/; cp -r src/images public/; cp src/index.html public/",
 		"build-scripts-dev": "node ./esbuild.js dev",
 		"build-scripts-prod": "node ./esbuild.js prod; terser public/bookish.js -m -c -o public/bookish.js; terser public/app.js -m -c -o public/app.js;",
-		"build-dev": "npm run test; npm run build-clean; npm run build-assets; npm run build-scripts-dev",
+		"build-typecheck": "tsc",
+		"build-dev": "npm run build-clean; npm run build-assets; npm run build-typecheck; npm run build-scripts-dev; npm run test",
 		"build-prod": "npm run build-clean; npm run build-assets; npm run build-scripts-prod",
 		"deploy": "npm run build-prod; firebase deploy",
-		"test": "jest",
+		"test": "jest --coverage",
 		"run": "firebase emulators:start",
 		"watch": "watch 'npm run build-dev' ./src"
 	},
-	"transform": {
-		"^.+\\.(t|j)sx?$": "esbuild-jest"
-	},
 	"devDependencies": {
+		"@babel/core": "^7.16.7",
+		"@babel/preset-env": "^7.16.8",
+		"@babel/preset-typescript": "^7.16.7",
 		"@types/jest": "^27.4.0",
+		"@types/react-dom": "^17.0.11",
+		"@types/smoothscroll-polyfill": "^0.3.1",
 		"dotenv": "^10.0.0",
 		"esbuild": "^0.14.11",
-		"esbuild-jest": "^0.5.0",
 		"esbuild-plugin-svgr": "^1.0.0",
 		"http-server": "^14.0.0",
 		"jest": "^27.4.7",
@@ -35,11 +37,13 @@
 		"watch": "^0.13.0"
 	},
 	"dependencies": {
-		"ajv": "^6.0",
+		"ajv": "^8.8.2",
+		"ajv-formats": "^2.1.1",
 		"firebase": "^9.5.0",
 		"highlight.js": "11.1.0",
 		"react": "^17.0.2",
 		"react-dom": "^17.0.2",
+		"react-router": "^6.2.1",
 		"react-router-dom": "^6.2.1",
 		"react-router-hash-link": "^2.4.3",
 		"smoothscroll-polyfill": "^0.4.4"

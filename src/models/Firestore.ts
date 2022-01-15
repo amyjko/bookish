@@ -4,22 +4,22 @@ import Book, { BookSpecification } from "./Book"
 
 const booksCollection = collection(db, "books")
 
-export const getBooks = async () => {
+export const getBooks = async (): Promise<BookSpecification[] | null> => {
 
     try {
         const data = await getDocs(booksCollection);
-        return data.docs.map((doc) => ({...doc.data(), id: doc.id}))
+        return data.docs.map((doc) => ({...doc.data(), id: doc.id} as BookSpecification))
     } catch {
         return null
     }
 
 }
 
-export const getUserBooks = async (userID) => {
+export const getUserBooks = async (userID: string): Promise<BookSpecification[] | null> => {
 
     try {
         const books = await getDocs(query(booksCollection, where("uids", "array-contains", userID)))
-        return books.docs.map((doc) => ({...doc.data(), id: doc.id}))
+        return books.docs.map((doc) => ({...doc.data(), id: doc.id} as BookSpecification))
     } catch(err) {
         console.error(err)
         return null
@@ -27,7 +27,7 @@ export const getUserBooks = async (userID) => {
 
 }
 
-export const getBook = async (bookID) => {
+export const getBook = async (bookID: string): Promise<Book> => {
 
     const book = await getDoc(doc(db, "books", bookID))
     if(book.exists())
@@ -39,7 +39,7 @@ export const getBook = async (bookID) => {
 
 }
 
-export const createBook = async (userID) => {
+export const createBook = async (userID: string): Promise<string> => {
 
     // Make a new empty book, add this user, and store it.
     const newBook = new Book()

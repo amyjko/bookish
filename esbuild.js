@@ -16,7 +16,7 @@ define["process.env.dev"] = process.argv[2] === "dev"
 // Build the app with the environment variables.
 const appOptions = {
   // the entry point file described above
-  entryPoints: ['src/App.jsx'],
+  entryPoints: ['src/App.tsx'],
   loader: { '.js': 'jsx' },
   // the build folder location described above
   outfile: 'public/app.js',
@@ -35,7 +35,7 @@ build(appOptions).catch(() => process.exit(1))
 // Build the reader, slightly smaller for just reading.
 const readerOptions = {
   // the entry point file described above
-  entryPoints: ['src/Reader.jsx'],
+  entryPoints: ['src/Reader.tsx'],
   loader: { '.js': 'jsx' },
   plugins: [ svgrPlugin() ],
   bundle: true,

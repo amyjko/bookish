@@ -1,7 +1,7 @@
 import Parser, { ChapterNode } from "./Parser";
-import Book from "./Book"
+import Book, { ChapterSpecification } from "./Book"
 
-type Match = {
+export type Match = {
 	left: string,
 	match: string,
 	right: string
@@ -14,36 +14,36 @@ class Chapter {
 	authors: Array<string>;
 	image: string;
 	numbered: boolean;
-	section: string | null;
+	section: string | undefined;
 	forthcoming: boolean;
-	text: string;
-	ast: ChapterNode | null;
-	index: Record<string, Array<Match>> | null;
+	text: string | undefined;
+	ast: ChapterNode | undefined;
+	index: Record<string, Array<Match>> | undefined;
 	wordCount: number;
 
-    constructor(book: Book, spec) {
+    constructor(book: Book, spec: ChapterSpecification) {
 
         this.book = book;
         this.id = spec.id;
         this.title = spec.title;
         this.authors = spec.authors;
         this.image = spec.image;
-        this.numbered = "numbered" in spec ? spec.numbered : false;
-        this.section = "section" in spec ? spec.section : null;
+        this.numbered = spec.numbered ? spec.numbered : false;
+        this.section = spec.section ? spec.section : undefined;
 		this.forthcoming = spec.forthcoming === true;
-        this.text = "text" in spec ? spec.text : null;
+        this.text = spec.text ? spec.text : undefined;
 
 		// If the chapter has text, then parse it, count searchable words, and compute an index.
-		if(this.text !== null) {
+		if(this.text) {
 			this.ast = Parser.parseChapter(this.book, this.text);
 			this.wordCount = this.ast.toText().split(/\s+/).length;
 			this.index = this.computeIndex();
 		}
 		// Otherwise, set them all to null.
 		else {
-			this.ast = null;
+			this.ast = undefined;
 			this.wordCount = 0;
-			this.index = null;
+			this.index = undefined;
 		}
 		
     }
@@ -63,7 +63,7 @@ class Chapter {
 	}
 
 	getID() { return this.id; }
-    getSection() { return this.section; }
+    getSection(): string | undefined { return this.section; }
     isForthcoming() { return this.forthcoming; }
 	isNumbered() { return this.numbered; }
     getText() { return this.text; }
@@ -77,12 +77,15 @@ class Chapter {
 	// Utility function
 	getReadingTime() { return this.isForthcoming() ? undefined : Math.max(1, Math.round(this.getWordCount() / 150)); }
 
-	computeIndex(): Record<string, Array<Match>> {
+	computeIndex(): Record<string, Match[]> | undefined {
+
+		if(!this.ast)
+			return;
 
 		// Build a list of common words
-		let commonWords = {};
+		let commonWords: Set<string> = new Set();
 		["a","about","all","also","and","are","as","at","be","because","but","by","can","come","could","day","do","does","even","find","first","for","from","get","give","go","has","have","he","her","here","him","his","how","I","if","in","into","is","it","its","just","know","like","look","make","man","many","me","more","my","new","no","not","now","of","on","one","only","or","other","our","out","people","say","see","she","so","some","take","tell","than","that","the","their","them","then","there","these","they","thing","think","this","those","time","to","two","up","use","very","want","was","way","we","well","went","what","when","which","who","will","with","would","year","yes","you","your"].forEach(
-			word => commonWords[word] = true
+			word => commonWords.add(word)
         );
 
 		// Get all the text in the chapter.
@@ -92,7 +95,7 @@ class Chapter {
 		const words = text.split(/\b/);
 
 		// Index the words
-		const index = {};
+		const index: Record<string, Array<Match>> = {};
 		words.forEach((word, wordNumber) => {
 
 			// Skip non words. We keep them for search results.
@@ -106,7 +109,7 @@ class Chapter {
 			// • It shouldn't have an apostrophe
 			// • It should be longer than two letters
 			// • It shouldn't end in 'ly'
-			if(!(word in commonWords) && word.indexOf('\u2019') < 0 && (word.length > 2 && word.substring(word.length - 2, word.length) !== "ly")) {
+			if(!(commonWords.has(word)) && word.indexOf('\u2019') < 0 && (word.length > 2 && word.substring(word.length - 2, word.length) !== "ly")) {
 				
 				// If we haven't started a list of occurrences, start one.
 				if(!(word in index))
@@ -117,16 +120,16 @@ class Chapter {
 					match: words[wordNumber],
 					right: words.slice(Math.min(words.length - 1, wordNumber + 1), Math.min(words.length - 1, wordNumber + 10) + 1).join("")
 				}
-				// Add the occurrence
-				index[word].push(match);
+				// Add the occurrence, but a lower case canonical version.
+				index[word.toLowerCase()].push(match);
 			}
 		
 		});
 
-		return this.book.cleanIndex(index);
+		return index;
 
 	}
 
 }
 
-export { Chapter };
+export default Chapter

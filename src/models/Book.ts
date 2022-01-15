@@ -1,6 +1,5 @@
 import Parser, { EmbedNode } from "./Parser";
-import { Chapter } from './Chapter.js';
-import { ArrayBindingOrAssignmentElement } from "typescript";
+import Chapter from './Chapter.js';
 
 export type ChapterSpecification = {
     id: string;
@@ -10,11 +9,19 @@ export type ChapterSpecification = {
     numbered?: boolean;
     forthcoming?: boolean;
     section?: string;
+    text?: string;
+}
+
+export type Author = {
+    id: string;
+    name: string;
+    url?: string;
 }
 
 export type BookSpecification = {
+    id?: string;
     title: string;
-    authors: Array<{ id: string, name: string, url?: string }>;
+    authors: Author[];
     images: Record<string, string>;
     description: string;
     chapters: Array<ChapterSpecification>;
@@ -40,19 +47,19 @@ export default class Book {
 
     title: string;
     symbols: Record<string, string>;
-    tags: Array<string>;
+    tags: string[];
     license: string;
     references: Record<string, string | Array<string>>;
-    glossary: Record<string, { phrase: string, definition: string, synonyms?: Array<string>}>;
-    authors: Array<{ id: string, name: string, url?: string}>;
+    glossary: Record<string, { phrase: string, definition: string, synonyms?: string[]}>;
+    authors: Author[];
     description: string;
     acknowledgements: string;
     revisions: Array<[string, string]>;
     images: Record<string, string>;
     sources: Record<string, string>;
-    uids: Array<string>;
-    chapters: Array<Chapter>;
-    chaptersByID: Record<string, Chapter>;
+    uids: string[];
+    chapters: Chapter[];
+    chaptersByID: Record<string, Chapter | undefined>;
     chapterNumbers: Record<string, number>;
 
     // Given an object with a valid specification and an object mapping chapter IDs to chapter text,
@@ -64,19 +71,19 @@ export default class Book {
 
         // Copy all of the specification metadata to fields.
         // Choose suitable defaults if the spec is empty.
-        this.title = specification && "title" in specification ? specification.title : "Untitled"
-        this.symbols = specification && "symbols" in specification ? specification.symbols : {}
-        this.tags = specification && "tags" in specification ? specification.tags : []
-        this.license = specification && "license" in specification ? specification.license : "This work is licensed under [Attribution-NoDerivatives 4.0 International|http://creativecommons.org/licenses/by-nd/4.0/]",
-        this.references = specification && "references" in specification ? specification.references : {}
-        this.glossary = specification && "glossary" in specification ? specification.glossary : {}
-        this.authors = specification && "authors" in specification ? specification.authors : []
-        this.description = specification && "description" in specification ? specification.description : "What's your book about?"
-        this.acknowledgements = specification && "acknowledgements" in specification ? specification.acknowledgements : "Anyone to thank?"
-        this.revisions = specification && "revisions" in specification ? specification.revisions : []
-        this.images = specification && "images" in specification ? specification.images : {}
-        this.sources = specification && "sources" in specification ? specification.sources : {}
-        this.uids = specification && "uids" in specification ? specification.uids : []
+        this.title = specification && specification.title ? specification.title : "Untitled"
+        this.symbols = specification && specification.symbols ? specification.symbols : {}
+        this.tags = specification && specification.tags ? specification.tags : []
+        this.license = specification && specification.license ? specification.license : "This work is licensed under [Attribution-NoDerivatives 4.0 International|http://creativecommons.org/licenses/by-nd/4.0/]",
+        this.references = specification && specification.references ? specification.references : {}
+        this.glossary = specification && specification.glossary ? specification.glossary : {}
+        this.authors = specification && specification.authors ? specification.authors : []
+        this.description = specification && specification.description ? specification.description : "What's your book about?"
+        this.acknowledgements = specification && specification.acknowledgements ? specification.acknowledgements : "Anyone to thank?"
+        this.revisions = specification && specification.revisions ? specification.revisions : []
+        this.images = specification && specification.images ? specification.images : {}
+        this.sources = specification && specification.sources ? specification.sources : {}
+        this.uids = specification && specification.uids ? specification.uids : []
 
         // Create a list and dictionary of Chapter objects.
         this.chapters = []
@@ -85,10 +92,11 @@ export default class Book {
         // If there's a spec and it has chapters, process them.
         if(specification && specification.chapters.length > 0) {
             // Initialize the chapters dictionary since parsing depends this index to detect whether a chapter exists.
-            specification.chapters.forEach(chapter => this.chaptersByID[chapter.id] = null)
+            specification.chapters.forEach(chapter => this.chaptersByID[chapter.id] = undefined)
             specification.chapters.forEach(chapter => {
-                this.chaptersByID[chapter.id] = new Chapter(this, chapter)
-                this.chapters.push(this.chaptersByID[chapter.id])
+                const chap = new Chapter(this, chapter)
+                this.chaptersByID[chapter.id] = chap
+                this.chapters.push(chap)
             })
         }
 
@@ -119,7 +127,7 @@ export default class Book {
 
     }
 
-    addUserID(uid) {
+    addUserID(uid: string) {
 
         this.uids.push(uid);
 
@@ -127,31 +135,36 @@ export default class Book {
 
     getTitle() { return this.title; }
     getChapters() { return this.chapters }
-    hasChapter(chapterID) { return chapterID in this.chaptersByID || ["references", "glossary", "index", "search", "media"].includes(chapterID); }
-    getChapter(chapterID) { return this.hasChapter(chapterID) ? this.chaptersByID[chapterID] : null; }
+    hasChapter(chapterID: string): boolean { return chapterID in this.chaptersByID || ["references", "glossary", "index", "search", "media"].includes(chapterID); }
+    getChapter(chapterID: string): Chapter | undefined { return this.hasChapter(chapterID) ? this.chaptersByID[chapterID] : undefined; }
     getSymbols() { return this.symbols }
 	getLicense() { return this.license; }
     hasReferences() { return this.references && Object.keys(this.references).length > 0; }
 	getReferences() { return this.references; }
+    getReference(citationID: string) { return this.references[citationID]; }
     hasGlossary() { return this.glossary && Object.keys(this.glossary).length > 0 }
 	getGlossary() { return this.glossary }
 	getTags() { return this.tags }
 	getAuthors() { return this.authors; }	
-	getAuthorByID(id) { return this.authors.find(el => el.id === id); }
+	getAuthorByID(id: string) { return this.authors.find(el => el.id === id); }
 	getDescription() { return this.description; }
 	getAcknowledgements() { return this.acknowledgements; }
 	getRevisions() { return this.revisions; }
 
-    hasImage(id) { return id in this.images; }
-    getImage(id) { return this.hasImage(id) ? this.images[id] : null; }
+    hasImage(id: string) { return id in this.images; }
+    getImage(id: string) { return this.hasImage(id) ? this.images[id] : undefined; }
 	
 	getBookReadingTime() {
 		return this.chapters
                 .map(chapter => chapter.getReadingTime())
-                .reduce((total, time) => time === undefined ? total : total + time, 0);
+                .reduce((total, time) => 
+                    total === undefined ? 0 : 
+                    time === undefined ? 
+                        total : total + time, 0
+                );
 	}
 
-	getChapterNumber(chapterID) {
+	getChapterNumber(chapterID: string) {
 
 		// If we haven't cached it yet, compute it.
 		if(!(chapterID in this.chapterNumbers)) {
@@ -183,17 +196,23 @@ export default class Book {
 
 	}
 
-	getSource(sourceID) { 
+	getSource(sourceID: string) { 
 		return sourceID.charAt(0) === "#" && sourceID.substring(1) in this.sources ? 
             this.sources[sourceID.substring(1)] : 
             null;
 	}
 
-	getChapterName(chapterID) { return this.hasChapter(chapterID) ? this.getChapter(chapterID).getTitle() : null; }
+	getChapterName(chapterID: string): string | undefined { 
+        const chapter = this.getChapter(chapterID);
+        return chapter?.getTitle()
+    }
 
-    getChapterSection(chapterID) { return this.hasChapter(chapterID) ? this.chaptersByID[chapterID].getSection() : null; }
+    getChapterSection(chapterID: string): string | undefined { 
+        const chapter = this.chaptersByID[chapterID];
+        return chapter?.getSection();
+    }
 
-	getFootnoteSymbol(number) {
+	getFootnoteSymbol(number: number) {
 
 		let symbols = "abcdefghijklmnopqrstuvwxyz";
         // Let's hope there are never more than 26^2 footnotes in a single chapter...
@@ -203,9 +222,10 @@ export default class Book {
 
 	}
 
-    getBookIndex() {
+    getBookIndex(): Record<string, Set<string>> {
 
-		const bookIndex = {};
+        // A map from word to a map of chapters containing the word
+		const bookIndex: Record<string, Set<string>> = {};
 
 		// Construct the index by building a dictionary of chapters in which each word appears.
 		this.chapters.forEach(chapter => {
@@ -214,57 +234,18 @@ export default class Book {
 			    Object.keys(index).forEach(word => {
                     if(word !== "" && word.length > 2) {
                         if(!(word in bookIndex))
-                            bookIndex[word] = {};
-                        bookIndex[word][chapter.id] = true;
+                            bookIndex[word] = new Set();
+                        bookIndex[word].add(chapter.id);
                     }
                 });
 		});
 
-		// Convert each word's dictionary to a list of chapter IDs for display.
-		Object.keys(bookIndex).forEach(word => {
-			bookIndex[word] = Object.keys(bookIndex[word]);
-		});
-
-		return this.cleanIndex(bookIndex);
-
-	}
-
-    cleanIndex(index) {
-
-		// Remove any:
-		// * upper case versions of words if they appear in lower case,
-		// * plural versions of words if they appear in singular
-		// as a heuristic for detecting non-proper nounds.
-		const duplicates = [];
-		Object.keys(index).forEach(word => {
-			let duplicate = false;
-			let canonical = null;
-			if((word.charAt(0) === word.charAt(0).toUpperCase() && word.toLowerCase() in index)) {
-				duplicate = true;
-				canonical = word.toLowerCase();
-			}
-            // TODO This breaks the highlighting behavior because it tries to find exact matches
-			// if(word.charAt(word.length - 1) === "s" && word.toLowerCase().substring(0, word.length - 1) in index) {
-			// 	duplicate = true;
-			// 	canonical = word.toLowerCase().substring(0, word.length - 1);
-			// }
-			if(duplicate) {				
-				duplicates.push(word);
-				// Merge any chapter occurrences, removing duplicates using a set and spread.
-				if(Array.isArray(index[canonical]))
-					index[canonical] = [...new Set(index[canonical].concat(index[word]))];
-			}
-		})
-		duplicates.forEach(word => {
-			delete index[word];
-		});
-
-		return index;
+        return bookIndex;
 
 	}
 
 	// Given the current chapter, find the available chapter after it.
-    getNextChapterID(chapterID) {
+    getNextChapterID(chapterID: string) {
 
         // Handle back matter chapters.
         switch(chapterID) {
@@ -295,7 +276,7 @@ export default class Book {
 	}
 
 	// Given a chapter id, find the available chapter before it.
-	getPreviousChapterID(chapterID) {
+	getPreviousChapterID(chapterID: string) {
 
         switch(chapterID) {
 
@@ -326,14 +307,18 @@ export default class Book {
 	}
 
     // Get all of the embeds in the book
-    getMedia() {
+    getMedia(): EmbedNode[] {
 
-        let media = [];
+        let media: EmbedNode[] = [];
         let urls = new Set(); // This just prevents duplicates.
 
         // Add the book cover
-        if(this.getImage("cover"))
-            media.push(Parser.parseEmbed(this, this.getImage("cover")));
+        const cover = this.getImage("cover")
+        if(cover) {
+            let coverNode = Parser.parseEmbed(this, cover);
+            if(coverNode instanceof EmbedNode)
+                media.push(coverNode);
+        }
 
         // Add the cover and images from each chapter.
 		this.getChapters().forEach(c => {
@@ -346,7 +331,7 @@ export default class Book {
 
             let embeds = c?.getAST()?.getEmbeds();
             if(embeds)
-                embeds.forEach(embed => {
+                embeds.forEach((embed: EmbedNode) => {
                     if(!urls.has(embed.url)) {
                         media.push(embed);
                         urls.add(embed.url);
@@ -358,8 +343,9 @@ export default class Book {
         // Add the back matter covers
         let backmatter = ["references", "glossary", "index", "search", "media"];
         backmatter.forEach(id => {
-            if(this.hasImage(id)) {
-                let image = Parser.parseEmbed(this, this.getImage(id));
+            const img = this.getImage(id)
+            if(img) {
+                let image = Parser.parseEmbed(this, img);
                 if(image instanceof EmbedNode && !urls.has(image.url)) {
                     media.push(image);
                     urls.add(image.url);

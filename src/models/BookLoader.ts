@@ -1,5 +1,6 @@
 import Ajv from 'ajv';
-import Book from './Book'
+import addFormats from 'ajv-formats';
+import Book, { BookSpecification, ChapterSpecification } from './Book'
 
 let schema = require("../schemas/book.json");
 
@@ -10,7 +11,7 @@ let schema = require("../schemas/book.json");
 // If any errors are encountered, throws an Error.
 export default async function loadBookFromURL(url: string) {
 
-    let specification = null
+    let specification: BookSpecification | undefined = undefined
 
     // Fetch the JSON from the given URL
     return fetch(url + "book.json")
@@ -26,29 +27,35 @@ export default async function loadBookFromURL(url: string) {
 
         })
         // If the JSON doesn't parse...
-        .catch(error => {
+        .catch(() => {
             throw Error("The book.json file that we received doesn't appear to be a JSON-formatted document.")
         })
         // Validate the specification and then load its chapters...
         .then(book => {
 
             // Validate the book schema before we get started.
-            const ajv = new Ajv();
+            const ajv = new Ajv({
+                strictTuples: false
+            });
+            addFormats(ajv);
 
             // Did the specification have schema errors?
             // Initialize the book as null and set the errors.
             if (!ajv.validate(schema, book)) {
                 throw Error(
-                    "The book has one or more error validation errors: " +
-                    ajv.errors.map(error => url + error.dataPath + " " + error.message).join("\n")
+                    "The book specification has validation errors" +
+                    (ajv.errors ?
+                        ": " + ajv.errors.map(error => url + error.instancePath + " " + error.message).join("\n") :
+                        "."
+                    )
                 )
             }
 
             // Remember the book spec
-            specification = book
+            specification = book as BookSpecification
 
             // Map all non-forthcoming chapters to a list of fetch promises
-            return Promise.all(book.chapters.filter(chapter => !chapter.forthcoming).map(chapter => 
+            return Promise.all(specification.chapters.filter((chapter: ChapterSpecification) => !chapter.forthcoming).map((chapter: ChapterSpecification) => 
                 fetch(url + "chapters/" + chapter.id + ".md")
                     .then((response) => {
 

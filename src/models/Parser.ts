@@ -26,7 +26,7 @@ import Book from "./Book";
 // FOOTNOTE :: {TEXT}
 // TEXT :: (.+)
 
-type Position = "|" | "<" | ">";
+export type Position = "|" | "<" | ">";
 
 type Bookkeeping = {
     citations: Record<string, boolean>;
@@ -67,14 +67,14 @@ type BlockNode = HeaderNode | RuleNode | EmbedNode | BulletedListNode | Numbered
 
 export default class Parser {
 
-    book: Book;
+    book: Book | undefined;
     text: string;
     index: number;
     openedDoubleQuote: boolean;
     // We pass this to all parsing functions to gather information strewn about the document.
     metadata: Bookkeeping;
 
-    constructor(book: Book, text: string) {
+    constructor(book: Book | undefined, text: string) {
         if(typeof text !== "string")
             throw "Parser expected a string but received " + typeof text;
 
@@ -108,19 +108,19 @@ export default class Parser {
 
     }
 
-    static parseChapter(book, text: string) {
-        return (new Parser(book, Parser.preprocessSymbols(book, text))).parseChapter();
+    static parseChapter(book: Book | undefined, text: string) {
+        return (new Parser(book, book ? Parser.preprocessSymbols(book, text) : text)).parseChapter();
     }
 
-    static parseContent(book, text: string) {
+    static parseContent(book: Book, text: string) {
         return (new Parser(book, Parser.preprocessSymbols(book, text))).parseContent();
     }
 
-    static parseEmbed(book, text: string) {
+    static parseEmbed(book: Book, text: string) {
         return (new Parser(book, Parser.preprocessSymbols(book, text))).parseEmbed();
     }
 
-    static parseReference(ref: string | Array<string>, book, short=false) {
+    static parseReference(ref: string | Array<string>, book: Book, short=false) {
 
         if(typeof ref === "string")
             return Parser.parseContent(book, ref);
@@ -153,7 +153,7 @@ export default class Parser {
     }
 
     // Get the next character, if there is one, null otherwise.
-    peek(): string {
+    peek(): string | null {
         return this.more() ? this.text.charAt(this.index) : null; 
     }
     
@@ -163,7 +163,7 @@ export default class Parser {
     }
 
     // Return the current character--if there is one-- and increment the index.
-	read(smarten=true): string { 
+	read(smarten=true): string | null { 
 		if(!this.more())
             return null;
         
@@ -215,12 +215,12 @@ export default class Parser {
     }
 
     // The character before
-    charBeforeNext(): string {
+    charBeforeNext(): string | null {
         return this.index === 0 ? null : this.text.charAt(this.index - 1);
     }
 
     // The character after
-    charAfterNext(): string {
+    charAfterNext(): string | null {
         return this.index === this.text.length - 1 ? null : this.text.charAt(this.index + 1);
     }
     
@@ -244,13 +244,14 @@ export default class Parser {
     nextIsContentDelimiter(): boolean {
 
         const next = this.peek();
+        const charAfterNext = this.charAfterNext();
         return next === "\n" ||
             next === "_" ||
             next === "*" ||
             next === "`" ||
             next === "@" ||
             next === "~" ||
-            (next === ":" && this.charAfterNext().match(/[a-z]/i) !== null) ||
+            (next === ":" && charAfterNext !== null && charAfterNext.match(/[a-z]/i) !== null) ||
             next === "^" ||
             next === "<" ||
             next === "{" ||
@@ -274,8 +275,11 @@ export default class Parser {
 
     // Read until encountering something other than a tab or a space.
     readWhitespace(): void {
-        while(this.more() && /^[ \t]/.test(this.peek()))
+        let peek = this.peek()
+        while(peek !== null && /^[ \t]/.test(peek)) {
             this.read();
+            peek = this.peek()
+        }
     }
 
     // Read until the end of the line.
@@ -320,7 +324,8 @@ export default class Parser {
         }
 
         // Replace all of the remaining symbols using book symbol definitions.
-        rest = Parser.preprocessSymbols(this.book, rest);
+        if(this.book)
+            rest = Parser.preprocessSymbols(this.book, rest);
         
         // Replace the text with the pre-processed text.
         this.text = declarations + rest;
@@ -404,13 +409,13 @@ export default class Parser {
         // Read whitespace before the block.
         this.readWhitespace();
 
-        // Read the comment and return nothing.
-        if(this.nextIs("%")) {
+        // Read comment lines
+        while(this.nextIs("%")) {
             this.readUntilNewLine();
-            return null;
         }
+
         // Parse and return a header if it starts with a hash
-        else if(this.nextIs("#"))
+        if(this.nextIs("#"))
             return this.parseHeader();
         // Parse and return a horizontal rule if it starts with a dash
         else if(this.nextIs("-"))
@@ -791,13 +796,17 @@ export default class Parser {
     // because we don't allow infinite nesting of the same formatting type.
     parseContent(awaiting?: string): ContentNode {
 
-        let segments = [];
+        let segments: Node[] = [];
 
         // Read until hitting a delimiter.
         while(this.more() && !this.nextIs("\n")) {
+
+            const next = this.peek();
+            const charAfterNext = this.charAfterNext();
+
             // Parse some formatted text
-            if(this.nextIs("_") || this.nextIs("*"))
-                segments.push(this.parseFormatted(this.peek()));
+            if(next === "_" || next === "*")
+                segments.push(this.parseFormatted(next));
             // Parse unformatted text
             else if(this.nextIs("`")) {
                 segments.push(this.parseInlineCode());
@@ -824,18 +833,21 @@ export default class Parser {
             else if(this.charBeforeNext() === " " && this.nextIs("%"))
                 this.parseComment();
             // Parse an unresolved symbol
-            else if(this.nextIs("@")) {
+            else if(next === "@") {
                 // Read the @, then the symbol name.
                 this.read();
                 let symbol = "";
                 // Stop at the end of the name or file.
-                while(this.more() && /[a-zA-Z0-9]/.test(this.peek()))
+                let next = this.peek();
+                while(next !== null && /[a-zA-Z0-9]/.test(next)) {
                     symbol = symbol + this.read();
+                    next = this.peek();
+                }
                 segments.push(this.createError("Couldn't find symbol @" + symbol));
 
             }
             // Parse a label
-            else if(this.nextIs(":") && this.charAfterNext().match(/[a-z]/i)) {
+            else if(next === ":" && charAfterNext !== null && charAfterNext.match(/[a-z]/i)) {
                 segments.push(this.parseLabel());
             }
             // Keep reading text until finding a delimiter.
@@ -957,8 +969,11 @@ export default class Parser {
 
         // Consume everything until it's not a letter.
         let id = "";
-        while(this.more() && this.peek().match(/[a-z]/i))
+        let next = this.peek();
+        while(next !== null && next.match(/[a-z]/i)) {
             id = id + this.read();
+            next = this.peek();
+        }
 
         const label = new LabelNode(id);
 
@@ -971,12 +986,15 @@ export default class Parser {
 
     }
 
-    parseFormatted(awaiting: string): FormattedNode {
+    parseFormatted(awaiting: string): FormattedNode | ErrorNode {
 
         // Remember what we're matching.
         const delimeter = this.read();
-        const segments = [];
+        const segments: Array<ContentNode | TextNode | ErrorNode> = [];
         let text = "";
+
+        if(delimeter === null)
+            return this.createError("Somehow parsing formatted text at end of file.");
 
         // Read some content until reaching the delimiter or the end of the line
         while(this.more() && this.peek() !== delimeter && !this.nextIs("\n")) {
@@ -1036,10 +1054,12 @@ export default class Parser {
 
         // If there's a letter immediately after a backtick, it's a language for an inline code name
         let language = "";
-        if(/^[a-z]$/.test(this.peek())) {
+        let next = this.peek();
+        if(next !== null && /^[a-z]$/.test(next)) {
             do {
                 language = language + this.read();
-            } while(/^[a-z]$/.test(this.peek()));
+                next = this.peek();
+            } while(next !== null && /^[a-z]$/.test(next));
         } else
             language = "plaintext"
 
@@ -1127,8 +1147,11 @@ export default class Parser {
         // Read the glossary entry ID
         let glossaryID = "";
         // Stop at the end of the name or file.
-        while(this.more() && /[a-zA-Z]/.test(this.peek()))
+        let next = this.peek();
+        while(next !== null && /[a-zA-Z]/.test(next)) {
             glossaryID = glossaryID + this.read();
+            next = this.peek();
+        }
 
         let node = new DefinitionNode(text, glossaryID);
 
@@ -1136,11 +1159,15 @@ export default class Parser {
 
     }
 
-    parseEscaped(): TextNode {
+    parseEscaped(): TextNode | ErrorNode {
 
         // Skip the scape and just add the next character.
         this.read();
-        return new TextNode(this.read(), this.index);
+        const char = this.read();
+        if(char)
+            return new TextNode(char, this.index);
+
+        return this.createError("Unterminated escape.");
 
     }
     
@@ -1187,7 +1214,7 @@ export default class Parser {
                 label = parts[1];
             }
 
-            if(chapter !== "" && !this.book.hasChapter(chapter))
+            if(chapter !== "" && this.book && !this.book.hasChapter(chapter))
                 return this.createError("Unknown chapter name '" + link + "'");
 
         }
@@ -1198,10 +1225,7 @@ export default class Parser {
 
 }
 
-class Node {
-    toText() {
-        throw new Error("Method not implemented.");
-    }
+export abstract class Node {
     type: NodeType;
 
     constructor(type: NodeType) {
@@ -1210,6 +1234,11 @@ class Node {
             throw new Error("All nodes require a type string.")
         this.type = type
     }
+
+    toText() {
+        throw new Error("Method not implemented.");
+    }
+
 }
 
 export class ChapterNode extends Node {
@@ -1226,11 +1255,11 @@ export class ChapterNode extends Node {
 
     }
 
-    getErrors(): Array<ErrorNode> { return this.metadata.errors; }
+    getErrors(): ErrorNode[] { return this.metadata.errors; }
     getCitations(): Record<string, boolean> { return this.metadata.citations; }
-    getFootnotes(): Array<FootnoteNode> { return this.metadata.footnotes; }
-    getHeaders(): Array<HeaderNode> { return this.metadata.headers; }
-    getEmbeds(): Array<EmbedNode> { return this.metadata.embeds; }
+    getFootnotes(): FootnoteNode[] { return this.metadata.footnotes; }
+    getHeaders(): HeaderNode[] { return this.metadata.headers; }
+    getEmbeds(): EmbedNode[] { return this.metadata.embeds; }
 
     getCitationNumber(citationID: string) { 
         
@@ -1249,7 +1278,7 @@ export class ChapterNode extends Node {
 
 }
 
-class ParagraphNode extends Node {
+export class ParagraphNode extends Node {
     content: ContentNode;
 
     constructor(content: ContentNode) {
@@ -1258,7 +1287,7 @@ class ParagraphNode extends Node {
 
     }
 
-    toText() {
+    toText(): string {
         return this.content.toText();
     }
 
@@ -1280,7 +1309,7 @@ export class EmbedNode extends Node {
         this.position = position;
     }
 
-    toText() {
+    toText(): string {
         return this.caption.toText();
     }
 
@@ -1295,7 +1324,7 @@ export class EmbedNode extends Node {
 
 }
 
-class HeaderNode extends Node {
+export class HeaderNode extends Node {
     level: number;
     content: ContentNode;
     constructor(level: number, content: ContentNode) {
@@ -1304,50 +1333,50 @@ class HeaderNode extends Node {
         this.content = content;
     }
 
-    toText() {
+    toText(): string {
         return this.content.toText();
     }
 
 }
 
-class RuleNode extends Node {
+export class RuleNode extends Node {
     constructor() {
         super("rule");
     }
 
-    toText() {
+    toText(): string {
         return "";
     }
 
 }
 
-class BulletedListNode extends Node {
+export class BulletedListNode extends Node {
     items: Array<ContentNode | BulletedListNode>;
     constructor(items: Array<ContentNode | BulletedListNode>) {
         super("bulleted");
         this.items = items;
     }
 
-    toText() {
+    toText(): string {
         return this.items.map(item => item.toText()).join(" ");
     }
 
 }
 
-class NumberedListNode extends Node {
+export class NumberedListNode extends Node {
     items: Array<ContentNode | NumberedListNode>;
     constructor(items: Array<ContentNode | NumberedListNode>) {
         super("numbered");
         this.items = items;
     }
 
-    toText() {
+    toText(): string {
         return this.items.map(item => item.toText()).join(" ");
     }
 
 }
 
-class CodeNode extends Node {
+export class CodeNode extends Node {
     code: string;
     caption: ContentNode;
     position: Position;
@@ -1373,25 +1402,25 @@ class CodeNode extends Node {
 
 }
 
-class QuoteNode extends Node {
+export class QuoteNode extends Node {
     elements: Array<BlockNode>;
-    credit: ContentNode;
+    credit: ContentNode | null;
     position: Position;
 
-    constructor(elements: Array<BlockNode>, credit: ContentNode, position: Position) {
+    constructor(elements: Array<BlockNode>, credit: ContentNode | null, position: Position) {
         super("quote");
         this.elements = elements;
         this.credit = credit;
         this.position = position;
     }
 
-    toText() {
+    toText(): string {
         return this.elements.map(element => element.toText()).join(" ") + (this.credit ? " " + this.credit.toText() : "");
     }
 
 }
 
-class CalloutNode extends Node {
+export class CalloutNode extends Node {
     elements: Array<BlockNode>;
     position: Position;
     
@@ -1401,13 +1430,13 @@ class CalloutNode extends Node {
         this.position = position;
     }
 
-    toText() {
+    toText(): string {
         return this.elements.map(element => element.toText()).join(" ");
     }
 
 }
 
-class TableNode extends Node {
+export class TableNode extends Node {
     rows: Array<Array<ContentNode>>;
     caption: Node;
     position: Position;
@@ -1425,23 +1454,23 @@ class TableNode extends Node {
 
 }
 
-class FormattedNode extends Node {
+export class FormattedNode extends Node {
     format: string;
-    segments: Array<ContentNode | TextNode>;
+    segments: Array<ContentNode | TextNode | ErrorNode>;
 
-    constructor(format: string, segments: Array<ContentNode | TextNode>) {
+    constructor(format: string, segments: Array<ContentNode | TextNode | ErrorNode>) {
         super("formatted");
         this.format = format;
         this.segments = segments;
     }
 
-    toText() {
+    toText(): string {
         return this.segments.map(segment => segment.toText()).join(" ");
     }
 
 }
 
-class InlineCodeNode extends Node {
+export class InlineCodeNode extends Node {
     code: string;
     language: string;
 
@@ -1451,13 +1480,13 @@ class InlineCodeNode extends Node {
         this.language = language;
     }
 
-    toText() {
+    toText(): string {
         return this.code;
     }
 
 }
 
-class LinkNode extends Node {
+export class LinkNode extends Node {
     content: ContentNode;
     url: string;
     constructor(content: ContentNode, url: string) {
@@ -1466,26 +1495,26 @@ class LinkNode extends Node {
         this.url = url;
     }
 
-    toText() {
+    toText(): string {
         return this.content.toText();
     }
 
 }
 
-class CitationsNode extends Node {
+export class CitationsNode extends Node {
     citations: Array<string>;
     constructor(citations: Array<string>) {
         super("citations");
         this.citations = citations;
     }
 
-    toText() {
+    toText(): string {
         return "";
     }
 
 }
 
-class DefinitionNode extends Node {
+export class DefinitionNode extends Node {
     phrase: ContentNode;
     glossaryID: string;
     constructor(phrase: ContentNode, glossaryID: string) {
@@ -1494,38 +1523,38 @@ class DefinitionNode extends Node {
         this.glossaryID = glossaryID;
     }
 
-    toText() {
+    toText(): string {
         return this.phrase.toText();
     }
 
 }
 
-class FootnoteNode extends Node {
+export class FootnoteNode extends Node {
     footnote: ContentNode;
     constructor(footnote: ContentNode) {
         super("footnote");
         this.footnote = footnote;
     }
 
-    toText() {
+    toText(): string {
         return this.footnote.toText();
     }
 
 }
 
-class ContentNode extends Node {
-    segments: Array<TextNode>;
-    constructor(segments: Array<TextNode>) {
+export class ContentNode extends Node {
+    segments: Node[];
+    constructor(segments: Node[]) {
         super("content");
         this.segments = segments;
     }
 
-    toText() {
+    toText(): string {
         return this.segments.map(segment => segment.toText()).join(" ");
     }
 }
 
-class SubSuperscriptNode extends Node {
+export class SubSuperscriptNode extends Node {
     superscript: boolean;
     content: ContentNode;
     constructor(superscript: boolean, content: ContentNode) {
@@ -1534,12 +1563,12 @@ class SubSuperscriptNode extends Node {
         this.content = content;
     }
 
-    toText() {
+    toText(): string {
         return this.content.toText();
     }
 }
 
-class TextNode extends Node {
+export class TextNode extends Node {
     text: string;
     position: number;
     constructor(text: string, position: number) {
@@ -1548,26 +1577,26 @@ class TextNode extends Node {
         this.position = position - text.length;
     }
 
-    toText() {
+    toText(): string {
         return this.text;
     }
 
 }
 
-class ErrorNode extends Node {
+export class ErrorNode extends Node {
     error: string;
     constructor(error: string) {
         super("error");
         this.error = error;
     }
 
-    toText() {
+    toText(): string {
         return "";
     }
 
 }
 
-class LabelNode extends Node {
+export class LabelNode extends Node {
     id: string;
     constructor(id: string) {
         super("label");
@@ -1576,19 +1605,20 @@ class LabelNode extends Node {
 
     getID() { return this.id; }
 
-    toText() { return ""; }
+    toText(): string { return ""; }
 
 }
 
-class ReferenceNode extends Node {
+export class ReferenceNode extends Node {
     authors: string;
     year: string;
     title: string;
     source: string;
-    url: string;
-    summary: string;
+    url: string | null;
+    summary: string | null;
     short: boolean;
-    constructor(authors: string, year: string, title: string, source: string, url: string, summary: string, short: boolean) {
+    
+    constructor(authors: string, year: string, title: string, source: string, url: string | null, summary: string | null, short: boolean) {
         super("reference")
         this.authors = authors
         this.year = year
