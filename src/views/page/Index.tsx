@@ -60,10 +60,11 @@ const Index = (props: { book: Book }) => {
                                     if(numberB === undefined) return 1;
                                     return numberA - numberB;
                                 })
+                                // Map them to links to the first occurrence in the chapter.
                                 .map(
                                     (chapterID, index) => 
                                         <span key={index}>
-                                            Chapter { book.getChapterNumber(chapterID) !== undefined ? <span> {book.getChapterNumber(chapterID)}. </span> : null}<Link to={base + "/" + chapterID + "/" + word}>{book.getChapterName(chapterID)}</Link>
+                                            Chapter { book.getChapterNumber(chapterID) !== undefined ? <span> {book.getChapterNumber(chapterID)}. </span> : null}<Link to={base + "/" + chapterID + "/" + word + "/0"}>{book.getChapterName(chapterID)}</Link>
                                             {index < bookIndex[word].size - 1 ? <br/> : null}
                                         </span>
                         )}
