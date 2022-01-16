@@ -89,3 +89,86 @@ button:hover {
     color: var(--bookish-app-chrome-hover-color);
     cursor: pointer;
 }
+
+.bookish-app-editable {
+    position: relative;
+}
+
+.bookish-app-editable.bookish-app-editable-viewing:hover:before {
+    color: var(--bookish-paragraph-color);
+}
+
+.bookish-app-editable:before {
+    font-family: "Arial";
+    font-size: var(--bookish-small-font-size);
+    color: var(--bookish-muted-color);
+    position: absolute;
+    left: -2em;
+}
+
+/* Pencil! */
+.bookish-app-editable-viewing:before {
+    content: "\270E";
+}
+
+/* Check mark */
+.bookish-app-editable-saved:before {
+    content: "\2713";
+}
+
+/* Match the parent's styling as much as possible. */
+input[type="text"].bookish-app-editable {
+    font-family: inherit;
+    font-size: inherit;
+    font-weight: inherit;
+    color: inherit;
+    border: none;
+    box-sizing: content-box;
+    padding: 0;
+    margin: 0;
+    display: inline-block;
+}
+
+.bookish-app-editable-saving {
+    animation-name: waiting;
+    animation-duration: 0.5s;
+    animation-iteration-count: infinite;
+}
+
+@keyframes waiting {
+    from, to { transform: scale(1, 1); }
+    25% { transform: scale(1, 1.2); }
+    50% { transform: scale(1, 1.0); }
+    75% { transform: scale(1, 1.1); }
+}
+
+.bookish-app-editable-error {
+    animation: failure 100ms 10;
+}
+
+@keyframes failure {
+    0% {
+		transform: translate(-2px, 0px);
+	}
+	50% {
+		transform: translate(0px, 0px);
+	}
+	100% {
+		transform: translate(2px, 0px);
+	}
+}
+
+input[type="text"].bookish-app-editable-error {
+    background-color: var(--bookish-app-error-background);
+}
+
+.bookish-app-editable-message {
+    font-size: var(--bookish-small-font-size);
+    float: right;
+    line-height: 1em;
+    margin-top: 1em;
+}
+
+.bookish-app-editable-message-error {
+    color: var(--bookish-app-error-color);
+}

@@ -134,6 +134,18 @@ export default class Book {
     }
 
     getTitle() { return this.title; }
+    setTitle(title: string): Promise<void> { 
+        return new Promise((resolve, reject) => {
+            this.title = title;
+            setTimeout(() => {
+                if(Math.random() < .5)
+                    resolve()
+                else
+                    reject("Unable to save")
+            }, 100)
+        })
+    }
+
     getChapters() { return this.chapters }
     hasChapter(chapterID: string): boolean { return chapterID in this.chaptersByID || ["references", "glossary", "index", "search", "media"].includes(chapterID); }
     getChapter(chapterID: string): Chapter | undefined { return this.hasChapter(chapterID) ? this.chaptersByID[chapterID] : undefined; }

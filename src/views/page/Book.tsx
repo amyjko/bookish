@@ -18,11 +18,13 @@ smoothscroll.polyfill();
 
 export const DarkModeContext = React.createContext<{ darkMode: boolean, setDarkMode: Function | undefined }>({ darkMode: false, setDarkMode: undefined})
 export const BaseContext = React.createContext<{ base: string }>({ base: "" })
+export const EditorContext = React.createContext<{ editable: boolean, setEditingBook: Function | undefined }>({ editable: false, setEditingBook: undefined })
 
-const Book = (props: { book: BookModel, base?: string }) => {
+const Book = (props: { book: BookModel, base?: string, editable?: boolean }) => {
 
 	const { book } = props
 	const location = useLocation()
+	const [ editingBook, setEditingBook ] = useState(false)
 
 	// The base path allows links to adjust to different routing contexts in which a book is placed.
 	// For example, when the book is hosted alone, all routes might start with the bare root "/", 
@@ -61,12 +63,16 @@ const Book = (props: { book: BookModel, base?: string }) => {
 	// When dark mode changes, update dark mode.
 	useEffect(updateDarkMode, [ darkMode ])
 
+	// When editing changes, update the book
+	useEffect(() => {}, [ editingBook ])
+
 	// Render the book
 	return <div className={"bookish"  + (darkMode ? " bookish-dark" : "")}>
 		<DarkModeContext.Provider value={{ darkMode, setDarkMode}}>
 		<BaseContext.Provider value={{ base }}>
+		<EditorContext.Provider value={{ editable: props.editable ? true : false, setEditingBook }}>
 			<Routes>
-				<Route path="/" element={<TableOfContents book={book} />} />
+				<Route path="/" element={<TableOfContents book={book}/>} />
 				{
 					// Map all the book chapters to a bare route
 					book.getChapters().map((chapter, index) => {
@@ -94,6 +100,7 @@ const Book = (props: { book: BookModel, base?: string }) => {
 				<Route path="print" element={<Print book={book} />} />
 				<Route path="*" element={<Unknown message={<p>This page doesn't exist.</p>} book={book} />}/>
 			</Routes>
+		</EditorContext.Provider>
 		</BaseContext.Provider>
 		</DarkModeContext.Provider>
 	</div>

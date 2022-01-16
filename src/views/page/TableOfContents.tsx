@@ -67,8 +67,8 @@ const TableOfContents = (props: { book: Book }) => {
 	let subtitle = undefined;
 	let colon = title.indexOf(":");
 	if(colon >= 0) {
-		subtitle = title.substr(colon + 1);
-		title = title.substr(0, colon);
+		subtitle = title.substring(colon + 1).trim();
+		title = title.substring(0, colon).trim();
 	}
 
 	return <Page>

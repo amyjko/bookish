@@ -1,8 +1,10 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useContext } from 'react';
 import Book from '../../models/Book';
 
 import Parser from "../../models/Parser";
 import { renderNode } from '../chapter/Renderer'
+import EditablePlainText from '../editor/EditablePlainText';
+import { EditorContext } from './Book';
 
 type HeaderProps = {
 	book: Book;
@@ -20,6 +22,7 @@ const Header = (props: HeaderProps) => {
 
 	const title = useRef<HTMLHeadingElement | null>(null)
 	const reminder = useRef<HTMLDivElement>(null)
+	const { editable } = useContext(EditorContext)
 
 	function updateScrollReminder() {
 		if(title.current && reminder.current) {
@@ -45,6 +48,11 @@ const Header = (props: HeaderProps) => {
 
 	}, [])
 
+	const titleView = <>
+		{props.header}
+		{ props.subtitle ? <div className="bookish-subtitle">{props.subtitle}</div> : null }
+	</>
+
 	return (
 		<div className="bookish-chapter-header">
 			{
@@ -59,8 +67,20 @@ const Header = (props: HeaderProps) => {
 			{ props.outline }
 			<div className="bookish-chapter-header-text">
 				{ props.before }
-				<h1 ref={title} className="bookish-title">{props.header}</h1>
-				{ props.subtitle ? <h2 className="bookish-subtitle">{props.subtitle}</h2> : null }
+				<h1 ref={title} className="bookish-title">
+				{
+					editable ? 
+						<EditablePlainText 
+							text={props.header}
+							validationError={text => text.length === 0 ? "Titles have to be at least one character long." : undefined }
+							save={text => props.book.setTitle(text)}
+						>
+							{titleView}
+						</EditablePlainText>
+						: 
+						titleView
+				}
+				</h1>
 				{ props.after }
 				{ props.tags ? 
 					<div>{props.tags.map((tag, index) => <span key={"tag-" + index} className="bookish-tag">{tag}</span>)}</div> : 

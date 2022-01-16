@@ -280,10 +280,12 @@ h4 {
 }
 
 .bookish-subtitle {
+	font-size: var(--bookish-header-1-font-size);
 	font-weight: normal;
 	font-style: italic;
 	margin-top: 0; /* Shouldn't have any space below title */
 	margin-bottom: calc(var(--bookish-title-font-size) * 0.5);
+	line-height: var(--bookish-header-line-height);
 }
 
 .bookish-figure {

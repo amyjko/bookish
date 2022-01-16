@@ -23,6 +23,6 @@ export default function Editor() {
 
     return  error !== null ? <div className="bookish-app-alert">{error.message}</div> :
             book === null ? <Loading/> :
-                <Book book={book} base={"/write/" + id} />
+                <Book book={book} base={"/write/" + id} editable={true} />
 
 }
