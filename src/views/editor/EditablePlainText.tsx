@@ -68,13 +68,13 @@ const EditablePlainText = (props: {
                     if(setEditingBook)
                         setEditingBook(false);
                 })
-                .catch(message => {
+                .catch((message: Error) => {
                     // Restore editing and show the error.
                     if(editor?.current)
                         editor.current.disabled = false
                     editor?.current?.focus()
                     setStatus(Status.Editing);
-                    setError(message)
+                    setError(message.message)
                 })
         }
     }

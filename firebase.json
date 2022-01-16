@@ -12,8 +12,8 @@
     ],
     "rewrites": [
       {
-        "source": "/examples/:name/**",
-        "destination": "/examples/:name/index.html"
+        "source": "/examples/tutorial/**",
+        "destination": "/examples/tutorial/index.html"
       },
       {
         "source": "**",

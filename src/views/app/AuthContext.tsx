@@ -1,6 +1,6 @@
 import React, { useContext, useEffect, useState } from "react"
 import { sendSignInLinkToEmail, User } from "firebase/auth"
-import { auth } from "../../firebase"
+import { auth } from "../../models/Firebase"
 
 const AuthContext = React.createContext<{
     currentUser?: User | null,
@@ -24,39 +24,46 @@ const AuthProvider: React.FC<{}> = ({ children }) => {
     // Login using Firebase's password-less email verification
     function login(email: string) {
 
-        const actionCodeSettings = {
-            url: process.env.DOMAIN + "/finishlogin",
-            handleCodeInApp: true
-        }
+        if(auth) {
 
-        // Ask Firebase to log in with the given email
-        sendSignInLinkToEmail(auth, email, actionCodeSettings)
-            .then(() => {
-                // Remember the email in local storage so we don't have to ask for it again
-                // after returning to the link above.
-                window.localStorage.setItem("email", email)
-            })
-            .catch((error) => {
-                // TODO Need to more properly handle this error.
-                console.error(error)
-            })
+            const actionCodeSettings = {
+                url: process.env.DOMAIN + "/finishlogin",
+                handleCodeInApp: true
+            }
+
+            // Ask Firebase to log in with the given email
+            sendSignInLinkToEmail(auth, email, actionCodeSettings)
+                .then(() => {
+                    // Remember the email in local storage so we don't have to ask for it again
+                    // after returning to the link above.
+                    window.localStorage.setItem("email", email)
+                })
+                .catch((error) => {
+                    // TODO Need to more properly handle this error.
+                    console.error(error)
+                })
+
+        }
 
     }
 
     // Logout using Firebase's authentication framework.
     function logout() {
-        return auth.signOut()
+        if(auth)
+            return auth.signOut()
     }
 
     // Whenever the authorization state changes, update the user and loading state.
     // Unsubscribe whenever the component unloads by returning the unsubscribe callback
     // provided by Firebase Auth.
     useEffect(() => {
-        const unsubscribe = auth.onAuthStateChanged(user => {
-            setCurrentUser(user);
-            setLoading(false);
-        });
-        return unsubscribe;
+        if(auth) {
+            const unsubscribe = auth.onAuthStateChanged(user => {
+                setCurrentUser(user);
+                setLoading(false);
+            });
+            return unsubscribe;
+        }
     }, []);
 
     // Expose the state and the login/logout functionality.

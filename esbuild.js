@@ -12,6 +12,7 @@ for (const k in process.env) {
 
 // Dev or prod?
 define["process.env.dev"] = process.argv[2] === "dev"
+define["process.env.reader"] = false
 
 // Build the app with the environment variables.
 const appOptions = {
@@ -27,7 +28,7 @@ const appOptions = {
   // Optional and for development only. This provides the ability to
   // map the built code back to the original source format when debugging.
   sourcemap: 'inline',
-  define
+  define: define
 }
 
 build(appOptions).catch(() => process.exit(1))
@@ -46,6 +47,9 @@ const readerOptions = {
   // Optional and for development only. This provides the ability to
   // map the built code back to the original source format when debugging.
   sourcemap: 'inline',
+  define: {
+    "process.env.reader": true
+  }
 }
 
 build(readerOptions).catch(() => process.exit(1))

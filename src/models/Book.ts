@@ -1,5 +1,6 @@
 import Parser, { EmbedNode } from "./Parser";
 import Chapter from './Chapter.js';
+import { updateBook } from "./Firestore";
 
 export type ChapterSpecification = {
     id: string;
@@ -45,6 +46,7 @@ export default class Book {
     static IndexID = "index";
 	static GlossaryID = "glossary";
 
+    id: string | undefined;
     title: string;
     symbols: Record<string, string>;
     tags: string[];
@@ -71,6 +73,7 @@ export default class Book {
 
         // Copy all of the specification metadata to fields.
         // Choose suitable defaults if the spec is empty.
+        this.id = specification && specification.id ? specification.id : undefined
         this.title = specification && specification.title ? specification.title : "Untitled"
         this.symbols = specification && specification.symbols ? specification.symbols : {}
         this.tags = specification && specification.tags ? specification.tags : []
@@ -133,17 +136,16 @@ export default class Book {
 
     }
 
+    getID() { return this.id }
+
     getTitle() { return this.title; }
     setTitle(title: string): Promise<void> { 
-        return new Promise((resolve, reject) => {
-            this.title = title;
-            setTimeout(() => {
-                if(Math.random() < .5)
-                    resolve()
-                else
-                    reject("Unable to save")
-            }, 100)
-        })
+        // Save the title locally immediately
+        this.title = title;
+
+        // Try to update the book.
+        return updateBook(this)
+
     }
 
     getChapters() { return this.chapters }

@@ -71,7 +71,7 @@ const Header = (props: HeaderProps) => {
 				{
 					editable ? 
 						<EditablePlainText 
-							text={props.header}
+							text={props.header + (props.subtitle ? ": " + props.subtitle : "")}
 							validationError={text => text.length === 0 ? "Titles have to be at least one character long." : undefined }
 							save={text => props.book.setTitle(text)}
 						>
