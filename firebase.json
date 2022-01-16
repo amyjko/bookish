@@ -16,9 +16,9 @@
         "destination": "/examples/:name/index.html"
       },
       {
-        "source": "!/examples/**",
+        "source": "**",
         "destination": "/index.html"
-      }      
+      }
     ]
   },
   "emulators": {

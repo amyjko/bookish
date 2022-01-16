@@ -158,7 +158,7 @@ const Chapter = (props: { chapter: ChapterModel, book: Book, print?: boolean }) 
 			}
 		}
 		// Otherwise, if there's an ID in the URL, jump to it.
-		else if(highlightedID !== null) {
+		else if(highlightedID) {
 			const el = document.getElementById(highlightedID as string)
 			// If we found the element, remove the hash any time after a few seconds. See handleScroll for the removal logic.
 			if(el) {
