@@ -41,6 +41,7 @@ const References = (props: { book: Book }) => {
 		<Page>
 			<Header 
 				book={book}
+				label="References title"
 				image={book.getImage(Book.ReferencesID)} 
 				header="References"
 				tags={book.getTags()}

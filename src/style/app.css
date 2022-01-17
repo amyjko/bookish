@@ -117,7 +117,7 @@ button:hover {
 }
 
 /* Match the parent's styling as much as possible. */
-input[type="text"].bookish-app-editable {
+input[type="text"].bookish-app-editable, textarea.bookish-app-editable {
     font-family: inherit;
     font-size: inherit;
     font-weight: inherit;
@@ -127,6 +127,15 @@ input[type="text"].bookish-app-editable {
     padding: 0;
     margin: 0;
     display: inline-block;
+}
+
+textarea:focus, input:focus {
+    outline: 2px solid var(--bookish-highlight-color);
+}
+
+textarea.bookish-app-editable {
+    width: 100%;
+    resize: none;
 }
 
 .bookish-app-editable-saving {

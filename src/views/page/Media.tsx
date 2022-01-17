@@ -20,6 +20,7 @@ export default function Media(props: { book: Book }) {
 	return <Page>
 			<Header 
 				book={book}
+				label="Media title"
 				image={book.getImage(Book.MediaID)} 
 				header="Media"
 				tags={book.getTags()}

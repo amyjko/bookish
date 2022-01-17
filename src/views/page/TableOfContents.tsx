@@ -9,11 +9,14 @@ import { renderNode } from '../chapter/Renderer'
 import Parser, { EmbedNode } from "../../models/Parser"
 import Book from '../../models/Book'
 import Outline from './Outline'
-import { BaseContext } from './Book'
+import { BaseContext, EditorContext } from './Book'
+import BookPreview from '../app/BookPreview'
+import TextEditor from '../editor/TextEditor'
 
 const TableOfContents = (props: { book: Book }) => {
 
 	const { base } = useContext(BaseContext)
+	const { editable } = useContext(EditorContext)
 
 	// Always start at the top of the page.
 	useEffect(() => {
@@ -71,9 +74,14 @@ const TableOfContents = (props: { book: Book }) => {
 		title = title.substring(0, colon).trim();
 	}
 
+	const acknowledgementsHeader = <h2 className="bookish-header" id="acknowledgements">Acknowledgements</h2>
+	const description = renderNode(Parser.parseChapter(book, book.getDescription()))
+
+
 	return <Page>
 		<Header 
 			book={book}
+			label="Book title"
 			image={book.getImage("cover")} 
 			header={title}
 			subtitle={subtitle}
@@ -88,7 +96,21 @@ const TableOfContents = (props: { book: Book }) => {
 		/>
 
 		<div className="bookish-description">
-			{ renderNode(Parser.parseChapter(book, book.getDescription())) }
+		{
+			editable ? 
+				<>
+					<TextEditor 
+						label="Book description"
+						text={book.getDescription()}
+						multiline
+						save={text => book.setDescription(text)}
+					>
+					{ description }
+					</TextEditor>
+				</>
+				:
+				description
+		}
 		</div>
 
 		<h2 className="bookish-header" id="chapters">Chapters</h2>
@@ -181,19 +203,52 @@ const TableOfContents = (props: { book: Book }) => {
 			</table>
 		</div>
 
+		{/* If editable, show acknowledgements even if they're empty, otherwise hide */}
 		{
-			book.getAcknowledgements() ?
+			editable ? 
 				<>
-					<h2 className="bookish-header" id="acknowledgements">Acknowledgements</h2>
-					{ renderNode(Parser.parseChapter(book, book.getAcknowledgements())) }
+					{ acknowledgementsHeader }
+					<TextEditor 
+						label="Acknowledgements"
+						text={book.getAcknowledgements()}
+						multiline
+						save={text => book.setAcknowledgements(text)}
+					>
+						{ book.getAcknowledgements() ? 
+							renderNode(Parser.parseChapter(book, book.getAcknowledgements())) :
+							<em>Click to write acknowledgements.</em>
+						}
+					</TextEditor>
 				</>
-				: null
+				:
+				book.getAcknowledgements() ?
+					<>
+						{ acknowledgementsHeader }
+						{ renderNode(Parser.parseChapter(book, book.getAcknowledgements())) }
+					</>
+					: null
 		}
 
 		<h2 className="bookish-header" id="license">License</h2>
 
 		<p>
-			{ book.getLicense() ? renderNode(Parser.parseContent(book, book.getLicense())) : "All rights reserved." }
+		{
+			editable ?
+			<>
+				<TextEditor 
+					label="License"
+					text={book.getLicense()}
+					multiline
+					save={text => book.setLicense(text)}
+				>
+					{ renderNode(Parser.parseContent(book, book.getLicense())) }
+				</TextEditor>
+			</>
+			:
+			renderNode(Parser.parseContent(book, book.getLicense()))
+
+		}
+
 		</p>
 
 		<h2 className="bookish-header" id="print">Print</h2>

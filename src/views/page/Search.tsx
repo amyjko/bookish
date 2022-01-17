@@ -83,6 +83,7 @@ const Search = (props: { book: Book }) => {
     return <Page>
         <Header 
             book={book}
+            label="Search title"
             image={book.getImage(Book.SearchID)} 
             header="Search"
             tags={book.getTags()}

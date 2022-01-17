@@ -77,12 +77,12 @@ export default class Book {
         this.title = specification && specification.title ? specification.title : "Untitled"
         this.symbols = specification && specification.symbols ? specification.symbols : {}
         this.tags = specification && specification.tags ? specification.tags : []
-        this.license = specification && specification.license ? specification.license : "This work is licensed under [Attribution-NoDerivatives 4.0 International|http://creativecommons.org/licenses/by-nd/4.0/]",
+        this.license = specification && specification.license ? specification.license : "All rights reserved.",
         this.references = specification && specification.references ? specification.references : {}
         this.glossary = specification && specification.glossary ? specification.glossary : {}
         this.authors = specification && specification.authors ? specification.authors : []
         this.description = specification && specification.description ? specification.description : "What's your book about?"
-        this.acknowledgements = specification && specification.acknowledgements ? specification.acknowledgements : "Anyone to thank?"
+        this.acknowledgements = specification && specification.acknowledgements ? specification.acknowledgements : ""
         this.revisions = specification && specification.revisions ? specification.revisions : []
         this.images = specification && specification.images ? specification.images : {}
         this.sources = specification && specification.sources ? specification.sources : {}
@@ -140,19 +140,37 @@ export default class Book {
 
     getTitle() { return this.title; }
     setTitle(title: string): Promise<void> { 
-        // Save the title locally immediately
+        // Update locally, then update on the server.
         this.title = title;
-
-        // Try to update the book.
         return updateBook(this)
 
+    }
+
+    getDescription() { return this.description; }
+    setDescription(text: string) { 
+        // Update locally, then update on the server.
+        this.description = text;
+        return updateBook(this);
+    }
+
+	getAcknowledgements() { return this.acknowledgements; }
+    setAcknowledgements(text: string) { 
+        // Update locally, then update on the server.
+        this.acknowledgements = text;
+        return updateBook(this);
+    }
+
+    getLicense() { return this.license; }
+    setLicense(text: string) { 
+        // Update locally, then update on the server.
+        this.license = text;
+        return updateBook(this);
     }
 
     getChapters() { return this.chapters }
     hasChapter(chapterID: string): boolean { return chapterID in this.chaptersByID || ["references", "glossary", "index", "search", "media"].includes(chapterID); }
     getChapter(chapterID: string): Chapter | undefined { return this.hasChapter(chapterID) ? this.chaptersByID[chapterID] : undefined; }
     getSymbols() { return this.symbols }
-	getLicense() { return this.license; }
     hasReferences() { return this.references && Object.keys(this.references).length > 0; }
 	getReferences() { return this.references; }
     getReference(citationID: string) { return this.references[citationID]; }
@@ -161,8 +179,7 @@ export default class Book {
 	getTags() { return this.tags }
 	getAuthors() { return this.authors; }	
 	getAuthorByID(id: string) { return this.authors.find(el => el.id === id); }
-	getDescription() { return this.description; }
-	getAcknowledgements() { return this.acknowledgements; }
+
 	getRevisions() { return this.revisions; }
 
     hasImage(id: string) { return id in this.images; }

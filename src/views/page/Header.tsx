@@ -3,11 +3,12 @@ import Book from '../../models/Book';
 
 import Parser from "../../models/Parser";
 import { renderNode } from '../chapter/Renderer'
-import EditablePlainText from '../editor/EditablePlainText';
+import TextEditor from '../editor/TextEditor';
 import { EditorContext } from './Book';
 
 type HeaderProps = {
 	book: Book;
+	label: string;
 	header: string;
 	subtitle?: string;
 	before?: React.ReactNode;
@@ -70,13 +71,14 @@ const Header = (props: HeaderProps) => {
 				<h1 ref={title} className="bookish-title">
 				{
 					editable ? 
-						<EditablePlainText 
+						<TextEditor 
+							label={props.label}
 							text={props.header + (props.subtitle ? ": " + props.subtitle : "")}
 							validationError={text => text.length === 0 ? "Titles have to be at least one character long." : undefined }
 							save={text => props.book.setTitle(text)}
 						>
 							{titleView}
-						</EditablePlainText>
+						</TextEditor>
 						: 
 						titleView
 				}

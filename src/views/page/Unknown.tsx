@@ -11,6 +11,7 @@ const Unknown = (props: { book: Book, message: React.ReactNode }) => {
 		<Page>
 			<Header 
 				book={props.book}
+				label="Unknown page title"
 				image={props.book.getImage("unknown") } 
 				header="Oops."
 				outline={

@@ -189,6 +189,7 @@ const Chapter = (props: { chapter: ChapterModel, book: Book, print?: boolean }) 
 			<div className="bookish-chapter">
 				<Header 
 					book={book}
+					label="Chapter title"
 					image={chapter.getImage()}
 					print={props.print}
 					outline=

@@ -24,6 +24,7 @@ const Glossary = (props: { book: Book }) => {
 		<Page>
 			<Header 
 				book={book}
+				label="Glossary title"
 				image={book.getImage(Book.GlossaryID)} 
 				header="Glossary"
 				tags={book.getTags()}

@@ -79,6 +79,7 @@ const Index = (props: { book: Book }) => {
     return <Page>
         <Header 
             book={book}
+            label="Index title"
             image={book.getImage(Book.IndexID)} 
             header="Index"
             tags={book.getTags()}
