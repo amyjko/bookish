@@ -121,6 +121,7 @@ input[type="text"].bookish-app-editable, textarea.bookish-app-editable {
     font-family: inherit;
     font-size: inherit;
     font-weight: inherit;
+    line-height: inherit;
     color: inherit;
     border: none;
     box-sizing: content-box;
