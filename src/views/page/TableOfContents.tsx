@@ -12,16 +12,47 @@ import Outline from './Outline'
 import { BaseContext, EditorContext } from './Book'
 import BookPreview from '../app/BookPreview'
 import TextEditor from '../editor/TextEditor'
+import Acknowledgements from './Acknowledgements'
+import License from './Acknowledgements'
+import Description from './Description'
+import Revisions from './Revisions'
+
+const TableOfContentsRow = (props: { 
+	image: React.ReactNode, 
+	chapterID: string, 
+	title: string, 
+	number?: number,
+	annotation?: string, 
+	forthcoming?: boolean, 
+	etc?: React.ReactNode
+}) => {
+
+	const { base } = useContext(BaseContext)
+
+	return <>
+		<tr className={props.forthcoming ? "bookish-forthcoming" : ""}>
+			<td>{props.image}</td>
+			<td>
+				{ props.number ? <div className="bookish-chapter-number">{"Chapter " + props.number}</div> : null }
+				{ props.forthcoming ?
+					<span>{props.title}</span> :
+					<Link to={base + "/" + props.chapterID}>{props.title}</Link>
+				}
+				{ props.annotation ? <small className="bookish-muted"><br/><em>{props.annotation}</em></small> : null }
+			</td>
+			<td>{props.etc}</td>
+		</tr>
+	</>
+
+}
 
 const TableOfContents = (props: { book: Book }) => {
 
 	const { base } = useContext(BaseContext)
-	const { editable } = useContext(EditorContext)
 
 	// Always start at the top of the page.
 	useEffect(() => {
 		window.scrollTo(0, 0)
-
 	}, [])
 
 	// Get the book being rendered.
@@ -74,10 +105,6 @@ const TableOfContents = (props: { book: Book }) => {
 		title = title.substring(0, colon).trim();
 	}
 
-	const acknowledgementsHeader = <h2 className="bookish-header" id="acknowledgements">Acknowledgements</h2>
-	const description = renderNode(Parser.parseChapter(book, book.getDescription()))
-
-
 	return <Page>
 		<Header 
 			book={book}
@@ -95,23 +122,7 @@ const TableOfContents = (props: { book: Book }) => {
 			}
 		/>
 
-		<div className="bookish-description">
-		{
-			editable ? 
-				<>
-					<TextEditor 
-						label="Book description"
-						text={book.getDescription()}
-						multiline
-						save={text => book.setDescription(text)}
-					>
-					{ description }
-					</TextEditor>
-				</>
-				:
-				description
-		}
-		</div>
+		<Description book={book} />
 
 		<h2 className="bookish-header" id="chapters">Chapters</h2>
 		<div className="bookish-table">
@@ -123,8 +134,6 @@ const TableOfContents = (props: { book: Book }) => {
 							// Get the image, chapter number, and section for rendering.
 							const chapterID = chapter.getID();
 							const chapterAST = chapter.getAST();
-							const chapterNumber = book.getChapterNumber(chapterID);
-							const section = chapter.getSection();
 							const readingTime = chapter.getReadingTime();
 							const readingEstimate =
 								readingTime === undefined ? "Forthcoming" :
@@ -133,25 +142,17 @@ const TableOfContents = (props: { book: Book }) => {
 								"~" + Math.round(10 * readingTime / 60) / 10 + " hour read";
 
 							return (
-								<tr key={"chapter" + index} className={chapter.isForthcoming() ? "bookish-forthcoming" : ""}>
-									<td>
-										{ getImage(chapter.getImage()) }
-									</td>
-									<td>
-										<div>
-											{ chapterNumber === undefined ? null : <div className="bookish-chapter-number">{"Chapter " + chapterNumber}</div> }
-											<div>
-												{
-													!chapter.isForthcoming() ? 
-														<Link to={base + "/" + chapterID}>{chapter.getTitle()}</Link> :
-														<span>{chapter.getTitle()}</span>
-												}
-											</div>
-											{ section === null ? null : <div className="bookish-section-name">{section}</div> }
-										</div>
-									</td>
-									<td>
-										<small className="bookish-muted">
+								<TableOfContentsRow
+									key={chapterID}
+									image={getImage(chapter.getImage())}
+									chapterID={chapterID}
+									number={book.getChapterNumber(chapterID)}
+									title={chapter.getTitle()}
+									annotation={chapter.getSection()}
+									forthcoming={chapter.isForthcoming()}
+									etc={
+										<>
+											<small className="bookish-muted">
 											<em>
 												{ readingEstimate }
 												{ !chapter.isForthcoming() && getProgressDescription(chapterID in progress ? progress[chapterID] : null) }
@@ -162,94 +163,56 @@ const TableOfContents = (props: { book: Book }) => {
 												<span><br/><small className="bookish-error">{chapterAST.getErrors().length + " " + (chapterAST.getErrors().length > 1 ? "errors" : "error")}</small></span> :
 												null
 										}
-									</td>
-								</tr>
+										</>
+									}
+								/>
 							)
 						})
 					}
 					{
-						!book.hasReferences() ? 
-							null :
-							<tr key="references">
-								<td>{ getImage(book.getImage(Book.ReferencesID)) }</td>
-								<td><Link to={base + "/references"}>References</Link><br/><small className="bookish-muted"><em>Everything cited</em></small></td>
-								<td></td>
-							</tr>
+						book.hasReferences() ? 
+							<TableOfContentsRow
+								image={getImage(book.getImage(Book.ReferencesID))}
+								chapterID="references"
+								title="References"
+								annotation="Everything cited"
+							/> 
+							: null
 					}
 					{
 						book.getGlossary() && Object.keys(book.getGlossary()).length > 0 ?
-						<tr key="glossary">
-							<td>{ getImage(book.getImage(Book.GlossaryID)) }</td>
-							<td><Link to={base + "/glossary"}>Glossary</Link><br/><small className="bookish-muted"><em>Definitions</em></small></td>
-							<td></td>
-						</tr> : null
+							<TableOfContentsRow
+								image={getImage(book.getImage(Book.GlossaryID))}
+								chapterID="glossary"
+								title="Glossary"
+								annotation="Definitions"
+							/> 
+							: null
 					}
-					<tr key="index">
-						<td>{ getImage(book.getImage(Book.IndexID)) }</td>
-						<td><Link to={base + "/index/a"}>Index</Link><br/><small className="bookish-muted"><em>Common words and where they are</em></small></td>
-						<td></td>
-					</tr>
-					<tr key="search">
-						<td>{ getImage(book.getImage(Book.SearchID)) }</td>
-						<td><Link to={base + "/search"}>Search</Link><br/><small className="bookish-muted"><em>Find where words occur</em></small></td>
-						<td></td>
-					</tr>
-					<tr key="media">
-						<td>{ getImage(book.getImage(Book.MediaID)) }</td>
-						<td><Link to={base + "/media"}>Media</Link><br/><small className="bookish-muted"><em>Images and video in the book</em></small></td>
-						<td></td>
-					</tr>
+					<TableOfContentsRow
+						image={getImage(book.getImage(Book.IndexID))}
+						chapterID="index"
+						title="Index"
+						annotation="Common words and where they are"
+					/>
+					<TableOfContentsRow
+						image={getImage(book.getImage(Book.SearchID))}
+						chapterID="search"
+						title="Search"
+						annotation="Find where words occur"
+					/>
+					<TableOfContentsRow
+						image={getImage(book.getImage(Book.MediaID))}
+						chapterID="media"
+						title="Media"
+						annotation="Images and video in the book"
+					/>
 				</tbody>
 			</table>
 		</div>
 
-		{/* If editable, show acknowledgements even if they're empty, otherwise hide */}
-		{
-			editable ? 
-				<>
-					{ acknowledgementsHeader }
-					<TextEditor 
-						label="Acknowledgements"
-						text={book.getAcknowledgements()}
-						multiline
-						save={text => book.setAcknowledgements(text)}
-					>
-						{ book.getAcknowledgements() ? 
-							renderNode(Parser.parseChapter(book, book.getAcknowledgements())) :
-							<em>Click to write acknowledgements.</em>
-						}
-					</TextEditor>
-				</>
-				:
-				book.getAcknowledgements() ?
-					<>
-						{ acknowledgementsHeader }
-						{ renderNode(Parser.parseChapter(book, book.getAcknowledgements())) }
-					</>
-					: null
-		}
-
-		<h2 className="bookish-header" id="license">License</h2>
-
-		<p>
-		{
-			editable ?
-			<>
-				<TextEditor 
-					label="License"
-					text={book.getLicense()}
-					multiline
-					save={text => book.setLicense(text)}
-				>
-					{ renderNode(Parser.parseContent(book, book.getLicense())) }
-				</TextEditor>
-			</>
-			:
-			renderNode(Parser.parseContent(book, book.getLicense()))
-
-		}
-
-		</p>
+		<Acknowledgements book={book} />
+		<License book={book} />
 
 		<h2 className="bookish-header" id="print">Print</h2>
 
@@ -263,18 +226,8 @@ const TableOfContents = (props: { book: Book }) => {
 			{ book.getAuthors().map(author => author.name).join(", ") } ({(new Date()).getFullYear() }). <em>{book.getTitle()}</em>. { location.protocol+'//'+location.host+location.pathname }, <em>retrieved { (new Date()).toLocaleDateString("en-US")}</em>.
 		</p>
 
-		{
-			book.getRevisions().length === 0 ? 
-				null :
-				<>
-					<h2 className="bookish-header" id="revisions">Revisions</h2>
-					<ul>
-						{book.getRevisions().map((revision, index) => {
-							return <li key={"revision" + index}><em>{revision[0]}</em>. { renderNode(Parser.parseContent(book, revision[1])) }</li>;
-						})}
-					</ul>
-				</>	
-		}
+		<Revisions book={book} />
+		
 	</Page>
 
 }

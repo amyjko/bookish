@@ -35,7 +35,8 @@
 			"authors": ["ajko"],
 			"image": "|unknown.jpg|A photo of skeptical Boomy|Time to learn about errors, huh?|@amyCredit|",
 			"section": "Part II",
-			"forthcoming": true
+			"forthcoming": true,
+			"numbered": false
 		},
 		{
 			"id": "errors",
