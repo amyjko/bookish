@@ -28,7 +28,7 @@ class Chapter {
         this.title = spec.title;
         this.authors = spec.authors;
         this.image = spec.image;
-        this.numbered = spec.numbered ? spec.numbered : false;
+        this.numbered = spec.numbered === true || spec.numbered === undefined;
         this.section = spec.section ? spec.section : undefined;
 		this.forthcoming = spec.forthcoming === true;
         this.text = spec.text ? spec.text : undefined;
