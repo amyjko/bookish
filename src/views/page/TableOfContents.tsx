@@ -1,11 +1,9 @@
-import React, { useEffect, useContext } from 'react'
+import React, { useEffect, useState, useContext } from 'react'
 import { Link } from 'react-router-dom'
 
 import Header from "./Header"
 import Authors from "../chapter/Authors"
 import Page from './Page'
-import { renderNode } from '../chapter/Renderer'
-
 import Parser, { EmbedNode } from "../../models/Parser"
 import Book from '../../models/Book'
 import Outline from './Outline'
@@ -46,9 +44,29 @@ const TableOfContentsRow = (props: {
 
 }
 
+const AddChapter = () => {
+
+	const { book, setEditingBook } = useContext(EditorContext)
+	const [ waiting, setWaiting ] = useState(false)
+
+	function add() {
+		if(book && setEditingBook) {
+			setWaiting(true)
+			setEditingBook(true)
+			let add = book.addChapter();
+			if(add)
+				add.then(() => { setWaiting(false); setEditingBook(false) })
+		}
+	}
+
+	return <button disabled={waiting || book === undefined} onClick={add}>+</button>
+
+}
+
 const TableOfContents = (props: { book: Book }) => {
 
 	const { base } = useContext(BaseContext)
+	const { editable } = useContext(EditorContext)
 
 	// Always start at the top of the page.
 	useEffect(() => {
@@ -120,11 +138,12 @@ const TableOfContents = (props: { book: Book }) => {
 					next={book.getNextChapterID("")}
 				/>
 			}
+			save={text => props.book.setTitle(text)}
 		/>
 
 		<Description book={book} />
 
-		<h2 className="bookish-header" id="chapters">Chapters</h2>
+		<h2 className="bookish-header" id="chapters">Chapters { editable ? <AddChapter/> : null }</h2>
 		<div className="bookish-table">
 			<table id="toc">
 				<tbody>

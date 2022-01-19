@@ -17,6 +17,7 @@ type HeaderProps = {
 	tags?: string[];
 	image: string | undefined;
 	outline: React.ReactNode;
+	save?: (text: string) => Promise<void>;
 }
 
 const Header = (props: HeaderProps) => {
@@ -70,12 +71,12 @@ const Header = (props: HeaderProps) => {
 				{ props.before }
 				<h1 ref={title} className="bookish-title">
 				{
-					editable ? 
+					editable && props.save ? 
 						<TextEditor 
 							label={props.label}
 							text={props.header + (props.subtitle ? ": " + props.subtitle : "")}
 							validationError={text => text.length === 0 ? "Titles have to be at least one character long." : undefined }
-							save={text => props.book.setTitle(text)}
+							save={props.save}
 						>
 							{titleView}
 						</TextEditor>

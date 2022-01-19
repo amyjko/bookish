@@ -1,5 +1,6 @@
 import Parser, { ChapterNode } from "./Parser";
 import Book, { ChapterSpecification } from "./Book"
+import { updateBook } from "./Firestore";
 
 export type Match = {
 	left: string,
@@ -10,9 +11,10 @@ export type Match = {
 class Chapter {
 	book: Book;
 	id: string;
+	bookID: string;
 	title: string;
 	authors: Array<string>;
-	image: string;
+	image?: string;
 	numbered: boolean;
 	section: string | undefined;
 	forthcoming: boolean;
@@ -24,14 +26,15 @@ class Chapter {
     constructor(book: Book, spec: ChapterSpecification) {
 
         this.book = book;
-        this.id = spec.id;
+		this.id = spec.id;
+		this.bookID = spec.bookID;
         this.title = spec.title;
         this.authors = spec.authors;
         this.image = spec.image;
         this.numbered = spec.numbered === true || spec.numbered === undefined;
         this.section = spec.section ? spec.section : undefined;
 		this.forthcoming = spec.forthcoming === true;
-        this.text = spec.text ? spec.text : undefined;
+        this.text = spec.text ? spec.text : "";
 
 		// If the chapter has text, then parse it, count searchable words, and compute an index.
 		if(this.text) {
@@ -49,27 +52,44 @@ class Chapter {
     }
 
 	toObject() {
-		return {
+		let payload = {
 			id: this.id,
+			bookID: this.bookID,
 			title: this.title,
-			authors: [...this.authors],
-			image: this.image,
-			numbered: this.numbered,
-			section: this.section,
-			forthcoming: this.forthcoming,
-			text: this.text
-		}
+			authors: [...this.authors]
+		} as ChapterSpecification
+
+		if(this.image) payload.image = this.image;
+		if(this.numbered) payload.numbered = this.numbered
+		if(this.section) payload.section = this.section;
+		if(this.forthcoming) payload.forthcoming = this.forthcoming;
+		if(this.text) payload.text = this.text;
+
+		return payload
 
 	}
 
 	getID() { return this.id; }
+	setID(id: string) {
+		this.id = id;
+		return updateBook(this.book)
+	}
+
     getSection(): string | undefined { return this.section; }
     isForthcoming() { return this.forthcoming; }
 	isNumbered() { return this.numbered; }
     getText() { return this.text; }
     getWordCount() { return this.wordCount; }
 	getAuthors() { return this.authors; }
-    getTitle() { return this.title; }
+
+	getTitle() { return this.title; }
+	setTitle(title: string) { 
+		
+		this.title = title;
+		return updateBook(this.book)
+
+	}
+
 	getImage() { return this.image; }
     getIndex() { return this.index; }
     getAST() { return this.ast; }

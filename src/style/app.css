@@ -90,6 +90,10 @@ button:hover {
     cursor: pointer;
 }
 
+.bookish-header button {
+    vertical-align: middle;
+}
+
 .bookish-app-editable {
     position: relative;
 }
@@ -127,7 +131,8 @@ input[type="text"].bookish-app-editable, textarea.bookish-app-editable {
     box-sizing: content-box;
     padding: 0;
     margin: 0;
-    display: inline-block;
+    display: inline;
+    width: auto;
 }
 
 textarea:focus, input:focus {

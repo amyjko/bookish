@@ -18,7 +18,10 @@ smoothscroll.polyfill();
 
 export const DarkModeContext = React.createContext<{ darkMode: boolean, setDarkMode: Function | undefined }>({ darkMode: false, setDarkMode: undefined})
 export const BaseContext = React.createContext<{ base: string }>({ base: "" })
-export const EditorContext = React.createContext<{ editable: boolean, setEditingBook: Function | undefined }>({ editable: false, setEditingBook: undefined })
+export const EditorContext = React.createContext<{ 
+	book: BookModel | undefined,
+	editable: boolean,
+	setEditingBook: Function | undefined }>({ book: undefined, editable: false, setEditingBook: undefined })
 
 const Book = (props: { book: BookModel, base?: string, editable?: boolean }) => {
 
@@ -70,7 +73,7 @@ const Book = (props: { book: BookModel, base?: string, editable?: boolean }) => 
 	return <div className={"bookish"  + (darkMode ? " bookish-dark" : "")}>
 		<DarkModeContext.Provider value={{ darkMode, setDarkMode}}>
 		<BaseContext.Provider value={{ base }}>
-		<EditorContext.Provider value={{ editable: props.editable ? true : false, setEditingBook }}>
+		<EditorContext.Provider value={{ book, editable: props.editable ? true : false, setEditingBook }}>
 			<Routes>
 				<Route path="/" element={<TableOfContents book={book}/>} />
 				{
@@ -98,7 +101,7 @@ const Book = (props: { book: BookModel, base?: string, editable?: boolean }) => 
 				<Route path="search" element={<Search book={book} />} />
 				<Route path="media" element={<Media book={book} />} />
 				<Route path="print" element={<Print book={book} />} />
-				<Route path="*" element={<Unknown message={<p>This page doesn't exist.</p>} book={book} />}/>
+				<Route path="*" element={<Unknown message="This page doesn't exist." book={book} />}/>
 			</Routes>
 		</EditorContext.Provider>
 		</BaseContext.Provider>

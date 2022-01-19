@@ -1,6 +1,6 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 
 import Parser, { ChapterNode } from "../../models/Parser"
 import Header from '../page/Header'
@@ -13,6 +13,8 @@ import { renderNode } from './Renderer'
 import Marker from "../svg/marker.svg"
 import Book from '../../models/Book'
 import ChapterModel from '../../models/Chapter'
+import { EditorContext } from '../page/Book';
+import TextEditor from '../editor/TextEditor';
 
 export type ChapterContextType = {
 	book?: Book, 
@@ -40,6 +42,9 @@ const Chapter = (props: { chapter: ChapterModel, book: Book, print?: boolean }) 
 	// Keep track of which hash mark is scrolled to
 	let [ highlightedID, setHighlightedID ] = useState<string | undefined>(undefined)
 
+	const { editable } = useContext(EditorContext)
+	const navigate = useNavigate()
+	
 	// When this component is mounted...
 	// 1) Subscribe and unsubscribe to window listeners
 	// 2) Do initial layout of marginals
@@ -215,6 +220,27 @@ const Chapter = (props: { chapter: ChapterModel, book: Book, print?: boolean }) 
 					}
 					before={
 						<span>
+						{/* Add an editable chapter ID if in editor mode */}
+						{
+							editable ?
+								<span className="bookish-muted">
+									<TextEditor 
+										text={props.chapter.getID()} 
+										label="Chapter URL ID editor"
+										save={ id => props.chapter.setID(id).then(() => navigate(`/write/${props.book.getBookID()}/${id}`)) }
+										validationError={(newChapterID) => 
+											!/^[a-zA-Z0-9]+$/.test(newChapterID) ? "Chapter IDs must be one or more letters or numbers" :
+											props.book.hasChapter(newChapterID) ? "There's already a chapter that has this ID." :
+											undefined
+										}
+									>
+										{props.chapter.getID()}
+									</TextEditor>
+									<br/>
+								</span>
+								:
+								null
+						}
 						{
 							chapterNumber === undefined ? 
 								null : 
@@ -236,7 +262,8 @@ const Chapter = (props: { chapter: ChapterModel, book: Book, print?: boolean }) 
 									chapter.getAuthors().map(author => book.getAuthorByID(author)) : 
 									book.getAuthors()} 
 						/>
-					} 
+					}
+					save={ text => props.chapter.setTitle(text) }
 				/>
 				<Marker/>
 				{ /* Render the chapter body, passing some context */ }

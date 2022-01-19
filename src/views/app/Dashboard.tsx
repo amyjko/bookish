@@ -56,7 +56,7 @@ export default function Dashboard() {
 		{ 
 			error ? <div className="bookish-app-alert">{error}</div> :
 			loading ? <p>Loading books...</p> : 
-				books.map(book => <BookPreview key={book.id} book={book} write={true} />)
+				books.map(book => <BookPreview key={book.bookID} book={book} write={true} />)
 		}
 
 	</>

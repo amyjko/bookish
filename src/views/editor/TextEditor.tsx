@@ -23,6 +23,15 @@ const TextEditor = (props: {
     const inputEditor = useRef<HTMLInputElement>(null)
     const textareaEditor = useRef<HTMLTextAreaElement>(null)
 	const { setEditingBook } = useContext(EditorContext)
+    const isMounted = useRef(false)
+
+    // Track whether the component is mounted so that we don't set state after unmounting
+    // We need to do this because the save function might navigate away from this view.
+    // (e.g., when changing the ID of a chapter, we navigate away to the new chapter ID).
+    useEffect(() => {
+      isMounted.current = true;
+      return () => { isMounted.current = false }
+    }, []);
 
     function measure() {
         if(textareaEditor?.current) {
@@ -93,21 +102,25 @@ const TextEditor = (props: {
             // Attempt to save
             props.save.call(undefined, text)
                 .then(() => {
-                    // Success! Lose focus...
-                    editor?.blur();
-                    // Changed to saved status...
-                    setStatus(Status.Saved);
-                    // Notify the book that we're done editing
-                    if(setEditingBook)
-                        setEditingBook(false);
+                    if(isMounted.current) {
+                        // Success! Lose focus...
+                        editor?.blur();
+                        // Changed to saved status...
+                        setStatus(Status.Saved);
+                        // Notify the book that we're done editing
+                        if(setEditingBook)
+                            setEditingBook(false);
+                    }
                 })
                 .catch((message: Error) => {
-                    // Restore editing and show the error.
-                    if(editor)
-                        editor.disabled = false
-                    editor?.focus()
-                    setStatus(Status.Editing);
-                    setError(message.message)
+                    if(isMounted.current) {
+                        // Restore editing and show the error.
+                        if(editor)
+                            editor.disabled = false
+                        editor?.focus()
+                        setStatus(Status.Editing);
+                        setError(message.message)
+                    }
                 })
         }
     }

@@ -4,9 +4,10 @@ import { updateBook } from "./Firestore";
 
 export type ChapterSpecification = {
     id: string;
+    bookID: string;
     title: string;
     authors: Array<string>;
-    image: string;
+    image?: string;
     numbered?: boolean;
     forthcoming?: boolean;
     section?: string;
@@ -20,7 +21,7 @@ export type Author = {
 }
 
 export type BookSpecification = {
-    id?: string;
+    bookID?: string;
     title: string;
     authors: Author[];
     images: Record<string, string>;
@@ -46,7 +47,7 @@ export default class Book {
     static IndexID = "index";
 	static GlossaryID = "glossary";
 
-    id: string | undefined;
+    bookID: string | undefined;
     title: string;
     symbols: Record<string, string>;
     tags: string[];
@@ -73,7 +74,7 @@ export default class Book {
 
         // Copy all of the specification metadata to fields.
         // Choose suitable defaults if the spec is empty.
-        this.id = specification && specification.id ? specification.id : undefined
+        this.bookID = specification && specification.bookID ? specification.bookID : undefined
         this.title = specification && specification.title ? specification.title : "Untitled"
         this.symbols = specification && specification.symbols ? specification.symbols : {}
         this.tags = specification && specification.tags ? specification.tags : []
@@ -112,6 +113,7 @@ export default class Book {
     toObject() {
 
         return {
+            bookID: this.bookID,
             title: this.title,
             authors: JSON.parse(JSON.stringify(this.authors)),
             uids: JSON.parse(JSON.stringify(this.uids)),
@@ -130,13 +132,15 @@ export default class Book {
 
     }
 
+    getBookID() { return this.bookID }
+    setBookID(id: string) { this.bookID = id; }
+
     addUserID(uid: string) {
 
         this.uids.push(uid);
 
     }
 
-    getID() { return this.id }
 
     getTitle() { return this.title; }
     setTitle(title: string): Promise<void> { 
@@ -170,6 +174,35 @@ export default class Book {
     getChapters() { return this.chapters }
     hasChapter(chapterID: string): boolean { return chapterID in this.chaptersByID || ["references", "glossary", "index", "search", "media"].includes(chapterID); }
     getChapter(chapterID: string): Chapter | undefined { return this.hasChapter(chapterID) ? this.chaptersByID[chapterID] : undefined; }
+
+    addChapter() {
+
+        if(!this.bookID)
+            return
+
+        // Synthesize a chapter ID placeholder that doesn't overlap with existing chapter names
+        let number = 1;
+        while(this.hasChapter("chapter" + number))
+            number++;
+
+        // Create a default chapter on this model
+        const emptyChapter = {
+            "id": `chapter${number}`,
+            "bookID": this.bookID,
+            "title": "Untitled Chapter",
+            "authors": [],
+            "forthcoming": true,
+            "text": ""
+        }
+        const chap = new Chapter(this, emptyChapter)
+        this.chapters.push(chap);
+        this.chaptersByID[emptyChapter.id] = chap
+
+        // Ask the database to create the chapter, returning the promise
+        return updateBook(this);
+
+    }
+
     getSymbols() { return this.symbols }
     hasReferences() { return this.references && Object.keys(this.references).length > 0; }
 	getReferences() { return this.references; }
@@ -354,7 +387,8 @@ export default class Book {
         // Add the cover and images from each chapter.
 		this.getChapters().forEach(c => {
 
-            let cover = c.getImage() === null ? null : Parser.parseEmbed(this, c.getImage());
+            const image = c.getImage()
+            let cover = image === undefined ? undefined : Parser.parseEmbed(this, image);
             if(cover && cover instanceof EmbedNode && !urls.has(cover.url)) {
                 media.push(cover);
                 urls.add(cover.url);
