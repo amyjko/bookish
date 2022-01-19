@@ -1,4 +1,4 @@
-import React, { useContext } from 'react'
+import React, { useContext, useState } from 'react'
 import { EditorContext } from '../page/Book';
 
 const Toggle = (props: { 
@@ -8,11 +8,13 @@ const Toggle = (props: {
 }) => {
 
     const { setEditingBook } = useContext(EditorContext)
+    const [ saving, setSaving ] = useState(false)
 
     function toggle() {
 
         if(setEditingBook)
             setEditingBook(true);
+        setSaving(true)
 
         props.save.call(undefined, !props.on)
         .then(() => {
@@ -20,13 +22,14 @@ const Toggle = (props: {
         .catch((message: Error) => {
         })
         .finally(() => {
+            setSaving(false)
             if(setEditingBook)
                 setEditingBook(false);
         })
 
     }
 
-    return <span className="bookish-app-interactive" onClick={toggle}>
+    return <span className={"bookish-app-interactive" + (saving ? " bookish-app-editable-saving" : "")} onClick={toggle}>
         {props.children}
     </span>
 

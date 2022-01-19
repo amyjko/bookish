@@ -52,6 +52,7 @@ class Chapter {
     }
 
 	toObject() {
+
 		let payload = {
 			id: this.id,
 			bookID: this.bookID,
@@ -60,7 +61,7 @@ class Chapter {
 		} as ChapterSpecification
 
 		if(this.image) payload.image = this.image;
-		if(this.numbered) payload.numbered = this.numbered
+		payload.numbered = this.numbered ? true : false;
 		if(this.section) payload.section = this.section;
 		if(this.forthcoming) payload.forthcoming = this.forthcoming;
 		if(this.text) payload.text = this.text;
@@ -84,6 +85,11 @@ class Chapter {
 	}
 
 	isNumbered() { return this.numbered; }
+	setNumbered(numbered: boolean) {
+		this.numbered = numbered;
+		return updateBook(this.book);
+	}
+
     getText() { return this.text; }
     getWordCount() { return this.wordCount; }
 	getAuthors() { return this.authors; }

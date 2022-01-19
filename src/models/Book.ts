@@ -63,7 +63,6 @@ export default class Book {
     uids: string[];
     chapters: Chapter[];
     chaptersByID: Record<string, Chapter | undefined>;
-    chapterNumbers: Record<string, number>;
 
     // Given an object with a valid specification and an object mapping chapter IDs to chapter text,
     // construct an object representing a book.
@@ -103,9 +102,6 @@ export default class Book {
                 this.chapters.push(chap)
             })
         }
-
-        // Lookup table for optimization
-		this.chapterNumbers = {};
 
     }
 
@@ -230,33 +226,23 @@ export default class Book {
 
 	getChapterNumber(chapterID: string) {
 
-		// If we haven't cached it yet, compute it.
-		if(!(chapterID in this.chapterNumbers)) {
-			let chapterNumber = 1;
-			let match = null;
-			this.chapters.forEach(chapter => {
-				// If we found a match...
-				if(chapter.getID() === chapterID) {
-					match = chapterNumber;
-					// And it's an unnumbered chapter, set to null.
-					if(!chapter.isNumbered())
-                        match = null;
-				} 
-				// Otherwise, increment if it's numbered.
-				else if(chapter.isNumbered())
-					chapterNumber++;
-			});
-			// Remember the number if we found it.
-            if(match !== null) {
-    			this.chapterNumbers[chapterID] = match;
-                return match;
-            }
-            else return undefined;
-            
-		}
-        else 
-            // Return it.
-            return this.chapterNumbers[chapterID];
+        let chapterNumber = 1;
+        let match = null;
+        this.chapters.forEach(chapter => {
+            // If we found a match...
+            if(chapter.getID() === chapterID) {
+                match = chapterNumber;
+                // And it's an unnumbered chapter, set to null.
+                if(!chapter.isNumbered())
+                    match = null;
+            } 
+            // Otherwise, increment if it's numbered.
+            else if(chapter.isNumbered())
+                chapterNumber++;
+        });
+        // Remember the number if we found it.
+        if(match !== null) return match;
+        else return undefined;
 
 	}
 

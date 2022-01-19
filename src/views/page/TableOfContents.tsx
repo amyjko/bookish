@@ -15,10 +15,12 @@ import License from './Acknowledgements'
 import Description from './Description'
 import Revisions from './Revisions'
 import Toggle from '../editor/Toggle'
+import Chapter from '../../models/Chapter'
 
 const TableOfContentsRow = (props: { 
 	image: React.ReactNode, 
-	chapterID: string, 
+	chapterID: string,
+	chapter?: Chapter,
 	title: string, 
 	number?: number,
 	annotation?: string, 
@@ -29,11 +31,21 @@ const TableOfContentsRow = (props: {
 	const { base } = useContext(BaseContext)
 	const { editable } = useContext(EditorContext)
 
+	const chapter = props.chapter
+
 	return <>
 		<tr className={props.forthcoming ? "bookish-forthcoming" : ""}>
 			<td>{props.image}</td>
 			<td>
-				{ props.number ? <div className="bookish-chapter-number">{"Chapter " + props.number}</div> : null }
+				{ editable && chapter ? 
+					<Toggle on={props.number !== undefined} save={ on => chapter.setNumbered(on) }>
+						<div className="bookish-chapter-number">{props.number ? "Chapter " + props.number : <span className="bookish-muted">Unnumbered</span>}</div>
+					</Toggle>
+					:
+					props.number ? 
+						<div className="bookish-chapter-number">{"Chapter " + props.number}</div> : 
+						null
+				}
 				{ props.forthcoming && !editable ?
 					<span>{props.title}</span> :
 					<Link to={base + "/" + props.chapterID}>{props.title}</Link>
@@ -150,7 +162,7 @@ const TableOfContents = (props: { book: Book }) => {
 			<table id="toc">
 				<tbody>
 					{
-						book.getChapters().map((chapter, index) => {
+						book.getChapters().map((chapter) => {
 
 							// Get the image, chapter number, and section for rendering.
 							const chapterID = chapter.getID();
@@ -181,6 +193,7 @@ const TableOfContents = (props: { book: Book }) => {
 								<TableOfContentsRow
 									key={chapterID}
 									image={getImage(chapter.getImage())}
+									chapter={chapter}
 									chapterID={chapterID}
 									number={book.getChapterNumber(chapterID)}
 									title={chapter.getTitle()}
