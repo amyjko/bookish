@@ -79,13 +79,13 @@ class Chapter {
     getSection(): string | undefined { return this.section; }
 
 	isForthcoming() { return this.forthcoming; }
-	setForthcoming(forthcoming: boolean) {
+	async setForthcoming(forthcoming: boolean) {
 		this.forthcoming = forthcoming;
 		return updateBook(this.book);
 	}
 
 	isNumbered() { return this.numbered; }
-	setNumbered(numbered: boolean) {
+	async setNumbered(numbered: boolean) {
 		this.numbered = numbered;
 		return updateBook(this.book);
 	}
@@ -95,7 +95,7 @@ class Chapter {
 	getAuthors() { return this.authors; }
 
 	getTitle() { return this.title; }
-	setTitle(title: string) { 
+	async setTitle(title: string) { 
 		
 		this.title = title;
 		return updateBook(this.book)

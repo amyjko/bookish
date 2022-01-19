@@ -1,6 +1,11 @@
 import React, { useContext, useState } from 'react'
 import { EditorContext } from '../page/Book';
 
+enum Status {
+    Viewing,
+    Saving,
+    Error
+}
 const Toggle = (props: { 
     on: boolean,
     children : React.ReactNode[] | React.ReactNode,
@@ -8,30 +13,31 @@ const Toggle = (props: {
 }) => {
 
     const { setEditingBook } = useContext(EditorContext)
-    const [ saving, setSaving ] = useState(false)
+    const [ saving, setSaving ] = useState(Status.Viewing)
 
     function toggle() {
 
         if(setEditingBook)
             setEditingBook(true);
-        setSaving(true)
+        setSaving(Status.Saving)
 
         props.save.call(undefined, !props.on)
-        .then(() => {
-        })
-        .catch((message: Error) => {
-        })
-        .finally(() => {
-            setSaving(false)
-            if(setEditingBook)
-                setEditingBook(false);
-        })
+            .then(() => setSaving(Status.Viewing))
+            .catch(() => setSaving(Status.Error))
+            .finally(() => {
+                if(setEditingBook)
+                    setEditingBook(false);
+            })
 
     }
 
-    return <span className={"bookish-app-interactive" + (saving ? " bookish-app-editable-saving" : "")} onClick={toggle}>
+    return <div 
+        className={
+            "bookish-app-interactive" + 
+                (saving === Status.Saving ? " bookish-app-editable-saving" : "") +
+                (saving === Status.Error ? " bookish-app-editable-error" : "")} onClick={toggle}>
         {props.children}
-    </span>
+    </div>
 
 }
 
