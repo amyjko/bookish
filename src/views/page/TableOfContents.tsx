@@ -26,13 +26,14 @@ const TableOfContentsRow = (props: {
 }) => {
 
 	const { base } = useContext(BaseContext)
+	const { editable } = useContext(EditorContext)
 
 	return <>
 		<tr className={props.forthcoming ? "bookish-forthcoming" : ""}>
 			<td>{props.image}</td>
 			<td>
 				{ props.number ? <div className="bookish-chapter-number">{"Chapter " + props.number}</div> : null }
-				{ props.forthcoming ?
+				{ props.forthcoming && !editable ?
 					<span>{props.title}</span> :
 					<Link to={base + "/" + props.chapterID}>{props.title}</Link>
 				}
