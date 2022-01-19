@@ -5,7 +5,7 @@ import { renderNode } from "../chapter/Renderer"
 import TextEditor from "../editor/TextEditor"
 import { EditorContext } from "./Book"
 
-const Acknowledgements = (props: { book: Book }) => {
+const License = (props: { book: Book }) => {
 
 	const { editable } = useContext(EditorContext)
 	const book = props.book
@@ -34,4 +34,4 @@ const Acknowledgements = (props: { book: Book }) => {
 
 }
 
-export default Acknowledgements
+export default License
