@@ -14,6 +14,7 @@ import Description from './Description'
 import Revisions from './Revisions'
 import Toggle from '../editor/Toggle'
 import Chapter from '../../models/Chapter'
+import TextEditor from '../editor/TextEditor'
 
 const TableOfContentsRow = (props: { 
 	image: React.ReactNode, 
@@ -21,7 +22,7 @@ const TableOfContentsRow = (props: {
 	chapter?: Chapter,
 	title: string, 
 	number?: number,
-	annotation?: string, 
+	annotation?: React.ReactNode, 
 	forthcoming?: boolean, 
 	etc?: React.ReactNode
 }) => {
@@ -186,6 +187,7 @@ const TableOfContents = (props: { book: Book }) => {
 								}
 							</>
 
+							const section = chapter.getSection()
 
 							return (
 								<TableOfContentsRow
@@ -195,7 +197,19 @@ const TableOfContents = (props: { book: Book }) => {
 									chapterID={chapterID}
 									number={book.getChapterNumber(chapterID)}
 									title={chapter.getTitle()}
-									annotation={chapter.getSection()}
+									annotation={
+										editable ?
+											<TextEditor
+												label={"Chapter section editor"}
+												text={section ? section : ""}
+												validationError={() => undefined }
+												save={text => chapter.setSection(text) }
+											>
+												{section ? section : "No section"}
+											</TextEditor>
+											:
+											chapter.getSection()
+									}
 									forthcoming={chapter.isForthcoming()}
 									etc={editable ? 
 										<Toggle on={chapter.isForthcoming()} save={on => chapter.setForthcoming(on)}>

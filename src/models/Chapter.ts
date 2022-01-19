@@ -77,6 +77,10 @@ class Chapter {
 	}
 
     getSection(): string | undefined { return this.section; }
+	setSection(section: string) {
+		this.section = section;
+		return updateBook(this.book)
+	}
 
 	isForthcoming() { return this.forthcoming; }
 	async setForthcoming(forthcoming: boolean) {

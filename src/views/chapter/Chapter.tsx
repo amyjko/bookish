@@ -249,7 +249,7 @@ const Chapter = (props: { chapter: ChapterModel, book: Book, print?: boolean }) 
 						{ 
 							chapterSection === null ? 
 								null : 
-								<span className="bookish-section-name"> {chapterSection}</span>
+								<span className="bookish-section-name">&nbsp;&nbsp;{chapterSection}</span>
 						}
 						</span>						
 					}
