@@ -14,6 +14,7 @@ import Acknowledgements from './Acknowledgements'
 import License from './Acknowledgements'
 import Description from './Description'
 import Revisions from './Revisions'
+import Toggle from '../editor/Toggle'
 
 const TableOfContentsRow = (props: { 
 	image: React.ReactNode, 
@@ -161,6 +162,21 @@ const TableOfContents = (props: { book: Book }) => {
 								readingTime < 60 ? "~" + Math.floor(readingTime / 5) * 5 + " min read" :
 								"~" + Math.round(10 * readingTime / 60) / 10 + " hour read";
 
+							const etc = <>
+								<small className="bookish-muted">
+								<em>
+									{ readingEstimate }
+									{ !chapter.isForthcoming() && getProgressDescription(chapterID in progress ? progress[chapterID] : null) }
+								</em>
+								</small>
+								{
+									!chapter.isForthcoming() && chapterAST && chapterAST.getErrors().length > 0 ? 
+										<span><br/><small className="bookish-error">{chapterAST.getErrors().length + " " + (chapterAST.getErrors().length > 1 ? "errors" : "error")}</small></span> :
+										null
+								}
+							</>
+
+
 							return (
 								<TableOfContentsRow
 									key={chapterID}
@@ -170,20 +186,12 @@ const TableOfContents = (props: { book: Book }) => {
 									title={chapter.getTitle()}
 									annotation={chapter.getSection()}
 									forthcoming={chapter.isForthcoming()}
-									etc={
-										<>
-											<small className="bookish-muted">
-											<em>
-												{ readingEstimate }
-												{ !chapter.isForthcoming() && getProgressDescription(chapterID in progress ? progress[chapterID] : null) }
-											</em>
-										</small>
-										{
-											!chapter.isForthcoming() && chapterAST && chapterAST.getErrors().length > 0 ? 
-												<span><br/><small className="bookish-error">{chapterAST.getErrors().length + " " + (chapterAST.getErrors().length > 1 ? "errors" : "error")}</small></span> :
-												null
-										}
-										</>
+									etc={editable ? 
+										<Toggle on={chapter.isForthcoming()} save={on => chapter.setForthcoming(on)}>
+											{etc}
+										</Toggle> 
+										: 
+										etc
 									}
 								/>
 							)

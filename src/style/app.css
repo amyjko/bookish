@@ -187,3 +187,7 @@ input[type="text"].bookish-app-editable-error {
 .bookish-app-editable-message-error {
     color: var(--bookish-app-error-color);
 }
+
+.bookish-app-interactive {
+    cursor: pointer;
+}

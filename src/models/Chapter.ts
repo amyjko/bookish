@@ -76,7 +76,13 @@ class Chapter {
 	}
 
     getSection(): string | undefined { return this.section; }
-    isForthcoming() { return this.forthcoming; }
+
+	isForthcoming() { return this.forthcoming; }
+	setForthcoming(forthcoming: boolean) {
+		this.forthcoming = forthcoming;
+		return updateBook(this.book);
+	}
+
 	isNumbered() { return this.numbered; }
     getText() { return this.text; }
     getWordCount() { return this.wordCount; }
