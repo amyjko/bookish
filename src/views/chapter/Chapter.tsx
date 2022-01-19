@@ -230,7 +230,7 @@ const Chapter = (props: { chapter: ChapterModel, book: Book, print?: boolean }) 
 										save={ id => props.chapter.setID(id).then(() => navigate(`/write/${props.book.getBookID()}/${id}`)) }
 										validationError={(newChapterID) => 
 											!/^[a-zA-Z0-9]+$/.test(newChapterID) ? "Chapter IDs must be one or more letters or numbers" :
-											props.book.hasChapter(newChapterID) ? "There's already a chapter that has this ID." :
+											props.chapter.getID() !== newChapterID && props.book.hasChapter(newChapterID) ? "There's already a chapter that has this ID." :
 											undefined
 										}
 									>
