@@ -170,6 +170,15 @@ export default class Book {
     getChapters() { return this.chapters }
     hasChapter(chapterID: string): boolean { return chapterID in this.chaptersByID || ["references", "glossary", "index", "search", "media"].includes(chapterID); }
     getChapter(chapterID: string): Chapter | undefined { return this.hasChapter(chapterID) ? this.chaptersByID[chapterID] : undefined; }
+    getChapterPosition(chapterID: string): number | undefined {
+        var position = 0;
+        for(; position < this.chapters.length; position++)
+            if(this.chapters[position].getID() === chapterID)
+                return position;
+
+        return undefined;
+    }
+    getChapterCount() { return this.chapters.length }
 
     addChapter() {
 
@@ -195,6 +204,26 @@ export default class Book {
         this.chaptersByID[emptyChapter.id] = chap
 
         // Ask the database to create the chapter, returning the promise
+        return updateBook(this);
+
+    }
+
+    moveChapter(chapterID: string, increment: number): Promise<void> {
+
+        // Get the index of the chapter.
+        let index = this.chapters.findIndex(chapter => chapter.getID() === chapterID);
+        if(index < 0)
+            throw Error(`Chapter with ID ${chapterID} doesn't exist, can't move it.`)
+        else if(index + increment < 0)
+            throw Error(`Can't move this chapter ${increment} chapters earlier.`)
+        else if(index + increment >= this.chapters.length)
+            throw Error(`Can't move this chpater ${increment} chapters later.`)
+
+        const temp = this.chapters[index + increment]
+        this.chapters[index + increment] = this.chapters[index]
+        this.chapters[index] = temp
+
+        // Ask the database to update with this new order.
         return updateBook(this);
 
     }

@@ -11,7 +11,7 @@
     /* Define some UI defaults not used in the Bookish theme. */
     --bookish-app-chrome-background: rgb(244, 244, 244);
     --bookish-app-chrome-color: black;
-    --bookish-app-chrome-border-color: darkGray;
+    --bookish-app-chrome-border-color: #d5d5d5;
     --bookish-app-chrome-hover-background: #E8AF22;
     --bookish-app-chrome-hover-color: #FFFFFF;
 
@@ -84,10 +84,16 @@ button {
     border: 1px solid var(--bookish-app-chrome-border-color);
 }
 
-button:hover {
+button:hover:enabled {
     background-color: var(--bookish-app-chrome-hover-background);
     color: var(--bookish-app-chrome-hover-color);
     cursor: pointer;
+}
+
+button:disabled {
+    opacity: 0.3;
+    border: none;
+    cursor: auto;
 }
 
 .bookish-header button {

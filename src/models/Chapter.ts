@@ -70,6 +70,8 @@ class Chapter {
 
 	}
 
+	getBook() { return this.book }
+
 	getID() { return this.id; }
 	setID(id: string) {
 		this.id = id;
@@ -105,6 +107,9 @@ class Chapter {
 		return updateBook(this.book)
 
 	}
+
+	getPosition() { return this.book.getChapterPosition(this.getID()) }
+	move(increment: number) { return this.book.moveChapter(this.getID(), increment); }
 
 	getImage() { return this.image; }
     getIndex() { return this.index; }

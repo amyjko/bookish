@@ -28,9 +28,12 @@ const TableOfContentsRow = (props: {
 }) => {
 
 	const { base } = useContext(BaseContext)
-	const { editable } = useContext(EditorContext)
+	const { editable, setEditingBook } = useContext(EditorContext)
 
 	const chapter = props.chapter
+
+	function moveUp() { if(setEditingBook) setEditingBook(true); chapter?.move(-1).finally(() => setEditingBook ? setEditingBook(false) : undefined) }
+	function moveDown() { if(setEditingBook) setEditingBook(true); chapter?.move(1).finally(() => setEditingBook ? setEditingBook(false) : undefined) }
 
 	return <>
 		<tr className={props.forthcoming ? "bookish-forthcoming" : ""}>
@@ -52,6 +55,16 @@ const TableOfContentsRow = (props: {
 				{ props.annotation ? <small className="bookish-muted"><br/><em>{props.annotation}</em></small> : null }
 			</td>
 			<td>{props.etc}</td>
+			{
+				editable && chapter ?
+					<td>
+						<button disabled={chapter.getPosition() === 0} onClick={moveUp}>{"▲"}</button>
+						<br/>
+						<button disabled={chapter.getPosition() === chapter.getBook().getChapterCount() - 1} onClick={moveDown}>{"▼"}</button>
+					</td> 
+					:
+					null
+			}
 		</tr>
 	</>
 
