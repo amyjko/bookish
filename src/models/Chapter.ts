@@ -111,6 +111,8 @@ class Chapter {
 	getPosition() { return this.book.getChapterPosition(this.getID()) }
 	move(increment: number) { return this.book.moveChapter(this.getID(), increment); }
 
+	delete() { return this.book.deleteChapter(this.getID()) }
+
 	getImage() { return this.image; }
     getIndex() { return this.index; }
     getAST() { return this.ast; }

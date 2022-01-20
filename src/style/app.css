@@ -179,6 +179,10 @@ textarea.bookish-app-editable {
 	}
 }
 
+button.bookish-app-editable-confirm {
+    animation: failure 100ms infinite;
+}
+
 input[type="text"].bookish-app-editable-error {
     background-color: var(--bookish-app-error-background);
 }

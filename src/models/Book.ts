@@ -228,6 +228,19 @@ export default class Book {
 
     }
 
+    deleteChapter(chapterID: string): Promise<void> {
+
+        let index = this.chapters.findIndex(chapter => chapter.getID() === chapterID);
+        if(index < 0)
+            throw Error(`Chapter with ID ${chapterID} doesn't exist, can't delete it.`)
+
+        this.chapters.splice(index, 1);
+
+        // Ask the database to update with this new order.
+        return updateBook(this);
+
+    }
+
     getSymbols() { return this.symbols }
     hasReferences() { return this.references && Object.keys(this.references).length > 0; }
 	getReferences() { return this.references; }

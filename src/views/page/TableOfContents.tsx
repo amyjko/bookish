@@ -15,6 +15,7 @@ import Revisions from './Revisions'
 import Toggle from '../editor/Toggle'
 import Chapter from '../../models/Chapter'
 import TextEditor from '../editor/TextEditor'
+import ConfirmButton from '../editor/ConfirmButton'
 
 const TableOfContentsRow = (props: { 
 	image: React.ReactNode, 
@@ -56,12 +57,21 @@ const TableOfContentsRow = (props: {
 			</td>
 			<td>{props.etc}</td>
 			{
-				editable && chapter ?
-					<td>
-						<button disabled={chapter.getPosition() === 0} onClick={moveUp}>{"▲"}</button>
-						<br/>
-						<button disabled={chapter.getPosition() === chapter.getBook().getChapterCount() - 1} onClick={moveDown}>{"▼"}</button>
-					</td> 
+				editable ?
+					chapter ?
+						<td>
+							<button disabled={chapter.getPosition() === 0} onClick={moveUp}>{"▲"}</button>
+							&nbsp;
+							<button disabled={chapter.getPosition() === chapter.getBook().getChapterCount() - 1} onClick={moveDown}>{"▼"}</button>
+							&nbsp;
+							<ConfirmButton
+								commandLabel="Delete"
+								confirmLabel="Confirm"
+								command={() => chapter.delete()}
+							/>
+						</td> 
+						:
+						<td></td>					
 					:
 					null
 			}
