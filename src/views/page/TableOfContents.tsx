@@ -167,7 +167,11 @@ const TableOfContents = (props: { book: Book }) => {
 			header={title}
 			subtitle={subtitle}
 			tags={book.getTags()}
-			after={<Authors authors={book.getAuthors()} />}
+			after={<Authors 
+				authors={book.getAuthors()} 
+				add={ () => book.addAuthor("Author")}
+				edit={(index, text) => text.length === 0 ? book.removeAuthor(index) : book.setAuthor(index, text)} 
+			/>}
 			outline={
 				<Outline
 					previous={null}
@@ -299,7 +303,7 @@ const TableOfContents = (props: { book: Book }) => {
 		<h2 className="bookish-header" id="citation">Citation</h2>
 
 		<p>
-			{ book.getAuthors().map(author => author.name).join(", ") } ({(new Date()).getFullYear() }). <em>{book.getTitle()}</em>. { location.protocol+'//'+location.host+location.pathname }, <em>retrieved { (new Date()).toLocaleDateString("en-US")}</em>.
+			{ book.getAuthors().map(author => Parser.parseContent(book, author).toText()).join(", ") } ({(new Date()).getFullYear() }). <em>{book.getTitle()}</em>. { location.protocol+'//'+location.host+location.pathname }, <em>retrieved { (new Date()).toLocaleDateString("en-US")}</em>.
 		</p>
 
 		<Revisions book={book} />

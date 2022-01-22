@@ -18,15 +18,7 @@
         "title": { "type": "string" },
         "authors": {
             "type": "array",
-            "items": {
-                "type": "object",
-                "required": ["id", "name"],
-                "properties": {
-                    "id": { "type": "string", "pattern": "^[a-zA-Z0-9]+$" },
-                    "name": { "type": "string" },
-                    "url": { "type": ["string", "null"], "format": "uri" }
-                }
-            }
+            "items": { "type": "string" }
         },
         "images": {
             "type": "object",

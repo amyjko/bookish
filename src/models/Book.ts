@@ -6,7 +6,7 @@ export type ChapterSpecification = {
     id: string;
     bookID: string;
     title: string;
-    authors: Array<string>;
+    authors: string[];
     image?: string;
     numbered?: boolean;
     forthcoming?: boolean;
@@ -14,16 +14,10 @@ export type ChapterSpecification = {
     text?: string;
 }
 
-export type Author = {
-    id: string;
-    name: string;
-    url?: string;
-}
-
 export type BookSpecification = {
     bookID?: string;
     title: string;
-    authors: Author[];
+    authors: string[];
     images: Record<string, string>;
     description: string;
     chapters: Array<ChapterSpecification>;
@@ -54,7 +48,7 @@ export default class Book {
     license: string;
     references: Record<string, string | Array<string>>;
     glossary: Record<string, { phrase: string, definition: string, synonyms?: string[]}>;
-    authors: Author[];
+    authors: string[];
     description: string;
     acknowledgements: string;
     revisions: Array<[string, string]>;
@@ -248,8 +242,25 @@ export default class Book {
     hasGlossary() { return this.glossary && Object.keys(this.glossary).length > 0 }
 	getGlossary() { return this.glossary }
 	getTags() { return this.tags }
-	getAuthors() { return this.authors; }	
-	getAuthorByID(id: string) { return this.authors.find(el => el.id === id); }
+
+	getAuthors() { return this.authors; }
+
+    addAuthor(name: string) {
+        this.authors.push(name)
+        return updateBook(this);
+    }
+
+    setAuthor(index: number, name: string) {
+        if(index >= 0 && index < this.authors.length)
+            this.authors[index] = name;
+        return updateBook(this);
+    }
+
+    removeAuthor(index: number) {
+        if(index >= 0 && index < this.authors.length)
+            this.authors.splice(index, 1)
+        return updateBook(this);
+    }
 
 	getRevisions() { return this.revisions; }
 

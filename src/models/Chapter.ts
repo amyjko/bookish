@@ -13,7 +13,7 @@ class Chapter {
 	id: string;
 	bookID: string;
 	title: string;
-	authors: Array<string>;
+	authors: string[];
 	image?: string;
 	numbered: boolean;
 	section: string | undefined;
@@ -98,7 +98,24 @@ class Chapter {
 
     getText() { return this.text; }
     getWordCount() { return this.wordCount; }
+
+	addAuthor(name: string) {
+        this.authors.push(name)
+        return updateBook(this.getBook());
+    }
+
 	getAuthors() { return this.authors; }
+    setAuthor(index: number, name: string) {
+        if(index >= 0 && index < this.authors.length)
+            this.authors[index] = name;
+        return updateBook(this.getBook());
+    }
+
+    removeAuthor(index: number) {
+        if(index >= 0 && index < this.authors.length)
+            this.authors.splice(index, 1)
+        return updateBook(this.getBook());
+    }
 
 	getTitle() { return this.title; }
 	async setTitle(title: string) { 

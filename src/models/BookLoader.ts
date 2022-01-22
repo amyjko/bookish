@@ -31,7 +31,7 @@ export default async function loadBookFromURL(url: string) {
             throw Error("The book.json file that we received doesn't appear to be a JSON-formatted document.")
         })
         // Validate the specification and then load its chapters...
-        .then(book => {
+        .then((book) => {
 
             // Validate the book schema before we get started.
             const ajv = new Ajv({
@@ -52,7 +52,7 @@ export default async function loadBookFromURL(url: string) {
             }
 
             // Remember the book spec
-            specification = book as BookSpecification
+            specification = book as unknown as BookSpecification
 
             // Map all non-forthcoming chapters to a list of fetch promises
             return Promise.all(specification.chapters.filter((chapter: ChapterSpecification) => !chapter.forthcoming).map((chapter: ChapterSpecification) => 

@@ -257,10 +257,10 @@ const Chapter = (props: { chapter: ChapterModel, book: Book, print?: boolean }) 
 					tags={book.getTags()}
 					/* If there are chapter authors, map them to authors declared in the book title, otherwise use all the authors of the book */
 					after={
-						<Authors authors={
-								chapter.getAuthors() ? 
-									chapter.getAuthors().map(author => book.getAuthorByID(author)) : 
-									book.getAuthors()} 
+						<Authors 
+							authors={ chapter.getAuthors() && chapter.getAuthors().length > 0 ? chapter.getAuthors() : book.getAuthors() }
+							add={ () => chapter.addAuthor("Author") }
+							edit={(index, text) => text.length === 0 ? chapter.removeAuthor(index) : chapter.setAuthor(index, text) }
 						/>
 					}
 					save={ text => props.chapter.setTitle(text) }

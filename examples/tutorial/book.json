@@ -1,8 +1,8 @@
 {
 	"title": "Bookish Tutorial: An placeholder for better documentation",
 	"authors": [
-		{ "id": "ajko", "name": "Amy J. Ko", "url": "https://faculty.washington.edu/ajko/" },
-		{ "id": "boomy", "name" : "Boomy" }
+		"[Amy J. Ko|https://faculty.washington.edu/ajko]",
+		"Boomy"
 	],
 	"images": {
 		"cover": "|cover.jpg|A photograph of Boomy the cat sleeping|Boomy is excited that you're trying Bookish!|@amyCredit|",
@@ -19,20 +19,18 @@
 		{
 			"id": "introduction",
 			"title": "Introduction",
-			"authors": ["ajko"],
+			"authors": ["Someone Else"],
 			"image": "|chapter1.jpg|A photo of Boomy|OMG this is the longest caption ever OMG this is the longest caption ever OMG this is the longest caption ever OMG this is the longest caption ever OMG this is the longest caption ever OMG this is the longest caption ever |@amyCredit|",
 			"numbered": true
 		},
 		{
 			"id": "marginals",
 			"title": "Marginals",
-			"authors": ["ajko"],
 			"image": "|unknown.jpg|A photo of skeptical Boomy|Time to learn about errors, huh?|@amyCredit|"
 		},
 		{
 			"id": "unfinished",
 			"title": "Unfinished",
-			"authors": ["ajko"],
 			"image": "|unknown.jpg|A photo of skeptical Boomy|Time to learn about errors, huh?|@amyCredit|",
 			"section": "Part II",
 			"forthcoming": true,
@@ -41,7 +39,6 @@
 		{
 			"id": "errors",
 			"title": "Errors",
-			"authors": ["ajko", "boomy"],
 			"image": "|unknown.jpg|A photo of skeptical Boomy|Time to learn about errors, huh?|@amyCredit|",
 			"section": "Part I"
 		}
