@@ -18,7 +18,7 @@ const ConfirmButton = (props: { commandLabel: string, confirmLabel: string, comm
     
         if(!confirming && !executing) {
             setConfirming(true)
-            setTimeoutID(setTimeout(() => setConfirming(false), 2000))
+            setTimeoutID(setTimeout(() => isMounted.current ? setConfirming(false) : undefined, 2000))
         } else if(confirming) {
             if(setEditingBook) setEditingBook(true)
             props.command.call(undefined)

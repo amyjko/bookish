@@ -1,10 +1,11 @@
 import Parser, { EmbedNode } from "./Parser";
 import Chapter from './Chapter.js';
-import { updateBook } from "./Firestore";
+import { addChapter, removeChapter, updateBook } from "./Firestore";
+import { DocumentReference } from "firebase/firestore";
 
 export type ChapterSpecification = {
+    ref: DocumentReference | undefined;
     id: string;
-    bookID: string;
     title: string;
     authors: string[];
     image?: string;
@@ -14,21 +15,31 @@ export type ChapterSpecification = {
     text?: string;
 }
 
+export type ChapterContent = {
+    text: string
+}
+
+export type BookPreview = {
+    ref: DocumentReference;
+    title: string;
+    authors: string[];
+    description: string;
+}
+
 export type BookSpecification = {
-    bookID?: string;
     title: string;
     authors: string[];
     images: Record<string, string>;
     description: string;
-    chapters: Array<ChapterSpecification>;
+    chapters: ChapterSpecification[];
     license: string;
     acknowledgements?: string;
-    tags?: Array<string>;
+    tags?: string[];
     revisions?: Array<[string, string]>;
     sources?: Record<string, string>;
-    references?: Record<string, string | Array<string>>;
+    references?: Record<string, string | string[]>;
     symbols?: Record<string, string>;
-    glossary?: Record<string, { phrase: string, definition: string, synonyms?: Array<string>}>;
+    glossary?: Record<string, { phrase: string, definition: string, synonyms?: string[]}>;
     uids?: Array<string>;
 }
 
@@ -41,7 +52,7 @@ export default class Book {
     static IndexID = "index";
 	static GlossaryID = "glossary";
 
-    bookID: string | undefined;
+    ref: DocumentReference | undefined;
     title: string;
     symbols: Record<string, string>;
     tags: string[];
@@ -60,14 +71,15 @@ export default class Book {
 
     // Given an object with a valid specification and an object mapping chapter IDs to chapter text,
     // construct an object representing a book.
-    constructor(specification?: BookSpecification) {
+    constructor(ref: DocumentReference | undefined, specification?: BookSpecification) {
 
         if(typeof specification !== "object" && specification !== undefined)
             throw Error("Expected a book specification object, but received " + specification)
 
+        this.ref = ref
+
         // Copy all of the specification metadata to fields.
         // Choose suitable defaults if the spec is empty.
-        this.bookID = specification && specification.bookID ? specification.bookID : undefined
         this.title = specification && specification.title ? specification.title : "Untitled"
         this.symbols = specification && specification.symbols ? specification.symbols : {}
         this.tags = specification && specification.tags ? specification.tags : []
@@ -103,7 +115,6 @@ export default class Book {
     toObject() {
 
         return {
-            bookID: this.bookID,
             title: this.title,
             authors: JSON.parse(JSON.stringify(this.authors)),
             uids: JSON.parse(JSON.stringify(this.uids)),
@@ -122,15 +133,13 @@ export default class Book {
 
     }
 
-    getBookID() { return this.bookID }
-    setBookID(id: string) { this.bookID = id; }
+    getRef() { return this.ref }
 
     addUserID(uid: string) {
 
         this.uids.push(uid);
 
     }
-
 
     getTitle() { return this.title; }
     setTitle(title: string): Promise<void> { 
@@ -167,32 +176,36 @@ export default class Book {
     getChapterPosition(chapterID: string): number | undefined {
         var position = 0;
         for(; position < this.chapters.length; position++)
-            if(this.chapters[position].getID() === chapterID)
+            if(this.chapters[position].getChapterID() === chapterID)
                 return position;
 
         return undefined;
     }
     getChapterCount() { return this.chapters.length }
 
-    addChapter() {
+    async addChapter() {
 
-        if(!this.bookID)
-            return
+        if(!this.ref)
+            throw Error("No book ID, can't add chapter")
+
+        const bookID = this.ref
 
         // Synthesize a chapter ID placeholder that doesn't overlap with existing chapter names
         let number = 1;
         while(this.hasChapter("chapter" + number))
             number++;
 
+        const chapterRef = await addChapter(bookID, { text: "Unwritten chapter" })
+
         // Create a default chapter on this model
         const emptyChapter = {
-            "id": `chapter${number}`,
-            "bookID": this.bookID,
-            "title": "Untitled Chapter",
-            "authors": [],
-            "forthcoming": true,
-            "text": ""
+            ref: chapterRef,
+            id: `chapter${number}`,
+            title: "Untitled Chapter",
+            authors: [],
+            forthcoming: true
         }
+
         const chap = new Chapter(this, emptyChapter)
         this.chapters.push(chap);
         this.chaptersByID[emptyChapter.id] = chap
@@ -205,13 +218,13 @@ export default class Book {
     moveChapter(chapterID: string, increment: number): Promise<void> {
 
         // Get the index of the chapter.
-        let index = this.chapters.findIndex(chapter => chapter.getID() === chapterID);
+        let index = this.chapters.findIndex(chapter => chapter.getChapterID() === chapterID);
         if(index < 0)
             throw Error(`Chapter with ID ${chapterID} doesn't exist, can't move it.`)
         else if(index + increment < 0)
             throw Error(`Can't move this chapter ${increment} chapters earlier.`)
         else if(index + increment >= this.chapters.length)
-            throw Error(`Can't move this chpater ${increment} chapters later.`)
+            throw Error(`Can't move this chapter ${increment} chapters later.`)
 
         const temp = this.chapters[index + increment]
         this.chapters[index + increment] = this.chapters[index]
@@ -224,14 +237,15 @@ export default class Book {
 
     deleteChapter(chapterID: string): Promise<void> {
 
-        let index = this.chapters.findIndex(chapter => chapter.getID() === chapterID);
+        let index = this.chapters.findIndex(chapter => chapter.getChapterID() === chapterID);
         if(index < 0)
             throw Error(`Chapter with ID ${chapterID} doesn't exist, can't delete it.`)
 
+        const chapter = this.chapters[index]
         this.chapters.splice(index, 1);
 
-        // Ask the database to update with this new order.
-        return updateBook(this);
+        // Ask the database to update the new book metadata then delete the chapter.
+        return updateBook(this).then(() => removeChapter(chapter));
 
     }
 
@@ -283,7 +297,7 @@ export default class Book {
         let match = null;
         this.chapters.forEach(chapter => {
             // If we found a match...
-            if(chapter.getID() === chapterID) {
+            if(chapter.getChapterID() === chapterID) {
                 match = chapterNumber;
                 // And it's an unnumbered chapter, set to null.
                 if(!chapter.isNumbered())
@@ -338,7 +352,7 @@ export default class Book {
                     if(word !== "" && word.length > 2) {
                         if(!(word in bookIndex))
                             bookIndex[word] = new Set();
-                        bookIndex[word].add(chapter.id);
+                        bookIndex[word].add(chapter.chapterID);
                     }
                 });
 		});
@@ -357,16 +371,16 @@ export default class Book {
             case Book.IndexID: return Book.SearchID;
             case Book.SearchID: return Book.MediaID;
             case Book.MediaID: return Book.TableOfContentsID;
-            case Book.TableOfContentsID: return this.chapters.length > 0 ? this.chapters[0].getID() : null;
+            case Book.TableOfContentsID: return this.chapters.length > 0 ? this.chapters[0].getChapterID() : null;
             default:
                 let after = false;
                 for(let i = 0; i < this.chapters.length; i++) {
                     let chapter = this.chapters[i];
-                    if(chapter.getID() === chapterID)
+                    if(chapter.getChapterID() === chapterID)
                         after = true;
                     // If we're after the given chapter and it's not forthcoming.
                     else if(after && !chapter.isForthcoming())
-                        return chapter.getID();
+                        return chapter.getChapterID();
                 }
                 // If the given ID was the last chapter, go to the next back matter chapter.
                 if(after)
@@ -384,20 +398,20 @@ export default class Book {
         switch(chapterID) {
 
             // Handle back matter chapters.
-            case Book.ReferencesID: return this.chapters[this.chapters.length - 1].id; // Last chapter of the book
-            case Book.GlossaryID: return this.hasReferences() ? Book.ReferencesID : this.chapters.length > 0 ? this.chapters[this.chapters.length - 1].id : Book.TableOfContentsID;
-            case Book.IndexID: return this.hasGlossary() ? Book.GlossaryID : this.hasReferences() ? Book.ReferencesID : this.chapters.length > 0 ? this.chapters[this.chapters.length - 1].id : Book.TableOfContentsID;
+            case Book.ReferencesID: return this.chapters[this.chapters.length - 1].chapterID; // Last chapter of the book
+            case Book.GlossaryID: return this.hasReferences() ? Book.ReferencesID : this.chapters.length > 0 ? this.chapters[this.chapters.length - 1].chapterID : Book.TableOfContentsID;
+            case Book.IndexID: return this.hasGlossary() ? Book.GlossaryID : this.hasReferences() ? Book.ReferencesID : this.chapters.length > 0 ? this.chapters[this.chapters.length - 1].chapterID : Book.TableOfContentsID;
             case Book.SearchID: return Book.IndexID;
             case Book.MediaID: return Book.SearchID;
             default:
                 let before = false;
                 for(let i = this.chapters.length - 1; i >= 0; i--) {
                     let chapter = this.chapters[i];
-                    if(chapter.getID() === chapterID)
+                    if(chapter.getChapterID() === chapterID)
                         before = true;
                     // If we're before the given chapter and it's not forthcoming.
                     else if(before && !chapter.isForthcoming())
-                        return chapter.getID();
+                        return chapter.getChapterID();
                 }
                 // If the given ID was the last chapter, go to the next back matter chapter.
                 if(before)

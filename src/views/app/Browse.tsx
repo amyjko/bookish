@@ -1,18 +1,18 @@
 import React from "react"
 import { useState, useEffect } from "react"
-import { BookSpecification } from "../../models/Book"
-import { getBooks } from '../../models/Firestore'
+import { BookPreview as Preview } from "../../models/Book"
+import { getPreviews } from '../../models/Firestore'
 import BookPreview from './BookPreview'
 
 export default function Browse() {
 
-	const [ books, setBooks ] = useState<BookSpecification[]>([])
+	const [ books, setBooks ] = useState<Preview[]>([])
 	const [ loading, setLoading ] = useState<boolean>(true)
 	const [ error, setError ] = useState('')
 
 	// Get the books when the component loads.
 	useEffect(() => {
-		getBooks().then(books => {
+		getPreviews().then(books => {
 			setLoading(false) 
 			if(books === null)
 				setError("Unable to load books");
@@ -29,7 +29,7 @@ export default function Browse() {
 		{ 
 			error ? <div className=".bookish-app-alert">{error}</div> :
 			loading ? <p>Loading books...</p> : 
-				books.map((book) => { return <BookPreview key={book.bookID} book={book} write={false} />})
+				books.map((book, index) => { return <BookPreview key={`book${index}`} book={book} write={false} />})
 		}
 	</>
 

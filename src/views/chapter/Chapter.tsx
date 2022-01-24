@@ -182,7 +182,7 @@ const Chapter = (props: { chapter: ChapterModel, book: Book, print?: boolean }) 
 	// Prepare to render the chapter by getting some data from the chapter and book.
 	const book = props.book;
 	const chapter = props.chapter;
-	const chapterID = chapter.getID();
+	const chapterID = chapter.getChapterID();
 	const chapterNumber = book.getChapterNumber(chapterID);
 	const chapterSection = book.getChapterSection(chapterID);
 	const chapterAST = chapter.getAST();
@@ -225,16 +225,16 @@ const Chapter = (props: { chapter: ChapterModel, book: Book, print?: boolean }) 
 							editable ?
 								<span className="bookish-muted">
 									<TextEditor 
-										text={props.chapter.getID()} 
+										text={props.chapter.getChapterID()} 
 										label="Chapter URL ID editor"
-										save={ id => props.chapter.setID(id).then(() => navigate(`/write/${props.book.getBookID()}/${id}`)) }
+										save={ id => props.chapter.setChapterID(id).then(() => navigate(`/write/${props.book.getRef()}/${id}`)) }
 										validationError={(newChapterID) => 
 											!/^[a-zA-Z0-9]+$/.test(newChapterID) ? "Chapter IDs must be one or more letters or numbers" :
-											props.chapter.getID() !== newChapterID && props.book.hasChapter(newChapterID) ? "There's already a chapter that has this ID." :
+											props.chapter.getChapterID() !== newChapterID && props.book.hasChapter(newChapterID) ? "There's already a chapter that has this ID." :
 											undefined
 										}
 									>
-										{props.chapter.getID()}
+										{props.chapter.getChapterID()}
 									</TextEditor>
 									<br/>
 								</span>

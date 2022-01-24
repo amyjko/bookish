@@ -40,7 +40,7 @@ const Search = (props: { book: Book }) => {
     // Go through all the chapter indexes and find matches.
     if(query.length > 2)
         book.getChapters().forEach((chapter: Chapter) => {
-            let chapterID = chapter.getID();
+            let chapterID = chapter.getChapterID();
             let index = chapter.getIndex();
             let chapterNumber = book.getChapterNumber(chapterID);
 

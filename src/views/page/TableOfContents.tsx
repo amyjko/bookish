@@ -191,7 +191,7 @@ const TableOfContents = (props: { book: Book }) => {
 						book.getChapters().map((chapter) => {
 
 							// Get the image, chapter number, and section for rendering.
-							const chapterID = chapter.getID();
+							const chapterID = chapter.getChapterID();
 							const chapterAST = chapter.getAST();
 							const readingTime = chapter.getReadingTime();
 							const readingEstimate =

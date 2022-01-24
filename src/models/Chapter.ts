@@ -1,6 +1,7 @@
 import Parser, { ChapterNode } from "./Parser";
 import Book, { ChapterSpecification } from "./Book"
-import { updateBook } from "./Firestore";
+import { getChapterText, updateBook } from "./Firestore";
+import { DocumentReference } from "firebase/firestore";
 
 export type Match = {
 	left: string,
@@ -10,8 +11,8 @@ export type Match = {
 
 class Chapter {
 	book: Book;
-	id: string;
-	bookID: string;
+	ref: DocumentReference | undefined;
+	chapterID: string;
 	title: string;
 	authors: string[];
 	image?: string;
@@ -21,27 +22,25 @@ class Chapter {
 	text: string | undefined;
 	ast: ChapterNode | undefined;
 	index: Record<string, Array<Match>> | undefined;
-	wordCount: number;
+	wordCount: number | undefined;
 
     constructor(book: Book, spec: ChapterSpecification) {
 
         this.book = book;
-		this.id = spec.id;
-		this.bookID = spec.bookID;
+		this.ref = spec.ref;
+		this.chapterID = spec.id;
         this.title = spec.title;
         this.authors = spec.authors;
         this.image = spec.image;
         this.numbered = spec.numbered === true || spec.numbered === undefined;
         this.section = spec.section ? spec.section : undefined;
 		this.forthcoming = spec.forthcoming === true;
-        this.text = spec.text ? spec.text : "";
 
 		// If the chapter has text, then parse it, count searchable words, and compute an index.
-		if(this.text) {
-			this.ast = Parser.parseChapter(this.book, this.text);
-			this.wordCount = this.ast.toText().split(/\s+/).length;
-			this.index = this.computeIndex();
-		}
+		if(spec.text)
+			this.setText(spec.text)
+		else if(this.ref)
+			getChapterText(this.ref).then(text => this.setText(text.text))
 		// Otherwise, set them all to null.
 		else {
 			this.ast = undefined;
@@ -54,8 +53,8 @@ class Chapter {
 	toObject() {
 
 		let payload = {
-			id: this.id,
-			bookID: this.bookID,
+			ref: this.ref,
+			id: this.chapterID,
 			title: this.title,
 			authors: [...this.authors]
 		} as ChapterSpecification
@@ -72,9 +71,12 @@ class Chapter {
 
 	getBook() { return this.book }
 
-	getID() { return this.id; }
-	setID(id: string) {
-		this.id = id;
+	getRef() { return this.ref; }
+
+	getChapterID() { return this.chapterID; }
+	setChapterID(id: string) {
+		const previousID = this.chapterID;
+		this.chapterID = id;
 		return updateBook(this.book)
 	}
 
@@ -96,8 +98,15 @@ class Chapter {
 		return updateBook(this.book);
 	}
 
-    getText() { return this.text; }
-    getWordCount() { return this.wordCount; }
+	getText() { return this.text; }
+	setText(text: string) {
+
+		this.text = text;
+		this.ast = Parser.parseChapter(this.book, this.text);
+		this.wordCount = this.ast.toText().split(/\s+/).length;
+		this.index = this.computeIndex();
+
+	}
 
 	addAuthor(name: string) {
         this.authors.push(name)
@@ -125,17 +134,17 @@ class Chapter {
 
 	}
 
-	getPosition() { return this.book.getChapterPosition(this.getID()) }
-	move(increment: number) { return this.book.moveChapter(this.getID(), increment); }
+	getPosition() { return this.book.getChapterPosition(this.getChapterID()) }
+	move(increment: number) { return this.book.moveChapter(this.getChapterID(), increment); }
 
-	delete() { return this.book.deleteChapter(this.getID()) }
+	delete() { return this.book.deleteChapter(this.getChapterID()) }
 
 	getImage() { return this.image; }
     getIndex() { return this.index; }
     getAST() { return this.ast; }
 
 	// Utility function
-	getReadingTime() { return this.isForthcoming() ? undefined : Math.max(1, Math.round(this.getWordCount() / 150)); }
+	getReadingTime() { return this.isForthcoming() || !this.wordCount ? undefined : Math.max(1, Math.round(this.wordCount / 150)); }
 
 	computeIndex(): Record<string, Match[]> | undefined {
 

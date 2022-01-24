@@ -80,18 +80,18 @@ const Book = (props: { book: BookModel, base?: string, editable?: boolean }) => 
 					// Map all the book chapters to a bare route
 					book.getChapters().map((chapter, index) => {
 						return <Route 
-								key={"chapter-route-" + chapter.getID()} 
-								path={"/" + chapter.getID()} 
-								element={<Chapter key={"chapter-" + chapter.getID()} chapter={chapter} book={book} />} />
+								key={"chapter-route-" + chapter.getChapterID()} 
+								path={"/" + chapter.getChapterID()} 
+								element={<Chapter key={"chapter-" + chapter.getChapterID()} chapter={chapter} book={book} />} />
 					})
 				}
 				{
 					// Map all the book chapters a route with word and number to highlight
 					book.getChapters().map((chapter, index) => {
 						return <Route 
-								key={"chapter-route-" + chapter.getID() + "-highlighted"}
-								path={chapter.getID() + "/:word/:number"}
-								element={<Chapter key={"chapter-" + chapter.getID() + "-highlighted"} chapter={chapter} book={book} />} />
+								key={"chapter-route-" + chapter.getChapterID() + "-highlighted"}
+								path={chapter.getChapterID() + "/:word/:number"}
+								element={<Chapter key={"chapter-" + chapter.getChapterID() + "-highlighted"} chapter={chapter} book={book} />} />
 					})
 				}
 				<Route path="references" element={<References book={book} />} />

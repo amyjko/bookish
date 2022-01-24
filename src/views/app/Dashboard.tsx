@@ -2,13 +2,12 @@ import React, { useState, useEffect } from "react"
 import { useAuth } from "./AuthContext"
 import { createBook, getUserBooks } from '../../models/Firestore'
 import BookPreview from './BookPreview'
-import { Link } from "react-router-dom"
 import { useNavigate } from "react-router-dom"
-import { BookSpecification } from "../../models/Book"
+import { BookPreview as Preview } from "../../models/Book"
 
 export default function Dashboard() {
 
-	const [ books, setBooks ] = useState<BookSpecification[]>([])
+	const [ books, setBooks ] = useState<Preview[]>([])
 	const [ loading, setLoading ] = useState(true)
 	const [ error, setError ] = useState('')
 	const navigate = useNavigate()
@@ -56,7 +55,7 @@ export default function Dashboard() {
 		{ 
 			error ? <div className="bookish-app-alert">{error}</div> :
 			loading ? <p>Loading books...</p> : 
-				books.map(book => <BookPreview key={book.bookID} book={book} write={true} />)
+				books.map((book, index) => <BookPreview key={`book${index}`} book={book} write={true} />)
 		}
 
 	</>

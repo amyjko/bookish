@@ -1,30 +1,34 @@
 import { db } from "./Firebase"
-import { collection, getDocs, getDoc, setDoc, doc, addDoc, query, where, limit } from "firebase/firestore"
-import Book, { BookSpecification } from "./Book"
+import { collection, getDocs, getDoc, setDoc, doc, addDoc, query, where, limit, deleteDoc, DocumentReference } from "firebase/firestore"
+import Book, { BookPreview, BookSpecification, ChapterContent, ChapterSpecification } from "./Book"
+import Chapter from "./Chapter"
 
 
-export const getBooks = async (): Promise<BookSpecification[] | null> => {
+export const getPreviews = async (): Promise<BookPreview[] | null> => {
 
     if(!db)
-        throw Error("Can't retrieve books, not connected to Firebase.")
+        throw Error("Can't retrieve previews, not connected to Firebase.")
 
     try {
-        const data = await getDocs(collection(db, "books"));
-        return data.docs.map((doc) => ({...doc.data(), bookID: doc.id} as BookSpecification))
+        const data = await getDocs(collection(db, "previews"));
+        return data.docs.map((doc) => ({...doc.data(), ref: doc.ref} as BookPreview))
     } catch {
         return null
     }
 
 }
 
-export const getUserBooks = async (userID: string): Promise<BookSpecification[] | null> => {
+export const getUserBooks = async (userID: string): Promise<BookPreview[] | null> => {
 
     if(!db)
         throw Error("Can't retrieve user's books, not connected to Firebase.")
 
     try {
         const books = await getDocs(query(collection(db, "books"), where("uids", "array-contains", userID)))
-        return books.docs.map((doc) => ({...doc.data(), bookID: doc.id} as BookSpecification))
+        return books.docs.map((doc) => {
+            const book = new Book(doc.ref, doc.data() as BookSpecification) as BookPreview
+            return book
+        })
     } catch(err) {
         console.error(err)
         return null
@@ -32,42 +36,16 @@ export const getUserBooks = async (userID: string): Promise<BookSpecification[] 
 
 }
 
-export const getFullBook = async (bookID: string): Promise<Book> => {
+export const getBook = async (bookID: string): Promise<Book> => {
 
     if(!db)
         throw Error("Can't retrieve book, not connected to Firebase.")
 
     const book = await getDoc(doc(db, "books", bookID))
-    if(book.exists()) {
-        const content = await getBookContents(bookID)
-        if(content) {
-            const preview = book.data()
-            const fullBook = Object.assign(content, preview)
-            return new Book(fullBook as unknown as BookSpecification)
-        } 
-        else throw Error("Uh oh. Somehow there was no book content for this book. That should never happen.")
-    }
-    else throw Error("" + bookID + " doesn't exist")
-
-}
-
-const splitBook = (fullBook: BookSpecification): [ {}, {} ] => {
-
-    const preview = (({ title, authors, description, uids }) => ({ title, authors, description, uids }))(fullBook)
-    const { title, authors, description, uids, ... content } = fullBook
-    return [ preview, content ]
-
-}
-
-const getBookContents = async (bookID: string): Promise<BookSpecification | undefined> => {
-
-    if(!db)
-        throw Error("Can't get book contents, not connected to Firebase.")
-
-    const contents = await getDocs(query(collection(db, "bookContents"), where("bookID", "==", bookID), limit(1)))
-    if(!contents.empty)
-        return contents.docs[0].data() as BookSpecification
-    else return undefined;
+    if(book.exists())
+        return new Book(book.ref, book.data() as BookSpecification)
+    
+    throw Error("" + bookID + " doesn't exist")
 
 }
 
@@ -77,15 +55,14 @@ export const createBook = async (userID: string): Promise<string> => {
         throw Error("Can't create book, not connected to Firebase.")
 
     // Make a new empty book
-    const newBook = new Book()
+    const newBook = new Book(undefined)
     // Add the current user to the book
     newBook.addUserID(userID)
     // Add the book to the database
-    const bookRef = await addDoc(collection(db, "books"), splitBook(newBook.toObject())[0])
-    // Save the ID book ref to the contents so we have a reference back to the book.
-    newBook.setBookID(bookRef.id)
-    // Save the book contents
-    await addDoc(collection(db, "bookContents"), splitBook(newBook.toObject())[1])
+    const bookRef = await addDoc(collection(db, "books"), newBook.toObject())
+
+    // Note that we don't create a sub-collection of chapters here.
+    // Firestore creates sub-collections automatically when documents are added.
 
     // Return the book id
     return bookRef.id
@@ -99,19 +76,49 @@ export const updateBook = async (book: Book): Promise<void> => {
 
     // Get the object for the book so we can store it.
     const spec = book.toObject();
-    const id = book.getBookID();
+    const bookRef = book.getRef();
 
     // Make sure the given book has an ID
-    if(!id)
+    if(!bookRef)
         throw Error("Book given has no ID");
 
-    // Split the book
-    const [ preview, content ] = splitBook(spec)
-
     // Update the book's preview
-    await setDoc(doc(db, "books", id), preview);
+    await setDoc(doc(db, "books", bookRef.id), spec);
 
-    // Update the book's content
-    await setDoc(doc(db, "bookContents", id), content);
+}
+
+export const addChapter = async (ref: DocumentReference, chapter: ChapterContent): Promise<DocumentReference> => {
+
+    if(!db)
+        throw Error("Can't add chapter, not connected to Firebase.")
+
+    return await addDoc(collection(db, `books/${ref.id}/chapters`), chapter)
+
+}
+
+export const removeChapter = async(chapter: Chapter): Promise<void> => {
+
+    if(!db)
+        throw Error("Can't add chapter, not connected to Firebase.")
+
+    const ref = chapter.getRef()
+
+    if(!ref)
+        throw Error("Can't delete chapter, no bookID")
+
+    await deleteDoc(ref);
+
+}
+
+export const getChapterText = async(chapter: DocumentReference): Promise<ChapterContent> => {
+
+    if(!db)
+        throw Error("Not connected to Firebase.")
+
+    const text = await getDoc(chapter)
+    if(!text.exists())
+        throw Error("Chapter text does not exist.")
+
+    return text.data() as ChapterContent
 
 }
