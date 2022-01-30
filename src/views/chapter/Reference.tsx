@@ -1,5 +1,5 @@
 import React from 'react'
-import { ReferenceNode } from '../../models/Parser';
+import { ReferenceNode } from "../../models/ReferenceNode";
 
 const Reference = (props: { node: ReferenceNode }) => {
 
@@ -18,10 +18,10 @@ const Reference = (props: { node: ReferenceNode }) => {
         else {
             authors = authorList[0].trim() + ", et al.";
         }
-        return <span className="bookish-reference-text">{authors} ({node.year}). {node.url === null ? node.title : <a href={node.url} target={"_blank"}>{node.title}</a>}{node.title.charAt(node.title.length - 1) === "?" ? "" : "."} <em>{node.source}</em></span>
+        return <span data-nodeid={props.node.nodeID} className="bookish-reference-text">{authors} ({node.year}). {node.url === null ? node.title : <a href={node.url} target={"_blank"}>{node.title}</a>}{node.title.charAt(node.title.length - 1) === "?" ? "" : "."} <em>{node.source}</em></span>
     }
     else
-        return <span className="bookish-reference-text">{node.authors} ({node.year}). {node.url === null ? node.title : <a href={node.url} target={"_blank"}>{node.title}</a>}{node.title.charAt(node.title.length - 1) === "?" ? "" : "."} <em>{node.source}</em>.{node.summary ? <span className="bookish-reference-summary">{node.summary}</span> : null }</span>
+        return <span data-nodeid={props.node.nodeID} className="bookish-reference-text">{node.authors} ({node.year}). {node.url === null ? node.title : <a href={node.url} target={"_blank"}>{node.title}</a>}{node.title.charAt(node.title.length - 1) === "?" ? "" : "."} <em>{node.source}</em>.{node.summary ? <span className="bookish-reference-summary">{node.summary}</span> : null }</span>
     
 }
 

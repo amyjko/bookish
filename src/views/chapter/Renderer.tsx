@@ -2,7 +2,8 @@
 
 import React from 'react'
 
-import { Node, Position } from '../../models/Parser'
+import { Position } from '../../models/Parser'
+import { Node } from "../../models/Node"
 import ChapterBody from './ChapterBody'
 import Paragraph from './Paragraph'
 import Figure from './Figure'

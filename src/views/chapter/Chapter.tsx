@@ -2,7 +2,8 @@ import React, { useContext } from 'react';
 import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 
-import Parser, { ChapterNode } from "../../models/Parser"
+import Parser from "../../models/Parser"
+import { ChapterNode } from "../../models/ChapterNode";
 import Header from '../page/Header'
 import Authors from "./Authors"
 import Outline from '../page/Outline'
@@ -15,6 +16,7 @@ import Book from '../../models/Book'
 import ChapterModel from '../../models/Chapter'
 import { EditorContext } from '../page/Book';
 import TextEditor from '../editor/TextEditor';
+import ChapterEditor from '../editor/ChapterEditor';
 
 export type ChapterContextType = {
 	book?: Book, 
@@ -278,8 +280,8 @@ const Chapter = (props: { chapter: ChapterModel, book: Book, print?: boolean }) 
 					}}
 				>
 				{
-					chapterAST ? 
-						renderNode(chapterAST) :
+					chapterAST ?
+						(editable ? <ChapterEditor ast={chapterAST} /> : renderNode(chapterAST)) :
 						null
 				}
 				</ChapterContext.Provider>

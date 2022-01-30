@@ -1,11 +1,12 @@
 import React, { useState, useRef, useEffect } from 'react';
+import { CodeNode } from "../../models/CodeNode";
 import Code from './Code';
 
 // Make Typescript happy
 type Skulpt = { configure: Function, importMainWithBody: Function} | undefined
 declare var Sk: Skulpt
 
-const Python = (props: { code: string }) => {
+const Python = (props: { node: CodeNode, code: string }) => {
 
     // Start with whatever code was passed in.
     const [code, setCode] = useState<string>(props.code)
@@ -105,7 +106,7 @@ const Python = (props: { code: string }) => {
     let spans = lines.map((line: string, index: number) => <span className="python-output-line" key={index}>{line}{index < lines.length - 1 ? <br/> : null}</span>)
 
     return <div className="bookish-python" ref={ref}>
-        <Code inline={false} language={"python"} editable edited={handleEdit}>{code}</Code>
+        <Code inline={false} language={"python"} editable edited={handleEdit} nodeID={props.node.nodeID}>{code}</Code>
         <div className="bookish-code-language">{"python"}</div>
         <div>
             <button disabled={code === props.code } onClick={reset}>{"\u21BB"}</button>

@@ -1,4 +1,28 @@
 import Book from "./Book";
+import { BulletedListNode } from "./BulletedListNode";
+import { CalloutNode } from "./CalloutNode";
+import { ChapterNode } from "./ChapterNode";
+import { CitationsNode } from "./CitationsNode";
+import { CodeNode } from "./CodeNode";
+import { ContentNode } from "./ContentNode";
+import { DefinitionNode } from "./DefinitionNode";
+import { EmbedNode } from "./EmbedNode";
+import { ErrorNode } from "./ErrorNode";
+import { FootnoteNode } from "./FootnoteNode";
+import { FormattedNode } from "./FormattedNode";
+import { HeaderNode } from "./HeaderNode";
+import { InlineCodeNode } from "./InlineCodeNode";
+import { LabelNode } from "./LabelNode";
+import { LinkNode } from "./LinkNode";
+import { Node } from "./Node";
+import { NumberedListNode } from "./NumberedListNode";
+import { ParagraphNode } from "./ParagraphNode";
+import { QuoteNode } from "./QuoteNode";
+import { ReferenceNode } from "./ReferenceNode";
+import { RuleNode } from "./RuleNode";
+import { SubSuperscriptNode } from "./SubSuperscriptNode";
+import { TableNode } from "./TableNode";
+import { TextNode } from "./TextNode";
 
 // TODO This grammar is slightly out of date.
 // A simple recursive descent parser for this grammar.
@@ -28,7 +52,8 @@ import Book from "./Book";
 
 export type Position = "|" | "<" | ">";
 
-type Bookkeeping = {
+export type Bookkeeping = {
+    index: Map<number, Node>;
     citations: Record<string, boolean>;
     footnotes: Array<FootnoteNode>;
     headers: Array<HeaderNode>;
@@ -38,7 +63,7 @@ type Bookkeeping = {
     errors: Array<ErrorNode>;
 }
 
-type NodeType = 
+export type NodeType = 
     "chapter" | 
     "paragraph" | 
     "embed" | 
@@ -63,7 +88,7 @@ type NodeType =
     "label" | 
     "reference"
 
-type BlockNode = HeaderNode | RuleNode | EmbedNode | BulletedListNode | NumberedListNode | CodeNode | QuoteNode | CalloutNode | TableNode | ParagraphNode;
+export type BlockNode = HeaderNode | RuleNode | EmbedNode | BulletedListNode | NumberedListNode | CodeNode | QuoteNode | CalloutNode | TableNode | ParagraphNode;
 
 export default class Parser {
 
@@ -83,6 +108,7 @@ export default class Parser {
         this.index = 0; // Start at the first character.
         this.openedDoubleQuote = false; // Track most recently observed quotes.
         this.metadata = {
+            index: new Map<number, Node>(),
             citations: {},
             footnotes: [],
             headers: [],
@@ -113,11 +139,11 @@ export default class Parser {
     }
 
     static parseContent(book: Book, text: string) {
-        return (new Parser(book, Parser.preprocessSymbols(book, text))).parseContent();
+        return (new Parser(book, Parser.preprocessSymbols(book, text))).parseContent(undefined);
     }
 
     static parseEmbed(book: Book, text: string) {
-        return (new Parser(book, Parser.preprocessSymbols(book, text))).parseEmbed();
+        return (new Parser(book, Parser.preprocessSymbols(book, text))).parseEmbed(undefined);
     }
 
     static parseReference(ref: string | Array<string>, book: Book, short=false) {
@@ -137,18 +163,18 @@ export default class Parser {
                 if(source.charAt(0) === "#") {
                     let src = book.getSource(source)
                     if(src === null)
-                        return new ErrorNode("Unknown source " + source)
+                        return new ErrorNode(undefined, "Unknown source " + source)
                     else
                         source = src
                 }
 
-                return new ReferenceNode(authors, year, title, source, url, summary, short)
+                return new ReferenceNode(undefined, authors, year, title, source, url, summary, short)
             }
             else
-                return new ErrorNode("Expected at least 4 items in the reference array, but found " + ref.length + ": " + ref.toString())
+                return new ErrorNode(undefined, "Expected at least 4 items in the reference array, but found " + ref.length + ": " + ref.toString())
         }
         else
-            return new ErrorNode("Invalid reference: " + ref)
+            return new ErrorNode(undefined, "Invalid reference: " + ref)
 
     }
 
@@ -299,9 +325,9 @@ export default class Parser {
     }
 
     // Create and store an error
-    createError(message: string) {
+    createError(parent: Node | undefined, message: string) {
 
-        const error = new ErrorNode(message);
+        const error = new ErrorNode(parent, message);
         this.metadata.errors.push(error);
         return error;
 
@@ -309,10 +335,13 @@ export default class Parser {
 
     parseChapter(): ChapterNode {
 
-        let blocks = [];
+        let blocks: BlockNode[] = [];
+
+        // Make the chapter node so we can pass it around.
+        const chapter = new ChapterNode(blocks, this.metadata)
 
         // Read any symbols declared for this chapter.
-        this.parseSymbols();
+        this.parseSymbols(chapter);
 
         // Get the remaining text.
         let declarations = this.text.substring(0, this.index);
@@ -333,7 +362,7 @@ export default class Parser {
         // While there's more text, parse a line.
         while(this.more()) {
             // Read a block
-            const block = this.parseBlock();
+            const block = this.parseBlock(chapter);
             // Add it to the list if we parsed something.
             if(block !== null)
                 blocks.push(block);            
@@ -342,11 +371,11 @@ export default class Parser {
                 this.read();
         }
 
-        return new ChapterNode(blocks, this.metadata);
+        return chapter;
 
     }
 
-    parseSymbols() {
+    parseSymbols(parent: ChapterNode) {
 
         // Read whitespace before the symbols
         this.readWhitespace();
@@ -363,7 +392,7 @@ export default class Parser {
             // Names need to be letter and numbers only.
             if(!/^[a-zA-Z0-9]+$/.test(name)) {
                 this.readUntilNewLine();
-                this.createError(
+                this.createError(parent,
                     name.trim() === "" ? 
                         "Did you mean to declare a symbol? Use an @ symbol, then a name of only numbers and letters, then a colon, then whatever content you want it to represent." :
                         "'" + name + "' isn't a valid name for a symbol; letters and numbers only"
@@ -377,7 +406,7 @@ export default class Parser {
             // Name declarations need to be terminated with a colon before the block starts.
             if(!this.nextIs(":")) {
                 this.readUntilNewLine();
-                this.createError("Symbol names are to be followed by a ':'");
+                this.createError(parent, "Symbol names are to be followed by a ':'");
                 return;
             }
 
@@ -391,7 +420,7 @@ export default class Parser {
             let startIndex = this.index;
 
             // Parse a block, any block.
-            this.parseBlock();
+            this.parseBlock(parent);
 
             // Remember the text we parsed.
             this.metadata.symbols[name] = this.text.substring(startIndex, this.index).trim();
@@ -404,7 +433,7 @@ export default class Parser {
 
     }
 
-    parseBlock(): BlockNode {
+    parseBlock(parent: ChapterNode | CalloutNode): BlockNode {
 
         // Read whitespace before the block.
         this.readWhitespace();
@@ -416,44 +445,46 @@ export default class Parser {
 
         // Parse and return a header if it starts with a hash
         if(this.nextIs("#"))
-            return this.parseHeader();
+            return this.parseHeader(parent);
         // Parse and return a horizontal rule if it starts with a dash
         else if(this.nextIs("-"))
-            return this.parseRule();
+            return this.parseRule(parent);
         // Parse and return an embed if it starts with a bar
         else if(this.nextIs("|"))
-            return this.parseEmbed();
+            return this.parseEmbed(parent);
         // Parse and return a bulleted list if it starts with a star and space
         else if(this.nextMatches(/^\*+\s+/))
-            return this.parseBulletedList();
+            return this.parseBulletedList(parent);
         // Parse and return a numbered list if it starts with a number
         else if(this.nextMatches(/^[0-9]+\.+/))
-            return this.parseNumberedList();
+            return this.parseNumberedList(parent);
         // Parse and return a code block if it starts with `, some optional letters or a !, some whitespace, and a newline
         else if(this.nextMatches(/^`[a-zA-Z!]*[ \t]*\n/))
-            return this.parseCode();
+            return this.parseCode(parent);
         // Parse and return a quote block if it starts with "
         else if(this.nextMatches(/^"[ \t]*\n/))
-            return this.parseQuote();
+            return this.parseQuote(parent);
         // Parse and return a callout if the line starts with =
         else if(this.nextMatches(/^=[ \t]*\n/))
-            return this.parseCallout();
+            return this.parseCallout(parent);
         // Parse and return a table if the line starts with a ,
         else if(this.nextIs(","))
-            return this.parseTable();
+            return this.parseTable(parent);
         // Parse the text as paragraph;
         else
-            return this.parseParagraph();
+            return this.parseParagraph(parent);
 
     }
 
-    parseParagraph(): ParagraphNode {
+    parseParagraph(parent: ChapterNode | CalloutNode): ParagraphNode {
 
-        return new ParagraphNode(this.parseContent());
+        const paragraph = new ParagraphNode(parent)
+        paragraph.setContent(this.parseContent(paragraph))
+        return paragraph;
 
     }
 
-    parseHeader(): HeaderNode {
+    parseHeader(parent: ChapterNode | CalloutNode): HeaderNode {
 
         // Read a sequence of hashes
         let count = 0;
@@ -466,28 +497,29 @@ export default class Parser {
         this.readWhitespace();
 
         // Parse some content.
-        let content = this.parseContent();
-        let node = new HeaderNode(Math.min(3, count), content);
+        let header = new HeaderNode(parent, Math.min(3, count));
+        header.setContent(this.parseContent(header));
         
-        this.metadata.headers.push(node);
+        this.metadata.headers.push(header);
 
         // Return a header node.
-        return node;
+        return header;
 
     }
     
-    parseRule(): RuleNode {
+    parseRule(parent: ChapterNode | CalloutNode): RuleNode {
 
         // Read until the end of the line. Ignore all text that follows.
         this.readUntilNewLine();
 
-        return new RuleNode();
+        return new RuleNode(parent);
 
     }
 
-    parseBulletedList(): BulletedListNode {
+    parseBulletedList(parent: ChapterNode | CalloutNode | BulletedListNode): BulletedListNode {
 
-        const bullets = [];
+        const items: (ContentNode | BulletedListNode)[] = [];
+        const bullets = new BulletedListNode(parent, items)
         let lastLevel = undefined;
         let currentLevel = undefined;
 
@@ -509,7 +541,7 @@ export default class Parser {
                 // Read the whitespace after the bullet.
                 this.readWhitespace();
                 // Parse content after the bullet.
-                bullets.push(this.parseContent());
+                items.push(this.parseContent(bullets));
             }
             // Otherwise, unread the stars, then either stop parsing or parse nested list.
             else {
@@ -526,7 +558,7 @@ export default class Parser {
                     break;
                 // Otherwise, it's greater, and we should read another list.
                 else {
-                    bullets.push(this.parseBulletedList());
+                    items.push(this.parseBulletedList(bullets));
                     // Reset the current level to the last level, so we expect another bullet at the same level.
                     currentLevel = lastLevel;
                 }
@@ -544,13 +576,14 @@ export default class Parser {
             }
 
         }
-        return new BulletedListNode(bullets);
+        return bullets;
 
     }
 
-    parseNumberedList(): NumberedListNode {
+    parseNumberedList(parent: ChapterNode | CalloutNode | NumberedListNode): NumberedListNode {
 
-        const bullets = [];
+        const items: (ContentNode | NumberedListNode)[] = [];
+        const list = new NumberedListNode(parent, items);
         let lastLevel = undefined;
         let currentLevel = undefined;
 
@@ -577,7 +610,7 @@ export default class Parser {
                 // Read the whitespace after the bullet.
                 this.readWhitespace();
                 // Parse content after the bullet.
-                bullets.push(this.parseContent());
+                items.push(this.parseContent(list));
             }
             // Otherwise, unread the stars, then either stop parsing or parse nested list.
             else {
@@ -600,7 +633,7 @@ export default class Parser {
                     break;
                 // Otherwise, it's greater, and we should read another list.
                 else {
-                    bullets.push(this.parseNumberedList());
+                    items.push(this.parseNumberedList(list));
                     // Reset the current level to the last level, so we expect another bullet at the same level.
                     currentLevel = lastLevel;
                 }
@@ -617,11 +650,11 @@ export default class Parser {
             }
 
         }
-        return new NumberedListNode(bullets);
+        return list;
 
     }
 
-    parseCode(): CodeNode {
+    parseCode(parent: ChapterNode | CalloutNode): CodeNode {
 
         // Parse the back tick
         this.read();
@@ -651,11 +684,13 @@ export default class Parser {
 
         let position = this.parsePosition();
 
+        const node = new CodeNode(parent, code, language, position)
+
         // Read the caption. Note that parsing inline content stops at a newline, 
         // so if there's a line break after the last row, there won't be a caption.
-        const caption = this.parseContent();
+        node.setCaption(this.parseContent(node))
 
-        return new CodeNode(code, language, caption, position);
+        return node;
 
     }
 
@@ -676,9 +711,10 @@ export default class Parser {
 
     }
 
-    parseQuote(): QuoteNode {
+    parseQuote(parent: ChapterNode | CalloutNode): QuoteNode {
 
-        const blocks = [];
+        const blocks: BlockNode[] = [];
+        const quote = new QuoteNode(parent, blocks)
 
         // Parse the ", then any whitespace, then the newline
         this.read();
@@ -691,7 +727,7 @@ export default class Parser {
 
         while(this.more() && !this.nextIs("\"")) {
             // Read a block
-            const block = this.parseBlock();
+            const block = this.parseBlock(quote);
             // Add it to the list if we parsed something.
             if(block !== null)
                 blocks.push(block);
@@ -704,21 +740,22 @@ export default class Parser {
         this.read();
 
         // Is there a position indicator?
-        let position = this.parsePosition()
+        quote.setPosition(this.parsePosition())
         
         // Read any whitespace after the position indicator.
         this.readWhitespace();
 
         // Read the credit.
-        const credit = this.nextIs("\n") ? null : this.parseContent();
+        quote.setCredit(this.nextIs("\n") ? undefined : this.parseContent(quote))
 
-        return new QuoteNode(blocks, credit, position);
+        return quote;
 
     }
 
-    parseCallout(): CalloutNode {
+    parseCallout(parent: ChapterNode | CalloutNode): CalloutNode {
 
-        const blocks = [];
+        const blocks: BlockNode[] = [];
+        const callout = new CalloutNode(parent, blocks)
 
         // Parse the = ...
         this.read();
@@ -732,7 +769,7 @@ export default class Parser {
         // Then, read until we find a closing _
         while(this.more() && !this.nextIs("=")) {
             // Read a block
-            const block = this.parseBlock();
+            const block = this.parseBlock(callout);
             // Add it to the list if we parsed something.
             if(block !== null)
                 blocks.push(block);
@@ -745,19 +782,19 @@ export default class Parser {
         this.read();
 
         // Is there a position indicator?
-        let position = this.parsePosition();
+        callout.setPosition(this.parsePosition());
         
         // Read whitespace that follows.
         this.readWhitespace();
 
-        return new CalloutNode(blocks, position);
+        return callout;
 
     }
 
-    parseTable(): TableNode {
+    parseTable(parent: ChapterNode | CalloutNode): TableNode {
 
-        const rows = [];
-
+        const rows: ContentNode[][] = [];
+        const table =new TableNode(parent, rows)
         // Parse rows until the lines stop starting with ,
         while(this.more() && this.nextIs(",")) {
 
@@ -769,7 +806,7 @@ export default class Parser {
                 this.read();
 
                 // Read content until reaching another | or the end of the line.
-                row.push(this.parseContent("|"));
+                row.push(this.parseContent(table, "|"));
 
             }
 
@@ -782,21 +819,22 @@ export default class Parser {
         }
 
         // Read the position indicator if there is one.        
-        let position = this.parsePosition();
+        table.setPosition(this.parsePosition());
 
         // Read the caption. Note that parsing inline content stops at a newline, 
         // so if there's a line break after the last row, there won't be a caption.
-        const caption = this.parseContent();
+        table.setCaption(this.parseContent(table));
 
-        return new TableNode(rows, caption, position);
+        return table;
 
     }
 
     // The "awaiting" argument keeps track of upstream formatting. We don't need a stack here
     // because we don't allow infinite nesting of the same formatting type.
-    parseContent(awaiting?: string): ContentNode {
+    parseContent(parent: BlockNode | undefined, awaiting?: string): ContentNode {
 
-        let segments: Node[] = [];
+        const segments: Node[] = [];
+        const content = new ContentNode(parent, segments)
 
         // Read until hitting a delimiter.
         while(this.more() && !this.nextIs("\n")) {
@@ -806,29 +844,29 @@ export default class Parser {
 
             // Parse some formatted text
             if(next === "_" || next === "*")
-                segments.push(this.parseFormatted(next));
+                segments.push(this.parseFormatted(content, next));
             // Parse unformatted text
             else if(this.nextIs("`")) {
-                segments.push(this.parseInlineCode());
+                segments.push(this.parseInlineCode(content));
             }
             // Parse a citation list
             else if(this.nextIs("<"))
-                segments.push(this.parseCitations());
+                segments.push(this.parseCitations(content));
             // Parse sub/super scripts
             else if(this.nextIs("^"))
-                segments.push(this.parseSubSuperscripts());
+                segments.push(this.parseSubSuperscripts(content));
             // Parse a footnote
             else if(this.nextIs("{"))
-                segments.push(this.parseFootnote());
+                segments.push(this.parseFootnote(content));
             // Parse a definition
             else if(this.nextIs("~"))
-                segments.push(this.parseDefinition());
+                segments.push(this.parseDefinition(content));
             // Parse an escaped character
             else if(this.nextIs("\\"))
-                segments.push(this.parseEscaped());
+                segments.push(this.parseEscaped(content));
             // Parse a link
             else if(this.nextIs("["))
-               segments.push(this.parseLink());
+               segments.push(this.parseLink(content));
             // Parse inline comments
             else if(this.charBeforeNext() === " " && this.nextIs("%"))
                 this.parseComment();
@@ -843,19 +881,19 @@ export default class Parser {
                     symbol = symbol + this.read();
                     next = this.peek();
                 }
-                segments.push(this.createError("Couldn't find symbol @" + symbol));
+                segments.push(this.createError(content, "Couldn't find symbol @" + symbol));
 
             }
             // Parse a label
             else if(next === ":" && charAfterNext !== null && charAfterNext.match(/[a-z]/i)) {
-                segments.push(this.parseLabel());
+                segments.push(this.parseLabel(content));
             }
             // Keep reading text until finding a delimiter.
             else {
                 let text = "";
                 while(this.more() && (!awaiting || !this.nextIs(awaiting)) && !this.nextIsContentDelimiter() && !this.nextIs("\n"))
                     text = text + this.read();
-                segments.push(new TextNode(text, this.index));
+                segments.push(new TextNode(content, text, this.index));
             }
 
             // If we've reached a delimiter we're waiting for, then stop parsing, so it can handle it. Otherwise, we'll keep reading.
@@ -864,11 +902,11 @@ export default class Parser {
 
         }
 
-        return new ContentNode(segments);
+        return content;
 
     }
 
-    parseEmbed(): EmbedNode | ErrorNode {
+    parseEmbed(parent: ChapterNode | CalloutNode | undefined): EmbedNode | ErrorNode {
 
         // Read |
         this.read();
@@ -879,12 +917,12 @@ export default class Parser {
         // Error if missing URL.
         if(url === "") {
             this.readUntilNewLine();
-            return this.createError("Missing URL in embed.");
+            return this.createError(parent, "Missing URL in embed.");
         }
 
         if(this.peek() !== "|") {
             this.readUntilNewLine();
-            return this.createError("Missing '|' after URL in embed");
+            return this.createError(parent, "Missing '|' after URL in embed");
         }
 
         // Read a |
@@ -895,42 +933,42 @@ export default class Parser {
 
         if(this.peek() !== "|") {
             this.readUntilNewLine();
-            return this.createError("Missing '|' after description in embed");
+            return this.createError(parent, "Missing '|' after description in embed");
         }
 
         // Error if missing description.
         if(description === "") {
             this.readUntilNewLine();
-            return this.createError("Missing image/video description in embed.");
+            return this.createError(parent, "Missing image/video description in embed.");
         }
         
         // Read a |
         this.read();
 
         // Parse the caption
-        const caption = this.parseContent("|");
+        const caption = this.parseContent(parent, "|");
 
         if(this.peek() !== "|") {
             this.readUntilNewLine();
-            return this.createError("Missing '|' after caption in embed");
+            return this.createError(parent, "Missing '|' after caption in embed");
         }
         
         // Read a |
         this.read();
 
         // Parse the credit
-        const credit = this.parseContent("|");
+        const credit = this.parseContent(parent, "|");
 
         // Error if missing credit.
         if(credit.toText().trim() === "") {
             this.readUntilNewLine();
-            return this.createError("Missing credit in embed.");
+            return this.createError(parent, "Missing credit in embed.");
         }
         
         // Check for the closing delimeter
         if(this.peek() !== "|") {
             this.readUntilNewLine();
-            return this.createError("Missing '|' after credit in embed.");
+            return this.createError(parent, "Missing '|' after credit in embed.");
         }
 
         // Read a |
@@ -939,7 +977,7 @@ export default class Parser {
         // Is there a position indicator?
         let position = this.parsePosition();
         
-        const embed = new EmbedNode(url, description, caption, credit, position);
+        const embed = new EmbedNode(parent, url, description, caption, credit, position);
 
         this.metadata.embeds.push(embed);
 
@@ -962,7 +1000,7 @@ export default class Parser {
 
     }
 
-    parseLabel(): LabelNode | ErrorNode {
+    parseLabel(parent: ContentNode): LabelNode | ErrorNode {
 
         // Consume the :
         this.read();
@@ -975,18 +1013,18 @@ export default class Parser {
             next = this.peek();
         }
 
-        const label = new LabelNode(id);
+        const label = new LabelNode(parent, id);
 
         let matches = this.metadata.labels.filter(lab => lab.getID() === id);
         if(matches.length > 0)
-            return this.createError("Duplicate label " + id);
+            return this.createError(parent, "Duplicate label " + id);
         this.metadata.labels.push(label);
 
         return label;
 
     }
 
-    parseFormatted(awaiting: string): FormattedNode | ErrorNode {
+    parseFormatted(parent: ContentNode, awaiting: string): FormattedNode | ErrorNode {
 
         // Remember what we're matching.
         const delimeter = this.read();
@@ -994,7 +1032,9 @@ export default class Parser {
         let text = "";
 
         if(delimeter === null)
-            return this.createError("Somehow parsing formatted text at end of file.");
+            return this.createError(parent, "Somehow parsing formatted text at end of file.");
+
+        const node = new FormattedNode(parent, delimeter, segments)
 
         // Read some content until reaching the delimiter or the end of the line
         while(this.more() && this.peek() !== delimeter && !this.nextIs("\n")) {
@@ -1003,9 +1043,9 @@ export default class Parser {
             if(this.nextIsContentDelimiter()) {
                 // If the text is a non-empty string, make a text node with what we've accumulated.
                 if(text !== "")
-                    segments.push(new TextNode(text, this.index));
+                    segments.push(new TextNode(node, text, this.index));
                 // Parse the formatted content.
-                segments.push(this.parseContent(awaiting));
+                segments.push(this.parseContent(node, awaiting));
                 // Reset the accumulator.
                 text = "";
             }
@@ -1017,20 +1057,20 @@ export default class Parser {
 
         // If there's more text, save it!
         if(text !== "")
-            segments.push(new TextNode(text, this.index));
+            segments.push(new TextNode(node, text, this.index));
 
         // Read the closing delimeter
         if(this.nextIs(delimeter))
             this.read();
         // If it wasn't closed, add an error
         else
-            segments.push(this.createError("Unclosed " + delimeter));
+            segments.push(this.createError(node, "Unclosed " + delimeter));
         
-        return new FormattedNode(delimeter, segments);
+        return node;
 
     }
 
-    parseInlineCode(): InlineCodeNode {
+    parseInlineCode(parent: ContentNode): InlineCodeNode {
 
         // Parse the back tick
         this.read();
@@ -1063,11 +1103,11 @@ export default class Parser {
         } else
             language = "plaintext"
 
-        return new InlineCodeNode(code, language);
+        return new InlineCodeNode(parent, code, language);
         
     }
 
-    parseCitations(): CitationsNode {
+    parseCitations(parent: ContentNode): CitationsNode {
         
         let citations = "";
 
@@ -1086,11 +1126,11 @@ export default class Parser {
             this.metadata.citations[citation] = true;
         });
 
-        return new CitationsNode(citationList);
+        return new CitationsNode(parent, citationList);
 
     }
 
-    parseSubSuperscripts(): SubSuperscriptNode {
+    parseSubSuperscripts(parent: ContentNode): SubSuperscriptNode {
         
         // Read the ^
         this.read();
@@ -1104,28 +1144,31 @@ export default class Parser {
             superscript = false;
         }
 
+        const node = new SubSuperscriptNode(parent, superscript)
+
         // Parse the content
-        let content = this.parseContent("^");
+        node.setContent(this.parseContent(node, "^"));
 
         // Read the closing ^
         this.read();
 
-        return new SubSuperscriptNode(superscript, content);
+        return node;
 
     }
 
-    parseFootnote(): FootnoteNode {
-        
+    parseFootnote(parent: ContentNode): FootnoteNode {
+
+        let node = new FootnoteNode(parent);
+
         // Read the {
         this.read();
 
         // Read the footnote content.
-        const footnote = this.parseContent("}");
+        const footnote = this.parseContent(node, "}");
+        node.setContent(footnote)
 
         // Read the closing }
         this.read();
-
-        let node = new FootnoteNode(footnote);
 
         this.metadata.footnotes.push(node);
 
@@ -1133,13 +1176,15 @@ export default class Parser {
 
     }
 
-    parseDefinition(): DefinitionNode {
-        
+    parseDefinition(parent: ContentNode): DefinitionNode {
+
+        const node = new DefinitionNode(parent);
+
         // Read the ~
         this.read();
-
-        // Read the footnote content.
-        const text = this.parseContent("~");
+        
+        // Read the definition content.
+        node.setPhrase(this.parseContent(node, "~"));
 
         // Read the closing ~
         this.read();
@@ -1153,39 +1198,41 @@ export default class Parser {
             next = this.peek();
         }
 
-        let node = new DefinitionNode(text, glossaryID);
+        node.setGlossaryID(glossaryID)
 
         return node;
 
     }
 
-    parseEscaped(): TextNode | ErrorNode {
+    parseEscaped(chapter: ContentNode): TextNode | ErrorNode {
 
         // Skip the scape and just add the next character.
         this.read();
         const char = this.read();
         if(char)
-            return new TextNode(char, this.index);
+            return new TextNode(chapter, char, this.index);
 
-        return this.createError("Unterminated escape.");
+        return this.createError(chapter, "Unterminated escape.");
 
     }
     
-    parseLink(): LinkNode | ErrorNode {
+    parseLink(parent: ContentNode): LinkNode | ErrorNode {
  
+        const node = new LinkNode(parent)
+
         // Read the [
         this.read();
         // Read some content, awaiting |
-        const content = this.parseContent("|");
+        const content = this.parseContent(node, "|");
 
         // Catch links with no label.
         if(content.segments.length === 0)
-            return this.createError("Unclosed link");
+            return this.createError(parent, "Unclosed link");
 
         // Catch missing bars
         if(this.peek() !== "|") {
             this.readUntilNewLine();
-            return this.createError("Missing '|' in link");
+            return this.createError(parent, "Missing '|' in link");
         }
 
         // Read the |
@@ -1196,7 +1243,7 @@ export default class Parser {
         // Catch missing closing
         if(this.peek() !== "]") {
             this.readUntilNewLine();
-            return this.createError("Missing ] in link");
+            return this.createError(parent, "Missing ] in link");
         }
 
         // Read the ]
@@ -1215,417 +1262,15 @@ export default class Parser {
             }
 
             if(chapter !== "" && this.book && !this.book.hasChapter(chapter))
-                return this.createError("Unknown chapter name '" + link + "'");
+                return this.createError(parent, "Unknown chapter name '" + link + "'");
 
         }
 
-        return new LinkNode(content, link);
+        node.setContent(content)
+        node.setURL(link)
+
+        return node;
 
     }
 
-}
-
-export abstract class Node {
-    type: NodeType;
-
-    constructor(type: NodeType) {
-
-        if(typeof type !== "string" || type.length === 0)
-            throw new Error("All nodes require a type string.")
-        this.type = type
-    }
-
-    toText() {
-        throw new Error("Method not implemented.");
-    }
-
-}
-
-export class ChapterNode extends Node {
-    blocks: Array<Node>;
-    metadata: Bookkeeping;
-    constructor(blocks: Array<BlockNode>, metadata: Bookkeeping) {
-        super("chapter");
-
-        // The AST of the chapter.
-        this.blocks = blocks;
-
-        // Content extracted during parsing.
-        this.metadata = metadata;
-
-    }
-
-    getErrors(): ErrorNode[] { return this.metadata.errors; }
-    getCitations(): Record<string, boolean> { return this.metadata.citations; }
-    getFootnotes(): FootnoteNode[] { return this.metadata.footnotes; }
-    getHeaders(): HeaderNode[] { return this.metadata.headers; }
-    getEmbeds(): EmbedNode[] { return this.metadata.embeds; }
-
-    getCitationNumber(citationID: string) { 
-        
-        const index = Object.keys(this.getCitations()).sort().indexOf(citationID);
-
-        if(index < 0)
-            return null;
-        else
-            return index + 1;
-    
-    }
-
-    toText(): string {
-        return this.blocks.map(block => block.toText()).join(" ");
-    }
-
-}
-
-export class ParagraphNode extends Node {
-    content: ContentNode;
-
-    constructor(content: ContentNode) {
-        super("paragraph");
-        this.content = content;
-
-    }
-
-    toText(): string {
-        return this.content.toText();
-    }
-
-}
-
-export class EmbedNode extends Node {
-    url: string;
-    description: string;
-    caption: ContentNode;
-    credit: ContentNode;
-    position: Position;
-
-    constructor(url:string, description: string, caption: ContentNode, credit: ContentNode, position: Position) {
-        super("embed");
-        this.url = url;
-        this.description = description;
-        this.caption = caption;
-        this.credit = credit;
-        this.position = position;
-    }
-
-    toText(): string {
-        return this.caption.toText();
-    }
-
-    toJSON() {
-        return {
-            url: this.url,
-            alt: this.description,
-            caption: this.caption.toText(),
-            credit: this.credit.toText()
-        };   
-    }
-
-}
-
-export class HeaderNode extends Node {
-    level: number;
-    content: ContentNode;
-    constructor(level: number, content: ContentNode) {
-        super("header");
-        this.level = level;
-        this.content = content;
-    }
-
-    toText(): string {
-        return this.content.toText();
-    }
-
-}
-
-export class RuleNode extends Node {
-    constructor() {
-        super("rule");
-    }
-
-    toText(): string {
-        return "";
-    }
-
-}
-
-export class BulletedListNode extends Node {
-    items: Array<ContentNode | BulletedListNode>;
-    constructor(items: Array<ContentNode | BulletedListNode>) {
-        super("bulleted");
-        this.items = items;
-    }
-
-    toText(): string {
-        return this.items.map(item => item.toText()).join(" ");
-    }
-
-}
-
-export class NumberedListNode extends Node {
-    items: Array<ContentNode | NumberedListNode>;
-    constructor(items: Array<ContentNode | NumberedListNode>) {
-        super("numbered");
-        this.items = items;
-    }
-
-    toText(): string {
-        return this.items.map(item => item.toText()).join(" ");
-    }
-
-}
-
-export class CodeNode extends Node {
-    code: string;
-    caption: ContentNode;
-    position: Position;
-    language: string;
-    executable: boolean;
-    constructor(code : string, language: string, caption: ContentNode, position: Position) {
-        super("code");
-
-        this.code = code;
-        this.caption = caption;
-        this.position = position;
-        this.language = language ? language : "plaintext";
-        this.executable = language.charAt(language.length - 1) === "!";
-
-        if(this.executable)
-            this.language = this.language.slice(0, -1);
-
-    }
-
-    toText() {
-        return "";
-    }
-
-}
-
-export class QuoteNode extends Node {
-    elements: Array<BlockNode>;
-    credit: ContentNode | null;
-    position: Position;
-
-    constructor(elements: Array<BlockNode>, credit: ContentNode | null, position: Position) {
-        super("quote");
-        this.elements = elements;
-        this.credit = credit;
-        this.position = position;
-    }
-
-    toText(): string {
-        return this.elements.map(element => element.toText()).join(" ") + (this.credit ? " " + this.credit.toText() : "");
-    }
-
-}
-
-export class CalloutNode extends Node {
-    elements: Array<BlockNode>;
-    position: Position;
-    
-    constructor(elements: Array<BlockNode>, position: Position) {
-        super("callout");
-        this.elements = elements;
-        this.position = position;
-    }
-
-    toText(): string {
-        return this.elements.map(element => element.toText()).join(" ");
-    }
-
-}
-
-export class TableNode extends Node {
-    rows: Array<Array<ContentNode>>;
-    caption: Node;
-    position: Position;
-    
-    constructor(rows: Array<Array<ContentNode>>, caption: ContentNode, position: Position) {
-        super("table");
-        this.rows = rows;
-        this.caption = caption;
-        this.position = position;
-    }
-
-    toText() {
-        return this.rows.map(row => row.map(cell => cell.toText()).join(", ")).join(", ");
-    }
-
-}
-
-export class FormattedNode extends Node {
-    format: string;
-    segments: Array<ContentNode | TextNode | ErrorNode>;
-
-    constructor(format: string, segments: Array<ContentNode | TextNode | ErrorNode>) {
-        super("formatted");
-        this.format = format;
-        this.segments = segments;
-    }
-
-    toText(): string {
-        return this.segments.map(segment => segment.toText()).join(" ");
-    }
-
-}
-
-export class InlineCodeNode extends Node {
-    code: string;
-    language: string;
-
-    constructor(code: string, language: string) {
-        super("inline-code");
-        this.code = code;
-        this.language = language;
-    }
-
-    toText(): string {
-        return this.code;
-    }
-
-}
-
-export class LinkNode extends Node {
-    content: ContentNode;
-    url: string;
-    constructor(content: ContentNode, url: string) {
-        super("link");
-        this.content = content;
-        this.url = url;
-    }
-
-    toText(): string {
-        return this.content.toText();
-    }
-
-}
-
-export class CitationsNode extends Node {
-    citations: Array<string>;
-    constructor(citations: Array<string>) {
-        super("citations");
-        this.citations = citations;
-    }
-
-    toText(): string {
-        return "";
-    }
-
-}
-
-export class DefinitionNode extends Node {
-    phrase: ContentNode;
-    glossaryID: string;
-    constructor(phrase: ContentNode, glossaryID: string) {
-        super("definition");
-        this.phrase = phrase;
-        this.glossaryID = glossaryID;
-    }
-
-    toText(): string {
-        return this.phrase.toText();
-    }
-
-}
-
-export class FootnoteNode extends Node {
-    footnote: ContentNode;
-    constructor(footnote: ContentNode) {
-        super("footnote");
-        this.footnote = footnote;
-    }
-
-    toText(): string {
-        return this.footnote.toText();
-    }
-
-}
-
-export class ContentNode extends Node {
-    segments: Node[];
-    constructor(segments: Node[]) {
-        super("content");
-        this.segments = segments;
-    }
-
-    toText(): string {
-        return this.segments.map(segment => segment.toText()).join(" ");
-    }
-}
-
-export class SubSuperscriptNode extends Node {
-    superscript: boolean;
-    content: ContentNode;
-    constructor(superscript: boolean, content: ContentNode) {
-        super("script");
-        this.superscript = superscript;
-        this.content = content;
-    }
-
-    toText(): string {
-        return this.content.toText();
-    }
-}
-
-export class TextNode extends Node {
-    text: string;
-    position: number;
-    constructor(text: string, position: number) {
-        super("text");
-        this.text = text;
-        this.position = position - text.length;
-    }
-
-    toText(): string {
-        return this.text;
-    }
-
-}
-
-export class ErrorNode extends Node {
-    error: string;
-    constructor(error: string) {
-        super("error");
-        this.error = error;
-    }
-
-    toText(): string {
-        return "";
-    }
-
-}
-
-export class LabelNode extends Node {
-    id: string;
-    constructor(id: string) {
-        super("label");
-        this.id = id;
-    }
-
-    getID() { return this.id; }
-
-    toText(): string { return ""; }
-
-}
-
-export class ReferenceNode extends Node {
-    authors: string;
-    year: string;
-    title: string;
-    source: string;
-    url: string | null;
-    summary: string | null;
-    short: boolean;
-    
-    constructor(authors: string, year: string, title: string, source: string, url: string | null, summary: string | null, short: boolean) {
-        super("reference")
-        this.authors = authors
-        this.year = year
-        this.title = title
-        this.source = source
-        this.url = url
-        this.summary = summary
-        this.short = short
-    }
 }

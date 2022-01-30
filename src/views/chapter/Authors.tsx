@@ -11,14 +11,11 @@ const Authors = (
 ) => {
 
     const { authors } = props
-    const { editable, setEditingBook, book } = useContext(EditorContext)
+    const { editable, book } = useContext(EditorContext)
 
     function addAuthor() {
 
-        if(setEditingBook) {
-            setEditingBook(true);
-            if(book) props.add.call(undefined).finally(() => setEditingBook(false))
-        }
+        if(book) props.add.call(undefined)
 
     }
 

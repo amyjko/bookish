@@ -1,6 +1,7 @@
 import React, { useContext } from 'react'
 import Marginal  from './Marginal'
-import Parser, { CitationsNode } from '../../models/Parser'
+import Parser from '../../models/Parser'
+import { CitationsNode } from "../../models/CitationsNode"
 import { renderNode } from './Renderer'
 import { ChapterContext, ChapterContextType } from './Chapter'
 
@@ -56,7 +57,7 @@ const Citations = (props: {node: CitationsNode}) => {
             }
         );
     
-    return <span className="bookish-citation">
+    return <span className="bookish-citation"  data-nodeid={props.node.nodeID}>
         <Marginal
             id={"citation-" + citations.join("-")}
             interactor={<>{segments}</>}

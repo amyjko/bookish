@@ -1,4 +1,5 @@
-import Parser, { EmbedNode } from "./Parser";
+import Parser from "./Parser";
+import { EmbedNode } from "./EmbedNode";
 import Chapter from './Chapter.js';
 import { addChapter, removeChapter, updateBook } from "./Firestore";
 import { DocumentReference } from "firebase/firestore";
@@ -69,6 +70,8 @@ export default class Book {
     chapters: Chapter[];
     chaptersByID: Record<string, Chapter | undefined>;
 
+    listeners: Set<Function>;
+
     // Given an object with a valid specification and an object mapping chapter IDs to chapter text,
     // construct an object representing a book.
     constructor(ref: DocumentReference | undefined, specification?: BookSpecification) {
@@ -94,6 +97,9 @@ export default class Book {
         this.sources = specification && specification.sources ? specification.sources : {}
         this.uids = specification && specification.uids ? specification.uids : []
 
+        // No listeners yet
+        this.listeners = new Set()
+
         // Create a list and dictionary of Chapter objects.
         this.chapters = []
         this.chaptersByID = {}
@@ -109,6 +115,14 @@ export default class Book {
             })
         }
 
+    }
+
+    addListener(listener: Function) { this.listeners.add(listener); }
+    removeListener(listener: Function) { this.listeners.delete(listener); }
+    notifyListeners() { this.listeners.forEach(listener => listener.call(undefined)); }
+    update() {
+        this.notifyListeners()
+        return updateBook(this)
     }
 
     // Convert the book back into JSON for storage. Deep copies arrays and objects to avoid other code mutating this object.
@@ -145,7 +159,7 @@ export default class Book {
     setTitle(title: string): Promise<void> { 
         // Update locally, then update on the server.
         this.title = title;
-        return updateBook(this)
+        return this.update();
 
     }
 
@@ -153,21 +167,21 @@ export default class Book {
     setDescription(text: string) { 
         // Update locally, then update on the server.
         this.description = text;
-        return updateBook(this);
+        return this.update();
     }
 
 	getAcknowledgements() { return this.acknowledgements; }
     setAcknowledgements(text: string) { 
         // Update locally, then update on the server.
         this.acknowledgements = text;
-        return updateBook(this);
+        return this.update();
     }
 
     getLicense() { return this.license; }
     setLicense(text: string) { 
         // Update locally, then update on the server.
         this.license = text;
-        return updateBook(this);
+        return this.update();
     }
 
     getChapters() { return this.chapters }
@@ -211,7 +225,7 @@ export default class Book {
         this.chaptersByID[emptyChapter.id] = chap
 
         // Ask the database to create the chapter, returning the promise
-        return updateBook(this);
+        return this.update();
 
     }
 
@@ -231,7 +245,7 @@ export default class Book {
         this.chapters[index] = temp
 
         // Ask the database to update with this new order.
-        return updateBook(this);
+        return this.update();
 
     }
 
@@ -245,7 +259,7 @@ export default class Book {
         this.chapters.splice(index, 1);
 
         // Ask the database to update the new book metadata then delete the chapter.
-        return updateBook(this).then(() => removeChapter(chapter));
+        return this.update().then(() => removeChapter(chapter));
 
     }
 
@@ -261,19 +275,21 @@ export default class Book {
 
     addAuthor(name: string) {
         this.authors.push(name)
-        return updateBook(this);
+        return this.update();
     }
 
     setAuthor(index: number, name: string) {
         if(index >= 0 && index < this.authors.length)
             this.authors[index] = name;
-        return updateBook(this);
+
+            return this.update();
     }
 
     removeAuthor(index: number) {
         if(index >= 0 && index < this.authors.length)
-            this.authors.splice(index, 1)
-        return updateBook(this);
+            this.authors.splice(index, 1);
+
+        return this.update();
     }
 
 	getRevisions() { return this.revisions; }

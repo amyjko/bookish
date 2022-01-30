@@ -6,7 +6,6 @@ const ConfirmButton = (props: { commandLabel: string, confirmLabel: string, comm
     const [ confirming, setConfirming ] = useState(false)
     const [ executing, setExecuting ] = useState(false)
     const [ timeoutID, setTimeoutID ] = useState<NodeJS.Timeout | undefined>(undefined)
-    const { setEditingBook } = useContext(EditorContext)
     const isMounted = useRef(false)
 
     useEffect(() => {
@@ -20,12 +19,10 @@ const ConfirmButton = (props: { commandLabel: string, confirmLabel: string, comm
             setConfirming(true)
             setTimeoutID(setTimeout(() => isMounted.current ? setConfirming(false) : undefined, 2000))
         } else if(confirming) {
-            if(setEditingBook) setEditingBook(true)
             props.command.call(undefined)
                 .finally(() => {
                     if(isMounted.current) {
                         if(timeoutID) clearTimeout(timeoutID)
-                        if(setEditingBook) setEditingBook(false)                    
                         setConfirming(false)
                         setExecuting(false)
                     }

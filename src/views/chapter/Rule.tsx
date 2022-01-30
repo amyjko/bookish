@@ -1,8 +1,9 @@
 import React from 'react'
+import { RuleNode } from "../../models/RuleNode"
 
-const Rule = () => {
+const Rule = (props: {node: RuleNode}) => {
 
-    return <hr/>
+    return <hr data-nodeid={props.node.nodeID}/>
 
 }
 

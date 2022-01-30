@@ -12,22 +12,15 @@ const Toggle = (props: {
     save: (set: boolean) => Promise<void>
 }) => {
 
-    const { setEditingBook } = useContext(EditorContext)
     const [ saving, setSaving ] = useState(Status.Viewing)
 
     function toggle() {
 
-        if(setEditingBook)
-            setEditingBook(true);
         setSaving(Status.Saving)
 
         props.save.call(undefined, !props.on)
             .then(() => setSaving(Status.Viewing))
             .catch(() => setSaving(Status.Error))
-            .finally(() => {
-                if(setEditingBook)
-                    setEditingBook(false);
-            })
 
     }
 

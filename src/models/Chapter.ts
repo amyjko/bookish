@@ -1,4 +1,5 @@
-import Parser, { ChapterNode } from "./Parser";
+import Parser from "./Parser";
+import { ChapterNode } from "./ChapterNode";
 import Book, { ChapterSpecification } from "./Book"
 import { getChapterText, updateBook } from "./Firestore";
 import { DocumentReference } from "firebase/firestore";
@@ -50,6 +51,11 @@ class Chapter {
 		
     }
 
+	update() {
+		this.book.notifyListeners()
+		return updateBook(this.book)
+	}
+
 	toObject() {
 
 		let payload = {
@@ -77,25 +83,25 @@ class Chapter {
 	setChapterID(id: string) {
 		const previousID = this.chapterID;
 		this.chapterID = id;
-		return updateBook(this.book)
+		return this.update()
 	}
 
     getSection(): string | undefined { return this.section; }
 	setSection(section: string) {
 		this.section = section;
-		return updateBook(this.book)
+		return this.update()
 	}
 
 	isForthcoming() { return this.forthcoming; }
 	async setForthcoming(forthcoming: boolean) {
 		this.forthcoming = forthcoming;
-		return updateBook(this.book);
+		return this.update()
 	}
 
 	isNumbered() { return this.numbered; }
 	async setNumbered(numbered: boolean) {
 		this.numbered = numbered;
-		return updateBook(this.book);
+		return this.update()
 	}
 
 	getText() { return this.text; }
@@ -106,32 +112,31 @@ class Chapter {
 		this.wordCount = this.ast.toText().split(/\s+/).length;
 		this.index = this.computeIndex();
 
+		this.book.notifyListeners()
 	}
 
 	addAuthor(name: string) {
         this.authors.push(name)
-        return updateBook(this.getBook());
+		return this.update()
     }
 
 	getAuthors() { return this.authors; }
     setAuthor(index: number, name: string) {
         if(index >= 0 && index < this.authors.length)
             this.authors[index] = name;
-        return updateBook(this.getBook());
-    }
+		return this.update()
+	}
 
     removeAuthor(index: number) {
         if(index >= 0 && index < this.authors.length)
             this.authors.splice(index, 1)
-        return updateBook(this.getBook());
-    }
+		return this.update()
+	}
 
 	getTitle() { return this.title; }
-	async setTitle(title: string) { 
-		
+	async setTitle(title: string) {
 		this.title = title;
-		return updateBook(this.book)
-
+		return this.update()
 	}
 
 	getPosition() { return this.book.getChapterPosition(this.getChapterID()) }

@@ -22,7 +22,6 @@ const TextEditor = (props: {
     const [ error, setError ] = useState<undefined | string>(undefined)
     const inputEditor = useRef<HTMLInputElement>(null)
     const textareaEditor = useRef<HTMLTextAreaElement>(null)
-	const { setEditingBook } = useContext(EditorContext)
     const isMounted = useRef(false)
 
     // Track whether the component is mounted so that we don't set state after unmounting
@@ -65,8 +64,6 @@ const TextEditor = (props: {
             setText(editor.value)
             if(props.validationError)
                 setError(props.validationError.call(undefined, editor.value))
-            if(setEditingBook)
-                setEditingBook(true);
         }
     }
 
@@ -74,9 +71,6 @@ const TextEditor = (props: {
 
         // Return to viewing
         setStatus(Status.Viewing);
-        // Notify the book that we're done editing
-        if(setEditingBook)
-            setEditingBook(false);        
         
     }
 
@@ -107,9 +101,6 @@ const TextEditor = (props: {
                         editor?.blur();
                         // Changed to saved status...
                         setStatus(Status.Saved);
-                        // Notify the book that we're done editing
-                        if(setEditingBook)
-                            setEditingBook(false);
                     }
                 })
                 .catch((message: Error) => {

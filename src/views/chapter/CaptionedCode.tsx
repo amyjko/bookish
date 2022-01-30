@@ -2,22 +2,27 @@ import React from 'react'
 import { renderNode, renderPosition } from './Renderer'
 import Code from './Code'
 import Python from './Python'
-import { CodeNode } from '../../models/Parser'
+import { CodeNode } from "../../models/CodeNode"
 
 const CaptionedCode = (props: { node: CodeNode}) => {
 
     const { node } = props
 
-    return <div className={"bookish-figure " + renderPosition(node.position)}>
+    return <div className={"bookish-figure " + renderPosition(node.position)} data-nodeid={props.node.nodeID}>
         {
             node.language === "python" && node.executable ? 
-                <Python code={node.code}></Python> :
+                <Python node={node} code={node.code}></Python> :
                 <div>
-                    <Code editable={false} inline={false} language={node.language}>{node.code}</Code>
+                    <Code editable={false} inline={false} language={node.language} nodeID={node.nodeID}>{node.code}</Code>
                     { node.language !== "plaintext" ? <div className="bookish-code-language">{node.language}</div> : null }
                 </div>
         }
-        <div className="bookish-figure-caption">{renderNode(node.caption)}</div>
+        { 
+            node.caption ? 
+                <div className="bookish-figure-caption">{renderNode(node.caption)}</div>
+                : 
+                null
+        }
     </div>
 
 }

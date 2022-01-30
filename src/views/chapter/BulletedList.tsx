@@ -1,5 +1,5 @@
 import React from 'react'
-import { BulletedListNode } from '../../models/Parser'
+import { BulletedListNode } from "../../models/BulletedListNode"
 import { renderNode } from './Renderer'
 
 export type BulletedListProps = {
@@ -8,7 +8,7 @@ export type BulletedListProps = {
 
 const BulletedList = (props: BulletedListProps) => {
 
-    return <ul>{
+    return <ul data-nodeid={props.node.nodeID}>{
         props.node.items.map((item, index) =>
             item.type === "bulleted" ?
                 renderNode(item, "item-" + index) :

@@ -142,7 +142,7 @@ input[type="text"].bookish-app-editable, textarea.bookish-app-editable {
     width: auto;
 }
 
-textarea:focus, input:focus {
+textarea:focus, input:focus, div[contenteditable="true"]:focus {
     outline: 2px solid var(--bookish-highlight-color);
 }
 

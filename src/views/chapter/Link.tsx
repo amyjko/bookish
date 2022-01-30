@@ -6,12 +6,15 @@ import { HashLink } from "../util/HashLink"
 import { renderNode } from './Renderer';
 import smoothlyScrollElementToEyeLevel from '../util/Scroll'
 import { BaseContext } from '../page/Book';
-import { LinkNode } from '../../models/Parser';
+import { LinkNode } from "../../models/LinkNode";
 
 const Link = (props: { node: LinkNode}) => {
 
     const { node } = props
     const { base } = useContext(BaseContext)
+
+    if(node.url === undefined || node.content === undefined)
+        return <></>;
 
     // If this is external link, make an anchor that opens a new window.
     if(node.url.startsWith("http")) {

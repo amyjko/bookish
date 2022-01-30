@@ -4,7 +4,8 @@ import { Link } from 'react-router-dom'
 import Header from "./Header"
 import Authors from "../chapter/Authors"
 import Page from './Page'
-import Parser, { EmbedNode } from "../../models/Parser"
+import Parser from "../../models/Parser"
+import { EmbedNode } from "../../models/EmbedNode"
 import Book from '../../models/Book'
 import Outline from './Outline'
 import { BaseContext, EditorContext } from './Book'
@@ -29,12 +30,12 @@ const TableOfContentsRow = (props: {
 }) => {
 
 	const { base } = useContext(BaseContext)
-	const { editable, setEditingBook } = useContext(EditorContext)
+	const { editable } = useContext(EditorContext)
 
 	const chapter = props.chapter
 
-	function moveUp() { if(setEditingBook) setEditingBook(true); chapter?.move(-1).finally(() => setEditingBook ? setEditingBook(false) : undefined) }
-	function moveDown() { if(setEditingBook) setEditingBook(true); chapter?.move(1).finally(() => setEditingBook ? setEditingBook(false) : undefined) }
+	function moveUp() { chapter?.move(-1) }
+	function moveDown() { chapter?.move(1) }
 
 	return <>
 		<tr className={props.forthcoming ? "bookish-forthcoming" : ""}>
@@ -82,16 +83,15 @@ const TableOfContentsRow = (props: {
 
 const AddChapter = () => {
 
-	const { book, setEditingBook } = useContext(EditorContext)
+	const { book } = useContext(EditorContext)
 	const [ waiting, setWaiting ] = useState(false)
 
 	function add() {
-		if(book && setEditingBook) {
+		if(book) {
 			setWaiting(true)
-			setEditingBook(true)
 			let add = book.addChapter();
 			if(add)
-				add.then(() => { setWaiting(false); setEditingBook(false) })
+				add.then(() => { setWaiting(false); })
 		}
 	}
 

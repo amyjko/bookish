@@ -4,7 +4,7 @@ import React, { useEffect, useRef } from 'react';
 // Suppress unescaped HTML warning, trusting the escaping of the parser.
 hljs.configure({ ignoreUnescapedHTML: true });
 
-const Code = (props: { editable: boolean, inline: boolean, edited?: Function, language?: string, children: React.ReactNode}) => {
+const Code = (props: { editable: boolean, inline: boolean, nodeID: number | undefined, edited?: Function, language?: string, children: React.ReactNode}) => {
 
     const el = useRef<HTMLElement>(null);
 
@@ -30,6 +30,7 @@ const Code = (props: { editable: boolean, inline: boolean, edited?: Function, la
     let lang = props.language ? (hljs.getLanguage(props.language) === undefined ? "text" : props.language) : "plaintext";
 
     return <code 
+        data-nodeid={props.nodeID}
         contentEditable={props.editable}
         suppressContentEditableWarning={true}
         className={"bookish-code " + (props.inline ? "bookish-code-inline" : "bookish-code-block") + " language-" + lang} 

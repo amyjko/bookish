@@ -1,5 +1,5 @@
 import React from 'react'
-import { ChapterNode } from '../../models/Parser'
+import { ChapterNode } from "../../models/ChapterNode"
 import { renderNode } from './Renderer'
 
 const ChapterBody = (props: { node: ChapterNode }) => {
@@ -7,7 +7,7 @@ const ChapterBody = (props: { node: ChapterNode }) => {
     const { node } = props
     const errors = node.metadata.errors
 
-    return <div className="bookish-chapter-body">
+    return <div className="bookish-chapter-body" data-nodeid={props.node.nodeID}>
         {
             errors.length === 0 ? 
                 null : 

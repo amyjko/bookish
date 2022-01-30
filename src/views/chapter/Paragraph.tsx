@@ -1,10 +1,10 @@
 import React from 'react'
-import { ParagraphNode } from '../../models/Parser'
+import { ParagraphNode } from "../../models/ParagraphNode"
 import { renderNode } from './Renderer'
 
 const Paragraph = (props: { node: ParagraphNode}) => {
 
-    return <p>{renderNode(props.node.content)}</p>
+    return props.node.content === undefined ? <></> : <p data-nodeid={props.node.nodeID}>{renderNode(props.node.content)}</p>
 
 }
 

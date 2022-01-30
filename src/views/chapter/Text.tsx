@@ -1,11 +1,29 @@
 import React, { useContext } from 'react'
-import { TextNode } from '../../models/Parser';
+import { TextNode } from "../../models/TextNode";
 import { ChapterContext } from './Chapter';
+
+function replaceMultipleSpacesWithNonBreakingSpaces(original: string) {
+
+    let text = ""
+    for(let i = 0; i < original.length; i++) {
+        // If its a space and its at the beginning, the end, or the previous character was a space, make it a non-breaking space.
+        let c = original.charAt(i)
+        if(c === " " && (i === 0 || i === original.length - 1 || original.charAt(i - 1) === " "))
+            text += "\u00a0";
+        else text += c
+    }
+
+    return text;
+
+}
 
 const Text = (props: { node: TextNode}) => {
 
     const { node } = props
     const context = useContext(ChapterContext)
+
+    // Replace any spaces at the beginning or end of the string with explicit non-breaking spaces to ensure that they render.
+    let text = replaceMultipleSpacesWithNonBreakingSpaces(node.text)
 
     // Is there a query we're supposed to highlight? If so, highlight it.
     if(context && context.highlightedWord) {
@@ -36,11 +54,12 @@ const Text = (props: { node: TextNode}) => {
             return <span>{segments}</span>;
 
         }
-        else return <span>{node.text}</span>;
+        else return <span>{text}</span>;
 
     } 
     // Otherwise, just return the text as a span with metadata.
-    else return <span className="bookish-text" data-position={node.position}>{node.text}</span>;
+    // Replace any spaces at the beginning or end of the string with explicit non-breaking spaces to ensure that they render.
+    else return <span className="bookish-text" data-position={node.position} data-nodeid={props.node.nodeID}>{text}</span>;
 
 }
 

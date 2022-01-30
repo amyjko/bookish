@@ -1,5 +1,5 @@
 import React from 'react'
-import { TableNode } from '../../models/Parser'
+import { TableNode } from "../../models/TableNode"
 
 import { renderNode, renderPosition } from './Renderer'
 
@@ -7,7 +7,7 @@ const Table = (props: { node: TableNode}) => {
 
     const { node } = props
 
-    return <div className={"bookish-figure " + renderPosition(node.position)}>
+    return <div className={"bookish-figure " + renderPosition(node.position)} data-nodeid={props.node.nodeID}>
         {/* Make the table responsive for small screens */}
         <div className="bookish-table">
             <table>
@@ -26,7 +26,7 @@ const Table = (props: { node: TableNode}) => {
                 </tbody>
             </table>
         </div>
-        <div className="bookish-figure-caption">{renderNode(node.caption)}</div>
+        { node.caption === undefined ? null : <div className="bookish-figure-caption">{renderNode(node.caption)}</div> }
     </div>
 
 }

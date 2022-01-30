@@ -20,14 +20,14 @@ export const DarkModeContext = React.createContext<{ darkMode: boolean, setDarkM
 export const BaseContext = React.createContext<{ base: string }>({ base: "" })
 export const EditorContext = React.createContext<{ 
 	book: BookModel | undefined,
-	editable: boolean,
-	setEditingBook: Function | undefined }>({ book: undefined, editable: false, setEditingBook: undefined })
+	editable: boolean }>({ book: undefined, editable: false })
 
 const Book = (props: { book: BookModel, base?: string, editable?: boolean }) => {
 
 	const { book } = props
 	const location = useLocation()
-	const [ editingBook, setEditingBook ] = useState(false)
+	const [, updateState] = React.useState<{}>();
+	const forceUpdate = React.useCallback(() => updateState({}), []);
 
 	// The base path allows links to adjust to different routing contexts in which a book is placed.
 	// For example, when the book is hosted alone, all routes might start with the bare root "/", 
@@ -63,17 +63,25 @@ const Book = (props: { book: BookModel, base?: string, editable?: boolean }) => 
 	// Update immediately before rendering.
 	updateDarkMode()
 
+	// Just use a counter to force re-renders on book changes.
+	function bookChange() {
+		forceUpdate()
+	}
+	
+	// Listen to book changes, stop when unmounted.
+	useEffect(() => {
+		book.addListener(bookChange)
+		return () => { book.removeListener(bookChange) }
+	}, [book])
+
 	// When dark mode changes, update dark mode.
 	useEffect(updateDarkMode, [ darkMode ])
-
-	// When editing changes, update the book
-	useEffect(() => {}, [ editingBook ])
 
 	// Render the book
 	return <div className={"bookish"  + (darkMode ? " bookish-dark" : "")}>
 		<DarkModeContext.Provider value={{ darkMode, setDarkMode}}>
 		<BaseContext.Provider value={{ base }}>
-		<EditorContext.Provider value={{ book, editable: props.editable ? true : false, setEditingBook }}>
+		<EditorContext.Provider value={{ book, editable: props.editable ? true : false }}>
 			<Routes>
 				<Route path="/" element={<TableOfContents book={book}/>} />
 				{

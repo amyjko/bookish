@@ -1,7 +1,8 @@
 import React, { useContext } from 'react'
 import Marginal  from './Marginal'
 import { renderNode } from './Renderer'
-import Parser, { DefinitionNode } from '../../models/Parser'
+import Parser from '../../models/Parser'
+import { DefinitionNode } from "../../models/DefinitionNode"
 import { ChapterContext, ChapterContextType } from './Chapter'
 
 const Definition = (props: { node: DefinitionNode}) => {
@@ -16,12 +17,16 @@ const Definition = (props: { node: DefinitionNode}) => {
     // Find the definition.
     let glossary = context.book.getGlossary();
 
-    if(!(node.glossaryID in glossary))
+    if(node.glossaryID === undefined || !(node.glossaryID in glossary))
         return <span className="bookish-error">Unknown glossary entry "{ node.glossaryID }"</span>
 
     let entry = glossary[node.glossaryID];
 
-    return <span className="bookish-definition">
+    // If for some reason there's no phrase, return nothing.
+    if(node.phrase === undefined)
+        return <></>
+
+    return <span className="bookish-definition" data-nodeid={props.node.nodeID}>
         <Marginal
             id={"glossary-" + node.glossaryID}
             interactor={renderNode(node.phrase)}

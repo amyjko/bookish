@@ -1,5 +1,5 @@
 import React from 'react';
-import { EmbedNode } from '../../models/Parser';
+import { EmbedNode } from "../../models/EmbedNode";
 import { renderNode, renderPosition } from './Renderer';
 
 const Figure = (props: { node: EmbedNode }) => {
@@ -7,7 +7,7 @@ const Figure = (props: { node: EmbedNode }) => {
 	const { node } = props
 
 	return (
-		<div className={"bookish-figure " + renderPosition(node.position)}>
+		<div className={"bookish-figure " + renderPosition(node.position)} data-nodeid={props.node.nodeID}>
 			{
 				node.url.includes("https://www.youtube.com") || 
 				node.url.includes("https://youtu.be") || 
