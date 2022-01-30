@@ -7,6 +7,7 @@ import { EmbedNode } from "./EmbedNode";
 import { Node } from "./Node";
 
 export type Selection = { startID: number, startIndex: number, endID: number, endIndex: number }
+export type CaretPosition = { node: number, index: number}
 
 export class ChapterNode extends Node {
     blocks: Array<Node>;

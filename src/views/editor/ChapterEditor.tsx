@@ -1,12 +1,12 @@
-import React, { useEffect, useRef } from "react"
-import { ChapterNode, Selection } from "../../models/ChapterNode";
+import React, { useEffect, useRef, useState } from "react"
+import { CaretPosition, ChapterNode, Selection } from "../../models/ChapterNode";
 import { renderNode } from "../chapter/Renderer";
 
 const ChapterEditor = (props: { ast: ChapterNode }) => {
 
     const { ast } = props
-    const ref = useRef(null)
-    const [caret, setCaret] = React.useState<{ node: number, index: number} | undefined>()
+    const ref = useRef<HTMLDivElement>(null)
+    const [caret, setCaret] = useState<CaretPosition | undefined>()
 
     // When the caret state changes, update the selection correspondingly.
     useEffect(() => {
@@ -42,7 +42,18 @@ const ChapterEditor = (props: { ast: ChapterNode }) => {
         selection.removeAllRanges()
         selection.addRange(range)
 
+        // Restore the visibility of the caret now that it's positioned.
+        if(ref.current)
+            ref.current.style.removeProperty("caret-color")
+
     }, [caret])
+
+    function updateCaret(position: CaretPosition | undefined) {
+        // Hide the caret to avoid flickering until the redraw is done.
+        if(ref.current)
+            ref.current.style.caretColor = "transparent"
+        setCaret(position)
+    }
 
     // Given an HTML node, find the corresponding AST node.
     function getNodeID(el: Node) {
@@ -115,18 +126,18 @@ const ChapterEditor = (props: { ast: ChapterNode }) => {
             }
             else if(event.key === "Backspace") {
                 event.preventDefault();
-                setCaret(ast.removeSelection(nodeSelection, false))
+                updateCaret(ast.removeSelection(nodeSelection, false))
                 return;
             }
             else if(event.key === "Delete") {
                 event.preventDefault();
-                setCaret(ast.removeSelection(nodeSelection, true))
+                updateCaret(ast.removeSelection(nodeSelection, true))
                 return;
             }
             // Insert text.
             else if(event.key.match(/^[` ~!@#$%^&*(){}\[\];:'",,<>/?\-_=+\\|.a-zA-Z0-9]$/)) {
                 event.preventDefault();
-                setCaret(ast.insert(event.key, nodeSelection))
+                updateCaret(ast.insert(event.key, nodeSelection))
                 return;
             }    
         }
