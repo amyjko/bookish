@@ -27,6 +27,7 @@ import Text from './Text'
 import ErrorMessage from './ErrorMessage'
 import Label from './Label'
 import Reference from './Reference'
+import Comment from './Comment'
 
 const renderers: Record<string, (props: { node: any }) => JSX.Element> = {
     "chapter": ChapterBody,
@@ -51,7 +52,8 @@ const renderers: Record<string, (props: { node: any }) => JSX.Element> = {
     "text": Text,
     "error": ErrorMessage,
     "label": Label,
-    "reference": Reference
+    "reference": Reference,
+    "comment": Comment
 }
 
 // Given a node and an optional ID to distinguish children in lists

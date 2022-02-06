@@ -12,7 +12,7 @@ const Formatted = (props: { node: FormattedNode}) => {
     if(node.format === "*")
         return <strong data-nodeid={props.node.nodeID}>{segmentDOMs}</strong>;
     else if(node.format === "_")
-        return <em> data-nodeid={props.node.nodeID}{segmentDOMs}</em>;
+        return <em data-nodeid={props.node.nodeID}>{segmentDOMs}</em>;
     else
         return <span data-nodeid={props.node.nodeID}>{segmentDOMs}</span>;
 

@@ -225,6 +225,12 @@ body {
 	font-weight: normal;
 }
 
+/* This accounts for completely empty chapters. */
+.bookish-chapter-body {
+	min-height: 2em;
+	min-width: 100%;
+}
+
 p {
 	font-family: var(--bookish-paragraph-font-family);
 	font-size: var(--bookish-paragraph-font-size);
@@ -235,6 +241,10 @@ p {
 
 	/* Allow paragraphs to break on words to support small screens. */
 	word-break: break-word;
+
+	/* Empty paragraphs should have at least some height. */
+	min-height: var(--bookish-paragraph-line-height);
+
 }
 
 strong, b {

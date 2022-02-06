@@ -1,8 +1,9 @@
-import { ChapterNode } from "./ChapterNode";
+import { CaretPosition, ChapterNode } from "./ChapterNode";
 import { Node } from "./Node";
 import { Position } from "./Parser";
 import { ContentNode } from "./ContentNode";
 import { CalloutNode } from "./CalloutNode";
+import { QuoteNode } from "./QuoteNode";
 
 
 export class EmbedNode extends Node {
@@ -12,17 +13,21 @@ export class EmbedNode extends Node {
     credit: ContentNode;
     position: Position;
 
-    constructor(parent: ChapterNode | CalloutNode | undefined, url: string, description: string, caption: ContentNode, credit: ContentNode, position: Position) {
+    constructor(parent: ChapterNode | CalloutNode | QuoteNode | undefined, url: string, description: string) {
         super(parent, "embed");
         this.url = url;
         this.description = description;
-        this.caption = caption;
-        this.credit = credit;
-        this.position = position;
+        this.caption = new ContentNode(this, []);
+        this.credit = new ContentNode(this, []);
+        this.position = "<";
     }
 
     toText(): string {
         return this.caption.toText();
+    }
+
+    toBookdown(): String {
+        return `|${this.url}|${this.description}|${this.caption.toBookdown()}|${this.credit.toBookdown()}|`;
     }
 
     toJSON() {
@@ -40,5 +45,29 @@ export class EmbedNode extends Node {
     }
 
     removeChild(node: Node): void {}
+    
+    getSiblingOf(child: Node, next: boolean) { return undefined; }
+
+    copy(parent: ChapterNode | CalloutNode | QuoteNode): EmbedNode {
+        const node = new EmbedNode(parent, this.url, this.description);
+        node.caption = this.caption.copy(this);
+        node.credit = this.credit.copy(this);
+        node.position = this.position;
+        return node;
+    }
+
+    deleteBackward(index: number | Node | undefined): CaretPosition | undefined {
+        throw Error("EmbedNode doesn't know how to backspace.")
+    }
+
+    deleteRange(start: number, end: number): CaretPosition {
+        throw new Error("Embed deleteRange not implemented.");
+    }
+    
+    deleteForward(index: number | Node | undefined): CaretPosition | undefined {
+        throw new Error("Embed deleteForward not implemented.");
+    }
+
+    clean() {}
 
 }

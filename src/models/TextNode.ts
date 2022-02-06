@@ -1,97 +1,40 @@
+import { CaretPosition } from "./ChapterNode";
+import { ContentNode } from "./ContentNode";
+import { FormattedNode } from "./FormattedNode";
 import { Node } from "./Node";
+
+export type TextNodeParent = ContentNode | FormattedNode;
 
 export class TextNode extends Node {
     text: string;
     position: number;
-    constructor(parent: Node, text: string, position: number) {
+    constructor(parent: TextNodeParent, text: string, position: number) {
         super(parent, "text");
         this.text = text;
         this.position = position - text.length;
     }
 
-    insert(char: string, index: number) {
-        if (this.nodeID) {
-            this.text = this.text.slice(0, index) + char + this.text.slice(index);
-            return {
-                node: this.nodeID,
-                index: index + 1
-            };
-        } else
-            return undefined;
-    }
-
-    removeRange(index: number, count: number, forward: boolean): { node: number, index: number } | undefined {
-        if (this.nodeID) {
-            // If we're deleting backwards and we haven't been asked to delete before the first character, delete!
-            if (!forward) {
-                // If this is anywhere after the first index, just adjust the text and return the new caret position.
-                if(index - count >= 0) {
-                    this.text = this.text.slice(0, index - count) + this.text.slice(index);
-                    if(this.text.length > 0)
-                    return {
-                        node: this.nodeID,
-                        index: index - count
-                    }
-                }
-                // Otherwise, delegate this to the previous text node.
-                else {
-                    const previousText = this.previousText()
-                    if(previousText)
-                        return previousText.removeRange(previousText.text.length, count, false)
-                    // If there isn't any, don't do anything.
-                    else 
-                        return undefined
-                }
-            }
-            else if (forward) {
-                // If were before the end of the string.
-                if(index + count <= this.text.length) {
-                    this.text = this.text.slice(0, index) + this.text.slice(index + count);
-                    if(this.text.length > 0) {
-                        // Don't move the position, just stay in place.
-                        return {
-                            node: this.nodeID,
-                            index: index
-                        }
-                    }
-                } 
-                // Otherwise, delegate to the next text node.
-                else {
-                    const nextText = this.nextText()
-                    if(nextText)
-                        return nextText.removeRange(0, count, true)
-                    // If there isn't any, don't do anything.
-                    else 
-                        return undefined
-                }
-            }
-
-            // If the node is now empty, remove it and return a selection before this deleted node, or after if there is no before.
-            if(this.text.length === 0) {
-                const previous = this.previousText()
-                const next = this.nextText()
-                this.remove()
-                if(previous && previous.nodeID) {
-                    return {
-                        node: previous.nodeID,
-                        index: previous.text.length
-                    }
-                }
-                if(next && next.nodeID) {
-                    return {
-                        node: next.nodeID,
-                        index: 0
-                    }
-                }
-                return undefined
-            }
-
-        } 
-        return undefined;
-    }
-
     toText(): string {
         return this.text;
+    }
+
+    toBookdown() {
+
+        // Escape all characters with special meaning inside content nodes: _*`<^{~\[@% and :'s with no space after
+        return new String(this.text)
+            .replace(/\\/g, '\\\\') // This has to go first! Otherwise it breaks all of the others below.
+            .replace(/_/g, '\\_')
+            .replace(/\*/g, '\\*')
+            .replace(/`/g, '\\`')
+            .replace(/</g, '\\<')
+            .replace(/\^/g, '\\^')
+            .replace(/{/g, '\\{')
+            .replace(/~/g, '\\~')
+            .replace(/ %/g, ' \\%')
+            .replace(/\[/g, '\\[')
+            .replace(/@/g, '\\@')
+            .replace(/(:)([a-z])/g, '\\:$2')
+
     }
 
     previousText() {
@@ -115,6 +58,131 @@ export class TextNode extends Node {
     }
 
     traverseChildren(fn: (node: Node) => void): void {}
+    
     removeChild(node: Node): void {}
+
+    getSiblingOf(child: Node, next: boolean) { return undefined; }
+
+    copy(parent: ContentNode | FormattedNode) {
+        return new TextNode(parent, this.text, this.position)
+    }
+
+    insert(char: string, index: number): CaretPosition {
+        this.text = this.text.slice(0, index) + char + this.text.slice(index);
+        return {
+            node: this.nodeID,
+            index: index + 1
+        };
+    }
+
+    deleteBackward(index: number | Node | undefined): CaretPosition | undefined {
+
+        // There are no nodes in text nodes.
+        if(index instanceof Node)
+            return undefined;
+
+        // If no number was given, backspace from the right.
+        if(index === undefined)
+            index = this.text.length;
+
+        // If index is 0, delegate to the parent.
+        if(index === 0)
+            return this.parent?.deleteBackward(this);
+
+        // Delete the character at the index and move the caret one left.
+        this.text = this.text.slice(0, index - 1) + this.text.slice(index);
+        return {
+            node: this.nodeID,
+            index: index - 1
+        }
+        
+    }
+
+    deleteForward(index: number | Node | undefined): CaretPosition | undefined {
+
+        // There are no nodes in text nodes.
+        if(index instanceof Node)
+            return undefined;
+
+        // If no number was given, start on the right.
+        if(index === undefined)
+            index = 0;
+
+        // If index is the end of this string, delegate to the parent.
+        if(index === this.text.length)
+            return this.parent?.deleteForward(this);
+
+        // Delete the character at the index.
+        this.text = this.text.slice(0, index) + this.text.slice(index + 1);
+
+        // Keep the caret where it is.
+        return {
+            node: this.nodeID,
+            index: index
+        }
+        
+    }
+
+    deleteRange(start: number, end: number): CaretPosition {
+        
+        // They can be given out of order, so sort them.
+        const first = Math.min(start, end, this.text.length);
+        const last = Math.max(start, end, 0);
+
+        // Remove the text
+        this.text = this.text.slice(0, first) + this.text.slice(last);
+
+        // Keep the caret at the start.
+        return {
+            node: this.nodeID,
+            index: first
+        }
+        
+    }
+
+    wrap(start: number, end: number, formatted: FormattedNode) {
+
+        if(!this.parent) return;
+
+        const parent = this.parent as TextNodeParent;
+
+        // If we're wrapping the whole node, just replace it. This keeps the tree tidier.
+        if(start === 0 && end === this.text.length) {
+            this.parent = formatted;
+            formatted.segments.push(this);
+            parent.segments[parent.segments.indexOf(this)] = formatted;
+            return {
+                node: formatted.nodeID,
+                index: 0
+            }
+        }
+
+        // Otherwise, splice it.
+        const left = this.text.substring(0, start);
+        const middle = this.text.substring(start, end);
+        const right = this.text.substring(end);
+
+        // Modify the original text node.
+        this.text = left;
+
+        // Create a new formatted text node
+        formatted.segments.push(new TextNode(formatted as TextNodeParent, middle, 0));
+
+        // Insert the middle and right after the original node.
+        const segmentIndex = parent.segments.indexOf(this);
+        parent.segments.splice(segmentIndex + 1, 0, formatted);
+        parent.segments.splice(segmentIndex + 2, 0, new TextNode(parent as TextNodeParent, right, 0));
+
+        // Select the formatted node.
+        return {
+            node: formatted.segments[0].nodeID,
+            index: 0
+        };
+
+    }
+
+    clean() {
+        if(this.text.length === 0) this.remove();
+    }
 
 }

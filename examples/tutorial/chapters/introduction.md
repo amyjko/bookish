@@ -86,6 +86,7 @@ Bullets can be nested by increasing or decreasing the number of \*:
 ** Item _1.2_
 *** Item _1.2.1_
 *** Item _1.2.2_
+** Item _1.3_
 * Item _2_
 * Item _3_
 * Item _4_
@@ -260,7 +261,6 @@ if two == 2:
    print("Truth")
 print("Done")
 ` Look, syntax highlighting!
-
 
 You can also include code inline by wrapping things in \`in backticks\`: `if two == 2: print "Truth"`, and by including the language name after the closing backtick, as in `\`if two == 2: print "Truth"\`python`markdown, you can language format inline code: `if two == 2: print "Truth"`python
 
