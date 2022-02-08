@@ -329,18 +329,17 @@ This is my callout
 And if that's not enough, you can make tables with captions, with each
 
 `markdown
-,this|is|[my|errors]|table
-,the|next|row|is
-,my|test|is|*_failing_*
+,this | is | [my|errors] | table
+,the |next |row | is
+,my | test | is | *_failing_*
 this is my caption
 `
 
 Which will render like this:
 
-,this|is|[my|errors]|table
-,headerRow
-,the|next|row|is
-,my|test|is|*_failing_*
+, this | is | [my|errors] | table
+, the |next |row | is
+, my | test | is | *_failing_*
 this is my caption
 
 Each cell can have inline formatting as in any other paragraph (but you can't put paragraph-level things in cells).

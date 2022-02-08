@@ -800,7 +800,7 @@ export default class Parser {
     parseTable(parent: ChapterNode | CalloutNode | QuoteNode): TableNode {
 
         const rows: ContentNode[][] = [];
-        const table =new TableNode(parent, rows)
+        const table = new TableNode(parent, rows)
         // Parse rows until the lines stop starting with ,
         while(this.more() && this.nextIs(",")) {
 
@@ -810,6 +810,9 @@ export default class Parser {
 
                 // Read the starting , or next |
                 this.read();
+
+                // Read whitespace that follows.
+                this.readWhitespace();
 
                 // Read content until reaching another | or the end of the line.
                 row.push(this.parseContent(table, "|"));
