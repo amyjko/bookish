@@ -61,7 +61,7 @@ const renderers: Record<string, (props: { node: any }) => JSX.Element> = {
 const renderNode = (node: Node, key?: string) => {
     
     if(!(node.type in renderers))
-        throw Error("Couldn't find a renderer for AST node type '" + node.type)
+        throw Error(`Couldn't find a renderer for AST node type "${node.type}"`)
 
     const componentType: (props: { node: any }) => JSX.Element = renderers[node.type];
 

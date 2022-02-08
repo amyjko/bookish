@@ -1,10 +1,7 @@
 import { CaretPosition, ChapterNode } from "./ChapterNode";
 import { Node } from "./Node";
-import { Position } from "./Parser";
+import { BlockParentNode, Position } from "./Parser";
 import { ContentNode } from "./ContentNode";
-import { CalloutNode } from "./CalloutNode";
-import { QuoteNode } from "./QuoteNode";
-
 
 export class EmbedNode extends Node {
     url: string;
@@ -13,7 +10,7 @@ export class EmbedNode extends Node {
     credit: ContentNode;
     position: Position;
 
-    constructor(parent: ChapterNode | CalloutNode | QuoteNode | undefined, url: string, description: string) {
+    constructor(parent: BlockParentNode | undefined, url: string, description: string) {
         super(parent, "embed");
         this.url = url;
         this.description = description;
@@ -48,7 +45,7 @@ export class EmbedNode extends Node {
     
     getSiblingOf(child: Node, next: boolean) { return undefined; }
 
-    copy(parent: ChapterNode | CalloutNode | QuoteNode): EmbedNode {
+    copy(parent: BlockParentNode): EmbedNode {
         const node = new EmbedNode(parent, this.url, this.description);
         node.caption = this.caption.copy(this);
         node.credit = this.credit.copy(this);

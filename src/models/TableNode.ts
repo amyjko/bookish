@@ -1,18 +1,14 @@
 import { CaretPosition, ChapterNode } from "./ChapterNode";
 import { Node } from "./Node";
-import { Position } from "./Parser";
+import { BlockParentNode, Position } from "./Parser";
 import { ContentNode } from "./ContentNode";
-import { CalloutNode } from "./CalloutNode";
-import { QuoteNode } from "./QuoteNode";
-
-export type TableParent = ChapterNode | CalloutNode | QuoteNode
 
 export class TableNode extends Node {
     rows: ContentNode[][];
     caption: ContentNode | undefined;
     position: Position;
 
-    constructor(parent: TableParent, rows: ContentNode[][]) {
+    constructor(parent: BlockParentNode, rows: ContentNode[][]) {
         super(parent, "table");
         this.rows = rows;
         this.position = "|";
@@ -44,7 +40,7 @@ export class TableNode extends Node {
 
     getSiblingOf(child: Node, next: boolean) { return undefined; }
 
-    copy(parent: TableParent): TableNode {
+    copy(parent: BlockParentNode): TableNode {
         const rows: ContentNode[][] = [];
         const node = new TableNode(parent, rows);
         if(this.caption) node.setCaption(this.caption.copy(node))

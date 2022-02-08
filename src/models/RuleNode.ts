@@ -1,10 +1,10 @@
 import { CaretPosition, ChapterNode } from "./ChapterNode";
 import { Node } from "./Node";
-import { BlockNode } from "./Parser";
+import { BlockParentNode } from "./Parser";
 
 
 export class RuleNode extends Node {
-    constructor(parent: ChapterNode | BlockNode) {
+    constructor(parent: BlockParentNode) {
         super(parent, "rule");
     }
 
@@ -22,7 +22,7 @@ export class RuleNode extends Node {
 
     getSiblingOf(child: Node, next: boolean) { return undefined; }
 
-    copy(parent: ChapterNode): RuleNode {
+    copy(parent: BlockParentNode): RuleNode {
         return new RuleNode(parent)
     }
 

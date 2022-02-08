@@ -1,12 +1,12 @@
 import { CaretPosition, ChapterNode } from "./ChapterNode";
 import { Node } from "./Node";
-import { BlockNode, Position } from "./Parser";
+import { BlockNode, BlockParentNode, Position } from "./Parser";
 
 export class CalloutNode extends Node {
     elements: BlockNode[];
     position: Position;
 
-    constructor(parent: Node, elements: BlockNode[]) {
+    constructor(parent: BlockParentNode, elements: BlockNode[]) {
         super(parent, "callout");
         this.elements = elements;
         this.position = "|";
@@ -38,7 +38,7 @@ export class CalloutNode extends Node {
         return this.elements[this.elements.indexOf(child as BlockNode) + (next ? 1 : -1)];
     }
 
-    copy(parent: Node): CalloutNode {
+    copy(parent: BlockParentNode): CalloutNode {
         const els: BlockNode[] = []
         const node = new CalloutNode(parent, els)
         node.setPosition(this.position)

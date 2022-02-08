@@ -1,6 +1,6 @@
 import { CaretPosition, ChapterNode } from "./ChapterNode";
 import { Node } from "./Node";
-import { BlockNode, Position } from "./Parser";
+import { BlockNode, BlockParentNode, Position } from "./Parser";
 import { ContentNode } from "./ContentNode";
 import { CalloutNode } from "./CalloutNode";
 
@@ -10,7 +10,7 @@ export class QuoteNode extends Node {
     credit: ContentNode | undefined;
     position: Position;
 
-    constructor(parent: ChapterNode | CalloutNode | QuoteNode, elements: Array<BlockNode>) {
+    constructor(parent: BlockParentNode, elements: Array<BlockNode>) {
         super(parent, "quote");
         this.elements = elements;
         this.position = "|";
@@ -47,7 +47,7 @@ export class QuoteNode extends Node {
             this.elements[this.elements.indexOf(child as BlockNode ) + (next ? 1 : -1)];
     }
 
-    copy(parent: ChapterNode | CalloutNode | QuoteNode) {
+    copy(parent: BlockParentNode) {
         const elements: BlockNode[] = []
         const node = new QuoteNode(parent, elements);
         this.elements.forEach(e => elements.push(e.copy(node as unknown as ChapterNode)));

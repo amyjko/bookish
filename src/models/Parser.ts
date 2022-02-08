@@ -90,6 +90,7 @@ export type NodeType =
     "reference" |
     "comment"
 
+export type BlockParentNode = ChapterNode | BulletedListNode | CalloutNode | QuoteNode;
 export type BlockNode = HeaderNode | RuleNode | EmbedNode | BulletedListNode | NumberedListNode | CodeNode | QuoteNode | CalloutNode | TableNode | ParagraphNode;
 
 export default class Parser {
@@ -911,7 +912,7 @@ export default class Parser {
 
     }
 
-    parseEmbed(parent: ChapterNode | CalloutNode | QuoteNode | undefined): EmbedNode | ErrorNode {
+    parseEmbed(parent: BlockParentNode | undefined): EmbedNode | ErrorNode {
 
         // Read |
         this.read();

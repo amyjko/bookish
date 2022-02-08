@@ -1,14 +1,13 @@
 import { Node } from "./Node";
 import { ContentNode } from "./ContentNode";
-import { CaretPosition, ChapterNode } from "./ChapterNode";
-import { CalloutNode } from "./CalloutNode";
-import { QuoteNode } from "./QuoteNode";
+import { CaretPosition } from "./ChapterNode";
+import { BlockParentNode } from "./Parser";
 
 export type BulletedListItemType = ContentNode | BulletedListNode;
 
 export class BulletedListNode extends Node {
     items: (BulletedListItemType)[];
-    constructor(parent: ChapterNode | BulletedListNode | CalloutNode | QuoteNode, items: (ContentNode | BulletedListNode)[]) {
+    constructor(parent: BlockParentNode | BulletedListNode, items: (ContentNode | BulletedListNode)[]) {
         super(parent, "bulleted");
         this.items = items;
     }
@@ -42,7 +41,7 @@ export class BulletedListNode extends Node {
         return this.items[this.items.indexOf(child as BulletedListItemType) + (next ? 1 : -1)];
     }
 
-    copy(parent: ChapterNode | BulletedListNode | CalloutNode | QuoteNode): BulletedListNode {
+    copy(parent: BlockParentNode | BulletedListNode): BulletedListNode {
         const items: (ContentNode | BulletedListNode)[] = [];
         const list = new BulletedListNode(parent, items);
         this.items.forEach(item => items.push(item.copy(list)))

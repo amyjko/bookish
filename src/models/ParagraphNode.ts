@@ -1,13 +1,12 @@
 import { CaretPosition, ChapterNode, Selection } from "./ChapterNode";
 import { Node } from "./Node";
 import { ContentNode } from "./ContentNode";
-import { CalloutNode } from "./CalloutNode";
-import { QuoteNode } from "./QuoteNode";
+import { BlockParentNode } from "./Parser";
 
 export class ParagraphNode extends Node {
     content: ContentNode;
 
-    constructor(parent: ChapterNode | CalloutNode | QuoteNode) {
+    constructor(parent: BlockParentNode) {
         super(parent, "paragraph");
         this.content = new ContentNode(this, []);
     }
@@ -34,7 +33,7 @@ export class ParagraphNode extends Node {
 
     getSiblingOf(child: Node, next: boolean) { return undefined; }
 
-    copy(parent: ChapterNode | CalloutNode | QuoteNode): ParagraphNode {
+    copy(parent: BlockParentNode): ParagraphNode {
         const p = new ParagraphNode(parent);
         if(this.content) p.setContent(this.content.copy(p))
         return p;

@@ -1,14 +1,13 @@
 import { CaretPosition, ChapterNode } from "./ChapterNode";
 import { Node } from "./Node";
 import { ContentNode } from "./ContentNode";
-import { CalloutNode } from "./CalloutNode";
-import { QuoteNode } from "./QuoteNode";
+import { BlockParentNode } from "./Parser";
 
 export type NumberedListNodeType = ContentNode | NumberedListNode;
 
 export class NumberedListNode extends Node {
     items: NumberedListNodeType[];
-    constructor(parent: ChapterNode | CalloutNode | NumberedListNode | QuoteNode, items: Array<ContentNode | NumberedListNode>) {
+    constructor(parent: BlockParentNode | NumberedListNode, items: Array<ContentNode | NumberedListNode>) {
         super(parent, "numbered");
         this.items = items;
     }
@@ -38,7 +37,7 @@ export class NumberedListNode extends Node {
 
     getSiblingOf(child: Node, next: boolean) { return this.items[this.items.indexOf(child as NumberedListNodeType ) + (next ? 1 : -1)]; }
 
-    copy(parent: ChapterNode | NumberedListNode | CalloutNode | QuoteNode): NumberedListNode {
+    copy(parent: BlockParentNode | NumberedListNode): NumberedListNode {
         const items: (ContentNode | NumberedListNode)[] = [];
         const list = new NumberedListNode(parent, items);
         this.items.forEach(item => items.push(item.copy(list)))

@@ -7,7 +7,7 @@ import { EmbedNode } from "./EmbedNode";
 import { Node } from "./Node";
 import { ParagraphNode } from "./ParagraphNode";
 import { ContentNode } from "./ContentNode";
-import { Format, FormattedNode, FormattedNodeSegmentType } from "./FormattedNode";
+import { Format, FormattedNode } from "./FormattedNode";
 
 export type Selection = { startID: number, startIndex: number, endID: number, endIndex: number }
 export type CaretPosition = { node: number, index: number}

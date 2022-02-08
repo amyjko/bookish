@@ -1,14 +1,13 @@
 import { CaretPosition, ChapterNode } from "./ChapterNode";
 import { Node } from "./Node";
 import { ContentNode } from "./ContentNode";
-import { CalloutNode } from "./CalloutNode";
-import { QuoteNode } from "./QuoteNode";
+import { BlockParentNode } from "./Parser";
 
 
 export class HeaderNode extends Node {
     level: number;
     content: ContentNode | undefined;
-    constructor(parent: ChapterNode | CalloutNode | QuoteNode, level: number) {
+    constructor(parent: BlockParentNode, level: number) {
         super(parent, "header");
         this.level = level;
     }
@@ -35,7 +34,7 @@ export class HeaderNode extends Node {
 
     getSiblingOf(child: Node, next: boolean) { return undefined; }
 
-    copy(parent: ChapterNode | CalloutNode | QuoteNode): HeaderNode {
+    copy(parent: BlockParentNode): HeaderNode {
         const head = new HeaderNode(parent, this.level);
         if(this.content) head.setContent(this.content.copy(head));
         return head;

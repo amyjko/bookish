@@ -1,9 +1,7 @@
 import { CaretPosition, ChapterNode } from "./ChapterNode";
 import { Node } from "./Node";
-import { Position } from "./Parser";
+import { BlockParentNode, Position } from "./Parser";
 import { ContentNode } from "./ContentNode";
-import { CalloutNode } from "./CalloutNode";
-import { QuoteNode } from "./QuoteNode";
 
 export class CodeNode extends Node {
     code: string;
@@ -11,7 +9,7 @@ export class CodeNode extends Node {
     position: Position;
     language: string;
     executable: boolean;
-    constructor(parent: ChapterNode | CalloutNode | QuoteNode, code: string, language: string, position: Position) {
+    constructor(parent: BlockParentNode, code: string, language: string, position: Position) {
         super(parent, "code");
 
         this.code = code;
@@ -44,7 +42,7 @@ export class CodeNode extends Node {
     removeChild(node: Node): void {}
     getSiblingOf(child: Node, next: boolean) { return undefined; }
     
-    copy(parent: ChapterNode | CalloutNode | QuoteNode): CodeNode {
+    copy(parent: BlockParentNode): CodeNode {
         const c = new CodeNode(parent, this.code, this.language, this.position);
         if(this.caption) c.setCaption(this.caption.copy(c));
         return c;
