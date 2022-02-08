@@ -112,8 +112,6 @@ class Chapter {
 		this.wordCount = this.ast.toText().split(/\s+/).length;
 		this.index = this.computeIndex();
 
-		console.log(this.ast.toBookdown());
-
 		this.book.notifyListeners()
 	}
 
