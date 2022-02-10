@@ -41,6 +41,12 @@ export class QuoteNode extends Node {
         this.elements = this.elements.filter(item => item !== node)
     }
 
+    replaceChild(node: Node, replacement: BlockNode): void {
+        const index = this.elements.indexOf(node as BlockNode);
+        if(index < 0) return;
+        this.elements[index] = replacement;
+    }
+
     getSiblingOf(child: Node, next: boolean) {     
         return child === this.credit ? 
             (next ? undefined : this.elements[this.elements.length - 1]) : 

@@ -38,6 +38,8 @@ export class TableNode extends Node {
 
     removeChild(node: Node): void {}
 
+    replaceChild(node: Node, replacement: ContentNode): void {}
+
     getSiblingOf(child: Node, next: boolean) { return undefined; }
 
     copy(parent: BlockParentNode): TableNode {

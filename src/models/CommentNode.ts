@@ -24,6 +24,8 @@ export class CommentNode extends Node {
 
     removeChild(node: Node): void {}
 
+    replaceChild(node: Node, replacement: Node): void {}
+
     getSiblingOf(child: Node, next: boolean): Node | undefined { return undefined; }
 
     deleteBackward(index: number | Node | undefined): CaretPosition | undefined {

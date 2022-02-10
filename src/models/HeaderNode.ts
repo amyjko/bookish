@@ -32,6 +32,10 @@ export class HeaderNode extends Node {
         if(this.content === node) this.remove();
     }
 
+    replaceChild(node: Node, replacement: Node): void {
+        if(this.content === node) this.remove();
+    }
+
     getSiblingOf(child: Node, next: boolean) { return undefined; }
 
     copy(parent: BlockParentNode): HeaderNode {

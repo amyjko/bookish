@@ -22,6 +22,7 @@ export class CitationsNode extends Node {
 
     removeChild(node: Node): void {}
     getSiblingOf(child: Node, next: boolean) { return undefined; }
+    replaceChild(node: Node, replacement: Node): void {}
 
     copy(parent: ContentNode): CitationsNode {
         return new CitationsNode(parent, [...this.citations])

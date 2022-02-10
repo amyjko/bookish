@@ -20,6 +20,8 @@ export class RuleNode extends Node {
  
     removeChild(node: Node): void {}
 
+    replaceChild(node: Node, replacement: Node): void {}
+
     getSiblingOf(child: Node, next: boolean) { return undefined; }
 
     copy(parent: BlockParentNode): RuleNode {

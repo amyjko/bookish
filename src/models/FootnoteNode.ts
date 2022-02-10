@@ -30,6 +30,12 @@ export class FootnoteNode extends Node {
         if(this.footnote === node) this.remove();
     }
 
+    replaceChild(node: ContentNode, replacement: ContentNode): void {
+        if(this.footnote === node)
+            this.footnote = replacement;
+    }
+
+
     getSiblingOf(child: Node, next: boolean) { return undefined; }
 
     copy(parent: ContentNode): FootnoteNode {

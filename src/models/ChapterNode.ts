@@ -1,4 +1,4 @@
-import { Bookkeeping, BlockNode } from "./Parser";
+import { Bookkeeping, BlockNode, BlockParentNode } from "./Parser";
 import { ErrorNode } from "./ErrorNode";
 import { TextNode } from "./TextNode";
 import { FootnoteNode } from "./FootnoteNode";
@@ -8,6 +8,7 @@ import { Node } from "./Node";
 import { ParagraphNode } from "./ParagraphNode";
 import { ContentNode } from "./ContentNode";
 import { Format, FormattedNode } from "./FormattedNode";
+import { RuleNode } from "./RuleNode";
 
 export type Selection = { startID: number, startIndex: number, endID: number, endIndex: number }
 export type CaretPosition = { node: number, index: number}
@@ -95,6 +96,12 @@ export class ChapterNode extends Node {
 
     removeChild(node: Node): void {
         this.blocks = this.blocks.filter(item => item !== node)
+    }
+
+    replaceChild(node: Node, replacement: BlockNode): void {
+        const index = this.blocks.indexOf(node as BlockNode);
+        if(index < 0) return;
+        this.blocks[index] = replacement;
     }
 
     copy(parent: Node): ChapterNode {
@@ -329,6 +336,24 @@ export class ChapterNode extends Node {
             }
 
         }
+
+    }
+
+    insertRule(selection: Selection): CaretPosition | undefined {
+
+        const range = this.getRange(selection);
+        if(!range) return;
+
+        const { start } = range;
+
+        // If this is an empty text node in a paragraph node, then replace the paragraph node with a rule.
+        if(start instanceof TextNode && start.parent instanceof ContentNode && start.parent.parent instanceof ParagraphNode && start.text === "") {
+            const paragraph: ParagraphNode = start.parent.parent as ParagraphNode;
+            const rule = new RuleNode(paragraph.parent as BlockParentNode);
+            paragraph.replaceWith(rule);
+            return { node: rule.nodeID, index: 0 };
+        }
+        return undefined;
 
     }
 

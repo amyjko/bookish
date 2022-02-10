@@ -19,6 +19,9 @@ export class ErrorNode extends Node {
     traverseChildren(fn: (node: Node) => void): void {}
 
     removeChild(node: Node): void {}
+
+    replaceChild(node: Node, replacement: Node): void {}
+
     getSiblingOf(child: Node, next: boolean) { return undefined; }
 
     copy(parent: Node): ErrorNode {

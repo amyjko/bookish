@@ -34,6 +34,12 @@ export class FormattedNode extends Node {
         this.segments = this.segments.filter(item => item !== node)
     }
 
+    replaceChild(node: Node, replacement: FormattedNodeSegmentType): void {
+        const index = this.segments.indexOf(node as FormattedNodeSegmentType);
+        if(index < 0) return;
+        this.segments[index] = replacement;
+    }
+
     getSiblingOf(child: Node, next: boolean) { return this.segments[this.segments.indexOf(child as FormattedNodeSegmentType) + (next ? 1 : -1)]; }
 
     copy(parent: ContentNode) {

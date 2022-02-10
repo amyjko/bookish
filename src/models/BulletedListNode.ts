@@ -37,6 +37,12 @@ export class BulletedListNode extends Node {
         this.items = this.items.splice(index, 1);
     }
 
+    replaceChild(node: Node, replacement: BulletedListItemType): void {
+        const index = this.items.indexOf(node as BulletedListItemType);
+        if(index < 0) return;
+        this.items[index] = replacement;
+    }
+
     getSiblingOf(child: Node, next: boolean) {
         return this.items[this.items.indexOf(child as BulletedListItemType) + (next ? 1 : -1)];
     }

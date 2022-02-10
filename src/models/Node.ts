@@ -101,12 +101,20 @@ export abstract class Node {
 
     // Ask the parent to remove this, if there is one.
     remove() : void { 
-        this.getChapter()?.unindexNode(this)
-        this.parent?.removeChild(this)
+        this.getChapter()?.unindexNode(this);
+        this.parent?.removeChild(this);
     }
 
     // Each node has its own way of removing a child.
     abstract removeChild(node: Node): void;
+
+    // Each node has its own way of replacing a child.
+    abstract replaceChild(node: Node, replacement: Node): void;
+
+    replaceWith(replacement: Node): void {
+        this.parent?.replaceChild(this, replacement);
+        this.getChapter()?.unindexNode(this);
+    }
 
     getNodes(): Node[] {
         const nodes: Node[] = [];

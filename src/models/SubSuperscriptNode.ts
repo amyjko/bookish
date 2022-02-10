@@ -31,6 +31,11 @@ export class SubSuperscriptNode extends Node {
         if(this.content === node) this.remove();
     }
 
+    replaceChild(node: Node, replacement: ContentNode): void {
+        if(this.content === node)
+            this.content = replacement;
+    }
+
     getSiblingOf(child: Node, next: boolean) { return undefined; }
 
     copy(parent: ContentNode): SubSuperscriptNode {

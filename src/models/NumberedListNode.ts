@@ -35,6 +35,12 @@ export class NumberedListNode extends Node {
         this.items = this.items.filter(item => item !== node)
     }
 
+    replaceChild(node: Node, replacement: NumberedListNodeType): void {
+        const index = this.items.indexOf(node as NumberedListNodeType);
+        if(index < 0) return;
+        this.items[index] = replacement;
+    }
+
     getSiblingOf(child: Node, next: boolean) { return this.items[this.items.indexOf(child as NumberedListNodeType ) + (next ? 1 : -1)]; }
 
     copy(parent: BlockParentNode | NumberedListNode): NumberedListNode {

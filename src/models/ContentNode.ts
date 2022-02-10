@@ -33,6 +33,12 @@ export class ContentNode extends Node {
         this.segments = this.segments.filter(item => item !== node)
     }
 
+    replaceChild(node: Node, replacement: Node): void {
+        const index = this.segments.indexOf(node as Node);
+        if(index < 0) return;
+        this.segments[index] = replacement;
+    }
+
     getSiblingOf(child: Node, next: boolean) { return this.segments[this.segments.indexOf(child as BlockNode) + (next ? 1 : -1)]; }
 
     copy(parent: ContentParent): ContentNode {

@@ -157,6 +157,11 @@ const ChapterEditor = (props: { ast: ChapterNode }) => {
                 event.preventDefault();
                 return;
             }
+            else if(event.key === "-") {
+                console.log(`Rule`);
+                event.preventDefault();
+                updateCaret(ast.insertRule(nodeSelection))
+            }
             else return;
         } else {
             if(event.key === "Enter") {

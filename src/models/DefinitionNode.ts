@@ -31,6 +31,9 @@ export class DefinitionNode extends Node {
     }
 
     removeChild(node: Node): void {}
+
+    replaceChild(node: Node, replacement: Node): void {}
+   
     getSiblingOf(child: Node, next: boolean) { return undefined; }
 
     copy(): DefinitionNode {
