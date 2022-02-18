@@ -1,13 +1,12 @@
-import { CaretPosition, ChapterNode } from "./ChapterNode";
 import { Node } from "./Node";
-import { ContentNode } from "./ContentNode";
+import { FormattedNode } from "./FormattedNode";
 import { BlockParentNode } from "./Parser";
 
-export type NumberedListNodeType = ContentNode | NumberedListNode;
+export type NumberedListNodeType = FormattedNode | NumberedListNode;
 
 export class NumberedListNode extends Node {
     items: NumberedListNodeType[];
-    constructor(parent: BlockParentNode | NumberedListNode, items: Array<ContentNode | NumberedListNode>) {
+    constructor(parent: BlockParentNode | NumberedListNode, items: Array<FormattedNode | NumberedListNode>) {
         super(parent, "numbered");
         this.items = items;
     }
@@ -44,22 +43,10 @@ export class NumberedListNode extends Node {
     getSiblingOf(child: Node, next: boolean) { return this.items[this.items.indexOf(child as NumberedListNodeType ) + (next ? 1 : -1)]; }
 
     copy(parent: BlockParentNode | NumberedListNode): NumberedListNode {
-        const items: (ContentNode | NumberedListNode)[] = [];
+        const items: NumberedListNodeType[] = [];
         const list = new NumberedListNode(parent, items);
         this.items.forEach(item => items.push(item.copy(list)))
         return list;
-    }
-
-    deleteBackward(index: number | Node | undefined): CaretPosition | undefined {
-        throw Error("NumberedListNode doesn't know how to backspace.")
-    }
-
-    deleteRange(start: number, end: number): CaretPosition {
-        throw new Error("NumberedList deleteRange not implemented.");
-    }
-    
-    deleteForward(index: number | Node | undefined): CaretPosition | undefined {
-        throw new Error("NumberedList deleteForward not implemented.");
     }
 
     clean() {

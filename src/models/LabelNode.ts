@@ -1,11 +1,10 @@
-import { CaretPosition } from "./ChapterNode";
-import { ContentNode } from "./ContentNode";
+import { FormattedNode } from "./FormattedNode";
 import { Node } from "./Node";
 
 
 export class LabelNode extends Node {
     id: string;
-    constructor(parent: ContentNode, id: string) {
+    constructor(parent: FormattedNode, id: string) {
         super(parent, "label");
         this.id = id;
     }
@@ -26,20 +25,8 @@ export class LabelNode extends Node {
 
     getSiblingOf(child: Node, next: boolean) { return undefined; }
 
-    copy(parent: ContentNode): LabelNode {
+    copy(parent: FormattedNode): LabelNode {
         return new LabelNode(parent, this.id)
-    }
-
-    deleteBackward(index: number | Node | undefined): CaretPosition | undefined {
-        throw Error("LabelNode doesn't know how to backspace.")
-    }
-    
-    deleteRange(start: number, end: number): CaretPosition {
-        throw new Error("Label deleteRange not implemented.");
-    }
-    
-    deleteForward(index: number | Node | undefined): CaretPosition | undefined {
-        throw new Error("Label deleteForward not implemented.");
     }
 
     clean() {

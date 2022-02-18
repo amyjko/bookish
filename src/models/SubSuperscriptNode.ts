@@ -1,17 +1,15 @@
-import { CaretPosition } from "./ChapterNode";
-import { ContentNode } from "./ContentNode";
+import { FormattedNode } from "./FormattedNode";
 import { Node } from "./Node";
-
 
 export class SubSuperscriptNode extends Node {
     superscript: boolean;
-    content: ContentNode | undefined;
-    constructor(parent: ContentNode, superscript: boolean) {
+    content: FormattedNode | undefined;
+    constructor(parent: FormattedNode, superscript: boolean) {
         super(parent, "script");
         this.superscript = superscript;
     }
 
-    setContent(content: ContentNode) {
+    setContent(content: FormattedNode) {
         this.content = content;
     }
 
@@ -31,29 +29,17 @@ export class SubSuperscriptNode extends Node {
         if(this.content === node) this.remove();
     }
 
-    replaceChild(node: Node, replacement: ContentNode): void {
+    replaceChild(node: Node, replacement: FormattedNode): void {
         if(this.content === node)
             this.content = replacement;
     }
 
     getSiblingOf(child: Node, next: boolean) { return undefined; }
 
-    copy(parent: ContentNode): SubSuperscriptNode {
+    copy(parent: FormattedNode): SubSuperscriptNode {
         const node = new SubSuperscriptNode(parent, this.superscript)
         if(this.content) node.setContent(this.content.copy(node));
         return node;
-    }
-
-    deleteBackward(index: number | Node | undefined): CaretPosition | undefined {
-        throw Error("SubSuperscript deleteBackward not implemented.")
-    }
-
-    deleteRange(start: number, end: number): CaretPosition {
-        throw new Error("SubSuperscript deleteRange not implemented.");
-    }
-    
-    deleteForward(index: number | Node | undefined): CaretPosition | undefined {
-        throw new Error("SubSuperscript deleteForward not implemented.");
     }
 
     clean() {}

@@ -1,4 +1,3 @@
-import { CaretPosition, ChapterNode } from "./ChapterNode";
 import { Node } from "./Node";
 import { BlockParentNode } from "./Parser";
 
@@ -26,18 +25,6 @@ export class RuleNode extends Node {
 
     copy(parent: BlockParentNode): RuleNode {
         return new RuleNode(parent)
-    }
-
-    deleteBackward(index: number | Node | undefined): CaretPosition | undefined {
-        throw Error("Rule deleteBackward not implemented.")
-    }
-
-    deleteRange(start: number, end: number): CaretPosition {
-        throw new Error("Rule deleteRange not implemented.");
-    }
-    
-    deleteForward(index: number | Node | undefined): CaretPosition | undefined {
-        throw new Error("Rule deleteForward not implemented.");
     }
 
     clean() {}

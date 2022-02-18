@@ -15,13 +15,12 @@ import CaptionedCode from './CaptionedCode'
 import Quote from './Quote'
 import Callout from './Callout'
 import Table from './Table'
-import Formatted from './Formatted'
+import Segments from './Segments'
 import InlineCode from './InlineCode'
 import Link from './Link'
 import Citations from './Citations'
 import Definition from './Definition'
 import Footnote from './Footnote'
-import Content from './Content'
 import Superscript from './Superscript'
 import Text from './Text'
 import ErrorMessage from './ErrorMessage'
@@ -41,13 +40,12 @@ const renderers: Record<string, (props: { node: any }) => JSX.Element> = {
     "quote": Quote,
     "callout": Callout,
     "table": Table,
-    "formatted": Formatted,
+    "formatted": Segments,
     "inline-code": InlineCode,
     "link": Link,
     "citations": Citations,
     "definition": Definition,
     "footnote": Footnote,
-    "content": Content,
     "script": Superscript,
     "text": Text,
     "error": ErrorMessage,

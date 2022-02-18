@@ -1,4 +1,4 @@
-import type { CaretPosition, ChapterNode } from "./ChapterNode";
+import type { ChapterNode } from "./ChapterNode";
 import { NodeType } from "./Parser";
 
 export abstract class Node {
@@ -126,22 +126,7 @@ export abstract class Node {
 
     abstract getSiblingOf(child: Node, next: boolean): Node | undefined;
 
-    // Each node defines how it handles backspace at the given index or Node.
-    abstract deleteBackward(index: number | Node | undefined) : CaretPosition | undefined;
-
-    // Delete everything between this range, inclusive start, exclusive end.
-    abstract deleteRange(start: number, end: number) : CaretPosition;
-
-    // Delete forward from the given position
-    abstract deleteForward(index: number | Node | undefined) : CaretPosition | undefined;
-
     // Delete nodes if they're empty.
     abstract clean(): void;
-
-    // Insert at the given position
-    insert(symbol: string, index: number): CaretPosition | undefined {
-        console.error(`Insert on ${this.type} not supported.`)
-        return undefined;
-    }
 
 }

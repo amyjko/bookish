@@ -1,4 +1,4 @@
-import { CaretPosition, ChapterNode } from "./ChapterNode";
+import { ChapterNode } from "./ChapterNode";
 import { Node } from "./Node";
 
 
@@ -31,18 +31,6 @@ export class ReferenceNode extends Node {
 
     copy(parent: ChapterNode): ReferenceNode {
         return new ReferenceNode(parent, this.authors, this.year, this.title, this.source, this.url, this.summary, this.short);
-    }
-
-    deleteBackward(index: number | Node | undefined): CaretPosition | undefined {
-        throw Error("Reference doesn't know how to backspace.")
-    }
-
-    deleteRange(start: number, end: number): CaretPosition {
-        throw new Error("Reference deleteRange not implemented.");
-    }
-    
-    deleteForward(index: number | Node | undefined): CaretPosition | undefined {
-        throw new Error("Reference deleteForward not implemented.");
     }
 
     clean() {}

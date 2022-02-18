@@ -1,12 +1,16 @@
 import React, { useEffect, useRef, useState } from "react"
-import { CaretPosition, ChapterNode, Selection } from "../../models/ChapterNode";
+import { ChapterNode, CaretRange } from "../../models/ChapterNode";
+import { TextNode } from "../../models/TextNode";
 import { renderNode } from "../chapter/Renderer";
+
+export const CaretContext = React.createContext<CaretRange | undefined>(undefined)
 
 const ChapterEditor = (props: { ast: ChapterNode }) => {
 
-    const { ast } = props
-    const ref = useRef<HTMLDivElement>(null)
-    const [ caret, setCaret ] = useState<CaretPosition | [ CaretPosition, CaretPosition ] | undefined>()
+    const { ast } = props;
+    const ref = useRef<HTMLDivElement>(null);
+
+    const [ selection, setSelection ] = useState<CaretRange>();
 
     function getTextNode(node: Element) {
         // Find the text node in the given match.
@@ -20,210 +24,135 @@ const ChapterEditor = (props: { ast: ChapterNode }) => {
         return text;
     }
 
-    function validatePosition(node: Node, index: number): boolean {
-        // Some assertions, just in case some defects slip through.
-        if(node && node.nodeType === Node.TEXT_NODE && node.nodeValue) {
-            if(index < 0 || index > node.nodeValue.length) {
-                console.error(`Somehow, the caret we're setting on "${node.nodeValue}" and the index is ${index}`)
-                return false;
-            }
-        }        
-        return true;
-    }
-
-    // When the caret state changes, update the selection correspondingly.
-    useEffect(() => {
-
-        if(caret) {
-
-            const start = Array.isArray(caret) ? caret[0] : caret;
-            const end = Array.isArray(caret) ? caret[1] : undefined;
-
-            const startNode = document.querySelector(`[data-nodeid="${start.node}"]`);
-            const endNode = end ? document.querySelector(`[data-nodeid="${end.node}"]`) : undefined;
-
-            const selection = window.getSelection();
-            
-            if(!startNode) { console.error(`Couldn't find node ID ${start.node}`); return; }
-            if(end && !endNode) { console.error(`Couldn't find node ID ${end.node}`); return; }
-            if(!selection) { console.error(`Couldn't find a window selection.`); return; }
-
-            // Find the text node in the given match.
-            const startTextNode = getTextNode(startNode);
-            const endTextNode = endNode ? getTextNode(endNode) : undefined;
-
-            // Some assertions, just in case some defects slip through.
-            if(!validatePosition(startTextNode, start.index)) return;
-            if(end && endTextNode && !validatePosition(endTextNode, end.index)) return;
-
-            const range = document.createRange()
-            range.setStart(startTextNode, start.index)
-            // Set a selection if we were given one.
-            range.setEnd(endTextNode ? endTextNode: startTextNode, end ? end.index : start.index)
-            selection.removeAllRanges()
-            selection.addRange(range)
-
-        }
-
-        // Restore the visibility of the caret now that it's positioned.
-        if(ref.current)
-            ref.current.style.removeProperty("caret-color")
-
-    }, [ caret ])
-
-    function updateCaret(position: CaretPosition | [ CaretPosition, CaretPosition ] | undefined) {
-        // Hide the caret to avoid flickering until the redraw is done.
-        // Update the position.
-        if(position) {
-            if(ref.current)
-                ref.current.style.caretColor = "transparent";
-            setCaret(position);
-        }
-    }
-
-    // Given an HTML node, find the corresponding AST node.
-    function getNodeID(el: Node) {
-
-        let element: HTMLElement | null = null
-        if(el.nodeType === Node.ELEMENT_NODE) {
-            element = el as HTMLElement
-            if(element.dataset.nodeid !== undefined)
-                return parseInt(element.dataset.nodeid)
-        } else {
-            element = el.parentElement;
-        }
-
-        // If we have an element, but it didn't have a node id, search for the closest parent that does.
-        if(element !== null)
-            element = element.closest("[data-nodeid]")
-
-        // If we found a parent that does, return its node ID.
-        if(element !== null && element.dataset.nodeid) {
-            return parseInt(element.dataset.nodeid)
-        }
-
-        return undefined
-
-    }
-
     function handleKeyDown(event: React.KeyboardEvent) {
 
-        // console.log(`Pressed down ${event.key}`)
+        if(selection === undefined)
+            return;
 
-        const selection = window.getSelection()
-        let nodeSelection: Selection | undefined = undefined
-        if(selection) {
-            if(selection.anchorNode && selection.focusNode) {
-                const anchor = getNodeID(selection.anchorNode)
-                const focus = getNodeID(selection.focusNode)
-                if(anchor !== undefined && focus !== undefined)
-                    nodeSelection = {
-                        startID: anchor,
-                        startIndex: selection.anchorOffset,
-                        endID: focus,
-                        endIndex: selection.focusOffset
-                    }
+        // Move the caret right!
+        if(event.key === "ArrowRight") {
+            event.preventDefault();
+            // What's to the right of the current selection's start?
+            if(selection.start.node instanceof TextNode && selection.end.node instanceof TextNode) {
+                // Adjust the selection
+                const next = event.altKey ? selection.end.node.nextWord(selection.end.index) : selection.end.node.next(selection.end.index);
+                if(event.shiftKey) {
+                    setSelection({ start: selection.start, end: next })
+                }
+                // Move the caret
+                else {
+                    setSelection({ start: next, end: next })    
+                }
             }
-        }
-
-        // No selection? Bubble up the keyboard event.
-        if(nodeSelection === undefined) {
             return;
         }
-        // Command? Capture the common ones.
-        else if(event.metaKey) {
-            if(event.key === "b") {
+        // Move the caret left!
+        else if(event.key === "ArrowLeft") {
+            event.preventDefault();
+            if(selection.start.node instanceof TextNode && selection.end.node instanceof TextNode) {
+                // Adjust the selection
+                const previous = event.altKey ? selection.end.node.previousWord(selection.end.index) : selection.end.node.previous(selection.end.index);
+                if(event.shiftKey) {
+                    setSelection({ start: selection.start, end: previous })
+                }
+                else {
+                    setSelection({ start: previous, end: previous })    
+                }
+            }
+            return;
+        }
+        // Backspace over a character!
+        else if(event.key === "Backspace") {
+            event.preventDefault();
+            const caret = (ast.deleteSelection(selection, true));
+            setSelection({ start: caret, end: caret });
+            return;
+        }
+        // Delete forward a character!
+        else if(event.key === "Delete") {
+            event.preventDefault();
+            const caret = ast.deleteSelection(selection, false);
+            setSelection({ start: caret, end: caret });
+            return;
+        }
+        // Split the current paragraph and place the caret at the beginning of the new one!
+        else if(event.key === "Enter") {
+            if(selection.start.node instanceof TextNode) {
                 event.preventDefault();
-                updateCaret(ast.formatSelection(nodeSelection, "*"))
+                const caret = ast.splitSelection(selection);
+                setSelection({ start: caret, end: caret });
                 return;
             }
-            else if(event.key === "i") {
-                event.preventDefault();
-                updateCaret(ast.formatSelection(nodeSelection, "_"))
-                return;
-            }
-            else if(event.key === "c") {
-                console.log(`Copy`)
-                event.preventDefault();
-                return;
-            }
-            else if(event.key === "x") {
-                console.log(`Cut`)
-                event.preventDefault();
-                return;
-            }
-            else if(event.key === "v") {
-                console.log(`Paste`)
-                event.preventDefault();
-                return;
-            }
-            else if(event.key === "-") {
-                console.log(`Rule`);
-                event.preventDefault();
-                updateCaret(ast.insertRule(nodeSelection))
-            }
-            else return;
-        } else {
-            if(event.key === "Enter") {
-                event.preventDefault();
-                updateCaret(ast.splitSelection(nodeSelection));
-                return;
-            }
-            else if(event.key === "Tab") {
-                console.log(`Tab`)
+        }
+        if(event.metaKey && event.key === "b") {
+            event.preventDefault();
+            setSelection(ast.formatSelection(selection, "*"))
+            return;
+        }
+        else if(event.metaKey && event.key === "i") {
+            event.preventDefault();
+            setSelection(ast.formatSelection(selection, "_"))
+            return;
+        }
+        // Insert a character!
+        else if(event.key.match(/^[` ~!@#$%^&*(){}\[\];:'",,<>/?\-_=+\\|.a-zA-Z0-9]$/)) {
+            if(!event.metaKey) {
                 event.preventDefault()
+                const caret = ast.insertSelection(event.key, selection);
+                setSelection({ start: caret, end: caret });
                 return;
             }
-            else if(event.key === "Backspace") {
-                event.preventDefault();
-                updateCaret(ast.deleteSelection(nodeSelection, true));
-                return;
-            }
-            else if(event.key === "Delete") {
-                event.preventDefault();
-                updateCaret(ast.deleteSelection(nodeSelection, false));
-                return;
-            }
-            else if(event.key.match(/^[` ~!@#$%^&*(){}\[\];:'",,<>/?\-_=+\\|.a-zA-Z0-9]$/)) {
-                event.preventDefault()
-                updateCaret(ast.insertSelection(event.key, nodeSelection))
-                return;
-            }    
         }
 
-        if(event.key)
-            switch(event.key) {
-                case "Cut":
-                    event.preventDefault();
-                    return;
-                case "Copy":
-                    event.preventDefault();
-                    return;
-                case "Paste":
-                    event.preventDefault();
-                    return;
-                // Let the browser handle everything else
-                default:
-                    return;
-            }
+    }
+
+    function handleMouseDown(event: React.MouseEvent) {
+        
+        if(!ref.current)
+            return;
+
+        ref.current.focus();
+
+    }
+
+    function onFocus(event: React.FocusEvent) {
+
+        const text = ast.getTextNodes();
+        setSelection({
+            start: { node: text[0], index: 0 },
+            end: { node: text[0], index: 0 }
+        });
+
+    }
+
+    function onBlur(event: React.FocusEvent) {
+
+        setSelection(undefined);
 
     }
 
     function handleKeyUp(event: React.KeyboardEvent) {
-        event.preventDefault()
+        event.preventDefault();
     }
 
-    return <div 
-        ref={ref}
-        contentEditable 
-        suppressContentEditableWarning={true}
-        onKeyDown={handleKeyDown}
-        onKeyUp={handleKeyUp}
-        spellCheck={false}
-        >{
-        renderNode(props.ast)
-    }</div>;
-
+    return <CaretContext.Provider value={selection}>
+            <div 
+                className="bookish-chapter-editor"
+                ref={ref}
+                // contentEditable 
+                // suppressContentEditableWarning={true}
+                onKeyDown={handleKeyDown}
+                onKeyUp={handleKeyUp}
+                onMouseDown={handleMouseDown}
+                onFocus={onFocus}
+                onBlur={onBlur}
+                // spellCheck={false}
+                tabIndex={0}
+                >{
+                renderNode(props.ast)
+            }</div>
+        </CaretContext.Provider>
+    ;
 }
 
 export default ChapterEditor

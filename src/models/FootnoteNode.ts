@@ -1,16 +1,14 @@
 import { Node } from "./Node";
-import { ContentNode } from "./ContentNode";
-import { CaretPosition } from "./ChapterNode";
-
+import { FormattedNode } from "./FormattedNode";
 
 export class FootnoteNode extends Node {
-    footnote: ContentNode | undefined;
-    constructor(parent: ContentNode, ) {
+    footnote: FormattedNode | undefined;
+    constructor(parent: FormattedNode, ) {
         super(parent, "footnote");
         
     }
 
-    setContent(footnote: ContentNode) {
+    setContent(footnote: FormattedNode) {
         this.footnote = footnote;
     }
 
@@ -30,7 +28,7 @@ export class FootnoteNode extends Node {
         if(this.footnote === node) this.remove();
     }
 
-    replaceChild(node: ContentNode, replacement: ContentNode): void {
+    replaceChild(node: FormattedNode, replacement: FormattedNode): void {
         if(this.footnote === node)
             this.footnote = replacement;
     }
@@ -38,22 +36,10 @@ export class FootnoteNode extends Node {
 
     getSiblingOf(child: Node, next: boolean) { return undefined; }
 
-    copy(parent: ContentNode): FootnoteNode {
-        const foot = new FootnoteNode(this.parent as ContentNode);
+    copy(parent: FormattedNode): FootnoteNode {
+        const foot = new FootnoteNode(this.parent as FormattedNode);
         if(this.footnote) foot.setContent(this.footnote.copy(foot));
         return foot;
-    }
-
-    deleteBackward(index: number | Node | undefined): CaretPosition | undefined {
-        throw Error("FootnoteNode doesn't know how to backspace.")
-    }
-
-    deleteRange(start: number, end: number): CaretPosition {
-        throw new Error("Footnote deleteRange not implemented.");
-    }
-
-    deleteForward(index: number | Node | undefined): CaretPosition | undefined {
-        throw new Error("Footnote deleteForward not implemented.");
     }
 
     clean() {}

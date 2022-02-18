@@ -1,5 +1,6 @@
 import React, { useContext } from 'react'
 import { TextNode } from "../../models/TextNode";
+import { CaretContext } from '../editor/ChapterEditor';
 import { ChapterContext } from './Chapter';
 
 function replaceMultipleSpacesWithNonBreakingSpaces(original: string) {
@@ -19,8 +20,9 @@ function replaceMultipleSpacesWithNonBreakingSpaces(original: string) {
 
 const Text = (props: { node: TextNode}) => {
 
-    const { node } = props
-    const context = useContext(ChapterContext)
+    const { node } = props;
+    const context = useContext(ChapterContext);
+    const caret = useContext(CaretContext);
 
     // Replace any spaces at the beginning or end of the string with explicit non-breaking spaces to ensure that they render.
     let text = replaceMultipleSpacesWithNonBreakingSpaces(node.text)
@@ -56,11 +58,70 @@ const Text = (props: { node: TextNode}) => {
         }
         else return <span>{text}</span>;
 
-    } 
+    }
+
+    if(caret && caret.start.node instanceof TextNode && caret.end.node instanceof TextNode) {
+        const textIndex = node.getChapter()?.getIndexOfTextNode(node);
+        const startIndex = node.getChapter()?.getIndexOfTextNode(caret.start.node);
+        const endIndex = node.getChapter()?.getIndexOfTextNode(caret.end.node);
+        const insideSelection = textIndex !== undefined && startIndex !== undefined && endIndex !== undefined && Math.min(startIndex, endIndex) < textIndex && Math.max(startIndex, endIndex) > textIndex;
+
+        if(insideSelection)
+            return <span className="bookish-caret-selection">{text}</span>
+
+        // Is this node between a selection?
+        // If this node contains the caret or a selection, render it.
+        if(caret.start.node === node || caret.end.node === node) {
+        
+            const startNodeIndex = node.getChapter()?.getIndexOfTextNode(caret.start.node as TextNode);
+            const endNodeIndex = node.getChapter()?.getIndexOfTextNode(caret.end.node as TextNode);
+            let start = startNodeIndex !== undefined && endNodeIndex !== undefined && startNodeIndex > endNodeIndex ? caret.end : caret.start;
+            // Put the start and end in order, as they might be in reverse.
+            let end = start === caret.start ? caret.end : caret.start;
+            if(start.node === end.node && start.index > end.index) {
+                let temp = start; start = end; end = temp;
+            }
+
+            return <span className={"bookish-text bookish-caret-container"} data-position={node.position} data-nodeid={props.node.nodeID}>
+                {
+                    // If the start and end node are the same...
+                    start.node === end.node ? (
+                        // And the index is the same...
+                        start.index === end.index ?
+                            // Render a caret.
+                            <>
+                                <span>{text.substring(0, start.index)}</span>
+                                <span className="bookish-caret"></span>
+                                <span>{text.substring(start.index)}</span>
+                            </> :
+                            // Otherwise, render a selection, ordering indices in case they're out of order.
+                            <>
+                                <span>{text.substring(0, start.index)}</span>
+                                <span className="bookish-caret-selection">{text.substring(start.index, end.index)}</span>
+                                <span>{text.substring(end.index)}</span>
+                            </>
+                    ) :
+                    // If they are different nodes, and this is the start node, render the end of this as highlighted
+                    start.node === node ?
+                    <>
+                        <span>{text.substring(0, start.index)}</span>
+                        <span className="bookish-caret-selection">{text.substring(start.index)}</span>
+                    </> :
+                    // If this is the end of the selection, render the end of this as highlighted.
+                    <>
+                        <span className="bookish-caret-selection">{text.substring(0, end.index)}</span>
+                        <span>{text.substring(end.index)}</span>
+                    </>
+                }
+            </span>;
+
+        }
+
+    }
+
     // Otherwise, just return the text as a span with metadata.
-    // Replace any spaces at the beginning or end of the string with explicit non-breaking spaces to ensure that they render.
-    else return <span className="bookish-text" data-position={node.position} data-nodeid={props.node.nodeID}>{text}</span>;
+    return <span className={"bookish-text"} data-position={node.position} data-nodeid={props.node.nodeID}>{text}</span>;
 
 }
 
-export default Text
+export default Text;

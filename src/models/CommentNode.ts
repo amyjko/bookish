@@ -1,4 +1,3 @@
-import { CaretPosition } from "./ChapterNode";
 import { Node } from "./Node";
 
 export class CommentNode extends Node {
@@ -27,18 +26,6 @@ export class CommentNode extends Node {
     replaceChild(node: Node, replacement: Node): void {}
 
     getSiblingOf(child: Node, next: boolean): Node | undefined { return undefined; }
-
-    deleteBackward(index: number | Node | undefined): CaretPosition | undefined {
-        throw new Error("Method not implemented.");
-    }
-
-    deleteRange(start: number, end: number): CaretPosition {
-        throw new Error("Method not implemented.");
-    }
-
-    deleteForward(index: number | Node | undefined): CaretPosition | undefined {
-        throw new Error("Method not implemented.");
-    }
 
     clean(): void {}
 

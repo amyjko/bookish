@@ -1,13 +1,11 @@
-import { CaretPosition } from "./ChapterNode";
-import { ContentNode } from "./ContentNode";
+import { FormattedNode } from "./FormattedNode";
 import { Node } from "./Node";
-
 
 export class InlineCodeNode extends Node {
     code: string;
     language: string;
 
-    constructor(parent: ContentNode, code: string, language: string) {
+    constructor(parent: FormattedNode, code: string, language: string) {
         super(parent, "inline-code");
         this.code = code;
         this.language = language;
@@ -29,20 +27,8 @@ export class InlineCodeNode extends Node {
 
     getSiblingOf(child: Node, next: boolean) { return undefined; }
 
-    copy(parent: ContentNode): InlineCodeNode {
+    copy(parent: FormattedNode): InlineCodeNode {
         return new InlineCodeNode(parent, this.code, this.language)
-    }
-
-    deleteBackward(index: number | Node | undefined): CaretPosition | undefined {
-        throw Error("InlineCodeNode doesn't know how to backspace.")
-    }
-
-    deleteRange(start: number, end: number): CaretPosition {
-        throw new Error("InlineCode deleteRange not implemented.");
-    }
-    
-    deleteForward(index: number | Node | undefined): CaretPosition | undefined {
-        throw new Error("InlineCode deleteForward not implemented.");
     }
 
     clean() {

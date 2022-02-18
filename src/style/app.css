@@ -202,3 +202,33 @@ input[type="text"].bookish-app-editable-error {
 .bookish-app-interactive {
     cursor: pointer;
 }
+
+.bookish-chapter-editor:focus {
+    outline: none;
+}
+
+.bookish-caret-container {
+    background-color: var(--bookish-app-chrome-background);
+}
+
+@keyframes caret-blink {
+    100% {
+        outline: none;
+    }
+}
+.bookish-caret {
+    width: 0px;
+    height: 1em;
+    vertical-align: baseline;
+    background: none;
+    transform: scaleY(1.25);
+    outline: 1px solid var(--bookish-paragraph-color);
+    display: inline-block;
+    /* animation: caret-blink 1.5s steps(2) infinite; */
+    box-sizing: border-box;
+    white-space: nowrap;
+}
+
+.bookish-caret-selection {
+    background-color: var(--bookish-highlight-color);
+}

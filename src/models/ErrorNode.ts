@@ -1,4 +1,3 @@
-import { CaretPosition } from "./ChapterNode";
 import { Node } from "./Node";
 
 export class ErrorNode extends Node {
@@ -26,18 +25,6 @@ export class ErrorNode extends Node {
 
     copy(parent: Node): ErrorNode {
         return new ErrorNode(parent, this.text, this.error);
-    }
-
-    deleteBackward(index: number | Node | undefined): CaretPosition | undefined {
-        throw Error("ErrorNode doesn't know how to backspace.")
-    }
-
-    deleteRange(start: number, end: number): CaretPosition {
-        throw new Error("Embed deleteRange not implemented.");
-    }
-    
-    deleteForward(index: number | Node | undefined): CaretPosition | undefined {
-        throw new Error("Embed deleteForward not implemented.");
     }
 
     clean() {}

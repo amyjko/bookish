@@ -1,14 +1,13 @@
-import { CaretPosition, ChapterNode } from "./ChapterNode";
 import { Node } from "./Node";
 import { BlockParentNode, Position } from "./Parser";
-import { ContentNode } from "./ContentNode";
+import { FormattedNode } from "./FormattedNode";
 
 export class TableNode extends Node {
-    rows: ContentNode[][];
-    caption: ContentNode | undefined;
+    rows: FormattedNode[][];
+    caption: FormattedNode | undefined;
     position: Position;
 
-    constructor(parent: BlockParentNode, rows: ContentNode[][]) {
+    constructor(parent: BlockParentNode, rows: FormattedNode[][]) {
         super(parent, "table");
         this.rows = rows;
         this.position = "|";
@@ -18,7 +17,7 @@ export class TableNode extends Node {
         this.position = position;
     }
 
-    setCaption(caption: ContentNode) {
+    setCaption(caption: FormattedNode) {
         this.caption = caption;
     }
 
@@ -38,33 +37,21 @@ export class TableNode extends Node {
 
     removeChild(node: Node): void {}
 
-    replaceChild(node: Node, replacement: ContentNode): void {}
+    replaceChild(node: Node, replacement: FormattedNode): void {}
 
     getSiblingOf(child: Node, next: boolean) { return undefined; }
 
     copy(parent: BlockParentNode): TableNode {
-        const rows: ContentNode[][] = [];
+        const rows: FormattedNode[][] = [];
         const node = new TableNode(parent, rows);
         if(this.caption) node.setCaption(this.caption.copy(node))
         this.rows.forEach(row => {
-            const cells: ContentNode[] = []
+            const cells: FormattedNode[] = []
             row.forEach(cell => cells.push(cell.copy(node)))
             rows.push(cells)
         })
         return node;
 
-    }
-
-    deleteBackward(index: number | Node | undefined): CaretPosition | undefined {
-        throw Error("Table deleteBackward not implemented.")
-    }
-
-    deleteRange(start: number, end: number): CaretPosition {
-        throw new Error("Table deleteRange not implemented.");
-    }
-    
-    deleteForward(index: number | Node | undefined): CaretPosition | undefined {
-        throw new Error("Table deleteForward not implemented.");
     }
 
     clean() {}

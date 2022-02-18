@@ -1,18 +1,17 @@
-import { CaretPosition, ChapterNode } from "./ChapterNode";
 import { Node } from "./Node";
-import { ContentNode } from "./ContentNode";
+import { FormattedNode } from "./FormattedNode";
 import { BlockParentNode } from "./Parser";
 
 
 export class HeaderNode extends Node {
     level: number;
-    content: ContentNode | undefined;
+    content: FormattedNode | undefined;
     constructor(parent: BlockParentNode, level: number) {
         super(parent, "header");
         this.level = level;
     }
 
-    setContent(content: ContentNode) {
+    setContent(content: FormattedNode) {
         this.content = content;
     }
 
@@ -42,18 +41,6 @@ export class HeaderNode extends Node {
         const head = new HeaderNode(parent, this.level);
         if(this.content) head.setContent(this.content.copy(head));
         return head;
-    }
-
-    deleteBackward(index: number | Node | undefined): CaretPosition | undefined {
-        throw Error("HeaderNode doesn't know how to backspace.")
-    }
-
-    deleteRange(start: number, end: number): CaretPosition {
-        throw new Error("Header deleteRange not implemented.");
-    }
-
-    deleteForward(index: number | Node | undefined): CaretPosition | undefined {
-        throw new Error("Header deleteForward not implemented.");
     }
 
     clean() {}

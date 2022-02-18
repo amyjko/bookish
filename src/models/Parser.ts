@@ -5,12 +5,11 @@ import { ChapterNode } from "./ChapterNode";
 import { CitationsNode } from "./CitationsNode";
 import { CodeNode } from "./CodeNode";
 import { CommentNode } from "./CommentNode";
-import { ContentNode, ContentParent } from "./ContentNode";
 import { DefinitionNode } from "./DefinitionNode";
 import { EmbedNode } from "./EmbedNode";
 import { ErrorNode } from "./ErrorNode";
 import { FootnoteNode } from "./FootnoteNode";
-import { Format, FormattedNode } from "./FormattedNode";
+import { Format, FormattedNodeSegmentType, FormattedNode, FormattedNodeParent } from "./FormattedNode";
 import { HeaderNode } from "./HeaderNode";
 import { InlineCodeNode } from "./InlineCodeNode";
 import { LabelNode } from "./LabelNode";
@@ -90,7 +89,7 @@ export type NodeType =
     "reference" |
     "comment"
 
-export type BlockParentNode = ChapterNode | BulletedListNode | CalloutNode | QuoteNode;
+export type BlockParentNode = ChapterNode | CalloutNode | QuoteNode;
 export type BlockNode = HeaderNode | RuleNode | EmbedNode | BulletedListNode | NumberedListNode | CodeNode | QuoteNode | CalloutNode | TableNode | ParagraphNode;
 
 export default class Parser {
@@ -521,7 +520,7 @@ export default class Parser {
 
     parseBulletedList(parent: ChapterNode | CalloutNode | BulletedListNode | QuoteNode): BulletedListNode {
 
-        const items: (ContentNode | BulletedListNode)[] = [];
+        const items: (FormattedNode | BulletedListNode)[] = [];
         const bullets = new BulletedListNode(parent, items)
         let lastLevel = undefined;
         let currentLevel = undefined;
@@ -585,7 +584,7 @@ export default class Parser {
 
     parseNumberedList(parent: ChapterNode | CalloutNode | NumberedListNode | QuoteNode): NumberedListNode {
 
-        const items: (ContentNode | NumberedListNode)[] = [];
+        const items: (FormattedNode | NumberedListNode)[] = [];
         const list = new NumberedListNode(parent, items);
         let lastLevel = undefined;
         let currentLevel = undefined;
@@ -799,7 +798,7 @@ export default class Parser {
 
     parseTable(parent: ChapterNode | CalloutNode | QuoteNode): TableNode {
 
-        const rows: ContentNode[][] = [];
+        const rows: FormattedNode[][] = [];
         const table = new TableNode(parent, rows)
         // Parse rows until the lines stop starting with ,
         while(this.more() && this.nextIs(",")) {
@@ -840,10 +839,10 @@ export default class Parser {
 
     // The "awaiting" argument keeps track of upstream formatting. We don't need a stack here
     // because we don't allow infinite nesting of the same formatting type.
-    parseContent(parent: ContentParent | undefined, awaiting?: string): ContentNode {
+    parseContent(parent: FormattedNodeParent | undefined, awaiting?: string): FormattedNode {
 
-        const segments: Node[] = [];
-        const content = new ContentNode(parent, segments)
+        const segments: FormattedNodeSegmentType[] = [];
+        const content = new FormattedNode(parent, "", segments);
 
         // Read until hitting a delimiter.
         while(this.more() && !this.nextIs("\n")) {
@@ -980,7 +979,7 @@ export default class Parser {
 
     }
 
-    parseComment(parent: ContentNode): CommentNode {
+    parseComment(parent: FormattedNode): CommentNode {
 
         // Consume the opening %
         this.read();
@@ -998,7 +997,7 @@ export default class Parser {
 
     }
 
-    parseLabel(parent: ContentNode): LabelNode | ErrorNode {
+    parseLabel(parent: FormattedNode): LabelNode | ErrorNode {
 
         // Consume the :
         this.read();
@@ -1022,11 +1021,11 @@ export default class Parser {
 
     }
 
-    parseFormatted(parent: ContentNode, awaiting: string): FormattedNode | ErrorNode {
+    parseFormatted(parent: FormattedNode, awaiting: string): FormattedNode | ErrorNode {
 
         // Remember what we're matching.
         const delimeter = this.read();
-        const segments: Array<ContentNode | TextNode | ErrorNode> = [];
+        const segments: Array<FormattedNode | TextNode | ErrorNode> = [];
         let text = "";
 
         if(delimeter === null)
@@ -1068,7 +1067,7 @@ export default class Parser {
 
     }
 
-    parseInlineCode(parent: ContentNode): InlineCodeNode {
+    parseInlineCode(parent: FormattedNode): InlineCodeNode {
 
         // Parse the back tick
         this.read();
@@ -1105,7 +1104,7 @@ export default class Parser {
         
     }
 
-    parseCitations(parent: ContentNode): CitationsNode {
+    parseCitations(parent: FormattedNode): CitationsNode {
         
         let citations = "";
 
@@ -1128,7 +1127,7 @@ export default class Parser {
 
     }
 
-    parseSubSuperscripts(parent: ContentNode): SubSuperscriptNode {
+    parseSubSuperscripts(parent: FormattedNode): SubSuperscriptNode {
         
         // Read the ^
         this.read();
@@ -1154,7 +1153,7 @@ export default class Parser {
 
     }
 
-    parseFootnote(parent: ContentNode): FootnoteNode {
+    parseFootnote(parent: FormattedNode): FootnoteNode {
 
         let node = new FootnoteNode(parent);
 
@@ -1174,7 +1173,7 @@ export default class Parser {
 
     }
 
-    parseDefinition(parent: ContentNode): DefinitionNode {
+    parseDefinition(parent: FormattedNode): DefinitionNode {
 
         const node = new DefinitionNode(parent);
 
@@ -1202,7 +1201,7 @@ export default class Parser {
 
     }
 
-    parseEscaped(chapter: ContentNode): TextNode | ErrorNode {
+    parseEscaped(chapter: FormattedNode): TextNode | ErrorNode {
 
         // Skip the scape and just add the next character.
         this.read();
@@ -1214,7 +1213,7 @@ export default class Parser {
 
     }
     
-    parseLink(parent: ContentNode): LinkNode | ErrorNode {
+    parseLink(parent: FormattedNode): LinkNode | ErrorNode {
  
         const node = new LinkNode(parent)
 

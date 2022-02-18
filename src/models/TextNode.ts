@@ -1,14 +1,11 @@
-import { CaretPosition } from "./ChapterNode";
-import { ContentNode } from "./ContentNode";
+import { Caret } from "./ChapterNode";
 import { FormattedNode } from "./FormattedNode";
 import { Node } from "./Node";
-
-export type TextNodeParent = ContentNode | FormattedNode;
 
 export class TextNode extends Node {
     text: string;
     position: number;
-    constructor(parent: TextNodeParent, text: string, position: number) {
+    constructor(parent: FormattedNode, text: string, position: number) {
         super(parent, "text");
         this.text = text;
         this.position = position - text.length;
@@ -65,67 +62,69 @@ export class TextNode extends Node {
 
     getSiblingOf(child: Node, next: boolean) { return undefined; }
 
-    copy(parent: ContentNode | FormattedNode) {
+    copy(parent: FormattedNode) {
         return new TextNode(parent, this.text, this.position)
     }
 
-    insert(char: string, index: number): CaretPosition {
+    insert(char: string, index: number): Caret {
         this.text = this.text.slice(0, index) + char + this.text.slice(index);
         return {
-            node: this.nodeID,
+            node: this,
             index: index + 1
         };
     }
 
-    deleteBackward(index: number | Node | undefined): CaretPosition | undefined {
+    deleteBackward(index?: number): Caret {
 
-        // There are no nodes in text nodes.
-        if(index instanceof Node)
-            return undefined;
-
-        // If no number was given, backspace from the right.
+        // If no index, delete from the end.
         if(index === undefined)
             index = this.text.length;
 
-        // If index is 0, delegate to the parent.
-        if(index === 0)
-            return this.parent?.deleteBackward(this);
-
-        // Delete the character at the index and move the caret one left.
-        this.text = this.text.slice(0, index - 1) + this.text.slice(index);
-        return {
-            node: this.nodeID,
-            index: index - 1
+        // If this is within bounds, delete.
+        if(index > 0) {
+            // Delete the character at the index and move the caret one left.
+            this.text = this.text.slice(0, index - 1) + this.text.slice(index);
+            return { node: this, index: index - 1 }
         }
+
+        // Otherwise, ask the previous word to delete.
+        const previous = this.getChapter()?.getPreviousTextNode(this);
+
+        // If there isn't one, don't delete, just return the beginning of this.
+        if(previous === undefined)
+            return { node: this, index: index }
+
+        // Otherwise, have the previous node delete.
+        return previous.deleteBackward();
         
     }
 
-    deleteForward(index: number | Node | undefined): CaretPosition | undefined {
+    deleteForward(index?: number): Caret {
 
-        // There are no nodes in text nodes.
-        if(index instanceof Node)
-            return undefined;
-
-        // If no number was given, start on the right.
+        // If no index, delete from the beginning.
         if(index === undefined)
             index = 0;
 
-        // If index is the end of this string, delegate to the parent.
-        if(index === this.text.length)
-            return this.parent?.deleteForward(this);
-
-        // Delete the character at the index.
-        this.text = this.text.slice(0, index) + this.text.slice(index + 1);
-
-        // Keep the caret where it is.
-        return {
-            node: this.nodeID,
-            index: index
+        // If this is within bounds, delete.
+        if(index < this.text.length) {
+            // Delete the character at the index and move the caret one left.
+            this.text = this.text.slice(0, index) + this.text.slice(index + 1);
+            return { node: this, index: index }
         }
+
+        // Otherwise, ask the previous word to delete.
+        const next = this.getChapter()?.getNextTextNode(this);
+
+        // If there isn't one, don't delete, just return the beginning of this.
+        if(next === undefined)
+            return { node: this, index: index }
+
+        // Otherwise, have the previous node delete.
+        return next.deleteForward();
         
     }
 
-    deleteRange(start: number, end: number): CaretPosition {
+    deleteRange(start: number, end: number): Caret {
         
         // They can be given out of order, so sort them.
         const first = Math.min(start, end, this.text.length);
@@ -136,17 +135,22 @@ export class TextNode extends Node {
 
         // Keep the caret at the start.
         return {
-            node: this.nodeID,
+            node: this,
             index: first
         }
         
+    }
+
+    deleteAll(): Caret {
+        this.text = "";
+        return { node: this, index: 0 };
     }
 
     wrap(start: number, end: number, formatted: FormattedNode) {
 
         if(!this.parent) return;
 
-        const parent = this.parent as TextNodeParent;
+        const parent = this.parent as FormattedNode;
 
         // If we're wrapping the whole node, just replace it. This keeps the tree tidier.
         if(start === 0 && end === this.text.length) {
@@ -168,12 +172,12 @@ export class TextNode extends Node {
         this.text = left;
 
         // Create a new formatted text node
-        formatted.segments.push(new TextNode(formatted as TextNodeParent, middle, 0));
+        formatted.segments.push(new TextNode(formatted as FormattedNode, middle, 0));
 
         // Insert the middle and right after the original node.
         const segmentIndex = parent.segments.indexOf(this);
         parent.segments.splice(segmentIndex + 1, 0, formatted);
-        parent.segments.splice(segmentIndex + 2, 0, new TextNode(parent as TextNodeParent, right, 0));
+        parent.segments.splice(segmentIndex + 2, 0, new TextNode(parent as FormattedNode, right, 0));
 
         // Select the formatted node.
         return {
@@ -185,6 +189,104 @@ export class TextNode extends Node {
 
     clean() {
         if(this.text.length === 0) this.remove();
+    }
+
+    next(index: number): Caret {
+    
+        // If there are more characters, just go next.
+        if(index < this.text.length)
+            return { node: this, index: index + 1 }
+        
+        // Otherwise, find the next text node after this one.
+        const text = this.getChapter()?.getNextTextNode(this);
+
+        // If we don't have a chapter, return what we were given.
+        if(text === undefined)
+            return { node: this, index: index };
+
+        // If this is the last node, return the end of this node.
+        if(text === this)
+            return { node: this, index: this.text.length }
+
+        // Otherwise, return the beginning of the next node.
+        // We skip the first index since it's equivalent to the last of this one.
+        return { node: text, index: 1 }
+
+    }
+
+    previous(index: number): Caret {
+    
+        // If there are more characters, just go next.
+        if(index > 0)
+            return { node: this, index: index - 1 }
+        
+        // Otherwise, find the previous text node before this one.
+        const text = this.getChapter()?.getPreviousTextNode(this);
+
+        // If we don't have a chapter, return what we were given.
+        if(text === undefined)
+            return { node: this, index: index };
+
+        // If this is the first node, return the beginning of this node.
+        if(text === this)
+            return { node: this, index: 0 }
+
+        // Otherwise, return the beginning of the next node.
+        // We skip the last index since it's the equivalent of this one's first.
+        return { node: text, index: text.text.length - 1 }
+
+    }
+
+    nextWord(index?: number): Caret {
+
+        if(index === undefined)
+            index = 0;
+
+        // Search for the space after the given index.
+        let i = index + 1;
+        for(; i < this.text.length; i++)
+            if(this.text.charAt(i) === " ")
+                break;
+
+        // If we found one in this node, return it.
+        if(i < this.text.length)
+            return { node: this, index: i };
+
+        // Otherwise, find the next text node's next word.
+        const next = this.getChapter()?.getNextTextNode(this)?.nextWord();
+
+        // If there isn't one, just go to the end of this.
+        if(next === undefined)
+            return { node: this, index: this.text.length };
+        else
+            return next;
+
+    }
+
+    previousWord(index?: number): Caret {
+
+        if(index === undefined)
+            index = this.text.length;
+
+        // Search for the space after the given index.
+        let i = index - 1;
+        for(; i > 0; i--)
+            if(this.text.charAt(i) === " ")
+                break;
+
+        // If we found one in this node, return it.
+        if(i > 0)
+            return { node: this, index: i };
+
+        // Otherwise, find the next text node's next word.
+        const previous = this.getChapter()?.getPreviousTextNode(this)?.previousWord();
+
+        // If there isn't one, just go to the beginning of this.
+        if(previous === undefined)
+            return { node: this, index: 0 };
+        else
+            return previous;
+
     }
 
 }

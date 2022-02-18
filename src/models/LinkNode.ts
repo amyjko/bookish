@@ -1,16 +1,15 @@
 import { Node } from "./Node";
-import { ContentNode } from "./ContentNode";
-import { CaretPosition } from "./ChapterNode";
+import { FormattedNode } from "./FormattedNode";
 
 export class LinkNode extends Node {
-    content: ContentNode | undefined;
+    content: FormattedNode | undefined;
     url: string | undefined;
     
-    constructor(parent: ContentNode) {
+    constructor(parent: FormattedNode) {
         super(parent, "link");
     }
 
-    setContent(content: ContentNode) {
+    setContent(content: FormattedNode) {
         this.content = content;
     }
 
@@ -36,23 +35,11 @@ export class LinkNode extends Node {
     
     getSiblingOf(child: Node, next: boolean) { return undefined; }
 
-    copy(parent: ContentNode): LinkNode {
+    copy(parent: FormattedNode): LinkNode {
         const link = new LinkNode(parent)
         if(this.content) link.setContent(this.content.copy(link))
         if(this.url) link.setURL(this.url)
         return link;
-    }
-
-    deleteBackward(index: number | Node | undefined): CaretPosition | undefined {
-        throw Error("LinkNode doesn't know how to backspace.")
-    }
-
-    deleteRange(start: number, end: number): CaretPosition {
-        throw new Error("Link deleteRange not implemented.");
-    }
-    
-    deleteForward(index: number | Node | undefined): CaretPosition | undefined {
-        throw new Error("Link deleteForward not implemented.");
     }
 
     clean() {}

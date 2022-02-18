@@ -1,13 +1,12 @@
 import { Node } from "./Node";
-import { ContentNode } from "./ContentNode";
-import { CaretPosition } from "./ChapterNode";
+import { FormattedNode } from "./FormattedNode";
 import { BlockParentNode } from "./Parser";
 
-export type BulletedListItemType = ContentNode | BulletedListNode;
+export type BulletedListItemType = FormattedNode | BulletedListNode;
 
 export class BulletedListNode extends Node {
     items: (BulletedListItemType)[];
-    constructor(parent: BlockParentNode | BulletedListNode, items: (ContentNode | BulletedListNode)[]) {
+    constructor(parent: BlockParentNode | BulletedListNode, items: (FormattedNode | BulletedListNode)[]) {
         super(parent, "bulleted");
         this.items = items;
     }
@@ -48,22 +47,10 @@ export class BulletedListNode extends Node {
     }
 
     copy(parent: BlockParentNode | BulletedListNode): BulletedListNode {
-        const items: (ContentNode | BulletedListNode)[] = [];
+        const items: BulletedListItemType[] = [];
         const list = new BulletedListNode(parent, items);
         this.items.forEach(item => items.push(item.copy(list)))
         return list;
-    }
-
-    deleteBackward(index: number | Node | undefined): CaretPosition | undefined {
-        throw Error("BulletListNode doesn't know how to backspace.")
-    }
-
-    deleteRange(start: number, end: number): CaretPosition {
-        throw new Error("BulletedList deleteRange not implemented.");
-    }
-    
-    deleteForward(index: number | Node | undefined): CaretPosition | undefined {
-        throw new Error("BulletedList deleteForward not implemented.");
     }
 
     clean() {

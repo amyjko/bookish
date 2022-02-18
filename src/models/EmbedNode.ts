@@ -1,21 +1,20 @@
-import { CaretPosition, ChapterNode } from "./ChapterNode";
 import { Node } from "./Node";
 import { BlockParentNode, Position } from "./Parser";
-import { ContentNode } from "./ContentNode";
+import { FormattedNode } from "./FormattedNode";
 
 export class EmbedNode extends Node {
     url: string;
     description: string;
-    caption: ContentNode;
-    credit: ContentNode;
+    caption: FormattedNode;
+    credit: FormattedNode;
     position: Position;
 
     constructor(parent: BlockParentNode | undefined, url: string, description: string) {
         super(parent, "embed");
         this.url = url;
         this.description = description;
-        this.caption = new ContentNode(this, []);
-        this.credit = new ContentNode(this, []);
+        this.caption = new FormattedNode(this, "", []);
+        this.credit = new FormattedNode(this, "", []);
         this.position = "<";
     }
 
@@ -53,18 +52,6 @@ export class EmbedNode extends Node {
         node.credit = this.credit.copy(this);
         node.position = this.position;
         return node;
-    }
-
-    deleteBackward(index: number | Node | undefined): CaretPosition | undefined {
-        throw Error("EmbedNode doesn't know how to backspace.")
-    }
-
-    deleteRange(start: number, end: number): CaretPosition {
-        throw new Error("Embed deleteRange not implemented.");
-    }
-    
-    deleteForward(index: number | Node | undefined): CaretPosition | undefined {
-        throw new Error("Embed deleteForward not implemented.");
     }
 
     clean() {}

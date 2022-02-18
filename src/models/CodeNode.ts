@@ -1,11 +1,10 @@
-import { CaretPosition, ChapterNode } from "./ChapterNode";
 import { Node } from "./Node";
 import { BlockParentNode, Position } from "./Parser";
-import { ContentNode } from "./ContentNode";
+import { FormattedNode } from "./FormattedNode";
 
 export class CodeNode extends Node {
     code: string;
-    caption: ContentNode | undefined;
+    caption: FormattedNode | undefined;
     position: Position;
     language: string;
     executable: boolean;
@@ -22,7 +21,7 @@ export class CodeNode extends Node {
 
     }
 
-    setCaption(caption : ContentNode) {
+    setCaption(caption : FormattedNode) {
         this.caption = caption;
     }
 
@@ -49,18 +48,6 @@ export class CodeNode extends Node {
         const c = new CodeNode(parent, this.code, this.language, this.position);
         if(this.caption) c.setCaption(this.caption.copy(c));
         return c;
-    }
-
-    deleteBackward(index: number | Node | undefined): CaretPosition | undefined {
-        throw Error("CodeNode doesn't know how to backspace.")
-    }
-
-    deleteRange(start: number, end: number): CaretPosition {
-        throw new Error("Code deleteRange not implemented.");
-    }
-    
-    deleteForward(index: number | Node | undefined): CaretPosition | undefined {
-        throw new Error("Code deleteForward not implemented.");
     }
 
     clean() {}

@@ -3,7 +3,7 @@ import { FormattedNode } from "../../models/FormattedNode";
 
 import { renderNode } from './Renderer'
 
-const Formatted = (props: { node: FormattedNode}) => {
+const Segments = (props: { node: FormattedNode}) => {
 
     const { node } = props
     
@@ -18,4 +18,4 @@ const Formatted = (props: { node: FormattedNode}) => {
 
 }
 
-export default Formatted
+export default Segments
