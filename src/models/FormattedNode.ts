@@ -318,8 +318,9 @@ export class FormattedNode extends Node {
                     node.parent = formatter;
                     // Wrap the node in all the formats, if there are any.
                     nodeFormat.format.split("").forEach(formatToApply => {
-                        // Don't do this if this is the node and its the format we're removing.
-                        if(nodeFormat.node !== middle || formatToApply !== format) {
+                        // If the requested formatting is "", remove all formatting. If it's not, then
+                        // only restore formatting if it's not the formatting we're removing.
+                        if(nodeFormat.node !== middle || (format !== "" && formatToApply !== format)) {
                             node = new FormattedNode(formatter, formatToApply as Format, [ node ]);
                         }
                     })
