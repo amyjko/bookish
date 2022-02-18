@@ -315,6 +315,20 @@ export class ChapterNode extends Node {
         if(!(range.start.node instanceof TextNode) || !(range.end.node instanceof TextNode))
             return range;
 
+        // If this isn't a selection, but rather a single point in a paragraph, and we're clearing formatting, just select the whole paragraph.
+        if(format === "" && range.start.node === range.end.node && range.start.index === range.end.index) {
+            const paragraph = range.start.node.getClosestParentMatching(p => p instanceof ParagraphNode) as ParagraphNode;
+            if(paragraph) {
+                const textPosition = paragraph.content.caretRangeToTextIndex(range.start);
+                const text = paragraph.getNodes().filter(n => n instanceof TextNode) as TextNode[];
+                if(text.length > 0) {
+                    this.formatSelection({ start: { node: text[0], index: 0 }, end: { node: text[text.length - 1], index: text[text.length - 1].text.length }}, "");
+                    const caret = paragraph.content.textIndexToCaret(textPosition);
+                    return caret ? { start: caret, end: caret } : range;
+                }
+            }
+        }
+
         // Sort them if they're out of order.
         const sortedRange = this.sortRange(range);
 

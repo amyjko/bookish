@@ -97,21 +97,7 @@ const ChapterEditor = (props: { ast: ChapterNode }) => {
         }
         else if(event.metaKey && event.key === "0") {
             event.preventDefault();
-            if(selection.start.node === selection.end.node && selection.start.index === selection.end.index) {
-                const paragraph = selection.start.node.getClosestParentMatching(p => p instanceof ParagraphNode) as ParagraphNode;
-                if(paragraph) {
-                    const textPosition = paragraph.content.caretRangeToTextIndex(selection.start);
-                    const text = paragraph.getNodes().filter(n => n instanceof TextNode) as TextNode[];
-                    if(text.length > 0) {
-                        ast.formatSelection({ start: { node: text[0], index: 0 }, end: { node: text[text.length - 1], index: text[text.length - 1].text.length }}, "");
-                        const caret = paragraph.content.textIndexToCaret(textPosition);
-                        if(caret)
-                            setSelection({ start: caret, end: caret });
-                    }
-                }
-            }
-            else
-                setSelection(ast.formatSelection(selection, ""));
+            setSelection(ast.formatSelection(selection, ""));
             return;
         }
         // Insert a character!
