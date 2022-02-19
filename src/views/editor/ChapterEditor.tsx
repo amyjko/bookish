@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from "react"
-import { ChapterNode, CaretRange } from "../../models/ChapterNode";
+import { ChapterNode, CaretRange, Caret } from "../../models/ChapterNode";
 import { FormattedNode } from "../../models/FormattedNode";
 import { ParagraphNode } from "../../models/ParagraphNode";
 import { TextNode } from "../../models/TextNode";
@@ -163,6 +163,56 @@ const ChapterEditor = (props: { ast: ChapterNode }) => {
 
     }
 
+    function getCaretCoordinate(caret: Caret) : { top: number, left: number } | undefined {
+
+        if(!(caret.node instanceof TextNode)) return undefined;
+        const domNode = document.querySelector(`[data-nodeid='${caret.node.nodeID}`);
+        if(domNode === null) return undefined;
+        const range = document.createRange();
+        range.setStart(domNode.childNodes[0], caret.index);
+        const rect = range.getBoundingClientRect();
+        return { top: rect.top, left: rect.left };
+
+    }
+
+    function getCaretAboveBelow(caret: Caret, below: boolean) : Caret {
+
+        if(caret.node instanceof TextNode) {
+            // Find the position of the current start node.
+            const startCoordinate = getCaretCoordinate(caret);
+            let candidate = below ? caret.node.next(caret.index) : caret.node.previous(caret.index);
+            let previousCandidate = undefined;
+            let previousCoordinate = undefined;
+            if(startCoordinate) {
+                while(candidate.node instanceof TextNode) {
+                    const candidateCoordinate = getCaretCoordinate(candidate);
+                    // Did we make it to the next line and the character before/after?
+                    if(candidateCoordinate && 
+                        (below ? 
+                            candidateCoordinate.top > startCoordinate.top && candidateCoordinate.left >= startCoordinate.left :
+                            candidateCoordinate.top < startCoordinate.top && candidateCoordinate.left <= startCoordinate.left)) {
+                        // Before we assume the one after the threshold is closest, check the previous.
+                        return previousCoordinate && previousCandidate && Math.abs(startCoordinate.left - previousCoordinate.left) < Math.abs(startCoordinate.left - candidateCoordinate.left) ?
+                            previousCandidate : candidate;
+                    }
+                    const nextCandidate = below ? candidate.node.next(candidate.index) : candidate.node.previous(candidate.index);
+                    if(nextCandidate.node === candidate.node && nextCandidate.index === candidate.index)
+                        break;
+                    else {
+                        previousCandidate = candidate;
+                        previousCoordinate = candidateCoordinate;
+                        candidate = nextCandidate;
+                    }
+                }
+                return candidate;
+            }
+        }
+
+        // If we didn't find one, just return what we were given.
+        return caret;
+
+    }
+
     function handleKeyDown(event: React.KeyboardEvent) {
 
         // Remember the time of this keystroke.
@@ -203,6 +253,22 @@ const ChapterEditor = (props: { ast: ChapterNode }) => {
                 }
             }
             return;
+        }
+        // Move the caret up!
+        else if(event.key === "ArrowUp") {
+            event.preventDefault();
+            if(caretRange.start.node instanceof TextNode && caretRange.end.node instanceof TextNode) {
+                const above = getCaretAboveBelow(caretRange.start, false);
+                setCaretRange({ start: above, end: above });
+            }
+        }
+        // Move the caret down!
+        else if(event.key === "ArrowDown") {
+            event.preventDefault();
+            if(caretRange.start.node instanceof TextNode && caretRange.end.node instanceof TextNode) {
+                const below = getCaretAboveBelow(caretRange.start, true);
+                setCaretRange({ start: below, end: below });
+            }
         }
         // Backspace over a character!
         else if(event.key === "Backspace") {
