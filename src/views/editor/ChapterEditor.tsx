@@ -258,16 +258,25 @@ const ChapterEditor = (props: { ast: ChapterNode }) => {
         else if(event.key === "ArrowUp") {
             event.preventDefault();
             if(caretRange.start.node instanceof TextNode && caretRange.end.node instanceof TextNode) {
-                const above = getCaretAboveBelow(caretRange.start, false);
-                setCaretRange({ start: above, end: above });
+                if(event.shiftKey) {
+                    setCaretRange({ start: caretRange.start, end: getCaretAboveBelow(caretRange.end, false) });
+                }
+                else {
+                    const above = getCaretAboveBelow(caretRange.start, false);
+                    setCaretRange({ start: above, end: above });
+                }
             }
         }
         // Move the caret down!
         else if(event.key === "ArrowDown") {
             event.preventDefault();
             if(caretRange.start.node instanceof TextNode && caretRange.end.node instanceof TextNode) {
-                const below = getCaretAboveBelow(caretRange.start, true);
-                setCaretRange({ start: below, end: below });
+                if(event.shiftKey)
+                    setCaretRange({ start: caretRange.start, end: getCaretAboveBelow(caretRange.end, true) });
+                else {
+                    const below = getCaretAboveBelow(caretRange.start, true);
+                    setCaretRange({ start: below, end: below });
+                }
             }
         }
         // Backspace over a character!
