@@ -1,6 +1,7 @@
 import { Caret } from "./ChapterNode";
 import { FormattedNode } from "./FormattedNode";
 import { Node } from "./Node";
+import { ParagraphNode } from "./ParagraphNode";
 
 export class TextNode extends Node<FormattedNode> {
 
@@ -82,6 +83,9 @@ export class TextNode extends Node<FormattedNode> {
         };
     }
 
+    isItalic() { return this.getAncestors().filter(p => p instanceof FormattedNode && p.getFormat() === "_").length > 0; }
+    isBold() { return this.getAncestors().filter(p => p instanceof FormattedNode && p.getFormat() === "*").length > 0; }
+
     deleteBackward(index?: number): Caret {
 
         // If no index, delete from the end.
@@ -158,6 +162,10 @@ export class TextNode extends Node<FormattedNode> {
         if(this.#text.length === 0) this.remove();
     }
 
+    getParagraph(): ParagraphNode {
+        return this.getClosestParentMatching(p => p instanceof ParagraphNode) as ParagraphNode;
+    }
+
     next(index: number): Caret {
     
         // If there are more characters, just go next.
@@ -165,19 +173,19 @@ export class TextNode extends Node<FormattedNode> {
             return { node: this, index: index + 1 }
         
         // Otherwise, find the next text node after this one.
-        const text = this.getChapter()?.getNextTextNode(this);
+        const nextText = this.getChapter()?.getNextTextNode(this);
 
         // If we don't have a chapter, return what we were given.
-        if(text === undefined)
+        if(nextText === undefined)
             return { node: this, index: index };
 
         // If this is the last node, return the end of this node.
-        if(text === this)
+        if(nextText === this)
             return { node: this, index: this.#text.length }
 
         // Otherwise, return the beginning of the next node.
-        // We skip the first index since it's equivalent to the last of this one.
-        return { node: text, index: 1 }
+        // Unless the next node is in a different paragraph, we skip the first index since it's equivalent to the last of this one.
+        return { node: nextText, index: this.getParagraph() !== nextText.getParagraph() ? 0: Math.min(1, nextText.getLength()) };
 
     }
 
@@ -188,19 +196,19 @@ export class TextNode extends Node<FormattedNode> {
             return { node: this, index: index - 1 }
         
         // Otherwise, find the previous text node before this one.
-        const text = this.getChapter()?.getPreviousTextNode(this);
+        const previousText = this.getChapter()?.getPreviousTextNode(this);
 
         // If we don't have a chapter, return what we were given.
-        if(text === undefined)
+        if(previousText === undefined)
             return { node: this, index: index };
 
         // If this is the first node, return the beginning of this node.
-        if(text === this)
+        if(previousText === this)
             return { node: this, index: 0 }
 
         // Otherwise, return the beginning of the next node.
         // We skip the last index since it's the equivalent of this one's first.
-        return { node: text, index: text.#text.length - 1 }
+        return { node: previousText, index: this.getParagraph() !== previousText.getParagraph() ? previousText.#text.length : previousText.#text.length - 1 }
 
     }
 
@@ -211,22 +219,25 @@ export class TextNode extends Node<FormattedNode> {
 
         // Search for the space after the given index.
         let i = index + 1;
-        for(; i < this.#text.length; i++)
-            if(this.#text.charAt(i) === " ")
-                break;
+        while(i < this.getLength() && this.#text.charAt(i).match(/\W/)) i++;
+        while(i < this.getLength() && this.#text.charAt(i).match(/\w/)) i++;
 
         // If we found one in this node, return it.
-        if(i < this.#text.length)
+        if(i < this.getLength() || (i === this.getLength() && this.#text.charAt(i - 1).match(/\w/)))
             return { node: this, index: i };
 
-        // Otherwise, find the next text node's next word.
-        const next = this.getChapter()?.getNextTextNode(this)?.nextWord();
+        // Otherwise, find the next text node's next word boundary.
+        const paragraphText = this.getParagraph().getTextNodes();
+        const nextText = this.getChapter()?.getNextTextNode(this);
+        const nextWord = nextText?.nextWord();
 
         // If there isn't one, just go to the end of this.
-        if(next === undefined)
+        if(paragraphText && nextText && this === paragraphText[paragraphText.length - 1])
+            return { node: nextText, index: 0 }
+        else if(nextWord === undefined)
             return { node: this, index: this.#text.length };
-        else
-            return next;
+         else
+            return nextWord;
 
     }
 
@@ -235,24 +246,27 @@ export class TextNode extends Node<FormattedNode> {
         if(index === undefined)
             index = this.#text.length;
 
-        // Search for the space after the given index.
+        // Scan left until we find a word character, then keep scanning until we reach a non-word character.
         let i = index - 1;
-        for(; i > 0; i--)
-            if(this.#text.charAt(i) === " ")
-                break;
-
+        while(i > 0 && this.#text.charAt(i - 1).match(/\W/)) i--;
+        while(i > 0 && this.#text.charAt(i - 1).match(/\w/)) i--;
+            
         // If we found one in this node, return it.
-        if(i > 0)
+        if(i > 0 || (i === 0 && this.#text.charAt(0).match(/\w/)))
             return { node: this, index: i };
 
-        // Otherwise, find the next text node's next word.
-        const previous = this.getChapter()?.getPreviousTextNode(this)?.previousWord();
+        // Otherwise, find the next text node's next word boundary.
+        const paragraphText = this.getParagraph().getTextNodes();
+        const previousText = this.getChapter()?.getPreviousTextNode(this);
+        const previousWord = previousText?.previousWord();
 
-        // If there isn't one, just go to the beginning of this.
-        if(previous === undefined)
+        // If there isn't one, just go to the end of this.
+        if(paragraphText && previousText && this === paragraphText[0])
+            return { node: previousText, index: previousText.getLength() }
+        else if(previousWord === undefined)
             return { node: this, index: 0 };
-        else
-            return previous;
+         else
+            return previousWord;
 
     }
 

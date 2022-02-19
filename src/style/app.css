@@ -207,28 +207,37 @@ input[type="text"].bookish-app-editable-error {
     outline: none;
 }
 
-.bookish-caret-container {
-    background-color: var(--bookish-app-chrome-background);
+.bookish-chapter-editor {
+    position: relative;
 }
 
-@keyframes caret-blink {
-    100% {
-        outline: none;
-    }
-}
-.bookish-caret {
+.bookish-chapter-editor-caret {
+    left: 0;
+    top: 0;
     width: 0px;
     height: 1em;
-    vertical-align: baseline;
     background: none;
     transform: scaleY(1.25);
     outline: 1px solid var(--bookish-paragraph-color);
     display: inline-block;
-    /* animation: caret-blink 1.5s steps(2) infinite; */
     box-sizing: border-box;
-    white-space: nowrap;
+    position: absolute;
 }
 
-.bookish-caret-selection {
-    background-color: var(--bookish-highlight-color);
+@keyframes bookish-chapter-editor-caret-blink {
+    100% {
+        outline: none;
+    }
+}
+
+.bookish-chapter-editor-caret-blink {
+    animation: bookish-chapter-editor-caret-blink 1s steps(2) infinite;
+}
+
+.bookish-chapter-editor-caret-italic {
+    transform: skew(-10deg);
+}
+
+.bookish-chapter-editor-caret-bold {
+    outline-width: 2px;
 }
