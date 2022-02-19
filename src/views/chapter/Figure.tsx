@@ -5,17 +5,22 @@ import { renderNode, renderPosition } from './Renderer';
 const Figure = (props: { node: EmbedNode }) => {
 
 	const { node } = props
+	const url = node.getURL();
+	const position = node.getPosition();
+	const description = node.getDescription();
+	const credit = node.getCredit();
+	const caption = node.getCaption();
 
 	return (
-		<div className={"bookish-figure " + renderPosition(node.position)} data-nodeid={props.node.nodeID}>
+		<div className={"bookish-figure " + renderPosition(position)} data-nodeid={props.node.nodeID}>
 			{
-				node.url.includes("https://www.youtube.com") || 
-				node.url.includes("https://youtu.be") || 
-				node.url.includes("vimeo.com") ?
+				url.includes("https://www.youtube.com") || 
+				url.includes("https://youtu.be") || 
+				url.includes("vimeo.com") ?
 					<div className="bookish-figure-embed">
 						<iframe 
 							className="bookish-figure-frame" 
-							src={node.url} 
+							src={url} 
 							frameBorder="0" 
 							allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" 
 							allowFullScreen>
@@ -23,11 +28,11 @@ const Figure = (props: { node: EmbedNode }) => {
 					</div> :
 					<img 
 						className={"bookish-figure-image"}
-						src={node.url.startsWith("http") ? node.url : "images/" + node.url} 
-						alt={node.description}
+						src={url.startsWith("http") ? url : "images/" + url} 
+						alt={description}
 					/>
 			}
-			<div className="bookish-figure-caption"><div className="bookish-figure-credit">{renderNode(node.credit)}</div>{renderNode(node.caption)}</div>
+			<div className="bookish-figure-caption"><div className="bookish-figure-credit">{renderNode(credit)}</div>{renderNode(caption)}</div>
 		</div>
 	)
 

@@ -90,7 +90,7 @@ export type NodeType =
     "comment"
 
 export type BlockParentNode = ChapterNode | CalloutNode | QuoteNode;
-export type BlockNode = HeaderNode | RuleNode | EmbedNode | BulletedListNode | NumberedListNode | CodeNode | QuoteNode | CalloutNode | TableNode | ParagraphNode;
+export type BlockNode = HeaderNode | RuleNode | EmbedNode | BulletedListNode | NumberedListNode | CodeNode | QuoteNode | CalloutNode | TableNode | ParagraphNode | ErrorNode;
 
 export default class Parser {
 
@@ -948,7 +948,7 @@ export default class Parser {
         this.read();
 
         // Parse the caption
-        embed.caption = this.parseContent(embed, "|");
+        embed.setCaption(this.parseContent(embed, "|"));
 
         if(this.peek() !== "|")
             return this.createError(embed, this.readUntilNewLine(), "Missing '|' after caption in embed");
@@ -957,10 +957,10 @@ export default class Parser {
         this.read();
 
         // Parse the credit
-        embed.credit = this.parseContent(embed, "|");
+        embed.setCredit(this.parseContent(embed, "|"));
 
         // Error if missing credit.
-        if(embed.credit.toText().trim() === "")
+        if(embed.getCredit().toText().trim() === "")
             return this.createError(parent, this.readUntilNewLine(), "Missing credit in embed.");
         
         // Check for the closing delimeter
@@ -971,7 +971,7 @@ export default class Parser {
         this.read();
 
         // Is there a position indicator?
-        embed.position = this.parsePosition();
+        embed.setPosition(this.parsePosition());
         
         this.metadata.embeds.push(embed);
 
@@ -1162,7 +1162,7 @@ export default class Parser {
 
         // Read the footnote content.
         const footnote = this.parseContent(node, "}");
-        node.setContent(footnote)
+        node.setFootnote(footnote)
 
         // Read the closing }
         this.read();
@@ -1223,7 +1223,7 @@ export default class Parser {
         const content = this.parseContent(node, "|");
 
         // Catch links with no label.
-        if(content.segments.length === 0)
+        if(content.isEmpty())
             return this.createError(parent, undefined, "Unclosed link");
 
         // Catch missing bars

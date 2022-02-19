@@ -6,7 +6,7 @@ const InlineCode = (props: { node: InlineCodeNode }) => {
 
     const { node } = props
 
-    return <Code editable={false} inline={true} language={node.language} nodeID={node.nodeID}>{node.code}</Code>
+    return <Code editable={false} inline={true} language={node.getLanguage()} nodeID={node.nodeID}>{node.getCode()}</Code>
 
 }
 

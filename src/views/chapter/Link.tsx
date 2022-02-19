@@ -12,26 +12,28 @@ const Link = (props: { node: LinkNode}) => {
 
     const { node } = props
     const { base } = useContext(BaseContext)
+    const url = node.getURL();
+    const content = node.getText();
 
-    if(node.url === undefined || node.content === undefined)
+    if(url === undefined || content === undefined)
         return <></>;
 
     // If this is external link, make an anchor that opens a new window.
-    if(node.url.startsWith("http")) {
-        return <a href={node.url} target="_blank">{renderNode(node.content)}</a>;
+    if(url.startsWith("http")) {
+        return <a href={url} target="_blank">{renderNode(content)}</a>;
     }
     else {
-        if(node.url.indexOf(":") >= 0) {
-            let [chapter, label] = node.url.split(":");
+        if(url.indexOf(":") >= 0) {
+            let [chapter, label] = url.split(":");
             // If the chapter isn't specified, set to the current chapter's id.
             if(chapter === "")
-                return <HashLink smooth scroll={smoothlyScrollElementToEyeLevel} to={"#" + label}>{renderNode(node.content)}</HashLink>
+                return <HashLink smooth scroll={smoothlyScrollElementToEyeLevel} to={"#" + label}>{renderNode(content)}</HashLink>
             else
-                return <HashLink smooth scroll={smoothlyScrollElementToEyeLevel} to={"/" + chapter + "#" + label}>{renderNode(node.content)}</HashLink>
+                return <HashLink smooth scroll={smoothlyScrollElementToEyeLevel} to={"/" + chapter + "#" + label}>{renderNode(content)}</HashLink>
         }
         else {
             // If this is internal link, make a route link to the chapter.
-            return <RouterLink to={base + "/" + node.url}>{renderNode(node.content)}</RouterLink>
+            return <RouterLink to={base + "/" + url}>{renderNode(content)}</RouterLink>
         }
     }
 

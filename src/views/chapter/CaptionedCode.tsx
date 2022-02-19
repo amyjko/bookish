@@ -6,20 +6,21 @@ import { CodeNode } from "../../models/CodeNode"
 
 const CaptionedCode = (props: { node: CodeNode}) => {
 
-    const { node } = props
+    const { node } = props;
+    const caption = node.getCaption()
 
-    return <div className={"bookish-figure " + renderPosition(node.position)} data-nodeid={props.node.nodeID}>
+    return <div className={"bookish-figure " + renderPosition(node.getPosition())} data-nodeid={props.node.nodeID}>
         {
-            node.language === "python" && node.executable ? 
-                <Python node={node} code={node.code}></Python> :
+            node.getLanguage() === "python" && node.isExecutable() ? 
+                <Python node={node} code={node.getCode()}></Python> :
                 <div>
-                    <Code editable={false} inline={false} language={node.language} nodeID={node.nodeID}>{node.code}</Code>
-                    { node.language !== "plaintext" ? <div className="bookish-code-language">{node.language}</div> : null }
+                    <Code editable={false} inline={false} language={node.getLanguage()} nodeID={node.nodeID}>{node.getCode()}</Code>
+                    { node.getLanguage() !== "plaintext" ? <div className="bookish-code-language">{node.getLanguage()}</div> : null }
                 </div>
         }
         { 
-            node.caption ? 
-                <div className="bookish-figure-caption">{renderNode(node.caption)}</div>
+            caption ? 
+                <div className="bookish-figure-caption">{renderNode(caption)}</div>
                 : 
                 null
         }

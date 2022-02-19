@@ -2,19 +2,21 @@ import { FormattedNode } from "./FormattedNode";
 import { Node } from "./Node";
 
 
-export class LabelNode extends Node {
-    id: string;
+export class LabelNode extends Node<FormattedNode> {
+    
+    #id: string;
+
     constructor(parent: FormattedNode, id: string) {
         super(parent, "label");
-        this.id = id;
+        this.#id = id;
     }
 
-    getID() { return this.id; }
+    getID() { return this.#id; }
 
     toText(): string { return ""; }
 
     toBookdown(): String {
-        return `:${this.id}`;
+        return `:${this.#id}`;
     }
 
     traverseChildren(fn: (node: Node) => void): void {}
@@ -26,11 +28,11 @@ export class LabelNode extends Node {
     getSiblingOf(child: Node, next: boolean) { return undefined; }
 
     copy(parent: FormattedNode): LabelNode {
-        return new LabelNode(parent, this.id)
+        return new LabelNode(parent, this.#id)
     }
 
     clean() {
-        if(this.id.length === 0) this.remove();
+        if(this.#id.length === 0) this.remove();
     }
 
 }

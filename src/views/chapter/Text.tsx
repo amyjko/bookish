@@ -23,14 +23,15 @@ const Text = (props: { node: TextNode}) => {
     const { node } = props;
     const context = useContext(ChapterContext);
     const caret = useContext(CaretContext);
-
+    const position = node.getPosition();
+    let text = node.getText();
+    
     // Replace any spaces at the beginning or end of the string with explicit non-breaking spaces to ensure that they render.
-    let text = replaceMultipleSpacesWithNonBreakingSpaces(node.text)
+    text = replaceMultipleSpacesWithNonBreakingSpaces(text)
 
     // Is there a query we're supposed to highlight? If so, highlight it.
     if(context && context.highlightedWord) {
         const query = context.highlightedWord;
-        const text = node.text;
         const lowerText = text.toLowerCase();
         // Does this text contain the query? Highlight it.
         if(lowerText.indexOf(query) >= 0) {
@@ -82,7 +83,7 @@ const Text = (props: { node: TextNode}) => {
                 let temp = start; start = end; end = temp;
             }
 
-            return <span className={"bookish-text bookish-caret-container"} data-position={node.position} data-nodeid={props.node.nodeID}>
+            return <span className={"bookish-text bookish-caret-container"} data-position={node.getPosition()} data-nodeid={props.node.nodeID}>
                 {
                     // If the start and end node are the same...
                     start.node === end.node ? (
@@ -120,7 +121,7 @@ const Text = (props: { node: TextNode}) => {
     }
 
     // Otherwise, just return the text as a span with metadata.
-    return <span className={"bookish-text"} data-position={node.position} data-nodeid={props.node.nodeID}>{text}</span>;
+    return <span className={"bookish-text"} data-position={position} data-nodeid={props.node.nodeID}>{text}</span>;
 
 }
 

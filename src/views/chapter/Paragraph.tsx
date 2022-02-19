@@ -4,7 +4,7 @@ import { renderNode } from './Renderer'
 
 const Paragraph = (props: { node: ParagraphNode}) => {
 
-    return props.node.content === undefined ? <></> : <p data-nodeid={props.node.nodeID}>{renderNode(props.node.content)}</p>
+    return props.node.getContent() === undefined ? <></> : <p data-nodeid={props.node.nodeID}>{renderNode(props.node.getContent())}</p>
 
 }
 

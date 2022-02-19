@@ -8,6 +8,8 @@ import { ChapterContext, ChapterContextType } from './Chapter'
 const Definition = (props: { node: DefinitionNode}) => {
 
     const { node } = props
+    const glossaryID = node.getGlossaryID();
+    const phrase = node.getPhrase();
     const context = useContext<ChapterContextType>(ChapterContext)
 
     // If there's no context, render nothing.
@@ -17,19 +19,19 @@ const Definition = (props: { node: DefinitionNode}) => {
     // Find the definition.
     let glossary = context.book.getGlossary();
 
-    if(node.glossaryID === undefined || !(node.glossaryID in glossary))
-        return <span className="bookish-error">Unknown glossary entry "{ node.glossaryID }"</span>
+    if(glossaryID === undefined || !(glossaryID in glossary))
+        return <span className="bookish-error">Unknown glossary entry "{ glossaryID }"</span>
 
-    let entry = glossary[node.glossaryID];
+    let entry = glossary[glossaryID];
 
     // If for some reason there's no phrase, return nothing.
-    if(node.phrase === undefined)
+    if(phrase === undefined)
         return <></>
 
     return <span className="bookish-definition" data-nodeid={props.node.nodeID}>
         <Marginal
-            id={"glossary-" + node.glossaryID}
-            interactor={renderNode(node.phrase)}
+            id={"glossary-" + glossaryID}
+            interactor={renderNode(phrase)}
             content={
                 <span className="bookish-definition-entry">
                     <strong className="bookish-definition-entry-phrase">{entry.phrase}</strong>: { renderNode(Parser.parseContent(context.book, entry.definition), "definition") }

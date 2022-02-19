@@ -458,17 +458,17 @@ export default class Book {
 
             const image = c.getImage()
             let cover = image === undefined ? undefined : Parser.parseEmbed(this, image);
-            if(cover && cover instanceof EmbedNode && !urls.has(cover.url)) {
+            if(cover && cover instanceof EmbedNode && !urls.has(cover.getURL())) {
                 media.push(cover);
-                urls.add(cover.url);
+                urls.add(cover.getURL());
             }
 
             let embeds = c?.getAST()?.getEmbeds();
             if(embeds)
                 embeds.forEach((embed: EmbedNode) => {
-                    if(!urls.has(embed.url)) {
+                    if(!urls.has(embed.getURL())) {
                         media.push(embed);
-                        urls.add(embed.url);
+                        urls.add(embed.getURL());
                     }
                 })
 
@@ -480,9 +480,9 @@ export default class Book {
             const img = this.getImage(id)
             if(img) {
                 let image = Parser.parseEmbed(this, img);
-                if(image instanceof EmbedNode && !urls.has(image.url)) {
+                if(image instanceof EmbedNode && !urls.has(image.getURL())) {
                     media.push(image);
-                    urls.add(image.url);
+                    urls.add(image.getURL());
                 }    
             }
         });

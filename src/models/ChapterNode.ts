@@ -13,8 +13,9 @@ export type Caret = { node: Node, index: number }
 export type CaretRange = { start: Caret, end: Caret }
 
 export class ChapterNode extends Node {
-    blocks: BlockNode[];
-    metadata: Bookkeeping;
+
+    #blocks: BlockNode[];
+    #metadata: Bookkeeping;
     index: Map<number, Node>;
     nextID: number;
 
@@ -22,10 +23,10 @@ export class ChapterNode extends Node {
         super(undefined, "chapter");
 
         // The AST of the chapter.
-        this.blocks = blocks;
+        this.#blocks = blocks;
 
         // Content extracted during parsing.
-        this.metadata = metadata;
+        this.#metadata = metadata;
 
         // Start the node index empty
         this.index = new Map();
@@ -42,6 +43,8 @@ export class ChapterNode extends Node {
         return this;
     }
 
+    getBlocks() { return this.#blocks; }
+
     indexNode(node: Node) {
         this.index.set(this.nextID, node);
         node.setID(this.nextID);
@@ -56,11 +59,11 @@ export class ChapterNode extends Node {
 
     getNode(id: number) { return this.index.get(id); }
 
-    getErrors(): ErrorNode[] { return this.metadata.errors; }
-    getCitations(): Record<string, boolean> { return this.metadata.citations; }
-    getFootnotes(): FootnoteNode[] { return this.metadata.footnotes; }
-    getHeaders(): HeaderNode[] { return this.metadata.headers; }
-    getEmbeds(): EmbedNode[] { return this.metadata.embeds; }
+    getErrors(): ErrorNode[] { return this.#metadata.errors; }
+    getCitations(): Record<string, boolean> { return this.#metadata.citations; }
+    getFootnotes(): FootnoteNode[] { return this.#metadata.footnotes; }
+    getHeaders(): HeaderNode[] { return this.#metadata.headers; }
+    getEmbeds(): EmbedNode[] { return this.#metadata.embeds; }
 
     getCitationNumber(citationID: string) {
 
@@ -75,13 +78,13 @@ export class ChapterNode extends Node {
     }
 
     toText(): string {
-        return this.blocks.map(block => block.toText()).join(" ");
+        return this.#blocks.map(block => block.toText()).join(" ");
     }
 
     toBookdown() {
         // Render the symbols then all the blocks
-        return Object.keys(this.metadata.symbols).sort().map(name => `@${name}: ${this.metadata.symbols[name]}\n\n`).join("") +
-            this.blocks.map(b => b.toBookdown()).join("\n\n");
+        return Object.keys(this.#metadata.symbols).sort().map(name => `@${name}: ${this.#metadata.symbols[name]}\n\n`).join("") +
+            this.#blocks.map(b => b.toBookdown()).join("\n\n");
     }
 
     getTextNodes(): TextNode[] {
@@ -112,23 +115,23 @@ export class ChapterNode extends Node {
     }
 
     traverseChildren(fn: (node: Node) => void): void {
-        this.blocks.forEach(item => item.traverse(fn) )
+        this.#blocks.forEach(item => item.traverse(fn) )
     }
 
     removeChild(node: Node): void {
-        this.blocks = this.blocks.filter(item => item !== node)
+        this.#blocks = this.#blocks.filter(item => item !== node)
     }
 
     replaceChild(node: Node, replacement: BlockNode): void {
-        const index = this.blocks.indexOf(node as BlockNode);
+        const index = this.#blocks.indexOf(node as BlockNode);
         if(index < 0) return;
-        this.blocks[index] = replacement;
+        this.#blocks[index] = replacement;
     }
 
     copy(parent: Node): ChapterNode {
         const blocks: BlockNode[] = []
-        const chap = new ChapterNode(blocks, this.metadata)
-        this.blocks.forEach(b => blocks.push(b.copy(chap) as BlockNode))
+        const chap = new ChapterNode(blocks, this.#metadata)
+        this.#blocks.forEach(b => blocks.push(b.copy(chap) as BlockNode))
         return chap
     }
 
@@ -138,7 +141,7 @@ export class ChapterNode extends Node {
     }
 
     getSiblingOf(child: Node, next: boolean) {
-        return this.blocks[this.blocks.indexOf(child as BlockNode) + (next ? 1 : -1)];
+        return this.#blocks[this.#blocks.indexOf(child as BlockNode) + (next ? 1 : -1)];
     }
 
     insertSelection(char: string, range: CaretRange): Caret {
@@ -243,7 +246,7 @@ export class ChapterNode extends Node {
         (sortedRange.end.node as TextNode).deleteRange(0, sortedRange.end.index);
 
         // End with the start node, so it can determine where to place the caret after everything else is gone.
-        const caret = (sortedRange.start.node as TextNode).deleteRange(sortedRange.start.index, (sortedRange.start.node as TextNode).text.length);
+        const caret = (sortedRange.start.node as TextNode).deleteRange(sortedRange.start.index, (sortedRange.start.node as TextNode).getLength());
 
         // Merge any text nodes in this chapter to clean up any unnecessary boundaries after deletion.
         this.clean();
@@ -272,25 +275,10 @@ export class ChapterNode extends Node {
     }
 
     insertAfter(anchor: BlockNode, block: BlockNode) {
-        const index = this.blocks.indexOf(anchor);
+        const index = this.#blocks.indexOf(anchor);
         if(index < 0)
             return;
-        this.blocks.splice(index + 1, 0, block);
-    }
-
-    insertRule(range: CaretRange): Caret {
-
-        const { start } = range;
-
-        // If this is an empty text node in a paragraph node, then replace the paragraph node with a rule.
-        if(start.node instanceof TextNode && start.node.parent instanceof FormattedNode && start.node.parent.parent instanceof ParagraphNode && start.node.text === "") {
-            const paragraph: ParagraphNode = start.node.parent.parent as ParagraphNode;
-            const rule = new RuleNode(paragraph.parent as BlockParentNode);
-            paragraph.replaceWith(rule);
-            return { node: rule, index: 0 };
-        }
-        return start;
-
+        this.#blocks.splice(index + 1, 0, block);
     }
 
     removeRedundantChildren(nodes: Set<Node>) {
@@ -319,11 +307,11 @@ export class ChapterNode extends Node {
         if(format === "" && range.start.node === range.end.node && range.start.index === range.end.index) {
             const paragraph = range.start.node.getClosestParentMatching(p => p instanceof ParagraphNode) as ParagraphNode;
             if(paragraph) {
-                const textPosition = paragraph.content.caretRangeToTextIndex(range.start);
+                const textPosition = paragraph.getContent().caretRangeToTextIndex(range.start);
                 const text = paragraph.getNodes().filter(n => n instanceof TextNode) as TextNode[];
                 if(text.length > 0) {
-                    this.formatSelection({ start: { node: text[0], index: 0 }, end: { node: text[text.length - 1], index: text[text.length - 1].text.length }}, "");
-                    const caret = paragraph.content.textIndexToCaret(textPosition);
+                    this.formatSelection({ start: { node: text[0], index: 0 }, end: { node: text[text.length - 1], index: text[text.length - 1].getLength() }}, "");
+                    const caret = paragraph.getContent().textIndexToCaret(textPosition);
                     return caret ? { start: caret, end: caret } : range;
                 }
             }
@@ -337,7 +325,7 @@ export class ChapterNode extends Node {
         const endParagraph = sortedRange.end.node.closestParent(ParagraphNode) as ParagraphNode;
 
         // Don't do anything if we didn't find paragraphs or the paragraphs don't have the same parent.
-        if(startParagraph === undefined || endParagraph === undefined || startParagraph.parent !== endParagraph.parent)
+        if(startParagraph === undefined || endParagraph === undefined || startParagraph.getParent() !== endParagraph.getParent())
             return range;
 
         // If this is the same paragraph, just format it.
@@ -345,19 +333,23 @@ export class ChapterNode extends Node {
             return startParagraph.format(sortedRange, format);
 
         // If there's more than one paragraph, find all of the paragraph's to format.
-        const startParagraphIndex = (startParagraph.parent as BlockParentNode).blocks.indexOf(startParagraph);
-        const endParagraphIndex = (endParagraph.parent as BlockParentNode).blocks.indexOf(endParagraph);
+        const startParagraphIndex = startParagraph.getParent()?.getBlocks().indexOf(startParagraph);
+        const endParagraphIndex = endParagraph.getParent()?.getBlocks().indexOf(endParagraph);
+
+        // In case a paragraph has no parent.
+        if(startParagraphIndex === undefined || endParagraphIndex === undefined)
+            return range;
 
         // Iterate through the list of blocks to find all of the paragraphs to format
         const paragraphs: Set<ParagraphNode> = new Set();
-        (startParagraph.parent as BlockParentNode).blocks.forEach((block, index) => {
+        (startParagraph.getParent() as BlockParentNode).getBlocks().forEach((block, index) => {
             if(block instanceof ParagraphNode && index > startParagraphIndex && index < endParagraphIndex)
                 paragraphs.add(block);
         });
 
         // Format the start paragraph from the start to it's last text node.
         const lastStartTextNode = startParagraph.getLastTextNode();
-        const newStartRange = startParagraph.format({ start: sortedRange.start, end: { node: lastStartTextNode, index: lastStartTextNode.text.length}}, format);
+        const newStartRange = startParagraph.format({ start: sortedRange.start, end: { node: lastStartTextNode, index: lastStartTextNode.getLength()}}, format);
         let newEndRange = newStartRange;
 
         // If the end node is different from the start node, format from it's beginning to the end node.

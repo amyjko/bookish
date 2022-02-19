@@ -2,7 +2,7 @@ import { ChapterNode } from "./ChapterNode";
 import { Node } from "./Node";
 
 
-export class ReferenceNode extends Node {
+export class ReferenceNode extends Node<ChapterNode> {
     authors: string;
     year: string;
     title: string;

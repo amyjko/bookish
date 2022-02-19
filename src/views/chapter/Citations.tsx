@@ -21,7 +21,7 @@ const Citations = (props: {node: CitationsNode}) => {
     const book = context.book
 
     // Sort citations numerically, however they're numbered.
-    let citations = node.citations.sort((a, b) => {
+    let citations = node.getCitations().sort((a, b) => {
         let aNumber = chapter.getCitationNumber(a);
         let bNumber = chapter.getCitationNumber(b);
         if(aNumber === null) {

@@ -1,19 +1,21 @@
 import { Node } from "./Node";
 
 export class ErrorNode extends Node {
-    text: string | undefined;
-    error: string;
+    #text: string | undefined;
+    #error: string;
     constructor(parent: Node | undefined, text: string | undefined, error: string) {
         super(parent, "error");
-        this.text = text;
-        this.error = error;
+        this.#text = text;
+        this.#error = error;
     }
+
+    getError() { return this.#error; }
 
     toText(): string {
         return "";
     }
 
-    toBookdown(): String { return this.text ? this.text : ""; }
+    toBookdown(): String { return this.#text ? this.#text : ""; }
 
     traverseChildren(fn: (node: Node) => void): void {}
 
@@ -24,7 +26,7 @@ export class ErrorNode extends Node {
     getSiblingOf(child: Node, next: boolean) { return undefined; }
 
     copy(parent: Node): ErrorNode {
-        return new ErrorNode(parent, this.text, this.error);
+        return new ErrorNode(parent, this.#text, this.#error);
     }
 
     clean() {}

@@ -5,11 +5,13 @@ import { renderNode } from './Renderer'
  const Superscript = (props: { node: SubSuperscriptNode}) => {
 
     const { node } = props
+    const isSuperscript = node.isSuperscript();
+    const content = node.getContent();
 
-    return node.content === undefined ? <></> :
-        node.superscript ?
-        <sup data-nodeid={props.node.nodeID}>{renderNode(node.content)}</sup> :
-        <sub data-nodeid={props.node.nodeID}>{renderNode(node.content)}</sub>
+    return content === undefined ? <></> :
+        isSuperscript ?
+        <sup data-nodeid={props.node.nodeID}>{renderNode(content)}</sup> :
+        <sub data-nodeid={props.node.nodeID}>{renderNode(content)}</sub>
 
 }
 

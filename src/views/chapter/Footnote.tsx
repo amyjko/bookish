@@ -7,10 +7,11 @@ import { FootnoteNode } from "../../models/FootnoteNode"
 const Footnote = (props: { node: FootnoteNode }) => {
 
     const { node } = props
+    const footnote = node.getFootnote();
     const context = useContext(ChapterContext)
 
     // If no chapter was provided, then don't render the footnote, since there's no context in which to render it.
-    if(!context || !context.chapter || !context.book || node.footnote === undefined)
+    if(!context || !context.chapter || !context.book || footnote === undefined)
         return <></>;
 
     // What footnote number is this?
@@ -21,7 +22,7 @@ const Footnote = (props: { node: FootnoteNode }) => {
         <Marginal 
             id={"footnote-" + number}
             interactor={<sup className="bookish-footnote-symbol">{letter}</sup>}
-            content={<span className="bookish-footnote"><sup className="bookish-footnote-symbol">{letter}</sup> {renderNode(node.footnote)}</span>} 
+            content={<span className="bookish-footnote"><sup className="bookish-footnote-symbol">{letter}</sup> {renderNode(footnote)}</span>} 
         />
     </span>
 

@@ -2,19 +2,23 @@ import { FormattedNode } from "./FormattedNode";
 import { Node } from "./Node";
 
 
-export class CitationsNode extends Node {
-    citations: string[];
+export class CitationsNode extends Node<FormattedNode> {
+    
+    #citations: string[];
+    
     constructor(parent: FormattedNode, citations: Array<string>) {
         super(parent, "citations");
-        this.citations = citations;
+        this.#citations = citations;
     }
 
     toText(): string {
         return "";
     }
 
+    getCitations() { return this.#citations; }
+
     toBookdown(): String {
-        return "<" + this.citations.join(",") + ">"
+        return "<" + this.#citations.join(",") + ">"
     }    
 
     traverseChildren(fn: (node: Node) => void): void {}
@@ -24,11 +28,11 @@ export class CitationsNode extends Node {
     replaceChild(node: Node, replacement: Node): void {}
 
     copy(parent: FormattedNode): CitationsNode {
-        return new CitationsNode(parent, [...this.citations])
+        return new CitationsNode(parent, [...this.#citations])
     }
 
     clean() {
-        if(this.citations.length === 0) this.remove();
+        if(this.#citations.length === 0) this.remove();
     }
 
 }

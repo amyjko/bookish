@@ -2,7 +2,8 @@ import { Node } from "./Node";
 import { BlockParentNode } from "./Parser";
 
 
-export class RuleNode extends Node {
+export class RuleNode extends Node<BlockParentNode> {
+    
     constructor(parent: BlockParentNode) {
         super(parent, "rule");
     }

@@ -1,32 +1,36 @@
 import { Node } from "./Node";
 import { FormattedNode } from "./FormattedNode";
 
-export class LinkNode extends Node {
-    content: FormattedNode | undefined;
-    url: string | undefined;
+export class LinkNode extends Node<FormattedNode> {
+
+    #content: FormattedNode | undefined;
+    #url: string | undefined;
     
     constructor(parent: FormattedNode) {
         super(parent, "link");
     }
 
+    getURL() { return this.#url }
+    getText() { return this.#content; }
+
     setContent(content: FormattedNode) {
-        this.content = content;
+        this.#content = content;
     }
 
     setURL(url: string) {
-        this.url = url;
+        this.#url = url;
     }
 
     toText(): string {
-        return this.content ? this.content.toText() : "";
+        return this.#content ? this.#content.toText() : "";
     }
 
     toBookdown(): String {
-        return `[${this.content?.toBookdown()}|${this.url}]`
+        return `[${this.#content?.toBookdown()}|${this.#url}]`
     }
 
     traverseChildren(fn: (node: Node) => void): void {
-        this.content?.traverse(fn)
+        this.#content?.traverse(fn)
     }
 
     removeChild(node: Node): void {}
@@ -37,8 +41,8 @@ export class LinkNode extends Node {
 
     copy(parent: FormattedNode): LinkNode {
         const link = new LinkNode(parent)
-        if(this.content) link.setContent(this.content.copy(link))
-        if(this.url) link.setURL(this.url)
+        if(this.#content) link.setContent(this.#content.copy(link))
+        if(this.#url) link.setURL(this.#url)
         return link;
     }
 
