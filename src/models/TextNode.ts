@@ -92,11 +92,22 @@ export class TextNode extends Node<FormattedNode> {
         if(index === undefined)
             index = this.#text.length;
 
-        // If this is within bounds, delete.
+        // If the given index is after the first character, delete it.
         if(index > 0) {
             // Delete the character at the index and move the caret one left.
             this.#text = this.#text.slice(0, index - 1) + this.#text.slice(index);
-            return { node: this, index: index - 1 }
+            return { node: this, index: index - 1 };
+        }
+
+        // If this is the first text node in a paragraph, merge this paragraph with the previous one,
+        // returning a caret at the given index of this text node.
+        const paragraph = this.getParagraph();
+        const firstText = paragraph?.getFirstTextNode();
+        if(firstText === this) {
+            const previousParagraph = paragraph.getPreviousIfParagraph();
+            if(previousParagraph)
+                previousParagraph.appendParagraph(paragraph);
+            return { node: this, index: index };
         }
 
         // Otherwise, ask the previous word to delete.
@@ -104,7 +115,7 @@ export class TextNode extends Node<FormattedNode> {
 
         // If there isn't one, don't delete, just return the beginning of this.
         if(previous === undefined)
-            return { node: this, index: index }
+            return { node: this, index: index };
 
         // Otherwise, have the previous node delete.
         return previous.deleteBackward();
@@ -121,7 +132,18 @@ export class TextNode extends Node<FormattedNode> {
         if(index < this.#text.length) {
             // Delete the character at the index and move the caret one left.
             this.#text = this.#text.slice(0, index) + this.#text.slice(index + 1);
-            return { node: this, index: index }
+            return { node: this, index: index };
+        }
+
+        // If this is the last text node in a paragraph, merge the next paragraph with this one,
+        // returning a caret at the given index of this text node.
+        const paragraph = this.getParagraph();
+        const lastText = paragraph?.getLastTextNode();
+        if(lastText === this) {
+            const nextParagraph = paragraph.getNextIfParagraph();
+            if(nextParagraph)
+                paragraph.appendParagraph(nextParagraph);
+            return { node: this, index: index };
         }
 
         // Otherwise, ask the previous word to delete.
@@ -129,7 +151,7 @@ export class TextNode extends Node<FormattedNode> {
 
         // If there isn't one, don't delete, just return the beginning of this.
         if(next === undefined)
-            return { node: this, index: index }
+            return { node: this, index: index };
 
         // Otherwise, have the previous node delete.
         return next.deleteForward();

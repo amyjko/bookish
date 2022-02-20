@@ -1,8 +1,9 @@
 import { Node } from "./Node";
 import { FormattedNodeSegmentType, FormattedNode, Format } from "./FormattedNode";
-import { BlockParentNode } from "./Parser";
+import { BlockNode, BlockParentNode } from "./Parser";
 import { TextNode } from "./TextNode";
 import { Caret, CaretRange } from "./ChapterNode";
+import { ClassType } from "react";
 
 export class ParagraphNode extends Node<BlockParentNode> {
 
@@ -61,40 +62,35 @@ export class ParagraphNode extends Node<BlockParentNode> {
         return text[text.length - 1] as TextNode;
     }
 
+    getPreviousIfParagraph(): ParagraphNode | undefined {
+        return this.getSiblingIfType(-1, ParagraphNode);
+    }
+
+    getNextIfParagraph(): ParagraphNode | undefined {
+        return this.getSiblingIfType(1, ParagraphNode);
+    }
+
+    getSiblingIfType<T extends BlockNode>(offset: number, type: Function): T | undefined  {
+        const parent = this.getParent();
+        const blocks = parent?.getBlocks();
+        const index = blocks?.indexOf(this);
+        const next = index !== undefined && blocks ? blocks[index + offset] : undefined;
+        return next instanceof type ? next as T : undefined;
+    }
+
     getTextNodes(): TextNode[] {
         return this.getNodes().filter(n => n instanceof TextNode) as TextNode[];
     }
 
-    deleteBackward(index: number | Node | undefined) {
+    appendParagraph(paragraph : ParagraphNode) {
 
-        // If the node's previous sibling is a paragraph, merge this paragraph's content into the previous paragraph.
-        const sibling = this.getSibling(false);
+        // Copy the given paragraph's segments into this paragraph's segments.
+        paragraph.getContent().getSegments().forEach(segment => {
+            this.#content.addSegment(segment);
+        });
 
-        // If there is no sibling, keep the caret here.
-        if(sibling === undefined || !(sibling instanceof ParagraphNode))  {
-            return undefined;
-        }
-        // If the sibling is a paragraph, merge.
-        else if(sibling instanceof ParagraphNode) {
-
-            // Remember the last index of the sibling's content.
-            const lastIndexOfSiblingContent = sibling.#content ? sibling.#content.getLength() : 0;
-
-            // Copy this content's segments into the previous sibling.
-            this.#content?.getSegments().forEach(segment => {
-                sibling.#content?.getSegments().push(segment.copy(sibling.#content) as FormattedNodeSegmentType);
-            });
-
-            // Remove this paragraph.
-            this.remove();
-
-            // Place the caret at the end of the previous sibling's content node.
-            return {
-                node: sibling.#content.nodeID,
-                index: lastIndexOfSiblingContent
-            }
-
-        }
+        // Remove the given paragraph from its context.
+        paragraph.remove();
         
     }
 
