@@ -175,7 +175,10 @@ const ChapterEditor = (props: { ast: ChapterNode }) => {
 
     }
 
-    function getCaretAboveBelow(caret: Caret, below: boolean) : Caret {
+    function getCaretAbove(caret: Caret) { return getCaretOnLine(caret, false); }
+    function getCaretBelow(caret: Caret) { return getCaretOnLine(caret, true); }
+
+    function getCaretOnLine(caret: Caret, below: boolean) : Caret {
 
         if(caret.node instanceof TextNode) {
             // Find the position of the current start node.
@@ -185,24 +188,39 @@ const ChapterEditor = (props: { ast: ChapterNode }) => {
             let previousCoordinate = undefined;
             if(startCoordinate) {
                 while(candidate.node instanceof TextNode) {
-                    const candidateCoordinate = getCaretCoordinate(candidate);
+                    const candidateCoordinate = getCaretCoordinate(candidate);                    
                     // Did we make it to the next line and the character before/after?
-                    if(candidateCoordinate && 
-                        (below ? 
-                            candidateCoordinate.top > startCoordinate.top && candidateCoordinate.left >= startCoordinate.left :
-                            candidateCoordinate.top < startCoordinate.top && candidateCoordinate.left <= startCoordinate.left)) {
-                        // Before we assume the one after the threshold is closest, check the previous.
-                        return previousCoordinate && previousCandidate && Math.abs(startCoordinate.left - previousCoordinate.left) < Math.abs(startCoordinate.left - candidateCoordinate.left) ?
-                            previousCandidate : candidate;
+                    if(candidateCoordinate) {
+                        const closerCandidate = previousCoordinate && previousCandidate && Math.abs(startCoordinate.left - previousCoordinate.left) < Math.abs(startCoordinate.left - candidateCoordinate.left) ? previousCandidate : candidate;
+                        if(below) {
+                            // If this candidate is on the line below the line below the start line, then return the last candidate on the line below the start line.
+                            if(previousCandidate && previousCoordinate && previousCoordinate.top > startCoordinate.top && candidateCoordinate.top > previousCoordinate.top)
+                                return previousCandidate;
+                            // If this is just below the start position, stop and return the closer of the current and previous candidates.
+                            else if(candidateCoordinate.top > startCoordinate.top && candidateCoordinate.left >= startCoordinate.left)
+                                return closerCandidate;
+                        } else {
+                            // If this candidate is on the live above the line above the start line, then return the last candidate on the line above the start line.
+                            if(previousCandidate && previousCoordinate && previousCoordinate.top < startCoordinate.top && candidateCoordinate.top < previousCoordinate.top)
+                                return previousCandidate;
+                            // If this is just above the start position, stop and return the closer of the current and previous candidates.
+                            if(candidateCoordinate.top < startCoordinate.top && candidateCoordinate.left <= startCoordinate.left)
+                                return closerCandidate;    
+                        }
                     }
+
+                    // Get the next candidate to consider.
                     const nextCandidate = below ? candidate.node.next(candidate.index) : candidate.node.previous(candidate.index);
+
+                    // If the caret didn't move, we stop searching.
                     if(nextCandidate.node === candidate.node && nextCandidate.index === candidate.index)
                         break;
-                    else {
-                        previousCandidate = candidate;
-                        previousCoordinate = candidateCoordinate;
-                        candidate = nextCandidate;
-                    }
+
+                    // Otherwise, we advance to the next candidate.
+                    previousCandidate = candidate;
+                    previousCoordinate = candidateCoordinate;
+                    candidate = nextCandidate;
+
                 }
                 return candidate;
             }
@@ -259,10 +277,10 @@ const ChapterEditor = (props: { ast: ChapterNode }) => {
             event.preventDefault();
             if(caretRange.start.node instanceof TextNode && caretRange.end.node instanceof TextNode) {
                 if(event.shiftKey) {
-                    setCaretRange({ start: caretRange.start, end: getCaretAboveBelow(caretRange.end, false) });
+                    setCaretRange({ start: caretRange.start, end: getCaretAbove(caretRange.end) });
                 }
                 else {
-                    const above = getCaretAboveBelow(caretRange.start, false);
+                    const above = getCaretAbove(caretRange.start);
                     setCaretRange({ start: above, end: above });
                 }
             }
@@ -272,9 +290,9 @@ const ChapterEditor = (props: { ast: ChapterNode }) => {
             event.preventDefault();
             if(caretRange.start.node instanceof TextNode && caretRange.end.node instanceof TextNode) {
                 if(event.shiftKey)
-                    setCaretRange({ start: caretRange.start, end: getCaretAboveBelow(caretRange.end, true) });
+                    setCaretRange({ start: caretRange.start, end: getCaretBelow(caretRange.end) });
                 else {
-                    const below = getCaretAboveBelow(caretRange.start, true);
+                    const below = getCaretBelow(caretRange.start);
                     setCaretRange({ start: below, end: below });
                 }
             }
