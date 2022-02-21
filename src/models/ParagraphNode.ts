@@ -34,10 +34,7 @@ export class ParagraphNode extends Node<BlockParentNode> {
         this.#content?.traverse(fn)
     }
 
-    removeChild(node: Node): void {
-        // If this content node is being removed, remove this.
-        if(this.#content === node) this.remove();
-    }
+    removeChild(node: Node): void {}
 
     replaceChild(node: Node, replacement: FormattedNode): void {
         if(this.#content === node)
@@ -92,7 +89,7 @@ export class ParagraphNode extends Node<BlockParentNode> {
         // Remove the given paragraph from its context.
         paragraph.remove();
 
-        // Clean this paragraph.
+        // Clean this paragraph to merge any new text nodes at the boundary.
         this.clean();
         
     }
@@ -142,43 +139,41 @@ export class ParagraphNode extends Node<BlockParentNode> {
         if(parent === undefined || chapter === undefined)
             return caret;
 
+        // If we weren't given a textnode, do nothing.
+        if(!(caret.node instanceof TextNode))
+            return caret;
+
         // If the caret is at the last position of the paragraph, insert a new paragraph.
-        const originalTextNodes = this.getNodes().filter(n => n instanceof TextNode) as TextNode[];
-        if(originalTextNodes.length > 0 && caret.node === originalTextNodes[originalTextNodes.length - 1] && caret.index === originalTextNodes[originalTextNodes.length - 1].getText().length) {
+        const lastTextNode = this.getLastTextNode();
+        if(caret.node === lastTextNode && caret.index == lastTextNode.getLength()) {
             const newParagraph = new ParagraphNode(parent);
             parent.insertAfter(this, newParagraph);
-            return { node: newParagraph.#content.getSegments()[0], index: 0 };
+            return { node: newParagraph.getFirstTextNode(), index: 0 };
         }
 
         // Find what index this node is in the paragraph so we can find its doppleganger in the copy.
-        const caretNodeIndex  = this.getNodes().indexOf(caret.node);
+        const caretNodeIndex  = this.getTextNodes().indexOf(caret.node);
 
-        // Begin by duplicating the paragraph.
+        // Copy this paragraph and insert it after.
         const copy = this.copy(parent);
-
-        // Insert the copy after the original.
         parent.insertAfter(this, copy);
 
-        // Delete everything after the caret in the original paragraph.
-        const textNodes = this.getNodes().filter(n => n instanceof TextNode);
-        const lastTextNode = textNodes.length > 0 ? textNodes[textNodes.length - 1] as TextNode : undefined;
-
-        // If we found a text node, delete
-        if(lastTextNode && (caret.node !== lastTextNode || caret.index !== lastTextNode.getText().length))
-            chapter.deleteSelection({ start: caret, end: { node: lastTextNode, index: lastTextNode.getText().length}}, false)
+        // Delete everything after the caret.
+        chapter.deleteSelection({ start: caret, end: { node: lastTextNode, index: lastTextNode.getText().length}}, false);
 
         // Delete everything before the caret in the copy.
-        const copyNodes = copy.getNodes();
-        const copyTextNodes = copyNodes.filter(n => n instanceof TextNode);
-        const firstTextNode = copyTextNodes.length > 0 ? copyTextNodes[0] as TextNode : undefined;
-        const newNodePosition = copyNodes[caretNodeIndex];
+        const newNodePosition = copy.getTextNodes()[caretNodeIndex];
 
         // If there's anything to delete, delete it.
-        if(firstTextNode && newNodePosition)
-            chapter.deleteSelection({ start: { node: firstTextNode, index: 0 }, end: { node: newNodePosition, index: caret.index }}, false);
+        if(newNodePosition)
+            chapter.deleteSelection({ start: { node: copy.getFirstTextNode(), index: 0 }, end: { node: newNodePosition, index: caret.index }}, false);
 
-        // Return the first text node after deletion.
-        return { node: copy.getNodes().filter(n => n instanceof TextNode)[0], index: 0 };        
+        // Clean up this and the new paragraph.
+        this.clean();
+        copy.clean();
+
+        // Return a caret at the beginning of the new paragraph.
+        return { node: copy.getFirstTextNode(), index: 0 };        
 
     }
 
@@ -195,6 +190,9 @@ export class ParagraphNode extends Node<BlockParentNode> {
 
     clean() {
         this.#content.clean();
+        // Make sure the paragraph always has an empty text node so that it's navigable.
+        if(this.#content.getSegments().length === 0)
+            this.#content.addSegment(new TextNode(this.#content, "", 0));
     }
     
 }

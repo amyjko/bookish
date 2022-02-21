@@ -221,6 +221,41 @@ export class ChapterNode extends Node {
 
     }
 
+    caretToTextIndex(caret: Caret): number {
+
+        if(!(caret.node instanceof TextNode))
+            throw Error("Can only get text position of text nodes");
+
+        const text = this.getTextNodes();
+        let index = 0;
+        for(let i = 0; i < text.length; i++) {
+            const t = text[i];
+            if(t !== caret.node)
+                index += t.getLength();
+            else {
+                index += caret.index;
+                break;
+            }
+        }
+
+        return index;
+
+    }
+
+    textIndexToCaret(index: number): Caret | undefined {
+
+        const text = this.getTextNodes();
+        let currentIndex = 0;
+        for(let i = 0; i < text.length; i++) {
+            const t = text[i];
+            if(index >= currentIndex && index <= currentIndex + t.getLength())
+                return { node: t, index: index - currentIndex };
+            currentIndex += t.getLength();
+        }
+        return undefined;
+
+    }
+
     removeRange(range: CaretRange) : Caret {
 
         // Sort the range
@@ -239,11 +274,14 @@ export class ChapterNode extends Node {
 
         // Just keep backspacing from the end caret until the returned caret is identical to the previous caret or the start caret.
         let previousCaret = undefined;
+        let startPosition = this.caretToTextIndex(start);
         let currentCaret = end;
+        let currentPosition = this.caretToTextIndex(end);
         do {
             previousCaret = currentCaret;
             currentCaret = (currentCaret.node as TextNode).deleteBackward(currentCaret.index);
-        } while(!(currentCaret.node === start.node && currentCaret.index === start.index) &&
+            currentPosition = this.caretToTextIndex(currentCaret);
+        } while(currentPosition > startPosition &&
                 !(previousCaret.node === currentCaret.node && previousCaret.index === currentCaret.index));
 
         return currentCaret;
@@ -301,7 +339,7 @@ export class ChapterNode extends Node {
         if(format === "" && range.start.node === range.end.node && range.start.index === range.end.index) {
             const paragraph = range.start.node.getClosestParentMatching(p => p instanceof ParagraphNode) as ParagraphNode;
             if(paragraph) {
-                const textPosition = paragraph.getContent().caretRangeToTextIndex(range.start);
+                const textPosition = paragraph.getContent().caretToTextIndex(range.start);
                 const text = paragraph.getNodes().filter(n => n instanceof TextNode) as TextNode[];
                 if(text.length > 0) {
                     this.formatSelection({ start: { node: text[0], index: 0 }, end: { node: text[text.length - 1], index: text[text.length - 1].getLength() }}, "");

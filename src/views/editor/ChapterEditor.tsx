@@ -171,9 +171,11 @@ const ChapterEditor = (props: { ast: ChapterNode }) => {
 
         if(!(caret.node instanceof TextNode)) return undefined;
         const domNode = document.querySelector(`[data-nodeid='${caret.node.nodeID}`);
-        if(domNode === null) return undefined;
+        // If we didn't find the node or there's no text node inside it, then there's no caret position.
+        // This happens temporarily before the useEffect above has a chance to insert zero-width non-breaking space.
+        if(domNode === null || domNode.childNodes.length === 0) return undefined;
         const range = document.createRange();
-        range.setStart(domNode.childNodes[0], caret.index);
+        range.setStart(domNode.childNodes.length === 0 ? domNode : domNode.childNodes[0], domNode.childNodes.length === 0 ? 0 : caret.index);
         const rect = range.getBoundingClientRect();
         return { top: rect.top, left: rect.left };
 

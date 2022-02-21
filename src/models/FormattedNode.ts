@@ -127,7 +127,7 @@ export class FormattedNode extends Node<FormattedNodeParent> {
 
         // If this is empty, remove it.
         if(this.#segments.length === 0) { 
-            this.remove();    
+            this.remove();
             return;
         }
     
@@ -150,7 +150,7 @@ export class FormattedNode extends Node<FormattedNodeParent> {
         return this.getNodes().filter(n => n instanceof TextNode) as TextNode[];
     }
 
-    caretRangeToTextIndex(caret: Caret): number {
+    caretToTextIndex(caret: Caret): number {
 
         if(!(caret.node instanceof TextNode))
             throw Error("Can only get text position of text nodes");
@@ -222,8 +222,8 @@ export class FormattedNode extends Node<FormattedNodeParent> {
         //    ✓ 1. Return a CaretRange that corresponds to the original positions
 
         // Convert the range into text positions so we can return a proper caret range.
-        const textStart = this.caretRangeToTextIndex(range.start);
-        const textEnd = this.caretRangeToTextIndex(range.end);
+        const textStart = this.caretToTextIndex(range.start);
+        const textEnd = this.caretToTextIndex(range.end);
 
         // Verify that the two given nodes share a FormattedNode ancestor.
         const formatted = range.start.node.getCommonAncestor(range.end.node);

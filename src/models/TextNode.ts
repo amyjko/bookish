@@ -108,7 +108,7 @@ export class TextNode extends Node<FormattedNode> {
             if(previousParagraph) {
                 // Remember the text position of the last position in the previous paragraph.
                 const lastText = previousParagraph.getLastTextNode();
-                const textPosition = previousParagraph.getContent().caretRangeToTextIndex({ node: lastText, index: lastText.getLength() });
+                const textPosition = previousParagraph.getContent().caretToTextIndex({ node: lastText, index: lastText.getLength() });
                 previousParagraph.appendParagraph(paragraph);
                 const newCaret = previousParagraph.getContent().textIndexToCaret(textPosition);
                 if(newCaret)
@@ -159,7 +159,7 @@ export class TextNode extends Node<FormattedNode> {
             if(nextParagraph) {
                 // Remember the position of the last index of the last text node so we can map back after cleaning.
                 const lastText = paragraph.getLastTextNode();
-                const textPosition = paragraph.getContent().caretRangeToTextIndex({ node: lastText, index: lastText.getLength() });
+                const textPosition = paragraph.getContent().caretToTextIndex({ node: lastText, index: lastText.getLength() });
                 paragraph.appendParagraph(nextParagraph);
                 const newCaret = paragraph.getContent().textIndexToCaret(textPosition);
                 if(newCaret)
@@ -191,7 +191,7 @@ export class TextNode extends Node<FormattedNode> {
     deleteAndClean(caret: Caret): Caret {
 
         const formatter = this.getRootFormatter();
-        const textPosition = formatter.caretRangeToTextIndex(caret);
+        const textPosition = formatter.caretToTextIndex(caret);
         formatter.clean();
         const cleanCaret = formatter.textIndexToCaret(textPosition);
         if(cleanCaret)
