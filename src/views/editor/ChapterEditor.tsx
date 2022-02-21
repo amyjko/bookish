@@ -246,6 +246,9 @@ const ChapterEditor = (props: { ast: ChapterNode }) => {
         if(caretRange === undefined)
             return;
 
+        // Command key can be control or meta
+        const isCommand = event.ctrlKey || event.metaKey;
+
         // Move the caret right!
         if(event.key === "ArrowRight") {
             event.preventDefault();
@@ -326,33 +329,35 @@ const ChapterEditor = (props: { ast: ChapterNode }) => {
                 return;
             }
         }
-        if(event.metaKey && event.key === "b") {
-            event.preventDefault();
-            setCaretRange(ast.formatSelection(caretRange, "*"))
-            return;
-        }
-        else if(event.metaKey && event.key === "i") {
-            event.preventDefault();
-            setCaretRange(ast.formatSelection(caretRange, "_"))
-            return;
-        }
-        else if(event.metaKey && event.key === ",") {
-            event.preventDefault();
-            setCaretRange(ast.formatSelection(caretRange, "v"))
-            return;
-        }
-        else if(event.metaKey && event.key === ".") {
-            event.preventDefault();
-            setCaretRange(ast.formatSelection(caretRange, "^"))
-            return;
-        }
-        else if(event.metaKey && event.key === "0") {
-            event.preventDefault();
-            setCaretRange(ast.formatSelection(caretRange, ""));
-            return;
+        else if(isCommand) {
+            if(event.key === "b") {
+                event.preventDefault();
+                setCaretRange(ast.formatSelection(caretRange, "*"))
+                return;
+            }
+            else if(event.key === "i") {
+                event.preventDefault();
+                setCaretRange(ast.formatSelection(caretRange, "_"))
+                return;
+            }
+            else if(event.key === ",") {
+                event.preventDefault();
+                setCaretRange(ast.formatSelection(caretRange, "v"))
+                return;
+            }
+            else if(event.key === ".") {
+                event.preventDefault();
+                setCaretRange(ast.formatSelection(caretRange, "^"))
+                return;
+            }
+            else if(event.key === "0") {
+                event.preventDefault();
+                setCaretRange(ast.formatSelection(caretRange, ""));
+                return;
+            }
         }
         // Insert any non control character! This is a bit hacky: all but "Fn" are more than three characters.
-        else if(!event.metaKey && event.key.length == 1) {
+        if(event.key.length == 1) {
             event.preventDefault()
             const caret = ast.insertSelection(event.key, caretRange);
             setCaretRange({ start: caret, end: caret });
