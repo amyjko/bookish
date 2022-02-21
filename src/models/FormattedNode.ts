@@ -2,7 +2,6 @@ import { Node } from "./Node";
 import { ErrorNode } from "./ErrorNode";
 import { TextNode } from "./TextNode";
 import { BlockNode } from "./Parser";
-import { SubSuperscriptNode } from "./SubSuperscriptNode";
 import { FootnoteNode } from "./FootnoteNode";
 import { LinkNode } from "./LinkNode";
 import { EmbedNode } from "./EmbedNode";
@@ -13,9 +12,9 @@ import { CommentNode } from "./CommentNode";
 import { LabelNode } from "./LabelNode";
 import { Caret, CaretRange } from "./ChapterNode";
 
-export type Format = "*" | "_" | "";
-export type FormattedNodeSegmentType = FormattedNode | TextNode | ErrorNode | InlineCodeNode | CitationsNode | SubSuperscriptNode | FootnoteNode | DefinitionNode | LinkNode | CommentNode | LabelNode;
-export type FormattedNodeParent = BlockNode | FormattedNode | SubSuperscriptNode | FootnoteNode | LinkNode | EmbedNode | DefinitionNode;
+export type Format = "" | "*" | "_" | "" | "^" | "v";
+export type FormattedNodeSegmentType = FormattedNode | TextNode | ErrorNode | InlineCodeNode | CitationsNode | FootnoteNode | DefinitionNode | LinkNode | CommentNode | LabelNode;
+export type FormattedNodeParent = BlockNode | FormattedNode | FootnoteNode | LinkNode | EmbedNode | DefinitionNode;
 
 export class FormattedNode extends Node<FormattedNodeParent> {
     #format: Format;
@@ -39,7 +38,7 @@ export class FormattedNode extends Node<FormattedNodeParent> {
     }
 
     toBookdown(): string {
-        return this.#format + this.#segments.map(s => s.toBookdown()).join("") + this.#format;
+        return (this.#format === "v" ? "^v" : this.#format) + this.#segments.map(s => s.toBookdown()).join("") + this.#format;
     }
 
     addSegment(node: FormattedNodeSegmentType) {

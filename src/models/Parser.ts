@@ -20,7 +20,6 @@ import { ParagraphNode } from "./ParagraphNode";
 import { QuoteNode } from "./QuoteNode";
 import { ReferenceNode } from "./ReferenceNode";
 import { RuleNode } from "./RuleNode";
-import { SubSuperscriptNode } from "./SubSuperscriptNode";
 import { TableNode } from "./TableNode";
 import { TextNode } from "./TextNode";
 
@@ -1127,7 +1126,7 @@ export default class Parser {
 
     }
 
-    parseSubSuperscripts(parent: FormattedNode): SubSuperscriptNode {
+    parseSubSuperscripts(parent: FormattedNode): FormattedNode {
         
         // Read the ^
         this.read();
@@ -1141,10 +1140,10 @@ export default class Parser {
             superscript = false;
         }
 
-        const node = new SubSuperscriptNode(parent, superscript)
+        const node = new FormattedNode(parent, superscript ? "^" : "v", []);
 
         // Parse the content
-        node.setContent(this.parseContent(node, "^"));
+        node.addSegment(this.parseContent(node, "^"));
 
         // Read the closing ^
         this.read();

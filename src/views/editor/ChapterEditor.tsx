@@ -336,6 +336,16 @@ const ChapterEditor = (props: { ast: ChapterNode }) => {
             setCaretRange(ast.formatSelection(caretRange, "_"))
             return;
         }
+        else if(event.metaKey && event.key === ",") {
+            event.preventDefault();
+            setCaretRange(ast.formatSelection(caretRange, "v"))
+            return;
+        }
+        else if(event.metaKey && event.key === ".") {
+            event.preventDefault();
+            setCaretRange(ast.formatSelection(caretRange, "^"))
+            return;
+        }
         else if(event.metaKey && event.key === "0") {
             event.preventDefault();
             setCaretRange(ast.formatSelection(caretRange, ""));
