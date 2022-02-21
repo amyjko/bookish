@@ -91,6 +91,9 @@ export class ParagraphNode extends Node<BlockParentNode> {
 
         // Remove the given paragraph from its context.
         paragraph.remove();
+
+        // Clean this paragraph.
+        this.clean();
         
     }
 
@@ -190,6 +193,8 @@ export class ParagraphNode extends Node<BlockParentNode> {
 
     }
 
-    clean() {}
+    clean() {
+        this.#content.clean();
+    }
     
 }

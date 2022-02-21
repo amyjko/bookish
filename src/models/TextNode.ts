@@ -105,20 +105,35 @@ export class TextNode extends Node<FormattedNode> {
         const firstText = paragraph?.getFirstTextNode();
         if(firstText === this) {
             const previousParagraph = paragraph.getPreviousIfParagraph();
-            if(previousParagraph)
+            if(previousParagraph) {
+                // Remember the text position of the last position in the previous paragraph.
+                const lastText = previousParagraph.getLastTextNode();
+                const textPosition = previousParagraph.getContent().caretRangeToTextIndex({ node: lastText, index: lastText.getLength() });
                 previousParagraph.appendParagraph(paragraph);
-            return { node: this, index: index };
+                const newCaret = previousParagraph.getContent().textIndexToCaret(textPosition);
+                if(newCaret)
+                    return newCaret;
+                else throw Error("Couldn't map caret back to new position.");
+            }
+            else return { node: this, index: index };
         }
 
-        // Otherwise, ask the previous word to delete.
+        // Otherwise, see if there's a previous node.
         const previous = this.getChapter()?.getPreviousTextNode(this);
 
-        // If there isn't one, don't delete, just return the beginning of this.
+        // If there isn't one, don't delete, don't change anything; just return the beginning of this. We've reached the beginning.
         if(previous === undefined)
             return { node: this, index: index };
 
-        // Otherwise, have the previous node delete.
-        return previous.deleteBackward();
+        // Otherwise, delete from the previous node.
+        const newCaret = previous.deleteBackward();
+
+        // If this is empty, delete it, then normalize the paragraph.
+        if(this.getLength() === 0)
+            return this.deleteAndClean(newCaret);
+
+        // Return the new caret position.
+        return newCaret;
         
     }
 
@@ -141,21 +156,48 @@ export class TextNode extends Node<FormattedNode> {
         const lastText = paragraph?.getLastTextNode();
         if(lastText === this) {
             const nextParagraph = paragraph.getNextIfParagraph();
-            if(nextParagraph)
+            if(nextParagraph) {
+                // Remember the position of the last index of the last text node so we can map back after cleaning.
+                const lastText = paragraph.getLastTextNode();
+                const textPosition = paragraph.getContent().caretRangeToTextIndex({ node: lastText, index: lastText.getLength() });
                 paragraph.appendParagraph(nextParagraph);
-            return { node: this, index: index };
+                const newCaret = paragraph.getContent().textIndexToCaret(textPosition);
+                if(newCaret)
+                    return newCaret;
+                else throw Error("Couldn't map caret back to new position.");
+            }
+            else return { node: this, index: index };
         }
 
         // Otherwise, ask the previous word to delete.
         const next = this.getChapter()?.getNextTextNode(this);
 
-        // If there isn't one, don't delete, just return the beginning of this.
+        // If there isn't one, don't change anything, we've reached the end of the text.
         if(next === undefined)
             return { node: this, index: index };
 
         // Otherwise, have the previous node delete.
-        return next.deleteForward();
+        const newCaret = next.deleteForward();
+
+        // If this is empty, delete it, then normalize the paragraph.
+        if(this.getLength() === 0)
+            return this.deleteAndClean(newCaret);
+
+        // Return the new caret position.
+        return newCaret;        
         
+    }
+
+    deleteAndClean(caret: Caret): Caret {
+
+        const formatter = this.getRootFormatter();
+        const textPosition = formatter.caretRangeToTextIndex(caret);
+        formatter.clean();
+        const cleanCaret = formatter.textIndexToCaret(textPosition);
+        if(cleanCaret)
+            return cleanCaret;
+        else throw Error("Couldn't map caret back to new position.");
+
     }
 
     deleteRange(start: number, end: number): Caret {
@@ -186,6 +228,10 @@ export class TextNode extends Node<FormattedNode> {
 
     getParagraph(): ParagraphNode {
         return this.getClosestParentMatching(p => p instanceof ParagraphNode) as ParagraphNode;
+    }
+
+    getRootFormatter(): FormattedNode {
+        return this.getFarthestParentMatching(p => p instanceof FormattedNode) as FormattedNode;
     }
 
     next(index: number): Caret {

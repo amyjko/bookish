@@ -75,6 +75,13 @@ export abstract class Node<ParentType extends Node<any> = Node<any>> {
 
     }
 
+    getFarthestParentMatching(match: (node: Node) => boolean): Node | undefined {
+
+        const matchingParents = this.getAncestors().filter(match);
+        return matchingParents.length > 0 ? matchingParents[matchingParents.length - 1] : undefined;
+
+    }
+
     getAncestors() {
 
         const ancestors = [];

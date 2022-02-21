@@ -85,7 +85,11 @@ const ChapterEditor = (props: { ast: ChapterNode }) => {
                     // We guard this to avoid triggering unnecessary selection change events that don't
                     // actually modify the selection.
                     if(rangeChanged) {
-                        docSelection.setBaseAndExtent(startNode.childNodes[0], sortedRange.start.index, endNode.childNodes[0], sortedRange.end.index);
+                        try {
+                            docSelection.setBaseAndExtent(startNode.childNodes[0], sortedRange.start.index, endNode.childNodes[0], sortedRange.end.index);
+                        } catch {
+                            throw Error(`Error setting caret range was set to ${startNode.childNodes[0]}:${sortedRange.start.index} - ${endNode.childNodes[0]}:${sortedRange.end.index}`);
+                        }
                         currentRange = docSelection.getRangeAt(0);
                     }
 

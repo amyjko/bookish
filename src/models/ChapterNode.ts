@@ -119,7 +119,7 @@ export class ChapterNode extends Node {
     }
 
     removeChild(node: Node): void {
-        this.#blocks = this.#blocks.filter(item => item !== node)
+        this.#blocks = this.#blocks.filter(item => item !== node);
     }
 
     replaceChild(node: Node, replacement: BlockNode): void {
@@ -155,7 +155,10 @@ export class ChapterNode extends Node {
                 caret = this.removeRange(range);
 
             // Insert at the start position.
-            return range.start.node.insert(char, range.start.index);
+            if(caret.node instanceof TextNode)
+                return caret.node.insert(char, caret.index);
+            else
+                return caret;
 
         } else
             return range.start;
@@ -187,9 +190,16 @@ export class ChapterNode extends Node {
         if(!(range.start.node instanceof TextNode) || !(range.end.node instanceof TextNode))
             return range;
 
-        // If they're different text nodes, just delete all of the text in between.
+        // Where do these text nodes appear in the chapter?
         let startIndex = this.getIndexOfTextNode(range.start.node);
         let endIndex = this.getIndexOfTextNode(range.end.node);
+
+        // Defensively verify that we could find the given nodes in the document.
+        // If we can't, something is wrong upstream.
+        if(startIndex && startIndex < 0)
+            throw Error(`Could not find ${range.start.node.toBookdown()} in chapter.`);
+        if(endIndex && endIndex < 0)
+            throw Error(`Could not find ${range.end.node.toBookdown()} in chapter.`);
 
         // If we didn't find them, or the start is before the end, return the given range.
         return startIndex === undefined || endIndex === undefined || startIndex < endIndex ? 
@@ -213,46 +223,30 @@ export class ChapterNode extends Node {
 
     removeRange(range: CaretRange) : Caret {
 
-        // Find all text nodes between the range.
-        const { start, end } = range;
-
-        // If the start and end positions are different, delete everything between them, and the corresponding parts of each.
-        if(!(start.node instanceof TextNode) || !(end.node instanceof TextNode))
-            return range.start;
-
-        // Just ask the text node to delete the range.
-        if(start.node === end.node)
-            return start.node.deleteRange(start.index, end.index);
-
         // Sort the range
         const sortedRange = this.sortRange(range);
 
-        // If they're different text nodes, just delete all of the text in between.
-        let startIndex = this.getIndexOfTextNode(start.node);
-        let endIndex = this.getIndexOfTextNode(end.node);
-
-        // Just in case...
-        if(startIndex === undefined || endIndex === undefined)
+        // Find all text nodes between the range.
+        const { start, end } = sortedRange;
+        
+        // Can only delete between text nodes.
+        if(!(start.node instanceof TextNode) || !(end.node instanceof TextNode))
             return range.start;
 
-        // Delete everything between
-        const text = this.getTextNodes();
+        // No op if the positions are the same.
+        if(start.node === end.node && start.index === end.index)
+            return range.start;
 
-        // Delete all of the text
-        for(let index = startIndex + 1; index < endIndex; index++)
-            text[index].remove();
+        // Just keep backspacing from the end caret until the returned caret is identical to the previous caret or the start caret.
+        let previousCaret = undefined;
+        let currentCaret = end;
+        do {
+            previousCaret = currentCaret;
+            currentCaret = (currentCaret.node as TextNode).deleteBackward(currentCaret.index);
+        } while(!(currentCaret.node === start.node && currentCaret.index === start.index) &&
+                !(previousCaret.node === currentCaret.node && previousCaret.index === currentCaret.index));
 
-        // Delete everything before the end position
-        (sortedRange.end.node as TextNode).deleteRange(0, sortedRange.end.index);
-
-        // End with the start node, so it can determine where to place the caret after everything else is gone.
-        const caret = (sortedRange.start.node as TextNode).deleteRange(sortedRange.start.index, (sortedRange.start.node as TextNode).getLength());
-
-        // Merge any text nodes in this chapter to clean up any unnecessary boundaries after deletion.
-        this.clean();
-
-        // Return the new caret from the deleted end.
-        return caret;
+        return currentCaret;
 
     }
 
