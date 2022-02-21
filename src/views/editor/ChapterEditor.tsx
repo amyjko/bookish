@@ -254,10 +254,17 @@ const ChapterEditor = (props: { ast: ChapterNode }) => {
             event.preventDefault();
             // What's to the right of the current selection's start?
             if(caretRange.start.node instanceof TextNode && caretRange.end.node instanceof TextNode) {
-                // Adjust the selection
                 const next = event.altKey ? caretRange.end.node.nextWord(caretRange.end.index) : caretRange.end.node.next(caretRange.end.index);
+                const paragraph = caretRange.start.node.getParagraph();
+                const last = paragraph.getLastTextNode();
+                const lastCaret = { node: last, index: last.getLength() };
+                // Adjust the selection
                 if(event.shiftKey) {
-                    setCaretRange({ start: caretRange.start, end: next })
+                    setCaretRange(isCommand ? { start: caretRange.start, end: lastCaret} : { start: caretRange.start, end: next })
+                }
+                // Move to the end of the paragraph
+                else if(isCommand) {
+                    setCaretRange({ start: lastCaret, end: lastCaret});
                 }
                 // Move the caret
                 else {
@@ -272,8 +279,15 @@ const ChapterEditor = (props: { ast: ChapterNode }) => {
             if(caretRange.start.node instanceof TextNode && caretRange.end.node instanceof TextNode) {
                 // Adjust the selection
                 const previous = event.altKey ? caretRange.end.node.previousWord(caretRange.end.index) : caretRange.end.node.previous(caretRange.end.index);
+                const paragraph = caretRange.start.node.getParagraph();
+                const first = paragraph.getFirstTextNode();
+                const firstCaret = { node: first, index: 0 };
                 if(event.shiftKey) {
-                    setCaretRange({ start: caretRange.start, end: previous })
+                    setCaretRange(isCommand ? { start: caretRange.start, end: firstCaret } : { start: caretRange.start, end: previous });
+                }
+                // Move to the beginning of the paragraph
+                else if(isCommand) {
+                    setCaretRange({ start: firstCaret, end: firstCaret});
                 }
                 else {
                     setCaretRange({ start: previous, end: previous })    
@@ -356,8 +370,9 @@ const ChapterEditor = (props: { ast: ChapterNode }) => {
                 return;
             }
         }
+        
         // Insert any non control character! This is a bit hacky: all but "Fn" are more than three characters.
-        if(event.key.length == 1) {
+        if(!isCommand && event.key.length == 1) {
             event.preventDefault()
             const caret = ast.insertSelection(event.key, caretRange);
             setCaretRange({ start: caret, end: caret });
