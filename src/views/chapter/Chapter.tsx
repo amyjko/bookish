@@ -172,11 +172,18 @@ const Chapter = (props: { chapter: ChapterModel, book: Book, print?: boolean }) 
 				smoothlyScrollElementToEyeLevel(el)
 			}
 		}
-		// Otherwise, scroll to the last scroll position, if there is one.
-		else {
-			// Scroll to the previous position, if there was one, so that refresh preserves position.
-			let scrollPosition = localStorage.getItem('scrollposition');
-			window.scrollTo(0, scrollPosition === null ? 0 : parseInt(scrollPosition));
+		else {			
+			// If we got to this page through a refresh, scroll to 
+			const entries = performance.getEntriesByType("navigation");
+			const position = localStorage.getItem('scrollposition');
+			if(position !== null && entries.length > 0 && (entries[entries.length - 1] as PerformanceNavigationTiming).type === "reload") {
+				// Scroll to the previous position, if there was one, so that refresh preserves position.
+				window.scrollTo(0, parseInt(position));
+			} 
+			// Otherwise, just scroll to the top.
+			else {
+				window.scrollTo(0, 0);
+			}
 		}
 
 	}
