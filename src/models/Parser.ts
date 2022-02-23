@@ -1214,16 +1214,11 @@ export default class Parser {
     
     parseLink(parent: FormattedNode): LinkNode | ErrorNode {
  
-        const node = new LinkNode(parent)
-
         // Read the [
         this.read();
-        // Read some content, awaiting |
-        const content = this.parseContent(node, "|");
 
-        // Catch links with no label.
-        if(content.isEmpty())
-            return this.createError(parent, undefined, "Unclosed link");
+        // Read pure text until funding |
+        const text = this.readUntilNewlineOr("|");
 
         // Catch missing bars
         if(this.peek() !== "|") {
@@ -1233,8 +1228,9 @@ export default class Parser {
 
         // Read the |
         this.read();
+
         // Read the link
-        let link = this.readUntilNewlineOr("]");
+        let url = this.readUntilNewlineOr("]");
 
         // Catch missing closing
         if(this.peek() !== "]") {
@@ -1246,26 +1242,23 @@ export default class Parser {
         this.read();
 
         // If it's internal, validate it.
-        if(!link.startsWith("http")) {
+        if(!url.startsWith("http")) {
 
             // Pull out any labels and just get the chapter name.
-            let chapter = link;
+            let chapter = url;
             let label = null;
-            if(link.indexOf(":") >= 0) {
+            if(url.indexOf(":") >= 0) {
                 let parts = chapter.split(":");
                 chapter = parts[0];
                 label = parts[1];
             }
 
             if(chapter !== "" && this.book && !this.book.hasChapter(chapter))
-                return this.createError(parent, undefined, "Unknown chapter name '" + link + "'");
+                return this.createError(parent, undefined, "Unknown chapter name '" + url + "'");
 
         }
 
-        node.setContent(content)
-        node.setURL(link)
-
-        return node;
+        return new LinkNode(parent, text, url);
 
     }
 

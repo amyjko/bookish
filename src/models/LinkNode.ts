@@ -3,18 +3,20 @@ import { FormattedNode } from "./FormattedNode";
 
 export class LinkNode extends Node<FormattedNode> {
 
-    #content: FormattedNode | undefined;
-    #url: string | undefined;
+    #text: string;
+    #url: string;
     
-    constructor(parent: FormattedNode) {
+    constructor(parent: FormattedNode, text: string = "", url: string = "") {
         super(parent, "link");
+        this.#text = text;
+        this.#url = url;
     }
 
     getURL() { return this.#url }
-    getText() { return this.#content; }
+    getText() { return this.#text; }
 
-    setContent(content: FormattedNode) {
-        this.#content = content;
+    setText(text: string) {
+        this.#text = text;
     }
 
     setURL(url: string) {
@@ -22,16 +24,14 @@ export class LinkNode extends Node<FormattedNode> {
     }
 
     toText(): string {
-        return this.#content ? this.#content.toText() : "";
+        return this.#text ? this.#text : "";
     }
 
     toBookdown(): String {
-        return `[${this.#content?.toBookdown()}|${this.#url}]`
+        return `[${this.#text}|${this.#url}]`
     }
 
-    traverseChildren(fn: (node: Node) => void): void {
-        this.#content?.traverse(fn)
-    }
+    traverseChildren(fn: (node: Node) => void): void {}
 
     removeChild(node: Node): void {}
 
@@ -40,10 +40,7 @@ export class LinkNode extends Node<FormattedNode> {
     getSiblingOf(child: Node, next: boolean) { return undefined; }
 
     copy(parent: FormattedNode): LinkNode {
-        const link = new LinkNode(parent)
-        if(this.#content) link.setContent(this.#content.copy(link))
-        if(this.#url) link.setURL(this.#url)
-        return link;
+        return new LinkNode(parent, this.#text, this.#url);
     }
 
     clean() {}
