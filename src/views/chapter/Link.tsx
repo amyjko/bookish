@@ -103,9 +103,9 @@ const Link = (props: { node: LinkNode}) => {
         (
             textFocused || urlFocused ?
                 <>
-                    <span className="bookish-editor-link-editor">
+                    <span className="bookish-editor-inline-editor">
                         <span className="bookish-editor-link">{contentDOM}</span>
-                        <span className="bookish-editor-link-form">
+                        <span className="bookish-editor-inline-form">
                             <input 
                                 type="text"
                                 className={isValid(editedURL) ? "" : "bookish-editor-link-invalid"}

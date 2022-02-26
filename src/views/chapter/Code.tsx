@@ -33,7 +33,7 @@ const Code = (props: { editable: boolean, inline: boolean, nodeID: number | unde
         data-nodeid={props.nodeID}
         contentEditable={props.editable}
         suppressContentEditableWarning={true}
-        className={"bookish-code " + (props.inline ? "bookish-code-inline" : "bookish-code-block") + " language-" + lang} 
+        className={`bookish-code ${props.inline ? "bookish-code-inline" : "bookish-code-block"} ${"language-" + lang}`} 
         onBlur={handleChange}
         ref={el}>
             {props.children}

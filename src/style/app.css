@@ -222,6 +222,7 @@ input[type="text"].bookish-app-editable-error {
     display: inline-block;
     box-sizing: border-box;
     position: absolute;
+    z-index: 1;
 }
 
 @keyframes bookish-chapter-editor-caret-blink {
@@ -247,17 +248,18 @@ input[type="text"].bookish-app-editable-error {
     outline-color: var(--bookish-link-color);
 }
 
-.bookish-editor-link-editor {
+.bookish-editor-inline-editor {
     display: inline-block;
     position: relative;
 }
 
-.bookish-editor-link-form {
+.bookish-editor-inline-form {
     position: absolute;
     left: 0;
     width: auto;
     top: 2em;
     width: 15em;
+    z-index: 2;
 }
 
 .bookish-editor-link {

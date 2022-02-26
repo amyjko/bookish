@@ -262,22 +262,6 @@ export class FormattedNode extends Node<FormattedNodeParent> {
                     // preventing formatting removal.
                     (n === startNode && range.start.index < startNode.getLength()) ||
                     (n === endNode && range.end.index > 0) || 
-                (n === endNode && range.end.index > 0) || 
-                    (n === endNode && range.end.index > 0) || 
-                (n === endNode && range.end.index > 0) || 
-                    (n === endNode && range.end.index > 0) || 
-                (n === endNode && range.end.index > 0) || 
-                    (n === endNode && range.end.index > 0) || 
-                (n === endNode && range.end.index > 0) || 
-                    (n === endNode && range.end.index > 0) || 
-                (n === endNode && range.end.index > 0) || 
-                    (n === endNode && range.end.index > 0) || 
-                (n === endNode && range.end.index > 0) || 
-                    (n === endNode && range.end.index > 0) || 
-                (n === endNode && range.end.index > 0) || 
-                    (n === endNode && range.end.index > 0) || 
-                (n === endNode && range.end.index > 0) || 
-                    (n === endNode && range.end.index > 0) || 
                     // Include any nodes between the start and the end nodes.
                     (textNodes.indexOf(n) > textNodes.indexOf(startNode) && textNodes.indexOf(n) < textNodes.indexOf(endNode))
                 )

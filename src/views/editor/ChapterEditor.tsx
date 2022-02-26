@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from "react"
 import { ChapterNode, CaretRange, Caret } from "../../models/ChapterNode";
-import { FormattedNode } from "../../models/FormattedNode";
+import { InlineCodeNode } from "../../models/InlineCodeNode";
 import { LinkNode } from "../../models/LinkNode";
 import { ParagraphNode } from "../../models/ParagraphNode";
 import { TextNode } from "../../models/TextNode";
@@ -331,9 +331,9 @@ const ChapterEditor = (props: { ast: ChapterNode }) => {
             if(caretRange.start.node instanceof TextNode && caretRange.end.node instanceof TextNode) {
 
                 // If this is a text node in a link, enter the link form.
-                const link = caretRange.start.node.getClosestParentMatching(p => p instanceof LinkNode);
-                if(link) {
-                    setCaretRange({ start: { node: link, index: 0 }, end: { node: link, index: 0 }});
+                const atom = caretRange.start.node.getClosestParentMatching(p => p instanceof LinkNode || p instanceof InlineCodeNode);
+                if(atom) {
+                    setCaretRange({ start: { node: atom, index: 0 }, end: { node: atom, index: 0 }});
                 }
                 else if(event.shiftKey)
                     setCaretRange({ start: caretRange.start, end: getCaretBelow(caretRange.end) });
@@ -415,6 +415,30 @@ const ChapterEditor = (props: { ast: ChapterNode }) => {
                     setCaretRange({ start: text, end: text});
                 }
                 return;
+            }
+            else if(event.key === "j") {
+                event.preventDefault();
+
+                // If the caret is already in a code node, remove it.
+                const code = caretRange.start.node.getClosestParentMatching(p => p instanceof InlineCodeNode) as InlineCodeNode;
+                if(code) {
+                    const parent = code.getParent();
+                    if(parent) {
+                        const index = parent.caretToTextIndex(caretRange.start);
+                        code.unformat();
+                        const newCaret = parent.textIndexToCaret(index);
+                        if(newCaret)
+                            setCaretRange({ start: newCaret, end: newCaret });
+                    }
+                }
+                else {
+                    const caret = ast.insertNodeAtSelection(caretRange, (parent, text) => new InlineCodeNode(parent, text, ""));
+                    // Get the text node inside the new link.
+                    const textNode = (caret.node as InlineCodeNode).getTextNode();
+                    const text = { node: textNode, index: textNode.getLength() };
+                    setCaretRange({ start: text, end: text});
+                }
+
             }
         }
         
