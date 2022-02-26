@@ -15,7 +15,7 @@ import CaptionedCode from './CaptionedCode'
 import Quote from './Quote'
 import Callout from './Callout'
 import Table from './Table'
-import Segments from './Formatted'
+import Formatted from './Formatted'
 import InlineCode from './InlineCode'
 import Link from './Link'
 import Citations from './Citations'
@@ -39,7 +39,7 @@ const renderers: Record<string, (props: { node: any }) => JSX.Element> = {
     "quote": Quote,
     "callout": Callout,
     "table": Table,
-    "formatted": Segments,
+    "formatted": Formatted,
     "inline-code": InlineCode,
     "link": Link,
     "citations": Citations,
