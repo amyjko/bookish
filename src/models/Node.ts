@@ -21,6 +21,7 @@ export abstract class Node<ParentType extends Node<any> = Node<any>> {
 
     getParent(): ParentType | undefined { return this.#parent; }
     setParent(parent: ParentType | undefined): void { this.#parent = parent; }
+    inside(type: Function) { return this.getClosestParentMatching(p => p instanceof type) !== undefined; }
 
     setID(id: number) { this.nodeID = id; }
 

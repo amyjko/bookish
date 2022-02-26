@@ -1,11 +1,10 @@
+import { AtomNode } from "./AtomNode";
 import { Caret } from "./ChapterNode";
 import { FormattedNode } from "./FormattedNode";
-import { InlineCodeNode } from "./InlineCodeNode";
-import { LinkNode } from "./LinkNode";
 import { Node } from "./Node";
 import { ParagraphNode } from "./ParagraphNode";
 
-export type TextNodeParent = FormattedNode | LinkNode | InlineCodeNode;
+export type TextNodeParent = FormattedNode | AtomNode<any>;
 
 export class TextNode extends Node<TextNodeParent> {
 

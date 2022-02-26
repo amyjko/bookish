@@ -1179,8 +1179,11 @@ export default class Parser {
         // Read the ~
         this.read();
         
-        // Read the definition content.
-        node.setPhrase(this.parseContent(node, "~"));
+        // Read the phrase
+        const text = this.readUntilNewlineOr("~");
+
+        // Set it.
+        node.setText(text);
 
         // Read the closing ~
         this.read();
@@ -1194,7 +1197,7 @@ export default class Parser {
             next = this.peek();
         }
 
-        node.setGlossaryID(glossaryID)
+        node.setMeta(glossaryID);
 
         return node;
 

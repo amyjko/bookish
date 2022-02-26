@@ -8,8 +8,8 @@ import { ChapterContext, ChapterContextType } from './Chapter'
 const Definition = (props: { node: DefinitionNode}) => {
 
     const { node } = props
-    const glossaryID = node.getGlossaryID();
-    const phrase = node.getPhrase();
+    const glossaryID = node.getMeta();
+    const phrase = node.getText();
     const context = useContext<ChapterContextType>(ChapterContext)
 
     // If there's no context, render nothing.
@@ -19,14 +19,11 @@ const Definition = (props: { node: DefinitionNode}) => {
     // Find the definition.
     let glossary = context.book.getGlossary();
 
-    if(glossaryID === undefined || !(glossaryID in glossary))
+    // Error if there's no corresponding entry.
+    if(!(glossaryID in glossary))
         return <span className="bookish-error">Unknown glossary entry "{ glossaryID }"</span>
 
     let entry = glossary[glossaryID];
-
-    // If for some reason there's no phrase, return nothing.
-    if(phrase === undefined)
-        return <></>
 
     return <span className="bookish-definition" data-nodeid={props.node.nodeID}>
         <Marginal

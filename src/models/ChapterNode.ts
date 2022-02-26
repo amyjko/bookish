@@ -8,6 +8,7 @@ import { Node } from "./Node";
 import { ParagraphNode } from "./ParagraphNode";
 import { Format, FormattedNode, FormattedNodeSegmentType } from "./FormattedNode";
 import { RuleNode } from "./RuleNode";
+import { AtomNode } from "./AtomNode";
 
 export type Caret = { node: Node, index: number }
 export type CaretRange = { start: Caret, end: Caret }
@@ -447,6 +448,33 @@ export class ChapterNode extends Node {
 
         // Return the new range.
         return { start: newStartRange.start, end: newEndRange.end };
+
+    }
+
+    // If the caret is in an atom of the given type, remove it.
+    // If it is not, wrap it.
+    toggleAtom<AtomType extends AtomNode<any>>(range: CaretRange, type: Function, creator: (parent: FormattedNode, text: string) => FormattedNodeSegmentType): Caret | undefined {
+
+        // If the caret is already in a link node, remove it.
+        if(range.start.node.inside(type)) {
+            const atom = range.start.node.getClosestParentMatching(p => p instanceof type) as AtomType;
+            const formatted = atom.getParent();
+            if(formatted) {
+                const index = formatted.caretToTextIndex(range.start);
+                atom.unwrap();
+                const newCaret = formatted.textIndexToCaret(index);
+                if(newCaret)
+                    return newCaret;
+            }
+        }
+        else {
+            const caret = this.insertNodeAtSelection(range, creator);
+            // Get the text node inside the new link.
+            const textNode = (caret.node as AtomNode<any>).getText();
+            return { node: textNode, index: textNode.getLength() }
+        }
+
+        return undefined;
 
     }
 

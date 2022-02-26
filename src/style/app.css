@@ -257,8 +257,8 @@ input[type="text"].bookish-app-editable-error {
     position: absolute;
     left: 0;
     width: auto;
-    top: 2em;
-    width: 15em;
+    top: var(--bookish-paragraph-line-height);
+    width: auto;
     z-index: 2;
 }
 

@@ -3,18 +3,16 @@ import { ErrorNode } from "./ErrorNode";
 import { TextNode } from "./TextNode";
 import { BlockNode } from "./Parser";
 import { FootnoteNode } from "./FootnoteNode";
-import { LinkNode } from "./LinkNode";
 import { EmbedNode } from "./EmbedNode";
-import { InlineCodeNode } from "./InlineCodeNode";
 import { CitationsNode } from "./CitationsNode";
-import { DefinitionNode } from "./DefinitionNode";
 import { CommentNode } from "./CommentNode";
 import { LabelNode } from "./LabelNode";
 import { Caret, CaretRange } from "./ChapterNode";
+import { AtomNode } from "./AtomNode";
 
 export type Format = "" | "*" | "_" | "" | "^" | "v";
-export type FormattedNodeSegmentType = FormattedNode | TextNode | ErrorNode | InlineCodeNode | CitationsNode | FootnoteNode | DefinitionNode | LinkNode | CommentNode | LabelNode;
-export type FormattedNodeParent = BlockNode | FormattedNode | FootnoteNode | LinkNode | EmbedNode | DefinitionNode;
+export type FormattedNodeSegmentType = FormattedNode | TextNode | ErrorNode | AtomNode<any> | CitationsNode | FootnoteNode | CommentNode | LabelNode;
+export type FormattedNodeParent = BlockNode | FormattedNode | FootnoteNode | EmbedNode;
 
 export class FormattedNode extends Node<FormattedNodeParent> {
     #format: Format;
@@ -385,8 +383,8 @@ export class FormattedNode extends Node<FormattedNodeParent> {
         const nodes = this.getNodes();
         const newNodes: { node: FormattedNodeSegmentType, format: string | undefined}[] = [];
         nodes.forEach(node => {
-            // If this is a formatting node or a text node inside of an atomic node, ignore it.
-            if(node instanceof FormattedNode || node.getClosestParentMatching(p => p instanceof LinkNode) !== undefined) {
+            // If this is a formatting node or a text node inside of an atom node, ignore it.
+            if(node instanceof FormattedNode || node.getClosestParentMatching(p => p instanceof AtomNode) !== undefined) {
                 // Do nothing. This strips the formatted nodes and leaves any text nodes to be included by their parents.
             }
             // If this is a text node inside of a formatting node, remember its formatting.

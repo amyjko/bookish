@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState } from "react"
+import { AtomNode } from "../../models/AtomNode";
 import { ChapterNode, CaretRange, Caret } from "../../models/ChapterNode";
 import { InlineCodeNode } from "../../models/InlineCodeNode";
 import { LinkNode } from "../../models/LinkNode";
@@ -394,51 +395,16 @@ const ChapterEditor = (props: { ast: ChapterNode }) => {
             }
             else if(event.key === "k") {
                 event.preventDefault();
-
-                // If the caret is already in a link node, remove it.
-                const link = caretRange.start.node.getClosestParentMatching(p => p instanceof LinkNode) as LinkNode;
-                if(link) {
-                    const parent = link.getParent();
-                    if(parent) {
-                        const index = parent.caretToTextIndex(caretRange.start);
-                        link.unlink();
-                        const newCaret = parent.textIndexToCaret(index);
-                        if(newCaret)
-                            setCaretRange({ start: newCaret, end: newCaret });
-                    }
-                }
-                else {
-                    const caret = ast.insertNodeAtSelection(caretRange, (parent, text) => new LinkNode(parent, text, ""));
-                    // Get the text node inside the new link.
-                    const textNode = (caret.node as LinkNode).getText();
-                    const text = { node: textNode, index: textNode.getLength() };
-                    setCaretRange({ start: text, end: text});
-                }
+                const caret = ast.toggleAtom(caretRange, LinkNode, (parent, text) => new LinkNode(parent, text));
+                if(caret)
+                    setCaretRange({ start: caret, end: caret});
                 return;
             }
             else if(event.key === "j") {
                 event.preventDefault();
-
-                // If the caret is already in a code node, remove it.
-                const code = caretRange.start.node.getClosestParentMatching(p => p instanceof InlineCodeNode) as InlineCodeNode;
-                if(code) {
-                    const parent = code.getParent();
-                    if(parent) {
-                        const index = parent.caretToTextIndex(caretRange.start);
-                        code.unformat();
-                        const newCaret = parent.textIndexToCaret(index);
-                        if(newCaret)
-                            setCaretRange({ start: newCaret, end: newCaret });
-                    }
-                }
-                else {
-                    const caret = ast.insertNodeAtSelection(caretRange, (parent, text) => new InlineCodeNode(parent, text, ""));
-                    // Get the text node inside the new link.
-                    const textNode = (caret.node as InlineCodeNode).getTextNode();
-                    const text = { node: textNode, index: textNode.getLength() };
-                    setCaretRange({ start: text, end: text});
-                }
-
+                const caret = ast.toggleAtom(caretRange, InlineCodeNode, (parent, text) => new InlineCodeNode(parent, text));
+                if(caret)
+                    setCaretRange({ start: caret, end: caret});
             }
         }
         
