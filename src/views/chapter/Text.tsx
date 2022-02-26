@@ -26,7 +26,6 @@ const Text = (props: { node: TextNode}) => {
     let text = node.getText();
     
     const context = useContext(ChapterContext);
-    const caret = useContext(CaretContext);
     const ref = useRef<HTMLSpanElement | null>(null);
 
     // Replace any spaces at the beginning or end of the string with explicit non-breaking spaces to ensure that they render.

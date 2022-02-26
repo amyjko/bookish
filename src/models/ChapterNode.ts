@@ -6,7 +6,7 @@ import { HeaderNode } from "./HeaderNode";
 import { EmbedNode } from "./EmbedNode";
 import { Node } from "./Node";
 import { ParagraphNode } from "./ParagraphNode";
-import { Format, FormattedNode } from "./FormattedNode";
+import { Format, FormattedNode, FormattedNodeSegmentType } from "./FormattedNode";
 import { RuleNode } from "./RuleNode";
 
 export type Caret = { node: Node, index: number }
@@ -162,6 +162,54 @@ export class ChapterNode extends Node {
 
         } else
             return range.start;
+
+    }
+
+    getSelectedText(range: CaretRange): string | undefined {
+
+        if(!(range.start.node instanceof TextNode) || !(range.end.node instanceof TextNode))
+            return undefined;
+
+        const start = this.getIndexOfTextNode(range.start.node);
+        const end = this.getIndexOfTextNode(range.end.node);
+
+        if(start === undefined || end === undefined)
+            return undefined;
+
+        return this.getTextNodes().map((current, index) => {
+            return current === range.start.node ? (
+                    current === range.end.node ? 
+                        current.getText().substring(range.start.index, range.end.index) : 
+                        current.getText().substring(range.start.index)) :
+                index > start && index < end ? current.getText() :
+                current === range.end.node ? current.getText().substring(0, range.end.index) :
+                "";
+        }).join("");
+        
+    }
+
+    insertNodeAtSelection(range: CaretRange, nodeCreator: (parent: FormattedNode, text: string) => FormattedNodeSegmentType): Caret {
+
+        let caret = range.start;
+
+        // Only works at a text node.
+        if(!(caret.node instanceof TextNode))
+            return caret;
+
+        // Get the nearest FormattedNode parent of the selected text.
+        const formatted = caret.node.getClosestParentMatching(p => p instanceof FormattedNode) as FormattedNode;
+
+        // Can't do anything if it's not in a formatted node.
+        if(formatted === undefined)
+            return caret;
+    
+        // If there's a selection, grab it's text and then remove the text.
+        let selectedText = this.getSelectedText(range);
+        if (range.start.node !== range.end.node || range.start.index !== range.end.index)
+            caret = this.removeRange(range);
+
+        // Create and insert the into the formatted node.
+        return formatted.insertSegmentAt(nodeCreator.call(undefined, formatted, selectedText ? selectedText : ""), caret);
 
     }
 
@@ -339,10 +387,12 @@ export class ChapterNode extends Node {
         if(format === "" && range.start.node === range.end.node && range.start.index === range.end.index) {
             const paragraph = range.start.node.getClosestParentMatching(p => p instanceof ParagraphNode) as ParagraphNode;
             if(paragraph) {
+                // Remember the caret position
                 const textPosition = paragraph.getContent().caretToTextIndex(range.start);
                 const text = paragraph.getNodes().filter(n => n instanceof TextNode) as TextNode[];
                 if(text.length > 0) {
                     this.formatSelection({ start: { node: text[0], index: 0 }, end: { node: text[text.length - 1], index: text[text.length - 1].getLength() }}, "");
+                    // Restore the caret position
                     const caret = paragraph.getContent().textIndexToCaret(textPosition);
                     return caret ? { start: caret, end: caret } : range;
                 }

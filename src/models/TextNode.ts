@@ -1,14 +1,17 @@
 import { Caret } from "./ChapterNode";
 import { FormattedNode } from "./FormattedNode";
+import { LinkNode } from "./LinkNode";
 import { Node } from "./Node";
 import { ParagraphNode } from "./ParagraphNode";
 
-export class TextNode extends Node<FormattedNode> {
+export type TextNodeParent = FormattedNode | LinkNode;
+
+export class TextNode extends Node<TextNodeParent> {
 
     #text: string;
     #position: number;
 
-    constructor(parent: FormattedNode, text: string, position: number) {
+    constructor(parent: TextNodeParent, text: string, position: number) {
         super(parent, "text");
         this.#text = text;
         this.#position = position - text.length;

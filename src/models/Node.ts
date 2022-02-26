@@ -113,6 +113,7 @@ export abstract class Node<ParentType extends Node<any> = Node<any>> {
     remove() : void { 
         this.getChapter()?.unindexNode(this);
         this.#parent?.removeChild(this);
+        this.#parent = undefined;
     }
 
     // Each node has its own way of removing a child.

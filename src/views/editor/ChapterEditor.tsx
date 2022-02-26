@@ -1,16 +1,21 @@
 import React, { useEffect, useRef, useState } from "react"
 import { ChapterNode, CaretRange, Caret } from "../../models/ChapterNode";
 import { FormattedNode } from "../../models/FormattedNode";
+import { LinkNode } from "../../models/LinkNode";
 import { ParagraphNode } from "../../models/ParagraphNode";
 import { TextNode } from "../../models/TextNode";
 import { renderNode } from "../chapter/Renderer";
 
-export const CaretContext = React.createContext<{ selection: CaretRange | undefined, rect: { x: number, y: number} | undefined} | undefined>(undefined)
+export const CaretContext = React.createContext<{ 
+        selection: CaretRange | undefined, 
+        rect: { x: number, y: number} | undefined,
+        setCaretRange: Function
+    }     | undefined>(undefined)
 
 const ChapterEditor = (props: { ast: ChapterNode }) => {
 
     const { ast } = props;
-    const ref = useRef<HTMLDivElement>(null);
+    const editorRef = useRef<HTMLDivElement>(null);
 
     const [ caretRange, setCaretRange ] = useState<CaretRange>();
     const [ caretRect, setCaretRect ] = useState<{ x: number, y: number}>();
@@ -40,6 +45,12 @@ const ChapterEditor = (props: { ast: ChapterNode }) => {
     // 2) We can measure the caret position, so we can render our own fancy one rather than relying on inconsistent cross browser behavior.
     useEffect(() => {
 
+        // Grab the focus if we're focused on a text node.
+        if(caretRange && caretRange.start.node instanceof TextNode && editorRef.current) {
+            editorRef.current.focus();
+        }
+
+        // Measure the location of the selection using the browser's selection.
         let docSelection = document.getSelection();
         let newCaretPosition = undefined;
         if(docSelection) {
@@ -52,7 +63,7 @@ const ChapterEditor = (props: { ast: ChapterNode }) => {
 
                 // If we found both selected nodes and we have a reference to the DOM, update the 
                 // browser's selection if necessary and measure it's position so we can draw our own caret.
-                if(startNode && endNode && ref.current) {
+                if(startNode && endNode && editorRef.current) {
 
                     // If the current selection isn't different from the new one, then we don't do any of this.
                     // This prevents an infinite loop when, for example, the user clicks, the browser selection changes, 
@@ -96,7 +107,7 @@ const ChapterEditor = (props: { ast: ChapterNode }) => {
                     // Measure and remember caret position
                     if(currentRange) {
                         const rangeRect = currentRange.getBoundingClientRect();
-                        const editorRect = ref.current.getBoundingClientRect();
+                        const editorRect = editorRef.current.getBoundingClientRect();
                         const position = {
                             x: rangeRect.left - editorRect.left,
                             y: rangeRect.top - editorRect.top
@@ -156,6 +167,7 @@ const ChapterEditor = (props: { ast: ChapterNode }) => {
 
         // Map the browser selection to our caret range model.
         const selection = document.getSelection();
+
         if(selection && selection.anchorNode && selection.anchorOffset && selection.focusNode && selection.focusOffset) {
             const start = rangeToCaret(selection.anchorNode, selection.anchorOffset);
             const end = rangeToCaret(selection.focusNode, selection.focusOffset);
@@ -239,6 +251,11 @@ const ChapterEditor = (props: { ast: ChapterNode }) => {
 
     function handleKeyDown(event: React.KeyboardEvent) {
 
+        // Only handle keystrokes when this is focused.
+        // Otherwise, we let any focusable elements in this editor handle them.
+        if(document.activeElement !== editorRef.current)
+            return;
+
         // Remember the time of this keystroke.
         setLastInputTime(Date.now());
         setIdle(false);
@@ -312,7 +329,13 @@ const ChapterEditor = (props: { ast: ChapterNode }) => {
         else if(event.key === "ArrowDown") {
             event.preventDefault();
             if(caretRange.start.node instanceof TextNode && caretRange.end.node instanceof TextNode) {
-                if(event.shiftKey)
+
+                // If this is a text node in a link, enter the link form.
+                const link = caretRange.start.node.getClosestParentMatching(p => p instanceof LinkNode);
+                if(link) {
+                    setCaretRange({ start: { node: link, index: 0 }, end: { node: link, index: 0 }});
+                }
+                else if(event.shiftKey)
                     setCaretRange({ start: caretRange.start, end: getCaretBelow(caretRange.end) });
                 else {
                     const below = getCaretBelow(caretRange.start);
@@ -369,6 +392,30 @@ const ChapterEditor = (props: { ast: ChapterNode }) => {
                 setCaretRange(ast.formatSelection(caretRange, ""));
                 return;
             }
+            else if(event.key === "k") {
+                event.preventDefault();
+
+                // If the caret is already in a link node, remove it.
+                const link = caretRange.start.node.getClosestParentMatching(p => p instanceof LinkNode) as LinkNode;
+                if(link) {
+                    const parent = link.getParent();
+                    if(parent) {
+                        const index = parent.caretToTextIndex(caretRange.start);
+                        link.unlink();
+                        const newCaret = parent.textIndexToCaret(index);
+                        if(newCaret)
+                            setCaretRange({ start: newCaret, end: newCaret });
+                    }
+                }
+                else {
+                    const caret = ast.insertNodeAtSelection(caretRange, (parent, text) => new LinkNode(parent, text, ""));
+                    // Get the text node inside the new link.
+                    const textNode = (caret.node as LinkNode).getText();
+                    const text = { node: textNode, index: textNode.getLength() };
+                    setCaretRange({ start: text, end: text});
+                }
+                return;
+            }
         }
         
         // Insert any non control character! This is a bit hacky: all but "Fn" are more than three characters.
@@ -383,45 +430,57 @@ const ChapterEditor = (props: { ast: ChapterNode }) => {
 
     function handleMouseDown(event: React.MouseEvent) {
         
-        if(!ref.current)
+        if(!editorRef.current)
             return;
 
-        ref.current.focus();
+        // Grab focus.
+        editorRef.current.focus();
+
+        // If we've selected a non-TextNode, release it, so the browser is free to select a text node.
+        if(caretRange && !(caretRange.start.node instanceof TextNode)) {
+            setCaretRange(undefined);
+        }
 
     }
 
-    function onFocus(event: React.FocusEvent) {}
+    function onFocus(event: React.FocusEvent) {
+    }
 
     function onBlur(event: React.FocusEvent) {
-        setCaretRange(undefined);
+        
+        // If the editor lost focus and the caret was on a text node, erase the caret.
+        // Otherwise, we leave it alone, since children of this editor may focus and blur.
+        if(editorRef.current && event.target === editorRef.current && caretRange?.start.node instanceof TextNode) {
+            setCaretRange(undefined);
+        }
     }
 
     function handleKeyUp(event: React.KeyboardEvent) {
         event.preventDefault();
-    }    
+    }
 
     const isSelection = caretRange && (caretRange.start.node !== caretRange.end.node || caretRange.start.index !== caretRange.end.index);
     const isItalic = caretRange && !isSelection && caretRange.start.node instanceof TextNode && caretRange.start.node.isItalic();
     const isBold = caretRange && !isSelection && caretRange.start.node instanceof TextNode && caretRange.start.node.isBold();
+    const isLink = caretRange && !isSelection && caretRange.start.node.getClosestParentMatching(p => p instanceof LinkNode) !== undefined;
 
-    return <CaretContext.Provider value={{ selection: caretRange, rect: caretRect}}>
+    return <CaretContext.Provider value={{ selection: caretRange, rect: caretRect, setCaretRange: setCaretRange }}>
             <div 
                 className="bookish-chapter-editor"
-                ref={ref}
+                ref={editorRef}
                 onKeyDown={handleKeyDown}
                 onKeyUp={handleKeyUp}
                 onMouseDown={handleMouseDown}
                 onFocus={onFocus}
                 onBlur={onBlur}
-                // spellCheck={false}
-                tabIndex={0}
+                tabIndex={0} // Makes the editor focusable.
                 >
                 {
                     // Draw a caret. We draw our own since this view isn't contentEditable and we can't show a caret.
                     // Customize the rendering based on the formatting applied to the text node.
                     caretRect && caretRange && !isSelection ? 
                         <div 
-                            className={`bookish-chapter-editor-caret ${isItalic ? "bookish-chapter-editor-caret-italic" :""} ${isBold ? "bookish-chapter-editor-caret-bold" : ""} ${idle ? "bookish-chapter-editor-caret-blink" : ""}`}
+                            className={`bookish-chapter-editor-caret ${isLink ? "bookish-chapter-editor-caret-linked" : isItalic ? "bookish-chapter-editor-caret-italic" :""} ${isBold ? "bookish-chapter-editor-caret-bold" : ""} ${idle ? "bookish-chapter-editor-caret-blink" : ""}`}
                             style={{
                                 left: caretRect.x,
                                 top: caretRect.y
