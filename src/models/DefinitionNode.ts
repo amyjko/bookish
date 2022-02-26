@@ -4,7 +4,7 @@ import { AtomNode } from "./AtomNode";
 
 export class DefinitionNode extends AtomNode<string> {
     constructor(parent: FormattedNode, phrase: string = "", glossaryID: string = "") {
-        super(parent, "", "", "definition");
+        super(parent, phrase, glossaryID, "definition");
     }
 
     toText(): string {

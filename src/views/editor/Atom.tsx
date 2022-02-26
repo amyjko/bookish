@@ -23,11 +23,6 @@ const Atom = (props: { node: AtomNode<any>, editingTextView: React.ReactElement,
         if(event.key === "ArrowUp" || event.key === "Enter") {
             caret.setCaretRange({ start: { node: node.getText(), index: 0 }, end: { node: node.getText(), index: 0 }});
         }
-        // If escape, remove the link.
-        else if(event.key === "Escape") {
-            const newCaret = node.unwrap();
-            caret.setCaretRange({ start: newCaret, end: newCaret });
-        }
 
     }
 
@@ -47,7 +42,6 @@ const Atom = (props: { node: AtomNode<any>, editingTextView: React.ReactElement,
             textFocused || metaFocused ?
                 <>
                     <span className="bookish-editor-inline-editor">
-                        { editingTextView }
                         <span 
                             className="bookish-editor-inline-form" 
                             onKeyDown={handleKeyDown}
@@ -56,6 +50,7 @@ const Atom = (props: { node: AtomNode<any>, editingTextView: React.ReactElement,
                             { metaView }
                         </span>
                     </span>
+                    { editingTextView }
                 </> 
             : 
             editingTextView

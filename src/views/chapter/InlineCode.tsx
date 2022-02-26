@@ -11,7 +11,6 @@ const InlineCode = (props: { node: InlineCodeNode }) => {
     const { node } = props
 
     const caret = useContext(CaretContext);
-    const { editable } = useContext(EditorContext);
     const selectRef = useRef<HTMLSelectElement>(null);
     const [ language, setLanguage ] = useState<string>(node.getMeta());
 

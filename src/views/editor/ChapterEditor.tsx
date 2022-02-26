@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from "react"
 import { AtomNode } from "../../models/AtomNode";
 import { ChapterNode, CaretRange, Caret } from "../../models/ChapterNode";
+import { DefinitionNode } from "../../models/DefinitionNode";
 import { InlineCodeNode } from "../../models/InlineCodeNode";
 import { LinkNode } from "../../models/LinkNode";
 import { ParagraphNode } from "../../models/ParagraphNode";
@@ -8,10 +9,10 @@ import { TextNode } from "../../models/TextNode";
 import { renderNode } from "../chapter/Renderer";
 
 export const CaretContext = React.createContext<{ 
-        selection: CaretRange | undefined, 
-        rect: { x: number, y: number} | undefined,
-        setCaretRange: Function
-    }     | undefined>(undefined)
+    selection: CaretRange | undefined, 
+    rect: { x: number, y: number} | undefined,
+    setCaretRange: Function
+} | undefined>(undefined);
 
 const ChapterEditor = (props: { ast: ChapterNode }) => {
 
@@ -332,7 +333,7 @@ const ChapterEditor = (props: { ast: ChapterNode }) => {
             if(caretRange.start.node instanceof TextNode && caretRange.end.node instanceof TextNode) {
 
                 // If this is a text node in a link, enter the link form.
-                const atom = caretRange.start.node.getClosestParentMatching(p => p instanceof LinkNode || p instanceof InlineCodeNode);
+                const atom = caretRange.start.node.getClosestParentMatching(p => p instanceof AtomNode);
                 if(atom) {
                     setCaretRange({ start: { node: atom, index: 0 }, end: { node: atom, index: 0 }});
                 }
@@ -403,6 +404,12 @@ const ChapterEditor = (props: { ast: ChapterNode }) => {
             else if(event.key === "j") {
                 event.preventDefault();
                 const caret = ast.toggleAtom(caretRange, InlineCodeNode, (parent, text) => new InlineCodeNode(parent, text));
+                if(caret)
+                    setCaretRange({ start: caret, end: caret});
+            }
+            else if(event.key === "d") {
+                event.preventDefault();
+                const caret = ast.toggleAtom(caretRange, DefinitionNode, (parent, text) => new DefinitionNode(parent, text));
                 if(caret)
                     setCaretRange({ start: caret, end: caret});
             }

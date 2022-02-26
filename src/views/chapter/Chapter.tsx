@@ -16,7 +16,7 @@ import Book from '../../models/Book'
 import ChapterModel from '../../models/Chapter'
 import { EditorContext } from '../page/Book';
 import TextEditor from '../editor/TextEditor';
-import ChapterEditor from '../editor/ChapterEditor';
+import ChapterEditor, { CaretContext } from '../editor/ChapterEditor';
 
 export type ChapterContextType = {
 	book?: Book, 
@@ -24,7 +24,8 @@ export type ChapterContextType = {
 	highlightedWord?: string,
 	highlightedID?: string,
 	marginalID?: string,
-	setMarginal?: Function
+	setMarginal?: Function,
+	layoutMarginals?: Function
 }
 
 export const ChapterContext = React.createContext<ChapterContextType>({})
@@ -36,16 +37,16 @@ const Chapter = (props: { chapter: ChapterModel, book: Book, print?: boolean }) 
 
 	// When the window resizes, the responsive layout might cause the marginals to move to the footer.
 	// when this happens, we want to immediately remove all of the explicit positioning.
-	const handleResize = () => layoutMarginals()
+	const handleResize = () => layoutMarginals();
 	
 	// The currently selected marginal; we only do one at a time.
-	let [ marginal, setMarginal ] = useState<string | undefined>(undefined)
+	let [ marginal, setMarginal ] = useState<string | undefined>(undefined);
 
 	// Keep track of which hash mark is scrolled to
-	let [ highlightedID, setHighlightedID ] = useState<string | undefined>(undefined)
+	let [ highlightedID, setHighlightedID ] = useState<string | undefined>(undefined);
 
-	const { editable } = useContext(EditorContext)
-	const navigate = useNavigate()
+	const { editable } = useContext(EditorContext);
+	const navigate = useNavigate();
 	
 	// When this component is mounted...
 	// 1) Subscribe and unsubscribe to window listeners
@@ -112,10 +113,10 @@ const Chapter = (props: { chapter: ChapterModel, book: Book, print?: boolean }) 
 		}))
 		
 		// Do an initial check the hash to see if there's an ID to scroll to
-		observeHash()
+		observeHash();
 
 		// Position the marginals, since there's new content.
-		layoutMarginals()
+		layoutMarginals();
 
 		// On cleanup, unsubscribe from everything above.
 		return () => {
@@ -145,16 +146,16 @@ const Chapter = (props: { chapter: ChapterModel, book: Book, print?: boolean }) 
 	// Position the marginals on each render.
 	useEffect(() => {
 		layoutMarginals();
-	})
+	});
 
 	// Get the word and number to highlight from the URL
-	const { word, number } = useParams()
+	const { word, number } = useParams();
 
 	// This gets called after the page is done loading. There are various things we scroll to.
 	const scrollToLastLocation = () => {
 
 		// In case loading changed marginal positions
-		layoutMarginals()
+		layoutMarginals();
 
 		// If there's a word we're trying to highlight in the URL path, scroll to the corresponding match.
 		if(word && number) {
@@ -283,7 +284,8 @@ const Chapter = (props: { chapter: ChapterModel, book: Book, print?: boolean }) 
 							highlightedWord: word,
 							highlightedID: highlightedID,
 							marginalID: marginal,
-							setMarginal: setMarginal
+							setMarginal: setMarginal,
+							layoutMarginals: layoutMarginals
 					}}
 				>
 				{
