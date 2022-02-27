@@ -207,10 +207,6 @@ input[type="text"].bookish-app-editable-error {
     outline: none;
 }
 
-.bookish-chapter-editor {
-    position: relative;
-}
-
 .bookish-chapter-editor-caret {
     left: 0;
     top: 0;

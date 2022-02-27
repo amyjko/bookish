@@ -109,10 +109,10 @@ const ChapterEditor = (props: { ast: ChapterNode }) => {
                     // Measure and remember caret position
                     if(currentRange) {
                         const rangeRect = currentRange.getBoundingClientRect();
-                        const editorRect = editorRef.current.getBoundingClientRect();
+                        const pageRect = document.querySelector(".bookish-page")?.getBoundingClientRect();
                         const position = {
-                            x: rangeRect.left - editorRect.left,
-                            y: rangeRect.top - editorRect.top
+                            x: rangeRect.left + window.scrollX - (pageRect ? pageRect.left + window.scrollX : 0),
+                            y: rangeRect.top + window.scrollY - (pageRect ? pageRect.top + window.scrollY : 0)
                         };
                         newCaretPosition = position;
                     }
@@ -483,7 +483,7 @@ const ChapterEditor = (props: { ast: ChapterNode }) => {
                                 top: caretRect.y
                             }}>
                         </div> : null
-                }                
+                }
                 { renderNode(props.ast) }
             </div>
         </CaretContext.Provider>
