@@ -4,14 +4,12 @@ import { TextNode } from "./TextNode";
 import { BlockNode } from "./Parser";
 import { FootnoteNode } from "./FootnoteNode";
 import { EmbedNode } from "./EmbedNode";
-import { CitationsNode } from "./CitationsNode";
-import { CommentNode } from "./CommentNode";
-import { LabelNode } from "./LabelNode";
 import { Caret, CaretRange } from "./ChapterNode";
+import { MetadataNode } from "./MetadataNode";
 import { AtomNode } from "./AtomNode";
 
 export type Format = "" | "*" | "_" | "" | "^" | "v";
-export type FormattedNodeSegmentType = FormattedNode | TextNode | ErrorNode | AtomNode<any> | CitationsNode | FootnoteNode | CommentNode | LabelNode;
+export type FormattedNodeSegmentType = FormattedNode | TextNode | ErrorNode | MetadataNode<any> | AtomNode<any>;
 export type FormattedNodeParent = BlockNode | FormattedNode | FootnoteNode | EmbedNode;
 
 export class FormattedNode extends Node<FormattedNodeParent> {
@@ -384,7 +382,7 @@ export class FormattedNode extends Node<FormattedNodeParent> {
         const newNodes: { node: FormattedNodeSegmentType, format: string | undefined}[] = [];
         nodes.forEach(node => {
             // If this is a formatting node or a text node inside of an atom node, ignore it.
-            if(node instanceof FormattedNode || node.getClosestParentMatching(p => p instanceof AtomNode) !== undefined) {
+            if(node instanceof FormattedNode || node.getClosestParentMatching(p => p instanceof MetadataNode) !== undefined) {
                 // Do nothing. This strips the formatted nodes and leaves any text nodes to be included by their parents.
             }
             // If this is a text node inside of a formatting node, remember its formatting.

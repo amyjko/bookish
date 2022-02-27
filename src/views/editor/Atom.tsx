@@ -2,9 +2,9 @@ import React, { ReactNode, useContext } from 'react'
 
 import { EditorContext } from '../page/Book';
 import { CaretContext } from './ChapterEditor';
-import { AtomNode } from '../../models/AtomNode';
+import { MetadataNode } from '../../models/MetadataNode';
 
-const Atom = (props: { node: AtomNode<any>, editingTextView: React.ReactElement, readingTextView: React.ReactElement, metaView: React.ReactElement}) => {
+const Atom = (props: { node: MetadataNode<any>, editingTextView: React.ReactElement, readingTextView: React.ReactElement, metaView: React.ReactElement}) => {
 
     const { node, editingTextView, readingTextView, metaView } = props;
     const caret = useContext(CaretContext);

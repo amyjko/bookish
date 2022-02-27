@@ -1,54 +1,27 @@
-import { Node } from "./Node";
 import { FormattedNode } from "./FormattedNode";
-import { TextNode } from "./TextNode";
-import { Caret } from "./ChapterNode";
+import { Node } from "./Node";
 import { NodeType } from "./Parser";
 
-export abstract class AtomNode<MetaType> extends Node<FormattedNode> {
 
-    #text: TextNode;
-    #meta: MetaType;
-    
-    constructor(parent: FormattedNode, text: string, meta: MetaType, type: NodeType) {
+export abstract class AtomNode<MetadataType> extends Node<FormattedNode> {    
+    #meta: MetadataType;
+
+    constructor(parent: FormattedNode, meta: MetadataType, type: NodeType) {
         super(parent, type);
-        this.#text = new TextNode(this, text, 0);
         this.#meta = meta;
     }
 
-    getMeta() { return this.#meta }
-    setMeta(meta: MetaType) { this.#meta = meta; }
+    getMeta() { return this.#meta; }
+    setMeta(meta: MetadataType) { this.#meta = meta; }
 
-    getText() { return this.#text; }
-    setText(text: string) { this.#text = new TextNode(this, text, 0); }
+    traverseChildren(fn: (node: Node) => void): void {}
+    removeChild(node: Node<Node<any>>): void {}
+    replaceChild(node: Node<Node<any>>, replacement: Node<Node<any>>): void {}
+    getSiblingOf(child: Node<Node<any>>, next: boolean): Node<Node<any>> | undefined { return undefined; }
+    clean(): void {}
 
-    traverseChildren(fn: (node: Node) => void): void { this.#text.traverse(fn); }
-    replaceChild(node: Node, replacement: Node): void {}
-    getSiblingOf(child: Node, next: boolean) { return undefined; }
-
-    removeChild(node: Node): void {
-        if(node === this.#text)
-            this.remove();
-    }
-
-    unwrap(): Caret | undefined {
-        const parent = this.getParent();
-        if(parent === undefined)
-            return undefined;
-        // Remember the text position of the text.
-        const index = parent.caretToTextIndex({ node: this.#text, index: 0});
-        // Replace this with it's text node.
-        this.getParent()?.replaceChild(this, this.#text);
-        // Return the corresponding caret position.
-        return parent.textIndexToCaret(index);
-    }
-
-    clean() {
-        if(this.#text.getLength() === 0)
-            this.remove();
-    }
-
+    abstract toBookdown(): string;
     abstract toText(): string;
-    abstract toBookdown(): String;
-    abstract copy(parent: FormattedNode): AtomNode<MetaType>;
+    abstract copy(parent: FormattedNode): AtomNode<any>;
 
 }

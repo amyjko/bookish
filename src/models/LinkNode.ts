@@ -1,7 +1,7 @@
 import { FormattedNode } from "./FormattedNode";
-import { AtomNode } from "./AtomNode";
+import { MetadataNode } from "./MetadataNode";
 
-export class LinkNode extends AtomNode<string> {
+export class LinkNode extends MetadataNode<string> {
     
     constructor(parent: FormattedNode, text: string = "", url: string = "") {
         super(parent, text, url, "link");

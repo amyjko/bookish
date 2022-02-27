@@ -1,7 +1,7 @@
-import { AtomNode } from "./AtomNode";
+import { MetadataNode } from "./MetadataNode";
 import { FormattedNode } from "./FormattedNode";
 
-export class InlineCodeNode extends AtomNode<string> {
+export class InlineCodeNode extends MetadataNode<string> {
 
     constructor(parent: FormattedNode, code: string = "", language: string = "plaintext") {
         super(parent, code, language, "inline-code");

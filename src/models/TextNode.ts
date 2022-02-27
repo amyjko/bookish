@@ -1,10 +1,10 @@
-import { AtomNode } from "./AtomNode";
+import { MetadataNode } from "./MetadataNode";
 import { Caret } from "./ChapterNode";
 import { FormattedNode } from "./FormattedNode";
 import { Node } from "./Node";
 import { ParagraphNode } from "./ParagraphNode";
 
-export type TextNodeParent = FormattedNode | AtomNode<any>;
+export type TextNodeParent = FormattedNode | MetadataNode<any>;
 
 export class TextNode extends Node<TextNodeParent> {
 

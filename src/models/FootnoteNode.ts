@@ -1,51 +1,21 @@
-import { Node } from "./Node";
 import { FormattedNode } from "./FormattedNode";
+import { AtomNode } from "./AtomNode";
 
-export class FootnoteNode extends Node<FormattedNode> {
+export class FootnoteNode extends AtomNode<FormattedNode> {
 
-    #footnote: FormattedNode | undefined;
-
-    constructor(parent: FormattedNode, ) {
-        super(parent, "footnote");
-        
+    constructor(parent: FormattedNode) {
+        super(parent, new FormattedNode(parent, "", []), "footnote");
+        // Hack: can't pass this before calling super.
+        this.getMeta().setParent(this);        
     }
 
-    getFootnote() { return this.#footnote; }
-
-    setFootnote(footnote: FormattedNode) {
-        this.#footnote = footnote;
-    }
-
-    toText(): string {
-        return this.#footnote ? this.#footnote.toText() : "";
-    }
-
-    toBookdown(): String {
-        return "{" + this.#footnote?.toBookdown() + "}";
-    }
-
-    traverseChildren(fn: (node: Node) => void): void {
-        this.#footnote?.traverse(fn)
-    }
-
-    removeChild(node: Node): void {
-        if(this.#footnote === node) this.remove();
-    }
-
-    replaceChild(node: FormattedNode, replacement: FormattedNode): void {
-        if(this.#footnote === node)
-            this.#footnote = replacement;
-    }
-
-
-    getSiblingOf(child: Node, next: boolean) { return undefined; }
+    toText(): string { return this.getMeta().toText(); }
+    toBookdown(): string { return "{" + this.getMeta().toBookdown() + "}"; }
 
     copy(parent: FormattedNode): FootnoteNode {
         const foot = new FootnoteNode(this.getParent() as FormattedNode);
-        if(this.#footnote) foot.setFootnote(this.#footnote.copy(foot));
+        foot.setMeta(this.getMeta().copy(foot));
         return foot;
     }
-
-    clean() {}
     
 }

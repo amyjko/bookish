@@ -7,7 +7,7 @@ import { FootnoteNode } from "../../models/FootnoteNode"
 const Footnote = (props: { node: FootnoteNode }) => {
 
     const { node } = props
-    const footnote = node.getFootnote();
+    const footnote = node.getMeta();
     const context = useContext(ChapterContext)
 
     // If no chapter was provided, then don't render the footnote, since there's no context in which to render it.

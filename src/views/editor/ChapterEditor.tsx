@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from "react"
-import { AtomNode } from "../../models/AtomNode";
+import { MetadataNode } from "../../models/MetadataNode";
 import { ChapterNode, CaretRange, Caret } from "../../models/ChapterNode";
 import { DefinitionNode } from "../../models/DefinitionNode";
 import { InlineCodeNode } from "../../models/InlineCodeNode";
@@ -333,7 +333,7 @@ const ChapterEditor = (props: { ast: ChapterNode }) => {
             if(caretRange.start.node instanceof TextNode && caretRange.end.node instanceof TextNode) {
 
                 // If this is a text node in a link, enter the link form.
-                const atom = caretRange.start.node.getClosestParentMatching(p => p instanceof AtomNode);
+                const atom = caretRange.start.node.getClosestParentMatching(p => p instanceof MetadataNode);
                 if(atom) {
                     setCaretRange({ start: { node: atom, index: 0 }, end: { node: atom, index: 0 }});
                 }

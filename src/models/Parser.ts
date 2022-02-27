@@ -1011,7 +1011,7 @@ export default class Parser {
 
         const label = new LabelNode(parent, id);
 
-        let matches = this.metadata.labels.filter(lab => lab.getID() === id);
+        let matches = this.metadata.labels.filter(lab => lab.getMeta() === id);
         if(matches.length > 0)
             return this.createError(parent, undefined, "Duplicate label " + id);
         this.metadata.labels.push(label);
@@ -1161,7 +1161,7 @@ export default class Parser {
 
         // Read the footnote content.
         const footnote = this.parseContent(node, "}");
-        node.setFootnote(footnote)
+        node.setMeta(footnote);
 
         // Read the closing }
         this.read();

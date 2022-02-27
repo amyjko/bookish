@@ -1,8 +1,8 @@
 import { Node } from "./Node";
 import { FormattedNode } from "./FormattedNode";
-import { AtomNode } from "./AtomNode";
+import { MetadataNode } from "./MetadataNode";
 
-export class DefinitionNode extends AtomNode<string> {
+export class DefinitionNode extends MetadataNode<string> {
     constructor(parent: FormattedNode, phrase: string = "", glossaryID: string = "") {
         super(parent, phrase, glossaryID, "definition");
     }

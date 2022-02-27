@@ -1,38 +1,14 @@
+import { AtomNode } from "./AtomNode";
 import { FormattedNode } from "./FormattedNode";
-import { Node } from "./Node";
 
-
-export class LabelNode extends Node<FormattedNode> {
+export class LabelNode extends AtomNode<string> {
     
-    #id: string;
-
     constructor(parent: FormattedNode, id: string) {
-        super(parent, "label");
-        this.#id = id;
+        super(parent, id, "label");
     }
-
-    getID() { return this.#id; }
 
     toText(): string { return ""; }
-
-    toBookdown(): String {
-        return `:${this.#id}`;
-    }
-
-    traverseChildren(fn: (node: Node) => void): void {}
-    
-    removeChild(node: Node): void {}
-    
-    replaceChild(node: Node, replacement: Node): void {}
-
-    getSiblingOf(child: Node, next: boolean) { return undefined; }
-
-    copy(parent: FormattedNode): LabelNode {
-        return new LabelNode(parent, this.#id)
-    }
-
-    clean() {
-        if(this.#id.length === 0) this.remove();
-    }
+    toBookdown(): string { return `:${this.getMeta()}`; }
+    copy(parent: FormattedNode): LabelNode { return new LabelNode(parent, this.getMeta()); }
 
 }
