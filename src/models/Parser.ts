@@ -54,7 +54,6 @@ export type Position = "|" | "<" | ">";
 export type Bookkeeping = {
     index: Map<number, Node>;
     citations: Record<string, boolean>;
-    footnotes: FootnoteNode[];
     headers: HeaderNode[];
     symbols: Record<string, string>;
     embeds: EmbedNode[];
@@ -111,7 +110,6 @@ export default class Parser {
         this.metadata = {
             index: new Map<number, Node>(),
             citations: {},
-            footnotes: [],
             headers: [],
             symbols: {},
             embeds: [],
@@ -1165,8 +1163,6 @@ export default class Parser {
 
         // Read the closing }
         this.read();
-
-        this.metadata.footnotes.push(node);
 
         return node;
 

@@ -165,6 +165,28 @@ export class FormattedNode extends Node<FormattedNodeParent> {
         return this.getNodes().filter(n => n instanceof TextNode) as TextNode[];
     }
 
+    getTextOrAtomNodes(): (TextNode | AtomNode<any>)[] {
+        return this.getNodes().filter(n => n instanceof TextNode || n instanceof AtomNode) as (TextNode | AtomNode<any>)[];
+    }
+
+    getNextTextOrAtom(node: TextNode | AtomNode<any>): TextNode | AtomNode<any> | undefined {
+        // Otherwise, find the next text node after this one.
+        const text = this.getTextOrAtomNodes();
+        const index = text.indexOf(node);
+        return index === undefined ? undefined :
+            index < text.length - 1 ? text[index + 1] :
+            undefined;
+    }
+
+    getPreviousTextOrAtom(node: TextNode | AtomNode<any>): TextNode | AtomNode<any> | undefined {
+        // Otherwise, find the next text node after this one.
+        const text = this.getTextOrAtomNodes();
+        const index = text.indexOf(node);
+        return index === undefined ? undefined :
+            index > 0 ? text[index - 1] :
+            undefined;
+    }
+
     caretToTextIndex(caret: Caret): number {
 
         if(!(caret.node instanceof TextNode))
@@ -381,8 +403,8 @@ export class FormattedNode extends Node<FormattedNodeParent> {
         const nodes = this.getNodes();
         const newNodes: { node: FormattedNodeSegmentType, format: string | undefined}[] = [];
         nodes.forEach(node => {
-            // If this is a formatting node or a text node inside of an atom node, ignore it.
-            if(node instanceof FormattedNode || node.getClosestParentMatching(p => p instanceof MetadataNode) !== undefined) {
+            // If this is a formatting node, a text node inside of an metadata node, or an Atom node, ignore it.
+            if(node instanceof FormattedNode || node instanceof AtomNode || node.getClosestParentMatching(p => p instanceof MetadataNode) !== undefined) {
                 // Do nothing. This strips the formatted nodes and leaves any text nodes to be included by their parents.
             }
             // If this is a text node inside of a formatting node, remember its formatting.

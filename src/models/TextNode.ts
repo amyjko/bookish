@@ -1,8 +1,9 @@
 import { MetadataNode } from "./MetadataNode";
-import { Caret } from "./ChapterNode";
+import { Caret, ChapterNode } from "./ChapterNode";
 import { FormattedNode } from "./FormattedNode";
 import { Node } from "./Node";
 import { ParagraphNode } from "./ParagraphNode";
+import { AtomNode } from "./AtomNode";
 
 export type TextNodeParent = FormattedNode | MetadataNode<any>;
 
@@ -23,9 +24,7 @@ export class TextNode extends Node<TextNodeParent> {
     getLength() { return this.#text.length; }
     setText(text: string) { this.#text = text; }
 
-    toText(): string {
-        return this.#text;
-    }
+    toText(): string { return this.#text; }
 
     toBookdown() {
 
@@ -44,26 +43,6 @@ export class TextNode extends Node<TextNodeParent> {
             .replace(/@/g, '\\@')
             .replace(/(:)([a-z])/g, '\\:$2')
 
-    }
-
-    previousText() {
-        const chap = this.getChapter()
-        if(chap === undefined) return undefined;
-
-        const text = chap.getTextNodes()
-        const index = text.indexOf(this)
-        // If we didn't find it or this is the first text node, there is no previous text node.
-        return index < 1 ? undefined : text[index - 1];
-    }
-
-    nextText() {
-        const chap = this.getChapter()
-        if(chap === undefined) return undefined;
-
-        const text = chap.getTextNodes()
-        const index = text.indexOf(this)
-        // If we didn't find it or this is the first text node, there is no previous text node.
-        return index < 0 || index === text.length - 1 ? undefined : text[index + 1];
     }
 
     traverseChildren(fn: (node: Node) => void): void {}
@@ -122,7 +101,7 @@ export class TextNode extends Node<TextNodeParent> {
         }
 
         // Otherwise, see if there's a previous node.
-        const previous = this.getChapter()?.getPreviousTextNode(this);
+        const previous = this.getChapter()?.getPreviousTextOrAtom(this);
 
         // If there isn't one, don't delete, don't change anything; just return the beginning of this. We've reached the beginning.
         if(previous === undefined)
@@ -173,7 +152,7 @@ export class TextNode extends Node<TextNodeParent> {
         }
 
         // Otherwise, ask the previous word to delete.
-        const next = this.getChapter()?.getNextTextNode(this);
+        const next = this.getChapter()?.getNextTextOrAtom(this);
 
         // If there isn't one, don't change anything, we've reached the end of the text.
         if(next === undefined)
@@ -193,7 +172,10 @@ export class TextNode extends Node<TextNodeParent> {
 
     deleteAndClean(caret: Caret): Caret {
 
-        const formatter = this.getRootFormatter();
+        const formatter = this.getRoot();
+        if(formatter === undefined)
+            return caret;
+
         const textPosition = formatter.caretToTextIndex(caret);
         formatter.clean();
         const cleanCaret = formatter.textIndexToCaret(textPosition);
@@ -233,8 +215,10 @@ export class TextNode extends Node<TextNodeParent> {
         return this.getClosestParentMatching(p => p instanceof ParagraphNode) as ParagraphNode;
     }
 
-    getRootFormatter(): FormattedNode {
-        return this.getFarthestParentMatching(p => p instanceof FormattedNode) as FormattedNode;
+    getRoot(): FormattedNode | ChapterNode | undefined {
+        const format = this.getFarthestParentMatching(p => p instanceof FormattedNode) as FormattedNode;
+        const chapter = this.getFarthestParentMatching(p => p instanceof ChapterNode) as ChapterNode;
+        return chapter ? chapter : format ? format : undefined;
     }
 
     next(index: number): Caret {
@@ -244,19 +228,21 @@ export class TextNode extends Node<TextNodeParent> {
             return { node: this, index: index + 1 }
         
         // Otherwise, find the next text node after this one.
-        const nextText = this.getChapter()?.getNextTextNode(this);
+        const next = this.getRoot()?.getNextTextOrAtom(this);
 
         // If we don't have a chapter, return what we were given.
-        if(nextText === undefined)
+        if(next === undefined)
             return { node: this, index: index };
 
         // If this is the last node, return the end of this node.
-        if(nextText === this)
-            return { node: this, index: this.#text.length }
+        if(next === this)
+            return { node: this, index: this.#text.length };
 
         // Otherwise, return the beginning of the next node.
         // Unless the next node is in a different paragraph, we skip the first index since it's equivalent to the last of this one.
-        return { node: nextText, index: this.getParagraph() !== nextText.getParagraph() ? 0: Math.min(1, nextText.getLength()) };
+        return next instanceof AtomNode ?
+            { node: next, index: 0 } :
+            { node: next, index: this.getParagraph() !== next.getParagraph() ? 0 : Math.min(1, next.getLength()) };
 
     }
 
@@ -267,19 +253,21 @@ export class TextNode extends Node<TextNodeParent> {
             return { node: this, index: index - 1 }
         
         // Otherwise, find the previous text node before this one.
-        const previousText = this.getChapter()?.getPreviousTextNode(this);
+        const previous = this.getRoot()?.getPreviousTextOrAtom(this);
 
         // If we don't have a chapter, return what we were given.
-        if(previousText === undefined)
+        if(previous === undefined)
             return { node: this, index: index };
 
         // If this is the first node, return the beginning of this node.
-        if(previousText === this)
-            return { node: this, index: 0 }
+        if(previous === this)
+            return { node: this, index: 0 };
 
         // Otherwise, return the beginning of the next node.
         // We skip the last index since it's the equivalent of this one's first.
-        return { node: previousText, index: this.getParagraph() !== previousText.getParagraph() ? previousText.#text.length : previousText.#text.length - 1 }
+        return previous instanceof AtomNode ?
+            { node: previous, index: 0} :
+            { node: previous, index: this.getParagraph() !== previous.getParagraph() ? previous.#text.length : previous.#text.length - 1 }
 
     }
 
@@ -299,12 +287,12 @@ export class TextNode extends Node<TextNodeParent> {
 
         // Otherwise, find the next text node's next word boundary.
         const paragraphText = this.getParagraph().getTextNodes();
-        const nextText = this.getChapter()?.getNextTextNode(this);
-        const nextWord = nextText?.nextWord();
+        const nextNode = this.getRoot()?.getNextTextOrAtom(this);
+        const nextWord = nextNode?.nextWord();
 
         // If there isn't one, just go to the end of this.
-        if(paragraphText && nextText && this === paragraphText[paragraphText.length - 1])
-            return { node: nextText, index: 0 }
+        if(paragraphText && nextNode && this === paragraphText[paragraphText.length - 1])
+            return { node: nextNode, index: 0 };
         else if(nextWord === undefined)
             return { node: this, index: this.#text.length };
          else
@@ -328,12 +316,12 @@ export class TextNode extends Node<TextNodeParent> {
 
         // Otherwise, find the next text node's next word boundary.
         const paragraphText = this.getParagraph().getTextNodes();
-        const previousText = this.getChapter()?.getPreviousTextNode(this);
-        const previousWord = previousText?.previousWord();
+        const previousNode = this.getRoot()?.getPreviousTextOrAtom(this);
+        const previousWord = previousNode?.previousWord();
 
         // If there isn't one, just go to the end of this.
-        if(paragraphText && previousText && this === paragraphText[0])
-            return { node: previousText, index: previousText.getLength() }
+        if(paragraphText && previousNode && this === paragraphText[0])
+            return { node: previousNode, index: previousNode instanceof TextNode ? previousNode.getLength() : 0 };
         else if(previousWord === undefined)
             return { node: this, index: 0 };
          else

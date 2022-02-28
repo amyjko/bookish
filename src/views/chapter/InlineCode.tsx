@@ -2,9 +2,8 @@ import React, { ChangeEvent, useContext, useEffect, useRef, useState } from 'rea
 import Code from './Code'
 import { InlineCodeNode } from "../../models/InlineCodeNode"
 import { CaretContext } from '../editor/ChapterEditor'
-import { EditorContext } from '../page/Book'
 import { renderNode } from './Renderer'
-import Atom from '../editor/Atom'
+import Metadata from '../editor/Metadata'
 
 const InlineCode = (props: { node: InlineCodeNode }) => {
 
@@ -15,7 +14,7 @@ const InlineCode = (props: { node: InlineCodeNode }) => {
     const [ language, setLanguage ] = useState<string>(node.getMeta());
 
     // Is the caret on this code node?
-    const selectFocused = caret && caret.selection && caret.selection.start.node === node;
+    const selectFocused = caret && caret.range && caret.range.start.node === node;
 
     useEffect(() => {
         if(selectFocused && selectRef.current)
@@ -34,7 +33,7 @@ const InlineCode = (props: { node: InlineCodeNode }) => {
     const editableView = <span className="bookish-code bookish-code-inline hljs" data-nodeid={node.nodeID}>{renderNode(node.getText())}</span>;
     const staticView = <Code editable={false} inline={true} language={node.getMeta()} nodeID={node.getText().nodeID}>{node.getMeta()}</Code>;
 
-    return <Atom
+    return <Metadata
         node={node}
         editingTextView={editableView}
         readingTextView={staticView}

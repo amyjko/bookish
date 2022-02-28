@@ -5,11 +5,11 @@ import { HashLink } from "../util/HashLink"
 
 import { renderNode } from './Renderer';
 import smoothlyScrollElementToEyeLevel from '../util/Scroll'
-import { BaseContext, EditorContext } from '../page/Book';
+import { BaseContext } from '../page/Book';
 import { LinkNode } from "../../models/LinkNode";
 import { CaretContext } from '../editor/ChapterEditor';
 import { ChapterContext } from './Chapter';
-import Atom from '../editor/Atom';
+import Metadata from '../editor/Metadata';
 
 const Link = (props: { node: LinkNode}) => {
 
@@ -25,7 +25,7 @@ const Link = (props: { node: LinkNode}) => {
     const contentDOM = renderNode(content);
 
     // Is the caret on this link?
-    const urlFocused = caret && caret.selection && caret.selection.start.node === node;
+    const urlFocused = caret && caret.range && caret.range.start.node === node;
     
     useEffect(() => {
         if(urlFocused && urlInput.current)
@@ -67,7 +67,7 @@ const Link = (props: { node: LinkNode}) => {
             // If this is internal link, make a route link to the chapter.
             <RouterLink to={base + "/" + url}>{contentDOM}</RouterLink>;
 
-    return <Atom
+    return <Metadata
         node={node}
         editingTextView={<span className="bookish-editor-link">{contentDOM}</span>}
         readingTextView={link}

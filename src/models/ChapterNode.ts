@@ -7,8 +7,8 @@ import { EmbedNode } from "./EmbedNode";
 import { Node } from "./Node";
 import { ParagraphNode } from "./ParagraphNode";
 import { Format, FormattedNode, FormattedNodeSegmentType } from "./FormattedNode";
-import { RuleNode } from "./RuleNode";
 import { MetadataNode } from "./MetadataNode";
+import { AtomNode } from "./AtomNode";
 
 export type Caret = { node: Node, index: number }
 export type CaretRange = { start: Caret, end: Caret }
@@ -62,7 +62,7 @@ export class ChapterNode extends Node {
 
     getErrors(): ErrorNode[] { return this.#metadata.errors; }
     getCitations(): Record<string, boolean> { return this.#metadata.citations; }
-    getFootnotes(): FootnoteNode[] { return this.#metadata.footnotes; }
+    getFootnotes(): FootnoteNode[] { return this.getNodes().filter(n => n instanceof FootnoteNode) as FootnoteNode[]; }
     getHeaders(): HeaderNode[] { return this.#metadata.headers; }
     getEmbeds(): EmbedNode[] { return this.#metadata.embeds; }
 
@@ -92,26 +92,30 @@ export class ChapterNode extends Node {
         return this.getNodes().filter(node => node instanceof TextNode) as TextNode[]
     }
 
+    getTextOrAtomNodes(): (TextNode | AtomNode<any>)[] {
+        return this.getNodes().filter(node => node instanceof TextNode || node instanceof AtomNode) as (TextNode | AtomNode<any>)[]
+    }
+
     getIndexOfTextNode(node: TextNode): number | undefined {
         const text = this.getTextNodes();
         return text.indexOf(node);
     }
 
-    getNextTextNode(node: TextNode): TextNode | undefined {
+    getNextTextOrAtom(node: TextNode | AtomNode<any>): TextNode | AtomNode<any> | undefined {
         // Otherwise, find the next text node after this one.
-        const text = this.getTextNodes();
-        const index = text.indexOf(node);
+        const nodes = this.getTextOrAtomNodes();
+        const index = nodes.indexOf(node);
         return index === undefined ? undefined :
-            index < text.length - 1 ? text[index + 1] :
+            index < nodes.length - 1 ? nodes[index + 1] :
             undefined;
     }
 
-    getPreviousTextNode(node: TextNode): TextNode | undefined {
+    getPreviousTextOrAtom(node: TextNode | AtomNode<any>): TextNode | AtomNode<any> | undefined {
         // Otherwise, find the next text node after this one.
-        const text = this.getTextNodes();
-        const index = text.indexOf(node);
+        const nodes = this.getTextOrAtomNodes();
+        const index = nodes.indexOf(node);
         return index === undefined ? undefined :
-            index > 0 ? text[index - 1] :
+            index > 0 ? nodes[index - 1] :
             undefined;
     }
 
@@ -219,17 +223,22 @@ export class ChapterNode extends Node {
         const start = range.start;
 
         // If the start and end are the same, delete within the node.
-        if(start.node === range.end.node && start.node instanceof TextNode) {
-
-            // If the positions are the same, just do a single character.
-            // Otherwise, do a range.
-            return range.start.index === range.end.index ? 
-                ( backward ? start.node.deleteBackward(start.index) : start.node.deleteForward(start.index)) :
-                start.node.deleteRange(start.index, range.end.index);
-
+        if(start.node === range.end.node) {
+            if(start.node instanceof TextNode) {
+                // If the positions are the same, just do a single character.
+                // Otherwise, do a range.
+                return range.start.index === range.end.index ? 
+                    ( backward ? start.node.deleteBackward(start.index) : start.node.deleteForward(start.index)) :
+                    start.node.deleteRange(start.index, range.end.index);
+            }
+            else if(start.node instanceof AtomNode) {
+                return start.node.deleteBackward();
+            }
+            // Otherwise, do nothing.
+            else return range.start;
         }
         // If the start and end positions are different, delete everything between them, and the corresponding parts of each.
-        else return this.removeRange(range)
+        else return this.removeRange(range);
 
     }
 

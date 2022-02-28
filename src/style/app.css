@@ -267,3 +267,11 @@ input[type="text"].bookish-app-editable-error {
 .bookish-editor-link-invalid {
     background-color: var(--bookish-app-error-background);
 }
+
+.bookish-editor-atom {
+}
+
+.bookish-editor-atom-highlight {
+    border-radius: 1em;
+    background-color: var(--bookish-highlight-color);
+}

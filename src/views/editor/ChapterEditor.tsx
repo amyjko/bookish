@@ -7,9 +7,11 @@ import { LinkNode } from "../../models/LinkNode";
 import { ParagraphNode } from "../../models/ParagraphNode";
 import { TextNode } from "../../models/TextNode";
 import { renderNode } from "../chapter/Renderer";
+import { FootnoteNode } from "../../models/FootnoteNode";
+import { AtomNode } from "../../models/AtomNode";
 
 export const CaretContext = React.createContext<{ 
-    selection: CaretRange | undefined, 
+    range: CaretRange | undefined, 
     rect: { x: number, y: number} | undefined,
     setCaretRange: Function
 } | undefined>(undefined);
@@ -183,15 +185,19 @@ const ChapterEditor = (props: { ast: ChapterNode }) => {
 
     function getCaretCoordinate(caret: Caret) : { top: number, left: number } | undefined {
 
-        if(!(caret.node instanceof TextNode)) return undefined;
+        if(!(caret.node instanceof TextNode || caret.node instanceof AtomNode)) 
+            return undefined;
         const domNode = document.querySelector(`[data-nodeid='${caret.node.nodeID}`);
         // If we didn't find the node or there's no text node inside it, then there's no caret position.
         // This happens temporarily before the useEffect above has a chance to insert zero-width non-breaking space.
         if(domNode === null || domNode.childNodes.length === 0) return undefined;
         const range = document.createRange();
         range.setStart(domNode.childNodes.length === 0 ? domNode : domNode.childNodes[0], domNode.childNodes.length === 0 ? 0 : caret.index);
-        const rect = range.getBoundingClientRect();
-        return { top: rect.top, left: rect.left };
+        const characterRect = range.getBoundingClientRect();
+        if(characterRect.left > 0)
+            return { top: characterRect.top, left: characterRect.left };
+        const elementRect = domNode.getBoundingClientRect();
+        return { top: elementRect.top, left: elementRect.left };
 
     }
 
@@ -200,14 +206,14 @@ const ChapterEditor = (props: { ast: ChapterNode }) => {
 
     function getCaretOnLine(caret: Caret, below: boolean) : Caret {
 
-        if(caret.node instanceof TextNode) {
+        if(caret.node instanceof TextNode || caret.node instanceof AtomNode) {
             // Find the position of the current start node.
             const startCoordinate = getCaretCoordinate(caret);
             let candidate = below ? caret.node.next(caret.index) : caret.node.previous(caret.index);
             let previousCandidate = undefined;
             let previousCoordinate = undefined;
             if(startCoordinate) {
-                while(candidate.node instanceof TextNode) {
+                while(candidate.node instanceof TextNode || candidate.node instanceof AtomNode) {
                     const candidateCoordinate = getCaretCoordinate(candidate);                    
                     // Did we make it to the next line and the character before/after?
                     if(candidateCoordinate) {
@@ -272,7 +278,8 @@ const ChapterEditor = (props: { ast: ChapterNode }) => {
         if(event.key === "ArrowRight") {
             event.preventDefault();
             // What's to the right of the current selection's start?
-            if(caretRange.start.node instanceof TextNode && caretRange.end.node instanceof TextNode) {
+            if((caretRange.start.node instanceof TextNode || caretRange.start.node instanceof AtomNode) && 
+               (caretRange.end.node instanceof TextNode || caretRange.end.node instanceof AtomNode)) {
                 const next = event.altKey ? caretRange.end.node.nextWord(caretRange.end.index) : caretRange.end.node.next(caretRange.end.index);
                 const paragraph = caretRange.start.node.getParagraph();
                 const last = paragraph.getLastTextNode();
@@ -295,7 +302,8 @@ const ChapterEditor = (props: { ast: ChapterNode }) => {
         // Move the caret left!
         else if(event.key === "ArrowLeft") {
             event.preventDefault();
-            if(caretRange.start.node instanceof TextNode && caretRange.end.node instanceof TextNode) {
+            if((caretRange.start.node instanceof TextNode || caretRange.start.node instanceof AtomNode) && 
+               (caretRange.end.node instanceof TextNode || caretRange.end.node instanceof AtomNode)) {
                 // Adjust the selection
                 const previous = event.altKey ? caretRange.end.node.previousWord(caretRange.end.index) : caretRange.end.node.previous(caretRange.end.index);
                 const paragraph = caretRange.start.node.getParagraph();
@@ -317,7 +325,8 @@ const ChapterEditor = (props: { ast: ChapterNode }) => {
         // Move the caret up!
         else if(event.key === "ArrowUp") {
             event.preventDefault();
-            if(caretRange.start.node instanceof TextNode && caretRange.end.node instanceof TextNode) {
+            if((caretRange.start.node instanceof TextNode || caretRange.start.node instanceof AtomNode) && 
+               (caretRange.end.node instanceof TextNode || caretRange.end.node instanceof AtomNode)) {
                 if(event.shiftKey) {
                     setCaretRange({ start: caretRange.start, end: getCaretAbove(caretRange.end) });
                 }
@@ -330,8 +339,8 @@ const ChapterEditor = (props: { ast: ChapterNode }) => {
         // Move the caret down!
         else if(event.key === "ArrowDown") {
             event.preventDefault();
-            if(caretRange.start.node instanceof TextNode && caretRange.end.node instanceof TextNode) {
-
+            if((caretRange.start.node instanceof TextNode || caretRange.start.node instanceof AtomNode) && 
+               (caretRange.end.node instanceof TextNode || caretRange.end.node instanceof AtomNode)) {
                 // If this is a text node in a link, enter the link form.
                 const atom = caretRange.start.node.getClosestParentMatching(p => p instanceof MetadataNode);
                 if(atom) {
@@ -413,6 +422,12 @@ const ChapterEditor = (props: { ast: ChapterNode }) => {
                 if(caret)
                     setCaretRange({ start: caret, end: caret});
             }
+            else if(event.shiftKey && event.key === "f") {
+                event.preventDefault();
+                const caret = ast.insertNodeAtSelection(caretRange, (parent, text) => new FootnoteNode(parent, text));
+                if(caret)
+                    setCaretRange({ start: caret, end: caret});
+            }
         }
         
         // Insert any non control character! This is a bit hacky: all but "Fn" are more than three characters.
@@ -461,7 +476,7 @@ const ChapterEditor = (props: { ast: ChapterNode }) => {
     const isBold = caretRange && !isSelection && caretRange.start.node instanceof TextNode && caretRange.start.node.isBold();
     const isLink = caretRange && !isSelection && caretRange.start.node.getClosestParentMatching(p => p instanceof LinkNode) !== undefined;
 
-    return <CaretContext.Provider value={{ selection: caretRange, rect: caretRect, setCaretRange: setCaretRange }}>
+    return <CaretContext.Provider value={{ range: caretRange, rect: caretRect, setCaretRange: setCaretRange }}>
             <div 
                 className="bookish-chapter-editor"
                 ref={editorRef}

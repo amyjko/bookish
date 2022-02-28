@@ -4,7 +4,7 @@ import { renderNode } from './Renderer'
 import Parser from '../../models/Parser'
 import { DefinitionNode } from "../../models/DefinitionNode"
 import { ChapterContext, ChapterContextType } from './Chapter'
-import Atom from '../editor/Atom'
+import Metadata from '../editor/Metadata'
 import { CaretContext } from '../editor/ChapterEditor'
 
 const Definition = (props: { node: DefinitionNode}) => {
@@ -29,7 +29,7 @@ const Definition = (props: { node: DefinitionNode}) => {
     let entry = glossary[glossaryID];
 
     // Is the caret on this link?
-    const focused = caret && caret.selection && caret.selection.start.node === node;
+    const focused = caret && caret.range && caret.range.start.node === node;
 
     useEffect(() => {
         if(focused && selectRef.current)
@@ -78,7 +78,7 @@ const Definition = (props: { node: DefinitionNode}) => {
     // Sort the glossary entries by phrase
     const entries = Object.keys(glossary).map(key => { return { glossaryID: key, phrase: glossary[key].phrase }; }).sort((a, b) => a.phrase.localeCompare(b.phrase));
 
-    return <Atom
+    return <Metadata
         node={node}
         editingTextView={marginalView}
         readingTextView={marginalView}

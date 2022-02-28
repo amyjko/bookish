@@ -115,7 +115,6 @@ body {
 	/* This helps marginals relative to the page */
 	position: relative;
 
-
 	/* To make room for navigation footer. Without this, the page is too short to show it. */
 	padding-left: var(--bookish-block-padding);
 	padding-right: var(--bookish-block-padding);
