@@ -24,7 +24,7 @@ const Atom = (props: { node: AtomNode<any>, textView: React.ReactElement, metaVi
 
     return caret ?
         <span 
-            className={`bookish-editor-atom ${selected ? "bookish-editor-atom-highlight" : ""}`} 
+            className={`bookish-editor-atom ${selected ? "bookish-editor-atom-selected" : ""}`} 
             onMouseDown={handleMouseDown}
         >
             { textView }

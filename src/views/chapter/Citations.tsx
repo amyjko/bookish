@@ -1,9 +1,10 @@
-import React, { useContext } from 'react'
+import React, { useContext, useEffect } from 'react'
 import Marginal  from './Marginal'
 import Parser from '../../models/Parser'
 import { CitationsNode } from "../../models/CitationsNode"
 import { renderNode } from './Renderer'
 import { ChapterContext, ChapterContextType } from './Chapter'
+import Atom from '../editor/Atom'
 
 const Citations = (props: {node: CitationsNode}) => {
 
@@ -17,8 +18,8 @@ const Citations = (props: {node: CitationsNode}) => {
     if(!context || !context.chapter)
         return <></>;
 
-    const chapter = context.chapter
-    const book = context.book
+    const chapter = context.chapter;
+    const book = context.book;
 
     // Sort citations numerically, however they're numbered.
     let citations = node.getMeta().sort((a, b) => {
@@ -56,33 +57,47 @@ const Citations = (props: {node: CitationsNode}) => {
                     segments.push(<sup key={"citation-comma-" + index}>,</sup>);
             }
         );
-    
-    return <span className="bookish-citation"  data-nodeid={props.node.nodeID}>
-        <Marginal
-            id={"citation-" + citations.join("-")}
-            interactor={<>{segments}</>}
-            content={
-                <span className="bookish-references">
-                    {
-                        book ?
-                            citations.map((citationID, index) => {
-                                let citationNumber = chapter.getCitationNumber(citationID);
-                                let ref = book.getReference(citationID);
-                                return ref ?
-                                    <span 
-                                        key={index} 
-                                        className="bookish-reference">
-                                            <sup className="bookish-citation-symbol">{citationNumber}</sup>
-                                            { renderNode(Parser.parseReference(ref, book, true)) }
-                                    </span> :
-                                    null
-                            }) :
-                        null
-                }
-                </span>
-            }
-        />
-    </span>
+
+    if(citations.length === 0)
+        segments.push(<span className="bookish-error" key="error">No citations</span>);
+
+    // Position the marginals on every render.
+    useEffect(() => {
+        if(context && context.layoutMarginals) {
+            context.layoutMarginals();
+        }
+    });
+
+    return <Atom
+        node={node}
+        textView={
+            <span className="bookish-citation"  data-nodeid={props.node.nodeID}>
+                <Marginal
+                    id={"citation-" + citations.join("-")}
+                    interactor={<>{segments}</>}
+                    content={
+                        <span className="bookish-references">
+                            {
+                                book ?
+                                    citations.map((citationID, index) => {
+                                        let citationNumber = chapter.getCitationNumber(citationID);
+                                        let ref = book.getReference(citationID);
+                                        return ref ?
+                                            <span 
+                                                key={index} 
+                                                className="bookish-reference">
+                                                    <sup className="bookish-citation-symbol">{citationNumber}</sup>
+                                                    { renderNode(Parser.parseReference(ref, book, true)) }
+                                            </span> :
+                                            null
+                                    }) :
+                                null
+                        }
+                        </span>
+                    }
+                />
+            </span>
+        }/>;
 
 }
 

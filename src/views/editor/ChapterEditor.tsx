@@ -9,10 +9,11 @@ import { TextNode } from "../../models/TextNode";
 import { renderNode } from "../chapter/Renderer";
 import { FootnoteNode } from "../../models/FootnoteNode";
 import { AtomNode } from "../../models/AtomNode";
+import { CitationsNode } from "../../models/CitationsNode";
 
 export const CaretContext = React.createContext<{ 
     range: CaretRange | undefined, 
-    rect: { x: number, y: number} | undefined,
+    coordinate: { x: number, y: number} | undefined,
     setCaretRange: Function
 } | undefined>(undefined);
 
@@ -22,7 +23,7 @@ const ChapterEditor = (props: { ast: ChapterNode }) => {
     const editorRef = useRef<HTMLDivElement>(null);
 
     const [ caretRange, setCaretRange ] = useState<CaretRange>();
-    const [ caretRect, setCaretRect ] = useState<{ x: number, y: number}>();
+    const [ caretCoordinate, setCaretCoordinate ] = useState<{ x: number, y: number}>();
     const [ lastInputTime, setLastInputTime ] = useState<number>(0);
     const [ idle, setIdle ] = useState<boolean>(true);
 
@@ -120,13 +121,13 @@ const ChapterEditor = (props: { ast: ChapterNode }) => {
                     }
 
                 }
-            } 
+            }
             // If the range is empty, remove the browser's selection too.
             else {
                 document.getSelection()?.empty();
             }
         }
-        setCaretRect(newCaretPosition);
+        setCaretCoordinate(newCaretPosition);
 
     }, [ caretRange ]);
 
@@ -428,6 +429,12 @@ const ChapterEditor = (props: { ast: ChapterNode }) => {
                 if(caret)
                     setCaretRange({ start: caret, end: caret});
             }
+            else if(event.shiftKey && event.key === "c" && caretRange.start.node === caretRange.end.node) {
+                event.preventDefault();
+                const caret = ast.insertNodeAtSelection(caretRange, (parent, text) => new CitationsNode(parent, []));
+                if(caret)
+                    setCaretRange({ start: caret, end: caret});
+            }
         }
         
         // Insert any non control character! This is a bit hacky: all but "Fn" are more than three characters.
@@ -476,7 +483,7 @@ const ChapterEditor = (props: { ast: ChapterNode }) => {
     const isBold = caretRange && !isSelection && caretRange.start.node instanceof TextNode && caretRange.start.node.isBold();
     const isLink = caretRange && !isSelection && caretRange.start.node.getClosestParentMatching(p => p instanceof LinkNode) !== undefined;
 
-    return <CaretContext.Provider value={{ range: caretRange, rect: caretRect, setCaretRange: setCaretRange }}>
+    return <CaretContext.Provider value={{ range: caretRange, coordinate: caretCoordinate, setCaretRange: setCaretRange }}>
             <div 
                 className="bookish-chapter-editor"
                 ref={editorRef}
@@ -490,12 +497,12 @@ const ChapterEditor = (props: { ast: ChapterNode }) => {
                 {
                     // Draw a caret. We draw our own since this view isn't contentEditable and we can't show a caret.
                     // Customize the rendering based on the formatting applied to the text node.
-                    caretRect && caretRange && !isSelection ? 
+                    caretCoordinate && caretRange && !isSelection ? 
                         <div 
                             className={`bookish-chapter-editor-caret ${isLink ? "bookish-chapter-editor-caret-linked" : isItalic ? "bookish-chapter-editor-caret-italic" :""} ${isBold ? "bookish-chapter-editor-caret-bold" : ""} ${idle ? "bookish-chapter-editor-caret-blink" : ""}`}
                             style={{
-                                left: caretRect.x,
-                                top: caretRect.y
+                                left: caretCoordinate.x,
+                                top: caretCoordinate.y
                             }}>
                         </div> : null
                 }

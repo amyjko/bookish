@@ -268,10 +268,15 @@ input[type="text"].bookish-app-editable-error {
     background-color: var(--bookish-app-error-background);
 }
 
-.bookish-editor-atom {
+@keyframes atom-selected {
+    from, to { outline-width: 2px; }
+    50% { outline-width: 4px; }
 }
 
-.bookish-editor-atom-highlight {
-    border-radius: 1em;
-    background-color: var(--bookish-highlight-color);
+.bookish-editor-atom-selected {
+    animation: 1s atom-selected infinite;
+    border-radius: 2px;
+    outline-style: solid;
+    outline-color: var(--bookish-paragraph-color);
+    outline-offset: 2px;
 }
