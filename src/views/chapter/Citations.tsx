@@ -1,16 +1,21 @@
-import React, { useContext, useEffect } from 'react'
+import React, { ChangeEvent, useContext, useEffect, useRef, useState } from 'react'
 import Marginal  from './Marginal'
 import Parser from '../../models/Parser'
 import { CitationsNode } from "../../models/CitationsNode"
 import { renderNode } from './Renderer'
 import { ChapterContext, ChapterContextType } from './Chapter'
 import Atom from '../editor/Atom'
+import { CaretContext } from '../editor/ChapterEditor'
+import Options from '../editor/Options'
 
 const Citations = (props: {node: CitationsNode}) => {
 
     const { node } = props
 
-    const context = useContext<ChapterContextType>(ChapterContext)
+    const context = useContext<ChapterContextType>(ChapterContext);
+    const caret = useContext(CaretContext);
+    const selected = caret && caret.range && caret.range.start.node === node;
+    const [ editedCitations, setEditedCitations ] = useState<string[]>(node.getMeta());
 
     let segments: React.ReactNode[] = [];
 
@@ -58,8 +63,9 @@ const Citations = (props: {node: CitationsNode}) => {
             }
         );
 
+    // Render empty citation list as an m-dash.
     if(citations.length === 0)
-        segments.push(<span className="bookish-error" key="error">No citations</span>);
+        segments.push(<sup className="bookish-citation-symbol" key="empty">{"\u2014"}</sup>);
 
     // Position the marginals on every render.
     useEffect(() => {
@@ -67,6 +73,11 @@ const Citations = (props: {node: CitationsNode}) => {
             context.layoutMarginals();
         }
     });
+
+    function handleChange(values: string[]) {
+        const citationSet = new Set<string>(values);
+        node.setMeta([...citationSet]);
+    }
 
     return <Atom
         node={node}
@@ -97,7 +108,17 @@ const Citations = (props: {node: CitationsNode}) => {
                     }
                 />
             </span>
-        }/>;
+        }
+        metaView={
+            !selected || !book ? undefined :
+            <Options
+                multiple={true}    
+                options={Object.keys(book.getReferences()).sort().map(citationID => { return { value: citationID, label: citationID }})}
+                values={node.getMeta()}
+                change={handleChange}
+            />
+        }
+        />;
 
 }
 

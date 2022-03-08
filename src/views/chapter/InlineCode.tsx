@@ -4,6 +4,7 @@ import { InlineCodeNode } from "../../models/InlineCodeNode"
 import { CaretContext } from '../editor/ChapterEditor'
 import { renderNode } from './Renderer'
 import Metadata from '../editor/Metadata'
+import Options from '../editor/Options'
 
 const InlineCode = (props: { node: InlineCodeNode }) => {
 
@@ -11,7 +12,6 @@ const InlineCode = (props: { node: InlineCodeNode }) => {
 
     const caret = useContext(CaretContext);
     const selectRef = useRef<HTMLSelectElement>(null);
-    const [ language, setLanguage ] = useState<string>(node.getMeta());
 
     // Is the caret on this code node?
     const selectFocused = caret && caret.range && caret.range.start.node === node;
@@ -23,11 +23,9 @@ const InlineCode = (props: { node: InlineCodeNode }) => {
 
     const languages = [ "C", "C++", "CSS", "Go", "HTML", "Java", "JavaScript", "Markdown", "Plaintext", "Python", "TypeScript" ];
 
-    function handleChange(event: ChangeEvent<HTMLSelectElement>) {
-        setLanguage(event.target.value);
-        node.setMeta(event.target.value);
-        if(caret && caret.setCaretRange)
-            caret.setCaretRange({ start: { node: node.getText(), index: 0 }, end: { node: node.getText(), index: 0 }});
+    function handleChange(values: string[]) {
+        const newValue = values[0];
+        node.setMeta(newValue);
     }
 
     const editableView = <span className="bookish-code bookish-code-inline hljs" data-nodeid={node.nodeID}>{renderNode(node.getText())}</span>;
@@ -38,14 +36,12 @@ const InlineCode = (props: { node: InlineCodeNode }) => {
         editingTextView={editableView}
         readingTextView={staticView}
         metaView={
-            <select 
-                ref={selectRef} 
-                tabIndex={0} 
-                value={language} 
-                onChange={handleChange}
-            >
-                { languages.map((lang, index) => <option key={index} value={lang.toLowerCase()}>{lang}</option>)}
-            </select>
+            <Options
+                multiple={false}
+                options={languages.map(lang => { return { value: lang.toLocaleLowerCase(), label: lang }})}
+                values={[node.getMeta()]}
+                change={handleChange}
+            />
         }
     />
 

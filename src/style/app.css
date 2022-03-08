@@ -280,3 +280,33 @@ input[type="text"].bookish-app-editable-error {
     outline-color: var(--bookish-paragraph-color);
     outline-offset: 2px;
 }
+
+.bookish-app-options {
+    display: inline-block;
+    width: 10em;
+    background-color: var(--bookish-app-chrome-background);
+    border: 1px solid var(--bookish-app-chrome-border-color);
+    border-radius: var(--bookish-app-chrome-roundedness);
+    max-height: 20em;
+    overflow-y: scroll;
+}
+
+.bookish-app-options-option {
+    display: flex;
+    width: 100%;
+    padding: var(--bookish-app-chrome-padding);
+    cursor: pointer;
+}
+
+.bookish-app-options-option-selected {
+    background-color: var(--bookish-app-chrome-border-color);
+}
+
+.bookish-app-options-option:hover {
+    background-color: var(--bookish-highlight-color);
+}
+
+.bookish-app-options-option span:first-child {
+    display: inline-block;
+    width: 1em;
+}

@@ -53,7 +53,6 @@ export type Position = "|" | "<" | ">";
 
 export type Bookkeeping = {
     index: Map<number, Node>;
-    citations: Record<string, boolean>;
     headers: HeaderNode[];
     symbols: Record<string, string>;
     embeds: EmbedNode[];
@@ -109,7 +108,6 @@ export default class Parser {
         this.openedDoubleQuote = false; // Track most recently observed quotes.
         this.metadata = {
             index: new Map<number, Node>(),
-            citations: {},
             headers: [],
             symbols: {},
             embeds: [],
@@ -1114,11 +1112,6 @@ export default class Parser {
 
         // Trim any whitespace, then split by commas.
         const citationList = citations.trim().split(",").map(citation => citation.trim());
-
-        // Record each citation for later.
-        citationList.forEach(citation => {
-            this.metadata.citations[citation] = true;
-        });
 
         return new CitationsNode(parent, citationList);
 

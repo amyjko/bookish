@@ -9,6 +9,7 @@ import { ParagraphNode } from "./ParagraphNode";
 import { Format, FormattedNode, FormattedNodeSegmentType } from "./FormattedNode";
 import { MetadataNode } from "./MetadataNode";
 import { AtomNode } from "./AtomNode";
+import { CitationsNode } from "./CitationsNode";
 
 export type Caret = { node: Node, index: number }
 export type CaretRange = { start: Caret, end: Caret }
@@ -61,21 +62,18 @@ export class ChapterNode extends Node {
     getNode(id: number) { return this.index.get(id); }
 
     getErrors(): ErrorNode[] { return this.#metadata.errors; }
-    getCitations(): Record<string, boolean> { return this.#metadata.citations; }
+    getCitations(): Set<string> { 
+        const citations = new Set<string>();
+        (this.getNodes().filter(n => n instanceof CitationsNode) as CitationsNode[]).forEach(cites => cites.getMeta().forEach(citationID => citations.add(citationID)));
+        return citations;
+    }
     getFootnotes(): FootnoteNode[] { return this.getNodes().filter(n => n instanceof FootnoteNode) as FootnoteNode[]; }
     getHeaders(): HeaderNode[] { return this.#metadata.headers; }
     getEmbeds(): EmbedNode[] { return this.#metadata.embeds; }
 
     getCitationNumber(citationID: string) {
-
-        const index = Object.keys(this.getCitations()).sort().indexOf(citationID);
-
-        if (index < 0)
-            return null;
-
-        else
-            return index + 1;
-
+        const index = Array.from(this.getCitations()).sort().indexOf(citationID);
+        return index < 0 ? null : index + 1;
     }
 
     toText(): string {
