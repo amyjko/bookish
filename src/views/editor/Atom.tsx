@@ -20,6 +20,9 @@ const Atom = (props: { node: AtomNode<any>, textView: React.ReactElement, metaVi
         // Select this so that the view stays focused.
         caret.setCaretRange({ start: { node: node, index: 0 }, end: { node: node, index: 0 }});
 
+        // Prevent the editor from receiving the click.
+        event.stopPropagation();
+
     }
 
     function handleKeyDown(event: React.KeyboardEvent) {
@@ -34,7 +37,7 @@ const Atom = (props: { node: AtomNode<any>, textView: React.ReactElement, metaVi
 
     }
 
-    return caret ?
+    return selected ?
         <span 
             className={`bookish-editor-atom ${selected ? "bookish-editor-atom-selected" : ""}`} 
             onMouseDown={handleMouseDown}

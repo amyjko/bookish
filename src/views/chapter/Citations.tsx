@@ -13,9 +13,6 @@ const Citations = (props: {node: CitationsNode}) => {
     const { node } = props
 
     const context = useContext<ChapterContextType>(ChapterContext);
-    const caret = useContext(CaretContext);
-    const selected = caret && caret.range && caret.range.start.node === node;
-    const [ editedCitations, setEditedCitations ] = useState<string[]>(node.getMeta());
 
     let segments: React.ReactNode[] = [];
 
@@ -110,7 +107,7 @@ const Citations = (props: {node: CitationsNode}) => {
             </span>
         }
         metaView={
-            !selected || !book ? undefined :
+            !book ? undefined :
             <Options
                 multiple={true}    
                 options={Object.keys(book.getReferences()).sort().map(citationID => { return { value: citationID, label: citationID }})}

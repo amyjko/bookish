@@ -10,6 +10,7 @@ import { Format, FormattedNode, FormattedNodeSegmentType } from "./FormattedNode
 import { MetadataNode } from "./MetadataNode";
 import { AtomNode } from "./AtomNode";
 import { CitationsNode } from "./CitationsNode";
+import { LabelNode } from "./LabelNode";
 
 export type Caret = { node: Node, index: number }
 export type CaretRange = { start: Caret, end: Caret }
@@ -70,6 +71,10 @@ export class ChapterNode extends Node {
     getFootnotes(): FootnoteNode[] { return this.getNodes().filter(n => n instanceof FootnoteNode) as FootnoteNode[]; }
     getHeaders(): HeaderNode[] { return this.#metadata.headers; }
     getEmbeds(): EmbedNode[] { return this.#metadata.embeds; }
+
+    getLabels(): LabelNode[] {
+        return (this.getNodes().filter(n => n instanceof LabelNode) as LabelNode[]);
+    }
 
     getCitationNumber(citationID: string) {
         const index = Array.from(this.getCitations()).sort().indexOf(citationID);

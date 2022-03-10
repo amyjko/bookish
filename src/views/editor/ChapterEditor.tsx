@@ -10,6 +10,7 @@ import { renderNode } from "../chapter/Renderer";
 import { FootnoteNode } from "../../models/FootnoteNode";
 import { AtomNode } from "../../models/AtomNode";
 import { CitationsNode } from "../../models/CitationsNode";
+import { LabelNode } from "../../models/LabelNode";
 
 export const CaretContext = React.createContext<{ 
     range: CaretRange | undefined, 
@@ -435,6 +436,12 @@ const ChapterEditor = (props: { ast: ChapterNode }) => {
                 if(caret)
                     setCaretRange({ start: caret, end: caret});
             }
+            else if(event.shiftKey && event.key === "l" && caretRange.start.node === caretRange.end.node) {
+                event.preventDefault();
+                const caret = ast.insertNodeAtSelection(caretRange, (parent, text) => new LabelNode(parent, ""));
+                if(caret)
+                    setCaretRange({ start: caret, end: caret});
+            }
         }
         
         // Insert any non control character! This is a bit hacky: all but "Fn" are more than three characters.
@@ -469,9 +476,9 @@ const ChapterEditor = (props: { ast: ChapterNode }) => {
         
         // If the editor lost focus and the caret was on a text node, erase the caret.
         // Otherwise, we leave it alone, since children of this editor may focus and blur.
-        if(editorRef.current && event.target === editorRef.current && caretRange?.start.node instanceof TextNode) {
-            setCaretRange(undefined);
-        }
+        // if(editorRef.current && event.target === editorRef.current && caretRange?.start.node instanceof TextNode) {
+        //     setCaretRange(undefined);
+        // }
     }
 
     function handleKeyUp(event: React.KeyboardEvent) {
@@ -482,6 +489,7 @@ const ChapterEditor = (props: { ast: ChapterNode }) => {
     const isItalic = caretRange && !isSelection && caretRange.start.node instanceof TextNode && caretRange.start.node.isItalic();
     const isBold = caretRange && !isSelection && caretRange.start.node instanceof TextNode && caretRange.start.node.isBold();
     const isLink = caretRange && !isSelection && caretRange.start.node.getClosestParentMatching(p => p instanceof LinkNode) !== undefined;
+    const focused = document.activeElement === editorRef.current;
 
     return <CaretContext.Provider value={{ range: caretRange, coordinate: caretCoordinate, setCaretRange: setCaretRange }}>
             <div 
@@ -499,7 +507,7 @@ const ChapterEditor = (props: { ast: ChapterNode }) => {
                     // Customize the rendering based on the formatting applied to the text node.
                     caretCoordinate && caretRange && !isSelection ? 
                         <div 
-                            className={`bookish-chapter-editor-caret ${isLink ? "bookish-chapter-editor-caret-linked" : isItalic ? "bookish-chapter-editor-caret-italic" :""} ${isBold ? "bookish-chapter-editor-caret-bold" : ""} ${idle ? "bookish-chapter-editor-caret-blink" : ""}`}
+                            className={`bookish-chapter-editor-caret ${isLink ? "bookish-chapter-editor-caret-linked" : isItalic ? "bookish-chapter-editor-caret-italic" :""} ${isBold ? "bookish-chapter-editor-caret-bold" : ""} ${focused && idle ? "bookish-chapter-editor-caret-blink" : ""} ${!focused ? "bookish-chapter-editor-caret-disabled" : ""}`}
                             style={{
                                 left: caretCoordinate.x,
                                 top: caretCoordinate.y

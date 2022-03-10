@@ -14,6 +14,7 @@
     --bookish-app-chrome-border-color: #d5d5d5;
     --bookish-app-chrome-hover-background: #E8AF22;
     --bookish-app-chrome-hover-color: #FFFFFF;
+    --bookish-app-chrome-muted: #AAAAAA;
 
     --bookish-app-error-background: rgb(255, 231, 231);
     --bookish-app-error-color: rgb(191, 15, 15);
@@ -225,6 +226,10 @@ input[type="text"].bookish-app-editable-error {
     100% {
         outline: none;
     }
+}
+
+.bookish-chapter-editor-caret-disabled {
+    outline-color: var(--bookish-app-chrome-muted);
 }
 
 .bookish-chapter-editor-caret-blink {

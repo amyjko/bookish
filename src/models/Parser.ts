@@ -56,7 +56,6 @@ export type Bookkeeping = {
     headers: HeaderNode[];
     symbols: Record<string, string>;
     embeds: EmbedNode[];
-    labels: LabelNode[];
     errors: ErrorNode[];
 }
 
@@ -111,7 +110,6 @@ export default class Parser {
             headers: [],
             symbols: {},
             embeds: [],
-            labels: [],
             errors: []
         };
 
@@ -1005,14 +1003,7 @@ export default class Parser {
             next = this.peek();
         }
 
-        const label = new LabelNode(parent, id);
-
-        let matches = this.metadata.labels.filter(lab => lab.getMeta() === id);
-        if(matches.length > 0)
-            return this.createError(parent, undefined, "Duplicate label " + id);
-        this.metadata.labels.push(label);
-
-        return label;
+        return new LabelNode(parent, id);
 
     }
 
