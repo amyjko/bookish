@@ -315,3 +315,13 @@ input[type="text"].bookish-app-editable-error {
     display: inline-block;
     width: 1em;
 }
+
+.bookish-app-comment {
+    background: var(--bookish-app-chrome-background);
+    border: 1px solid var(--bookish-app-chrome-border-color);
+    border-radius: 0 var(--bookish-app-chrome-padding) var(--bookish-app-chrome-padding) var(--bookish-app-chrome-padding);
+    padding: var(--bookish-app-chrome-padding);
+    font-size: var(--bookish-app-chrome-font-size);
+    display: inline-block;
+    line-height: 1.5em;
+}

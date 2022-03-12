@@ -713,7 +713,8 @@ a:hover {
 }
 
 .bookish-marginal-interactor .bookish-citation-symbol:before,
-.bookish-marginal-interactor .bookish-footnote-symbol:before {
+.bookish-marginal-interactor .bookish-footnote-symbol:before,
+.bookish-marginal-interactor .bookish-comment-symbol:before {
 	content: "";
 	width: 3em;
 	height: 3em;
@@ -730,14 +731,17 @@ a:hover {
 /* A little circle around the citation and footer symbols, when hovered on a device that supports hovering. */
 @media (hover: hover) {
 	.bookish-marginal-interactor.bookish-marginal-hovered .bookish-citation-symbol:before,
-	.bookish-marginal-interactor.bookish-marginal-hovered .bookish-footnote-symbol:before {
+	.bookish-marginal-interactor.bookish-marginal-hovered .bookish-footnote-symbol:before,
+	.bookish-marginal-interactor.bookish-marginal-hovered .bookish-comment-symbol:before	
+	{
 		opacity: 0.3;
 	}
 }
 
 /* A little circle around the citation and footer symbols, when hovered */
 .bookish-marginal-interactor.bookish-marginal-selected .bookish-citation-symbol:before,
-.bookish-marginal-interactor.bookish-marginal-selected .bookish-footnote-symbol:before {
+.bookish-marginal-interactor.bookish-marginal-selected .bookish-footnote-symbol:before,
+.bookish-marginal-interactor.bookish-marginal-selected .bookish-comment-symbol:before {
 	opacity: 0.7;
 }
 
@@ -793,6 +797,10 @@ ol li.bookish-reference::before {
 	font-family: var(--bookish-paragraph-font-family);
     font-weight: normal;
     color: var(--bookish-link-color);
+	position: relative;
+}
+
+.bookish-comment-symbol {
 	position: relative;
 }
 
@@ -1070,7 +1078,7 @@ a .bookish-outline-header-active {
 
 	.bookish-definition .bookish-marginal-interactor.bookish-marginal-hovered {
 		border-bottom-color: var(--bookish-link-color) !important;
-		border-bottom-width: 3px;	
+		border-bottom-width: 3px;
 	}
 
 	.bookish-definition .bookish-marginal.bookish-marginal-hovered .bookish-definition-entry {

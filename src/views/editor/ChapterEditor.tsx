@@ -11,6 +11,7 @@ import { FootnoteNode } from "../../models/FootnoteNode";
 import { AtomNode } from "../../models/AtomNode";
 import { CitationsNode } from "../../models/CitationsNode";
 import { LabelNode } from "../../models/LabelNode";
+import { CommentNode } from "../../models/CommentNode";
 
 export const CaretContext = React.createContext<{ 
     range: CaretRange | undefined, 
@@ -430,7 +431,7 @@ const ChapterEditor = (props: { ast: ChapterNode }) => {
                 if(caret)
                     setCaretRange({ start: caret, end: caret});
             }
-            else if(event.shiftKey && event.key === "c" && caretRange.start.node === caretRange.end.node) {
+            else if(event.shiftKey && event.key === "r" && caretRange.start.node === caretRange.end.node) {
                 event.preventDefault();
                 const caret = ast.insertNodeAtSelection(caretRange, (parent, text) => new CitationsNode(parent, []));
                 if(caret)
@@ -439,6 +440,12 @@ const ChapterEditor = (props: { ast: ChapterNode }) => {
             else if(event.shiftKey && event.key === "l" && caretRange.start.node === caretRange.end.node) {
                 event.preventDefault();
                 const caret = ast.insertNodeAtSelection(caretRange, (parent, text) => new LabelNode(parent, ""));
+                if(caret)
+                    setCaretRange({ start: caret, end: caret});
+            }
+            else if(event.shiftKey && event.key === "c" && caretRange.start.node === caretRange.end.node) {
+                event.preventDefault();
+                const caret = ast.insertNodeAtSelection(caretRange, (parent, text) => new CommentNode(parent, "This is my comment"));
                 if(caret)
                     setCaretRange({ start: caret, end: caret});
             }
