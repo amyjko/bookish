@@ -3,18 +3,24 @@ import { FormattedNodeSegmentType, FormattedNode, Format } from "./FormattedNode
 import { BlockNode, BlockParentNode } from "./Parser";
 import { TextNode } from "./TextNode";
 import { Caret, CaretRange } from "./ChapterNode";
-import { ClassType } from "react";
 
 export class ParagraphNode extends Node<BlockParentNode> {
 
     #content: FormattedNode;
+    #level: number;
 
-    constructor(parent: BlockParentNode) {
+    constructor(parent: BlockParentNode, level: number = 0) {
         super(parent, "paragraph");
         this.#content = new FormattedNode(this, "", []);
         // An empty text node to start.
         this.#content.addSegment(new TextNode(this.#content, "", 0));
+
+        // Assign whatever level is given.
+        this.#level = level;
     }
+
+    getLevel() { return this.#level; }
+    setLevel(level: number) { this.#level = level; }
 
     setContent(content: FormattedNode) {
         this.#content = content;
@@ -27,7 +33,7 @@ export class ParagraphNode extends Node<BlockParentNode> {
     }
 
     toBookdown() {
-        return this.#content.toBookdown();
+        return (this.#level === 1 ? "# " : this.#level === 2 ? "## " : this.#level === 3 ? "### " : "") + this.#content.toBookdown();
     }
 
     traverseChildren(fn: (node: Node) => void): void {
@@ -44,7 +50,7 @@ export class ParagraphNode extends Node<BlockParentNode> {
     getSiblingOf(child: Node, next: boolean) { return undefined; }
 
     copy(parent: BlockParentNode): ParagraphNode {
-        const p = new ParagraphNode(parent);
+        const p = new ParagraphNode(parent, this.#level);
         if(this.#content) p.setContent(this.#content.copy(p))
         return p;
     }

@@ -81,11 +81,12 @@ export class TextNode extends Node<TextNodeParent> {
             return { node: this, index: index - 1 };
         }
 
-        // If this is the first text node in a paragraph, merge this paragraph with the previous one,
-        // returning a caret at the given index of this text node.
+        // If this is the first text node in a paragraph, backspace over the block before it.
         const paragraph = this.getParagraph();
         const firstText = paragraph?.getFirstTextNode();
         if(firstText === this) {
+            // Is the block before a paragraph? Merge this paragraph with the previous one,
+            // returning a caret at the given index of this text node.
             const previousParagraph = paragraph.getPreviousIfParagraph();
             if(previousParagraph) {
                 // Remember the text position of the last position in the previous paragraph.
@@ -97,7 +98,13 @@ export class TextNode extends Node<TextNodeParent> {
                     return newCaret;
                 else throw Error("Couldn't map caret back to new position.");
             }
-            else return { node: this, index: index };
+            // Otherwise, delete the previous block.
+            else {
+                const previousBlock = paragraph.getParent()?.getSiblingOf(paragraph, false);
+                if(previousBlock)
+                    previousBlock.remove();
+                return { node: this, index: index };
+            }
         }
 
         // Otherwise, see if there's a previous node.
@@ -148,7 +155,12 @@ export class TextNode extends Node<TextNodeParent> {
                     return newCaret;
                 else throw Error("Couldn't map caret back to new position.");
             }
-            else return { node: this, index: index };
+            else {
+                const nextBlock = paragraph.getParent()?.getSiblingOf(paragraph, true);
+                if(nextBlock)
+                    nextBlock.remove();   
+                return { node: this, index: index };
+            }
         }
 
         // Otherwise, ask the previous word to delete.

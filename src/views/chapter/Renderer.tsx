@@ -1,5 +1,3 @@
-// Functions for translating chapter AST nodes into React views.
-
 import React from 'react'
 
 import { Position } from '../../models/Parser'
@@ -7,7 +5,6 @@ import { Node } from "../../models/Node"
 import ChapterBody from './ChapterBody'
 import Paragraph from './Paragraph'
 import Figure from './Figure'
-import Header from './Header'
 import Rule from './Rule'
 import BulletedList from './BulletedList'
 import NumberedList from './NumberedList'
@@ -31,7 +28,6 @@ const renderers: Record<string, (props: { node: any }) => JSX.Element> = {
     "chapter": ChapterBody,
     "paragraph": Paragraph,
     "embed": Figure,
-    "header": Header,
     "rule": Rule,
     "bulleted": BulletedList,
     "numbered": NumberedList,

@@ -2,7 +2,6 @@ import { Bookkeeping, BlockNode, BlockParentNode } from "./Parser";
 import { ErrorNode } from "./ErrorNode";
 import { TextNode } from "./TextNode";
 import { FootnoteNode } from "./FootnoteNode";
-import { HeaderNode } from "./HeaderNode";
 import { EmbedNode } from "./EmbedNode";
 import { Node } from "./Node";
 import { ParagraphNode } from "./ParagraphNode";
@@ -12,11 +11,12 @@ import { AtomNode } from "./AtomNode";
 import { CitationsNode } from "./CitationsNode";
 import { LabelNode } from "./LabelNode";
 import { CommentNode } from "./CommentNode";
+import { BlocksNode } from "./BlocksNode";
 
 export type Caret = { node: Node, index: number }
 export type CaretRange = { start: Caret, end: Caret }
 
-export class ChapterNode extends Node {
+export class ChapterNode extends BlocksNode {
 
     #blocks: BlockNode[];
     #metadata: Bookkeeping;
@@ -24,7 +24,7 @@ export class ChapterNode extends Node {
     nextID: number;
 
     constructor(blocks: BlockNode[], metadata: Bookkeeping) {
-        super(undefined, "chapter");
+        super(undefined, blocks, "chapter");
 
         // The AST of the chapter.
         this.#blocks = blocks;
@@ -70,7 +70,7 @@ export class ChapterNode extends Node {
         return citations;
     }
     getFootnotes(): FootnoteNode[] { return this.getNodes().filter(n => n instanceof FootnoteNode) as FootnoteNode[]; }
-    getHeaders(): HeaderNode[] { return this.#metadata.headers; }
+    getHeaders(): ParagraphNode[] { return this.getNodes().filter(n => n instanceof ParagraphNode && n.getLevel() > 0) as ParagraphNode[]; }
     getEmbeds(): EmbedNode[] { return this.#metadata.embeds; }
     getComments(): CommentNode[] { return this.getNodes().filter(n => n instanceof CommentNode) as CommentNode[]; }
 

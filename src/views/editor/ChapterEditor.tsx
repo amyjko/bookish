@@ -12,6 +12,12 @@ import { AtomNode } from "../../models/AtomNode";
 import { CitationsNode } from "../../models/CitationsNode";
 import { LabelNode } from "../../models/LabelNode";
 import { CommentNode } from "../../models/CommentNode";
+import { FormattedNode } from "../../models/FormattedNode";
+import { BlocksNode } from "../../models/BlocksNode";
+import { RuleNode } from "../../models/RuleNode";
+import { CalloutNode } from "../../models/CalloutNode";
+import { QuoteNode } from "../../models/QuoteNode";
+import { CodeNode } from "../../models/CodeNode";
 
 export const CaretContext = React.createContext<{ 
     range: CaretRange | undefined, 
@@ -25,7 +31,7 @@ const ChapterEditor = (props: { ast: ChapterNode }) => {
     const editorRef = useRef<HTMLDivElement>(null);
 
     const [ caretRange, setCaretRange ] = useState<CaretRange>();
-    const [ caretCoordinate, setCaretCoordinate ] = useState<{ x: number, y: number}>();
+    const [ caretCoordinate, setCaretCoordinate ] = useState<{ x: number, y: number, height: number}>();
     const [ lastInputTime, setLastInputTime ] = useState<number>(0);
     const [ idle, setIdle ] = useState<boolean>(true);
 
@@ -117,7 +123,8 @@ const ChapterEditor = (props: { ast: ChapterNode }) => {
                         const pageRect = document.querySelector(".bookish-page")?.getBoundingClientRect();
                         const position = {
                             x: rangeRect.left + window.scrollX - (pageRect ? pageRect.left + window.scrollX : 0),
-                            y: rangeRect.top + window.scrollY - (pageRect ? pageRect.top + window.scrollY : 0)
+                            y: rangeRect.top + window.scrollY - (pageRect ? pageRect.top + window.scrollY : 0),
+                            height: rangeRect.height
                         };
                         newCaretPosition = position;
                     }
@@ -258,6 +265,20 @@ const ChapterEditor = (props: { ast: ChapterNode }) => {
         // If we didn't find one, just return what we were given.
         return caret;
 
+    }
+
+    function atParagraphStart() {
+        return caretRange !== undefined &&
+            caretRange.start.node === caretRange.end.node && 
+            caretRange.start.index === caretRange.end.index && 
+            caretRange.start.index === 0 &&
+            caretRange.start.node instanceof TextNode && 
+            caretRange.start.node.getParent() instanceof FormattedNode &&
+            caretRange.start.node.getParent()?.getParent() instanceof ParagraphNode
+    }
+
+    function noSelection() {
+        return caretRange !== undefined && caretRange.start.node === caretRange.end.node
     }
 
     function handleKeyDown(event: React.KeyboardEvent) {
@@ -431,23 +452,85 @@ const ChapterEditor = (props: { ast: ChapterNode }) => {
                 if(caret)
                     setCaretRange({ start: caret, end: caret});
             }
-            else if(event.shiftKey && event.key === "r" && caretRange.start.node === caretRange.end.node) {
+            else if(event.shiftKey && event.key === "r" && noSelection()) {
                 event.preventDefault();
                 const caret = ast.insertNodeAtSelection(caretRange, (parent, text) => new CitationsNode(parent, []));
                 if(caret)
                     setCaretRange({ start: caret, end: caret});
             }
-            else if(event.shiftKey && event.key === "l" && caretRange.start.node === caretRange.end.node) {
+            else if(event.shiftKey && event.key === "l" && noSelection()) {
                 event.preventDefault();
                 const caret = ast.insertNodeAtSelection(caretRange, (parent, text) => new LabelNode(parent, ""));
                 if(caret)
                     setCaretRange({ start: caret, end: caret});
             }
-            else if(event.shiftKey && event.key === "c" && caretRange.start.node === caretRange.end.node) {
+            else if(event.shiftKey && event.key === "c" && noSelection()) {
                 event.preventDefault();
                 const caret = ast.insertNodeAtSelection(caretRange, (parent, text) => new CommentNode(parent, "This is my comment"));
                 if(caret)
                     setCaretRange({ start: caret, end: caret});
+            }
+            // Convert paragraph to header
+            else if(event.altKey && (event.code == "Digit0" || event.code === "Digit1"  || event.code === "Digit2"  || event.code === "Digit3")) {
+                const paragraph = caretRange.start.node.getClosestParentMatching(p => p instanceof ParagraphNode) as ParagraphNode;
+                if(paragraph) {
+                    paragraph.setLevel(parseInt(event.code.substring(5)));
+                    // Don't change the caret position, just re-render.
+                    setCaretRange({ start: caretRange.start, end: caretRange.end });
+                }
+            }
+            // Only insert blocks at the beginning of a paragraph node.
+            else if(atParagraphStart() && event.shiftKey) {
+                const paragraph = caretRange.start.node.getClosestParentMatching(p => p instanceof ParagraphNode) as ParagraphNode;
+                const parent = caretRange.start.node.getClosestParentMatching(p => p instanceof BlocksNode) as BlocksNode;
+                // Horizontal rules
+                if(event.key === "h") {
+                    event.preventDefault();
+                    event.stopPropagation();
+                    if(parent && paragraph)
+                        parent.insertBefore(paragraph, new RuleNode(parent));
+                    // Don't change the caret position, just re-render.
+                    setCaretRange({ start: caretRange.start, end: caretRange.end });
+                }
+                // Callouts
+                else if(event.key === "e") {
+                    event.preventDefault();
+                    event.stopPropagation();
+                    if(parent && paragraph) {
+                        const callout = new CalloutNode(parent, []);
+                        const newParagraph = new ParagraphNode(callout);
+                        callout.append(newParagraph);
+                        parent.insertBefore(paragraph, callout);
+                        const newText = newParagraph.getContent().getSegments()[0];
+                        // Place the caret inside the callout's first paragraph.
+                        setCaretRange({ start: { node: newText, index: 0}, end: { node: newText, index: 0 } });
+                    }
+                }
+                // Quote
+                else if(event.key === "u") {
+                    event.preventDefault();
+                    event.stopPropagation();
+                    if(parent && paragraph) {
+                        const quote = new QuoteNode(parent, []);
+                        const newParagraph = new ParagraphNode(quote);
+                        quote.append(newParagraph);
+                        parent.insertBefore(paragraph, quote);
+                        const newText = newParagraph.getContent().getSegments()[0];
+                        // Place the caret inside the callout's first paragraph.
+                        setCaretRange({ start: { node: newText, index: 0}, end: { node: newText, index: 0 } });
+                    }
+                }
+                // Code
+                else if(event.key === "s") {
+                    event.preventDefault();
+                    event.stopPropagation();
+                    if(parent && paragraph) {
+                        const code = new CodeNode(parent, "", "plaintext", "|");
+                        parent.insertBefore(paragraph, code);
+                        // Place the caret inside the code node.
+                        setCaretRange({ start: { node: code, index: 0}, end: { node: code, index: 0 } });
+                    }
+                }
             }
         }
         
@@ -517,7 +600,8 @@ const ChapterEditor = (props: { ast: ChapterNode }) => {
                             className={`bookish-chapter-editor-caret ${isLink ? "bookish-chapter-editor-caret-linked" : isItalic ? "bookish-chapter-editor-caret-italic" :""} ${isBold ? "bookish-chapter-editor-caret-bold" : ""} ${focused && idle ? "bookish-chapter-editor-caret-blink" : ""} ${!focused ? "bookish-chapter-editor-caret-disabled" : ""}`}
                             style={{
                                 left: caretCoordinate.x,
-                                top: caretCoordinate.y
+                                top: caretCoordinate.y,
+                                height: caretCoordinate.height
                             }}>
                         </div> : null
                 }

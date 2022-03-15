@@ -1,3 +1,4 @@
+import { BlocksNode } from "./BlocksNode";
 import Book from "./Book";
 import { BulletedListNode } from "./BulletedListNode";
 import { CalloutNode } from "./CalloutNode";
@@ -10,7 +11,6 @@ import { EmbedNode } from "./EmbedNode";
 import { ErrorNode } from "./ErrorNode";
 import { FootnoteNode } from "./FootnoteNode";
 import { Format, FormattedNodeSegmentType, FormattedNode, FormattedNodeParent } from "./FormattedNode";
-import { HeaderNode } from "./HeaderNode";
 import { InlineCodeNode } from "./InlineCodeNode";
 import { LabelNode } from "./LabelNode";
 import { LinkNode } from "./LinkNode";
@@ -53,7 +53,6 @@ export type Position = "|" | "<" | ">";
 
 export type Bookkeeping = {
     index: Map<number, Node>;
-    headers: HeaderNode[];
     symbols: Record<string, string>;
     embeds: EmbedNode[];
     errors: ErrorNode[];
@@ -85,8 +84,8 @@ export type NodeType =
     "reference" |
     "comment"
 
-export type BlockParentNode = ChapterNode | CalloutNode | QuoteNode;
-export type BlockNode = HeaderNode | RuleNode | EmbedNode | BulletedListNode | NumberedListNode | CodeNode | QuoteNode | CalloutNode | TableNode | ParagraphNode | ErrorNode;
+export type BlockParentNode = ChapterNode | CalloutNode | QuoteNode | BlocksNode;
+export type BlockNode = RuleNode | EmbedNode | BulletedListNode | NumberedListNode | CodeNode | QuoteNode | CalloutNode | TableNode | ParagraphNode | ErrorNode;
 
 export default class Parser {
 
@@ -107,7 +106,6 @@ export default class Parser {
         this.openedDoubleQuote = false; // Track most recently observed quotes.
         this.metadata = {
             index: new Map<number, Node>(),
-            headers: [],
             symbols: {},
             embeds: [],
             errors: []
@@ -471,7 +469,7 @@ export default class Parser {
 
     }
 
-    parseParagraph(parent: ChapterNode | CalloutNode | QuoteNode): ParagraphNode {
+    parseParagraph(parent: BlockParentNode): ParagraphNode {
 
         const paragraph = new ParagraphNode(parent)
         paragraph.setContent(this.parseContent(paragraph))
@@ -479,7 +477,7 @@ export default class Parser {
 
     }
 
-    parseHeader(parent: ChapterNode | CalloutNode | QuoteNode): HeaderNode {
+    parseHeader(parent: BlockParentNode): ParagraphNode {
 
         // Read a sequence of hashes
         let count = 0;
@@ -492,11 +490,9 @@ export default class Parser {
         this.readWhitespace();
 
         // Parse some content.
-        let header = new HeaderNode(parent, Math.min(3, count));
+        let header = new ParagraphNode(parent, Math.min(3, count));
         header.setContent(this.parseContent(header));
         
-        this.metadata.headers.push(header);
-
         // Return a header node.
         return header;
 
@@ -709,7 +705,7 @@ export default class Parser {
 
     }
 
-    parseQuote(parent: ChapterNode | CalloutNode | QuoteNode): QuoteNode {
+    parseQuote(parent: BlockParentNode): QuoteNode {
 
         const blocks: BlockNode[] = [];
         const quote = new QuoteNode(parent, blocks)
@@ -750,7 +746,7 @@ export default class Parser {
 
     }
 
-    parseCallout(parent: ChapterNode | CalloutNode | QuoteNode): CalloutNode {
+    parseCallout(parent: BlockParentNode): CalloutNode {
 
         const blocks: BlockNode[] = [];
         const callout = new CalloutNode(parent, blocks)
@@ -789,7 +785,7 @@ export default class Parser {
 
     }
 
-    parseTable(parent: ChapterNode | CalloutNode | QuoteNode): TableNode {
+    parseTable(parent: BlockParentNode): TableNode {
 
         const rows: FormattedNode[][] = [];
         const table = new TableNode(parent, rows)
