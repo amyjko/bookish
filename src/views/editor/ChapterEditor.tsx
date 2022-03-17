@@ -306,19 +306,22 @@ const ChapterEditor = (props: { ast: ChapterNode }) => {
                (caretRange.end.node instanceof TextNode || caretRange.end.node instanceof AtomNode)) {
                 const next = event.altKey ? caretRange.end.node.nextWord(caretRange.end.index) : caretRange.end.node.next(caretRange.end.index);
                 const paragraph = caretRange.start.node.getParagraph();
-                const last = paragraph.getLastTextNode();
-                const lastCaret = { node: last, index: last.getLength() };
-                // Adjust the selection
-                if(event.shiftKey) {
-                    setCaretRange(isCommand ? { start: caretRange.start, end: lastCaret} : { start: caretRange.start, end: next })
-                }
-                // Move to the end of the paragraph
-                else if(isCommand) {
-                    setCaretRange({ start: lastCaret, end: lastCaret});
-                }
-                // Move the caret
-                else {
-                    setCaretRange({ start: next, end: next })    
+                const formatter = caretRange.start.node.getFormattedRoot();
+                const last = paragraph ? paragraph.getLastTextNode() : formatter ? formatter.getLastTextNode() : undefined;
+                if(last) {
+                    const lastCaret = { node: last, index: last ? last.getLength() : 0 };
+                    // Adjust the selection
+                    if(event.shiftKey) {
+                        setCaretRange(isCommand ? { start: caretRange.start, end: lastCaret} : { start: caretRange.start, end: next })
+                    }
+                    // Move to the end of the paragraph
+                    else if(isCommand) {
+                        setCaretRange({ start: lastCaret, end: lastCaret});
+                    }
+                    // Move the caret
+                    else {
+                        setCaretRange({ start: next, end: next })    
+                    }
                 }
             }
             return;
@@ -331,17 +334,20 @@ const ChapterEditor = (props: { ast: ChapterNode }) => {
                 // Adjust the selection
                 const previous = event.altKey ? caretRange.end.node.previousWord(caretRange.end.index) : caretRange.end.node.previous(caretRange.end.index);
                 const paragraph = caretRange.start.node.getParagraph();
-                const first = paragraph.getFirstTextNode();
-                const firstCaret = { node: first, index: 0 };
-                if(event.shiftKey) {
-                    setCaretRange(isCommand ? { start: caretRange.start, end: firstCaret } : { start: caretRange.start, end: previous });
-                }
-                // Move to the beginning of the paragraph
-                else if(isCommand) {
-                    setCaretRange({ start: firstCaret, end: firstCaret});
-                }
-                else {
-                    setCaretRange({ start: previous, end: previous })    
+                const formatter = caretRange.start.node.getFormattedRoot();
+                const first = paragraph ? paragraph.getFirstTextNode() : formatter ? formatter.getFirstTextNode() : undefined;
+                if(first) {
+                    const firstCaret = { node: first, index: 0 };
+                    if(event.shiftKey && first) {
+                        setCaretRange(isCommand ? { start: caretRange.start, end: firstCaret } : { start: caretRange.start, end: previous });
+                    }
+                    // Move to the beginning of the paragraph
+                    else if(isCommand) {
+                        setCaretRange({ start: firstCaret, end: firstCaret});
+                    }
+                    else {
+                        setCaretRange({ start: previous, end: previous })    
+                    }
                 }
             }
             return;

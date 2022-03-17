@@ -55,6 +55,16 @@ export class FormattedNode extends Node<FormattedNodeParent> {
             this.remove();
     }
 
+    getFirstTextNode(): TextNode {
+        const text = this.getTextNodes();
+        return text[0] as TextNode;
+    }
+
+    getLastTextNode(): TextNode {
+        const text = this.getTextNodes();
+        return text[text.length - 1] as TextNode;
+    }
+
     replaceChild(node: Node, replacement: FormattedNodeSegmentType): void {
         // Find the given node's index.
         const index = this.#segments.indexOf(node as FormattedNodeSegmentType);

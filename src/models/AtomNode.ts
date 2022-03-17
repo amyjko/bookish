@@ -88,8 +88,12 @@ export abstract class AtomNode<MetadataType> extends Node<FormattedNode> {
         return this.previousWord();
     }
 
-    getParagraph(): ParagraphNode {
+    getParagraph(): ParagraphNode | undefined {
         return this.getClosestParentMatching(p => p instanceof ParagraphNode) as ParagraphNode;
+    }
+
+    getFormattedRoot(): FormattedNode | undefined {
+        return this.getFarthestParentMatching(p => p instanceof FormattedNode) as FormattedNode;
     }
 
     abstract toBookdown(): string;

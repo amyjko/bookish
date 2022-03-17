@@ -55,15 +55,9 @@ export class ParagraphNode extends Node<BlockParentNode> {
         return p;
     }
 
-    getFirstTextNode(): TextNode {
-        const text = this.getTextNodes()
-        return text[0] as TextNode;
-    }
+    getFirstTextNode(): TextNode { return this.getContent().getFirstTextNode(); }
 
-    getLastTextNode(): TextNode {
-        const text = this.getTextNodes();
-        return text[text.length - 1] as TextNode;
-    }
+    getLastTextNode(): TextNode { return this.getContent().getLastTextNode(); }
 
     getPreviousIfParagraph(): ParagraphNode | undefined {
         return this.getSiblingIfType(-1, ParagraphNode);

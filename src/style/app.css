@@ -323,3 +323,31 @@ input[type="text"].bookish-app-editable-error {
     display: inline-block;
     line-height: 1.5em;
 }
+
+.bookish-app-position-editor {
+    position: absolute;
+    top: 0;
+    left: 50%;
+    transform: translate(-50%, 0%);
+}
+
+.bookish-app-position {
+    display: inline-block;
+    background-color: var(--bookish-app-chrome-background);
+    cursor: pointer;
+    padding: var(--bookish-app-chrome-padding);
+}
+
+.bookish-app-position:first-child {
+    border-top-left-radius: var(--bookish-app-chrome-roundedness);
+    border-bottom-left-radius: var(--bookish-app-chrome-roundedness);
+}
+
+.bookish-app-position:last-child {
+    border-top-right-radius: var(--bookish-app-chrome-roundedness);
+    border-bottom-right-radius: var(--bookish-app-chrome-roundedness);
+}
+
+.bookish-app-position-selected {
+    background-color: var(--bookish-app-chrome-hover-background);
+}

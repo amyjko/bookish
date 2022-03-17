@@ -227,6 +227,10 @@ export class TextNode extends Node<TextNodeParent> {
         return this.getClosestParentMatching(p => p instanceof ParagraphNode) as ParagraphNode;
     }
 
+    getFormattedRoot(): FormattedNode | undefined {
+        return this.getFarthestParentMatching(p => p instanceof FormattedNode) as FormattedNode;
+    }
+
     getRoot(): FormattedNode | ChapterNode | undefined {
         const format = this.getFarthestParentMatching(p => p instanceof FormattedNode) as FormattedNode;
         const chapter = this.getFarthestParentMatching(p => p instanceof ChapterNode) as ChapterNode;

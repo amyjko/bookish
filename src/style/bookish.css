@@ -558,7 +558,6 @@ a:hover {
 
 .bookish-blockquote {
 	clear: both;
-
 	border: none;
     font-family: var(--bookish-header-font-family);
     font-weight: 400;
@@ -568,7 +567,7 @@ a:hover {
     margin-bottom: var(--bookish-paragraph-spacing);
     margin-left: var(--bookish-indent);
     margin-right: var(--bookish-indent);
-
+	position: relative;
 }
 
 .bookish-blockquote > p {
@@ -614,6 +613,7 @@ a:hover {
     padding-bottom: var(--bookish-paragraph-spacing);
     line-height: var(--bookish-paragraph-line-height-tight);
 	clear: both;
+	position: relative;
 }
 
 .bookish-callout h2, .bookish-callout h3, .bookish-callout h4 {

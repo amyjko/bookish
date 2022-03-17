@@ -3,6 +3,7 @@ import { Node } from "./Node";
 import { BlockNode, BlockParentNode, Position } from "./Parser";
 import { FormattedNode } from "./FormattedNode";
 import { BlocksNode } from "./BlocksNode";
+import { TextNode } from "./TextNode";
 
 export class QuoteNode extends BlocksNode {
     
@@ -12,6 +13,10 @@ export class QuoteNode extends BlocksNode {
     constructor(parent: BlockParentNode, elements: BlockNode[]) {
         super(parent, elements, "quote");
         this.#position = "|";
+
+        this.#credit = new FormattedNode(this, "", []);
+        this.#credit.addSegment(new TextNode(this.#credit, "", 0));
+        
     }
 
     getCredit() { return this.#credit; }
