@@ -34,11 +34,12 @@ const Book = (props: { book: BookModel, base?: string, editable?: boolean }) => 
 	// but when the book is being viewed or edited in the Bookish app, it needs a prefix for the
 	// route in the app.
 	const base: string = props.base ? props.base : ""
-
+	
 	// Default dark mode to whatever's stored in local storage, if anything.
+	// respect user choice on the website despite the system theme
 	let [ darkMode, setDarkMode ] = useState(
-		localStorage.getItem("bookish-dark") === "true" || // A previous setting
-		window.matchMedia("(prefers-color-scheme: dark)").matches // Operating system is set to dark
+		localStorage.getItem("bookish-dark") !== "false" && (localStorage.getItem("bookish-dark") === "true" || // A previous setting
+		window.matchMedia("(prefers-color-scheme: dark)").matches) // Operating system is set to dark
 	)
 
 	// Redirect old hash routes by simply replacing their hash before routing.
