@@ -6,8 +6,7 @@ import ChapterBody from './ChapterBody'
 import Paragraph from './Paragraph'
 import Figure from './Figure'
 import Rule from './Rule'
-import BulletedList from './BulletedList'
-import NumberedList from './NumberedList'
+import List from './List'
 import CaptionedCode from './CaptionedCode'
 import Quote from './Quote'
 import Callout from './Callout'
@@ -29,8 +28,7 @@ const renderers: Record<string, (props: { node: any }) => JSX.Element> = {
     "paragraph": Paragraph,
     "embed": Figure,
     "rule": Rule,
-    "bulleted": BulletedList,
-    "numbered": NumberedList,
+    "list": List,
     "code": CaptionedCode,
     "quote": Quote,
     "callout": Callout,

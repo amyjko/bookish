@@ -358,23 +358,23 @@ ol {
     counter-reset: item;
 }
 
-ol li {
+ol > li {
     counter-increment: item;
 }
 
-ol li {
+ol > li {
 	list-style-type: none;
 }
 
-ol ol li {
+ol > ol > li {
 	list-style-type: none;
 }
 
-ol ol ol li {
+ol > ol > ol > li {
 	list-style-type: none;
 }
 
-ol li::before {
+ol > li::before, ul > ol > li::before, ul > ul > ol > li::before {
     content: counter(item) ". ";
     color: var(--bookish-bullet-color);
     display: inline-block;
@@ -384,11 +384,11 @@ ol li::before {
     text-align: right;
 }
 
-ol ol li::before {
+ol > ol > li::before, ul > ol > ol > li::before {
     content: counter(item, lower-alpha) ". ";
 }
 
-ol ol ol li:before {
+ol > ol > ol > li:before {
     content: counter(item, upper-alpha) ". ";
 }
 

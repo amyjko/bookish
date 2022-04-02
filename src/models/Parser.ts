@@ -1,6 +1,5 @@
 import { BlocksNode } from "./BlocksNode";
 import Book from "./Book";
-import { BulletedListNode } from "./BulletedListNode";
 import { CalloutNode } from "./CalloutNode";
 import { ChapterNode } from "./ChapterNode";
 import { CitationsNode } from "./CitationsNode";
@@ -15,7 +14,7 @@ import { InlineCodeNode } from "./InlineCodeNode";
 import { LabelNode } from "./LabelNode";
 import { LinkNode } from "./LinkNode";
 import { Node } from "./Node";
-import { NumberedListNode } from "./NumberedListNode";
+import { ListNode, ListParentType } from "./ListNode";
 import { ParagraphNode } from "./ParagraphNode";
 import { QuoteNode } from "./QuoteNode";
 import { ReferenceNode } from "./ReferenceNode";
@@ -64,8 +63,7 @@ export type NodeType =
     "embed" | 
     "header" | 
     "rule" | 
-    "bulleted" | 
-    "numbered" | 
+    "list" | 
     "code" | 
     "quote" | 
     "callout" | 
@@ -85,7 +83,10 @@ export type NodeType =
     "comment"
 
 export type BlockParentNode = ChapterNode | CalloutNode | QuoteNode | BlocksNode;
-export type BlockNode = RuleNode | EmbedNode | BulletedListNode | NumberedListNode | CodeNode | QuoteNode | CalloutNode | TableNode | ParagraphNode | ErrorNode;
+export type BlockNode = RuleNode | EmbedNode | ListNode | CodeNode | QuoteNode | CalloutNode | TableNode | ParagraphNode | ErrorNode;
+
+const numberedRE = /^[0-9]+\.+/;
+const bulletRE = /^\*+\s+/;
 
 export default class Parser {
 
@@ -445,12 +446,9 @@ export default class Parser {
         // Parse and return an embed if it starts with a bar
         else if(this.nextIs("|"))
             return this.parseEmbed(parent);
-        // Parse and return a bulleted list if it starts with a star and space
-        else if(this.nextMatches(/^\*+\s+/))
-            return this.parseBulletedList(parent);
-        // Parse and return a numbered list if it starts with a number
-        else if(this.nextMatches(/^[0-9]+\.+/))
-            return this.parseNumberedList(parent);
+        // Parse and return a bulleted or numbered list
+        else if(this.nextMatches(bulletRE) || this.nextMatches(numberedRE))
+            return this.parseList(parent);
         // Parse and return a code block if it starts with `, some optional letters or a !, some whitespace, and a newline
         else if(this.nextMatches(/^`[a-zA-Z!]*[ \t]*\n/))
             return this.parseCode(parent);
@@ -507,93 +505,45 @@ export default class Parser {
 
     }
 
-    parseBulletedList(parent: ChapterNode | CalloutNode | BulletedListNode | QuoteNode): BulletedListNode {
+    parseList(parent: ListParentType): ListNode {
 
-        const items: (FormattedNode | BulletedListNode)[] = [];
-        const bullets = new BulletedListNode(parent, items)
+        let numbered = this.nextMatches(numberedRE);
+
+        const items: (FormattedNode | ListNode)[] = [];
+        const list = new ListNode(parent, items, numbered);
         let lastLevel = undefined;
         let currentLevel = undefined;
 
-        // Keep parsing bullets until there aren't any.
-        while(this.nextMatches(/^\*+\s+/)) {
+        // Keep parsing bullets until there aren't any. They must be of the same type, otherwise we stop.
+        while(this.nextMatches(numberedRE) || this.nextMatches(bulletRE)) {
+
+            numbered = this.nextMatches(numberedRE);
 
             // Remember the last level
             lastLevel = currentLevel;
-
-            // Figure out this level.
+        
+            // Start the current level at 0
             currentLevel = 0;
-            while(this.nextIs("*")) {
-                this.read();
-                currentLevel++;
-            }
 
-            // If this is the first bullet, or its the same level, just parse content.
-            if(lastLevel === undefined || lastLevel === currentLevel) {
-                // Read the whitespace after the bullet.
-                this.readWhitespace();
-                // Parse content after the bullet.
-                items.push(this.parseContent(bullets));
-            }
-            // Otherwise, unread the stars, then either stop parsing or parse nested list.
-            else {
+            let digits = undefined;
+            if(numbered) {
+                // Read the digits and remember how many there were so we can backtrack.
+                digits = this.index;
+                this.readUntilNewlineOr(".");
+                digits = this.index - digits;
 
-                // Unread the stars.
-                let count = currentLevel;
-                while(count > 0) {
-                    this.unread();
-                    count--;
+                // Figure out this level.
+                while(this.nextIs(".")) {
+                    this.read();
+                    currentLevel++;
                 }
-
-                // If this new bullet is a lower level, then stop reading bullets.
-                if(currentLevel < lastLevel)
-                    break;
-                // Otherwise, it's greater, and we should read another list.
-                else {
-                    items.push(this.parseBulletedList(bullets));
-                    // Reset the current level to the last level, so we expect another bullet at the same level.
-                    currentLevel = lastLevel;
+            } else {
+                // Figure out this level.
+                currentLevel = 0;
+                while(this.nextIs("*")) {
+                    this.read();
+                    currentLevel++;
                 }
-            }
-
-            // Read trailing whitespace after the content.
-            this.readWhitespace();
-
-            /// Keep reading newlines and content until we get to something that's neither.
-            while(this.peek() === "\n") {
-                // Read the newline
-                this.read();
-                // Read whitespace before the next block.
-                this.readWhitespace();
-            }
-
-        }
-        return bullets;
-
-    }
-
-    parseNumberedList(parent: ChapterNode | CalloutNode | NumberedListNode | QuoteNode): NumberedListNode {
-
-        const items: (FormattedNode | NumberedListNode)[] = [];
-        const list = new NumberedListNode(parent, items);
-        let lastLevel = undefined;
-        let currentLevel = undefined;
-
-        // Keep parsing bullets until there aren't any.
-        while(this.nextMatches(/^[0-9]+\.+/)) {
-
-            // Read the digits and remember how many there were so we can backtrack.
-            let digits = this.index;
-            this.readUntilNewlineOr(".");
-            digits = this.index - digits;
-
-            // Remember the last level
-            lastLevel = currentLevel;
-
-            // Figure out this level.
-            currentLevel = 0;
-            while(this.nextIs(".")) {
-                this.read();
-                currentLevel++;
             }
 
             // If this is the first bullet, or its the same level, just parse another bullet.
@@ -606,17 +556,20 @@ export default class Parser {
             // Otherwise, unread the stars, then either stop parsing or parse nested list.
             else {
 
-                // Unread the periods.
+
+                // Unread the periods/stars.
                 let count = currentLevel;
                 while(count > 0) {
                     this.unread();
                     count--;
                 }
                                 
-                // Unread the digits
-                while(digits > 0) {
-                    this.unread();
-                    digits--;
+                // Unread the digits if there are any
+                if(digits !== undefined) {
+                    while(digits > 0) {
+                        this.unread();
+                        digits--;
+                    }
                 }
 
                 // If this new bullet is a lower level, then stop reading bullets.
@@ -624,7 +577,7 @@ export default class Parser {
                     break;
                 // Otherwise, it's greater, and we should read another list.
                 else {
-                    items.push(this.parseNumberedList(list));
+                    items.push(this.parseList(list));
                     // Reset the current level to the last level, so we expect another bullet at the same level.
                     currentLevel = lastLevel;
                 }

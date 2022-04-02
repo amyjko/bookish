@@ -139,6 +139,16 @@ You can nest numbered lists by increasing or decreasing the number of \.'s:
 
 It doesn't matter how many \*'s there are exactly:linkexample, just whether that number is more or less than the bullets before or after it.
 
+You can also mix numbers and bullets:
+
+* One
+1.. Two
+2.. Three
+*** Four
+*** Five
+3.. Six
+* Seven
+
 # Links
 
 You can include [links to content|http://amyjko.com] like this:
