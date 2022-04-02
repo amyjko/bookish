@@ -197,7 +197,7 @@ const Chapter = (props: { chapter: ChapterModel, book: Book, print?: boolean }) 
 	const chapterSection = book.getChapterSection(chapterID);
 	const chapterAST = chapter.getAST();
 	const citations = chapterAST ? chapterAST.getCitations() : undefined;
-	const hasReferences = citations && Object.keys(citations).length > 0;
+	const hasReferences = citations && citations.size > 0;
 
 	return (
 		<Page afterLoaded={scrollToLastLocation}>
@@ -301,7 +301,7 @@ const Chapter = (props: { chapter: ChapterModel, book: Book, print?: boolean }) 
 
 						<ol>
 						{
-							Object.keys(citations).sort().map(citationID => {
+							[...citations].sort().map(citationID => {
 								let refs = book.getReferences();
 								if(citationID in refs) {
 									let ref = refs[citationID];
