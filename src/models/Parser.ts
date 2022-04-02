@@ -645,7 +645,7 @@ export default class Parser {
 
     }
 
-    parseCode(parent: ChapterNode | CalloutNode | QuoteNode): CodeNode {
+    parseCode(parent: BlockParentNode): CodeNode {
 
         // Parse the back tick
         this.read();
@@ -682,7 +682,7 @@ export default class Parser {
 
         // Read the caption. Note that parsing inline content stops at a newline, 
         // so if there's a line break after the last row, there won't be a caption.
-        node.setCaption(this.parseContent(node))
+        node.setCaption(this.parseContent(node));
 
         return node;
 

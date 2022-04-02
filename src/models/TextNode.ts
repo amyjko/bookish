@@ -4,8 +4,9 @@ import { FormattedNode } from "./FormattedNode";
 import { Node } from "./Node";
 import { ParagraphNode } from "./ParagraphNode";
 import { AtomNode } from "./AtomNode";
+import { CodeNode } from "./CodeNode";
 
-export type TextNodeParent = FormattedNode | MetadataNode<any>;
+export type TextNodeParent = FormattedNode | MetadataNode<any> | CodeNode;
 
 export class TextNode extends Node<TextNodeParent> {
 
@@ -84,7 +85,7 @@ export class TextNode extends Node<TextNodeParent> {
         // If this is the first text node in a paragraph, backspace over the block before it.
         const paragraph = this.getParagraph();
         const firstText = paragraph?.getFirstTextNode();
-        if(firstText === this) {
+        if(paragraph && firstText === this) {
             // Is the block before a paragraph? Merge this paragraph with the previous one,
             // returning a caret at the given index of this text node.
             const previousParagraph = paragraph.getPreviousIfParagraph();
@@ -143,7 +144,7 @@ export class TextNode extends Node<TextNodeParent> {
         // returning a caret at the given index of this text node.
         const paragraph = this.getParagraph();
         const lastText = paragraph?.getLastTextNode();
-        if(lastText === this) {
+        if(paragraph && lastText === this) {
             const nextParagraph = paragraph.getNextIfParagraph();
             if(nextParagraph) {
                 // Remember the position of the last index of the last text node so we can map back after cleaning.
@@ -223,8 +224,8 @@ export class TextNode extends Node<TextNodeParent> {
         if(this.#text.length === 0) this.remove();
     }
 
-    getParagraph(): ParagraphNode {
-        return this.getClosestParentMatching(p => p instanceof ParagraphNode) as ParagraphNode;
+    getParagraph(): ParagraphNode | undefined {
+        return this.getClosestParentMatching(p => p instanceof ParagraphNode) as ParagraphNode | undefined;
     }
 
     getFormattedRoot(): FormattedNode | undefined {
@@ -283,7 +284,7 @@ export class TextNode extends Node<TextNodeParent> {
         // We skip the last index since it's the equivalent of this one's first.
         return previous instanceof AtomNode ?
             { node: previous, index: 0} :
-            { node: previous, index: this.getParagraph() !== previous.getParagraph() ? previous.#text.length : previous.#text.length - 1 }
+            { node: previous, index: previous.#text.length };
 
     }
 
@@ -302,7 +303,8 @@ export class TextNode extends Node<TextNodeParent> {
             return { node: this, index: i };
 
         // Otherwise, find the next text node's next word boundary.
-        const paragraphText = this.getParagraph().getTextNodes();
+        const paragraph = this.getParagraph();
+        const paragraphText = paragraph ? paragraph.getTextNodes() : undefined;
         const nextNode = this.getRoot()?.getNextTextOrAtom(this);
         const nextWord = nextNode?.nextWord();
 
@@ -331,7 +333,8 @@ export class TextNode extends Node<TextNodeParent> {
             return { node: this, index: i };
 
         // Otherwise, find the next text node's next word boundary.
-        const paragraphText = this.getParagraph().getTextNodes();
+        const paragraph = this.getParagraph();
+        const paragraphText = paragraph ? paragraph.getTextNodes() : undefined;
         const previousNode = this.getRoot()?.getPreviousTextOrAtom(this);
         const previousWord = previousNode?.previousWord();
 

@@ -29,7 +29,11 @@ const Text = (props: { node: TextNode}) => {
     const ref = useRef<HTMLSpanElement | null>(null);
 
     // Replace any spaces at the beginning or end of the string with explicit non-breaking spaces to ensure that they render.
-    text = replaceMultipleSpacesWithNonBreakingSpaces(text)
+    text = replaceMultipleSpacesWithNonBreakingSpaces(text);
+
+    // If the text ends with a newline, render a non-breaking space at the end.
+    if(text.length > 0 && text.charAt(text.length - 1) === "\n")
+        text = text + "\ufeff";
 
     // Is there a query we're supposed to highlight? If so, highlight it.
     if(context && context.highlightedWord) {

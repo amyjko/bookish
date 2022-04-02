@@ -106,12 +106,19 @@ const ChapterEditor = (props: { ast: ChapterNode }) => {
                     if(emptyEnd)
                         endNode.appendChild(document.createTextNode('\ufeff'));
 
-                    // We guard this to avoid triggering unnecessary selection change events that don't
-                    // actually modify the selection.
+                    // If we're just after a new line, set the selection to the character after.
+                    const afterNewLine = 
+                        sortedRange.start.node instanceof TextNode && 
+                        sortedRange.start.index > 0 && 
+                        sortedRange.start.node.getText().charAt(sortedRange.start.index - 1) === "\n";                        
+
+                    // If the range has changed, set the selection so we can measure it's location.
+                    // We guard this to avoid triggering unnecessary selection change events that don't actually modify the selection.
                     if(rangeChanged) {
                         try {
                             docSelection.setBaseAndExtent(startNode.childNodes[0], sortedRange.start.index, endNode.childNodes[0], sortedRange.end.index);
-                        } catch {
+                        } catch(e) {
+                            console.error(e);
                             throw Error(`Error setting caret range was set to ${startNode.childNodes[0]}:${sortedRange.start.index} - ${endNode.childNodes[0]}:${sortedRange.end.index}`);
                         }
                         currentRange = docSelection.getRangeAt(0);
@@ -120,15 +127,21 @@ const ChapterEditor = (props: { ast: ChapterNode }) => {
                     // Measure and remember caret position
                     if(currentRange) {
                         const rangeRect = currentRange.getBoundingClientRect();
+                        const textRect = startNode.getBoundingClientRect();
                         const pageRect = document.querySelector(".bookish-page")?.getBoundingClientRect();
+                        const lineHeightString = window.getComputedStyle(startNode).getPropertyValue("line-height");
+                        const lineHeight = lineHeightString.endsWith("px") ? parseInt(lineHeightString.substring(0, lineHeightString.length - 2)) : undefined;
+                        // If we're after a new line, calculate the correct position, since selections don't actually render to the next line.
+                        const left = afterNewLine ? textRect.left : rangeRect.left;
+                        const top = afterNewLine && lineHeight ? rangeRect.top + lineHeight : rangeRect.top;
                         const position = {
-                            x: rangeRect.left + window.scrollX - (pageRect ? pageRect.left + window.scrollX : 0),
-                            y: rangeRect.top + window.scrollY - (pageRect ? pageRect.top + window.scrollY : 0),
+                            x: left + window.scrollX - (pageRect ? pageRect.left + window.scrollX : 0),
+                            y: top + window.scrollY - (pageRect ? pageRect.top + window.scrollY : 0),
                             height: rangeRect.height
                         };
                         newCaretPosition = position;
-                    }
 
+                    }
                 }
             }
             // If the range is empty, remove the browser's selection too.
@@ -308,21 +321,25 @@ const ChapterEditor = (props: { ast: ChapterNode }) => {
                 const paragraph = caretRange.start.node.getParagraph();
                 const formatter = caretRange.start.node.getFormattedRoot();
                 const last = paragraph ? paragraph.getLastTextNode() : formatter ? formatter.getLastTextNode() : undefined;
-                if(last) {
+                if(event.shiftKey && !isCommand) {
+                    setCaretRange({ start: caretRange.start, end: next });
+                    return;
+                }
+                else if(last) {
                     const lastCaret = { node: last, index: last ? last.getLength() : 0 };
                     // Adjust the selection
                     if(event.shiftKey) {
                         setCaretRange(isCommand ? { start: caretRange.start, end: lastCaret} : { start: caretRange.start, end: next })
+                        return;
                     }
                     // Move to the end of the paragraph
-                    else if(isCommand) {
+                    if(isCommand) {
                         setCaretRange({ start: lastCaret, end: lastCaret});
-                    }
-                    // Move the caret
-                    else {
-                        setCaretRange({ start: next, end: next })    
+                        return;
                     }
                 }
+                // Move the caret
+                setCaretRange({ start: next, end: next })    
             }
             return;
         }
@@ -336,19 +353,23 @@ const ChapterEditor = (props: { ast: ChapterNode }) => {
                 const paragraph = caretRange.start.node.getParagraph();
                 const formatter = caretRange.start.node.getFormattedRoot();
                 const first = paragraph ? paragraph.getFirstTextNode() : formatter ? formatter.getFirstTextNode() : undefined;
-                if(first) {
+                if(event.shiftKey && !isCommand) {
+                    setCaretRange({ start: caretRange.start, end: previous });
+                    return;
+                }
+                else if(first) {
                     const firstCaret = { node: first, index: 0 };
                     if(event.shiftKey && first) {
                         setCaretRange(isCommand ? { start: caretRange.start, end: firstCaret } : { start: caretRange.start, end: previous });
+                        return;
                     }
                     // Move to the beginning of the paragraph
-                    else if(isCommand) {
+                    if(isCommand) {
                         setCaretRange({ start: firstCaret, end: firstCaret});
-                    }
-                    else {
-                        setCaretRange({ start: previous, end: previous })    
+                        return;
                     }
                 }
+                setCaretRange({ start: previous, end: previous })    
             }
             return;
         }
@@ -402,8 +423,16 @@ const ChapterEditor = (props: { ast: ChapterNode }) => {
         else if(event.key === "Enter") {
             if(caretRange.start.node instanceof TextNode) {
                 event.preventDefault();
-                const caret = ast.splitSelection(caretRange);
-                setCaretRange({ start: caret, end: caret });
+                // If it's in a paragraph, split the paragraph.
+                // If it's in a code node, insert a newline.
+                if(caretRange.start.node.getParent() instanceof CodeNode) {
+                    const caret = caretRange.start.node.insert("\n", caretRange.start.index);
+                    setCaretRange({ start: caret, end: caret });
+                }
+                else {
+                    const caret = ast.splitSelection(caretRange);
+                    setCaretRange({ start: caret, end: caret });
+                }
                 return;
             }
         }
@@ -533,8 +562,8 @@ const ChapterEditor = (props: { ast: ChapterNode }) => {
                     if(parent && paragraph) {
                         const code = new CodeNode(parent, "", "plaintext", "|");
                         parent.insertBefore(paragraph, code);
-                        // Place the caret inside the code node.
-                        setCaretRange({ start: { node: code, index: 0}, end: { node: code, index: 0 } });
+                        // Place the caret inside the code's code node.
+                        setCaretRange({ start: { node: code.getCodeNode(), index: 0}, end: { node: code.getCodeNode(), index: 0 } });
                     }
                 }
             }

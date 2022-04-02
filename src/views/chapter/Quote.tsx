@@ -3,6 +3,7 @@ import { Position } from '../../models/Parser'
 import { QuoteNode } from "../../models/QuoteNode"
 import { CaretContext } from '../editor/ChapterEditor'
 import PositionEditor from '../editor/PositionEditor'
+import Switch from '../editor/Switch'
 import { EditorContext } from '../page/Book'
 import { renderNode, renderPosition } from './Renderer'
 
@@ -20,8 +21,8 @@ const Quote = (props: { node: QuoteNode}) => {
         { credit ? <div className="bookish-blockquote-caption"><span>{renderNode(credit)}</span></div> : null }
         { editable && caret && caret.range && caret.range.start.node.getClosestParentMatching(p => p === node) ?
             <PositionEditor 
-                position={position} 
-                edit={(position: Position) => node.setPosition(position)} 
+                value={position} 
+                edit={(value: string) => node.setPosition(value as Position)} 
             /> :
             null
         }

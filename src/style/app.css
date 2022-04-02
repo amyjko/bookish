@@ -324,30 +324,45 @@ input[type="text"].bookish-app-editable-error {
     line-height: 1.5em;
 }
 
-.bookish-app-position-editor {
+.bookish-app-switch {
     position: absolute;
-    top: 0;
-    left: 50%;
-    transform: translate(-50%, 0%);
 }
 
-.bookish-app-position {
+.bookish-app-left {
+    top: 0;
+    left: 0;
+    transform: translate(0, -100%);
+}
+
+.bookish-app-middle {
+    top: 0;
+    left: 50%;
+    transform: translate(-50%, -100%);
+}
+
+.bookish-app-right {
+    top: 0;
+    right: 0;
+    transform: translate(0, -100%);
+}
+
+.bookish-app-switch-option {
     display: inline-block;
     background-color: var(--bookish-app-chrome-background);
     cursor: pointer;
     padding: var(--bookish-app-chrome-padding);
 }
 
-.bookish-app-position:first-child {
+.bookish-app-switch-option:first-child {
     border-top-left-radius: var(--bookish-app-chrome-roundedness);
     border-bottom-left-radius: var(--bookish-app-chrome-roundedness);
 }
 
-.bookish-app-position:last-child {
+.bookish-app-switch-option:last-child {
     border-top-right-radius: var(--bookish-app-chrome-roundedness);
     border-bottom-right-radius: var(--bookish-app-chrome-roundedness);
 }
 
-.bookish-app-position-selected {
+.bookish-app-switch-option-selected {
     background-color: var(--bookish-app-chrome-hover-background);
 }
