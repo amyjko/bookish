@@ -16,6 +16,7 @@ export class ListNode extends Node<ListParentType> {
         super(parent, "list");
         this.#numbered = numbered;
         this.#items = items;
+        items.forEach(i => i.setParent(this));
     }
 
     isNumbered() { return this.#numbered; }
@@ -48,13 +49,16 @@ export class ListNode extends Node<ListParentType> {
     }
 
     removeChild(node: Node): void {
-        this.#items = this.#items.filter(item => item !== node)
+        this.#items = this.#items.filter(item => item !== node);
+        node.setParent(undefined);
+
     }
 
     replaceChild(node: Node, replacement: ListNodeType): void {
         const index = this.#items.indexOf(node as ListNodeType);
         if(index < 0) return;
         this.#items[index] = replacement;
+        replacement.setParent(this);
     }
 
     getSiblingOf(child: Node, next: boolean) { return this.#items[this.#items.indexOf(child as ListNodeType ) + (next ? 1 : -1)]; }
@@ -63,6 +67,11 @@ export class ListNode extends Node<ListParentType> {
         item.setParent(this);
         this.#items.push(item);
     }
+    
+    insert(item: ListNodeType) {
+        item.setParent(this);
+        this.#items.unshift(item);
+    }
 
     insertAfter(item: ListNodeType, anchor: ListNodeType) {
         const index = this.#items.indexOf(anchor);
@@ -70,6 +79,14 @@ export class ListNode extends Node<ListParentType> {
             return;
         item.setParent(this);
         this.#items.splice(index + 1, 0, item);
+    }
+
+    insertBefore(item: ListNodeType, anchor: ListNodeType) {
+        const index = this.#items.indexOf(anchor);
+        if(index < 0)
+            return;
+        item.setParent(this);
+        this.#items.splice(index, 0, item);
     }
 
     atBeginningOfItem(caret: Caret) {
@@ -85,7 +102,7 @@ export class ListNode extends Node<ListParentType> {
 
     backspaceItemContaining(caret: Caret): Caret {
 
-        // Find the root formatter and chpater
+        // Find the root formatter and chapter
         const node = caret.node;
         const format = caret.node.getFarthestParentMatching(n => n instanceof FormattedNode) as FormattedNode;
         const index = this.#items.indexOf(format);
@@ -102,13 +119,13 @@ export class ListNode extends Node<ListParentType> {
         const beforeFormat = textBefore.getFarthestParentMatching(n => n instanceof FormattedNode) as FormattedNode;
         if(beforeFormat === undefined)
             return caret;
-            
+
+        // Delete the item from this list.
+        this.removeChild(format);
+
         // Append the format to the previous format.
         const caretAsPosition = beforeFormat.caretToTextIndex(caret);
         beforeFormat.addSegment(format);
-
-        // Delete the item from this list.
-        this.#items.splice(index, 1);
 
         // Place the caret
         const newCaret = beforeFormat.textIndexToCaret(caretAsPosition);
@@ -141,6 +158,94 @@ export class ListNode extends Node<ListParentType> {
             // Delete items from 0 through the anchor
             copy.#items.splice(0, index + 1);
         return copy;
+
+    }
+
+    // Takes the given position, finds the root formatted node it is inside of, 
+    // and replaces it with a list that contains the formatted node.
+    indent(caret: Caret) {
+
+        if(this.getLevel() >= 3)
+            return;
+
+        // Find the root format
+        const format = caret.node.getFarthestParentMatching(n => n instanceof FormattedNode) as FormattedNode;
+        const index = this.#items.indexOf(format);
+
+        // If this isn't in this list, do nothing.
+        if(format === undefined || index < 0)
+            return;
+
+        const beforeList = this.#items[index - 1];
+        const afterList = this.#items[index + 1];
+
+        // If the format is just after a list, move the format to the end of the list.
+        if(beforeList instanceof ListNode) {
+            this.removeChild(format);
+            beforeList.append(format);
+        }
+        // If the format is just before a list, move the format to the beginning of the list.
+        else if(afterList instanceof ListNode) {
+            this.removeChild(format);
+            afterList.insert(format);
+        }
+        else {
+            // Otherwise, make a new list node, add the format to it.
+            const newList = new ListNode(this, [], this.isNumbered());
+
+            // Replace the format with this
+            this.replaceChild(format, newList);
+
+            // Add the format to the list.
+            newList.append(format);
+        }
+
+    }
+
+    unindent(caret: Caret) {
+
+        // Find the root format
+        const format = caret.node.getFarthestParentMatching(n => n instanceof FormattedNode) as FormattedNode;
+        const index = this.#items.indexOf(format);
+        const first = index === 0;
+        const last = index === this.#items.length - 1;
+
+        // If this isn't in this list, do nothing.
+        if(format === undefined || index < 0)
+            return;
+
+        // Find the list parent
+        const list = format.getParent() as ListNode;
+        const listParent = list?.getParent() as ListNode;
+
+        // Not a list, do nothing!
+        if(!(listParent instanceof ListNode))
+            return;
+
+        // If first, insert the format before this list.
+        if(first) {
+            this.removeChild(format);
+            listParent.insertBefore(format, this);
+        }
+        // If last, insert the format after this list.
+        else if(last) {
+            this.removeChild(format);
+            listParent.insertAfter(format, this);
+        }
+        // Otherwise, split the list and place the format between them.
+        else if(list && listParent) {
+            const before = list.copy(listParent);
+            const after = list.copy(listParent);
+            before.#items.splice(index);
+            after.#items.splice(0, index + 1);
+            listParent.replaceChild(list, format);
+            listParent.insertBefore(before, format);
+            listParent.insertAfter(after, format);
+        }
+    
+        // Remove this list if it's empty.
+        if(this.#items.length === 0)
+            this.remove();
 
     }
 

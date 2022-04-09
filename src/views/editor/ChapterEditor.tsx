@@ -460,16 +460,17 @@ const ChapterEditor = (props: { ast: ChapterNode }) => {
             }
         }
         else if(event.key === "Tab") {
-            const list = caretRange.start.node.closestParent(ListNode);
+            const list = caretRange.start.node.closestParent(ListNode) as ListNode;
             if(list) {
                 event.preventDefault();
                 event.stopPropagation();
                 if(event.shiftKey) {
-                    console.log("Dedent");
+                    list.unindent(caretRange.start);
                 }
                 else {
-                    console.log("Indent")
+                    list.indent(caretRange.start);
                 }
+                setCaretRange({ start: caretRange.start, end: caretRange.end });
             }
         }
         else if(isCommand) {
