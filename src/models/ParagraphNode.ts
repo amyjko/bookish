@@ -23,6 +23,7 @@ export class ParagraphNode extends Node<BlockParentNode> {
     setLevel(level: number) { this.#level = level; }
 
     setContent(content: FormattedNode) {
+        content.setParent(this);
         this.#content = content;
     }
 
@@ -139,7 +140,7 @@ export class ParagraphNode extends Node<BlockParentNode> {
         if(parent === undefined || chapter === undefined)
             return caret;
 
-        // If we weren't given a textnode, do nothing.
+        // If we weren't given a text node, do nothing.
         if(!(caret.node instanceof TextNode))
             return caret;
 

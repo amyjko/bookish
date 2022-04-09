@@ -40,7 +40,7 @@ export abstract class AtomNode<MetadataType> extends Node<FormattedNode> {
         const previous = this.getRoot()?.getPreviousTextOrAtom(this);
         return previous ?
             { node: previous, index: previous instanceof TextNode ? previous.getLength() : 0 } :
-            { node: this, index: 0 };        
+            { node: this, index: 0 };
     }
 
     deleteForward(): Caret {

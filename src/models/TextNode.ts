@@ -259,7 +259,7 @@ export class TextNode extends Node<TextNodeParent> {
         // Unless the next node is in a different paragraph, we skip the first index since it's equivalent to the last of this one.
         return next instanceof AtomNode ?
             { node: next, index: 0 } :
-            { node: next, index: this.getParagraph() !== next.getParagraph() ? 0 : Math.min(1, next.getLength()) };
+            { node: next, index: this.getFormattedRoot() !== next.getFormattedRoot() ? 0 : Math.min(1, next.getLength()) };
 
     }
 
@@ -284,7 +284,7 @@ export class TextNode extends Node<TextNodeParent> {
         // We skip the last index since it's the equivalent of this one's first.
         return previous instanceof AtomNode ?
             { node: previous, index: 0} :
-            { node: previous, index: previous.#text.length };
+            { node: previous, index: this.getFormattedRoot() !== previous.getFormattedRoot() ? previous.#text.length : Math.max(0, previous.#text.length - 1) };
 
     }
 

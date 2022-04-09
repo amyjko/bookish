@@ -29,7 +29,7 @@ const InlineCode = (props: { node: InlineCodeNode }) => {
     }
 
     const editableView = <span className="bookish-code bookish-code-inline hljs" data-nodeid={node.nodeID}>{renderNode(node.getText())}</span>;
-    const staticView = <Code editable={false} inline={true} language={node.getMeta()} nodeID={node.getText().nodeID}>{node.getMeta()}</Code>;
+    const staticView = <Code editable={false} inline={true} language={node.getMeta()} nodeID={node.getText().nodeID}>{node.getText().getText()}</Code>;
 
     return <Metadata
         node={node}

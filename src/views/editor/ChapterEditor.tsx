@@ -18,6 +18,7 @@ import { RuleNode } from "../../models/RuleNode";
 import { CalloutNode } from "../../models/CalloutNode";
 import { QuoteNode } from "../../models/QuoteNode";
 import { CodeNode } from "../../models/CodeNode";
+import { ListNode } from "../../models/ListNode";
 
 export const CaretContext = React.createContext<{ 
     range: CaretRange | undefined, 
@@ -408,8 +409,17 @@ const ChapterEditor = (props: { ast: ChapterNode }) => {
         // Backspace over a character!
         else if(event.key === "Backspace") {
             event.preventDefault();
-            const caret = (ast.deleteSelection(caretRange, true));
-            setCaretRange({ start: caret, end: caret });
+
+            // If we're at the beginning of an empty formatted node in a list item, merge this item into the previous item and delete this list item.
+            const list = caretRange.start.node.getClosestParentMatching(p => p instanceof ListNode) as ListNode;
+            if(list !== undefined && list.atBeginningOfItem(caretRange.start)) {
+                const newCaret = list.backspaceItemContaining(caretRange.start);
+                setCaretRange({ start: newCaret, end: newCaret });
+            }
+            else {
+                const caret = (ast.deleteSelection(caretRange, true));
+                setCaretRange({ start: caret, end: caret });
+            }
             return;
         }
         // Delete forward a character!
@@ -423,12 +433,25 @@ const ChapterEditor = (props: { ast: ChapterNode }) => {
         else if(event.key === "Enter") {
             if(caretRange.start.node instanceof TextNode) {
                 event.preventDefault();
-                // If it's in a paragraph, split the paragraph.
                 // If it's in a code node, insert a newline.
                 if(caretRange.start.node.getParent() instanceof CodeNode) {
                     const caret = caretRange.start.node.insert("\n", caretRange.start.index);
                     setCaretRange({ start: caret, end: caret });
                 }
+                // If it's in a list node, split the current list item
+                else if(caretRange.start.node.getClosestParentMatching(p => p instanceof ListNode) !== undefined) {
+                    const list = caretRange.start.node.getClosestParentMatching(p => p instanceof ListNode) as ListNode;
+                    const format = caretRange.start.node.getClosestParentMatching(p => p instanceof FormattedNode) as FormattedNode;
+                    const parts = format.split(caretRange.start);
+                    if(list && parts) {
+                        const [ first, second ] = parts;
+                        format.replaceWith(first);
+                        list.insertAfter(second, first);
+                        const caret = { node: second.getTextNodes()[0], index: 0};
+                        setCaretRange({ start: caret, end: caret})
+                    }
+                }
+                // If it's in a paragraph, split the paragraph.
                 else {
                     const caret = ast.splitSelection(caretRange);
                     setCaretRange({ start: caret, end: caret });
@@ -512,6 +535,53 @@ const ChapterEditor = (props: { ast: ChapterNode }) => {
                     paragraph.setLevel(parseInt(event.code.substring(5)));
                     // Don't change the caret position, just re-render.
                     setCaretRange({ start: caretRange.start, end: caretRange.end });
+                }
+            }
+            // List
+            else if(event.shiftKey && (event.key === "7" || event.key === "8")) {
+                event.preventDefault();
+                event.stopPropagation();
+                const paragraphParent = caretRange.start.node.getClosestParentMatching(p => p instanceof ParagraphNode) as ParagraphNode;
+                const list = caretRange.start.node.getClosestParentMatching(p => p instanceof ListNode) as ListNode;
+                const blocksParent = caretRange.start.node.getClosestParentMatching(p => p instanceof BlocksNode) as BlocksNode;
+                if(list) {
+                    // If it's a list and we requested the opposite, toggle the list type.
+                    if((list.isNumbered() && event.key === "7")) {
+                        list.setNumbered(false);
+                        setCaretRange({ start: caretRange.start, end: caretRange.end });
+                    }
+                    else if(!list.isNumbered() && event.key === "8") {
+                        list.setNumbered(true);
+                        setCaretRange({ start: caretRange.start, end: caretRange.end });
+                    }
+                    // Otherwise, unwrap the current list item.
+                    else {
+                        // Duplicate the list
+                        const format = caretRange.start.node.getClosestParentMatching(p => p instanceof FormattedNode) as FormattedNode;
+                        if(format) {
+                            const before = list.copyItemsBeforeAfter(format, true);
+                            const after = list.copyItemsBeforeAfter(format, false);
+                            if(before && after) {
+                                const newParagraph = new ParagraphNode(blocksParent);
+                                newParagraph.setContent(format);
+                                blocksParent.replaceChild(list, newParagraph);
+                                if(before.getLength() > 0)
+                                    blocksParent.insertAfter(newParagraph, after);
+                                if(after.getLength() > 0)
+                                    blocksParent.insertBefore(newParagraph, before);
+                                setCaretRange({ start: caretRange.start, end: caretRange.end });                                
+                            }
+                        }
+                    }
+                }
+                else if(blocksParent && paragraphParent) {
+                    const list = new ListNode(blocksParent, [], event.key === "7");
+                    const format = paragraphParent.getContent();
+                    list.append(format);
+                    const text = format.getTextNodes()[0];
+                    paragraphParent.replaceWith(list);
+                    // Place the caret inside the callout's first paragraph.
+                    setCaretRange({ start: caretRange.start, end: caretRange.start });
                 }
             }
             // Only insert blocks at the beginning of a paragraph node.

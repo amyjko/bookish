@@ -232,6 +232,69 @@ export class FormattedNode extends Node<FormattedNodeParent> {
 
     }
 
+    // Creates two formatted nodes that split this node at the given caret location.
+    split(caret: Caret): FormattedNode[] | undefined {
+
+        // We can only copy if
+        // ... this has a parent.
+        // ... the given caret is in this formatted node.
+        // ... the caret is on a text node.        
+        const parent = this.getParent();
+        if(parent === undefined || !caret.node.hasParent(this) || !(caret.node instanceof TextNode))
+            return undefined;
+
+        // Map the caret node to an index
+        const nodeIndex  = this.getTextNodes().indexOf(caret.node);
+
+        // Make two copies of this
+        const first = this.copy(parent);
+        const second = this.copy(parent);
+
+        // Compute the equivalent caret for each
+        // Find what index this node is in the paragraph so we can find its doppleganger in the copy.
+        const firstCaret = { node: first.getTextNodes()[nodeIndex], index: caret.index };
+        const secondCaret = { node: second.getTextNodes()[nodeIndex], index: caret.index };
+
+        // Delete everything after in the first, everything before in the second.
+        first.deleteRange({ start: firstCaret, end: first.getLastCaret() });
+        second.deleteRange({ start: second.getFirstCaret(), end: secondCaret });
+
+        // Here ya go caller!
+        return [first, second];
+
+    }
+
+    getFirstCaret(): Caret {
+        return { node: this.getTextNodes()[0], index: 0 };
+    }
+
+    getLastCaret(): Caret {
+        const nodes = this.getTextNodes();
+        const last = nodes[nodes.length - 1];
+        return { node: last, index: last.getLength() };
+    }
+
+    deleteRange(range: CaretRange) {
+
+        // AMY, FINISH IMPLEMENTING THIS! AND THEN AFTERWARDS, HAVE ParagraphNode.split() use it instead.
+        // Just keep backspacing from the end caret until the returned caret is identical to the previous caret or the start caret.
+        let previousCaret = undefined;
+        let startPosition = this.caretToTextIndex(range.start);
+        let currentCaret = range.end;
+        let currentPosition = this.caretToTextIndex(range.end);
+        do {
+            previousCaret = currentCaret;
+            currentCaret = (currentCaret.node as TextNode).deleteBackward(currentCaret.index);
+            currentPosition = this.caretToTextIndex(currentCaret);
+        } while(
+            currentPosition > startPosition &&
+            !(previousCaret.node === currentCaret.node && previousCaret.index === currentCaret.index)
+        );
+
+        return currentCaret;
+
+    }
+
     formatRange(range: CaretRange, format: Format): CaretRange {
 
         // This only transforms ranges that start and end with text nodes.
