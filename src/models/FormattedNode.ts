@@ -146,13 +146,17 @@ export class FormattedNode extends Node<FormattedNodeParent> {
 
     }
 
+    getFormattedRoot(): FormattedNode | undefined {
+        return this.getFarthestParentMatching(p => p instanceof FormattedNode) as FormattedNode;
+    }
+
     clean() {
 
         // Clean all of the segments bottom up first.
         this.#segments.forEach(s => s.clean());
 
-        // If this is empty, remove it.
-        if(this.#segments.length === 0) { 
+        // If this is empty and it's not the root, remove it.
+        if(this.#segments.length === 0 && this.getFormattedRoot() !== this) { 
             this.remove();
             return;
         }
@@ -258,7 +262,7 @@ export class FormattedNode extends Node<FormattedNodeParent> {
         // Delete everything after in the first, everything before in the second.
         first.deleteRange({ start: firstCaret, end: first.getLastCaret() });
         second.deleteRange({ start: second.getFirstCaret(), end: secondCaret });
-
+    
         // Here ya go caller!
         return [first, second];
 
@@ -276,12 +280,16 @@ export class FormattedNode extends Node<FormattedNodeParent> {
 
     deleteRange(range: CaretRange) {
 
-        // AMY, FINISH IMPLEMENTING THIS! AND THEN AFTERWARDS, HAVE ParagraphNode.split() use it instead.
         // Just keep backspacing from the end caret until the returned caret is identical to the previous caret or the start caret.
         let previousCaret = undefined;
         let startPosition = this.caretToTextIndex(range.start);
         let currentCaret = range.end;
         let currentPosition = this.caretToTextIndex(range.end);
+
+        // Don't delete if the range is a single position.
+        if(startPosition === currentPosition)
+            return;
+
         do {
             previousCaret = currentCaret;
             currentCaret = (currentCaret.node as TextNode).deleteBackward(currentCaret.index);

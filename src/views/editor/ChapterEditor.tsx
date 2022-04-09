@@ -459,6 +459,19 @@ const ChapterEditor = (props: { ast: ChapterNode }) => {
                 return;
             }
         }
+        else if(event.key === "Tab") {
+            const list = caretRange.start.node.closestParent(ListNode);
+            if(list) {
+                event.preventDefault();
+                event.stopPropagation();
+                if(event.shiftKey) {
+                    console.log("Dedent");
+                }
+                else {
+                    console.log("Indent")
+                }
+            }
+        }
         else if(isCommand) {
             if(event.key === "b") {
                 event.preventDefault();
@@ -557,7 +570,7 @@ const ChapterEditor = (props: { ast: ChapterNode }) => {
                     // Otherwise, unwrap the current list item.
                     else {
                         // Duplicate the list
-                        const format = caretRange.start.node.getClosestParentMatching(p => p instanceof FormattedNode) as FormattedNode;
+                        const format = caretRange.start.node.getFarthestParentMatching(p => p instanceof FormattedNode) as FormattedNode;
                         if(format) {
                             const before = list.copyItemsBeforeAfter(format, true);
                             const after = list.copyItemsBeforeAfter(format, false);
@@ -566,16 +579,16 @@ const ChapterEditor = (props: { ast: ChapterNode }) => {
                                 newParagraph.setContent(format);
                                 blocksParent.replaceChild(list, newParagraph);
                                 if(before.getLength() > 0)
-                                    blocksParent.insertAfter(newParagraph, after);
-                                if(after.getLength() > 0)
                                     blocksParent.insertBefore(newParagraph, before);
+                                if(after.getLength() > 0)
+                                    blocksParent.insertAfter(newParagraph, after);
                                 setCaretRange({ start: caretRange.start, end: caretRange.end });                                
                             }
                         }
                     }
                 }
                 else if(blocksParent && paragraphParent) {
-                    const list = new ListNode(blocksParent, [], event.key === "7");
+                    const list = new ListNode(blocksParent, [], event.key === "8");
                     const format = paragraphParent.getContent();
                     list.append(format);
                     const text = format.getTextNodes()[0];

@@ -106,11 +106,11 @@ export class ListNode extends Node<ListParentType> {
         // Append the format to the previous format.
         const caretAsPosition = beforeFormat.caretToTextIndex(caret);
         beforeFormat.addSegment(format);
-        beforeFormat.clean();
-        
+
         // Delete the item from this list.
         this.#items.splice(index, 1);
 
+        // Place the caret
         const newCaret = beforeFormat.textIndexToCaret(caretAsPosition);
         if(newCaret !== undefined)
             return newCaret;
@@ -135,8 +135,10 @@ export class ListNode extends Node<ListParentType> {
             return undefined;
         const copy = this.copy(parent);
         if(before)
+            // Delete items from anchor and after
             copy.#items.splice(index);
-        else   
+        else
+            // Delete items from 0 through the anchor
             copy.#items.splice(0, index + 1);
         return copy;
 
