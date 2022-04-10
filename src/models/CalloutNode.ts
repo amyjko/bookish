@@ -1,7 +1,9 @@
 import { BlocksNode } from "./BlocksNode";
 import { ChapterNode } from "./ChapterNode";
 import { Node } from "./Node";
-import { BlockNode, BlockParentNode, Position } from "./Parser";
+import { BlockNode } from "./BlockNode";
+import { BlockParentNode } from "./BlockParentNode";
+import { Position } from "./Position";
 
 export class CalloutNode extends BlocksNode {
     

@@ -366,3 +366,7 @@ input[type="text"].bookish-app-editable-error {
 .bookish-app-switch-option-selected {
     background-color: var(--bookish-app-chrome-hover-background);
 }
+
+.bookish-chapter-editor .bookish-table table td {
+    border: 1px solid var(--bookish-app-chrome-border-color);
+}

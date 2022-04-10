@@ -1,8 +1,8 @@
 import { Node } from "./Node";
 import { FormattedNode } from "./FormattedNode";
 import { TextNode } from "./TextNode";
-import { Caret } from "./ChapterNode";
-import { NodeType } from "./Parser";
+import { Caret } from "./Caret";
+import { NodeType } from "./NodeType";
 
 export abstract class MetadataNode<MetaType> extends Node<FormattedNode> {
 

@@ -1,5 +1,5 @@
 import React, { useContext } from 'react'
-import { Position } from '../../models/Parser'
+import { Position } from "../../models/Position"
 import { QuoteNode } from "../../models/QuoteNode"
 import { CaretContext } from '../editor/ChapterEditor'
 import PositionEditor from '../editor/PositionEditor'

@@ -1,7 +1,7 @@
 import { Node } from "./Node";
 import { FormattedNode } from "./FormattedNode";
-import { BlockParentNode } from "./Parser";
-import { Caret } from "./ChapterNode";
+import { BlockParentNode } from "./BlockParentNode";
+import { Caret } from "./Caret";
 import { TextNode } from "./TextNode";
 
 export type ListParentType =  BlockParentNode | ListNode;

@@ -1,8 +1,9 @@
-import { Caret, ChapterNode } from "./ChapterNode";
+import { ChapterNode } from "./ChapterNode";
+import { Caret } from "./Caret";
 import { FormattedNode } from "./FormattedNode";
 import { Node } from "./Node";
 import { ParagraphNode } from "./ParagraphNode";
-import { NodeType } from "./Parser";
+import { NodeType } from "./NodeType";
 import { TextNode } from "./TextNode";
 
 

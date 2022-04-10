@@ -1,5 +1,6 @@
 import { Node } from "./Node";
-import { BlockParentNode, Position } from "./Parser";
+import { BlockParentNode } from "./BlockParentNode";
+import { Position } from "./Position";
 import { FormattedNode } from "./FormattedNode";
 import { TextNode } from "./TextNode";
 

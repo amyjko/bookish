@@ -1,5 +1,6 @@
 import { MetadataNode } from "./MetadataNode";
-import { Caret, ChapterNode } from "./ChapterNode";
+import { ChapterNode } from "./ChapterNode";
+import { Caret } from "./Caret";
 import { FormattedNode } from "./FormattedNode";
 import { Node } from "./Node";
 import { ParagraphNode } from "./ParagraphNode";
@@ -221,7 +222,7 @@ export class TextNode extends Node<TextNodeParent> {
     }
 
     clean() {
-        if(this.#text.length === 0) this.remove();
+        // if(this.#text.length === 0) this.remove();
     }
 
     getParagraph(): ParagraphNode | undefined {

@@ -6,7 +6,7 @@ import { CodeNode } from "../../models/CodeNode"
 import { EditorContext } from '../page/Book'
 import { CaretContext } from '../editor/ChapterEditor'
 import Switch from '../editor/Switch'
-import { Position } from '../../models/Parser'
+import { Position } from "../../models/Position"
 import Options from '../editor/Options'
 import PositionEditor from '../editor/PositionEditor'
 

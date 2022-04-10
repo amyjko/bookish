@@ -1,5 +1,8 @@
+import { Caret } from "./Caret";
 import { Node } from "./Node";
-import { BlockNode, BlockParentNode, NodeType } from "./Parser";
+import { BlockNode } from "./BlockNode";
+import { BlockParentNode } from "./BlockParentNode";
+import { NodeType } from "./NodeType";
 
 export abstract class BlocksNode extends Node {
     
@@ -28,6 +31,11 @@ export abstract class BlocksNode extends Node {
 
     insertBefore(anchor: BlockNode, block: BlockNode) {
         this.insert(anchor, block, true);
+    }
+
+    indexOf(block: BlockNode): number | undefined {
+        const index = this.#blocks.indexOf(block);
+        return index < 0 ? undefined : index;
     }
 
     insert(anchor: BlockNode, block: BlockNode, before: boolean) {

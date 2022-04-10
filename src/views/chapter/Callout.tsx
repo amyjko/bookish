@@ -1,6 +1,6 @@
 import React, { useContext } from 'react'
 import { CalloutNode } from "../../models/CalloutNode"
-import { Position } from '../../models/Parser';
+import { Position } from "../../models/Position";
 import { CaretContext } from '../editor/ChapterEditor';
 import PositionEditor from '../editor/PositionEditor';
 import Switch from '../editor/Switch';

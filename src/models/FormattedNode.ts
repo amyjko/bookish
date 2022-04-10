@@ -1,10 +1,10 @@
 import { Node } from "./Node";
 import { ErrorNode } from "./ErrorNode";
 import { TextNode } from "./TextNode";
-import { BlockNode } from "./Parser";
+import { BlockNode } from "./BlockNode";
 import { FootnoteNode } from "./FootnoteNode";
 import { EmbedNode } from "./EmbedNode";
-import { Caret, CaretRange } from "./ChapterNode";
+import { Caret, CaretRange } from "./Caret";
 import { MetadataNode } from "./MetadataNode";
 import { AtomNode } from "./AtomNode";
 

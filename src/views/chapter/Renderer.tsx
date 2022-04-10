@@ -1,6 +1,6 @@
 import React from 'react'
 
-import { Position } from '../../models/Parser'
+import { Position } from "../../models/Position"
 import { Node } from "../../models/Node"
 import ChapterBody from './ChapterBody'
 import Paragraph from './Paragraph'

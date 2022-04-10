@@ -1,8 +1,9 @@
 import { Node } from "./Node";
 import { FormattedNodeSegmentType, FormattedNode, Format } from "./FormattedNode";
-import { BlockNode, BlockParentNode } from "./Parser";
+import { BlockNode } from "./BlockNode";
+import { BlockParentNode } from "./BlockParentNode";
 import { TextNode } from "./TextNode";
-import { Caret, CaretRange } from "./ChapterNode";
+import { Caret, CaretRange } from "./Caret";
 
 export class ParagraphNode extends Node<BlockParentNode> {
 

@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from "react"
 import { MetadataNode } from "../../models/MetadataNode";
-import { ChapterNode, CaretRange, Caret } from "../../models/ChapterNode";
+import { ChapterNode } from "../../models/ChapterNode";
+import { Caret, CaretRange } from "../../models/Caret";
 import { DefinitionNode } from "../../models/DefinitionNode";
 import { InlineCodeNode } from "../../models/InlineCodeNode";
 import { LinkNode } from "../../models/LinkNode";
@@ -19,6 +20,7 @@ import { CalloutNode } from "../../models/CalloutNode";
 import { QuoteNode } from "../../models/QuoteNode";
 import { CodeNode } from "../../models/CodeNode";
 import { ListNode } from "../../models/ListNode";
+import { TableNode } from "../../models/TableNode";
 
 export const CaretContext = React.createContext<{ 
     range: CaretRange | undefined, 
@@ -285,8 +287,8 @@ const ChapterEditor = (props: { ast: ChapterNode }) => {
         return caretRange !== undefined &&
             caretRange.start.node === caretRange.end.node && 
             caretRange.start.index === caretRange.end.index && 
-            caretRange.start.index === 0 &&
             caretRange.start.node instanceof TextNode && 
+            caretRange.start.index === 0 &&
             caretRange.start.node.getParent() instanceof FormattedNode &&
             caretRange.start.node.getParent()?.getParent() instanceof ParagraphNode
     }
@@ -311,13 +313,14 @@ const ChapterEditor = (props: { ast: ChapterNode }) => {
 
         // Command key can be control or meta
         const isCommand = event.ctrlKey || event.metaKey;
+        const controlOption = event.altKey && isCommand
 
         // Move the caret right!
-        if(event.key === "ArrowRight") {
+        if(!controlOption && event.key === "ArrowRight") {
             event.preventDefault();
             // What's to the right of the current selection's start?
             if((caretRange.start.node instanceof TextNode || caretRange.start.node instanceof AtomNode) && 
-               (caretRange.end.node instanceof TextNode || caretRange.end.node instanceof AtomNode)) {
+            (caretRange.end.node instanceof TextNode || caretRange.end.node instanceof AtomNode)) {
                 const next = event.altKey ? caretRange.end.node.nextWord(caretRange.end.index) : caretRange.end.node.next(caretRange.end.index);
                 const paragraph = caretRange.start.node.getParagraph();
                 const formatter = caretRange.start.node.getFormattedRoot();
@@ -345,10 +348,10 @@ const ChapterEditor = (props: { ast: ChapterNode }) => {
             return;
         }
         // Move the caret left!
-        else if(event.key === "ArrowLeft") {
+        else if(!controlOption && event.key === "ArrowLeft") {
             event.preventDefault();
             if((caretRange.start.node instanceof TextNode || caretRange.start.node instanceof AtomNode) && 
-               (caretRange.end.node instanceof TextNode || caretRange.end.node instanceof AtomNode)) {
+            (caretRange.end.node instanceof TextNode || caretRange.end.node instanceof AtomNode)) {
                 // Adjust the selection
                 const previous = event.altKey ? caretRange.end.node.previousWord(caretRange.end.index) : caretRange.end.node.previous(caretRange.end.index);
                 const paragraph = caretRange.start.node.getParagraph();
@@ -375,10 +378,10 @@ const ChapterEditor = (props: { ast: ChapterNode }) => {
             return;
         }
         // Move the caret up!
-        else if(event.key === "ArrowUp") {
+        else if(!controlOption && event.key === "ArrowUp") {
             event.preventDefault();
             if((caretRange.start.node instanceof TextNode || caretRange.start.node instanceof AtomNode) && 
-               (caretRange.end.node instanceof TextNode || caretRange.end.node instanceof AtomNode)) {
+            (caretRange.end.node instanceof TextNode || caretRange.end.node instanceof AtomNode)) {
                 if(event.shiftKey) {
                     setCaretRange({ start: caretRange.start, end: getCaretAbove(caretRange.end) });
                 }
@@ -389,10 +392,10 @@ const ChapterEditor = (props: { ast: ChapterNode }) => {
             }
         }
         // Move the caret down!
-        else if(event.key === "ArrowDown") {
+        else if(!controlOption && event.key === "ArrowDown") {
             event.preventDefault();
             if((caretRange.start.node instanceof TextNode || caretRange.start.node instanceof AtomNode) && 
-               (caretRange.end.node instanceof TextNode || caretRange.end.node instanceof AtomNode)) {
+            (caretRange.end.node instanceof TextNode || caretRange.end.node instanceof AtomNode)) {
                 // If this is a text node in a link, enter the link form.
                 const atom = caretRange.start.node.getClosestParentMatching(p => p instanceof MetadataNode);
                 if(atom) {
@@ -407,7 +410,7 @@ const ChapterEditor = (props: { ast: ChapterNode }) => {
             }
         }
         // Backspace over a character!
-        else if(event.key === "Backspace") {
+        else if(!controlOption && event.key === "Backspace") {
             event.preventDefault();
 
             // If we're at the beginning of an empty formatted node in a list item, merge this item into the previous item and delete this list item.
@@ -601,13 +604,13 @@ const ChapterEditor = (props: { ast: ChapterNode }) => {
             // Only insert blocks at the beginning of a paragraph node.
             else if(atParagraphStart() && event.shiftKey) {
                 const paragraph = caretRange.start.node.getClosestParentMatching(p => p instanceof ParagraphNode) as ParagraphNode;
-                const parent = caretRange.start.node.getClosestParentMatching(p => p instanceof BlocksNode) as BlocksNode;
+                const blocks = caretRange.start.node.getClosestParentMatching(p => p instanceof BlocksNode) as BlocksNode;
                 // Horizontal rules
                 if(event.key === "h") {
                     event.preventDefault();
                     event.stopPropagation();
-                    if(parent && paragraph)
-                        parent.insertBefore(paragraph, new RuleNode(parent));
+                    if(blocks && paragraph)
+                        blocks.insertBefore(paragraph, new RuleNode(blocks));
                     // Don't change the caret position, just re-render.
                     setCaretRange({ start: caretRange.start, end: caretRange.end });
                 }
@@ -615,11 +618,11 @@ const ChapterEditor = (props: { ast: ChapterNode }) => {
                 else if(event.key === "e") {
                     event.preventDefault();
                     event.stopPropagation();
-                    if(parent && paragraph) {
-                        const callout = new CalloutNode(parent, []);
+                    if(blocks && paragraph) {
+                        const callout = new CalloutNode(blocks, []);
                         const newParagraph = new ParagraphNode(callout);
                         callout.append(newParagraph);
-                        parent.insertBefore(paragraph, callout);
+                        blocks.insertBefore(paragraph, callout);
                         const newText = newParagraph.getContent().getSegments()[0];
                         // Place the caret inside the callout's first paragraph.
                         setCaretRange({ start: { node: newText, index: 0}, end: { node: newText, index: 0 } });
@@ -629,11 +632,11 @@ const ChapterEditor = (props: { ast: ChapterNode }) => {
                 else if(event.key === "u") {
                     event.preventDefault();
                     event.stopPropagation();
-                    if(parent && paragraph) {
-                        const quote = new QuoteNode(parent, []);
+                    if(blocks && paragraph) {
+                        const quote = new QuoteNode(blocks, []);
                         const newParagraph = new ParagraphNode(quote);
                         quote.append(newParagraph);
-                        parent.insertBefore(paragraph, quote);
+                        blocks.insertBefore(paragraph, quote);
                         const newText = newParagraph.getContent().getSegments()[0];
                         // Place the caret inside the callout's first paragraph.
                         setCaretRange({ start: { node: newText, index: 0}, end: { node: newText, index: 0 } });
@@ -643,11 +646,84 @@ const ChapterEditor = (props: { ast: ChapterNode }) => {
                 else if(event.key === "s") {
                     event.preventDefault();
                     event.stopPropagation();
-                    if(parent && paragraph) {
-                        const code = new CodeNode(parent, "", "plaintext", "|");
-                        parent.insertBefore(paragraph, code);
+                    if(blocks && paragraph) {
+                        const code = new CodeNode(blocks, "", "plaintext", "|");
+                        blocks.insertBefore(paragraph, code);
                         // Place the caret inside the code's code node.
                         setCaretRange({ start: { node: code.getCodeNode(), index: 0}, end: { node: code.getCodeNode(), index: 0 } });
+                    }
+                }
+                // Table
+                else if(event.key === "y") {
+                    event.preventDefault();
+                    event.stopPropagation();
+                    const index = blocks.indexOf(paragraph);
+                    if(blocks && paragraph && index) {
+
+                        // Make an empty table
+                        const table = new TableNode(blocks, []);
+
+                        // Add some rows and columns, relying on the table
+                        for(let r = 0; r < Math.max(1, 3); r++) table.addRow(0);
+                        for(let c = 0; c < Math.max(1, 3); c++) table.addColumn(0);
+
+                        // Set a default caption
+                        const caption = new FormattedNode(table, "", []);
+                        caption.addSegment(new TextNode(caption, "", 0));
+                        table.setCaption(caption);
+
+                        // Insert table
+                        blocks.insertBefore(paragraph, table);
+
+                        // // Return a caret corresponding to the first cell.
+                        const caret = { node: table.getRows()[0][0].getTextNodes()[0], index: 0 };
+                        setCaretRange({ start: caret, end: caret });
+                    }
+                }
+            }
+            else if(event.altKey) {
+                const format = caretRange.start.node.getFarthestParentMatching(n => n instanceof FormattedNode) as FormattedNode;
+                const table = format?.getParent();
+                if(table instanceof TableNode) {
+                    const location = table.locate(format);
+                    if(location) {
+                        let newFormat = undefined;
+                        if(event.key === "ArrowUp") {
+                            table.addRow(location.row);
+                            newFormat = table.getCell(location.row, location.column);
+                        }
+                        else if(event.key === "ArrowDown") {
+                            table.addRow(location.row + 1);
+                            newFormat = table.getCell(location.row + 1, location.column);
+                        }
+                        else if(event.key === "ArrowRight") {
+                            table.addColumn(location.column + 1);
+                            newFormat = table.getCell(location.row, location.column + 1);
+                        }
+                        else if(event.key === "ArrowLeft") {
+                            table.addColumn(location.column);
+                            newFormat = table.getCell(location.row, location.column);
+                        }
+                        else if(event.key === "Backspace") {
+                            if(event.shiftKey) {
+                                if(table.getColumnCount() > 1) {
+                                    table.deleteColumn(location.column);
+                                    newFormat = table.getCell(location.row, location.column === table.getColumnCount() ? location.column - 1 : location.column);
+                                }
+                            }
+                            else {
+                                if(table.getRowCount() > 1) {
+                                    table.deleteRow(location.row);
+                                    newFormat = table.getCell(location.row === table.getRowCount() ? location.row - 1 : location.row, location.column);
+                                }
+                            }
+                        }
+
+                        if(newFormat) {
+                            const newCaret = { node: newFormat.getTextNodes()[0], index: 0 };
+                            setCaretRange({ start: newCaret, end: newCaret });
+                        }
+
                     }
                 }
             }

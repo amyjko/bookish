@@ -1,4 +1,3 @@
-import { BlocksNode } from "./BlocksNode";
 import Book from "./Book";
 import { CalloutNode } from "./CalloutNode";
 import { ChapterNode } from "./ChapterNode";
@@ -21,6 +20,19 @@ import { ReferenceNode } from "./ReferenceNode";
 import { RuleNode } from "./RuleNode";
 import { TableNode } from "./TableNode";
 import { TextNode } from "./TextNode";
+import { Position } from "./Position";
+import { BlockParentNode } from "./BlockParentNode";
+import { BlockNode } from "./BlockNode";
+
+export type Bookkeeping = {
+    index: Map<number, Node>;
+    symbols: Record<string, string>;
+    embeds: EmbedNode[];
+    errors: ErrorNode[];
+}
+
+const numberedRE = /^[0-9]+\.+/;
+const bulletRE = /^\*+\s+/;
 
 // TODO This grammar is slightly out of date.
 // A simple recursive descent parser for this grammar.
@@ -48,45 +60,6 @@ import { TextNode } from "./TextNode";
 // FOOTNOTE :: {TEXT}
 // TEXT :: (.+)
 
-export type Position = "|" | "<" | ">";
-
-export type Bookkeeping = {
-    index: Map<number, Node>;
-    symbols: Record<string, string>;
-    embeds: EmbedNode[];
-    errors: ErrorNode[];
-}
-
-export type NodeType = 
-    "chapter" | 
-    "paragraph" | 
-    "embed" | 
-    "header" | 
-    "rule" | 
-    "list" | 
-    "code" | 
-    "quote" | 
-    "callout" | 
-    "table" | 
-    "formatted" | 
-    "inline-code" | 
-    "link" | 
-    "citations" | 
-    "definition" | 
-    "footnote" | 
-    "content" | 
-    "script" | 
-    "text" | 
-    "error" | 
-    "label" | 
-    "reference" |
-    "comment"
-
-export type BlockParentNode = ChapterNode | CalloutNode | QuoteNode | BlocksNode;
-export type BlockNode = RuleNode | EmbedNode | ListNode | CodeNode | QuoteNode | CalloutNode | TableNode | ParagraphNode | ErrorNode;
-
-const numberedRE = /^[0-9]+\.+/;
-const bulletRE = /^\*+\s+/;
 
 export default class Parser {
 

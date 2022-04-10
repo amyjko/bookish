@@ -1,5 +1,5 @@
 import { Node } from "./Node";
-import { BlockParentNode } from "./Parser";
+import { BlockParentNode } from "./BlockParentNode";
 
 
 export class RuleNode extends Node<BlockParentNode> {

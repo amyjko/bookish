@@ -1,4 +1,6 @@
-import { Bookkeeping, BlockNode, BlockParentNode } from "./Parser";
+import { Bookkeeping } from "./Parser";
+import { BlockNode } from "./BlockNode";
+import { BlockParentNode } from "./BlockParentNode";
 import { ErrorNode } from "./ErrorNode";
 import { TextNode } from "./TextNode";
 import { FootnoteNode } from "./FootnoteNode";
@@ -12,9 +14,7 @@ import { CitationsNode } from "./CitationsNode";
 import { LabelNode } from "./LabelNode";
 import { CommentNode } from "./CommentNode";
 import { BlocksNode } from "./BlocksNode";
-
-export type Caret = { node: Node, index: number }
-export type CaretRange = { start: Caret, end: Caret }
+import { Caret, CaretRange } from "./Caret";
 
 export class ChapterNode extends BlocksNode {
 

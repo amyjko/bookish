@@ -1,5 +1,5 @@
 import type { ChapterNode } from "./ChapterNode";
-import { NodeType } from "./Parser";
+import { NodeType } from "./NodeType";
 
 export abstract class Node<ParentType extends Node<any> = Node<any>> {
     nodeID: number = -1;
