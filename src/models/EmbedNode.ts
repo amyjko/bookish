@@ -2,6 +2,7 @@ import { Node } from "./Node";
 import { BlockParentNode } from "./BlockParentNode";
 import { Position } from "./Position";
 import { FormattedNode } from "./FormattedNode";
+import { TextNode } from "./TextNode";
 
 export class EmbedNode extends Node<BlockParentNode> {
     #url: string;
@@ -15,8 +16,10 @@ export class EmbedNode extends Node<BlockParentNode> {
         this.#url = url;
         this.#description = description;
         this.#caption = new FormattedNode(this, "", []);
+        this.#caption.addEmptyText();
         this.#credit = new FormattedNode(this, "", []);
-        this.#position = "<";
+        this.#credit.addEmptyText();
+        this.#position = "|";
     }
 
     getURL() { return this.#url; }
@@ -47,8 +50,8 @@ export class EmbedNode extends Node<BlockParentNode> {
     }
 
     traverseChildren(fn: (node: Node) => void): void {
-        this.#caption.traverse(fn);
         this.#credit.traverse(fn);
+        this.#caption.traverse(fn);
     }
 
     removeChild(node: Node): void {}

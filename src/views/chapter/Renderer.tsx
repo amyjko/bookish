@@ -4,7 +4,7 @@ import { Position } from "../../models/Position"
 import { Node } from "../../models/Node"
 import ChapterBody from './ChapterBody'
 import Paragraph from './Paragraph'
-import Figure from './Figure'
+import Embed from './Embed'
 import Rule from './Rule'
 import List from './List'
 import CaptionedCode from './CaptionedCode'
@@ -26,7 +26,7 @@ import Comment from './Comment'
 const renderers: Record<string, (props: { node: any }) => JSX.Element> = {
     "chapter": ChapterBody,
     "paragraph": Paragraph,
-    "embed": Figure,
+    "embed": Embed,
     "rule": Rule,
     "list": List,
     "code": CaptionedCode,

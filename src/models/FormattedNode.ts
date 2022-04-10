@@ -43,6 +43,10 @@ export class FormattedNode extends Node<FormattedNodeParent> {
         this.#segments.push(node);
     }
 
+    addEmptyText() {
+        this.addSegment(new TextNode(this, "", 0));
+    }
+
     traverseChildren(fn: (node: Node) => void): void {
         this.#segments.forEach(item => item.traverse(fn))
     }
@@ -57,12 +61,12 @@ export class FormattedNode extends Node<FormattedNodeParent> {
 
     getFirstTextNode(): TextNode {
         const text = this.getTextNodes();
-        return text[0] as TextNode;
+        return text[0];
     }
 
     getLastTextNode(): TextNode {
         const text = this.getTextNodes();
-        return text[text.length - 1] as TextNode;
+        return text[text.length - 1];
     }
 
     replaceChild(node: Node, replacement: FormattedNodeSegmentType): void {
@@ -172,6 +176,9 @@ export class FormattedNode extends Node<FormattedNodeParent> {
             if(index < 0) throw Error("Uh oh, parentage is wrong.");
             parent.#segments = parent.getSegments().slice(0, index).concat(this.getSegments()).concat(parent.getSegments().slice(index + 1));
         }
+        
+        // If we ended up with no segments, put a placeholder.
+        this.addEmptyText();
 
     }
 

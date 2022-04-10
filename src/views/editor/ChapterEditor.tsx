@@ -21,6 +21,7 @@ import { QuoteNode } from "../../models/QuoteNode";
 import { CodeNode } from "../../models/CodeNode";
 import { ListNode } from "../../models/ListNode";
 import { TableNode } from "../../models/TableNode";
+import { EmbedNode } from "../../models/EmbedNode";
 
 export const CaretContext = React.createContext<{ 
     range: CaretRange | undefined, 
@@ -651,6 +652,21 @@ const ChapterEditor = (props: { ast: ChapterNode }) => {
                         blocks.insertBefore(paragraph, code);
                         // Place the caret inside the code's code node.
                         setCaretRange({ start: { node: code.getCodeNode(), index: 0}, end: { node: code.getCodeNode(), index: 0 } });
+                    }
+                }
+                // Embed
+                else if(event.key === "p") {
+                    event.preventDefault();
+                    event.stopPropagation();
+                    if(blocks && paragraph) {
+                        const embed = new EmbedNode(blocks, "", "");
+                        blocks.insertBefore(paragraph, embed);
+                        // Place the caret inside the code's code node.
+                        const text = embed.getCaption().getFirstTextNode();
+                        if(text) {
+                            const caret = { node: text, index: 0 };
+                            setCaretRange({ start: caret, end: caret });
+                        }
                     }
                 }
                 // Table
