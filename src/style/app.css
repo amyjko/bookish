@@ -15,6 +15,7 @@
     --bookish-app-chrome-hover-background: #E8AF22;
     --bookish-app-chrome-hover-color: #FFFFFF;
     --bookish-app-chrome-muted: #AAAAAA;
+    --bookish-app-chrome-font-family: "Verdana";
 
     --bookish-app-error-background: rgb(255, 231, 231);
     --bookish-app-error-color: rgb(191, 15, 15);
@@ -63,7 +64,7 @@
 }
 
 input, button {
-    font-family: var(--bookish-header-font-family);
+    font-family: var(--bookish-app-chrome-font-family);
     font-size: var(--bookish-app-chrome-font-size);
     color: var(--bookish-app-chrome-color);
 }
@@ -110,7 +111,7 @@ button:disabled {
 }
 
 .bookish-app-editable:before {
-    font-family: "Arial";
+    font-family: var(----bookish-app-chrome-font-family);
     font-size: var(--bookish-small-font-size);
     color: var(--bookish-muted-color);
     position: absolute;
