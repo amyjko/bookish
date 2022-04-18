@@ -391,3 +391,15 @@ input[type="text"].bookish-app-editable-error {
     color: var(--bookish-app-chrome-muted);
     font-size: 80%;
 }
+
+.bookish-chapter-editor-toolbar button:first-child {
+    border-top-right-radius: 0;
+}
+
+.bookish-chapter-editor-toolbar button:last-child {
+    border-bottom-left-radius: 0;
+}
+
+.bookish-chapter-editor-toolbar button:not(:first-child):not(:last-child) {
+    border-radius: 0;
+}

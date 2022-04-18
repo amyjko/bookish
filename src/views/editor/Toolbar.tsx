@@ -3,6 +3,12 @@ import { ChapterNode } from "../../models/ChapterNode";
 import { CaretContext } from "./ChapterEditor";
 import { Command, commands } from "./Commands";
 
+import Text from "../svg/text.svg";
+import Hash from "../svg/hash.svg";
+import Level from "../svg/level.svg";
+import Block from "../svg/block.svg";
+import List from "../svg/list.svg";
+
 const keyLabels: {[key: string]: string} = {
     "Digit0": "0",
     "Digit1": "1",
@@ -25,6 +31,14 @@ const categoryOrder: {[key:string] : number } = {
     "list": 7,
     "table": 8,
     "block": 9,
+}
+
+const categoryIcons: {[key:string]: Function} = {
+    "text": Text,
+    "annotation": Hash,
+    "level": Level,
+    "block": Block,
+    "list": List
 }
 
 const Toolbar = (props: { 
@@ -64,7 +78,8 @@ const Toolbar = (props: {
                 commandsByCategory[cat].length === 0 ?
                     null :
                     <span key={cat}>
-                        <span>{ cat }&nbsp;</span>
+                        <span>{ cat in categoryIcons ? categoryIcons[cat].call(undefined) : cat }&nbsp;&nbsp;</span>
+                        <span>
                         {
                             commandsByCategory[cat]
                                 // Convert commands into buttons
@@ -78,7 +93,8 @@ const Toolbar = (props: {
                                     </button>
                                 )
                         }
-                        &nbsp;
+                        </span>
+                        &nbsp;&nbsp;&nbsp;&nbsp;
                     </span>
             )
         }
