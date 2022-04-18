@@ -370,3 +370,24 @@ input[type="text"].bookish-app-editable-error {
 .bookish-chapter-editor .bookish-table table td {
     border: 1px dashed var(--bookish-app-chrome-border-color);
 }
+
+.bookish-chapter-editor-toolbar {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: var(--bookish-background-color);
+    border: 1px solid var(--bookish-app-chrome-border-color);
+    margin-top: var(--bookish-app-chrome-padding);
+    padding: var(--bookish-app-chrome-padding);
+}
+
+.bookish-chapter-editor-toolbar svg {
+    width: 1em;
+    height: 1em;
+}
+
+.bookish-chapter-editor-toolbar-shortcut {
+    color: var(--bookish-app-chrome-muted);
+    font-size: 80%;
+}

@@ -1,33 +1,43 @@
 import React, { useEffect, useRef, useState } from "react"
-import { MetadataNode } from "../../models/MetadataNode";
 import { ChapterNode } from "../../models/ChapterNode";
 import { Caret, CaretRange } from "../../models/Caret";
-import { DefinitionNode } from "../../models/DefinitionNode";
-import { InlineCodeNode } from "../../models/InlineCodeNode";
 import { LinkNode } from "../../models/LinkNode";
 import { ParagraphNode } from "../../models/ParagraphNode";
 import { TextNode } from "../../models/TextNode";
 import { renderNode } from "../chapter/Renderer";
-import { FootnoteNode } from "../../models/FootnoteNode";
 import { AtomNode } from "../../models/AtomNode";
-import { CitationsNode } from "../../models/CitationsNode";
-import { LabelNode } from "../../models/LabelNode";
-import { CommentNode } from "../../models/CommentNode";
 import { FormattedNode } from "../../models/FormattedNode";
 import { BlocksNode } from "../../models/BlocksNode";
-import { RuleNode } from "../../models/RuleNode";
-import { CalloutNode } from "../../models/CalloutNode";
-import { QuoteNode } from "../../models/QuoteNode";
-import { CodeNode } from "../../models/CodeNode";
 import { ListNode } from "../../models/ListNode";
 import { TableNode } from "../../models/TableNode";
-import { EmbedNode } from "../../models/EmbedNode";
+import { Command, commands } from "./Commands";
+import Toolbar from "./Toolbar";
 
 export const CaretContext = React.createContext<{ 
     range: CaretRange | undefined, 
     coordinate: { x: number, y: number} | undefined,
     setCaretRange: Function
 } | undefined>(undefined);
+
+export type CaretContext = {
+    range: CaretRange,
+    start: Caret,
+    end: Caret,
+    isSelection: boolean,
+    chapter: ChapterNode | undefined, 
+    blocks: BlocksNode | undefined,
+    paragraph: ParagraphNode | undefined,
+    list: ListNode | undefined,
+    table: TableNode | undefined,
+    format: FormattedNode | undefined, 
+    startIsTextOrAtom: boolean, 
+    endIsTextOrAtom: boolean,
+    atParagraphStart: boolean
+}
+
+export type CaretUtilities = {
+    getCaretOnLine: (caret: Caret, below: boolean) => Caret
+}
 
 const ChapterEditor = (props: { ast: ChapterNode }) => {
 
@@ -37,7 +47,8 @@ const ChapterEditor = (props: { ast: ChapterNode }) => {
     const [ caretRange, setCaretRange ] = useState<CaretRange>();
     const [ caretCoordinate, setCaretCoordinate ] = useState<{ x: number, y: number, height: number}>();
     const [ lastInputTime, setLastInputTime ] = useState<number>(0);
-    const [ idle, setIdle ] = useState<boolean>(true);
+    const [ keyboardIdle, setKeyboardIdle ] = useState<boolean>(true);
+    const [ mouseMoving, setMouseMoving ] = useState<ReturnType<typeof setTimeout> | undefined>(undefined);
 
     useEffect(() => {
 
@@ -53,8 +64,12 @@ const ChapterEditor = (props: { ast: ChapterNode }) => {
 
     useEffect(() => {
         // Track time since last keystroke to control caret blinking behavior.
-        const keystrokeTimer = setInterval(() => setIdle((Date.now() - lastInputTime) > 300), 300);
-        return () => clearInterval(keystrokeTimer);
+        const keystrokeTimer = setInterval(() => setKeyboardIdle((Date.now() - lastInputTime) > 300), 300);
+        return () => {
+            if(mouseMoving)
+                clearTimeout(mouseMoving);
+            clearInterval(keystrokeTimer);
+        }
     }, [lastInputTime])
 
     // When the selection changes, set the browser's selection to correspond. This helps with two things:
@@ -194,7 +209,7 @@ const ChapterEditor = (props: { ast: ChapterNode }) => {
         
         // Make sure we're showing the caret.
         setLastInputTime(Date.now());
-        setIdle(false);
+        setKeyboardIdle(false);
 
         // Map the browser selection to our caret range model.
         const selection = document.getSelection();
@@ -227,9 +242,6 @@ const ChapterEditor = (props: { ast: ChapterNode }) => {
         return { top: elementRect.top, left: elementRect.left };
 
     }
-
-    function getCaretAbove(caret: Caret) { return getCaretOnLine(caret, false); }
-    function getCaretBelow(caret: Caret) { return getCaretOnLine(caret, true); }
 
     function getCaretOnLine(caret: Caret, below: boolean) : Caret {
 
@@ -294,8 +306,32 @@ const ChapterEditor = (props: { ast: ChapterNode }) => {
             caretRange.start.node.getParent()?.getParent() instanceof ParagraphNode
     }
 
-    function noSelection() {
-        return caretRange !== undefined && caretRange.start.node === caretRange.end.node
+    function getCaretContext(): CaretContext | undefined {
+        if(caretRange === undefined)
+            return undefined;
+
+        return { 
+            // We make a new range so that setCaretRange always causes a re-render
+            range: { start: caretRange.start, end: caretRange.end },
+            start: caretRange.start,
+            end: caretRange.end,
+            isSelection: caretRange.start.node !== caretRange.end.node || caretRange.start.index !== caretRange.end.index,
+            chapter: caretRange.start.node.getChapter(),
+            blocks: caretRange.start.node.getClosestParentMatching(p => p instanceof BlocksNode) as BlocksNode,
+            paragraph: caretRange.start.node.getClosestParentMatching(p => p instanceof ParagraphNode) as ParagraphNode,
+            list: caretRange.start.node.getClosestParentMatching(p => p instanceof ListNode) as ListNode,
+            table: caretRange.start.node.getClosestParentMatching(p => p instanceof TableNode) as TableNode,
+            format: (caretRange.start.node instanceof TextNode || caretRange.start.node instanceof AtomNode) ? caretRange.start.node.getFormattedRoot() : undefined,
+            startIsTextOrAtom: caretRange.start.node instanceof TextNode || caretRange.start.node instanceof AtomNode,
+            endIsTextOrAtom: caretRange.end.node instanceof TextNode || caretRange.end.node instanceof AtomNode,
+            atParagraphStart: atParagraphStart()
+        };
+    }
+
+    function getUtilities(): CaretUtilities {
+        return {
+            getCaretOnLine: getCaretOnLine
+        };
     }
 
     function handleKeyDown(event: React.KeyboardEvent) {
@@ -307,452 +343,62 @@ const ChapterEditor = (props: { ast: ChapterNode }) => {
 
         // Remember the time of this keystroke.
         setLastInputTime(Date.now());
-        setIdle(false);
+        setKeyboardIdle(false);
 
         if(caretRange === undefined)
             return;
 
-        // Command key can be control or meta
-        const isCommand = event.ctrlKey || event.metaKey;
-        const controlOption = event.altKey && isCommand
+        // Build some context
+        const context = getCaretContext();
 
-        // Move the caret right!
-        if(!controlOption && event.key === "ArrowRight") {
-            event.preventDefault();
-            // What's to the right of the current selection's start?
-            if((caretRange.start.node instanceof TextNode || caretRange.start.node instanceof AtomNode) && 
-            (caretRange.end.node instanceof TextNode || caretRange.end.node instanceof AtomNode)) {
-                const next = event.altKey ? caretRange.end.node.nextWord(caretRange.end.index) : caretRange.end.node.next(caretRange.end.index);
-                const paragraph = caretRange.start.node.getParagraph();
-                const formatter = caretRange.start.node.getFormattedRoot();
-                const last = paragraph ? paragraph.getLastTextNode() : formatter ? formatter.getLastTextNode() : undefined;
-                if(event.shiftKey && !isCommand) {
-                    setCaretRange({ start: caretRange.start, end: next });
-                    return;
-                }
-                else if(last) {
-                    const lastCaret = { node: last, index: last ? last.getLength() : 0 };
-                    // Adjust the selection
-                    if(event.shiftKey) {
-                        setCaretRange(isCommand ? { start: caretRange.start, end: lastCaret} : { start: caretRange.start, end: next })
-                        return;
-                    }
-                    // Move to the end of the paragraph
-                    if(isCommand) {
-                        setCaretRange({ start: lastCaret, end: lastCaret});
-                        return;
-                    }
-                }
-                // Move the caret
-                setCaretRange({ start: next, end: next })    
-            }
+        if(context === undefined)
             return;
-        }
-        // Move the caret left!
-        else if(!controlOption && event.key === "ArrowLeft") {
-            event.preventDefault();
-            if((caretRange.start.node instanceof TextNode || caretRange.start.node instanceof AtomNode) && 
-            (caretRange.end.node instanceof TextNode || caretRange.end.node instanceof AtomNode)) {
-                // Adjust the selection
-                const previous = event.altKey ? caretRange.end.node.previousWord(caretRange.end.index) : caretRange.end.node.previous(caretRange.end.index);
-                const paragraph = caretRange.start.node.getParagraph();
-                const formatter = caretRange.start.node.getFormattedRoot();
-                const first = paragraph ? paragraph.getFirstTextNode() : formatter ? formatter.getFirstTextNode() : undefined;
-                if(event.shiftKey && !isCommand) {
-                    setCaretRange({ start: caretRange.start, end: previous });
-                    return;
-                }
-                else if(first) {
-                    const firstCaret = { node: first, index: 0 };
-                    if(event.shiftKey && first) {
-                        setCaretRange(isCommand ? { start: caretRange.start, end: firstCaret } : { start: caretRange.start, end: previous });
-                        return;
-                    }
-                    // Move to the beginning of the paragraph
-                    if(isCommand) {
-                        setCaretRange({ start: firstCaret, end: firstCaret});
-                        return;
-                    }
-                }
-                setCaretRange({ start: previous, end: previous })    
-            }
-            return;
-        }
-        // Move the caret up!
-        else if(!controlOption && event.key === "ArrowUp") {
-            event.preventDefault();
-            if((caretRange.start.node instanceof TextNode || caretRange.start.node instanceof AtomNode) && 
-            (caretRange.end.node instanceof TextNode || caretRange.end.node instanceof AtomNode)) {
-                if(event.shiftKey) {
-                    setCaretRange({ start: caretRange.start, end: getCaretAbove(caretRange.end) });
-                }
-                else {
-                    const above = getCaretAbove(caretRange.start);
-                    setCaretRange({ start: above, end: above });
-                }
-            }
-        }
-        // Move the caret down!
-        else if(!controlOption && event.key === "ArrowDown") {
-            event.preventDefault();
-            if((caretRange.start.node instanceof TextNode || caretRange.start.node instanceof AtomNode) && 
-            (caretRange.end.node instanceof TextNode || caretRange.end.node instanceof AtomNode)) {
-                // If this is a text node in a link, enter the link form.
-                const atom = caretRange.start.node.getClosestParentMatching(p => p instanceof MetadataNode);
-                if(atom) {
-                    setCaretRange({ start: { node: atom, index: 0 }, end: { node: atom, index: 0 }});
-                }
-                else if(event.shiftKey)
-                    setCaretRange({ start: caretRange.start, end: getCaretBelow(caretRange.end) });
-                else {
-                    const below = getCaretBelow(caretRange.start);
-                    setCaretRange({ start: below, end: below });
-                }
-            }
-        }
-        // Backspace over a character!
-        else if(!controlOption && event.key === "Backspace") {
-            event.preventDefault();
 
-            // If we're at the beginning of an empty formatted node in a list item, merge this item into the previous item and delete this list item.
-            const list = caretRange.start.node.getClosestParentMatching(p => p instanceof ListNode) as ListNode;
-            if(list !== undefined && list.atBeginningOfItem(caretRange.start)) {
-                const newCaret = list.backspaceItemContaining(caretRange.start);
-                setCaretRange({ start: newCaret, end: newCaret });
+        // Loop through the commands to see if there's a match.
+        const unmatched = commands.every(command => {
+            // If the keystroke and caret position matches the command signature, execute the command and update the caret range.
+            if( command.shift === event.shiftKey && 
+                command.alt === event.altKey &&
+                command.control === (event.ctrlKey || event.metaKey) &&
+                (command.key === undefined || command.key === event.key) &&
+                (command.code === undefined || command.code === event.code) &&
+                command.active.call(undefined, context)) {
+
+                    event.preventDefault();
+                    event.stopPropagation();
+
+                    // Execute the command
+                    executeCommand(command, event.key);
+                    
+                    // Stop searching for a matching command.
+                    return false;
             }
-            else {
-                const caret = (ast.deleteSelection(caretRange, true));
+            // Continue searching for a matching command.
+            return true;
+        });
+
+        if(unmatched) {
+            // Insert any non control character! This is a bit hacky: all but "Fn" are more than three characters.
+            if(context.chapter !== undefined && event.key.length === 1) {
+                const caret = context.chapter.insertSelection(event.key, context.range);
                 setCaretRange({ start: caret, end: caret });
             }
-            return;
-        }
-        // Delete forward a character!
-        else if(event.key === "Delete") {
-            event.preventDefault();
-            const caret = ast.deleteSelection(caretRange, false);
-            setCaretRange({ start: caret, end: caret });
-            return;
-        }
-        // Split the current paragraph and place the caret at the beginning of the new one!
-        else if(event.key === "Enter") {
-            if(caretRange.start.node instanceof TextNode) {
-                event.preventDefault();
-                // If it's in a code node, insert a newline.
-                if(caretRange.start.node.getParent() instanceof CodeNode) {
-                    const caret = caretRange.start.node.insert("\n", caretRange.start.index);
-                    setCaretRange({ start: caret, end: caret });
-                }
-                // If it's in a list node, split the current list item
-                else if(caretRange.start.node.getClosestParentMatching(p => p instanceof ListNode) !== undefined) {
-                    const list = caretRange.start.node.getClosestParentMatching(p => p instanceof ListNode) as ListNode;
-                    const format = caretRange.start.node.getClosestParentMatching(p => p instanceof FormattedNode) as FormattedNode;
-                    const parts = format.split(caretRange.start);
-                    if(list && parts) {
-                        const [ first, second ] = parts;
-                        format.replaceWith(first);
-                        list.insertAfter(second, first);
-                        const caret = { node: second.getTextNodes()[0], index: 0};
-                        setCaretRange({ start: caret, end: caret})
-                    }
-                }
-                // If it's in a paragraph, split the paragraph.
-                else {
-                    const caret = ast.splitSelection(caretRange);
-                    setCaretRange({ start: caret, end: caret });
-                }
-                return;
-            }
-        }
-        else if(event.key === "Tab") {
-            const list = caretRange.start.node.closestParent(ListNode) as ListNode;
-            if(list) {
-                event.preventDefault();
-                event.stopPropagation();
-                if(event.shiftKey) {
-                    list.unindent(caretRange.start);
-                }
-                else {
-                    list.indent(caretRange.start);
-                }
-                setCaretRange({ start: caretRange.start, end: caretRange.end });
-            }
-        }
-        else if(isCommand) {
-            if(event.key === "b") {
-                event.preventDefault();
-                setCaretRange(ast.formatSelection(caretRange, "*"))
-                return;
-            }
-            else if(event.key === "i") {
-                event.preventDefault();
-                setCaretRange(ast.formatSelection(caretRange, "_"))
-                return;
-            }
-            else if(event.key === ",") {
-                event.preventDefault();
-                setCaretRange(ast.formatSelection(caretRange, "v"))
-                return;
-            }
-            else if(event.key === ".") {
-                event.preventDefault();
-                setCaretRange(ast.formatSelection(caretRange, "^"))
-                return;
-            }
-            else if(event.key === "0") {
-                event.preventDefault();
-                setCaretRange(ast.formatSelection(caretRange, ""));
-                return;
-            }
-            else if(event.key === "k") {
-                event.preventDefault();
-                const caret = ast.toggleAtom(caretRange, LinkNode, (parent, text) => new LinkNode(parent, text));
-                if(caret)
-                    setCaretRange({ start: caret, end: caret});
-                return;
-            }
-            else if(event.key === "j") {
-                event.preventDefault();
-                const caret = ast.toggleAtom(caretRange, InlineCodeNode, (parent, text) => new InlineCodeNode(parent, text));
-                if(caret)
-                    setCaretRange({ start: caret, end: caret});
-            }
-            else if(event.key === "d") {
-                event.preventDefault();
-                const caret = ast.toggleAtom(caretRange, DefinitionNode, (parent, text) => new DefinitionNode(parent, text));
-                if(caret)
-                    setCaretRange({ start: caret, end: caret});
-            }
-            else if(event.shiftKey && event.key === "f") {
-                event.preventDefault();
-                const caret = ast.insertNodeAtSelection(caretRange, (parent, text) => new FootnoteNode(parent, text));
-                if(caret)
-                    setCaretRange({ start: caret, end: caret});
-            }
-            else if(event.shiftKey && event.key === "r" && noSelection()) {
-                event.preventDefault();
-                const caret = ast.insertNodeAtSelection(caretRange, (parent, text) => new CitationsNode(parent, []));
-                if(caret)
-                    setCaretRange({ start: caret, end: caret});
-            }
-            else if(event.shiftKey && event.key === "l" && noSelection()) {
-                event.preventDefault();
-                const caret = ast.insertNodeAtSelection(caretRange, (parent, text) => new LabelNode(parent, ""));
-                if(caret)
-                    setCaretRange({ start: caret, end: caret});
-            }
-            else if(event.shiftKey && event.key === "c" && noSelection()) {
-                event.preventDefault();
-                const caret = ast.insertNodeAtSelection(caretRange, (parent, text) => new CommentNode(parent, "This is my comment"));
-                if(caret)
-                    setCaretRange({ start: caret, end: caret});
-            }
-            // Convert paragraph to header
-            else if(event.altKey && (event.code == "Digit0" || event.code === "Digit1"  || event.code === "Digit2"  || event.code === "Digit3")) {
-                const paragraph = caretRange.start.node.getClosestParentMatching(p => p instanceof ParagraphNode) as ParagraphNode;
-                if(paragraph) {
-                    paragraph.setLevel(parseInt(event.code.substring(5)));
-                    // Don't change the caret position, just re-render.
-                    setCaretRange({ start: caretRange.start, end: caretRange.end });
-                }
-            }
-            // List
-            else if(event.shiftKey && (event.key === "7" || event.key === "8")) {
-                event.preventDefault();
-                event.stopPropagation();
-                const paragraphParent = caretRange.start.node.getClosestParentMatching(p => p instanceof ParagraphNode) as ParagraphNode;
-                const list = caretRange.start.node.getClosestParentMatching(p => p instanceof ListNode) as ListNode;
-                const blocksParent = caretRange.start.node.getClosestParentMatching(p => p instanceof BlocksNode) as BlocksNode;
-                if(list) {
-                    // If it's a list and we requested the opposite, toggle the list type.
-                    if((list.isNumbered() && event.key === "7")) {
-                        list.setNumbered(false);
-                        setCaretRange({ start: caretRange.start, end: caretRange.end });
-                    }
-                    else if(!list.isNumbered() && event.key === "8") {
-                        list.setNumbered(true);
-                        setCaretRange({ start: caretRange.start, end: caretRange.end });
-                    }
-                    // Otherwise, unwrap the current list item.
-                    else {
-                        // Duplicate the list
-                        const format = caretRange.start.node.getFarthestParentMatching(p => p instanceof FormattedNode) as FormattedNode;
-                        if(format) {
-                            const before = list.copyItemsBeforeAfter(format, true);
-                            const after = list.copyItemsBeforeAfter(format, false);
-                            if(before && after) {
-                                const newParagraph = new ParagraphNode(blocksParent);
-                                newParagraph.setContent(format);
-                                blocksParent.replaceChild(list, newParagraph);
-                                if(before.getLength() > 0)
-                                    blocksParent.insertBefore(newParagraph, before);
-                                if(after.getLength() > 0)
-                                    blocksParent.insertAfter(newParagraph, after);
-                                setCaretRange({ start: caretRange.start, end: caretRange.end });                                
-                            }
-                        }
-                    }
-                }
-                else if(blocksParent && paragraphParent) {
-                    const list = new ListNode(blocksParent, [], event.key === "8");
-                    const format = paragraphParent.getContent();
-                    list.append(format);
-                    const text = format.getTextNodes()[0];
-                    paragraphParent.replaceWith(list);
-                    // Place the caret inside the callout's first paragraph.
-                    setCaretRange({ start: caretRange.start, end: caretRange.start });
-                }
-            }
-            // Only insert blocks at the beginning of a paragraph node.
-            else if(atParagraphStart() && event.shiftKey) {
-                const paragraph = caretRange.start.node.getClosestParentMatching(p => p instanceof ParagraphNode) as ParagraphNode;
-                const blocks = caretRange.start.node.getClosestParentMatching(p => p instanceof BlocksNode) as BlocksNode;
-                // Horizontal rules
-                if(event.key === "h") {
-                    event.preventDefault();
-                    event.stopPropagation();
-                    if(blocks && paragraph)
-                        blocks.insertBefore(paragraph, new RuleNode(blocks));
-                    // Don't change the caret position, just re-render.
-                    setCaretRange({ start: caretRange.start, end: caretRange.end });
-                }
-                // Callouts
-                else if(event.key === "e") {
-                    event.preventDefault();
-                    event.stopPropagation();
-                    if(blocks && paragraph) {
-                        const callout = new CalloutNode(blocks, []);
-                        const newParagraph = new ParagraphNode(callout);
-                        callout.append(newParagraph);
-                        blocks.insertBefore(paragraph, callout);
-                        const newText = newParagraph.getContent().getSegments()[0];
-                        // Place the caret inside the callout's first paragraph.
-                        setCaretRange({ start: { node: newText, index: 0}, end: { node: newText, index: 0 } });
-                    }
-                }
-                // Quote
-                else if(event.key === "u") {
-                    event.preventDefault();
-                    event.stopPropagation();
-                    if(blocks && paragraph) {
-                        const quote = new QuoteNode(blocks, []);
-                        const newParagraph = new ParagraphNode(quote);
-                        quote.append(newParagraph);
-                        blocks.insertBefore(paragraph, quote);
-                        const newText = newParagraph.getContent().getSegments()[0];
-                        // Place the caret inside the callout's first paragraph.
-                        setCaretRange({ start: { node: newText, index: 0}, end: { node: newText, index: 0 } });
-                    }
-                }
-                // Code
-                else if(event.key === "s") {
-                    event.preventDefault();
-                    event.stopPropagation();
-                    if(blocks && paragraph) {
-                        const code = new CodeNode(blocks, "", "plaintext", "|");
-                        blocks.insertBefore(paragraph, code);
-                        // Place the caret inside the code's code node.
-                        setCaretRange({ start: { node: code.getCodeNode(), index: 0}, end: { node: code.getCodeNode(), index: 0 } });
-                    }
-                }
-                // Embed
-                else if(event.key === "p") {
-                    event.preventDefault();
-                    event.stopPropagation();
-                    if(blocks && paragraph) {
-                        const embed = new EmbedNode(blocks, "", "");
-                        blocks.insertBefore(paragraph, embed);
-                        // Place the caret inside the code's code node.
-                        const text = embed.getCaption().getFirstTextNode();
-                        if(text) {
-                            const caret = { node: text, index: 0 };
-                            setCaretRange({ start: caret, end: caret });
-                        }
-                    }
-                }
-                // Table
-                else if(event.key === "y") {
-                    event.preventDefault();
-                    event.stopPropagation();
-                    const index = blocks.indexOf(paragraph);
-                    if(blocks && paragraph && index) {
-
-                        // Make an empty table
-                        const table = new TableNode(blocks, []);
-
-                        // Add some rows and columns, relying on the table
-                        for(let r = 0; r < Math.max(1, 3); r++) table.addRow(0);
-                        for(let c = 0; c < Math.max(1, 3); c++) table.addColumn(0);
-
-                        // Set a default caption
-                        const caption = new FormattedNode(table, "", []);
-                        caption.addSegment(new TextNode(caption, "", 0));
-                        table.setCaption(caption);
-
-                        // Insert table
-                        blocks.insertBefore(paragraph, table);
-
-                        // // Return a caret corresponding to the first cell.
-                        const caret = { node: table.getRows()[0][0].getTextNodes()[0], index: 0 };
-                        setCaretRange({ start: caret, end: caret });
-                    }
-                }
-            }
-            else if(event.altKey) {
-                const format = caretRange.start.node.getFarthestParentMatching(n => n instanceof FormattedNode) as FormattedNode;
-                const table = format?.getParent();
-                if(table instanceof TableNode) {
-                    const location = table.locate(format);
-                    if(location) {
-                        let newFormat = undefined;
-                        if(event.key === "ArrowUp") {
-                            table.addRow(location.row);
-                            newFormat = table.getCell(location.row, location.column);
-                        }
-                        else if(event.key === "ArrowDown") {
-                            table.addRow(location.row + 1);
-                            newFormat = table.getCell(location.row + 1, location.column);
-                        }
-                        else if(event.key === "ArrowRight") {
-                            table.addColumn(location.column + 1);
-                            newFormat = table.getCell(location.row, location.column + 1);
-                        }
-                        else if(event.key === "ArrowLeft") {
-                            table.addColumn(location.column);
-                            newFormat = table.getCell(location.row, location.column);
-                        }
-                        else if(event.key === "Backspace") {
-                            if(event.shiftKey) {
-                                if(table.getColumnCount() > 1) {
-                                    table.deleteColumn(location.column);
-                                    newFormat = table.getCell(location.row, location.column === table.getColumnCount() ? location.column - 1 : location.column);
-                                }
-                            }
-                            else {
-                                if(table.getRowCount() > 1) {
-                                    table.deleteRow(location.row);
-                                    newFormat = table.getCell(location.row === table.getRowCount() ? location.row - 1 : location.row, location.column);
-                                }
-                            }
-                        }
-
-                        if(newFormat) {
-                            const newCaret = { node: newFormat.getTextNodes()[0], index: 0 };
-                            setCaretRange({ start: newCaret, end: newCaret });
-                        }
-
-                    }
-                }
-            }
-        }
-        
-        // Insert any non control character! This is a bit hacky: all but "Fn" are more than three characters.
-        if(!isCommand && event.key.length == 1) {
-            event.preventDefault()
-            const caret = ast.insertSelection(event.key, caretRange);
-            setCaretRange({ start: caret, end: caret });
-            return;
         }
 
+    }
+
+    function executeCommand(command: Command, key: string) {
+        const context = getCaretContext();
+        if(context) {
+            const newRange = command.handler.call(
+                undefined, 
+                context,
+                getUtilities(),
+                key
+            );
+            if(newRange)
+                setCaretRange(newRange);
+        }
     }
 
     function handleMouseDown(event: React.MouseEvent) {
@@ -786,11 +432,20 @@ const ChapterEditor = (props: { ast: ChapterNode }) => {
         event.preventDefault();
     }
 
+    function handleMouseMove(event: React.MouseEvent) {
+        if(mouseMoving)
+            clearTimeout(mouseMoving);
+        const timeoutID = setTimeout(() => setMouseMoving(undefined), 1000);
+        setMouseMoving(timeoutID);
+    }
+
     const isSelection = caretRange && (caretRange.start.node !== caretRange.end.node || caretRange.start.index !== caretRange.end.index);
     const isItalic = caretRange && !isSelection && caretRange.start.node instanceof TextNode && caretRange.start.node.isItalic();
     const isBold = caretRange && !isSelection && caretRange.start.node instanceof TextNode && caretRange.start.node.isBold();
     const isLink = caretRange && !isSelection && caretRange.start.node.getClosestParentMatching(p => p instanceof LinkNode) !== undefined;
     const focused = document.activeElement === editorRef.current;
+
+    const context = getCaretContext();
 
     return <CaretContext.Provider value={{ range: caretRange, coordinate: caretCoordinate, setCaretRange: setCaretRange }}>
             <div 
@@ -799,6 +454,7 @@ const ChapterEditor = (props: { ast: ChapterNode }) => {
                 onKeyDown={handleKeyDown}
                 onKeyUp={handleKeyUp}
                 onMouseDown={handleMouseDown}
+                onMouseMove={handleMouseMove}
                 onFocus={onFocus}
                 onBlur={onBlur}
                 tabIndex={0} // Makes the editor focusable.
@@ -808,7 +464,7 @@ const ChapterEditor = (props: { ast: ChapterNode }) => {
                     // Customize the rendering based on the formatting applied to the text node.
                     caretCoordinate && caretRange && !isSelection ? 
                         <div 
-                            className={`bookish-chapter-editor-caret ${isLink ? "bookish-chapter-editor-caret-linked" : isItalic ? "bookish-chapter-editor-caret-italic" :""} ${isBold ? "bookish-chapter-editor-caret-bold" : ""} ${focused && idle ? "bookish-chapter-editor-caret-blink" : ""} ${!focused ? "bookish-chapter-editor-caret-disabled" : ""}`}
+                            className={`bookish-chapter-editor-caret ${isLink ? "bookish-chapter-editor-caret-linked" : isItalic ? "bookish-chapter-editor-caret-italic" :""} ${isBold ? "bookish-chapter-editor-caret-bold" : ""} ${focused && keyboardIdle ? "bookish-chapter-editor-caret-blink" : ""} ${!focused ? "bookish-chapter-editor-caret-disabled" : ""}`}
                             style={{
                                 left: caretCoordinate.x,
                                 top: caretCoordinate.y,
@@ -817,6 +473,8 @@ const ChapterEditor = (props: { ast: ChapterNode }) => {
                         </div> : null
                 }
                 { renderNode(props.ast) }
+                { context && caretCoordinate ? <Toolbar chapter={props.ast} context={context} executor={executeCommand}></Toolbar> : null }
+                
             </div>
         </CaretContext.Provider>
     ;
