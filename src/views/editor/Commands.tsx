@@ -292,7 +292,8 @@ export const commands: Command[] = [
         active: context => context.format !== undefined,
         handler: context => {
             const last = (context.format as FormattedNode).getLastTextNode();
-            return { start: { node: last, index: 0 }, end: { node: last, index: 0 }};
+            const caret = { node: last, index: last.getLength() };
+            return { start: caret, end: caret};
         }
     },
     {
