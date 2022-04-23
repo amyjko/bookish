@@ -25,12 +25,9 @@ const Atom = (props: { node: AtomNode<any>, textView: React.ReactElement }) => {
 
     }
 
-    return selected ?
-        <span className={`bookish-editor-atom ${selected ? "bookish-editor-atom-selected" : ""}`} onMouseDown={handleMouseDown}>
-            { textView }
-        </span>
-        :
-        textView;
+    return <span className={`bookish-editor-atom ${selected ? "bookish-editor-atom-selected" : ""}`} onMouseDown={handleMouseDown}>
+        { textView }
+    </span>
     
 }
 

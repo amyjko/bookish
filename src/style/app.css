@@ -279,6 +279,10 @@ input[type=text].bookish-editor-text-invalid {
     50% { outline-width: 4px; }
 }
 
+.bookish-editor-atom {
+    cursor: pointer;
+}
+
 .bookish-editor-atom-selected {
     animation: 1s atom-selected infinite;
     border-radius: 2px;
