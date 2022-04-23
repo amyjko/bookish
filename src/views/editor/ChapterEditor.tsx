@@ -447,6 +447,7 @@ const ChapterEditor = (props: { ast: ChapterNode }) => {
 
     }
 
+    const isAtom = caretRange && caretRange.start.node instanceof AtomNode;
     const isSelection = caretRange && (caretRange.start.node !== caretRange.end.node || caretRange.start.index !== caretRange.end.index);
     const isItalic = caretRange && !isSelection && caretRange.start.node instanceof TextNode && caretRange.start.node.isItalic();
     const isBold = caretRange && !isSelection && caretRange.start.node instanceof TextNode && caretRange.start.node.isBold();
@@ -470,7 +471,7 @@ const ChapterEditor = (props: { ast: ChapterNode }) => {
                 {
                     // Draw a caret. We draw our own since this view isn't contentEditable and we can't show a caret.
                     // Customize the rendering based on the formatting applied to the text node.
-                    caretCoordinate && caretRange && !isSelection ? 
+                    caretCoordinate && caretRange && !isAtom && !isSelection ? 
                         <div 
                             className={`bookish-chapter-editor-caret ${isLink ? "bookish-chapter-editor-caret-linked" : isItalic ? "bookish-chapter-editor-caret-italic" :""} ${isBold ? "bookish-chapter-editor-caret-bold" : ""} ${focused && keyboardIdle ? "bookish-chapter-editor-caret-blink" : ""} ${!focused ? "bookish-chapter-editor-caret-disabled" : ""}`}
                             style={{
