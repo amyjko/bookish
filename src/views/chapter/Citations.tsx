@@ -1,12 +1,10 @@
-import React, { ChangeEvent, useContext, useEffect, useRef, useState } from 'react'
+import React, { useContext, useEffect } from 'react'
 import Marginal  from './Marginal'
 import Parser from '../../models/Parser'
 import { CitationsNode } from "../../models/CitationsNode"
 import { renderNode } from './Renderer'
 import { ChapterContext, ChapterContextType } from './Chapter'
 import Atom from '../editor/Atom'
-import { CaretContext } from '../editor/ChapterEditor'
-import Options from '../editor/Options'
 
 const Citations = (props: {node: CitationsNode}) => {
 
@@ -71,11 +69,6 @@ const Citations = (props: {node: CitationsNode}) => {
         }
     });
 
-    function handleChange(values: string[]) {
-        const citationSet = new Set<string>(values);
-        node.setMeta([...citationSet]);
-    }
-
     return <Atom
         node={node}
         textView={
@@ -105,15 +98,6 @@ const Citations = (props: {node: CitationsNode}) => {
                     }
                 />
             </span>
-        }
-        metaView={
-            !book ? undefined :
-            <Options
-                multiple={true}    
-                options={Object.keys(book.getReferences()).sort().map(citationID => { return { value: citationID, label: citationID }})}
-                values={node.getMeta()}
-                change={handleChange}
-            />
         }
         />;
 

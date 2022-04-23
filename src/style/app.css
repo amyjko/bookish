@@ -34,6 +34,7 @@
 
 .bookish-app-header a {
     display: inline-block;
+    margin-top: var(--bookish-app-chrome-spacing);
     margin-left: var(--bookish-app-chrome-spacing);
     margin-right: var(--bookish-app-chrome-spacing);
 }
@@ -69,11 +70,12 @@ input, button {
     color: var(--bookish-app-chrome-color);
 }
 
-input[type="email"], input[type="text"] {
+input[type="email"], input[type="text"], select {
     padding: var(--bookish-app-chrome-padding);
     border-radius: var(--bookish-app-chrome-roundedness);
     font-size: var(--bookish-app-chrome-font-size);
     border: 1px solid var(--bookish-app-chrome-border-color);
+    background-color: var(--bookish-app-chrome-background);
 }
 
 button {
@@ -268,8 +270,8 @@ input[type="text"].bookish-app-editable-error {
     text-decoration: none;
 }
 
-.bookish-editor-link-invalid {
-    background-color: var(--bookish-app-error-background);
+input[type=text].bookish-editor-text-invalid {
+    outline: 3px solid var(--bookish-app-error-color);
 }
 
 @keyframes atom-selected {
@@ -285,36 +287,6 @@ input[type="text"].bookish-app-editable-error {
     outline-offset: 2px;
 }
 
-.bookish-app-options {
-    display: inline-block;
-    width: 10em;
-    background-color: var(--bookish-app-chrome-background);
-    border: 1px solid var(--bookish-app-chrome-border-color);
-    border-radius: var(--bookish-app-chrome-roundedness);
-    max-height: 20em;
-    overflow-y: scroll;
-}
-
-.bookish-app-options-option {
-    display: flex;
-    width: 100%;
-    padding: var(--bookish-app-chrome-padding);
-    cursor: pointer;
-}
-
-.bookish-app-options-option-selected {
-    background-color: var(--bookish-app-chrome-border-color);
-}
-
-.bookish-app-options-option:hover {
-    background-color: var(--bookish-highlight-color);
-}
-
-.bookish-app-options-option span:first-child {
-    display: inline-block;
-    width: 1em;
-}
-
 .bookish-app-comment {
     background: var(--bookish-app-chrome-background);
     border: 1px solid var(--bookish-app-chrome-border-color);
@@ -326,42 +298,29 @@ input[type="text"].bookish-app-editable-error {
 }
 
 .bookish-app-switch {
-    position: absolute;
-}
-
-.bookish-app-left {
-    top: 0;
-    left: 0;
-    transform: translate(0, -100%);
-}
-
-.bookish-app-middle {
-    top: 0;
-    left: 50%;
-    transform: translate(-50%, -100%);
-}
-
-.bookish-app-right {
-    top: 0;
-    right: 0;
-    transform: translate(0, -100%);
+    font-family: var(--bookish-app-chrome-font-family);
+    font-size: var(--bookish-app-chrome-font-size);
 }
 
 .bookish-app-switch-option {
     display: inline-block;
     background-color: var(--bookish-app-chrome-background);
     cursor: pointer;
-    padding: var(--bookish-app-chrome-padding);
+    padding-left: var(--bookish-app-chrome-padding);
+    padding-right: var(--bookish-app-chrome-padding);
+    border: 1px solid var(--bookish-app-chrome-border-color);
 }
 
 .bookish-app-switch-option:first-child {
     border-top-left-radius: var(--bookish-app-chrome-roundedness);
     border-bottom-left-radius: var(--bookish-app-chrome-roundedness);
+    margin-left: var(--bookish-app-chrome-padding);
 }
 
 .bookish-app-switch-option:last-child {
     border-top-right-radius: var(--bookish-app-chrome-roundedness);
     border-bottom-right-radius: var(--bookish-app-chrome-roundedness);
+    margin-right: var(--bookish-app-chrome-padding);
 }
 
 .bookish-app-switch-option-selected {
@@ -374,13 +333,14 @@ input[type="text"].bookish-app-editable-error {
 
 .bookish-chapter-editor-toolbar {
     position: fixed;
-    bottom: 0;
+    top: 0;
     left: 0;
     right: 0;
     background: var(--bookish-background-color);
     border: 1px solid var(--bookish-app-chrome-border-color);
-    margin-top: var(--bookish-app-chrome-padding);
     padding: var(--bookish-app-chrome-padding);
+    font-family: var(--bookish-app-chrome-font-family);
+    font-size: var(--bookish-app-chrome-font-size);
 }
 
 .bookish-chapter-editor-toolbar svg {
@@ -393,14 +353,61 @@ input[type="text"].bookish-app-editable-error {
     font-size: 80%;
 }
 
-.bookish-chapter-editor-toolbar button:first-child {
+.bookish-chapter-editor-toolbar-group button:nth-child(2) {
     border-top-right-radius: 0;
 }
 
-.bookish-chapter-editor-toolbar button:last-child {
+.bookish-chapter-editor-toolbar-group button:last-child {
     border-bottom-left-radius: 0;
 }
 
-.bookish-chapter-editor-toolbar button:not(:first-child):not(:last-child) {
+.bookish-chapter-editor-toolbar-group button:not(:nth-child(2)):not(:last-child) {
     border-radius: 0;
+}
+
+.bookish-chapter-editor-toolbar input[type="text"] {
+    width: 10em;
+}
+
+.bookish-chapter-editor-toolbar hr {
+    margin-top: var(--bookish-app-chrome-padding);
+    margin-bottom: var(--bookish-app-chrome-padding);
+    line-height: 1em;
+}
+
+.bookish-chapter-editor-toolbar-icon {
+    display: inline-block;
+    margin-right: var(--bookish-app-chrome-padding);
+}
+
+.bookish-chapter-editor-toolbar-group {
+    display: inline-block;
+    margin-right: calc(2 * var(--bookish-app-chrome-padding));
+}
+
+.bookish-chapter-editor-toolbar-group input, 
+.bookish-chapter-editor-toolbar-group select {
+    margin-left: var(--bookish-app-chrome-padding);
+    margin-right: var(--bookish-app-chrome-padding);
+}
+
+.bookish-editor-link {
+    color: var(--bookish-link-color);
+    font-weight: var(--bookish-link-font-weight);
+}
+
+.bookish-editor-note {
+    font-size: small;
+    font-style: italic;
+    color: var(--bookish-app-chrome-muted);
+}
+
+.bookish-editor-note-error {
+    border-bottom: solid 1px var(--bookish-app-error-color);
+}
+
+.bookish-editor-select {
+    display: inline-block;
+    max-width: 20em;
+    margin-right: var(--bookish-app-chrome-padding);
 }

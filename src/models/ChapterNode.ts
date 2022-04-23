@@ -78,6 +78,10 @@ export class ChapterNode extends BlocksNode {
         return (this.getNodes().filter(n => n instanceof LabelNode) as LabelNode[]);
     }
 
+    hasLabel(labelID: string) {
+        return this.getLabels().find(label => label.getMeta() === labelID) !== undefined;
+    }
+
     getCitationNumber(citationID: string) {
         const index = Array.from(this.getCitations()).sort().indexOf(citationID);
         return index < 0 ? null : index + 1;

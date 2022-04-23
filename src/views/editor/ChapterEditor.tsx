@@ -16,10 +16,11 @@ import Toolbar from "./Toolbar";
 export const CaretContext = React.createContext<{ 
     range: CaretRange | undefined, 
     coordinate: { x: number, y: number} | undefined,
-    setCaretRange: Function
+    setCaretRange: Function,
+    forceUpdate: Function
 } | undefined>(undefined);
 
-export type CaretContext = {
+export type CaretState = {
     range: CaretRange,
     start: Caret,
     end: Caret,
@@ -306,7 +307,7 @@ const ChapterEditor = (props: { ast: ChapterNode }) => {
             caretRange.start.node.getParent()?.getParent() instanceof ParagraphNode
     }
 
-    function getCaretContext(): CaretContext | undefined {
+    function getCaretContext(): CaretState | undefined {
         if(caretRange === undefined)
             return undefined;
 
@@ -410,7 +411,7 @@ const ChapterEditor = (props: { ast: ChapterNode }) => {
         editorRef.current.focus();
 
         // If we've selected a non-TextNode, release it, so the browser is free to select a text node.
-        if(caretRange && !(caretRange.start.node instanceof TextNode)) {
+        if(caretRange && !(caretRange.start.node instanceof TextNode || caretRange.start.node instanceof AtomNode)) {
             setCaretRange(undefined);
         }
 
@@ -439,6 +440,13 @@ const ChapterEditor = (props: { ast: ChapterNode }) => {
         setMouseMoving(timeoutID);
     }
 
+    function forceUpdate() {
+
+        if(caretRange !== undefined)
+            setCaretRange({ start: caretRange.start, end: caretRange.end }); 
+
+    }
+
     const isSelection = caretRange && (caretRange.start.node !== caretRange.end.node || caretRange.start.index !== caretRange.end.index);
     const isItalic = caretRange && !isSelection && caretRange.start.node instanceof TextNode && caretRange.start.node.isItalic();
     const isBold = caretRange && !isSelection && caretRange.start.node instanceof TextNode && caretRange.start.node.isBold();
@@ -447,7 +455,7 @@ const ChapterEditor = (props: { ast: ChapterNode }) => {
 
     const context = getCaretContext();
 
-    return <CaretContext.Provider value={{ range: caretRange, coordinate: caretCoordinate, setCaretRange: setCaretRange }}>
+    return <CaretContext.Provider value={{ range: caretRange, coordinate: caretCoordinate, setCaretRange: setCaretRange, forceUpdate: forceUpdate }}>
             <div 
                 className="bookish-chapter-editor"
                 ref={editorRef}

@@ -18,7 +18,7 @@ import { QuoteNode } from "../../models/QuoteNode";
 import { RuleNode } from "../../models/RuleNode";
 import { TableNode } from "../../models/TableNode";
 import { TextNode } from "../../models/TextNode";
-import { CaretContext, CaretUtilities } from "./ChapterEditor";
+import { CaretState, CaretUtilities } from "./ChapterEditor";
 
 // From: https://thenounproject.com/browse/collection-icon/minio-text-editor-bold-13520/?p=1
 import Clear from "../svg/clear.svg";
@@ -49,9 +49,9 @@ export type Command = {
     shift: boolean,
     key?: string,
     code?: string,
-    active: (context: CaretContext) => boolean,
+    active: (context: CaretState) => boolean,
     handler: (
-        context: CaretContext,
+        context: CaretState,
         utilities: CaretUtilities,
         key: string) => CaretRange
 }

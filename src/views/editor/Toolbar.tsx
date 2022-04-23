@@ -1,6 +1,6 @@
-import React from "react";
+import React, { ReactNode } from "react";
 import { ChapterNode } from "../../models/ChapterNode";
-import { CaretContext } from "./ChapterEditor";
+import { CaretState } from "./ChapterEditor";
 import { Command, commands } from "./Commands";
 
 import Text from "../svg/text.svg";
@@ -8,6 +8,31 @@ import Hash from "../svg/hash.svg";
 import Level from "../svg/level.svg";
 import Block from "../svg/block.svg";
 import List from "../svg/list.svg";
+import LinkIcon from "../svg/link.svg";
+import Code from "../svg/code.svg";
+
+import { TextNode } from "../../models/TextNode";
+import { AtomNode } from "../../models/AtomNode";
+
+import { LinkNode } from "../../models/LinkNode";
+import { LabelNode } from "../../models/LabelNode";
+import { InlineCodeNode } from "../../models/InlineCodeNode";
+import { CitationsNode } from "../../models/CitationsNode";
+import { DefinitionNode } from "../../models/DefinitionNode";
+import { CodeNode } from "../../models/CodeNode";
+import { CalloutNode } from "../../models/CalloutNode";
+
+import LabelEditor from "./LabelEditor";
+import InlineCodeEditor from "./InlineCodeEditor";
+import CitationsEditor from "./CitationsEditor";
+import LinkEditor from "./LinkEditor";
+import DefinitionEditor from "./DefinitionEditor";
+import CaptionedCodeEditor from "./CaptionedCodeEditor";
+import CalloutEditor from "./CalloutEditor";
+import { QuoteNode } from "../../models/QuoteNode";
+import QuoteEditor from "./QuoteEditor";
+import { EmbedNode } from "../../models/EmbedNode";
+import EmbedEditor from "./EmbedEditor";
 
 const keyLabels: {[key: string]: string} = {
     "Digit0": "0",
@@ -43,7 +68,7 @@ const categoryIcons: {[key:string]: Function} = {
 
 const Toolbar = (props: { 
     chapter: ChapterNode, 
-    context: CaretContext, 
+    context: CaretState, 
     executor: (command: Command, key: string) => void
     },
 ) => {
@@ -71,15 +96,28 @@ const Toolbar = (props: {
         commandsByCategory[cat] = active.filter(command => command.category === cat);
     });
 
+    const caretNode = props.context.start.node;
+
+    const metaNode = 
+        caretNode instanceof AtomNode ? caretNode :
+        caretNode instanceof TextNode ? caretNode.getParent() : 
+        undefined;
+
+    const calloutNode = caretNode.getClosestParentMatching(p => p instanceof CalloutNode) as CalloutNode;
+    const quoteNode = caretNode.getClosestParentMatching(p => p instanceof QuoteNode) as QuoteNode;
+    const embedNode = caretNode.getClosestParentMatching(p => p instanceof EmbedNode) as EmbedNode;
+
+    function wrapIcon(icon: Function) {
+        return <span className='bookish-chapter-editor-toolbar-icon'>{icon.call(undefined)}</span>;
+    }
+
     // Render command categories.
-    return <div className="bookish-chapter-editor-toolbar">
+    return <div className="bookish-chapter-editor-toolbar">        
         {
             categories.map((cat, index) => 
                 commandsByCategory[cat].length === 0 ?
                     null :
-                    <span key={cat}>
-                        <span>{ cat in categoryIcons ? categoryIcons[cat].call(undefined) : cat }&nbsp;&nbsp;</span>
-                        <span>
+                    <ToolbarGroup row={categoryOrder[cat] > 7} key={cat} icon={ cat in categoryIcons ? wrapIcon(categoryIcons[cat]) : cat.charAt(0).toUpperCase() + cat.slice(1) }>
                         {
                             commandsByCategory[cat]
                                 // Convert commands into buttons
@@ -93,12 +131,36 @@ const Toolbar = (props: {
                                     </button>
                                 )
                         }
-                        </span>
-                        &nbsp;&nbsp;&nbsp;&nbsp;
-                    </span>
+                    </ToolbarGroup>
             )
         }
+        { metaNode instanceof LinkNode ? <ToolbarGroup row={true} icon={wrapIcon(LinkIcon)}><LinkEditor link={metaNode}/></ToolbarGroup> : null }
+        { metaNode instanceof LabelNode ? <ToolbarGroup row={true} icon="Label"><LabelEditor label={metaNode}/></ToolbarGroup> : null }
+        { metaNode instanceof InlineCodeNode ? <ToolbarGroup row={true} icon={wrapIcon(Code)}><InlineCodeEditor code={metaNode}/></ToolbarGroup> : null }
+        { metaNode instanceof CitationsNode ? <ToolbarGroup row={true} icon="Citations"><CitationsEditor citations={metaNode}/></ToolbarGroup> : null }
+        { metaNode instanceof DefinitionNode ? <ToolbarGroup row={true} icon="Glossary"><DefinitionEditor definition={metaNode}/></ToolbarGroup> : null }
+        { metaNode instanceof CodeNode ? <ToolbarGroup row={true} icon={wrapIcon(Code)}><CaptionedCodeEditor code={props.context.start.node.getParent() as CodeNode}/></ToolbarGroup> : null }
+        { calloutNode ? <ToolbarGroup row={true} icon="Callout"><CalloutEditor callout={calloutNode} /></ToolbarGroup> : null }
+        { quoteNode ? <ToolbarGroup row={true} icon="Quote"><QuoteEditor quote={quoteNode} /></ToolbarGroup> : null }
+        { embedNode ? <ToolbarGroup row={true} icon="Image/Video"><EmbedEditor embed={embedNode} /></ToolbarGroup> : null }
+
     </div>
+
+}
+
+const ToolbarGroup = (props: {
+    row: boolean,
+    icon: ReactNode,
+    children: React.ReactNode
+}) => {
+
+    return <>
+        { props.row ? <hr/> : null }
+        <div className="bookish-chapter-editor-toolbar-group">
+            <span className="bookish-chapter-editor-toolbar-icon">{props.icon}</span>
+            { props.children }
+        </div>
+    </>
 
 }
 

@@ -5,9 +5,7 @@ import Python from './Python'
 import { CodeNode } from "../../models/CodeNode"
 import { EditorContext } from '../page/Book'
 import { CaretContext } from '../editor/ChapterEditor'
-import Switch from '../editor/Switch'
 import { Position } from "../../models/Position"
-import Options from '../editor/Options'
 import PositionEditor from '../editor/PositionEditor'
 
 const CaptionedCode = (props: { node: CodeNode}) => {
@@ -51,35 +49,6 @@ const CaptionedCode = (props: { node: CodeNode}) => {
                 : 
                 null
         }
-        { editing ?
-            <>
-                <PositionEditor
-                    value={position}
-                    edit={(value: string) => { 
-                        node.setPosition(value as Position); 
-                        // Force an update since the caret position changed.
-                        if(caret.range) 
-                            caret.setCaretRange({ start: caret.range.start, end: caret.range.end })} 
-                    } 
-                />
-                <Options
-                    multiple={false}
-                    options={languages.map(lang => { return { value: lang.toLocaleLowerCase(), label: lang }})}
-                    values={[language]}
-                    change={(values: string[]) => node.setLanguage(values[0])}
-                />
-                { language !== "python" ? null : 
-                    <Switch
-                        options={["executable", "read only"]}
-                        value={executable ? "executable" : "read only"}
-                        position=">"
-                        edit={(value: string) => node.setExecutable(value === "executable")}
-                    />
-                }
-            </>
-             :
-             null
-        }        
 
     </div>
 

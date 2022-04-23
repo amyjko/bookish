@@ -16,7 +16,7 @@ import Book from '../../models/Book'
 import ChapterModel from '../../models/Chapter'
 import { EditorContext } from '../page/Book';
 import TextEditor from '../editor/TextEditor';
-import ChapterEditor, { CaretContext } from '../editor/ChapterEditor';
+import ChapterEditor from '../editor/ChapterEditor';
 
 export type ChapterContextType = {
 	book?: Book, 

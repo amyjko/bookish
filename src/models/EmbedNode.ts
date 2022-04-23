@@ -28,6 +28,8 @@ export class EmbedNode extends Node<BlockParentNode> {
     getCredit() { return this.#credit; }
     getPosition() { return this.#position; }
 
+    setURL(url: string) { this.#url = url; }
+    setDescription(description: string) { this.#description = description; }
     setCaption(caption: FormattedNode) { this.#caption = caption; }
     setCredit(credit: FormattedNode) { this.#credit = credit; }
     setPosition(position: Position) { this.#position = position; }

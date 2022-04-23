@@ -1,4 +1,4 @@
-import React, { ChangeEvent, useContext } from 'react'
+import React, { useContext } from 'react'
 import { ChapterContext } from './Chapter'
 import { LabelNode } from "../../models/LabelNode"
 import Atom from '../editor/Atom';
@@ -18,32 +18,9 @@ const Label = (props: { node: LabelNode }) => {
         {editable ? "•" : ""}
     </span>
 
-    function handleChange(e: ChangeEvent<HTMLInputElement>) {
-
-        // Update the model
-        node.setMeta(e.target.value);
-
-    }
-
-    function isValid() { 
-
-        // At least one character and only appears once.
-        return node.getMeta().length > 0 && context.chapter && context.chapter.getLabels().filter(label => label.getMeta() === node.getMeta()).length === 1;
-
-    }
-
     return <Atom
         node={node}
         textView={label}
-        metaView={
-            <input 
-                type="text"
-                className={isValid() ? "" : "bookish-editor-link-invalid"}
-                value={node.getMeta()}
-                onChange={handleChange}
-                placeholder="label ID"
-            />
-        }
     />;
 }
 

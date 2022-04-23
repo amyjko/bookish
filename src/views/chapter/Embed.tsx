@@ -1,8 +1,6 @@
 import React, { useContext } from 'react';
 import { EmbedNode } from "../../models/EmbedNode";
-import { Position } from '../../models/Position';
 import { CaretContext } from '../editor/ChapterEditor';
-import PositionEditor from '../editor/PositionEditor';
 import { EditorContext } from '../page/Book';
 import { renderNode, renderPosition } from './Renderer';
 
@@ -17,12 +15,11 @@ const Embed = (props: { node: EmbedNode }) => {
 
 	const { editable } = useContext(EditorContext);
     const caret = useContext(CaretContext);
-    const editing = editable && caret && caret.range && caret.range.start.node.getClosestParentMatching(p => p === node);
 
 	return <div className={"bookish-figure " + renderPosition(position)} data-nodeid={props.node.nodeID}>
 			{
 				url.trim().length === 0 ?
-					<div className="bookish-figure-unspecified">{ editable ? "Specify an image or video URL." : "No image or video URL."}</div>
+					<div className="bookish-figure-unspecified">{ editable ? "Specify an image or video URL above." : "No image or video specified."}</div>
 				:
 				url.includes("https://www.youtube.com") || 
 				url.includes("https://youtu.be") || 
@@ -44,20 +41,6 @@ const Embed = (props: { node: EmbedNode }) => {
 					/>
 			}
 			<div className="bookish-figure-caption"><div className="bookish-figure-credit">{renderNode(credit)}</div>{renderNode(caption)}</div>
-			{ 
-			editing ?
-				<PositionEditor
-					value={position}
-					edit={(value: string) => { 
-						node.setPosition(value as Position); 
-						// Force an update since the caret position changed.
-						if(caret.range) 
-							caret.setCaretRange({ start: caret.range.start, end: caret.range.end })} 
-					} 
-				/>
-				:
-				null
-			}
 		</div>
 
 }

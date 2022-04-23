@@ -53,7 +53,6 @@ const Comment = (props: { node: CommentNode }) => {
             :
             <></>
         }
-        metaView={<></>}
     />;
 
 }

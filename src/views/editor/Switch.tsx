@@ -1,4 +1,5 @@
-import React from 'react'
+import React, { useContext } from 'react'
+import { CaretContext } from './ChapterEditor';
 
 const Switch = (props: { 
     options: string[],
@@ -8,7 +9,9 @@ const Switch = (props: {
 }) => {
 
     const { value, edit, position } = props;
- 
+
+    const caret = useContext(CaretContext);
+
     function handleClick(event: React.MouseEvent) {
 
         // Don't let anything else handle the click.
@@ -18,9 +21,13 @@ const Switch = (props: {
             edit.call(undefined, newValue);
         }
 
+        // Force an update on the chapter.
+        if(caret)
+            caret.forceUpdate();
+
     }
 
-    return <div className={`bookish-app-switch bookish-app-${position === "<" ? "left" : position === ">" ? "right" : "middle"}`}>
+    return <span className={`bookish-app-switch bookish-app-${position === "<" ? "left" : position === ">" ? "right" : "middle"}`}>
         {
             props.options.map((option, index) =>
                 <span 
@@ -32,7 +39,7 @@ const Switch = (props: {
                 </span>
             )
         }
-    </div>
+    </span>
 
 }
 
