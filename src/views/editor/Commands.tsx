@@ -25,7 +25,6 @@ import Clear from "../svg/clear.svg";
 import Bold from "../svg/bold.svg";
 import Italic from "../svg/italic.svg";
 import Link from "../svg/link.svg";
-import Unlink from "../svg/unlink.svg";
 import Media from "../svg/media.svg";
 import Subscript from "../svg/sub.svg";
 import Superscript from "../svg/super.svg";

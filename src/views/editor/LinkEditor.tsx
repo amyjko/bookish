@@ -3,6 +3,9 @@ import { LinkNode } from "../../models/LinkNode";
 import { ChapterContext } from "../chapter/Chapter";
 import URLEditor from "./URLEditor";
 
+import Unlink from "../svg/unlink.svg";
+import { CaretContext } from "./ChapterEditor";
+
 const LinkEditor = (props: {
     link: LinkNode
 }) => {
@@ -10,6 +13,7 @@ const LinkEditor = (props: {
     const chapter = useContext(ChapterContext);
     const link = props.link;
     const [ editedURL, setEditedURL ] = useState<string>(link.getMeta());
+    const caret = useContext(CaretContext);
 
     function handleChapterChange(e: ChangeEvent<HTMLSelectElement>) {
 
@@ -52,6 +56,16 @@ const LinkEditor = (props: {
     }
 
     return <span>
+        <button title="Remove link."
+            onClick={(e) => {
+                if(chapter && chapter.chapter && caret && caret.range) {
+                    const newCaret = chapter.chapter.toggleAtom(caret.range, LinkNode, (parent, text) => new LinkNode(parent, text));
+                    caret.setCaretRange({ start: newCaret, end: newCaret });
+                }
+            }}
+        >
+            <Unlink/>
+        </button>
         <select name="chapterID" onChange={handleChapterChange} value={editedURL}>
             <option key="url" value="">URL</option>
             {/* Convert each chapter into a chapter link and a link for all the chapter's labels */}
