@@ -386,8 +386,8 @@ const ChapterEditor = (props: { ast: ChapterNode }) => {
         });
 
         if(unmatched) {
-            // Insert any non-control character! This is a bit hacky: all but "Fn" are more than three characters.
-            if(context.chapter !== undefined && event.key.length === 1) {
+            // If there's no modifier key pressed, and the key is one character, insert the character! This is a bit hacky: all but "Fn" are more than three characters.
+            if(context.chapter !== undefined && !event.metaKey && !event.ctrlKey && !event.altKey && event.key.length === 1) {
                 const caret = context.chapter.insertSelection(event.key, context.range);
                 setCaretRange({ start: caret, end: caret });
                 return true;
