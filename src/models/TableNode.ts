@@ -102,7 +102,7 @@ export class TableNode extends Node<BlockParentNode> {
 
         for(let c = 0; c < columnCount; c++) {
             const format = new FormattedNode(this, "", []);
-            format.addSegment(new TextNode(format, "", 0));
+            format.addSegment(new TextNode(format, ""));
             column.push(format);
         }
 
@@ -137,7 +137,7 @@ export class TableNode extends Node<BlockParentNode> {
         // Figure out how many rows the table has and add a column 
         for(let r = 0; r < this.#rows.length; r++) {
             const format = new FormattedNode(this, "", []);
-            format.addSegment(new TextNode(format, "", 0));
+            format.addSegment(new TextNode(format, ""));
             this.#rows[r].splice(index, 0, format);
         }
 

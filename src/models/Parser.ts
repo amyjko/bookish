@@ -807,7 +807,7 @@ export default class Parser {
                 let text = "";
                 while(this.more() && (!awaiting || !this.nextIs(awaiting)) && !this.nextIsContentDelimiter() && !this.nextIs("\n"))
                     text = text + this.read();
-                segments.push(new TextNode(content, text, this.index));
+                segments.push(new TextNode(content, text));
             }
 
             // If we've reached a delimiter we're waiting for, then stop parsing, so it can handle it. Otherwise, we'll keep reading.
@@ -937,7 +937,7 @@ export default class Parser {
             if(this.nextIsContentDelimiter()) {
                 // If the text is a non-empty string, make a text node with what we've accumulated.
                 if(text !== "")
-                    segments.push(new TextNode(node, text, this.index));
+                    segments.push(new TextNode(node, text));
                 // Parse the formatted content.
                 segments.push(this.parseContent(node, awaiting));
                 // Reset the accumulator.
@@ -951,7 +951,7 @@ export default class Parser {
 
         // If there's more text, save it!
         if(text !== "")
-            segments.push(new TextNode(node, text, this.index));
+            segments.push(new TextNode(node, text));
 
         // Read the closing delimeter
         if(this.nextIs(delimeter))
@@ -1100,7 +1100,7 @@ export default class Parser {
         this.read();
         const char = this.read();
         if(char)
-            return new TextNode(chapter, char, this.index);
+            return new TextNode(chapter, char);
 
         return new ErrorNode(chapter, undefined, "Unterminated escape.");
 

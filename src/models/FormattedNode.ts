@@ -44,7 +44,7 @@ export class FormattedNode extends Node<FormattedNodeParent> {
     }
 
     addEmptyText() {
-        this.addSegment(new TextNode(this, "", 0));
+        this.addSegment(new TextNode(this, ""));
     }
 
     traverseChildren(fn: (node: Node) => void): void {
@@ -394,9 +394,9 @@ export class FormattedNode extends Node<FormattedNodeParent> {
                 const parent = text.getParent();
                 if(parent instanceof FormattedNode) {
                     const formattedMiddle = new FormattedNode(parent, format, []);
-                    const left = new TextNode(parent, text.getText().substring(0, text === range.start.node ? range.start.index : 0), 0);
-                    const middle = new TextNode(formattedMiddle, text.getText().substring(text === range.start.node ? range.start.index : 0, text === range.end.node ? range.end.index : text.getLength()), 0);
-                    const right = new TextNode(parent, text.getText().substring(text === range.end.node ? range.end.index : text.getLength()), 0);
+                    const left = new TextNode(parent, text.getText().substring(0, text === range.start.node ? range.start.index : 0));
+                    const middle = new TextNode(formattedMiddle, text.getText().substring(text === range.start.node ? range.start.index : 0, text === range.end.node ? range.end.index : text.getLength()));
+                    const right = new TextNode(parent, text.getText().substring(text === range.end.node ? range.end.index : text.getLength()));
                     formattedMiddle.addSegment(middle);
                     parent.#segments.splice(parent.#segments.indexOf(text), 1, left, formattedMiddle, right);
 
@@ -418,9 +418,9 @@ export class FormattedNode extends Node<FormattedNodeParent> {
                 // 1. Split the text node along the selection
                 const parent = text.getParent();
                 if(parent instanceof FormattedNode) {
-                    const left = new TextNode(parent, text.getText().substring(0, text === range.start.node ? range.start.index : 0), 0);
-                    const middle = new TextNode(parent, text.getText().substring(text === range.start.node ? range.start.index : 0, text === range.end.node ? range.end.index : text.getLength()), 0);
-                    const right = new TextNode(parent, text.getText().substring(text === range.end.node ? range.end.index : text.getLength()), 0);
+                    const left = new TextNode(parent, text.getText().substring(0, text === range.start.node ? range.start.index : 0));
+                    const middle = new TextNode(parent, text.getText().substring(text === range.start.node ? range.start.index : 0, text === range.end.node ? range.end.index : text.getLength()));
+                    const right = new TextNode(parent, text.getText().substring(text === range.end.node ? range.end.index : text.getLength()));
                     parent.#segments.splice(parent.#segments.indexOf(text), 1, left, middle, right);
 
                     // Remember the new empty text node
@@ -525,8 +525,8 @@ export class FormattedNode extends Node<FormattedNodeParent> {
             return caret;
 
         // Splice the text node.
-        const left = new TextNode(this, caret.node.getText().substring(0, caret.index), 0);
-        const right = new TextNode(this, caret.node.getText().substring(caret.index), 0);
+        const left = new TextNode(this, caret.node.getText().substring(0, caret.index));
+        const right = new TextNode(this, caret.node.getText().substring(caret.index));
 
         // Insert the new left, right and middle
         this.#segments.splice(index, 1, left, segment, right);

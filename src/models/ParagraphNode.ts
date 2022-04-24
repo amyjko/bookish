@@ -14,7 +14,7 @@ export class ParagraphNode extends Node<BlockParentNode> {
         super(parent, "paragraph");
         this.#content = new FormattedNode(this, "", []);
         // An empty text node to start.
-        this.#content.addSegment(new TextNode(this.#content, "", 0));
+        this.#content.addSegment(new TextNode(this.#content, ""));
 
         // Assign whatever level is given.
         this.#level = level;
@@ -194,7 +194,7 @@ export class ParagraphNode extends Node<BlockParentNode> {
         this.#content.clean();
         // Make sure the paragraph always has an empty text node so that it's navigable.
         if(this.#content.getSegments().length === 0)
-            this.#content.addSegment(new TextNode(this.#content, "", 0));
+            this.#content.addSegment(new TextNode(this.#content, ""));
     }
     
 }

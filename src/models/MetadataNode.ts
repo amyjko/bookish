@@ -11,7 +11,7 @@ export abstract class MetadataNode<MetaType> extends Node<FormattedNode> {
     
     constructor(parent: FormattedNode, text: string, meta: MetaType, type: NodeType) {
         super(parent, type);
-        this.#text = new TextNode(this, text, 0);
+        this.#text = new TextNode(this, text);
         this.#meta = meta;
     }
 
@@ -19,7 +19,7 @@ export abstract class MetadataNode<MetaType> extends Node<FormattedNode> {
     setMeta(meta: MetaType) { this.#meta = meta; }
 
     getText() { return this.#text; }
-    setText(text: string) { this.#text = new TextNode(this, text, 0); }
+    setText(text: string) { this.#text = new TextNode(this, text); }
 
     traverseChildren(fn: (node: Node) => void): void { this.#text.traverse(fn); }
     replaceChild(node: Node, replacement: Node): void {}

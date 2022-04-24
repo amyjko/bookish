@@ -12,15 +12,11 @@ export type TextNodeParent = FormattedNode | MetadataNode<any> | CodeNode;
 export class TextNode extends Node<TextNodeParent> {
 
     #text: string;
-    #position: number;
 
-    constructor(parent: TextNodeParent, text: string, position: number) {
+    constructor(parent: TextNodeParent, text: string) {
         super(parent, "text");
         this.#text = text;
-        this.#position = position - text.length;
     }
-
-    getPosition() { return this.#position; }
 
     getText() { return this.#text; }
     getLength() { return this.#text.length; }
@@ -56,7 +52,7 @@ export class TextNode extends Node<TextNodeParent> {
     getSiblingOf(child: Node, next: boolean) { return undefined; }
 
     copy(parent: FormattedNode) {
-        return new TextNode(parent, this.#text, this.#position)
+        return new TextNode(parent, this.#text)
     }
 
     insert(char: string, index: number): Caret {

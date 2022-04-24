@@ -22,7 +22,6 @@ const Text = (props: { node: TextNode}) => {
 
     const { node } = props;
 
-    const position = node.getPosition();
     let text = node.getText();
     
     const context = useContext(ChapterContext);
@@ -72,7 +71,7 @@ const Text = (props: { node: TextNode}) => {
     }
 
     // Otherwise, just return the text as a span with metadata.
-    return <span ref={ref} className={"bookish-text"} data-position={position} data-nodeid={props.node.nodeID}>{text}</span>;
+    return <span ref={ref} className={"bookish-text"} data-nodeid={props.node.nodeID}>{text}</span>;
 
 }
 

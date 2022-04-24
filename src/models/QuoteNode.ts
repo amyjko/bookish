@@ -17,7 +17,7 @@ export class QuoteNode extends BlocksNode {
         this.#position = "|";
 
         this.#credit = new FormattedNode(this, "", []);
-        this.#credit.addSegment(new TextNode(this.#credit, "", 0));
+        this.#credit.addSegment(new TextNode(this.#credit, ""));
         
     }
 

@@ -5,7 +5,7 @@ import { TextNode } from "./TextNode";
 export class FootnoteNode extends AtomNode<FormattedNode> {
 
     constructor(parent: FormattedNode, text: string = "") {
-        super(parent, new FormattedNode(parent, "", [ new TextNode(parent, text, 0)]), "footnote");
+        super(parent, new FormattedNode(parent, "", [ new TextNode(parent, text)]), "footnote");
         // Hack: can't pass this before calling super.
         this.getMeta().setParent(this);        
         this.getMeta().getSegments()[0].setParent(this.getMeta());

@@ -15,7 +15,7 @@ export class CodeNode extends Node<BlockParentNode> {
     constructor(parent: BlockParentNode, code: string, language: string, position: Position) {
         super(parent, "code");
 
-        this.#code = new TextNode(this, code, 0);
+        this.#code = new TextNode(this, code);
         this.#position = position;
         this.#language = language ? language : "plaintext";
         this.#executable = language.charAt(language.length - 1) === "!";
@@ -24,7 +24,7 @@ export class CodeNode extends Node<BlockParentNode> {
             this.#language = this.#language.slice(0, -1);
 
         this.#caption = new FormattedNode(this, "", []);
-        this.#caption.addSegment(new TextNode(this.#caption, "", 0));    
+        this.#caption.addSegment(new TextNode(this.#caption, ""));    
 
     }
 

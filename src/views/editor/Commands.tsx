@@ -771,7 +771,7 @@ export const commands: Command[] = [
 
                 // Set a default caption
                 const caption = new FormattedNode(table, "", []);
-                caption.addSegment(new TextNode(caption, "", 0));
+                caption.addSegment(new TextNode(caption, ""));
                 table.setCaption(caption);
 
                 // Insert table
