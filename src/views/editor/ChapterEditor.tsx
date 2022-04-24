@@ -185,7 +185,8 @@ const ChapterEditor = (props: { ast: ChapterNode }) => {
             if(parent && parent.dataset.nodeid) {
                 const node = ast.getNode(parseInt(parent.dataset.nodeid));
                 if(node instanceof TextNode)
-                    return { node: node, index: rangeIndex };
+                    // Account for the zero-width spaces that we insert in order to make selections possible on empty text nodes.
+                    return { node: node, index: Math.min(rangeIndex, node.getLength()) };
             }
         }
         // If it's an element, see if it has a nodeID and handle it accordingly.
