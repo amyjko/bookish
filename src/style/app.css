@@ -146,8 +146,10 @@ input[type="text"].bookish-app-editable, textarea.bookish-app-editable {
     width: auto;
 }
 
-textarea:focus, input:focus, div[contenteditable="true"]:focus {
+textarea:focus, input:focus, button:focus, select:focus {
     outline: 2px solid var(--bookish-highlight-color);
+    position: relative;
+    z-index: 2;
 }
 
 textarea.bookish-app-editable {
@@ -208,7 +210,8 @@ input[type="text"].bookish-app-editable-error {
 }
 
 .bookish-chapter-editor:focus {
-    outline: none;
+    outline: 2px solid var(--bookish-highlight-color);
+    outline-offset: var(--bookish-app-chrome-padding);
 }
 
 .bookish-chapter-editor-caret {
@@ -271,8 +274,15 @@ input[type="text"].bookish-app-editable-error {
 }
 
 input[type=text].bookish-editor-text-invalid {
-    outline: 3px solid var(--bookish-app-error-color);
+    animation: invalid 1s infinite;
 }
+
+@keyframes invalid {
+    0% { background-color: var(--bookish-app-error-background); }
+    50% { background-color: var(--bookish-app-chrome-background); }
+    100% { background-color: var(--bookish-app-error-background); }
+}
+
 
 @keyframes atom-selected {
     from, to { outline-width: 2px; }
@@ -357,7 +367,7 @@ input[type=text].bookish-editor-text-invalid {
     font-size: 80%;
 }
 
-.bookish-chapter-editor-toolbar-group button:nth-child(2) {
+.bookish-chapter-editor-toolbar-group button:first-of-type {
     border-top-right-radius: 0;
 }
 
@@ -365,7 +375,7 @@ input[type=text].bookish-editor-text-invalid {
     border-bottom-left-radius: 0;
 }
 
-.bookish-chapter-editor-toolbar-group button:not(:nth-child(2)):not(:last-child) {
+.bookish-chapter-editor-toolbar-group button:not(:first-of-type):not(:last-child) {
     border-radius: 0;
 }
 

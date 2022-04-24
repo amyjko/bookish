@@ -1,4 +1,4 @@
-import React, { ReactNode } from "react";
+import React, { ReactNode, RefObject } from "react";
 import { ChapterNode } from "../../models/ChapterNode";
 import { CaretState } from "./ChapterEditor";
 import { Command, commands } from "./Commands";
@@ -67,6 +67,7 @@ const categoryIcons: {[key:string]: Function} = {
 }
 
 const Toolbar = (props: { 
+    focused: boolean,
     chapter: ChapterNode, 
     context: CaretState, 
     executor: (command: Command, key: string) => void
@@ -111,10 +112,22 @@ const Toolbar = (props: {
         return <span className='bookish-chapter-editor-toolbar-icon'>{icon.call(undefined)}</span>;
     }
 
+    function handleKeyDown(event: React.KeyboardEvent) {
+        // Return focus to th editor if someone presses an unhandled enter
+        if(event.key === "Enter") {
+            const editor = document.querySelector(".bookish-chapter-editor");
+            if(editor instanceof HTMLElement) {
+                event.stopPropagation();
+                editor.focus();
+            }
+            return true;
+        }
+    }
+
     // Render command categories.
-    return <div className="bookish-chapter-editor-toolbar">        
+    return <div className="bookish-chapter-editor-toolbar" onKeyDown={handleKeyDown}>
         {
-            categories.map((cat, index) => 
+            categories.map(cat => 
                 commandsByCategory[cat].length === 0 ?
                     null :
                     <ToolbarGroup row={categoryOrder[cat] > 7} key={cat} icon={ cat in categoryIcons ? wrapIcon(categoryIcons[cat]) : cat.charAt(0).toUpperCase() + cat.slice(1) }>

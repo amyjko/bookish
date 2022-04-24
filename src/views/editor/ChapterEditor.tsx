@@ -50,6 +50,7 @@ const ChapterEditor = (props: { ast: ChapterNode }) => {
     const [ lastInputTime, setLastInputTime ] = useState<number>(0);
     const [ keyboardIdle, setKeyboardIdle ] = useState<boolean>(true);
     const [ mouseMoving, setMouseMoving ] = useState<ReturnType<typeof setTimeout> | undefined>(undefined);
+    const [ toolbarFocused, setToolbarFocused ] = useState<boolean>(false);
 
     useEffect(() => {
 
@@ -384,11 +385,28 @@ const ChapterEditor = (props: { ast: ChapterNode }) => {
         });
 
         if(unmatched) {
-            // Insert any non control character! This is a bit hacky: all but "Fn" are more than three characters.
+            // Insert any non-control character! This is a bit hacky: all but "Fn" are more than three characters.
             if(context.chapter !== undefined && event.key.length === 1) {
                 const caret = context.chapter.insertSelection(event.key, context.range);
                 setCaretRange({ start: caret, end: caret });
+                return true;
             }
+            // Toolbar navigation
+            else if(event.key === "Tab") {
+                event.preventDefault();
+                event.stopPropagation();
+                const controls = [
+                    document.querySelector(".bookish-chapter-editor-toolbar input"),
+                    document.querySelector(".bookish-chapter-editor-toolbar select"),
+                    document.querySelector(".bookish-chapter-editor-toolbar button")
+                ];
+                const match = controls.find(control => control && control instanceof HTMLElement);
+                if(match && match instanceof HTMLElement) {
+                    match.focus();
+                    return true;
+                }        
+            }
+
         }
 
     }
@@ -487,7 +505,7 @@ const ChapterEditor = (props: { ast: ChapterNode }) => {
                         </div> : null
                 }
                 { renderNode(props.ast) }
-                { context && caretCoordinate ? <Toolbar chapter={props.ast} context={context} executor={executeCommand}></Toolbar> : null }
+                { context && caretCoordinate ? <Toolbar focused={toolbarFocused} chapter={props.ast} context={context} executor={executeCommand}></Toolbar> : null }
                 
             </div>
         </CaretContext.Provider>

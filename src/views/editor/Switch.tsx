@@ -30,13 +30,13 @@ const Switch = (props: {
     return <span className={`bookish-app-switch bookish-app-${position === "<" ? "left" : position === ">" ? "right" : "middle"}`}>
         {
             props.options.map((option, index) =>
-                <span 
+                <button 
                     key={`option-${index}`} 
                     className={`bookish-app-switch-option ${value === option ? "bookish-app-switch-option-selected" : ""}`} 
                     data-value={option} 
                     onClick={handleClick}>
                         {option}
-                </span>
+                </button>
             )
         }
     </span>
