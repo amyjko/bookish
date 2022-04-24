@@ -1,18 +1,18 @@
 import { Node } from "./Node";
 import { BlockParentNode } from "./BlockParentNode";
 import { Position } from "./Position";
-import { FormattedNode } from "./FormattedNode";
+import { FormatNode } from "./FormatNode";
 import { TextNode } from "./TextNode";
 
 export type Location = { row: number, column: number };
 
 export class TableNode extends Node<BlockParentNode> {
 
-    #rows: FormattedNode[][];
-    #caption: FormattedNode | undefined;
+    #rows: FormatNode[][];
+    #caption: FormatNode | undefined;
     #position: Position;
 
-    constructor(parent: BlockParentNode, rows: FormattedNode[][]) {
+    constructor(parent: BlockParentNode, rows: FormatNode[][]) {
         super(parent, "table");
         this.#rows = rows;
         this.#position = "|";
@@ -30,7 +30,7 @@ export class TableNode extends Node<BlockParentNode> {
     }
 
     getCaption() { return this.#caption; }
-    setCaption(caption: FormattedNode) {
+    setCaption(caption: FormatNode) {
         this.#caption = caption;
     }
 
@@ -50,16 +50,16 @@ export class TableNode extends Node<BlockParentNode> {
 
     removeChild(node: Node): void {}
 
-    replaceChild(node: Node, replacement: FormattedNode): void {}
+    replaceChild(node: Node, replacement: FormatNode): void {}
 
     getSiblingOf(child: Node, next: boolean) { return undefined; }
 
     copy(parent: BlockParentNode): TableNode {
-        const rows: FormattedNode[][] = [];
+        const rows: FormatNode[][] = [];
         const node = new TableNode(parent, rows);
         if(this.#caption) node.setCaption(this.#caption.copy(node))
         this.#rows.forEach(row => {
-            const cells: FormattedNode[] = []
+            const cells: FormatNode[] = []
             row.forEach(cell => cells.push(cell.copy(node)))
             rows.push(cells)
         })
@@ -69,7 +69,7 @@ export class TableNode extends Node<BlockParentNode> {
 
     clean() {}
 
-    locate(format: FormattedNode): Location | undefined {
+    locate(format: FormatNode): Location | undefined {
 
         for(let r = 0; r < this.#rows.length; r++) {
             const row = this.#rows[r];
@@ -82,7 +82,7 @@ export class TableNode extends Node<BlockParentNode> {
 
     }
 
-    getCell(row: number, col: number): FormattedNode | undefined {
+    getCell(row: number, col: number): FormatNode | undefined {
 
         return row >= 0 && row < this.#rows.length && this.#rows.length > 0 && col >= 0 && col < this.#rows[0].length ?
             this.#rows[row][col] :
@@ -96,12 +96,12 @@ export class TableNode extends Node<BlockParentNode> {
             throw Error("Invalid table index");
 
         // Figure out how many columns the first row has, then create a row with that many columns
-        // and an empty FormattedNode.
+        // and an empty FormatNode.
         const columnCount = this.#rows.length === 0 ? 0 : this.#rows[0].length;
-        const column: FormattedNode[] = [];
+        const column: FormatNode[] = [];
 
         for(let c = 0; c < columnCount; c++) {
-            const format = new FormattedNode(this, "", []);
+            const format = new FormatNode(this, "", []);
             format.addSegment(new TextNode(format, ""));
             column.push(format);
         }
@@ -136,7 +136,7 @@ export class TableNode extends Node<BlockParentNode> {
 
         // Figure out how many rows the table has and add a column 
         for(let r = 0; r < this.#rows.length; r++) {
-            const format = new FormattedNode(this, "", []);
+            const format = new FormatNode(this, "", []);
             format.addSegment(new TextNode(format, ""));
             this.#rows[r].splice(index, 0, format);
         }

@@ -7,7 +7,7 @@ import { FootnoteNode } from "./FootnoteNode";
 import { EmbedNode } from "./EmbedNode";
 import { Node } from "./Node";
 import { ParagraphNode } from "./ParagraphNode";
-import { Format, FormattedNode, FormattedNodeSegmentType } from "./FormattedNode";
+import { Format, FormatNode, FormatNodeSegmentType } from "./FormatNode";
 import { MetadataNode } from "./MetadataNode";
 import { AtomNode } from "./AtomNode";
 import { CitationsNode } from "./CitationsNode";
@@ -202,7 +202,7 @@ export class ChapterNode extends BlocksNode {
         
     }
 
-    insertNodeAtSelection(range: CaretRange, nodeCreator: (parent: FormattedNode, text: string) => FormattedNodeSegmentType): Caret {
+    insertNodeAtSelection(range: CaretRange, nodeCreator: (parent: FormatNode, text: string) => FormatNodeSegmentType): Caret {
 
         let caret = range.start;
 
@@ -210,8 +210,8 @@ export class ChapterNode extends BlocksNode {
         if(!(caret.node instanceof TextNode))
             return caret;
 
-        // Get the nearest FormattedNode parent of the selected text.
-        const formatted = caret.node.getClosestParentMatching(p => p instanceof FormattedNode) as FormattedNode;
+        // Get the nearest FormatNode parent of the selected text.
+        const formatted = caret.node.getClosestParentMatching(p => p instanceof FormatNode) as FormatNode;
 
         // Can't do anything if it's not in a formatted node.
         if(formatted === undefined)
@@ -471,7 +471,7 @@ export class ChapterNode extends BlocksNode {
 
     // If the caret is in an atom of the given type, remove it.
     // If it is not, wrap it.
-    toggleAtom<AtomType extends MetadataNode<any>>(range: CaretRange, type: Function, creator: (parent: FormattedNode, text: string) => FormattedNodeSegmentType): Caret | undefined {
+    toggleAtom<AtomType extends MetadataNode<any>>(range: CaretRange, type: Function, creator: (parent: FormatNode, text: string) => FormatNodeSegmentType): Caret | undefined {
 
         // If the caret is already in a link node, remove it.
         if(range.start.node.inside(type)) {

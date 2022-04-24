@@ -8,7 +8,7 @@ import { DefinitionNode } from "./DefinitionNode";
 import { EmbedNode } from "./EmbedNode";
 import { ErrorNode } from "./ErrorNode";
 import { FootnoteNode } from "./FootnoteNode";
-import { Format, FormattedNodeSegmentType, FormattedNode, FormattedNodeParent } from "./FormattedNode";
+import { Format, FormatNodeSegmentType, FormatNode, FormatNodeParent } from "./FormatNode";
 import { InlineCodeNode } from "./InlineCodeNode";
 import { LabelNode } from "./LabelNode";
 import { LinkNode } from "./LinkNode";
@@ -473,7 +473,7 @@ export default class Parser {
 
         let numbered = this.nextMatches(numberedRE);
 
-        const items: (FormattedNode | ListNode)[] = [];
+        const items: (FormatNode | ListNode)[] = [];
         const list = new ListNode(parent, items, numbered);
         let lastLevel = undefined;
         let currentLevel = undefined;
@@ -704,7 +704,7 @@ export default class Parser {
 
     parseTable(parent: BlockParentNode): TableNode {
 
-        const rows: FormattedNode[][] = [];
+        const rows: FormatNode[][] = [];
         const table = new TableNode(parent, rows)
         // Parse rows until the lines stop starting with ,
         while(this.more() && this.nextIs(",")) {
@@ -745,10 +745,10 @@ export default class Parser {
 
     // The "awaiting" argument keeps track of upstream formatting. We don't need a stack here
     // because we don't allow infinite nesting of the same formatting type.
-    parseContent(parent: FormattedNodeParent | undefined, awaiting?: string): FormattedNode {
+    parseContent(parent: FormatNodeParent | undefined, awaiting?: string): FormatNode {
 
-        const segments: FormattedNodeSegmentType[] = [];
-        const content = new FormattedNode(parent, "", segments);
+        const segments: FormatNodeSegmentType[] = [];
+        const content = new FormatNode(parent, "", segments);
 
         // Read until hitting a delimiter.
         while(this.more() && !this.nextIs("\n")) {
@@ -758,7 +758,7 @@ export default class Parser {
 
             // Parse some formatted text
             if(next === "_" || next === "*")
-                segments.push(this.parseFormatted(content, next));
+                segments.push(this.parseFormat(content, next));
             // Parse unformatted text
             else if(this.nextIs("`")) {
                 segments.push(this.parseInlineCode(content));
@@ -883,7 +883,7 @@ export default class Parser {
 
     }
 
-    parseComment(parent: FormattedNode): CommentNode {
+    parseComment(parent: FormatNode): CommentNode {
 
         // Consume the opening %
         this.read();
@@ -901,7 +901,7 @@ export default class Parser {
 
     }
 
-    parseLabel(parent: FormattedNode): LabelNode | ErrorNode {
+    parseLabel(parent: FormatNode): LabelNode | ErrorNode {
 
         // Consume the :
         this.read();
@@ -918,17 +918,17 @@ export default class Parser {
 
     }
 
-    parseFormatted(parent: FormattedNode, awaiting: string): FormattedNode | ErrorNode {
+    parseFormat(parent: FormatNode, awaiting: string): FormatNode | ErrorNode {
 
         // Remember what we're matching.
         const delimeter = this.read();
-        const segments: Array<FormattedNode | TextNode | ErrorNode> = [];
+        const segments: Array<FormatNode | TextNode | ErrorNode> = [];
         let text = "";
 
         if(delimeter === null)
             return new ErrorNode(parent, undefined, "Somehow parsing formatted text at end of file.");
 
-        const node = new FormattedNode(parent, delimeter as Format, segments)
+        const node = new FormatNode(parent, delimeter as Format, segments)
 
         // Read some content until reaching the delimiter or the end of the line
         while(this.more() && this.peek() !== delimeter && !this.nextIs("\n")) {
@@ -964,7 +964,7 @@ export default class Parser {
 
     }
 
-    parseInlineCode(parent: FormattedNode): InlineCodeNode {
+    parseInlineCode(parent: FormatNode): InlineCodeNode {
 
         // Parse the back tick
         this.read();
@@ -1001,7 +1001,7 @@ export default class Parser {
         
     }
 
-    parseCitations(parent: FormattedNode): CitationsNode {
+    parseCitations(parent: FormatNode): CitationsNode {
         
         let citations = "";
 
@@ -1019,7 +1019,7 @@ export default class Parser {
 
     }
 
-    parseSubSuperscripts(parent: FormattedNode): FormattedNode {
+    parseSubSuperscripts(parent: FormatNode): FormatNode {
         
         // Read the ^
         this.read();
@@ -1033,7 +1033,7 @@ export default class Parser {
             superscript = false;
         }
 
-        const node = new FormattedNode(parent, superscript ? "^" : "v", []);
+        const node = new FormatNode(parent, superscript ? "^" : "v", []);
 
         // Parse the content
         node.addSegment(this.parseContent(node, "^"));
@@ -1045,7 +1045,7 @@ export default class Parser {
 
     }
 
-    parseFootnote(parent: FormattedNode): FootnoteNode {
+    parseFootnote(parent: FormatNode): FootnoteNode {
 
         let node = new FootnoteNode(parent);
 
@@ -1063,7 +1063,7 @@ export default class Parser {
 
     }
 
-    parseDefinition(parent: FormattedNode): DefinitionNode {
+    parseDefinition(parent: FormatNode): DefinitionNode {
 
         const node = new DefinitionNode(parent);
 
@@ -1094,7 +1094,7 @@ export default class Parser {
 
     }
 
-    parseEscaped(chapter: FormattedNode): TextNode | ErrorNode {
+    parseEscaped(chapter: FormatNode): TextNode | ErrorNode {
 
         // Skip the scape and just add the next character.
         this.read();
@@ -1106,7 +1106,7 @@ export default class Parser {
 
     }
     
-    parseLink(parent: FormattedNode): LinkNode | ErrorNode {
+    parseLink(parent: FormatNode): LinkNode | ErrorNode {
  
         // Read the [
         this.read();

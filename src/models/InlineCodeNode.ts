@@ -1,9 +1,9 @@
 import { MetadataNode } from "./MetadataNode";
-import { FormattedNode } from "./FormattedNode";
+import { FormatNode } from "./FormatNode";
 
 export class InlineCodeNode extends MetadataNode<string> {
 
-    constructor(parent: FormattedNode, code: string = "", language: string = "plaintext") {
+    constructor(parent: FormatNode, code: string = "", language: string = "plaintext") {
         super(parent, code, language, "inline-code");
     }
 
@@ -15,7 +15,7 @@ export class InlineCodeNode extends MetadataNode<string> {
         return "`" + this.getText().getText().replace(/`/g, '\\`') + "`" + (this.getMeta() === "plaintext" ? "" : this.getMeta());
     }
 
-    copy(parent: FormattedNode): InlineCodeNode {
+    copy(parent: FormatNode): InlineCodeNode {
         return new InlineCodeNode(parent, this.getText().getText(), this.getMeta())
     }
 

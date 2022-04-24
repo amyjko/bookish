@@ -1,23 +1,22 @@
 import { Node } from "./Node";
 import { BlockParentNode } from "./BlockParentNode";
 import { Position } from "./Position";
-import { FormattedNode } from "./FormattedNode";
-import { TextNode } from "./TextNode";
+import { FormatNode } from "./FormatNode";
 
 export class EmbedNode extends Node<BlockParentNode> {
     #url: string;
     #description: string;
-    #caption: FormattedNode;
-    #credit: FormattedNode;
+    #caption: FormatNode;
+    #credit: FormatNode;
     #position: Position;
 
     constructor(parent: BlockParentNode | undefined, url: string, description: string) {
         super(parent, "embed");
         this.#url = url;
         this.#description = description;
-        this.#caption = new FormattedNode(this, "", []);
+        this.#caption = new FormatNode(this, "", []);
         this.#caption.addEmptyText();
-        this.#credit = new FormattedNode(this, "", []);
+        this.#credit = new FormatNode(this, "", []);
         this.#credit.addEmptyText();
         this.#position = "|";
     }
@@ -30,8 +29,8 @@ export class EmbedNode extends Node<BlockParentNode> {
 
     setURL(url: string) { this.#url = url; }
     setDescription(description: string) { this.#description = description; }
-    setCaption(caption: FormattedNode) { this.#caption = caption; }
-    setCredit(credit: FormattedNode) { this.#credit = credit; }
+    setCaption(caption: FormatNode) { this.#caption = caption; }
+    setCredit(credit: FormatNode) { this.#credit = credit; }
     setPosition(position: Position) { this.#position = position; }
 
     toText(): string {

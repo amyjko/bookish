@@ -1,15 +1,15 @@
 import { Node } from "./Node";
-import { FormattedNode } from "./FormattedNode";
+import { FormatNode } from "./FormatNode";
 import { TextNode } from "./TextNode";
 import { Caret } from "./Caret";
 import { NodeType } from "./NodeType";
 
-export abstract class MetadataNode<MetaType> extends Node<FormattedNode> {
+export abstract class MetadataNode<MetaType> extends Node<FormatNode> {
 
     #text: TextNode;
     #meta: MetaType;
     
-    constructor(parent: FormattedNode, text: string, meta: MetaType, type: NodeType) {
+    constructor(parent: FormatNode, text: string, meta: MetaType, type: NodeType) {
         super(parent, type);
         this.#text = new TextNode(this, text);
         this.#meta = meta;
@@ -49,6 +49,6 @@ export abstract class MetadataNode<MetaType> extends Node<FormattedNode> {
 
     abstract toText(): string;
     abstract toBookdown(): String;
-    abstract copy(parent: FormattedNode): MetadataNode<MetaType>;
+    abstract copy(parent: FormatNode): MetadataNode<MetaType>;
 
 }

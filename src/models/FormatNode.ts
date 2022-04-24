@@ -9,14 +9,14 @@ import { MetadataNode } from "./MetadataNode";
 import { AtomNode } from "./AtomNode";
 
 export type Format = "" | "*" | "_" | "" | "^" | "v";
-export type FormattedNodeSegmentType = FormattedNode | TextNode | ErrorNode | MetadataNode<any> | AtomNode<any>;
-export type FormattedNodeParent = BlockNode | FormattedNode | FootnoteNode | EmbedNode;
+export type FormatNodeSegmentType = FormatNode | TextNode | ErrorNode | MetadataNode<any> | AtomNode<any>;
+export type FormatNodeParent = BlockNode | FormatNode | FootnoteNode | EmbedNode;
 
-export class FormattedNode extends Node<FormattedNodeParent> {
+export class FormatNode extends Node<FormatNodeParent> {
     #format: Format;
-    #segments: FormattedNodeSegmentType[];
+    #segments: FormatNodeSegmentType[];
 
-    constructor(parent: FormattedNodeParent | undefined, format: Format, segments: FormattedNodeSegmentType[]) {
+    constructor(parent: FormatNodeParent | undefined, format: Format, segments: FormatNodeSegmentType[]) {
         super(parent, "formatted");
         this.#format = format;
         this.#segments = segments;
@@ -26,7 +26,7 @@ export class FormattedNode extends Node<FormattedNodeParent> {
 
     getFormat() { return this.#format; }
     getSegments() { return this.#segments; }
-    setSegments(segs: FormattedNodeSegmentType[]) { this.#segments = segs; }
+    setSegments(segs: FormatNodeSegmentType[]) { this.#segments = segs; }
     isEmpty() { return this.#segments.length === 0; }
     getLength() { return this.#segments.length; }
 
@@ -38,7 +38,7 @@ export class FormattedNode extends Node<FormattedNodeParent> {
         return (this.#format === "v" ? "^v" : this.#format) + this.#segments.map(s => s.toBookdown()).join("") + this.#format;
     }
 
-    addSegment(node: FormattedNodeSegmentType) {
+    addSegment(node: FormatNodeSegmentType) {
         node.setParent(this);
         this.#segments.push(node);
     }
@@ -69,9 +69,9 @@ export class FormattedNode extends Node<FormattedNodeParent> {
         return text[text.length - 1];
     }
 
-    replaceChild(node: Node, replacement: FormattedNodeSegmentType): void {
+    replaceChild(node: Node, replacement: FormatNodeSegmentType): void {
         // Find the given node's index.
-        const index = this.#segments.indexOf(node as FormattedNodeSegmentType);
+        const index = this.#segments.indexOf(node as FormatNodeSegmentType);
         if(index < 0) return;
         // Replace it.
         replacement.setParent(this);
@@ -80,11 +80,11 @@ export class FormattedNode extends Node<FormattedNodeParent> {
         this.clean();
     }
 
-    getSiblingOf(child: Node, next: boolean) { return this.#segments[this.#segments.indexOf(child as FormattedNodeSegmentType) + (next ? 1 : -1)]; }
+    getSiblingOf(child: Node, next: boolean) { return this.#segments[this.#segments.indexOf(child as FormatNodeSegmentType) + (next ? 1 : -1)]; }
 
-    copy(parent: FormattedNodeParent) {
-        const node = new FormattedNode(parent, this.#format, []);
-        this.#segments.forEach(s => node.addSegment(s.copy(node) as FormattedNodeSegmentType));
+    copy(parent: FormatNodeParent) {
+        const node = new FormatNode(parent, this.#format, []);
+        this.#segments.forEach(s => node.addSegment(s.copy(node) as FormatNodeSegmentType));
         return node;
     }
 
@@ -115,7 +115,7 @@ export class FormattedNode extends Node<FormattedNodeParent> {
     mergeFormats() {
 
         // Go through each node in the segments list and flatten 
-        const merged: FormattedNodeSegmentType[] = [];
+        const merged: FormatNodeSegmentType[] = [];
         while(this.getLength() > 0) {
             const next = this.#segments.shift();
             if(next) {
@@ -132,7 +132,7 @@ export class FormattedNode extends Node<FormattedNodeParent> {
                 else {
                     const previous = merged[merged.length - 1];
                     // The previous and next nodes are the same format, merge next with previous.
-                    if(previous instanceof FormattedNode && next instanceof FormattedNode && previous.getFormat() === next.getFormat()) {
+                    if(previous instanceof FormatNode && next instanceof FormatNode && previous.getFormat() === next.getFormat()) {
                         // Merge the segments of the two nodes.
                         next.getSegments().forEach(n => { previous.addSegment(n); });
                     }
@@ -150,8 +150,8 @@ export class FormattedNode extends Node<FormattedNodeParent> {
 
     }
 
-    getFormattedRoot(): FormattedNode | undefined {
-        return this.getFarthestParentMatching(p => p instanceof FormattedNode) as FormattedNode;
+    getFormatRoot(): FormatNode | undefined {
+        return this.getFarthestParentMatching(p => p instanceof FormatNode) as FormatNode;
     }
 
     clean() {
@@ -160,7 +160,7 @@ export class FormattedNode extends Node<FormattedNodeParent> {
         this.#segments.forEach(s => s.clean());
 
         // If this is empty and it's not the root, remove it.
-        if(this.#segments.length === 0 && this.getFormattedRoot() !== this) { 
+        if(this.#segments.length === 0 && this.getFormatRoot() !== this) { 
             this.remove();
             return;
         }
@@ -170,7 +170,7 @@ export class FormattedNode extends Node<FormattedNodeParent> {
 
         // If this is in a format with the same format as its parent, move this node's segments to the parent to flatten it.
         const parent = this.getParent();
-        if(parent instanceof FormattedNode && this.getFormat() === parent.getFormat()) {
+        if(parent instanceof FormatNode && this.getFormat() === parent.getFormat()) {
             this.#segments.forEach(seg => seg.setParent(parent));
             const index = parent.getSegments().indexOf(this);
             if(index < 0) throw Error("Uh oh, parentage is wrong.");
@@ -244,7 +244,7 @@ export class FormattedNode extends Node<FormattedNodeParent> {
     }
 
     // Creates two formatted nodes that split this node at the given caret location.
-    split(caret: Caret): FormattedNode[] | undefined {
+    split(caret: Caret): FormatNode[] | undefined {
 
         // We can only copy if
         // ... this has a parent.
@@ -322,9 +322,9 @@ export class FormattedNode extends Node<FormattedNodeParent> {
         const endNode = range.end.node;
 
         // Cases to handle. Examples below are for * formatting. [] means no formatting. | means caret.
-        // A.  [This is my para|graph to format.]      -> [This is my para][*|*][graph to format.]   # Unformatted, no selection -> insert FormattedNode
-        // B.  [This is my ]*para|graph*[ to format.]  -> [This is my ]*para*[|]*graph*[ to format.] # Formatted, no selection -> split FormattedNode and insert unformatted node
-        // C.  [This is my |paragraph| to format.]     -> [This is my ]*|paragraph|*[ to format.]    # Selection -> wrap selection in FormattedNode
+        // A.  [This is my para|graph to format.]      -> [This is my para][*|*][graph to format.]   # Unformatted, no selection -> insert FormatNode
+        // B.  [This is my ]*para|graph*[ to format.]  -> [This is my ]*para*[|]*graph*[ to format.] # Formatted, no selection -> split FormatNode and insert unformatted node
+        // C.  [This is my |paragraph| to format.]     -> [This is my ]*|paragraph|*[ to format.]    # Selection -> wrap selection in FormatNode
         // D.  [This is my ]*|paragraph|*[ to format.] -> [This is my |paragraph| to format.]        # Fully formatted -> remove formatting
         // E.  [This is my |para]*graph*[| to format.] -> [This is my ]*|paragraph|*[ to format.]    # Partially formatted -> extend selection
         // F.  [This is my |para]*graph| to format*[.] -> [This is my ]*|paragraph| to format*[.]    # Partially formatted -> extend selection
@@ -336,9 +336,9 @@ export class FormattedNode extends Node<FormattedNodeParent> {
         //    ✓ 2. Create an empty set of text to format.
         //    ✓ 3. If some nodes aren't formatted, add all unformatted nodes to the set and prepare to format; otherwise add all formatted ranges and unformat.
         // - For each range:
-        //    1. Split the range's common ancestor's segments into beginning, middle, and end FormattedNodes [xxxx][][xxxx]
+        //    1. Split the range's common ancestor's segments into beginning, middle, and end FormatNodes [xxxx][][xxxx]
         //    2. Set the new middle node's formatting to the opposite of what it was
-        //    3. Paste the middle segments into the new middle FormattedNode  [xxxx][...][xxxx]
+        //    3. Paste the middle segments into the new middle FormatNode  [xxxx][...][xxxx]
         // - Clean up:
         //    1. Remove empty formatting (unless a new empty text node was created)
         //    1. Merge adjacent formatting
@@ -350,10 +350,10 @@ export class FormattedNode extends Node<FormattedNodeParent> {
         const textStart = this.caretToTextIndex(range.start);
         const textEnd = this.caretToTextIndex(range.end);
 
-        // Verify that the two given nodes share a FormattedNode ancestor.
+        // Verify that the two given nodes share a FormatNode ancestor.
         const formatted = range.start.node.getCommonAncestor(range.end.node);
         // If they don't, no op.
-        if(!formatted || !(formatted instanceof FormattedNode))
+        if(!formatted || !(formatted instanceof FormatNode))
             return range;
 
         // Determine which text nodes do and don't have the requested formatting.
@@ -361,7 +361,7 @@ export class FormattedNode extends Node<FormattedNodeParent> {
         const textNodes = this.getTextNodes();
         const selectedNodes = textNodes.filter(n => 
                 // Exclude any text nodes not parented by a formatted node (e.g., atomic nodes like links).
-                n.getParent() instanceof FormattedNode &&
+                n.getParent() instanceof FormatNode &&
                 (
                     // Only include the start and end node if we've selected 1 or more of their characters.
                     // Otherwise, they will be counted as formatted or unformatted in the logic below,
@@ -374,7 +374,7 @@ export class FormattedNode extends Node<FormattedNodeParent> {
         );
 
         // Split the nodes into formatted and unformatted so that we can operate on one or the other sets.
-        const formattedNodes = new Set(selectedNodes.filter(n => n.getClosestParentMatching(p => p instanceof FormattedNode && p.#format === format) !== undefined));
+        const formattedNodes = new Set(selectedNodes.filter(n => n.getClosestParentMatching(p => p instanceof FormatNode && p.#format === format) !== undefined));
         const unformattedNodes = new Set(selectedNodes.filter(n => !formattedNodes.has(n)));
 
         // If *any* nodes are unformatted, apply the formatting to all unformatted nodes.
@@ -392,8 +392,8 @@ export class FormattedNode extends Node<FormattedNodeParent> {
             // Don't worry about empty text nodes, we'll clean those up later.
             if(apply) {
                 const parent = text.getParent();
-                if(parent instanceof FormattedNode) {
-                    const formattedMiddle = new FormattedNode(parent, format, []);
+                if(parent instanceof FormatNode) {
+                    const formattedMiddle = new FormatNode(parent, format, []);
                     const left = new TextNode(parent, text.getText().substring(0, text === range.start.node ? range.start.index : 0));
                     const middle = new TextNode(formattedMiddle, text.getText().substring(text === range.start.node ? range.start.index : 0, text === range.end.node ? range.end.index : text.getLength()));
                     const right = new TextNode(parent, text.getText().substring(text === range.end.node ? range.end.index : text.getLength()));
@@ -417,7 +417,7 @@ export class FormattedNode extends Node<FormattedNodeParent> {
 
                 // 1. Split the text node along the selection
                 const parent = text.getParent();
-                if(parent instanceof FormattedNode) {
+                if(parent instanceof FormatNode) {
                     const left = new TextNode(parent, text.getText().substring(0, text === range.start.node ? range.start.index : 0));
                     const middle = new TextNode(parent, text.getText().substring(text === range.start.node ? range.start.index : 0, text === range.end.node ? range.end.index : text.getLength()));
                     const right = new TextNode(parent, text.getText().substring(text === range.end.node ? range.end.index : text.getLength()));
@@ -428,7 +428,7 @@ export class FormattedNode extends Node<FormattedNodeParent> {
                         newEmptyTextNode = middle;
 
                     // 2a. Find the formatter to remove
-                    const formatter = text.getClosestParentMatching(p => p instanceof FormattedNode && p.#format === format) as FormattedNode;
+                    const formatter = text.getClosestParentMatching(p => p instanceof FormatNode && p.#format === format) as FormatNode;
                     if(formatter === undefined) throw Error(`Somehow couldn't find a parent with format ${format}`);
 
                     // 2b. Get the nodes, in render order, and the formats applied to them.
@@ -443,7 +443,7 @@ export class FormattedNode extends Node<FormattedNodeParent> {
                                 // If the requested formatting is "", remove all formatting. If it's not, then
                                 // only restore formatting if it's not the formatting we're removing.
                                 if(node !== middle || (format !== "" && formatToApply !== format)) {
-                                    node = new FormattedNode(formatter, formatToApply as Format, [ node ]);
+                                    node = new FormatNode(formatter, formatToApply as Format, [ node ]);
                                 }
                             })
                         }
@@ -489,32 +489,32 @@ export class FormattedNode extends Node<FormattedNodeParent> {
     getSegmentFormats() {
 
         const nodes = this.getNodes();
-        const newNodes: { node: FormattedNodeSegmentType, format: string | undefined}[] = [];
+        const newNodes: { node: FormatNodeSegmentType, format: string | undefined}[] = [];
         nodes.forEach(node => {
             // If this is a formatting node, a text node inside of an metadata node, or an Atom node, ignore it.
-            if(node instanceof FormattedNode || node instanceof AtomNode || node.getClosestParentMatching(p => p instanceof MetadataNode) !== undefined) {
+            if(node instanceof FormatNode || node instanceof AtomNode || node.getClosestParentMatching(p => p instanceof MetadataNode) !== undefined) {
                 // Do nothing. This strips the formatted nodes and leaves any text nodes to be included by their parents.
             }
             // If this is a text node inside of a formatting node, remember its formatting.
-            else if(node instanceof TextNode && node.getParent() instanceof FormattedNode) {
+            else if(node instanceof TextNode && node.getParent() instanceof FormatNode) {
                 let format = "";
-                let parent = node.getParent() as FormattedNode;
+                let parent = node.getParent() as FormatNode;
                 while(parent) {
-                    if(parent instanceof FormattedNode)
+                    if(parent instanceof FormatNode)
                         format = format + parent.#format;
-                    parent = parent.getParent() as FormattedNode;
+                    parent = parent.getParent() as FormatNode;
                 }
-                newNodes.push({ node: node as FormattedNodeSegmentType, format: format });
+                newNodes.push({ node: node as FormatNodeSegmentType, format: format });
             }
             // Otherwise, if this doesn't have a add whatever node this is without formatting.
             else
-                newNodes.push({ node: node as FormattedNodeSegmentType, format: undefined });
+                newNodes.push({ node: node as FormatNodeSegmentType, format: undefined });
         });
         return newNodes;
 
     }
 
-    insertSegmentAt(segment: FormattedNodeSegmentType, caret: Caret) : Caret {
+    insertSegmentAt(segment: FormatNodeSegmentType, caret: Caret) : Caret {
 
         if(!(caret.node instanceof TextNode))
             return caret;

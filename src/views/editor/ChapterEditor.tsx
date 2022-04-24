@@ -6,7 +6,7 @@ import { ParagraphNode } from "../../models/ParagraphNode";
 import { TextNode } from "../../models/TextNode";
 import { renderNode } from "../chapter/Renderer";
 import { AtomNode } from "../../models/AtomNode";
-import { FormattedNode } from "../../models/FormattedNode";
+import { FormatNode } from "../../models/FormatNode";
 import { BlocksNode } from "../../models/BlocksNode";
 import { ListNode } from "../../models/ListNode";
 import { TableNode } from "../../models/TableNode";
@@ -30,7 +30,7 @@ export type CaretState = {
     paragraph: ParagraphNode | undefined,
     list: ListNode | undefined,
     table: TableNode | undefined,
-    format: FormattedNode | undefined, 
+    format: FormatNode | undefined, 
     startIsTextOrAtom: boolean, 
     endIsTextOrAtom: boolean,
     atParagraphStart: boolean
@@ -310,7 +310,7 @@ const ChapterEditor = (props: { ast: ChapterNode }) => {
             caretRange.start.index === caretRange.end.index && 
             caretRange.start.node instanceof TextNode && 
             caretRange.start.index === 0 &&
-            caretRange.start.node.getParent() instanceof FormattedNode &&
+            caretRange.start.node.getParent() instanceof FormatNode &&
             caretRange.start.node.getParent()?.getParent() instanceof ParagraphNode
     }
 
@@ -329,7 +329,7 @@ const ChapterEditor = (props: { ast: ChapterNode }) => {
             paragraph: caretRange.start.node.getClosestParentMatching(p => p instanceof ParagraphNode) as ParagraphNode,
             list: caretRange.start.node.getClosestParentMatching(p => p instanceof ListNode) as ListNode,
             table: caretRange.start.node.getClosestParentMatching(p => p instanceof TableNode) as TableNode,
-            format: (caretRange.start.node instanceof TextNode || caretRange.start.node instanceof AtomNode) ? caretRange.start.node.getFormattedRoot() : undefined,
+            format: (caretRange.start.node instanceof TextNode || caretRange.start.node instanceof AtomNode) ? caretRange.start.node.getFormatRoot() : undefined,
             startIsTextOrAtom: caretRange.start.node instanceof TextNode || caretRange.start.node instanceof AtomNode,
             endIsTextOrAtom: caretRange.end.node instanceof TextNode || caretRange.end.node instanceof AtomNode,
             atParagraphStart: atParagraphStart()

@@ -1,9 +1,9 @@
-import { FormattedNode } from "./FormattedNode";
+import { FormatNode } from "./FormatNode";
 import { MetadataNode } from "./MetadataNode";
 
 export class LinkNode extends MetadataNode<string> {
     
-    constructor(parent: FormattedNode, text: string = "", url: string = "") {
+    constructor(parent: FormatNode, text: string = "", url: string = "") {
         super(parent, text, url, "link");
     }
 
@@ -15,7 +15,7 @@ export class LinkNode extends MetadataNode<string> {
         return `[${this.getText().toText()}|${this.getMeta()}]`;
     }
 
-    copy(parent: FormattedNode): LinkNode {
+    copy(parent: FormatNode): LinkNode {
         return new LinkNode(parent, this.getText().getText(), this.getMeta());
     }
 

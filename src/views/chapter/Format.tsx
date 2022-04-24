@@ -1,9 +1,9 @@
 import React from 'react'
-import { FormattedNode } from "../../models/FormattedNode";
+import { FormatNode } from "../../models/FormatNode";
 
 import { renderNode } from './Renderer'
 
-const Formatted = (props: { node: FormattedNode}) => {
+const Format = (props: { node: FormatNode}) => {
 
     const { node } = props
     
@@ -24,4 +24,4 @@ const Formatted = (props: { node: FormattedNode}) => {
 
 }
 
-export default Formatted;
+export default Format;

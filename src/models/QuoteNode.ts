@@ -3,20 +3,20 @@ import { Node } from "./Node";
 import { BlockNode } from "./BlockNode";
 import { BlockParentNode } from "./BlockParentNode";
 import { Position } from "./Position";
-import { FormattedNode } from "./FormattedNode";
+import { FormatNode } from "./FormatNode";
 import { BlocksNode } from "./BlocksNode";
 import { TextNode } from "./TextNode";
 
 export class QuoteNode extends BlocksNode {
     
-    #credit: FormattedNode | undefined;
+    #credit: FormatNode | undefined;
     #position: Position;
 
     constructor(parent: BlockParentNode, elements: BlockNode[]) {
         super(parent, elements, "quote");
         this.#position = "|";
 
-        this.#credit = new FormattedNode(this, "", []);
+        this.#credit = new FormatNode(this, "", []);
         this.#credit.addSegment(new TextNode(this.#credit, ""));
         
     }
@@ -24,7 +24,7 @@ export class QuoteNode extends BlocksNode {
     getCredit() { return this.#credit; }
     getPosition() { return this.#position; }
 
-    setCredit(credit: FormattedNode | undefined) {
+    setCredit(credit: FormatNode | undefined) {
         this.#credit = credit;
     }
 

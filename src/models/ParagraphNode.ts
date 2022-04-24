@@ -1,5 +1,5 @@
 import { Node } from "./Node";
-import { FormattedNodeSegmentType, FormattedNode, Format } from "./FormattedNode";
+import { FormatNodeSegmentType, FormatNode, Format } from "./FormatNode";
 import { BlockNode } from "./BlockNode";
 import { BlockParentNode } from "./BlockParentNode";
 import { TextNode } from "./TextNode";
@@ -7,12 +7,12 @@ import { Caret, CaretRange } from "./Caret";
 
 export class ParagraphNode extends Node<BlockParentNode> {
 
-    #content: FormattedNode;
+    #content: FormatNode;
     #level: number;
 
     constructor(parent: BlockParentNode, level: number = 0) {
         super(parent, "paragraph");
-        this.#content = new FormattedNode(this, "", []);
+        this.#content = new FormatNode(this, "", []);
         // An empty text node to start.
         this.#content.addSegment(new TextNode(this.#content, ""));
 
@@ -23,7 +23,7 @@ export class ParagraphNode extends Node<BlockParentNode> {
     getLevel() { return this.#level; }
     setLevel(level: number) { this.#level = level; }
 
-    setContent(content: FormattedNode) {
+    setContent(content: FormatNode) {
         content.setParent(this);
         this.#content = content;
     }
@@ -44,7 +44,7 @@ export class ParagraphNode extends Node<BlockParentNode> {
 
     removeChild(node: Node): void {}
 
-    replaceChild(node: Node, replacement: FormattedNode): void {
+    replaceChild(node: Node, replacement: FormatNode): void {
         if(this.#content === node)
             this.#content = replacement;
     }
@@ -113,7 +113,7 @@ export class ParagraphNode extends Node<BlockParentNode> {
 
             // Copy the sibling's content into this.
             sibling.#content?.getSegments().forEach(segment => {
-                this.#content?.getSegments().push(segment.copy(this.#content) as FormattedNodeSegmentType);
+                this.#content?.getSegments().push(segment.copy(this.#content) as FormatNodeSegmentType);
             });
 
             // Remove the sibling paragraph.

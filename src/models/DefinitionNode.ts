@@ -1,9 +1,8 @@
-import { Node } from "./Node";
-import { FormattedNode } from "./FormattedNode";
+import { FormatNode } from "./FormatNode";
 import { MetadataNode } from "./MetadataNode";
 
 export class DefinitionNode extends MetadataNode<string> {
-    constructor(parent: FormattedNode, phrase: string = "", glossaryID: string = "") {
+    constructor(parent: FormatNode, phrase: string = "", glossaryID: string = "") {
         super(parent, phrase, glossaryID, "definition");
     }
 
@@ -16,7 +15,7 @@ export class DefinitionNode extends MetadataNode<string> {
     }
 
     copy(): DefinitionNode {
-        return new DefinitionNode(this.getParent() as FormattedNode, this.getText().getText(), this.getMeta());
+        return new DefinitionNode(this.getParent() as FormatNode, this.getText().getText(), this.getMeta());
     }
 
 }

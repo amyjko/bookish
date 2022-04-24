@@ -1,18 +1,18 @@
 import { Node } from "./Node";
-import { FormattedNode } from "./FormattedNode";
+import { FormatNode } from "./FormatNode";
 import { BlockParentNode } from "./BlockParentNode";
 import { Caret } from "./Caret";
 import { TextNode } from "./TextNode";
 
 export type ListParentType =  BlockParentNode | ListNode;
-export type ListNodeType = FormattedNode | ListNode;
+export type ListNodeType = FormatNode | ListNode;
 
 export class ListNode extends Node<ListParentType> {
 
     #numbered: boolean;
     #items: ListNodeType[];
 
-    constructor(parent: ListParentType, items: Array<FormattedNode | ListNode>, numbered: boolean) {
+    constructor(parent: ListParentType, items: Array<FormatNode | ListNode>, numbered: boolean) {
         super(parent, "list");
         this.#numbered = numbered;
         this.#items = items;
@@ -91,7 +91,7 @@ export class ListNode extends Node<ListParentType> {
 
     atBeginningOfItem(caret: Caret) {
 
-        const format = caret.node.getFarthestParentMatching(n => n instanceof FormattedNode) as FormattedNode;
+        const format = caret.node.getFarthestParentMatching(n => n instanceof FormatNode) as FormatNode;
 
         return format !== undefined &&
             caret.node.hasParent(this) &&
@@ -104,7 +104,7 @@ export class ListNode extends Node<ListParentType> {
 
         // Find the root formatter and chapter
         const node = caret.node;
-        const format = caret.node.getFarthestParentMatching(n => n instanceof FormattedNode) as FormattedNode;
+        const format = caret.node.getFarthestParentMatching(n => n instanceof FormatNode) as FormatNode;
         const index = this.#items.indexOf(format);
         const chapter = format.getChapter();        
         if(!(node instanceof TextNode) || format === undefined || chapter === undefined || index < 0)
@@ -116,7 +116,7 @@ export class ListNode extends Node<ListParentType> {
         const textBefore = chapterNodes[chapterIndex - 1];
 
         // Find the root format of the text before.
-        const beforeFormat = textBefore.getFarthestParentMatching(n => n instanceof FormattedNode) as FormattedNode;
+        const beforeFormat = textBefore.getFarthestParentMatching(n => n instanceof FormatNode) as FormatNode;
         if(beforeFormat === undefined)
             return caret;
 
@@ -169,7 +169,7 @@ export class ListNode extends Node<ListParentType> {
             return;
 
         // Find the root format
-        const format = caret.node.getFarthestParentMatching(n => n instanceof FormattedNode) as FormattedNode;
+        const format = caret.node.getFarthestParentMatching(n => n instanceof FormatNode) as FormatNode;
         const index = this.#items.indexOf(format);
 
         // If this isn't in this list, do nothing.
@@ -205,7 +205,7 @@ export class ListNode extends Node<ListParentType> {
     unindent(caret: Caret) {
 
         // Find the root format
-        const format = caret.node.getFarthestParentMatching(n => n instanceof FormattedNode) as FormattedNode;
+        const format = caret.node.getFarthestParentMatching(n => n instanceof FormatNode) as FormatNode;
         const index = this.#items.indexOf(format);
         const first = index === 0;
         const last = index === this.#items.length - 1;

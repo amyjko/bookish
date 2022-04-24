@@ -1,13 +1,13 @@
 import { Node } from "./Node";
 import { BlockParentNode } from "./BlockParentNode";
 import { Position } from "./Position";
-import { FormattedNode } from "./FormattedNode";
+import { FormatNode } from "./FormatNode";
 import { TextNode } from "./TextNode";
 
 export class CodeNode extends Node<BlockParentNode> {
 
     #code: TextNode;
-    #caption: FormattedNode;
+    #caption: FormatNode;
     #position: Position;
     #language: string;
     #executable: boolean;
@@ -23,7 +23,7 @@ export class CodeNode extends Node<BlockParentNode> {
         if (this.#executable)
             this.#language = this.#language.slice(0, -1);
 
-        this.#caption = new FormattedNode(this, "", []);
+        this.#caption = new FormatNode(this, "", []);
         this.#caption.addSegment(new TextNode(this.#caption, ""));    
 
     }
@@ -38,7 +38,7 @@ export class CodeNode extends Node<BlockParentNode> {
     isExecutable() { return this.#executable; }
     setExecutable(executable: boolean) { this.#executable = executable; }
 
-    setCaption(caption : FormattedNode) {
+    setCaption(caption : FormatNode) {
         this.#caption = caption;
     }
 

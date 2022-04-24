@@ -1,11 +1,11 @@
-import { FormattedNode } from "./FormattedNode";
+import { FormatNode } from "./FormatNode";
 import { AtomNode } from "./AtomNode";
 import { TextNode } from "./TextNode";
 
-export class FootnoteNode extends AtomNode<FormattedNode> {
+export class FootnoteNode extends AtomNode<FormatNode> {
 
-    constructor(parent: FormattedNode, text: string = "") {
-        super(parent, new FormattedNode(parent, "", [ new TextNode(parent, text)]), "footnote");
+    constructor(parent: FormatNode, text: string = "") {
+        super(parent, new FormatNode(parent, "", [ new TextNode(parent, text)]), "footnote");
         // Hack: can't pass this before calling super.
         this.getMeta().setParent(this);        
         this.getMeta().getSegments()[0].setParent(this.getMeta());
@@ -14,8 +14,8 @@ export class FootnoteNode extends AtomNode<FormattedNode> {
     toText(): string { return this.getMeta().toText(); }
     toBookdown(): string { return "{" + this.getMeta().toBookdown() + "}"; }
 
-    copy(parent: FormattedNode): FootnoteNode {
-        const foot = new FootnoteNode(this.getParent() as FormattedNode);
+    copy(parent: FormatNode): FootnoteNode {
+        const foot = new FootnoteNode(this.getParent() as FormatNode);
         foot.setMeta(this.getMeta().copy(foot));
         return foot;
     }

@@ -1,14 +1,14 @@
 import { AtomNode } from "./AtomNode";
-import { FormattedNode } from "./FormattedNode";
+import { FormatNode } from "./FormatNode";
 
 export class CitationsNode extends AtomNode<string[]> {
     
-    constructor(parent: FormattedNode, citations: string[]) {
+    constructor(parent: FormatNode, citations: string[]) {
         super(parent, citations, "citations");
     }
 
     toText(): string { return ""; }
     toBookdown(): string { return "<" + this.getMeta().join(",") + ">"; }
-    copy(parent: FormattedNode): CitationsNode { return new CitationsNode(parent, [...this.getMeta()]); }
+    copy(parent: FormatNode): CitationsNode { return new CitationsNode(parent, [...this.getMeta()]); }
  
 }

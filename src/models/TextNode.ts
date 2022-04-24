@@ -1,13 +1,13 @@
 import { MetadataNode } from "./MetadataNode";
 import { ChapterNode } from "./ChapterNode";
 import { Caret } from "./Caret";
-import { FormattedNode } from "./FormattedNode";
+import { FormatNode } from "./FormatNode";
 import { Node } from "./Node";
 import { ParagraphNode } from "./ParagraphNode";
 import { AtomNode } from "./AtomNode";
 import { CodeNode } from "./CodeNode";
 
-export type TextNodeParent = FormattedNode | MetadataNode<any> | CodeNode;
+export type TextNodeParent = FormatNode | MetadataNode<any> | CodeNode;
 
 export class TextNode extends Node<TextNodeParent> {
 
@@ -51,7 +51,7 @@ export class TextNode extends Node<TextNodeParent> {
 
     getSiblingOf(child: Node, next: boolean) { return undefined; }
 
-    copy(parent: FormattedNode) {
+    copy(parent: FormatNode) {
         return new TextNode(parent, this.#text)
     }
 
@@ -63,8 +63,8 @@ export class TextNode extends Node<TextNodeParent> {
         };
     }
 
-    isItalic() { return this.getAncestors().filter(p => p instanceof FormattedNode && p.getFormat() === "_").length > 0; }
-    isBold() { return this.getAncestors().filter(p => p instanceof FormattedNode && p.getFormat() === "*").length > 0; }
+    isItalic() { return this.getAncestors().filter(p => p instanceof FormatNode && p.getFormat() === "_").length > 0; }
+    isBold() { return this.getAncestors().filter(p => p instanceof FormatNode && p.getFormat() === "*").length > 0; }
 
     deleteBackward(index?: number): Caret {
 
@@ -225,12 +225,12 @@ export class TextNode extends Node<TextNodeParent> {
         return this.getClosestParentMatching(p => p instanceof ParagraphNode) as ParagraphNode | undefined;
     }
 
-    getFormattedRoot(): FormattedNode | undefined {
-        return this.getFarthestParentMatching(p => p instanceof FormattedNode) as FormattedNode;
+    getFormatRoot(): FormatNode | undefined {
+        return this.getFarthestParentMatching(p => p instanceof FormatNode) as FormatNode;
     }
 
-    getRoot(): FormattedNode | ChapterNode | undefined {
-        const format = this.getFarthestParentMatching(p => p instanceof FormattedNode) as FormattedNode;
+    getRoot(): FormatNode | ChapterNode | undefined {
+        const format = this.getFarthestParentMatching(p => p instanceof FormatNode) as FormatNode;
         const chapter = this.getFarthestParentMatching(p => p instanceof ChapterNode) as ChapterNode;
         return chapter ? chapter : format ? format : undefined;
     }
@@ -256,7 +256,7 @@ export class TextNode extends Node<TextNodeParent> {
         // Unless the next node is in a different paragraph, we skip the first index since it's equivalent to the last of this one.
         return next instanceof AtomNode ?
             { node: next, index: 0 } :
-            { node: next, index: this.getFormattedRoot() !== next.getFormattedRoot() ? 0 : Math.min(1, next.getLength()) };
+            { node: next, index: this.getFormatRoot() !== next.getFormatRoot() ? 0 : Math.min(1, next.getLength()) };
 
     }
 
@@ -281,7 +281,7 @@ export class TextNode extends Node<TextNodeParent> {
         // We skip the last index since it's the equivalent of this one's first.
         return previous instanceof AtomNode ?
             { node: previous, index: 0} :
-            { node: previous, index: this.getFormattedRoot() !== previous.getFormattedRoot() ? previous.#text.length : Math.max(0, previous.#text.length - 1) };
+            { node: previous, index: this.getFormatRoot() !== previous.getFormatRoot() ? previous.#text.length : Math.max(0, previous.#text.length - 1) };
 
     }
 

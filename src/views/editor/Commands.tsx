@@ -8,7 +8,7 @@ import { CommentNode } from "../../models/CommentNode";
 import { DefinitionNode } from "../../models/DefinitionNode";
 import { EmbedNode } from "../../models/EmbedNode";
 import { FootnoteNode } from "../../models/FootnoteNode";
-import { FormattedNode } from "../../models/FormattedNode";
+import { FormatNode } from "../../models/FormatNode";
 import { InlineCodeNode } from "../../models/InlineCodeNode";
 import { LabelNode } from "../../models/LabelNode";
 import { LinkNode } from "../../models/LinkNode";
@@ -55,7 +55,7 @@ export type Command = {
         key: string) => CaretRange
 }
 
-function insertTableRowColumn(table: TableNode, format: FormattedNode, row: boolean, before: boolean): CaretRange | undefined {
+function insertTableRowColumn(table: TableNode, format: FormatNode, row: boolean, before: boolean): CaretRange | undefined {
     const location = table.locate(format);
     if(location) {
         if(row)
@@ -71,7 +71,7 @@ function insertTableRowColumn(table: TableNode, format: FormattedNode, row: bool
     return undefined;
 }
 
-function deleteTableRowColumn(table: TableNode, format: FormattedNode, row: boolean): CaretRange | undefined {
+function deleteTableRowColumn(table: TableNode, format: FormatNode, row: boolean): CaretRange | undefined {
     const location = table.locate(format);
     if(!location) return undefined;
     if(row)
@@ -100,7 +100,7 @@ function convertToListItem(range: CaretRange, blocks: BlocksNode, paragraph: Par
     return range;
 }
 
-function unwrapListItem(blocks: BlocksNode, list: ListNode, format: FormattedNode) {
+function unwrapListItem(blocks: BlocksNode, list: ListNode, format: FormatNode) {
     // Duplicate the list
     const before = list.copyItemsBeforeAfter(format, true);
     const after = list.copyItemsBeforeAfter(format, false);
@@ -224,7 +224,7 @@ export const commands: Command[] = [
         control: true, alt: false, shift: false, key: "ArrowLeft",
         active: context => context.format !== undefined,
         handler: context => {
-            const first = (context.format as FormattedNode).getFirstTextNode();
+            const first = (context.format as FormatNode).getFirstTextNode();
             return { start: { node: first, index: 0 }, end: { node: first, index: 0 }};
         }
     },
@@ -257,7 +257,7 @@ export const commands: Command[] = [
         control: true, alt: false, shift: true, key: "ArrowLeft",
         active: context => context.format !== undefined,
         handler: context => {
-            const first = (context.format as FormattedNode).getFirstTextNode();
+            const first = (context.format as FormatNode).getFirstTextNode();
             return { start: context.start, end: { node: first, index: 0 } };
         }
     },
@@ -290,7 +290,7 @@ export const commands: Command[] = [
         control: true, alt: false, shift: false, key: "ArrowRight",
         active: context => context.format !== undefined,
         handler: context => {
-            const last = (context.format as FormattedNode).getLastTextNode();
+            const last = (context.format as FormatNode).getLastTextNode();
             const caret = { node: last, index: last.getLength() };
             return { start: caret, end: caret};
         }
@@ -324,7 +324,7 @@ export const commands: Command[] = [
         control: true, alt: false, shift: true, key: "ArrowRight",
         active: context => context.format !== undefined,
         handler: context => {
-            const last = (context.format as FormattedNode).getLastTextNode();
+            const last = (context.format as FormatNode).getLastTextNode();
             return { start: context.start, end: { node: last, index: 0 } };
         }
     },
@@ -425,7 +425,7 @@ export const commands: Command[] = [
         active: context => context.start.node.getClosestParentMatching(p => p instanceof ListNode) !== undefined,
         handler: context => {
             const list = context.start.node.getClosestParentMatching(p => p instanceof ListNode) as ListNode;
-            const format = context.start.node.getClosestParentMatching(p => p instanceof FormattedNode) as FormattedNode;
+            const format = context.start.node.getClosestParentMatching(p => p instanceof FormatNode) as FormatNode;
             const parts = format.split(context.start);            
             if(!list || !parts)
                 return context.range;
@@ -770,7 +770,7 @@ export const commands: Command[] = [
                 for(let c = 0; c < Math.max(1, 3); c++) table.addColumn(0);
 
                 // Set a default caption
-                const caption = new FormattedNode(table, "", []);
+                const caption = new FormatNode(table, "", []);
                 caption.addSegment(new TextNode(caption, ""));
                 table.setCaption(caption);
 

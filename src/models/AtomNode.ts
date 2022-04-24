@@ -1,16 +1,16 @@
 import { ChapterNode } from "./ChapterNode";
 import { Caret } from "./Caret";
-import { FormattedNode } from "./FormattedNode";
+import { FormatNode } from "./FormatNode";
 import { Node } from "./Node";
 import { ParagraphNode } from "./ParagraphNode";
 import { NodeType } from "./NodeType";
 import { TextNode } from "./TextNode";
 
 
-export abstract class AtomNode<MetadataType> extends Node<FormattedNode> {    
+export abstract class AtomNode<MetadataType> extends Node<FormatNode> {    
     #meta: MetadataType;
 
-    constructor(parent: FormattedNode, meta: MetadataType, type: NodeType) {
+    constructor(parent: FormatNode, meta: MetadataType, type: NodeType) {
         super(parent, type);
         this.#meta = meta;
     }
@@ -24,8 +24,8 @@ export abstract class AtomNode<MetadataType> extends Node<FormattedNode> {
     getSiblingOf(child: Node<Node<any>>, next: boolean): Node<Node<any>> | undefined { return undefined; }
     clean(): void {}
 
-    getRoot(): FormattedNode | ChapterNode | undefined {
-        const format = this.getFarthestParentMatching(p => p instanceof FormattedNode) as FormattedNode;
+    getRoot(): FormatNode | ChapterNode | undefined {
+        const format = this.getFarthestParentMatching(p => p instanceof FormatNode) as FormatNode;
         const chapter = this.getFarthestParentMatching(p => p instanceof ChapterNode) as ChapterNode;
         return chapter ? chapter : format ? format : undefined;
     }
@@ -93,12 +93,12 @@ export abstract class AtomNode<MetadataType> extends Node<FormattedNode> {
         return this.getClosestParentMatching(p => p instanceof ParagraphNode) as ParagraphNode;
     }
 
-    getFormattedRoot(): FormattedNode | undefined {
-        return this.getFarthestParentMatching(p => p instanceof FormattedNode) as FormattedNode;
+    getFormatRoot(): FormatNode | undefined {
+        return this.getFarthestParentMatching(p => p instanceof FormatNode) as FormatNode;
     }
 
     abstract toBookdown(): string;
     abstract toText(): string;
-    abstract copy(parent: FormattedNode): AtomNode<any>;
+    abstract copy(parent: FormatNode): AtomNode<any>;
 
 }
