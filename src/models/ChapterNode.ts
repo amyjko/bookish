@@ -63,7 +63,7 @@ export class ChapterNode extends BlocksNode {
 
     getNode(id: number) { return this.index.get(id); }
 
-    getErrors(): ErrorNode[] { return this.#metadata.errors; }
+    getErrors(): ErrorNode[] { return this.getNodes().filter(n => n instanceof ErrorNode) as ErrorNode[]; }
     getCitations(): Set<string> { 
         const citations = new Set<string>();
         (this.getNodes().filter(n => n instanceof CitationsNode) as CitationsNode[]).forEach(cites => cites.getMeta().forEach(citationID => citations.add(citationID)));
@@ -71,7 +71,7 @@ export class ChapterNode extends BlocksNode {
     }
     getFootnotes(): FootnoteNode[] { return this.getNodes().filter(n => n instanceof FootnoteNode) as FootnoteNode[]; }
     getHeaders(): ParagraphNode[] { return this.getNodes().filter(n => n instanceof ParagraphNode && n.getLevel() > 0) as ParagraphNode[]; }
-    getEmbeds(): EmbedNode[] { return this.#metadata.embeds; }
+    getEmbeds(): EmbedNode[] { return this.getNodes().filter(n => n instanceof EmbedNode) as EmbedNode[]; }
     getComments(): CommentNode[] { return this.getNodes().filter(n => n instanceof CommentNode) as CommentNode[]; }
 
     getLabels(): LabelNode[] {

@@ -25,10 +25,7 @@ import { BlockParentNode } from "./BlockParentNode";
 import { BlockNode } from "./BlockNode";
 
 export type Bookkeeping = {
-    index: Map<number, Node>;
     symbols: Record<string, string>;
-    embeds: EmbedNode[];
-    errors: ErrorNode[];
 }
 
 const numberedRE = /^[0-9]+\.+/;
@@ -60,7 +57,6 @@ const bulletRE = /^\*+\s+/;
 // FOOTNOTE :: {TEXT}
 // TEXT :: (.+)
 
-
 export default class Parser {
 
     book: Book | undefined;
@@ -79,10 +75,7 @@ export default class Parser {
         this.index = 0; // Start at the first character.
         this.openedDoubleQuote = false; // Track most recently observed quotes.
         this.metadata = {
-            index: new Map<number, Node>(),
-            symbols: {},
-            embeds: [],
-            errors: []
+            symbols: {}
         };
 
     }
@@ -292,11 +285,9 @@ export default class Parser {
     }
 
     // Create and store an error
-    createError(parent: Node | undefined, text: string | undefined, message: string) {
+    createError(parent: Node | undefined, text: string | undefined, message: string): ErrorNode {
 
-        const error = new ErrorNode(parent, text, message);
-        this.metadata.errors.push(error);
-        return error;
+        return new ErrorNode(parent, text, message);
 
     }
 
@@ -358,7 +349,7 @@ export default class Parser {
 
             // Names need to be letter and numbers only.
             if(!/^[a-zA-Z0-9]+$/.test(name)) {
-                this.createError(
+                new ErrorNode(
                     parent,
                     this.readUntilNewLine(),
                     name.trim() === "" ? 
@@ -373,7 +364,7 @@ export default class Parser {
 
             // Name declarations need to be terminated with a colon before the block starts.
             if(!this.nextIs(":")) {
-                this.createError(parent, this.readUntilNewLine(), "Symbol names are to be followed by a ':'");
+                new ErrorNode(parent, this.readUntilNewLine(), "Symbol names are to be followed by a ':'");
                 return;
             }
 
@@ -804,7 +795,7 @@ export default class Parser {
                     symbol = symbol + this.read();
                     next = this.peek();
                 }
-                segments.push(this.createError(content, undefined, "Couldn't find symbol @" + symbol));
+                segments.push(new ErrorNode(content, undefined, "Couldn't find symbol @" + symbol));
 
             }
             // Parse a label
@@ -839,10 +830,10 @@ export default class Parser {
 
         // Error if missing URL.
         if(url === "")
-            return this.createError(parent, this.readUntilNewLine(), "Missing URL in embed.");
+            return new ErrorNode(parent, this.readUntilNewLine(), "Missing URL in embed.");
 
         if(this.peek() !== "|")
-            return this.createError(parent, this.readUntilNewLine(), "Missing '|' after URL in embed");
+            return new ErrorNode(parent, this.readUntilNewLine(), "Missing '|' after URL in embed");
 
         // Read a |
         this.read();
@@ -851,11 +842,11 @@ export default class Parser {
         const description = this.readUntilNewlineOr("|");
 
         if(this.peek() !== "|")
-            return this.createError(parent, this.readUntilNewLine(), "Missing '|' after description in embed");
+            return new ErrorNode(parent, this.readUntilNewLine(), "Missing '|' after description in embed");
 
         // Error if missing description.
         if(description === "")
-            return this.createError(parent, this.readUntilNewLine(), "Missing image/video description in embed.");
+            return new ErrorNode(parent, this.readUntilNewLine(), "Missing image/video description in embed.");
         
         const embed = new EmbedNode(parent, url, description);
 
@@ -866,7 +857,7 @@ export default class Parser {
         embed.setCaption(this.parseContent(embed, "|"));
 
         if(this.peek() !== "|")
-            return this.createError(embed, this.readUntilNewLine(), "Missing '|' after caption in embed");
+            return new ErrorNode(embed, this.readUntilNewLine(), "Missing '|' after caption in embed");
         
         // Read a |
         this.read();
@@ -876,19 +867,17 @@ export default class Parser {
 
         // Error if missing credit.
         if(embed.getCredit().toText().trim() === "")
-            return this.createError(parent, this.readUntilNewLine(), "Missing credit in embed.");
+            return new ErrorNode(parent, this.readUntilNewLine(), "Missing credit in embed.");
         
         // Check for the closing delimeter
         if(this.peek() !== "|")
-            return this.createError(parent, this.readUntilNewLine(), "Missing '|' after credit in embed.");
+            return new ErrorNode(parent, this.readUntilNewLine(), "Missing '|' after credit in embed.");
 
         // Read a |
         this.read();
 
         // Is there a position indicator?
         embed.setPosition(this.parsePosition());
-        
-        this.metadata.embeds.push(embed);
 
         return embed;
 
@@ -937,7 +926,7 @@ export default class Parser {
         let text = "";
 
         if(delimeter === null)
-            return this.createError(parent, undefined, "Somehow parsing formatted text at end of file.");
+            return new ErrorNode(parent, undefined, "Somehow parsing formatted text at end of file.");
 
         const node = new FormattedNode(parent, delimeter as Format, segments)
 
@@ -969,7 +958,7 @@ export default class Parser {
             this.read();
         // If it wasn't closed, add an error
         else
-            segments.push(this.createError(node, undefined, "Unclosed " + delimeter));
+            segments.push(new ErrorNode(node, undefined, "Unclosed " + delimeter));
         
         return node;
 
@@ -1113,7 +1102,7 @@ export default class Parser {
         if(char)
             return new TextNode(chapter, char, this.index);
 
-        return this.createError(chapter, undefined, "Unterminated escape.");
+        return new ErrorNode(chapter, undefined, "Unterminated escape.");
 
     }
     
@@ -1128,7 +1117,7 @@ export default class Parser {
         // Catch missing bars
         if(this.peek() !== "|") {
             this.readUntilNewLine();
-            return this.createError(parent, undefined, "Missing '|' in link");
+            return new ErrorNode(parent, undefined, "Missing '|' in link");
         }
 
         // Read the |
@@ -1140,7 +1129,7 @@ export default class Parser {
         // Catch missing closing
         if(this.peek() !== "]") {
             this.readUntilNewLine();
-            return this.createError(parent, undefined, "Missing ] in link");
+            return new ErrorNode(parent, undefined, "Missing ] in link");
         }
 
         // Read the ]
@@ -1159,7 +1148,7 @@ export default class Parser {
             }
 
             if(chapter !== "" && this.book && !this.book.hasChapter(chapter))
-                return this.createError(parent, undefined, "Unknown chapter name '" + url + "'");
+                return new ErrorNode(parent, undefined, "Unknown chapter name '" + url + "'");
 
         }
 
