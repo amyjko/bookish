@@ -187,17 +187,6 @@ export class ParagraphNode extends Node<BlockParentNode> {
 
     }
 
-
-    format(range: CaretRange, format: Format): CaretRange {
-
-        const formatted = range.start.node.getCommonAncestor(range.end.node);
-        if(formatted && formatted.getClosestParentMatching(node => node instanceof ParagraphNode) !== this)
-            throw Error("Can't format a caret range that isn't within this particular ParagraphNode.");
-
-        return this.#content.formatRange(range, format);
-
-    }
-
     clean() {
         this.#content.clean();
         // Make sure the paragraph always has an empty text node so that it's navigable.
