@@ -402,70 +402,51 @@ export class ChapterNode extends BlocksNode {
         if(!(range.start.node instanceof TextNode) || !(range.end.node instanceof TextNode))
             return range;
 
-        // If this isn't a selection, but rather a single point in a paragraph, and we're clearing formatting, just select the whole paragraph.
+        // Preserve the original range, since there are a few cases where we adjust it.
+        let adjustedRange = range;
+
+        // If this a single point in format, and we're clearing formatting, just select the whole format.
         if(format === "" && range.start.node === range.end.node && range.start.index === range.end.index) {
-            const paragraph = range.start.node.getClosestParentMatching(p => p instanceof ParagraphNode) as ParagraphNode;
-            if(paragraph) {
-                // Remember the caret position
-                const textPosition = paragraph.getContent().caretToTextIndex(range.start);
-                const text = paragraph.getNodes().filter(n => n instanceof TextNode) as TextNode[];
-                if(text.length > 0) {
-                    this.formatSelection({ start: { node: text[0], index: 0 }, end: { node: text[text.length - 1], index: text[text.length - 1].getLength() }}, "");
-                    // Restore the caret position
-                    const caret = paragraph.getContent().textIndexToCaret(textPosition);
-                    return caret ? { start: caret, end: caret } : range;
-                }
-            }
+            const selection = range.start.node.getFormatRoot()?.getSelection();
+            if(selection)
+                adjustedRange = selection;
         }
 
-        // Sort them if they're out of order.
-        const sortedRange = this.sortRange(range);
+        // Sort the range if it's out of order
+        const sortedRange = this.sortRange(adjustedRange);
 
-        // Find the selected paragraphs.
-        const startParagraph = sortedRange.start.node.closestParent(ParagraphNode) as ParagraphNode;
-        const endParagraph = sortedRange.end.node.closestParent(ParagraphNode) as ParagraphNode;
-
-        // Don't do anything if we didn't find paragraphs or the paragraphs don't have the same parent.
-        if(startParagraph === undefined || endParagraph === undefined || startParagraph.getParent() !== endParagraph.getParent())
+        // Find all of the format roots in the selection by finding the range's common ancestor,
+        // then finding all of the format roots between the start and end node, inclusive.
+        const commonAncestor = sortedRange.start.node.getCommonAncestor(sortedRange.end.node);
+        if(commonAncestor === undefined)
             return range;
-
-        // If this is the same paragraph, just format it.
-        if(startParagraph === endParagraph)
-            return startParagraph.format(sortedRange, format);
-
-        // If there's more than one paragraph, find all of the paragraph's to format.
-        const startParagraphIndex = startParagraph.getParent()?.getBlocks().indexOf(startParagraph);
-        const endParagraphIndex = endParagraph.getParent()?.getBlocks().indexOf(endParagraph);
-
-        // In case a paragraph has no parent.
-        if(startParagraphIndex === undefined || endParagraphIndex === undefined)
-            return range;
-
-        // Iterate through the list of blocks to find all of the paragraphs to format
-        const paragraphs: Set<ParagraphNode> = new Set();
-        (startParagraph.getParent() as BlockParentNode).getBlocks().forEach((block, index) => {
-            if(block instanceof ParagraphNode && index > startParagraphIndex && index < endParagraphIndex)
-                paragraphs.add(block);
+        const formats = new Set<FormatNode>();
+        let insideSelection = false;
+        commonAncestor.getNodes().forEach(node => {
+            if(node === sortedRange.start.node)
+                insideSelection = true;
+            const root = node instanceof TextNode ? node.getFormatRoot() : undefined;
+            if(insideSelection && root)
+                formats.add(root);
+            if(insideSelection && node === sortedRange.end.node)
+                insideSelection = false;
         });
 
-        // Format the start paragraph from the start to it's last text node.
-        const lastStartTextNode = startParagraph.getLastTextNode();
-        const newStartRange = startParagraph.format({ start: sortedRange.start, end: { node: lastStartTextNode, index: lastStartTextNode.getLength()}}, format);
-        let newEndRange = newStartRange;
+        // Format each of the format roots as requested, accounting for the start and stop nodes.
+        const newRanges: CaretRange[] = [];
+        formats.forEach(root => {
 
-        // If the end node is different from the start node, format from it's beginning to the end node.
-        if(startParagraph !== endParagraph)
-            newEndRange = endParagraph.format({ start: { node: endParagraph.getFirstTextNode(), index: 0 }, end: sortedRange.end}, format);    
+            // The start is either the beginning of the format root or the start node, if this contains the start node.
+            const start = (sortedRange.start.node as TextNode).getFormatRoot() === root ? sortedRange.start : { node: root.getFirstTextNode(), index: 0 };
+            // The end is either the end of the formatting root or the end node, if this contains the end node.
+            const end = (sortedRange.end.node as TextNode).getFormatRoot() === root ? sortedRange.end : { node: root.getLastTextNode(), index: root.getLastTextNode().getLength() };
+            // Format the range and save the revised range!
+            newRanges.push(root.formatRange({ start: start, end: end }, format));
 
-        // Format the entirety of each inner paragraph.
-        paragraphs.forEach(p =>  {
-            const first = p.getFirstTextNode();
-            const last = p.getLastTextNode();
-            p.format({ start: { node: first, index: 0 }, end: { node: last, index: 0}}, format);
         });
 
         // Return the new range.
-        return { start: newStartRange.start, end: newEndRange.end };
+        return { start: newRanges[0].start, end: newRanges[newRanges.length - 1].end };
 
     }
 

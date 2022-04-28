@@ -481,7 +481,7 @@ export const commands: Command[] = [
         description: "clear formatting",
         mouse: true,
         category: "text",
-        control: true, alt: false, shift: false, key: "i",
+        control: true, alt: false, shift: false, key: "0",
         active: context => context.chapter !== undefined,
         handler: context => context.chapter ? context.chapter.formatSelection(context.range, "") : context.range
     },

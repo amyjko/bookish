@@ -57,6 +57,14 @@ export class ParagraphNode extends Node<BlockParentNode> {
         return p;
     }
 
+    getSelection(): CaretRange {
+
+        const first = this.getFirstTextNode();
+        const last = this.getLastTextNode();
+        return { start: { node: first, index: 0}, end: { node: last, index: last.getLength() } };
+
+    }
+
     getFirstTextNode(): TextNode { return this.getContent().getFirstTextNode(); }
 
     getLastTextNode(): TextNode { return this.getContent().getLastTextNode(); }

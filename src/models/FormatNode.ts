@@ -154,6 +154,10 @@ export class FormatNode extends Node<FormatNodeParent> {
         return this.getFarthestParentMatching(p => p instanceof FormatNode) as FormatNode;
     }
 
+    isFormatRoot(): boolean {
+        return this.getFormatRoot() === this;
+    }
+
     clean() {
 
         // Clean all of the segments bottom up first.
@@ -283,6 +287,14 @@ export class FormatNode extends Node<FormatNodeParent> {
         const nodes = this.getTextNodes();
         const last = nodes[nodes.length - 1];
         return { node: last, index: last.getLength() };
+    }
+
+    getSelection(): CaretRange {
+
+        const first = this.getFirstTextNode();
+        const last = this.getLastTextNode();
+        return { start: { node: first, index: 0}, end: { node: last, index: last.getLength() } };
+
     }
 
     deleteRange(range: CaretRange) {
