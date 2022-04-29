@@ -8,7 +8,7 @@ import { Caret, CaretRange } from "./Caret";
 import { MetadataNode } from "./MetadataNode";
 import { AtomNode } from "./AtomNode";
 
-export type Format = "" | "*" | "_" | "" | "^" | "v";
+export type Format = "" | "*" | "_" | "^" | "v";
 export type FormatNodeSegmentType = FormatNode | TextNode | ErrorNode | MetadataNode<any> | AtomNode<any>;
 export type FormatNodeParent = BlockNode | FormatNode | FootnoteNode | EmbedNode;
 
@@ -190,13 +190,13 @@ export class FormatNode extends Node<FormatNodeParent> {
         return this.getNodes().filter(n => n instanceof TextNode) as TextNode[];
     }
 
-    getTextOrAtomNodes(): (TextNode | AtomNode<any>)[] {
+    getTextAndAtomNodes(): (TextNode | AtomNode<any>)[] {
         return this.getNodes().filter(n => n instanceof TextNode || n instanceof AtomNode) as (TextNode | AtomNode<any>)[];
     }
 
     getNextTextOrAtom(node: TextNode | AtomNode<any>): TextNode | AtomNode<any> | undefined {
         // Otherwise, find the next text node after this one.
-        const text = this.getTextOrAtomNodes();
+        const text = this.getTextAndAtomNodes();
         const index = text.indexOf(node);
         return index === undefined ? undefined :
             index < text.length - 1 ? text[index + 1] :
@@ -205,7 +205,7 @@ export class FormatNode extends Node<FormatNodeParent> {
 
     getPreviousTextOrAtom(node: TextNode | AtomNode<any>): TextNode | AtomNode<any> | undefined {
         // Otherwise, find the next text node after this one.
-        const text = this.getTextOrAtomNodes();
+        const text = this.getTextAndAtomNodes();
         const index = text.indexOf(node);
         return index === undefined ? undefined :
             index > 0 ? text[index - 1] :
@@ -324,205 +324,188 @@ export class FormatNode extends Node<FormatNodeParent> {
 
     formatRange(range: CaretRange, format: Format): CaretRange {
 
-        // This only transforms ranges that start and end with text nodes.
-        if(!(range.start.node instanceof TextNode))
-           return range;
-        if(!(range.end.node instanceof TextNode)) 
+        // This only transforms ranges that start and end with text nodes and for nodes in the same format node.
+        if( !(range.start.node instanceof TextNode) || 
+            !(range.end.node instanceof TextNode) || 
+            !(range.start.node.getCommonAncestor(range.end.node) instanceof FormatNode))
             return range;
 
-        const startNode = range.start.node;
-        const endNode = range.end.node;
-
-        // Cases to handle. Examples below are for * formatting. [] means no formatting. | means caret.
-        // A.  [This is my para|graph to format.]      -> [This is my para][*|*][graph to format.]   # Unformatted, no selection -> insert FormatNode
-        // B.  [This is my ]*para|graph*[ to format.]  -> [This is my ]*para*[|]*graph*[ to format.] # Formatted, no selection -> split FormatNode and insert unformatted node
-        // C.  [This is my |paragraph| to format.]     -> [This is my ]*|paragraph|*[ to format.]    # Selection -> wrap selection in FormatNode
-        // D.  [This is my ]*|paragraph|*[ to format.] -> [This is my |paragraph| to format.]        # Fully formatted -> remove formatting
-        // E.  [This is my |para]*graph*[| to format.] -> [This is my ]*|paragraph|*[ to format.]    # Partially formatted -> extend selection
-        // F.  [This is my |para]*graph| to format*[.] -> [This is my ]*|paragraph| to format*[.]    # Partially formatted -> extend selection
-
-        // The algorithm:
-        // ✓ - Remember the text positions of the current range.
-        // - Identify needs
-        //    ✓ 1. Identify all text nodes in the selection that are and are not formatted.
-        //    ✓ 2. Create an empty set of text to format.
-        //    ✓ 3. If some nodes aren't formatted, add all unformatted nodes to the set and prepare to format; otherwise add all formatted ranges and unformat.
-        // - For each range:
-        //    1. Split the range's common ancestor's segments into beginning, middle, and end FormatNodes [xxxx][][xxxx]
-        //    2. Set the new middle node's formatting to the opposite of what it was
-        //    3. Paste the middle segments into the new middle FormatNode  [xxxx][...][xxxx]
-        // - Clean up:
-        //    1. Remove empty formatting (unless a new empty text node was created)
-        //    1. Merge adjacent formatting
-        //    2. Remove unformatted parents that have no effect
-        // - Position:
-        //    ✓ 1. Return a CaretRange that corresponds to the original positions
-
-        // Convert the range into text positions so we can return a proper caret range.
+        // Remember the text positions so we can return a new range in the new tree.
         const textStart = this.caretToTextIndex(range.start);
         const textEnd = this.caretToTextIndex(range.end);
 
-        // Verify that the two given nodes share a FormatNode ancestor.
-        const formatted = range.start.node.getCommonAncestor(range.end.node);
-        // If they don't, no op.
-        if(!formatted || !(formatted instanceof FormatNode))
-            return range;
+        // Find all of the content in the node so we can construct a new format tree with the old content.
+        const everythingButFormats = 
+            this.getNodes().filter(n => (n instanceof TextNode && !(n.getParent() instanceof MetadataNode)) || n instanceof AtomNode || n instanceof ErrorNode || n instanceof MetadataNode) as (TextNode | AtomNode<any> | MetadataNode<any>)[];
 
-        // Determine which text nodes do and don't have the requested formatting.
-        // This determines what transformations we apply.
-        const textNodes = this.getTextNodes();
-        const selectedNodes = textNodes.filter(n => 
-                // Exclude any text nodes not parented by a formatted node (e.g., atomic nodes like links).
-                n.getParent() instanceof FormatNode &&
-                (
-                    // Only include the start and end node if we've selected 1 or more of their characters.
-                    // Otherwise, they will be counted as formatted or unformatted in the logic below,
-                    // preventing formatting removal.
-                    (n === startNode && range.start.index < startNode.getLength()) ||
-                    (n === endNode && range.end.index > 0) || 
-                    // Include any nodes between the start and the end nodes.
-                    (textNodes.indexOf(n) > textNodes.indexOf(startNode) && textNodes.indexOf(n) < textNodes.indexOf(endNode))
-                )
-        );
-
-        // Split the nodes into formatted and unformatted so that we can operate on one or the other sets.
-        const formattedNodes = new Set(selectedNodes.filter(n => n.getClosestParentMatching(p => p instanceof FormatNode && p.#format === format) !== undefined));
-        const unformattedNodes = new Set(selectedNodes.filter(n => !formattedNodes.has(n)));
-
-        // If *any* nodes are unformatted, apply the formatting to all unformatted nodes.
-        const apply = unformattedNodes.size > 0;
-        const nodesToFormat = apply ? unformattedNodes : formattedNodes;
-
-        const insertingEmptyTextNode = textStart === textEnd;
-        let newEmptyTextNode = undefined;
-
-        // Format each node accordingly.
-        nodesToFormat.forEach(text => {
-
-            // If we're applying formatting, split this text node into left, middle, and right, and wrap the middle in the new formatting.
-            // Account for selection's start and end index.
-            // Don't worry about empty text nodes, we'll clean those up later.
-            if(apply) {
-                const parent = text.getParent();
-                if(parent instanceof FormatNode) {
-                    const formattedMiddle = new FormatNode(parent, format, []);
-                    const left = new TextNode(parent, text.getText().substring(0, text === range.start.node ? range.start.index : 0));
-                    const middle = new TextNode(formattedMiddle, text.getText().substring(text === range.start.node ? range.start.index : 0, text === range.end.node ? range.end.index : text.getLength()));
-                    const right = new TextNode(parent, text.getText().substring(text === range.end.node ? range.end.index : text.getLength()));
-                    formattedMiddle.addSegment(middle);
-                    parent.#segments.splice(parent.#segments.indexOf(text), 1, left, formattedMiddle, right);
-
-                    // Remember the new empty text node
-                    if(insertingEmptyTextNode)
-                        newEmptyTextNode = middle;
+        // Check if all of the selected content has the requested format so we can toggle it if so.
+        let checkIndex = 0;
+        let checkingEmptyNode = false;
+        const alreadyApplied = everythingButFormats.every(node => {
+            // If it's text, and the current position is in range of the selection, does the position contain the requested format?
+            if(node instanceof TextNode) {
+                // If we have a zero-width selection, remember, so we can ignore it in the next text node at the same location.
+                if(node.getText().length === 0) {
+                    if(checkIndex === textStart && textStart === textEnd) {
+                        checkingEmptyNode = true;
+                        return (node.getParent() as FormatNode).getFormats().includes(format);
+                    }
+                    else return true;
                 }
-            } 
-            // If we're removing formatting, remove and reapply formatting, except for the formatting to be removed from the selected node.
-            //   1. Split the text node at the selection so that it can be formatted differently.
-            //   2. Remember the formatting on all nodes, in order.
-            //   3. Create a new list of nodes, wrap each according to their original formatting, except the selected node, from which we exclude the formatting being removed.
-            // For example:
-            //   1. •I think •*•broadening participation in •_•com|put|ing•_*• is cool.•
-            //   2. •I think •*•broadening participation in •_•com•|•put•|•ing•_*• is cool.•
-            //   3. •I think ••broadening participation in ••com•|•put•|•ing•• is cool.•
-            else {
-
-                // 1. Split the text node along the selection
-                const parent = text.getParent();
-                if(parent instanceof FormatNode) {
-                    const left = new TextNode(parent, text.getText().substring(0, text === range.start.node ? range.start.index : 0));
-                    const middle = new TextNode(parent, text.getText().substring(text === range.start.node ? range.start.index : 0, text === range.end.node ? range.end.index : text.getLength()));
-                    const right = new TextNode(parent, text.getText().substring(text === range.end.node ? range.end.index : text.getLength()));
-                    parent.#segments.splice(parent.#segments.indexOf(text), 1, left, middle, right);
-
-                    // Remember the new empty text node
-                    if(insertingEmptyTextNode)
-                        newEmptyTextNode = middle;
-
-                    // 2a. Find the formatter to remove
-                    const formatter = text.getClosestParentMatching(p => p instanceof FormatNode && p.#format === format) as FormatNode;
-                    if(formatter === undefined) throw Error(`Somehow couldn't find a parent with format ${format}`);
-
-                    // 2b. Get the nodes, in render order, and the formats applied to them.
-                    const formatting = formatter.getSegmentFormats();
-                    
-                    // 3. Add all of the nodes 
-                    formatter.#segments = formatting.map(nodeFormat => {
-                        let node = nodeFormat.node;
-                        if(nodeFormat.format !== undefined) {
-                            // Wrap the node in all the formats, if there are any.
-                            nodeFormat.format.split("").forEach(formatToApply => {
-                                // If the requested formatting is "", remove all formatting. If it's not, then
-                                // only restore formatting if it's not the formatting we're removing.
-                                if(node !== middle || (format !== "" && formatToApply !== format)) {
-                                    node = new FormatNode(formatter, formatToApply as Format, [ node ]);
-                                }
-                            })
-                        }
-                        // Make sure all children have the formatter as parent.
-                        node.setParent(formatter);
-                        return node;
-                    });
-
-                    // 3b. Remove the format from the formatter.
-                    formatter.#format = "";
+                // If it has longer than zero characters, formatting is applied if all characters in range the node have it applied.
+                else {
+                    let allFormatted = true;
+                    for(let i = 0; i < node.getText().length; i++) {
+                        if((!checkingEmptyNode && checkIndex === textStart && textStart === textEnd) || (checkIndex >= textStart && checkIndex < textEnd))
+                            allFormatted = allFormatted && (node.getParent() as FormatNode).getFormats().includes(format);
+                        checkIndex++;
+                    }
+                    return allFormatted;
                 }
-
             }
-
+            // Treat all non-text as containing the requested format.
+            else return true;
         });
 
-        // Clean all of the formatting in this node, removing empty text and formatting nodes, 
-        // merging text and formatting nodes, and ridding of formatting containers that don't do any formatting.
-        // This ensures the simplest possible tree for later formatting, improving performance
-        // and beautifying any markup we save elsewhere.
-        // HOWEVER: We don't do this if we were inserting a formatting node at a single caret position, 
-        // so that we can insert text into that new formatting node.
-        if(newEmptyTextNode === undefined) {
+        // Reformat everything. The strategy is to step through each character, atom node, and metadata node in this format node
+        // and create a new series of formats that preserve existing formatting while applying new formatting to the selection.
+        const newFormat = new FormatNode(this.getParent(), "", []); // The current formatter we're adding to.
+        let currentFormat = newFormat;
+        let textIndex = 0;
+        let currentText = ""; // The current text we've accumulated, inserted before each format change and at the end.
+        let formattingEmptyNode = false;
+        let emptyNode = undefined;
+        everythingButFormats.forEach(node => {
+            if(node instanceof TextNode) {
+                // Remember we found an empty node so that we don't insert an extra one later.
+                if(node.getText().length === 0) {
+                    if(textIndex === textStart && textStart === textEnd) {
+                        formattingEmptyNode = true;
+                    }
+                }
+                else {
+                    // Process each character in the node.
+                    for(let i = 0; i < node.getText().length; i++) {
 
-            this.clean();
+                        // Determine the desired format for this character. Start with the current formats
+                        // and if we're in the selected range, adjust them accordingly based on the current formats 
+                        // and the requested format.
+                        let desiredFormats = (node.getParent() as FormatNode).getFormats();
+                        if( (textIndex === textStart && textStart === textEnd) || 
+                            (textIndex >= textStart && textIndex < textEnd)) {
+                            // Remove all formatting if we were asked to.
+                            if(format === "")
+                                desiredFormats = [];
+                            // Apply the formatting if it's not already applied.
+                            else if(!alreadyApplied && !desiredFormats.includes(format))
+                                desiredFormats.push(format);
+                            // Remove the formatting if it's already applied in the selection.
+                            else if(alreadyApplied && desiredFormats.includes(format))
+                                desiredFormats.splice(desiredFormats.indexOf(format), 1);
+                        }
 
-            // Convert the text selection back into a CaretRange, keeping selection on the same text.
-            const startCaret = this.textIndexToCaret(textStart);
-            const endCaret = this.textIndexToCaret(textEnd);
-            if(startCaret && endCaret)
-                return { start: startCaret, end: endCaret };
+                        // Remove undesired formats.
+                        currentFormat.getFormats().forEach(current => {
+                            // If the current format is not in the desired list, close the text
+                            // node and keep popping formats until we find the parent of the offending format.
+                            if(!desiredFormats.includes(current)) {
+                                if(currentText.length > 0) {
+                                    currentFormat.addSegment(new TextNode(currentFormat, currentText));
+                                    currentText = "";
+                                }
+                                // Not sure this loop is necessary; we should always remove in the order we added.
+                                while(currentFormat.#format !== current)
+                                    currentFormat = currentFormat.getParent() as FormatNode;
+                                currentFormat = currentFormat.getParent() as FormatNode;
 
-        } else {
-            const caret = { node: newEmptyTextNode, index: 0 };
-            return { start: caret, end: caret};
-        }
+                                // If we have unformatted something at a zero-width range, create empty format node, add a text node in it and remember it so
+                                // we can place the caret in it.
+                                if(!formattingEmptyNode && textIndex === textStart && textStart === textEnd) {
+                                    emptyNode = new TextNode(currentFormat, "");
+                                    currentFormat.addSegment(emptyNode);
+                                    const newDesiredFormat = new FormatNode(currentFormat, current, []);
+                                    currentFormat.addSegment(newDesiredFormat);
+                                    currentFormat = newDesiredFormat;
+                                }
+
+                            }
+                        });
+
+                        // Ensure the desired formats.
+                        desiredFormats.forEach(desiredFormat => {
+                            // If the current format does not yet include the desired format,
+                            // close the text node and start a new format.
+                            if(!currentFormat.getFormats().includes(desiredFormat)) {
+                                if(currentText.length > 0) {
+                                    currentFormat.addSegment(new TextNode(currentFormat, currentText));
+                                    currentText = "";
+                                }
+
+                                const newDesiredFormat = new FormatNode(currentFormat, desiredFormat, []);
+                                currentFormat.addSegment(newDesiredFormat);
+                                currentFormat = newDesiredFormat;
+
+                                // If we inserted an empty format node, add a text node in it and remember it so
+                                // we can place the caret in it.
+                                if(!formattingEmptyNode && textIndex === textStart && textStart === textEnd) {
+                                    emptyNode = new TextNode(currentFormat, "");
+                                    currentFormat.addSegment(emptyNode);
+                                    currentFormat = newDesiredFormat.getParent() as FormatNode;
+                                }
         
-        // This shouldn't ever happen unless something's gone horribly wrong and mutated the AST in a way that didn't preserve text.
-        throw Error("Couldn't map text positions back to nodes, something's wrong :(");
+                            }
+                        });
+
+                        // Append the current text.
+                        currentText += node.getText().charAt(i);
+                        textIndex++;
+                    }
+                }
+            }
+            // If it's not text, just add the segment unmodified, since we only format text.
+            else {
+                // Before adding the atom, create a text node and reset the accumulator.
+                if(currentText.length > 0) {
+                    currentFormat.addSegment(new TextNode(currentFormat, currentText));
+                    currentText = "";
+                }
+                // Add the atom immediately after.
+                currentFormat.addSegment(node);
+            }
+        });
+
+        // Add any text that we haven't included yet.
+        if(currentText.length > 0)
+            currentFormat.addSegment(new TextNode(currentFormat, currentText));
+
+        // Replace this format's segments with the new segments.
+        this.#segments = [];
+        newFormat.#segments.forEach(seg => this.addSegment(seg));
+
+        // If we made an empty node, place the caret in it.
+        if(emptyNode)
+            return { start: { node: emptyNode, index: 0 }, end: { node: emptyNode, index: 0}};
+
+        // Convert the text selection back into a CaretRange, keeping selection on the same text.
+        const startCaret = this.textIndexToCaret(textStart);
+        const endCaret = this.textIndexToCaret(textEnd);
+        if(startCaret && endCaret)
+            return { start: startCaret, end: endCaret };
+
+        throw Error("Couldn't map original positions onto new formatting; something is very broken!");
 
     }
 
-    getSegmentFormats() {
+    getFormats(): Format[] {
 
-        const nodes = this.getNodes();
-        const newNodes: { node: FormatNodeSegmentType, format: string | undefined}[] = [];
-        nodes.forEach(node => {
-            // If this is a formatting node, a text node inside of an metadata node, or an Atom node, ignore it.
-            if(node instanceof FormatNode || node instanceof AtomNode || node.getClosestParentMatching(p => p instanceof MetadataNode) !== undefined) {
-                // Do nothing. This strips the formatted nodes and leaves any text nodes to be included by their parents.
-            }
-            // If this is a text node inside of a formatting node, remember its formatting.
-            else if(node instanceof TextNode && node.getParent() instanceof FormatNode) {
-                let format = "";
-                let parent = node.getParent() as FormatNode;
-                while(parent) {
-                    if(parent instanceof FormatNode)
-                        format = format + parent.#format;
-                    parent = parent.getParent() as FormatNode;
-                }
-                newNodes.push({ node: node as FormatNodeSegmentType, format: format });
-            }
-            // Otherwise, if this doesn't have a add whatever node this is without formatting.
-            else
-                newNodes.push({ node: node as FormatNodeSegmentType, format: undefined });
-        });
-        return newNodes;
+        let format: FormatNodeParent | undefined = this;
+        const formats: Format[] = [];
+        while(format instanceof FormatNode) {
+            if(format.#format !== "")
+                formats.push(format.#format);
+            format = format.getParent();
+        }
+        return formats;
 
     }
 
