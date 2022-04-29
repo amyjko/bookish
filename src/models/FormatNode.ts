@@ -375,11 +375,20 @@ export class FormatNode extends Node<FormatNodeParent> {
         let currentText = ""; // The current text we've accumulated, inserted before each format change and at the end.
         let formattingEmptyNode = false;
         let emptyNode = undefined;
+        let zeroWidthSelection = textStart === textEnd;
+
+        function saveText() {
+            if(currentText.length > 0) {
+                currentFormat.addSegment(new TextNode(currentFormat, currentText));
+                currentText = "";
+            }
+        }
+
         everythingButFormats.forEach(node => {
             if(node instanceof TextNode) {
                 // Remember we found an empty node so that we don't insert an extra one later.
                 if(node.getText().length === 0) {
-                    if(textIndex === textStart && textStart === textEnd) {
+                    if(textIndex === textStart && zeroWidthSelection) {
                         formattingEmptyNode = true;
                     }
                 }
@@ -391,7 +400,7 @@ export class FormatNode extends Node<FormatNodeParent> {
                         // and if we're in the selected range, adjust them accordingly based on the current formats 
                         // and the requested format.
                         let desiredFormats = (node.getParent() as FormatNode).getFormats();
-                        if( (textIndex === textStart && textStart === textEnd) || 
+                        if( (textIndex === textStart && zeroWidthSelection) || 
                             (textIndex >= textStart && textIndex < textEnd)) {
                             // Remove all formatting if we were asked to.
                             if(format === "")
@@ -409,10 +418,10 @@ export class FormatNode extends Node<FormatNodeParent> {
                             // If the current format is not in the desired list, close the text
                             // node and keep popping formats until we find the parent of the offending format.
                             if(!desiredFormats.includes(current)) {
-                                if(currentText.length > 0) {
-                                    currentFormat.addSegment(new TextNode(currentFormat, currentText));
-                                    currentText = "";
-                                }
+
+                                // Save any text that we've accumulated.
+                                saveText();
+
                                 // Not sure this loop is necessary; we should always remove in the order we added.
                                 while(currentFormat.#format !== current)
                                     currentFormat = currentFormat.getParent() as FormatNode;
@@ -420,7 +429,7 @@ export class FormatNode extends Node<FormatNodeParent> {
 
                                 // If we have unformatted something at a zero-width range, create empty format node, add a text node in it and remember it so
                                 // we can place the caret in it.
-                                if(!formattingEmptyNode && textIndex === textStart && textStart === textEnd) {
+                                if(!formattingEmptyNode && textIndex === textStart && zeroWidthSelection) {
                                     emptyNode = new TextNode(currentFormat, "");
                                     currentFormat.addSegment(emptyNode);
                                     const newDesiredFormat = new FormatNode(currentFormat, current, []);
@@ -436,10 +445,9 @@ export class FormatNode extends Node<FormatNodeParent> {
                             // If the current format does not yet include the desired format,
                             // close the text node and start a new format.
                             if(!currentFormat.getFormats().includes(desiredFormat)) {
-                                if(currentText.length > 0) {
-                                    currentFormat.addSegment(new TextNode(currentFormat, currentText));
-                                    currentText = "";
-                                }
+
+                                // Save any text that we've accumulated.
+                                saveText();
 
                                 const newDesiredFormat = new FormatNode(currentFormat, desiredFormat, []);
                                 currentFormat.addSegment(newDesiredFormat);
@@ -447,7 +455,7 @@ export class FormatNode extends Node<FormatNodeParent> {
 
                                 // If we inserted an empty format node, add a text node in it and remember it so
                                 // we can place the caret in it.
-                                if(!formattingEmptyNode && textIndex === textStart && textStart === textEnd) {
+                                if(!formattingEmptyNode && textIndex === textStart && zeroWidthSelection) {
                                     emptyNode = new TextNode(currentFormat, "");
                                     currentFormat.addSegment(emptyNode);
                                     currentFormat = newDesiredFormat.getParent() as FormatNode;
@@ -474,9 +482,8 @@ export class FormatNode extends Node<FormatNodeParent> {
             }
         });
 
-        // Add any text that we haven't included yet.
-        if(currentText.length > 0)
-            currentFormat.addSegment(new TextNode(currentFormat, currentText));
+        // Save any text that we've accumulated.
+        saveText();
 
         // Replace this format's segments with the new segments.
         this.#segments = [];
