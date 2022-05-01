@@ -326,7 +326,7 @@ export const commands: Command[] = [
         active: context => context.format !== undefined,
         handler: context => {
             const last = (context.format as FormatNode).getLastTextNode();
-            return { start: context.start, end: { node: last, index: 0 } };
+            return { start: context.start, end: { node: last, index: last.getLength() } };
         }
     },
     {
