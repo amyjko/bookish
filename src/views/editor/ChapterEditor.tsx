@@ -422,7 +422,8 @@ const ChapterEditor = (props: { ast: ChapterNode }) => {
                 key
             );
             if(newRange)
-                setCaretRange(newRange);
+                // Force a render
+                setCaretRange({ start: newRange.start, end: newRange.end });
         }
     }
 

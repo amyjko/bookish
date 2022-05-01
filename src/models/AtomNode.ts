@@ -97,6 +97,8 @@ export abstract class AtomNode<MetadataType> extends Node<FormatNode> {
         return this.getFarthestParentMatching(p => p instanceof FormatNode) as FormatNode;
     }
 
+    getLength() { return 1; }
+
     abstract toBookdown(): string;
     abstract toText(): string;
     abstract copy(parent: FormatNode): AtomNode<any>;

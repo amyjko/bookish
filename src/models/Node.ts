@@ -42,7 +42,7 @@ export abstract class Node<ParentType extends Node<any> = Node<any>> {
 
     abstract copy(parent: ParentType): Node;
 
-    hasParent(node: Node<any>): boolean {
+    hasAncestor(node: Node<any>): boolean {
 
         let parent = this.#parent;
         while(parent) {
@@ -134,7 +134,7 @@ export abstract class Node<ParentType extends Node<any> = Node<any>> {
         return nodes;
     }
 
-    getSibling(next: boolean) { return this.#parent?.getSiblingOf(this, next); }
+    getSibling(next: boolean): Node<any> | undefined { return this.#parent?.getSiblingOf(this, next); }
 
     abstract getSiblingOf(child: Node, next: boolean): Node | undefined;
 

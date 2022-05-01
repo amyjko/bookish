@@ -94,7 +94,7 @@ export class ListNode extends Node<ListParentType> {
         const format = caret.node.getFarthestParentMatching(n => n instanceof FormatNode) as FormatNode;
 
         return format !== undefined &&
-            caret.node.hasParent(this) &&
+            caret.node.hasAncestor(this) &&
             caret.index === 0 &&
             format.getTextNodes()[0] === caret.node;
 

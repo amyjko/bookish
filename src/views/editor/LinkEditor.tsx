@@ -55,6 +55,15 @@ const LinkEditor = (props: {
 
     }
 
+    // Build the list of options (chapters and then any of the chapter's labels.)
+    const options: { value: string, label: string}[] = [];
+    chapter.book?.getChapters().map(chapter => {
+        options.push({ value: chapter.getChapterID(), label: chapter.getTitle() });
+        chapter.getAST()?.getLabels().map((label, index) => 
+            options.push({ value: `${chapter.getChapterID()}:${label.getMeta()}`, label: chapter.getTitle() + ": " + label.getMeta()})
+        )
+    });
+
     return <span>
         <button title="Remove link."
             onClick={(e) => {
@@ -67,18 +76,8 @@ const LinkEditor = (props: {
             <Unlink/>
         </button>
         <select name="chapterID" onChange={handleChapterChange} value={editedURL}>
-            <option key="url" value="">URL</option>
-            {/* Convert each chapter into a chapter link and a link for all the chapter's labels */}
-            { 
-                chapter.book?.getChapters().map(chapter => <>
-                    <option key={chapter.getChapterID()} value={chapter.getChapterID()}>{chapter.getTitle()}</option>
-                    {
-                        chapter.getAST()?.getLabels().map(label => 
-                            <option key={chapter.getChapterID() + label.getMeta()} value={`${chapter.getChapterID()}:${label.getMeta()}`}>{chapter.getTitle() + ": " + label.getMeta()}</option>
-                        )
-                    }
-                </>)
-            }
+            <option value="">URL</option>
+            { options.map((option, index) => <option key={index} value={option.value}>{option.label}</option>) }
         </select>
         <URLEditor url={editedURL} valid={isValid(editedURL)} edit={ url => { setEditedURL(url); link.setMeta(url); } } />
         {

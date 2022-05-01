@@ -6,6 +6,7 @@ import { Node } from "./Node";
 import { ParagraphNode } from "./ParagraphNode";
 import { AtomNode } from "./AtomNode";
 import { CodeNode } from "./CodeNode";
+import { BlocksNode } from "./BlocksNode";
 
 export type TextNodeParent = FormatNode | MetadataNode<any> | CodeNode;
 
@@ -66,167 +67,22 @@ export class TextNode extends Node<TextNodeParent> {
     isItalic() { return this.getAncestors().filter(p => p instanceof FormatNode && p.getFormat() === "_").length > 0; }
     isBold() { return this.getAncestors().filter(p => p instanceof FormatNode && p.getFormat() === "*").length > 0; }
 
-    deleteBackward(index?: number): Caret {
-
-        // If no index, delete from the end.
-        if(index === undefined)
-            index = this.#text.length;
-
-        // If the given index is after the first character, delete it.
-        if(index > 0) {
-            // Delete the character at the index and move the caret one left.
-            this.#text = this.#text.slice(0, index - 1) + this.#text.slice(index);
-            return { node: this, index: index - 1 };
-        }
-
-        // If this is the first text node in a paragraph, backspace over the block before it.
-        const paragraph = this.getParagraph();
-        const firstText = paragraph?.getFirstTextNode();
-        if(paragraph && firstText === this) {
-            // Is the block before a paragraph? Merge this paragraph with the previous one,
-            // returning a caret at the given index of this text node.
-            const previousParagraph = paragraph.getPreviousIfParagraph();
-            if(previousParagraph) {
-                // Remember the text position of the last position in the previous paragraph.
-                const lastText = previousParagraph.getLastTextNode();
-                const textPosition = previousParagraph.getContent().caretToTextIndex({ node: lastText, index: lastText.getLength() });
-                previousParagraph.appendParagraph(paragraph);
-                const newCaret = previousParagraph.getContent().textIndexToCaret(textPosition);
-                if(newCaret)
-                    return newCaret;
-                else throw Error("Couldn't map caret back to new position.");
-            }
-            // Otherwise, delete the previous block.
-            else {
-                const previousBlock = paragraph.getParent()?.getSiblingOf(paragraph, false);
-                if(previousBlock)
-                    previousBlock.remove();
-                return { node: this, index: index };
-            }
-        }
-
-        // Otherwise, see if there's a previous node.
-        const previous = this.getChapter()?.getPreviousTextOrAtom(this);
-
-        // If there isn't one, don't delete, don't change anything; just return the beginning of this. We've reached the beginning.
-        if(previous === undefined)
-            return { node: this, index: index };
-
-        // Otherwise, delete from the previous node.
-        const newCaret = previous.deleteBackward();
-
-        // If this is empty, delete it, then normalize the paragraph.
-        if(this.getLength() === 0)
-            return this.deleteAndClean(newCaret);
-
-        // Return the new caret position.
-        return newCaret;
-        
-    }
-
-    deleteForward(index?: number): Caret {
-
-        // If no index, delete from the beginning.
-        if(index === undefined)
-            index = 0;
-
-        // If this is within bounds, delete.
-        if(index < this.#text.length) {
-            // Delete the character at the index and move the caret one left.
-            this.#text = this.#text.slice(0, index) + this.#text.slice(index + 1);
-            return { node: this, index: index };
-        }
-
-        // If this is the last text node in a paragraph, merge the next paragraph with this one,
-        // returning a caret at the given index of this text node.
-        const paragraph = this.getParagraph();
-        const lastText = paragraph?.getLastTextNode();
-        if(paragraph && lastText === this) {
-            const nextParagraph = paragraph.getNextIfParagraph();
-            if(nextParagraph) {
-                // Remember the position of the last index of the last text node so we can map back after cleaning.
-                const lastText = paragraph.getLastTextNode();
-                const textPosition = paragraph.getContent().caretToTextIndex({ node: lastText, index: lastText.getLength() });
-                paragraph.appendParagraph(nextParagraph);
-                const newCaret = paragraph.getContent().textIndexToCaret(textPosition);
-                if(newCaret)
-                    return newCaret;
-                else throw Error("Couldn't map caret back to new position.");
-            }
-            else {
-                const nextBlock = paragraph.getParent()?.getSiblingOf(paragraph, true);
-                if(nextBlock)
-                    nextBlock.remove();   
-                return { node: this, index: index };
-            }
-        }
-
-        // Otherwise, ask the previous word to delete.
-        const next = this.getChapter()?.getNextTextOrAtom(this);
-
-        // If there isn't one, don't change anything, we've reached the end of the text.
-        if(next === undefined)
-            return { node: this, index: index };
-
-        // Otherwise, have the previous node delete.
-        const newCaret = next.deleteForward();
-
-        // If this is empty, delete it, then normalize the paragraph.
-        if(this.getLength() === 0)
-            return this.deleteAndClean(newCaret);
-
-        // Return the new caret position.
-        return newCaret;        
-        
-    }
-
-    deleteAndClean(caret: Caret): Caret {
-
-        const formatter = this.getRoot();
-        if(formatter === undefined)
-            return caret;
-
-        const textPosition = formatter.caretToTextIndex(caret);
-        formatter.clean();
-        const cleanCaret = formatter.textIndexToCaret(textPosition);
-        if(cleanCaret)
-            return cleanCaret;
-        else throw Error("Couldn't map caret back to new position.");
-
-    }
-
-    deleteRange(start: number, end: number): Caret {
-        
-        // They can be given out of order, so sort them.
-        const first = Math.min(start, end, this.#text.length);
-        const last = Math.max(start, end, 0);
-
-        // Remove the text
-        this.#text = this.#text.slice(0, first) + this.#text.slice(last);
-
-        // Keep the caret at the start.
-        return {
-            node: this,
-            index: first
-        }
-        
-    }
-
-    deleteAll(): Caret {
-        this.#text = "";
-        return { node: this, index: 0 };
-    }
-
-    clean() {
-        // if(this.#text.length === 0) this.remove();
-    }
+    clean() {}
 
     getParagraph(): ParagraphNode | undefined {
         return this.getClosestParentMatching(p => p instanceof ParagraphNode) as ParagraphNode | undefined;
     }
 
+    getFormat(): FormatNode | undefined {
+        return this.getClosestParentMatching(p => p instanceof FormatNode) as FormatNode;
+    }
+
     getFormatRoot(): FormatNode | undefined {
         return this.getFarthestParentMatching(p => p instanceof FormatNode) as FormatNode;
+    }
+
+    getBlocks(): BlocksNode | undefined {
+        return this.getClosestParentMatching(p => p instanceof BlocksNode) as BlocksNode;
     }
 
     getRoot(): FormatNode | ChapterNode | undefined {

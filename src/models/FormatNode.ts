@@ -214,10 +214,7 @@ export class FormatNode extends Node<FormatNodeParent> {
 
     caretToTextIndex(caret: Caret): number {
 
-        if(!(caret.node instanceof TextNode))
-            throw Error("Can only get text position of text nodes");
-
-        const text = this.getTextNodes();
+        const text = this.getTextAndAtomNodes();
         let index = 0;
         for(let i = 0; i < text.length; i++) {
             const t = text[i];
@@ -235,11 +232,11 @@ export class FormatNode extends Node<FormatNodeParent> {
 
     textIndexToCaret(index: number): Caret | undefined {
 
-        const text = this.getTextNodes();
+        const text = this.getTextAndAtomNodes();
         let currentIndex = 0;
         for(let i = 0; i < text.length; i++) {
             const t = text[i];
-            if(index >= currentIndex && index <= currentIndex + t.getLength())
+            if(!(t instanceof AtomNode) && index >= currentIndex && index <= currentIndex + t.getLength())
                 return { node: t, index: index - currentIndex };
             currentIndex += t.getLength();
         }
@@ -255,7 +252,7 @@ export class FormatNode extends Node<FormatNodeParent> {
         // ... the given caret is in this formatted node.
         // ... the caret is on a text node.        
         const parent = this.getParent();
-        if(parent === undefined || !caret.node.hasParent(this) || !(caret.node instanceof TextNode))
+        if(parent === undefined || !caret.node.hasAncestor(this) || !(caret.node instanceof TextNode))
             return undefined;
 
         // Map the caret node to an index
@@ -298,36 +295,19 @@ export class FormatNode extends Node<FormatNodeParent> {
     }
 
     deleteRange(range: CaretRange) {
-
-        // Just keep backspacing from the end caret until the returned caret is identical to the previous caret or the start caret.
-        let previousCaret = undefined;
-        let startPosition = this.caretToTextIndex(range.start);
-        let currentCaret = range.end;
-        let currentPosition = this.caretToTextIndex(range.end);
-
-        // Don't delete if the range is a single position.
-        if(startPosition === currentPosition)
-            return;
-
-        do {
-            previousCaret = currentCaret;
-            currentCaret = (currentCaret.node as TextNode).deleteBackward(currentCaret.index);
-            currentPosition = this.caretToTextIndex(currentCaret);
-        } while(
-            currentPosition > startPosition &&
-            !(previousCaret.node === currentCaret.node && previousCaret.index === currentCaret.index)
-        );
-
-        return currentCaret;
-
+        return this.editRange(range, undefined);
     }
 
-    formatRange(range: CaretRange, format: Format): CaretRange {
+    // This monolith takes the given range, and if it's within the bounds of this FormatNode
+    // either formats the given range with the given format (or deletes the range if the formed is undefined). 
+    // It's approach is to scan through every atomic node and character and build a new tree according to the existing
+    // tree, but with the requested modification.
+    editRange(range: CaretRange, format: Format | undefined): CaretRange {
 
         // This only transforms ranges that start and end with text nodes and for nodes in the same format node.
-        if( !(range.start.node instanceof TextNode) || 
-            !(range.end.node instanceof TextNode) || 
-            !(range.start.node.getCommonAncestor(range.end.node) instanceof FormatNode))
+        if( !(range.start.node instanceof TextNode || range.start.node instanceof AtomNode) || 
+            !(range.end.node instanceof TextNode || range.end.node instanceof AtomNode) || 
+            !(range.start.node.hasAncestor(this) && range.end.node.hasAncestor(this)))
             return range;
 
         // Remember the text positions so we can return a new range in the new tree.
@@ -336,14 +316,14 @@ export class FormatNode extends Node<FormatNodeParent> {
 
         // Find all of the content in the node so we can construct a new format tree with the old content.
         const everythingButFormats = 
-            this.getNodes().filter(n => (n instanceof TextNode && !(n.getParent() instanceof MetadataNode)) || n instanceof AtomNode || n instanceof ErrorNode || n instanceof MetadataNode) as (TextNode | AtomNode<any> | MetadataNode<any>)[];
+            this.getNodes().filter(n => !(n instanceof FormatNode)) as (TextNode | AtomNode<any>)[];
 
         // Check if all of the selected content has the requested format so we can toggle it if so.
         let checkIndex = 0;
         let checkingEmptyNode = false;
-        const alreadyApplied = everythingButFormats.every(node => {
+        const alreadyApplied = format === undefined || everythingButFormats.every(node => {
             // If it's text, and the current position is in range of the selection, does the position contain the requested format?
-            if(node instanceof TextNode) {
+            if(node instanceof TextNode && node.getParent() instanceof FormatNode) {
                 // If we have a zero-width selection, remember, so we can ignore it in the next text node at the same location.
                 if(node.getText().length === 0) {
                     if(checkIndex === textStart && textStart === textEnd) {
@@ -384,106 +364,143 @@ export class FormatNode extends Node<FormatNodeParent> {
             }
         }
 
+        function inRange() {
+            return textIndex >= Math.min(textStart, textEnd) && textIndex < Math.max(textStart, textEnd);
+        }
+
         everythingButFormats.forEach(node => {
             if(node instanceof TextNode) {
-                // Remember we found an empty node so that we don't insert an extra one later.
-                if(node.getText().length === 0) {
-                    if(textIndex === textStart && zeroWidthSelection) {
-                        formattingEmptyNode = true;
-                    }
-                }
-                else {
-                    // Process each character in the node.
-                    for(let i = 0; i < node.getText().length; i++) {
-
-                        // Determine the desired format for this character. Start with the current formats
-                        // and if we're in the selected range, adjust them accordingly based on the current formats 
-                        // and the requested format.
-                        let desiredFormats = (node.getParent() as FormatNode).getFormats();
-                        if( (textIndex === textStart && zeroWidthSelection) || 
-                            (textIndex >= textStart && textIndex < textEnd)) {
-                            // Remove all formatting if we were asked to.
-                            if(format === "")
-                                desiredFormats = [];
-                            // Apply the formatting if it's not already applied.
-                            else if(!alreadyApplied && !desiredFormats.includes(format))
-                                desiredFormats.push(format);
-                            // Remove the formatting if it's already applied in the selection.
-                            else if(alreadyApplied && desiredFormats.includes(format))
-                                desiredFormats.splice(desiredFormats.indexOf(format), 1);
+                const parent = node.getParent();
+                if(parent instanceof FormatNode) {
+                    // Remember we found an empty node so that we don't insert an extra one later.
+                    if(node.getText().length === 0) {
+                        if(textIndex === textStart && zeroWidthSelection) {
+                            formattingEmptyNode = true;
                         }
+                    }
+                    else {
+                        // Process each character in the node.
+                        for(let i = 0; i < node.getText().length; i++) {
 
-                        // Remove undesired formats.
-                        currentFormat.getFormats().forEach(current => {
-                            // If the current format is not in the desired list, close the text
-                            // node and keep popping formats until we find the parent of the offending format.
-                            if(!desiredFormats.includes(current)) {
+                            // Determine the desired format for this character. Start with the current formats
+                            // and if we're in the selected range, adjust them accordingly based on the current formats 
+                            // and the requested format. (If this is a range deletion, then we just stick with the existing formats).
+                            let formatter = node.getFormat();
+                            let desiredFormats = formatter ? formatter.getFormats() : [];
+                            if( format !== undefined && 
+                                ((textIndex === textStart && zeroWidthSelection) || inRange())) {
+                                // Remove all formatting if we were asked to.
+                                if(format === "")
+                                    desiredFormats = [];
+                                // Apply the formatting if it's not already applied.
+                                else if(!alreadyApplied && !desiredFormats.includes(format))
+                                    desiredFormats.push(format);
+                                // Remove the formatting if it's already applied in the selection.
+                                else if(alreadyApplied && desiredFormats.includes(format))
+                                    desiredFormats.splice(desiredFormats.indexOf(format), 1);
+                            }
 
-                                // Save any text that we've accumulated.
-                                saveText();
+                            // Remove undesired formats.
+                            currentFormat.getFormats().forEach(current => {
+                                // If the current format is not in the desired list, close the text
+                                // node and keep popping formats until we find the parent of the offending format.
+                                if(!desiredFormats.includes(current)) {
 
-                                // Not sure this loop is necessary; we should always remove in the order we added.
-                                while(currentFormat.#format !== current)
+                                    // Save any text that we've accumulated.
+                                    saveText();
+
+                                    // Not sure this loop is necessary; we should always remove in the order we added.
+                                    while(currentFormat.#format !== current)
+                                        currentFormat = currentFormat.getParent() as FormatNode;
                                     currentFormat = currentFormat.getParent() as FormatNode;
-                                currentFormat = currentFormat.getParent() as FormatNode;
 
-                                // If we have unformatted something at a zero-width range, create empty format node, add a text node in it and remember it so
-                                // we can place the caret in it.
-                                if(!formattingEmptyNode && textIndex === textStart && zeroWidthSelection) {
-                                    emptyNode = new TextNode(currentFormat, "");
-                                    currentFormat.addSegment(emptyNode);
-                                    const newDesiredFormat = new FormatNode(currentFormat, current, []);
+                                    // If we have unformatted something at a zero-width range, create empty format node, add a text node in it and remember it so
+                                    // we can place the caret in it.
+                                    if(!formattingEmptyNode && textIndex === textStart && zeroWidthSelection) {
+                                        emptyNode = new TextNode(currentFormat, "");
+                                        currentFormat.addSegment(emptyNode);
+                                        const newDesiredFormat = new FormatNode(currentFormat, current, []);
+                                        currentFormat.addSegment(newDesiredFormat);
+                                        currentFormat = newDesiredFormat;
+                                    }
+
+                                }
+                            });
+
+                            // Ensure the desired formats.
+                            desiredFormats.forEach(desiredFormat => {
+                                // If the current format does not yet include the desired format,
+                                // close the text node and start a new format.
+                                if(!currentFormat.getFormats().includes(desiredFormat)) {
+
+                                    // Save any text that we've accumulated.
+                                    saveText();
+
+                                    const newDesiredFormat = new FormatNode(currentFormat, desiredFormat, []);
                                     currentFormat.addSegment(newDesiredFormat);
                                     currentFormat = newDesiredFormat;
+
+                                    // If we inserted an empty format node, add a text node in it and remember it so
+                                    // we can place the caret in it.
+                                    if(!formattingEmptyNode && textIndex === textStart && zeroWidthSelection) {
+                                        emptyNode = new TextNode(currentFormat, "");
+                                        currentFormat.addSegment(emptyNode);
+                                        currentFormat = newDesiredFormat.getParent() as FormatNode;
+                                    }
+
                                 }
+                            });
 
-                            }
-                        });
+                            // If there's a format we're applying, or we're outside the deletion range, append the current text.
+                            if(format !== undefined || !inRange())
+                                currentText += node.getText().charAt(i);
+                            textIndex++;
+                        }
+                    }
+                }
+                // Otherwise, handle a MetadataNode
+                else if(parent instanceof MetadataNode) {
+                    // Save whatever text came before it.
+                    saveText();
 
-                        // Ensure the desired formats.
-                        desiredFormats.forEach(desiredFormat => {
-                            // If the current format does not yet include the desired format,
-                            // close the text node and start a new format.
-                            if(!currentFormat.getFormats().includes(desiredFormat)) {
-
-                                // Save any text that we've accumulated.
-                                saveText();
-
-                                const newDesiredFormat = new FormatNode(currentFormat, desiredFormat, []);
-                                currentFormat.addSegment(newDesiredFormat);
-                                currentFormat = newDesiredFormat;
-
-                                // If we inserted an empty format node, add a text node in it and remember it so
-                                // we can place the caret in it.
-                                if(!formattingEmptyNode && textIndex === textStart && zeroWidthSelection) {
-                                    emptyNode = new TextNode(currentFormat, "");
-                                    currentFormat.addSegment(emptyNode);
-                                    currentFormat = newDesiredFormat.getParent() as FormatNode;
-                                }
-        
-                            }
-                        });
-
-                        // Append the current text.
-                        currentText += node.getText().charAt(i);
+                    // Process each character in the node, skipping any in bounds if we're deleting.
+                    for(let i = 0; i < node.getText().length; i++) {
+                        if(format !== undefined || !inRange())
+                            currentText += node.getText().charAt(i);
                         textIndex++;
+                    }
+
+                    // Duplicate the MetadataNode but with new text. Erase the MetadataNode if the text is empty.
+                    if(currentText.length > 0) {
+                        const newMeta = parent.copy(currentFormat);
+                        newMeta.setText(currentText);
+                        currentFormat.addSegment(newMeta);
+                        currentText = "";
                     }
                 }
             }
-            // If it's not text, just add the segment unmodified, since we only format text.
-            else {
+            // If it's an AtomNode, just add it unmodified, since we only format text.
+            // unless it's in range of the deletion, in which case we delete it.
+            else if(node instanceof AtomNode) {
                 // Before adding the atom, create a text node and reset the accumulator.
-                if(currentText.length > 0) {
-                    currentFormat.addSegment(new TextNode(currentFormat, currentText));
-                    currentText = "";
-                }
-                // Add the atom immediately after.
-                currentFormat.addSegment(node);
+                saveText();
+
+                // Add the atom immediately after, unless it's in the deletion range.
+                // We include both the start and end since AtomNode's text index is on both sides.
+                if(format !== undefined || textIndex < Math.min(textStart, textEnd) || textIndex >= Math.max(textStart, textEnd))
+                    currentFormat.addSegment(node);
+
+                // Increment the text index, atoms count.
+                textIndex++;
             }
         });
 
-        // Save any text that we've accumulated.
+        // Save any remaining text that we've accumulated.
         saveText();
+
+        // If it's empty, make sure there's one empty text node to type in.
+        if(newFormat.getTextAndAtomNodes().length === 0)
+            newFormat.#segments = [ new TextNode(newFormat, "") ];
 
         // Replace this format's segments with the new segments.
         this.#segments = [];
@@ -492,13 +509,21 @@ export class FormatNode extends Node<FormatNodeParent> {
         // If we made an empty node, place the caret in it.
         if(emptyNode)
             return { start: { node: emptyNode, index: 0 }, end: { node: emptyNode, index: 0}};
+        // If we formatted, convert the text selection back into a CaretRange, keeping selection on the same text.
+        else if(format !== undefined) {
+            const startCaret = this.textIndexToCaret(textStart);
+            const endCaret = this.textIndexToCaret(textEnd);
+            if(startCaret && endCaret)
+                return { start: startCaret, end: endCaret };
+        }
+        // If we deleted, just return the start position of the caret.
+        else {
+            const startCaret = this.textIndexToCaret(Math.min(textStart, textEnd));
+            if(startCaret)
+                return { start: startCaret, end: startCaret };
+        }
 
-        // Convert the text selection back into a CaretRange, keeping selection on the same text.
-        const startCaret = this.textIndexToCaret(textStart);
-        const endCaret = this.textIndexToCaret(textEnd);
-        if(startCaret && endCaret)
-            return { start: startCaret, end: endCaret };
-
+        // This should never happen!
         throw Error("Couldn't map original positions onto new formatting; something is very broken!");
 
     }

@@ -18,16 +18,12 @@ import { Caret, CaretRange } from "./Caret";
 
 export class ChapterNode extends BlocksNode {
 
-    #blocks: BlockNode[];
     #metadata: Bookkeeping;
     index: Map<number, Node>;
     nextID: number;
 
     constructor(blocks: BlockNode[], metadata: Bookkeeping) {
         super(undefined, blocks, "chapter");
-
-        // The AST of the chapter.
-        this.#blocks = blocks;
 
         // Content extracted during parsing.
         this.#metadata = metadata;
@@ -47,7 +43,7 @@ export class ChapterNode extends BlocksNode {
         return this;
     }
 
-    getBlocks() { return this.#blocks; }
+    getBlocks() { return this.blocks; }
 
     indexNode(node: Node) {
         this.index.set(this.nextID, node);
@@ -88,13 +84,13 @@ export class ChapterNode extends BlocksNode {
     }
 
     toText(): string {
-        return this.#blocks.map(block => block.toText()).join(" ");
+        return this.blocks.map(block => block.toText()).join(" ");
     }
 
     toBookdown() {
         // Render the symbols then all the blocks
         return Object.keys(this.#metadata.symbols).sort().map(name => `@${name}: ${this.#metadata.symbols[name]}\n\n`).join("") +
-            this.#blocks.map(b => b.toBookdown()).join("\n\n");
+            this.blocks.map(b => b.toBookdown()).join("\n\n");
     }
 
     getTextNodes(): TextNode[] {
@@ -129,23 +125,23 @@ export class ChapterNode extends BlocksNode {
     }
 
     traverseChildren(fn: (node: Node) => void): void {
-        this.#blocks.forEach(item => item.traverse(fn) )
+        this.blocks.forEach(item => item.traverse(fn) )
     }
 
     removeChild(node: Node): void {
-        this.#blocks = this.#blocks.filter(item => item !== node);
+        this.blocks = this.blocks.filter(item => item !== node);
     }
 
     replaceChild(node: Node, replacement: BlockNode): void {
-        const index = this.#blocks.indexOf(node as BlockNode);
+        const index = this.blocks.indexOf(node as BlockNode);
         if(index < 0) return;
-        this.#blocks[index] = replacement;
+        this.blocks[index] = replacement;
     }
 
     copy(parent: Node): ChapterNode {
         const blocks: BlockNode[] = []
         const chap = new ChapterNode(blocks, this.#metadata)
-        this.#blocks.forEach(b => blocks.push(b.copy(chap) as BlockNode))
+        this.blocks.forEach(b => blocks.push(b.copy(chap) as BlockNode))
         return chap
     }
 
@@ -155,7 +151,7 @@ export class ChapterNode extends BlocksNode {
     }
 
     getSiblingOf(child: Node, next: boolean) {
-        return this.#blocks[this.#blocks.indexOf(child as BlockNode) + (next ? 1 : -1)];
+        return this.blocks[this.blocks.indexOf(child as BlockNode) + (next ? 1 : -1)];
     }
 
     insertSelection(char: string, range: CaretRange): Caret {
@@ -224,30 +220,6 @@ export class ChapterNode extends BlocksNode {
 
         // Create and insert the into the formatted node.
         return formatted.insertSegmentAt(nodeCreator.call(undefined, formatted, selectedText ? selectedText : ""), caret);
-
-    }
-
-    deleteSelection(range: CaretRange, backward: boolean): Caret {
-    
-        const start = range.start;
-
-        // If the start and end are the same, delete within the node.
-        if(start.node === range.end.node) {
-            if(start.node instanceof TextNode) {
-                // If the positions are the same, just do a single character.
-                // Otherwise, do a range.
-                return range.start.index === range.end.index ? 
-                    ( backward ? start.node.deleteBackward(start.index) : start.node.deleteForward(start.index)) :
-                    start.node.deleteRange(start.index, range.end.index);
-            }
-            else if(start.node instanceof AtomNode) {
-                return start.node.deleteBackward();
-            }
-            // Otherwise, do nothing.
-            else return range.start;
-        }
-        // If the start and end positions are different, delete everything between them, and the corresponding parts of each.
-        else return this.removeRange(range);
 
     }
 
@@ -323,38 +295,6 @@ export class ChapterNode extends BlocksNode {
 
     }
 
-    removeRange(range: CaretRange) : Caret {
-
-        // Sort the range
-        const sortedRange = this.sortRange(range);
-
-        // Find all text nodes between the range.
-        const { start, end } = sortedRange;
-        
-        // Can only delete between text nodes.
-        if(!(start.node instanceof TextNode) || !(end.node instanceof TextNode))
-            return range.start;
-
-        // No op if the positions are the same.
-        if(start.node === end.node && start.index === end.index)
-            return range.start;
-
-        // Just keep backspacing from the end caret until the returned caret is identical to the previous caret or the start caret.
-        let previousCaret = undefined;
-        let startPosition = this.caretToTextIndex(start);
-        let currentCaret = end;
-        let currentPosition = this.caretToTextIndex(end);
-        do {
-            previousCaret = currentCaret;
-            currentCaret = (currentCaret.node as TextNode).deleteBackward(currentCaret.index);
-            currentPosition = this.caretToTextIndex(currentCaret);
-        } while(currentPosition > startPosition &&
-                !(previousCaret.node === currentCaret.node && previousCaret.index === currentCaret.index));
-
-        return currentCaret;
-
-    }
-
     splitSelection(range: CaretRange): Caret {
 
         let caret = range.start;
@@ -373,20 +313,13 @@ export class ChapterNode extends BlocksNode {
 
     }
 
-    insertAfter(anchor: BlockNode, block: BlockNode) {
-        const index = this.#blocks.indexOf(anchor);
-        if(index < 0)
-            return;
-        this.#blocks.splice(index + 1, 0, block);
-    }
-
     removeRedundantChildren(nodes: Set<Node>) {
 
         // Remove any nodes whose parents are also in the list, as they would be redundant to format.
         const redundant: Set<Node> = new Set<Node>()
         nodes.forEach(node1 => {
             nodes.forEach(node2 => {
-                if(node1 !== node2 && node1.hasParent(node2))
+                if(node1 !== node2 && node1.hasAncestor(node2))
                 nodes.add(node1)
             })
         })
@@ -396,10 +329,25 @@ export class ChapterNode extends BlocksNode {
         
     }
 
-    formatSelection(range: CaretRange, format: Format): CaretRange {
+    removeRange(range: CaretRange): Caret {
+        return this.editRange(range, undefined).start;
+    }
 
-        // Only works on text nodes.
-        if(!(range.start.node instanceof TextNode) || !(range.end.node instanceof TextNode))
+    editRange(range: CaretRange, format: Format | undefined): CaretRange {
+
+        // If the range is an AtomNode and we're deleting, delete it.
+        if(format === undefined && (range.start.node instanceof AtomNode && range.end.node instanceof AtomNode)) {
+            let atom = range.start.node instanceof AtomNode ? range.start.node : range.end.node;
+            let newCaret = atom.previousWord();
+            if(newCaret.node === range.start.node)
+                newCaret = range.start.node.nextWord();
+            range.start.node.remove();
+            return { start: newCaret, end: newCaret };
+        }
+
+        // Only works on text nodes, atom nodes, and metadata nodes.
+        if( !(range.start.node instanceof TextNode || range.start.node instanceof AtomNode) || 
+            !(range.end.node instanceof TextNode || range.end.node instanceof AtomNode))
             return range;
 
         // Preserve the original range, since there are a few cases where we adjust it.
@@ -441,7 +389,7 @@ export class ChapterNode extends BlocksNode {
             // The end is either the end of the formatting root or the end node, if this contains the end node.
             const end = (sortedRange.end.node as TextNode).getFormatRoot() === root ? sortedRange.end : { node: root.getLastTextNode(), index: root.getLastTextNode().getLength() };
             // Format the range and save the revised range!
-            newRanges.push(root.formatRange({ start: start, end: end }, format));
+            newRanges.push(root.editRange({ start: start, end: end }, format));
 
         });
 
@@ -458,7 +406,7 @@ export class ChapterNode extends BlocksNode {
         if(range.start.node.inside(type)) {
             const atom = range.start.node.getClosestParentMatching(p => p instanceof type) as AtomType;
             const formatted = atom.getParent();
-            if(formatted) {
+            if(formatted && formatted instanceof FormatNode) {
                 const index = formatted.caretToTextIndex(range.start);
                 atom.unwrap();
                 const newCaret = formatted.textIndexToCaret(index);
@@ -469,8 +417,8 @@ export class ChapterNode extends BlocksNode {
         else {
             const caret = this.insertNodeAtSelection(range, creator);
             // Get the text node inside the new link.
-            const textNode = (caret.node as MetadataNode<any>).getText();
-            return { node: textNode, index: textNode.getLength() }
+            const textNode = caret.node as MetadataNode<any>;
+            return { node: textNode.getText(), index: textNode.getText().getLength() }
         }
 
         return undefined;

@@ -1,5 +1,5 @@
 import { Node } from "./Node";
-import { FormatNodeSegmentType, FormatNode, Format } from "./FormatNode";
+import { FormatNode } from "./FormatNode";
 import { BlockNode } from "./BlockNode";
 import { BlockParentNode } from "./BlockParentNode";
 import { TextNode } from "./TextNode";
@@ -69,6 +69,9 @@ export class ParagraphNode extends Node<BlockParentNode> {
 
     getLastTextNode(): TextNode { return this.getContent().getLastTextNode(); }
 
+    getFirstCaret(): Caret { return this.#content.getFirstCaret(); }
+    getLastCaret(): Caret { return this.#content.getLastCaret(); }
+
     getPreviousIfParagraph(): ParagraphNode | undefined {
         return this.getSiblingIfType(-1, ParagraphNode);
     }
@@ -104,39 +107,6 @@ export class ParagraphNode extends Node<BlockParentNode> {
         
     }
 
-    deleteForward(index: number | Node | undefined) {
-
-        // If the node's previous sibling is a paragraph, merge this paragraph's content into the previous paragraph.
-        const sibling = this.getSibling(true);
-
-        // If there is no sibling, keep the caret here.
-        if(sibling === undefined || !(sibling instanceof ParagraphNode))  {
-            return undefined;
-        }
-        // If the sibling is a paragraph, merge.
-        else if(sibling instanceof ParagraphNode) {
-
-            // Remember the last index of the sibling's content.
-            const lastIndexOfContent = this.#content.getLength();
-
-            // Copy the sibling's content into this.
-            sibling.#content?.getSegments().forEach(segment => {
-                this.#content?.getSegments().push(segment.copy(this.#content) as FormatNodeSegmentType);
-            });
-
-            // Remove the sibling paragraph.
-            sibling.remove();
-
-            // Leave the caret alone.
-            return {
-                node: this.#content.nodeID,
-                index: lastIndexOfContent
-            };
-
-        }
-        
-    }
-
     split(caret: Caret): Caret {
 
         // Get the parent
@@ -169,18 +139,14 @@ export class ParagraphNode extends Node<BlockParentNode> {
         parent.insertAfter(this, copy);
 
         // Delete everything after the caret.
-        chapter.deleteSelection({ start: caret, end: { node: lastTextNode, index: lastTextNode.getText().length}}, false);
+        chapter.removeRange({ start: caret, end: { node: lastTextNode, index: lastTextNode.getText().length}});
 
         // Delete everything before the caret in the copy.
         const newNodePosition = copy.getTextNodes()[caretNodeIndex];
 
         // If there's anything to delete, delete it.
         if(newNodePosition)
-            chapter.deleteSelection({ start: { node: copy.getFirstTextNode(), index: 0 }, end: { node: newNodePosition, index: caret.index }}, false);
-
-        // Clean up this and the new paragraph.
-        this.clean();
-        copy.clean();
+            chapter.removeRange({ start: { node: copy.getFirstTextNode(), index: 0 }, end: { node: newNodePosition, index: caret.index }});
 
         // Return a caret at the beginning of the new paragraph.
         return { node: copy.getFirstTextNode(), index: 0 };        

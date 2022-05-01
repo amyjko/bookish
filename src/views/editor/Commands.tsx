@@ -36,6 +36,7 @@ import Bullets from "../svg/bullets.svg";
 import Numbers from "../svg/numbers.svg";
 import Quote from "../svg/quote.svg";
 import Code from "../svg/code.svg";
+import { AtomNode } from "../../models/AtomNode";
 
 export type Command = {
     label?: string,
@@ -391,7 +392,38 @@ export const commands: Command[] = [
         control: false, alt: false, shift: false, key: "Backspace",
         active: context => context.chapter !== undefined,
         handler: context => {
-            const caret = (context.chapter as ChapterNode).deleteSelection({ start: context.start, end: context.end }, true);
+
+            if(context.start.node instanceof TextNode && context.start.node === context.end.node && context.start.index === context.end.index) {
+                // If we're right at the beginning of a paragraph, ask it's block node to backspace over the previous block.
+                const firstCaret = context.start.node.getFormatRoot()?.getFirstCaret();
+                if(firstCaret && firstCaret.node === context.start.node && firstCaret.index === context.start.index) {
+                    const blocks = context.start.node.getBlocks();
+                    const currentParagraph = context.start.node.getParagraph();
+                    if(currentParagraph && blocks) {
+                        if(currentParagraph instanceof ParagraphNode) {
+                            const previousBlock = blocks.getSiblingOf(currentParagraph, false);
+                            if(previousBlock instanceof ParagraphNode) {
+                                const lastIndex = previousBlock.getContent().caretToTextIndex(previousBlock.getLastCaret());
+                                previousBlock.appendParagraph(currentParagraph);
+                                const lastCaret = previousBlock.getContent().textIndexToCaret(lastIndex);
+                                if(lastCaret)
+                                    return { start: lastCaret, end: lastCaret };    
+                            }
+                            else {
+                                previousBlock?.remove();
+                                return context.range;
+                            }
+                        }
+                    }
+                    // Do nothing if there's no blocks node.
+                    return context.range;
+                }
+                // Otherwise, if the current caret isn't a selection, expand the range to select the previous caret position to delete it.
+                if(context.end.node instanceof TextNode || context.end.node instanceof AtomNode)
+                    context.end = context.end.node.previous(context.end.index);
+
+            }
+            const caret = (context.chapter as ChapterNode).removeRange({ start: context.start, end: context.end });
             return { start: caret, end: caret };
         }
     },
@@ -402,7 +434,36 @@ export const commands: Command[] = [
         control: false, alt: false, shift: false, key: "Delete",
         active: context => context.chapter !== undefined,
         handler: context => {
-            const caret = (context.chapter as ChapterNode).deleteSelection({ start: context.start, end: context.end }, false);
+            if(context.start.node instanceof TextNode && context.start.node === context.end.node && context.start.index === context.end.index) {
+                // If we're right at the end of a paragraph, ask it's block node to backspace over the previous block.
+                const lastCaret = context.start.node.getFormatRoot()?.getLastCaret();
+                if(lastCaret && lastCaret.node === context.start.node && lastCaret.index === context.start.index) {
+                    const blocks = context.start.node.getBlocks();
+                    const currentParagraph = context.start.node.getParagraph();
+                    if(currentParagraph && blocks) {
+                        if(currentParagraph instanceof ParagraphNode) {
+                            const nextBlock = blocks.getSiblingOf(currentParagraph, true);
+                            if(nextBlock instanceof ParagraphNode) {
+                                const firstIndex = currentParagraph.getContent().caretToTextIndex(currentParagraph.getLastCaret());
+                                currentParagraph.appendParagraph(nextBlock);
+                                const firstCaret = currentParagraph.getContent().textIndexToCaret(firstIndex);
+                                if(firstCaret)
+                                    return { start: firstCaret, end: firstCaret };    
+                            }
+                            else {
+                                nextBlock?.remove();
+                                return context.range;
+                            }
+                        }
+                    }
+                    // Do nothing if there's no blocks node.
+                    return context.range;
+                }
+                // Otherwise, if the current caret isn't a selection, expand the range to select the previous caret position to delete it.
+                if(context.end.node instanceof TextNode || context.end.node instanceof AtomNode)
+                    context.end = context.end.node.next(context.end.index);
+            }
+            const caret = (context.chapter as ChapterNode).removeRange({ start: context.start, end: context.end });
             return { start: caret, end: caret };
         }
     },
@@ -483,7 +544,7 @@ export const commands: Command[] = [
         category: "text",
         control: true, alt: false, shift: false, key: "0",
         active: context => context.chapter !== undefined,
-        handler: context => context.chapter ? context.chapter.formatSelection(context.range, "") : context.range
+        handler: context => context.chapter ? context.chapter.editRange(context.range, "") : context.range
     },
     {
         label: "bold",
@@ -493,7 +554,7 @@ export const commands: Command[] = [
         category: "text",
         control: true, alt: false, shift: false, key: "b",
         active: context => context.chapter !== undefined,
-        handler: context => context.chapter ? context.chapter.formatSelection(context.range, "*") : context.range
+        handler: context => context.chapter ? context.chapter.editRange(context.range, "*") : context.range
     },
     {
         description: "italic",
@@ -502,7 +563,7 @@ export const commands: Command[] = [
         category: "text",
         control: true, alt: false, shift: false, key: "i",
         active: context => context.chapter !== undefined,
-        handler: context => context.chapter ? context.chapter.formatSelection(context.range, "_") : context.range
+        handler: context => context.chapter ? context.chapter.editRange(context.range, "_") : context.range
     },
     {
         label: "<code>",
@@ -525,7 +586,7 @@ export const commands: Command[] = [
         category: "text",
         control: true, alt: false, shift: false, key: ",",
         active: context => context.chapter !== undefined,
-        handler: context => context.chapter ? context.chapter.formatSelection(context.range, "v") : context.range
+        handler: context => context.chapter ? context.chapter.editRange(context.range, "v") : context.range
     },
     {
         label: "super\u207F",
@@ -535,7 +596,7 @@ export const commands: Command[] = [
         category: "text",
         control: true, alt: false, shift: false, key: ".",
         active: context => context.chapter !== undefined,
-        handler: context => context.chapter ? context.chapter.formatSelection(context.range, "^") : context.range
+        handler: context => context.chapter ? context.chapter.editRange(context.range, "^") : context.range
     },
     {
         label: "link ⚭",
