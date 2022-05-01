@@ -307,14 +307,15 @@ const ChapterEditor = (props: { ast: ChapterNode }) => {
 
     }
 
-    function atParagraphStart() {
-        return caretRange !== undefined &&
-            caretRange.start.node === caretRange.end.node && 
-            caretRange.start.index === caretRange.end.index && 
-            caretRange.start.node instanceof TextNode && 
-            caretRange.start.index === 0 &&
-            caretRange.start.node.getParent() instanceof FormatNode &&
-            caretRange.start.node.getParent()?.getParent() instanceof ParagraphNode
+    function atParagraphStart(): boolean {
+        if( caretRange === undefined ||
+            caretRange.start.node !== caretRange.end.node ||
+            caretRange.start.index !== caretRange.end.index || 
+            !(caretRange.start.node instanceof TextNode))
+            return false;
+
+        const firstCaret = caretRange.start.node.getFormatRoot()?.getFirstCaret();
+        return firstCaret !== undefined && firstCaret.node === caretRange.start.node && firstCaret.index === caretRange.start.index;
     }
 
     function getCaretContext(): CaretState | undefined {
