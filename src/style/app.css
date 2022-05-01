@@ -294,11 +294,14 @@ input[type=text].bookish-editor-text-invalid {
 }
 
 .bookish-editor-atom-selected {
-    animation: 1s atom-selected infinite;
     border-radius: 2px;
     outline-style: solid;
     outline-color: var(--bookish-paragraph-color);
     outline-offset: 2px;
+}
+
+.bookish-editor-atom-selected-focused {
+    animation: 1s atom-selected infinite;
 }
 
 .bookish-app-comment {

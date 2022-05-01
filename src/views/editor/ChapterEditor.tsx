@@ -17,7 +17,8 @@ export const CaretContext = React.createContext<{
     range: CaretRange | undefined, 
     coordinate: { x: number, y: number} | undefined,
     setCaretRange: Function,
-    forceUpdate: Function
+    forceUpdate: Function,
+    focused: boolean
 } | undefined>(undefined);
 
 export type CaretState = {
@@ -481,7 +482,13 @@ const ChapterEditor = (props: { ast: ChapterNode }) => {
 
     const context = getCaretContext();
 
-    return <CaretContext.Provider value={{ range: caretRange, coordinate: caretCoordinate, setCaretRange: setCaretRange, forceUpdate: forceUpdate }}>
+    return <CaretContext.Provider value={{ 
+        range: caretRange, 
+        coordinate: caretCoordinate, 
+        setCaretRange: setCaretRange, 
+        forceUpdate: forceUpdate,
+        focused: focused
+    }}>
             <div 
                 className="bookish-chapter-editor"
                 ref={editorRef}
