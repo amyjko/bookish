@@ -330,6 +330,24 @@ export const commands: Command[] = [
         }
     },
     {
+        description: "expand selection to all",
+        mouse: false,
+        category: "selection",
+        control: true, alt: false, shift: false, key: "a",
+        active: context => true,
+        handler: context => {
+            // Find the first and last caret of the entire chapter.
+            const text = context.chapter?.getTextNodes();
+            if(text && text.length > 0) {
+                return {
+                    start: { node: text[0], index: 0 },
+                    end: { node: text[text.length - 1], index: text[text.length - 1].getLength() }
+                }
+            }
+            return context.range;
+        }
+    },
+    {
         description: "move up one line",
         mouse: false,
         category: "navigation",
