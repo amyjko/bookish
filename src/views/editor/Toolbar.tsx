@@ -84,7 +84,7 @@ const Toolbar = (props: {
     }
 
     // Filter the commands by those interactive with a mouse and active.
-    const active = commands.filter(command => command.mouse && command.active.call(undefined, props.context));
+    const visible = commands.filter(command => command.visible.call(undefined, props.context));
 
     // Extract the active categories and sort them
     const categories = 
@@ -94,7 +94,7 @@ const Toolbar = (props: {
     // Make a list for each category of commands
     const commandsByCategory: {[key: string]: Command[]} = {};
     categories.forEach(cat => {
-        commandsByCategory[cat] = active.filter(command => command.category === cat);
+        commandsByCategory[cat] = visible.filter(command => command.category === cat);
     });
 
     const caretNode = props.context.start.node;
@@ -137,6 +137,7 @@ const Toolbar = (props: {
                                 .map((command, index) =>
                                     <button 
                                         key={index}
+                                        disabled={!command.active.call(undefined, props.context)}
                                         title={command.description + " " + getShortcutDescription(command)}
                                         onClick={() => props.executor.call(undefined, command, "")}
                                     >

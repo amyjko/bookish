@@ -42,13 +42,13 @@ export type Command = {
     label?: string,
     icon?: Function,
     description: string
-    mouse: boolean,
     category: string,
     control: boolean,
     alt: boolean,
     shift: boolean,
     key?: string,
     code?: string,
+    visible: (context: CaretState) => boolean,
     active: (context: CaretState) => boolean,
     handler: (
         context: CaretState,
@@ -121,10 +121,10 @@ export const commands: Command[] = [
     {
         label: "row ↑",
         description: "insert row above",
-        mouse: true,
         category: "table",
         control: false, alt: true, shift: false, key: "ArrowUp",
-        active: context => context.format !== undefined && context.table !== undefined,
+        visible: context => context.table !== undefined,
+        active: context => context.format !== undefined,
         handler: context => {
             if(!context.table || !context.format) return context.range;
             const range = insertTableRowColumn(context.table, context.format, true, true);
@@ -134,10 +134,10 @@ export const commands: Command[] = [
     {
         label: "row ↓",
         description: "insert row below",
-        mouse: true,
         category: "table",
         control: false, alt: true, shift: false, key: "ArrowDown",
-        active: context => context.format !== undefined && context.table !== undefined,
+        visible: context => context.table !== undefined,
+        active: context => context.format !== undefined,
         handler: context => {
             if(!context.table || !context.format) return context.range;
             const range = insertTableRowColumn(context.table, context.format, true, false);
@@ -147,10 +147,10 @@ export const commands: Command[] = [
     {
         label: "col →",
         description: "insert column after",
-        mouse: true,
         category: "table",
         control: false, alt: true, shift: false, key: "ArrowRight",
-        active: context => context.format !== undefined && context.table !== undefined,
+        visible: context => context.table !== undefined,
+        active: context => context.format !== undefined,
         handler: context => {
             if(!context.table || !context.format) return context.range;
             const range = insertTableRowColumn(context.table, context.format, false, false);
@@ -160,10 +160,10 @@ export const commands: Command[] = [
     {
         label: "col ←",
         description: "insert column before",
-        mouse: true,
         category: "table",
         control: false, alt: true, shift: false, key: "ArrowLeft",
-        active: context => context.format !== undefined && context.table !== undefined,
+        visible: context => context.table !== undefined,
+        active: context => context.format !== undefined,
         handler: context => {
             if(!context.table || !context.format) return context.range;
             const range = insertTableRowColumn(context.table, context.format, false, true);
@@ -173,9 +173,9 @@ export const commands: Command[] = [
     {
         label: "\u232B row",
         description: "delete row",
-        mouse: true,
         category: "table",
         control: false, alt: true, shift: false, key: "Backspace",
+        visible: context => context.table !== undefined,
         active: context => context.format !== undefined && context.table !== undefined && context.table.getRowCount() > 1,
         handler: context => {
             if(!context.table || !context.format) return context.range;
@@ -186,9 +186,9 @@ export const commands: Command[] = [
     {
         label: "\u232B col",
         description: "delete column",
-        mouse: true,
         category: "table",
         control: false, alt: true, shift: true, key: "Backspace",
+        visible: context => context.table !== undefined,
         active: context => context.format !== undefined && context.table !== undefined && context.table.getColumnCount() > 1,
         handler: context => {
             if(!context.table || !context.format) return context.range;
@@ -198,9 +198,9 @@ export const commands: Command[] = [
     },
     {
         description: "move to previous character",
-        mouse: false,
         category: "navigation",
         control: false, alt: false, shift: false, key: "ArrowLeft",
+        visible: context => false,
         active: context => context.endIsTextOrAtom,
         handler: context => {
             const previous = (context.end.node as TextNode).previous(context.end.index);
@@ -209,9 +209,9 @@ export const commands: Command[] = [
     },
     {
         description: "move to previous word",
-        mouse: false,
         category: "navigation",
         control: false, alt: true, shift: false, key: "ArrowLeft",
+        visible: context => false,
         active: context => context.endIsTextOrAtom,
         handler: context => {
             const previous = (context.end.node as TextNode).previousWord(context.end.index);
@@ -220,9 +220,9 @@ export const commands: Command[] = [
     },
     {
         description: "move to paragraph start",
-        mouse: false,
         category: "navigation",
         control: true, alt: false, shift: false, key: "ArrowLeft",
+        visible: context => false,
         active: context => context.format !== undefined,
         handler: context => {
             const first = (context.format as FormatNode).getFirstTextNode();
@@ -231,9 +231,9 @@ export const commands: Command[] = [
     },
     {
         description: "expand selection to previous character",
-        mouse: false,
         category: "selection",
         control: false, alt: false, shift: true, key: "ArrowLeft",
+        visible: context => false,
         active: context => context.endIsTextOrAtom,
         handler: context => {
             const previous = (context.end.node as TextNode).previous(context.end.index);
@@ -242,9 +242,9 @@ export const commands: Command[] = [
     },
     {
         description: "expand selection to previous word",
-        mouse: false,
         category: "selection",
         control: false, alt: true, shift: true, key: "ArrowLeft",
+        visible: context => false,
         active: context => context.endIsTextOrAtom,
         handler: context => {
             const previous = (context.end.node as TextNode).previousWord(context.end.index);
@@ -253,9 +253,9 @@ export const commands: Command[] = [
     },
     {
         description: "expand selection to start",
-        mouse: false,
         category: "selection",
         control: true, alt: false, shift: true, key: "ArrowLeft",
+        visible: context => false,
         active: context => context.format !== undefined,
         handler: context => {
             const first = (context.format as FormatNode).getFirstTextNode();
@@ -264,9 +264,9 @@ export const commands: Command[] = [
     },
     {
         description: "move to next character",
-        mouse: false,
         category: "navigation",
         control: false, alt: false, shift: false, key: "ArrowRight",
+        visible: context => false,
         active: context => context.endIsTextOrAtom,
         handler: context => {
             const next = (context.end.node as TextNode).next(context.end.index);
@@ -275,9 +275,9 @@ export const commands: Command[] = [
     },
     {
         description: "move to next word",
-        mouse: false,
         category: "navigation",
         control: false, alt: true, shift: false, key: "ArrowRight",
+        visible: context => false,
         active: context => context.endIsTextOrAtom,
         handler: context => {
             const next = (context.end.node as TextNode).nextWord(context.end.index);
@@ -286,9 +286,9 @@ export const commands: Command[] = [
     },
     {
         description: "move to paragraph end",
-        mouse: false,
         category: "navigation",
         control: true, alt: false, shift: false, key: "ArrowRight",
+        visible: context => false,
         active: context => context.format !== undefined,
         handler: context => {
             const last = (context.format as FormatNode).getLastTextNode();
@@ -298,9 +298,9 @@ export const commands: Command[] = [
     },
     {
         description: "expand selection to next character",
-        mouse: false,
         category: "selection",
         control: false, alt: false, shift: true, key: "ArrowRight",
+        visible: context => false,
         active: context => context.endIsTextOrAtom,
         handler: context => {
             const previous = (context.end.node as TextNode).next(context.end.index);
@@ -309,9 +309,9 @@ export const commands: Command[] = [
     },
     {
         description: "expand selection to next word",
-        mouse: false,
         category: "selection",
         control: false, alt: true, shift: true, key: "ArrowRight",
+        visible: context => false,
         active: context => context.endIsTextOrAtom,
         handler: context => {
             const previous = (context.end.node as TextNode).nextWord(context.end.index);
@@ -320,9 +320,9 @@ export const commands: Command[] = [
     },
     {
         description: "expand selection to end",
-        mouse: false,
         category: "selection",
         control: true, alt: false, shift: true, key: "ArrowRight",
+        visible: context => false,
         active: context => context.format !== undefined,
         handler: context => {
             const last = (context.format as FormatNode).getLastTextNode();
@@ -331,9 +331,9 @@ export const commands: Command[] = [
     },
     {
         description: "expand selection to all",
-        mouse: false,
         category: "selection",
         control: true, alt: false, shift: false, key: "a",
+        visible: context => false,
         active: context => true,
         handler: context => {
             // Find the first and last caret of the entire chapter.
@@ -349,9 +349,9 @@ export const commands: Command[] = [
     },
     {
         description: "move up one line",
-        mouse: false,
         category: "navigation",
         control: false, alt: false, shift: false, key: "ArrowUp",
+        visible: context => false,
         active: context => context.startIsTextOrAtom,
         handler: (context, utilities) => {
             const above = utilities.getCaretOnLine(context.start, false);
@@ -360,9 +360,9 @@ export const commands: Command[] = [
     },
     {
         description: "move selection up one line",
-        mouse: false,
         category: "selection",
         control: false, alt: false, shift: true, key: "ArrowUp",
+        visible: context => false,
         active: context => context.startIsTextOrAtom,
         handler: (context, utilities) => {
             const above = utilities.getCaretOnLine(context.end, false);
@@ -371,9 +371,9 @@ export const commands: Command[] = [
     },
     {
         description: "move up down line",
-        mouse: false,
         category: "navigation",
         control: false, alt: false, shift: false, key: "ArrowDown",
+        visible: context => false,
         active: context => context.startIsTextOrAtom,
         handler: (context, utilities) => {
             const below = utilities.getCaretOnLine(context.start, true);
@@ -382,9 +382,9 @@ export const commands: Command[] = [
     },
     {
         description: "move selection down one line",
-        mouse: false,
         category: "selection",
         control: false, alt: false, shift: true, key: "ArrowDown",
+        visible: context => false,
         active: context => context.startIsTextOrAtom,
         handler: (context, utilities) => {
             const below = utilities.getCaretOnLine(context.end, true);
@@ -393,9 +393,9 @@ export const commands: Command[] = [
     },
     {
         description: "delete list item",
-        mouse: false,
         category: "list",
         control: false, alt: false, shift: false, key: "Backspace",
+        visible: context => false,
         active: context => (context.start.node.getClosestParentMatching(p => p instanceof ListNode) as ListNode)?.atBeginningOfItem(context.start) !== undefined,
         handler: context => {
             const list = context.start.node.getClosestParentMatching(p => p instanceof ListNode) as ListNode;
@@ -405,9 +405,9 @@ export const commands: Command[] = [
     },
     {
         description: "delete previous character",
-        mouse: false,
         category: "text",
         control: false, alt: false, shift: false, key: "Backspace",
+        visible: context => false,
         active: context => context.chapter !== undefined,
         handler: context => {
 
@@ -447,9 +447,9 @@ export const commands: Command[] = [
     },
     {
         description: "delete next character",
-        mouse: false,
         category: "text",
         control: false, alt: false, shift: false, key: "Delete",
+        visible: context => false,
         active: context => context.chapter !== undefined,
         handler: context => {
             if(context.start.node instanceof TextNode && context.start.node === context.end.node && context.start.index === context.end.index) {
@@ -487,9 +487,9 @@ export const commands: Command[] = [
     },
     {
         description: "insert code newline",
-        mouse: false,
         category: "text",
         control: false, alt: false, shift: false, key: "Enter",
+        visible: context => false,
         active: context => context.start.node.getParent() instanceof CodeNode,
         handler: context => {
             const caret = (context.start.node as TextNode).insert("\n", context.start.index);
@@ -498,9 +498,9 @@ export const commands: Command[] = [
     },
     {
         description: "split list item",
-        mouse: false,
         category: "list",
         control: false, alt: false, shift: false, key: "Enter",
+        visible: context => false,
         active: context => context.start.node.getClosestParentMatching(p => p instanceof ListNode) !== undefined,
         handler: context => {
             const list = context.start.node.getClosestParentMatching(p => p instanceof ListNode) as ListNode;
@@ -517,9 +517,9 @@ export const commands: Command[] = [
     },
     {
         description: "split paragraph",
-        mouse: false,
         category: "paragraph",
         control: false, alt: false, shift: false, key: "Enter",
+        visible: context => false,
         active: context => context.chapter !== undefined,
         handler: context => {
             const caret = (context.chapter as ChapterNode).splitSelection(context.range);
@@ -530,10 +530,10 @@ export const commands: Command[] = [
         label: "indent",
         icon: Indent,
         description: "indent list item",
-        mouse: true,
         category: "list",
         control: false, alt: false, shift: false, key: "Tab",
-        active: context => context.start.node.closestParent(ListNode) !== undefined,
+        visible: context => context.list !== undefined,
+        active: context => context.list !== undefined,
         handler: context => {
             const list = context.start.node.closestParent(ListNode) as ListNode;
             list.indent(context.start);
@@ -544,10 +544,10 @@ export const commands: Command[] = [
         label: "unindent",
         icon: Unindent,
         description: "unindent list item",
-        mouse: true,
         category: "list",
         control: false, alt: false, shift: true, key: "Tab",
-        active: context => context.start.node.closestParent(ListNode) !== undefined,
+        visible: context => context.list !== undefined,
+        active: context => context.list !== undefined && context.list.getParent() instanceof ListNode,
         handler: context => {
             const list = context.start.node.closestParent(ListNode) as ListNode;
             list.unindent(context.start);
@@ -558,39 +558,39 @@ export const commands: Command[] = [
         label: "plain",
         icon: Clear,
         description: "clear formatting",
-        mouse: true,
         category: "text",
         control: true, alt: false, shift: false, key: "0",
-        active: context => context.chapter !== undefined,
+        visible: context => true,
+        active: context => context.chapter !== undefined && context.startIsText && context.endIsText,
         handler: context => context.chapter ? context.chapter.editRange(context.range, "") : context.range
     },
     {
         label: "bold",
         icon: Bold,
         description: "bold",
-        mouse: true,
         category: "text",
+        visible: context => true,
         control: true, alt: false, shift: false, key: "b",
-        active: context => context.chapter !== undefined,
+        active: context => context.chapter !== undefined && context.startIsText && context.endIsText,
         handler: context => context.chapter ? context.chapter.editRange(context.range, "*") : context.range
     },
     {
         description: "italic",
         icon: Italic,
-        mouse: true,
         category: "text",
         control: true, alt: false, shift: false, key: "i",
-        active: context => context.chapter !== undefined,
+        visible: context => true,
+        active: context => context.chapter !== undefined && context.startIsText && context.endIsText,
         handler: context => context.chapter ? context.chapter.editRange(context.range, "_") : context.range
     },
     {
         label: "<code>",
         icon: Code,
         description: "toggle code",
-        mouse: true,
         category: "text",
         control: true, alt: false, shift: false, key: "j",
-        active: context => context.chapter !== undefined,
+        visible: context => true,
+        active: context => context.chapter !== undefined && context.startIsText && context.endIsText,
         handler: context => {
             const caret = context.chapter?.toggleAtom(context.range, InlineCodeNode, (parent, text) => new InlineCodeNode(parent, text));
             return caret ? { start: caret, end: caret} : context.range;
@@ -600,30 +600,30 @@ export const commands: Command[] = [
         label: "sub\u2099",
         icon: Subscript,
         description: "subscript",
-        mouse: true,
         category: "text",
         control: true, alt: false, shift: false, key: ",",
-        active: context => context.chapter !== undefined,
+        visible: context => true,
+        active: context => context.chapter !== undefined && context.startIsText && context.endIsText,
         handler: context => context.chapter ? context.chapter.editRange(context.range, "v") : context.range
     },
     {
         label: "super\u207F",
         icon: Superscript,
         description: "superscript",
-        mouse: true,
         category: "text",
         control: true, alt: false, shift: false, key: ".",
-        active: context => context.chapter !== undefined,
+        visible: context => true,
+        active: context => context.chapter !== undefined && context.startIsText && context.endIsText,
         handler: context => context.chapter ? context.chapter.editRange(context.range, "^") : context.range
     },
     {
         label: "link ⚭",
         icon: Link,
         description: "toggle link",
-        mouse: true,
         category: "annotation",
         control: true, alt: false, shift: false, key: "k",
-        active: context => context.chapter !== undefined,
+        visible: context => true,
+        active: context => context.chapter !== undefined && context.startIsText && context.endIsText,
         handler: context => {
             const caret = context.chapter?.toggleAtom(context.range, LinkNode, (parent, text) => new LinkNode(parent, text));
             return caret ? { start: caret, end: caret} : context.range;
@@ -632,10 +632,10 @@ export const commands: Command[] = [
     {
         label: "glossary",
         description: "toggle definition",
-        mouse: true,
         category: "annotation",
         control: true, alt: false, shift: false, key: "d",
-        active: context => context.chapter !== undefined,
+        visible: context => context.chapter !== undefined,
+        active: context => context.startIsText && context.endIsText,
         handler: context => {
             const caret = context.chapter?.toggleAtom(context.range, DefinitionNode, (parent, text) => new DefinitionNode(parent, text));
             return caret ? { start: caret, end: caret} : context.range;
@@ -644,10 +644,10 @@ export const commands: Command[] = [
     {
         label: "footnote",
         description: "insert footnote",
-        mouse: true,
         category: "annotation",
         control: true, alt: false, shift: false, key: "f",
-        active: context => context.chapter !== undefined,
+        visible: context => context.chapter !== undefined,
+        active: context => context.startIsText && context.endIsText,
         handler: context => {
             const caret = context.chapter?.insertNodeAtSelection(context.range, (parent, text) => new FootnoteNode(parent, text));
             return caret ? { start: caret, end: caret} : context.range;
@@ -656,10 +656,10 @@ export const commands: Command[] = [
     {
         label: "cite",
         description: "insert citations",
-        mouse: true,
         category: "annotation",
         control: true, alt: false, shift: false, key: "t",
-        active: context => context.chapter !== undefined,
+        visible: context => context.chapter !== undefined,
+        active: context => context.chapter !== undefined && context.startIsText && context.endIsText,
         handler: context => {
             const caret = context.chapter?.insertNodeAtSelection(context.range, (parent, text) => new CitationsNode(parent, []));
             return caret ? { start: caret, end: caret} : context.range;
@@ -668,10 +668,10 @@ export const commands: Command[] = [
     {
         label: "label",
         description: "insert label",
-        mouse: true,
         category: "annotation",
         control: true, alt: false, shift: false, key: "l",
-        active: context => context.chapter !== undefined,
+        visible: context => context.chapter !== undefined,
+        active: context => context.chapter !== undefined && context.startIsText && context.endIsText,
         handler: context => {
             const caret = context.chapter?.insertNodeAtSelection(context.range, (parent, text) => new LabelNode(parent, ""));
             return caret ? { start: caret, end: caret} : context.range;
@@ -681,10 +681,10 @@ export const commands: Command[] = [
         label: "comment",
         icon: Comment,
         description: "insert comment",
-        mouse: true,
         category: "annotation",
         control: true, alt: false, shift: false, key: "c",
-        active: context => context.chapter !== undefined,
+        visible: context => context.chapter !== undefined,
+        active: context => context.chapter !== undefined && context.startIsText && context.endIsText,
         handler: context => {
             const caret = context.chapter?.insertNodeAtSelection(context.range, (parent, text) => new CommentNode(parent, ""));
             return caret ? { start: caret, end: caret} : context.range;
@@ -694,10 +694,10 @@ export const commands: Command[] = [
         label: "paragraph",
         icon: Paragraph,
         description: "format as paragraph",
-        mouse: true,
         category: "level",
         control: true, alt: true, shift: false, code: "Digit0",
-        active: context => context.paragraph !== undefined,
+        visible: context => context.chapter !== undefined,
+        active: context => context.paragraph !== undefined && context.paragraph.getLevel() !== 0,
         handler: context => {
             context.paragraph?.setLevel(0);
             return context.range;
@@ -706,10 +706,10 @@ export const commands: Command[] = [
     {
         label: "h1",
         description: "format as 1st level header",
-        mouse: true,
         category: "level",
         control: true, alt: true, shift: false, code: "Digit1",
-        active: context => context.paragraph !== undefined,
+        visible: context => context.chapter !== undefined,
+        active: context => context.paragraph !== undefined && context.paragraph.getLevel() !== 1,
         handler: context => {
             context.paragraph?.setLevel(1);
             return context.range;
@@ -718,10 +718,10 @@ export const commands: Command[] = [
     {
         label: "h2",
         description: "format as 2nd level header",
-        mouse: true,
         category: "level",
         control: true, alt: true, shift: false, code: "Digit2",
-        active: context => context.paragraph !== undefined,
+        visible: context => context.chapter !== undefined,
+        active: context => context.paragraph !== undefined && context.paragraph.getLevel() !== 2,
         handler: context => {
             context.paragraph?.setLevel(2);
             return context.range;
@@ -730,10 +730,10 @@ export const commands: Command[] = [
     {
         label: "h3",
         description: "format as 3rd level header",
-        mouse: true,
         category: "level",
         control: true, alt: true, shift: false, code: "Digit3",
-        active: context => context.paragraph !== undefined,
+        visible: context => context.chapter !== undefined,
+        active: context => context.paragraph !== undefined && context.paragraph.getLevel() !== 3,
         handler: context => {
             context.paragraph?.setLevel(3);
             return context.range;
@@ -742,9 +742,9 @@ export const commands: Command[] = [
     {
         label: "\u2014",
         description: "insert horizontal rule",
-        mouse: true,
         category: "block",
         control: true, alt: false, shift: true, key: "h",
+        visible: context => context.blocks !== undefined && context.atParagraphStart,
         active: context => context.blocks !== undefined && context.atParagraphStart,
         handler: context => {
             if(context.blocks && context.paragraph)
@@ -755,9 +755,9 @@ export const commands: Command[] = [
     {
         label: "callout",
         description: "insert callout",
-        mouse: true,
         category: "block",
         control: true, alt: false, shift: true, key: "e",
+        visible: context => context.blocks !== undefined && context.atParagraphStart,
         active: context => context.blocks !== undefined && context.atParagraphStart,
         handler: context => {
             if(context.blocks && context.paragraph) {
@@ -776,9 +776,9 @@ export const commands: Command[] = [
         label: "‟",
         icon: Quote,
         description: "insert quote",
-        mouse: true,
         category: "block",
         control: true, alt: false, shift: true, key: "u",
+        visible: context => context.blocks !== undefined && context.atParagraphStart,
         active: context => context.blocks !== undefined && context.atParagraphStart,
         handler: context => {
             if(context.blocks && context.paragraph) {
@@ -797,9 +797,9 @@ export const commands: Command[] = [
         label: "<code>",
         icon: Code,
         description: "insert code",
-        mouse: true,
         category: "block",
         control: true, alt: false, shift: true, key: "s",
+        visible: context => context.blocks !== undefined && context.atParagraphStart,
         active: context => context.blocks !== undefined && context.atParagraphStart,
         handler: context => {
             if(context.blocks && context.paragraph) {
@@ -815,9 +815,9 @@ export const commands: Command[] = [
         label: "image/video",
         icon: Media,
         description: "insert image or video",
-        mouse: true,
         category: "block",
         control: true, alt: false, shift: true, key: "p",
+        visible: context => context.blocks !== undefined && context.atParagraphStart,
         active: context => context.blocks !== undefined && context.atParagraphStart,
         handler: context => {
             if(context.blocks && context.paragraph) {
@@ -836,9 +836,9 @@ export const commands: Command[] = [
     {
         label: "table",
         description: "insert table",
-        mouse: true,
         category: "block",
         control: true, alt: false, shift: true, key: "\\",
+        visible: context => context.blocks !== undefined && context.atParagraphStart,
         active: context => context.blocks !== undefined && context.atParagraphStart,
         handler: context => {
             if(context.blocks && context.paragraph) {
@@ -867,10 +867,10 @@ export const commands: Command[] = [
         label: "bulleted",
         icon: Bullets,
         description: "convert paragraph to bulleted list item",
-        mouse: true,
         category: "list",
         control: true, alt: false, shift: true, key: "7",
-        active: context => context.blocks !== undefined && context.paragraph !== undefined,
+        visible: context => context.list === undefined,
+        active: context => context.list === undefined,
         handler: context => {
             if(!context.blocks || !context.paragraph) return context.range;
             return convertToListItem(context.range, context.blocks, context.paragraph, context.list, false);
@@ -880,10 +880,10 @@ export const commands: Command[] = [
         label: "numbered",
         icon: Numbers,
         description: "convert paragraph to numbered list item",
-        mouse: true,
         category: "list",
         control: true, alt: false, shift: true, key: "8",
-        active: context => context.blocks !== undefined && context.paragraph !== undefined && (context.list === undefined || !context.list.isNumbered()),
+        visible: context => context.list === undefined,
+        active: context => context.list === undefined,
         handler: context => {
             if(!context.blocks || !context.paragraph) return context.range;
             return convertToListItem(context.range, context.blocks, context.paragraph, context.list, true);
@@ -893,9 +893,9 @@ export const commands: Command[] = [
         label: "bulleted",
         icon: Bullets,
         description: "convert numbered list item to bulleted",
-        mouse: true,
         category: "list",
         control: true, alt: false, shift: true, key: "7",
+        visible: context => context.blocks !== undefined && context.list !== undefined && context.list.isNumbered(),
         active: context => context.list !== undefined && context.list.isNumbered(),
         handler: context => {
             if(!context.list) return context.range;
@@ -907,9 +907,9 @@ export const commands: Command[] = [
         label: "numbered",
         icon: Numbers,
         description: "convert bulleted list item to numbered",
-        mouse: true,
         category: "list",
         control: true, alt: false, shift: true, key: "8",
+        visible: context => context.blocks !== undefined && context.list !== undefined && !context.list.isNumbered(),
         active: context => context.list !== undefined && !context.list.isNumbered(),
         handler: context => {
             if(!context.list) return context.range;
@@ -920,10 +920,10 @@ export const commands: Command[] = [
     {
         label: "paragraph",
         icon: Paragraph,
-        description: "convert list item to paragraph",
-        mouse: true,
+        description: "convert bulleted list item to paragraph",
         category: "list",
         control: true, alt: false, shift: true, key: "7",
+        visible: context => context.list !== undefined && !context.list.isNumbered(),
         active: context => context.list !== undefined && !context.list.isNumbered(),
         handler: context => {
             if(!context.blocks || !context.list || !context.format) return context.range;
@@ -934,10 +934,10 @@ export const commands: Command[] = [
     {
         label: "paragraph",
         icon: Paragraph,
-        description: "convert list item to paragraph",
-        mouse: true,
+        description: "convert numbered list item to paragraph",
         category: "list",
         control: true, alt: false, shift: true, key: "8",
+        visible: context => context.list !== undefined && context.list.isNumbered(),
         active: context => context.list !== undefined && context.list.isNumbered(),
         handler: context => {
             if(!context.blocks || !context.list || !context.format) return context.range;

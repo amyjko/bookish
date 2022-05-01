@@ -32,6 +32,8 @@ export type CaretState = {
     list: ListNode | undefined,
     table: TableNode | undefined,
     format: FormatNode | undefined, 
+    startIsText: boolean, 
+    endIsText: boolean,
     startIsTextOrAtom: boolean, 
     endIsTextOrAtom: boolean,
     atParagraphStart: boolean
@@ -331,6 +333,8 @@ const ChapterEditor = (props: { ast: ChapterNode }) => {
             list: caretRange.start.node.getClosestParentMatching(p => p instanceof ListNode) as ListNode,
             table: caretRange.start.node.getClosestParentMatching(p => p instanceof TableNode) as TableNode,
             format: (caretRange.start.node instanceof TextNode || caretRange.start.node instanceof AtomNode) ? caretRange.start.node.getFormatRoot() : undefined,
+            startIsText: caretRange.start.node instanceof TextNode,
+            endIsText: caretRange.end.node instanceof TextNode,
             startIsTextOrAtom: caretRange.start.node instanceof TextNode || caretRange.start.node instanceof AtomNode,
             endIsTextOrAtom: caretRange.end.node instanceof TextNode || caretRange.end.node instanceof AtomNode,
             atParagraphStart: atParagraphStart()
