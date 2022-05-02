@@ -260,41 +260,6 @@ export class ChapterNode extends BlocksNode {
 
     }
 
-    caretToTextIndex(caret: Caret): number {
-
-        if(!(caret.node instanceof TextNode))
-            throw Error("Can only get text position of text nodes");
-
-        const text = this.getTextNodes();
-        let index = 0;
-        for(let i = 0; i < text.length; i++) {
-            const t = text[i];
-            if(t !== caret.node)
-                index += t.getLength();
-            else {
-                index += caret.index;
-                break;
-            }
-        }
-
-        return index;
-
-    }
-
-    textIndexToCaret(index: number): Caret | undefined {
-
-        const text = this.getTextNodes();
-        let currentIndex = 0;
-        for(let i = 0; i < text.length; i++) {
-            const t = text[i];
-            if(index >= currentIndex && index <= currentIndex + t.getLength())
-                return { node: t, index: index - currentIndex };
-            currentIndex += t.getLength();
-        }
-        return undefined;
-
-    }
-
     splitSelection(range: CaretRange): Caret {
 
         let caret = range.start;
