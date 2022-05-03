@@ -1,6 +1,6 @@
 import { initializeApp } from "firebase/app";
-import { getAuth } from "firebase/auth"
-import { getFirestore } from "firebase/firestore"
+import { connectAuthEmulator, getAuth } from "firebase/auth"
+import { connectFirestoreEmulator, getFirestore } from "firebase/firestore"
 
 // Initialize Firebase using the environment variables provided at build time.
 // Only do this if we have environment variables defined. (We won't in the standalone Reader).
@@ -13,5 +13,12 @@ export const app = process.env.reader ? undefined : initializeApp({
     appId: process.env.BOOKISH_APP_ID
   });
 
-export const auth = process.env.reader ? undefined : getAuth()
-export const db = process.env.reader ? undefined : getFirestore()
+export const auth = process.env.reader ? undefined : getAuth();
+export const db = process.env.reader ? undefined : getFirestore();
+
+if(process.env.dev) {
+  if(db)
+    connectFirestoreEmulator(db, 'localhost', 8080);
+  if(auth)
+    connectAuthEmulator(auth, "http://localhost:9099");
+}

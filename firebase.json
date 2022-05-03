@@ -28,9 +28,6 @@
     "hosting": {
       "port": 8000
     },
-    "ui": {
-      "enabled": true
-    },
     "auth": {
       "port": 9099
     }
