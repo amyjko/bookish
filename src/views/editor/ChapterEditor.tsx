@@ -56,6 +56,16 @@ const ChapterEditor = (props: { ast: ChapterNode }) => {
     const [ toolbarFocused, setToolbarFocused ] = useState<boolean>(false);
 
     useEffect(() => {
+    
+        // Focus the editor on load.
+        if(editorRef.current) {
+            const text = ast.getTextNodes();
+            if(text.length > 0) {
+                const caret = { node: text[0], index: 0 };
+                setCaretRange({ start: caret, end: caret });
+                editorRef.current.focus();
+            }
+        }
 
         // Listen to selection changes
         document.addEventListener("selectionchange", handleSelectionChange);
@@ -448,18 +458,6 @@ const ChapterEditor = (props: { ast: ChapterNode }) => {
 
     }
 
-    function onFocus(event: React.FocusEvent) {
-    }
-
-    function onBlur(event: React.FocusEvent) {
-        
-        // If the editor lost focus and the caret was on a text node, erase the caret.
-        // Otherwise, we leave it alone, since children of this editor may focus and blur.
-        // if(editorRef.current && event.target === editorRef.current && caretRange?.start.node instanceof TextNode) {
-        //     setCaretRange(undefined);
-        // }
-    }
-
     function handleKeyUp(event: React.KeyboardEvent) {
         event.preventDefault();
     }
@@ -501,8 +499,6 @@ const ChapterEditor = (props: { ast: ChapterNode }) => {
                 onKeyUp={handleKeyUp}
                 onMouseDown={handleMouseDown}
                 onMouseMove={handleMouseMove}
-                onFocus={onFocus}
-                onBlur={onBlur}
                 tabIndex={0} // Makes the editor focusable.
                 >
                 {
