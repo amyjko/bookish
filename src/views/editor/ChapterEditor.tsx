@@ -188,9 +188,11 @@ const ChapterEditor = (props: { ast: ChapterNode }) => {
             const caretTop = newCaretPosition.y;
             const caretBottom = caretTop + newCaretPosition.height;
             const windowHeight = window.innerHeight;
+            const toolbar = document.querySelector(".bookish-chapter-editor-toolbar");
+            const toolbarHeight = toolbar ? toolbar.clientHeight : 0;
 
             const buffer = newCaretPosition.height * 5;
-            if(caretTop < window.scrollY - buffer) {
+            if(caretTop < window.scrollY + buffer + toolbarHeight) {
                 window.scrollTo({ top: caretTop - buffer, behavior: 'smooth'  });
             }
             else if(caretBottom > window.scrollY + windowHeight - buffer) {
