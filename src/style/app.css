@@ -401,6 +401,7 @@ input[type=text].bookish-editor-text-invalid {
 .bookish-chapter-editor-toolbar-group {
     display: inline-block;
     margin-right: calc(2 * var(--bookish-app-chrome-padding));
+    margin-bottom: var(--bookish-app-chrome-padding);
 }
 
 .bookish-chapter-editor-toolbar-group input, 

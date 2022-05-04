@@ -148,7 +148,7 @@ const Toolbar = (props: {
             categories.map(cat => 
                 commandsByCategory[cat].length === 0 ?
                     null :
-                    <ToolbarGroup row={categoryOrder[cat] > 7} key={cat} icon={ cat in categoryIcons ? wrapIcon(categoryIcons[cat]) : cat.charAt(0).toUpperCase() + cat.slice(1) }>
+                    <ToolbarGroup key={cat} icon={ cat in categoryIcons ? wrapIcon(categoryIcons[cat]) : cat.charAt(0).toUpperCase() + cat.slice(1) }>
                         {
                             commandsByCategory[cat]
                                 // Convert commands into buttons
@@ -167,32 +167,30 @@ const Toolbar = (props: {
             )
             : null
         }
-        { metaNode instanceof LinkNode ? <ToolbarGroup row={true} icon={wrapIcon(LinkIcon)}><LinkEditor link={metaNode}/></ToolbarGroup> : null }
-        { metaNode instanceof LabelNode ? <ToolbarGroup row={true} icon="Label"><LabelEditor label={metaNode}/></ToolbarGroup> : null }
-        { metaNode instanceof InlineCodeNode ? <ToolbarGroup row={true} icon={wrapIcon(Code)}><InlineCodeEditor code={metaNode}/></ToolbarGroup> : null }
-        { metaNode instanceof CitationsNode ? <ToolbarGroup row={true} icon="Citations"><CitationsEditor citations={metaNode}/></ToolbarGroup> : null }
-        { metaNode instanceof DefinitionNode ? <ToolbarGroup row={true} icon="Glossary"><DefinitionEditor definition={metaNode}/></ToolbarGroup> : null }
-        { metaNode instanceof CodeNode && context ? <ToolbarGroup row={true} icon={wrapIcon(Code)}><CaptionedCodeEditor code={context.start.node.getParent() as CodeNode}/></ToolbarGroup> : null }
-        { calloutNode ? <ToolbarGroup row={true} icon="Callout"><CalloutEditor callout={calloutNode} /></ToolbarGroup> : null }
-        { quoteNode ? <ToolbarGroup row={true} icon="Quote"><QuoteEditor quote={quoteNode} /></ToolbarGroup> : null }
-        { embedNode ? <ToolbarGroup row={true} icon="Image/Video"><EmbedEditor embed={embedNode} /></ToolbarGroup> : null }
+        { metaNode instanceof LinkNode ? <ToolbarGroup icon={wrapIcon(LinkIcon)}><LinkEditor link={metaNode}/></ToolbarGroup> : null }
+        { metaNode instanceof LabelNode ? <ToolbarGroup icon="Label"><LabelEditor label={metaNode}/></ToolbarGroup> : null }
+        { metaNode instanceof InlineCodeNode ? <ToolbarGroup icon={wrapIcon(Code)}><InlineCodeEditor code={metaNode}/></ToolbarGroup> : null }
+        { metaNode instanceof CitationsNode ? <ToolbarGroup icon="Citations"><CitationsEditor citations={metaNode}/></ToolbarGroup> : null }
+        { metaNode instanceof DefinitionNode ? <ToolbarGroup icon="Glossary"><DefinitionEditor definition={metaNode}/></ToolbarGroup> : null }
+        { metaNode instanceof CodeNode && context ? <ToolbarGroup icon={wrapIcon(Code)}><CaptionedCodeEditor code={context.start.node.getParent() as CodeNode}/></ToolbarGroup> : null }
+        { calloutNode ? <ToolbarGroup icon="Callout"><CalloutEditor callout={calloutNode} /></ToolbarGroup> : null }
+        { quoteNode ? <ToolbarGroup icon="Quote"><QuoteEditor quote={quoteNode} /></ToolbarGroup> : null }
+        { embedNode ? <ToolbarGroup icon="Image/Video"><EmbedEditor embed={embedNode} /></ToolbarGroup> : null }
 
     </div>
 
 }
 
 const ToolbarGroup = (props: {
-    row: boolean,
     icon: ReactNode,
     children: React.ReactNode
 }) => {
 
     return <>
-        { props.row ? <hr/> : null }
-        <div className="bookish-chapter-editor-toolbar-group">
+        <span className="bookish-chapter-editor-toolbar-group">
             <span className="bookish-chapter-editor-toolbar-icon">{props.icon}</span>
             { props.children }
-        </div>
+        </span>
     </>
 
 }
