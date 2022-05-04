@@ -47,6 +47,23 @@ const Outline = (props: { previous: string | null, next: string | null, collapse
 
 	}
 
+    function getHeaders(): Element[] {
+        return Array.from(document.getElementsByClassName("bookish-header"));
+    }
+
+    function updateHeaders() {
+
+        // When the outline updates (due to the page its on updating), generate a unique string for the current header outline.
+        // If it's different from the last rendered state, refresh.
+        let newHeaderString = "";
+        getHeaders().forEach(el => newHeaderString += el.outerHTML);
+
+        // If the headers change, update the outline.
+        if(headerString !== newHeaderString)
+            setHeaderString(newHeaderString);
+
+    }
+
     function getHighlightThreshold() { return window.innerHeight / 3; }
 
     const position = () => {
@@ -116,6 +133,12 @@ const Outline = (props: { previous: string | null, next: string | null, collapse
         window.addEventListener('resize', layout);
 		window.addEventListener('scroll', layout);
 
+        // This is a bit hacky: we update the headers on every selection change so we 
+        // can detect any header changes during editing. This isn't necessary during
+        // reading, and is only necessary when a header is created, updated, or removed,
+        // but we don't have a precise mechanism to listen to chapter changes, so we do this instead.
+        document.addEventListener("selectionchange", updateHeaders);
+        
         // Position outline after first render.
         layout();
 
@@ -124,6 +147,7 @@ const Outline = (props: { previous: string | null, next: string | null, collapse
 
             window.removeEventListener('scroll', layout);
             window.removeEventListener('resize', layout);
+            document.removeEventListener("selectionchange", updateHeaders);
     
         }
 
@@ -131,16 +155,9 @@ const Outline = (props: { previous: string | null, next: string | null, collapse
 
     useEffect(() => {
 
-        // When the outline updates (due to the page its on updating), generate a unique string for the current header outline.
-        // If it's different from the last rendered state, refresh.
-        let newHeaderString = "";
-        Array.from(document.getElementsByClassName("bookish-header")).forEach(el => newHeaderString += el.outerHTML);
+        updateHeaders();
 
-        // If the headers change, update the outline.
-        if(headerString !== newHeaderString)
-            setHeaderString(newHeaderString)
-
-    })
+    });
     
     let previous = "\u25C0\uFE0E";
     let next = "\u25B6\uFE0E";
@@ -149,8 +166,7 @@ const Outline = (props: { previous: string | null, next: string | null, collapse
     let dark = "\u263E";
 
     // Scan for headers and put them into a stable list.
-    let headers: Element[] = [];
-    Array.from(document.getElementsByClassName("bookish-header")).forEach(el => headers.push(el));
+    let headers: Element[] = getHeaders();
 
     return (
         <div 
