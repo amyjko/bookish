@@ -68,7 +68,6 @@ const categoryIcons: {[key:string]: Function} = {
 }
 
 const Toolbar = (props: { 
-    focused?: boolean,
     chapter?: ChapterNode, 
     context?: CaretState, 
     executor?: (command: Command, key: string) => void

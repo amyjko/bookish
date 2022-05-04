@@ -52,9 +52,7 @@ const ChapterEditor = (props: { ast: ChapterNode }) => {
     const [ caretCoordinate, setCaretCoordinate ] = useState<{ x: number, y: number, height: number}>();
     const [ lastInputTime, setLastInputTime ] = useState<number>(0);
     const [ keyboardIdle, setKeyboardIdle ] = useState<boolean>(true);
-    const [ mouseMoving, setMouseMoving ] = useState<ReturnType<typeof setTimeout> | undefined>(undefined);
-    const [ toolbarFocused, setToolbarFocused ] = useState<boolean>(false);
-
+ 
     useEffect(() => {
     
         // Focus the editor on load.
@@ -81,8 +79,6 @@ const ChapterEditor = (props: { ast: ChapterNode }) => {
         // Track time since last keystroke to control caret blinking behavior.
         const keystrokeTimer = setInterval(() => setKeyboardIdle((Date.now() - lastInputTime) > 300), 300);
         return () => {
-            if(mouseMoving)
-                clearTimeout(mouseMoving);
             clearInterval(keystrokeTimer);
         }
     }, [lastInputTime])
@@ -480,13 +476,6 @@ const ChapterEditor = (props: { ast: ChapterNode }) => {
         event.preventDefault();
     }
 
-    function handleMouseMove(event: React.MouseEvent) {
-        if(mouseMoving)
-            clearTimeout(mouseMoving);
-        const timeoutID = setTimeout(() => setMouseMoving(undefined), 1000);
-        setMouseMoving(timeoutID);
-    }
-
     function forceUpdate() {
 
         if(caretRange !== undefined)
@@ -516,10 +505,9 @@ const ChapterEditor = (props: { ast: ChapterNode }) => {
                 onKeyDown={handleKeyDown}
                 onKeyUp={handleKeyUp}
                 onMouseDown={handleMouseDown}
-                onMouseMove={handleMouseMove}
                 tabIndex={0} // Makes the editor focusable.
                 >
-                { context && caretCoordinate ? <Toolbar focused={toolbarFocused} chapter={props.ast} context={context} executor={executeCommand}></Toolbar> : null }
+                { context && caretCoordinate ? <Toolbar chapter={props.ast} context={context} executor={executeCommand}></Toolbar> : null }
                 {
                     // Draw a caret. We draw our own since this view isn't contentEditable and we can't show a caret.
                     // Customize the rendering based on the formatting applied to the text node.
