@@ -183,7 +183,25 @@ const ChapterEditor = (props: { ast: ChapterNode }) => {
                 document.getSelection()?.empty();
             }
         }
+
+        // Save the new caret position so we render it.
         setCaretCoordinate(newCaretPosition);
+
+        // If the caret position is outside the window, scroll to make it visible.
+        if(newCaretPosition) {
+            const caretTop = newCaretPosition.y;
+            const caretBottom = caretTop + newCaretPosition.height;
+            const windowHeight = window.innerHeight;
+
+            const buffer = newCaretPosition.height * 5;
+            if(caretTop < window.scrollY - buffer) {
+                window.scrollTo({ top: caretTop - buffer, behavior: 'smooth'  });
+            }
+            else if(caretBottom > window.scrollY + windowHeight - buffer) {
+                window.scrollTo({ top: caretBottom - (windowHeight - buffer), behavior: 'smooth'  }); 
+            }
+
+        }
 
     }, [ caretRange ]);
 

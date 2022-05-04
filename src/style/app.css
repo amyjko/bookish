@@ -358,6 +358,7 @@ input[type=text].bookish-editor-text-invalid {
     padding: var(--bookish-app-chrome-padding);
     font-family: var(--bookish-app-chrome-font-family);
     font-size: var(--bookish-app-chrome-font-size);
+    z-index: 2;
 }
 
 .bookish-chapter-editor-toolbar svg {
