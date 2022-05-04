@@ -116,7 +116,7 @@ export class ListNode extends Node<ListParentType> {
         const textBefore = chapterNodes[chapterIndex - 1];
 
         // Find the root format of the text before.
-        const beforeFormat = textBefore.getFarthestParentMatching(n => n instanceof FormatNode) as FormatNode;
+        const beforeFormat = textBefore?.getFarthestParentMatching(n => n instanceof FormatNode) as FormatNode;
         if(beforeFormat === undefined)
             return caret;
 
