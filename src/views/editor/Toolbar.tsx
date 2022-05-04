@@ -1,4 +1,4 @@
-import React, { ReactNode, RefObject } from "react";
+import React, { ReactNode } from "react";
 import { ChapterNode } from "../../models/ChapterNode";
 import { CaretState } from "./ChapterEditor";
 import { Command, commands } from "./Commands";
@@ -33,6 +33,7 @@ import { QuoteNode } from "../../models/QuoteNode";
 import QuoteEditor from "./QuoteEditor";
 import { EmbedNode } from "../../models/EmbedNode";
 import EmbedEditor from "./EmbedEditor";
+import Header from "../app/Header";
 
 const keyLabels: {[key: string]: string} = {
     "Digit0": "0",
@@ -67,10 +68,10 @@ const categoryIcons: {[key:string]: Function} = {
 }
 
 const Toolbar = (props: { 
-    focused: boolean,
-    chapter: ChapterNode, 
-    context: CaretState, 
-    executor: (command: Command, key: string) => void
+    focused?: boolean,
+    chapter?: ChapterNode, 
+    context?: CaretState, 
+    executor?: (command: Command, key: string) => void
     },
 ) => {
 
@@ -83,33 +84,49 @@ const Toolbar = (props: {
         return `${command.control ? controlSymbol : ""}${command.alt ? altSymbol : ""}${command.shift ? "\u21E7" : ""}${keyLabel}`;
     }
 
-    // Filter the commands by those interactive with a mouse and active.
-    const visible = commands.filter(command => command.visible.call(undefined, props.context));
-
-    // Extract the active categories and sort them
-    const categories = 
-        Array.from(new Set(commands.map(command => command.category)))
-            .sort((a, b) => a in categoryOrder && b in categoryOrder ? categoryOrder[a] - categoryOrder[b] : 0);
-
-    // Make a list for each category of commands
-    const commandsByCategory: {[key: string]: Command[]} = {};
-    categories.forEach(cat => {
-        commandsByCategory[cat] = visible.filter(command => command.category === cat);
-    });
-
-    const caretNode = props.context.start.node;
-
-    const metaNode = 
-        caretNode instanceof AtomNode ? caretNode :
-        caretNode instanceof TextNode ? caretNode.getParent() : 
-        undefined;
-
-    const calloutNode = caretNode.getClosestParentMatching(p => p instanceof CalloutNode) as CalloutNode;
-    const quoteNode = caretNode.getClosestParentMatching(p => p instanceof QuoteNode) as QuoteNode;
-    const embedNode = caretNode.getClosestParentMatching(p => p instanceof EmbedNode) as EmbedNode;
-
     function wrapIcon(icon: Function) {
         return <span className='bookish-chapter-editor-toolbar-icon'>{icon.call(undefined)}</span>;
+    }
+
+    const context = props.context;
+    const executor = props.executor;
+
+    let categories = undefined;
+    let commandsByCategory: {[key: string]: Command[]} = {};
+
+    let metaNode = undefined;
+    let calloutNode = undefined;
+    let quoteNode = undefined;
+    let embedNode = undefined;
+
+    if(context !== undefined) {
+
+        // Filter the commands by those interactive with a mouse and active.
+        const visible = commands.filter(command => command.visible.call(undefined, context));
+
+        // Extract the active categories and sort them
+        categories = 
+            Array.from(new Set(commands.map(command => command.category)))
+                .sort((a, b) => a in categoryOrder && b in categoryOrder ? categoryOrder[a] - categoryOrder[b] : 0);
+
+        // Make a list for each category of commands
+        commandsByCategory = {};
+        categories.forEach(cat => {
+            if(commandsByCategory)
+                commandsByCategory[cat] = visible.filter(command => command.category === cat);
+        });
+
+        const caretNode = context.start.node;
+
+        metaNode = 
+            caretNode instanceof AtomNode ? caretNode :
+            caretNode instanceof TextNode ? caretNode.getParent() : 
+            undefined;
+
+        calloutNode = caretNode.getClosestParentMatching(p => p instanceof CalloutNode) as CalloutNode;
+        quoteNode = caretNode.getClosestParentMatching(p => p instanceof QuoteNode) as QuoteNode;
+        embedNode = caretNode.getClosestParentMatching(p => p instanceof EmbedNode) as EmbedNode;
+
     }
 
     function handleKeyDown(event: React.KeyboardEvent) {
@@ -126,7 +143,9 @@ const Toolbar = (props: {
 
     // Render command categories.
     return <div className="bookish-chapter-editor-toolbar" onKeyDown={handleKeyDown}>
+        <Header/>
         {
+        context && categories && props.executor ?
             categories.map(cat => 
                 commandsByCategory[cat].length === 0 ?
                     null :
@@ -137,9 +156,9 @@ const Toolbar = (props: {
                                 .map((command, index) =>
                                     <button 
                                         key={index}
-                                        disabled={!command.active.call(undefined, props.context)}
+                                        disabled={!command.active.call(undefined, context)}
                                         title={command.description + " " + getShortcutDescription(command)}
-                                        onClick={() => props.executor.call(undefined, command, "")}
+                                        onClick={() => executor?.call(undefined, command, "")}
                                     >
                                         { command.icon ? command.icon.call(undefined) : command.label ? command.label : command.description }
                                     </button>
@@ -147,13 +166,14 @@ const Toolbar = (props: {
                         }
                     </ToolbarGroup>
             )
+            : null
         }
         { metaNode instanceof LinkNode ? <ToolbarGroup row={true} icon={wrapIcon(LinkIcon)}><LinkEditor link={metaNode}/></ToolbarGroup> : null }
         { metaNode instanceof LabelNode ? <ToolbarGroup row={true} icon="Label"><LabelEditor label={metaNode}/></ToolbarGroup> : null }
         { metaNode instanceof InlineCodeNode ? <ToolbarGroup row={true} icon={wrapIcon(Code)}><InlineCodeEditor code={metaNode}/></ToolbarGroup> : null }
         { metaNode instanceof CitationsNode ? <ToolbarGroup row={true} icon="Citations"><CitationsEditor citations={metaNode}/></ToolbarGroup> : null }
         { metaNode instanceof DefinitionNode ? <ToolbarGroup row={true} icon="Glossary"><DefinitionEditor definition={metaNode}/></ToolbarGroup> : null }
-        { metaNode instanceof CodeNode ? <ToolbarGroup row={true} icon={wrapIcon(Code)}><CaptionedCodeEditor code={props.context.start.node.getParent() as CodeNode}/></ToolbarGroup> : null }
+        { metaNode instanceof CodeNode && context ? <ToolbarGroup row={true} icon={wrapIcon(Code)}><CaptionedCodeEditor code={context.start.node.getParent() as CodeNode}/></ToolbarGroup> : null }
         { calloutNode ? <ToolbarGroup row={true} icon="Callout"><CalloutEditor callout={calloutNode} /></ToolbarGroup> : null }
         { quoteNode ? <ToolbarGroup row={true} icon="Quote"><QuoteEditor quote={quoteNode} /></ToolbarGroup> : null }
         { embedNode ? <ToolbarGroup row={true} icon="Image/Video"><EmbedEditor embed={embedNode} /></ToolbarGroup> : null }

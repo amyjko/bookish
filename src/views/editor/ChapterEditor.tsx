@@ -519,6 +519,7 @@ const ChapterEditor = (props: { ast: ChapterNode }) => {
                 onMouseMove={handleMouseMove}
                 tabIndex={0} // Makes the editor focusable.
                 >
+                { context && caretCoordinate ? <Toolbar focused={toolbarFocused} chapter={props.ast} context={context} executor={executeCommand}></Toolbar> : null }
                 {
                     // Draw a caret. We draw our own since this view isn't contentEditable and we can't show a caret.
                     // Customize the rendering based on the formatting applied to the text node.
@@ -533,7 +534,6 @@ const ChapterEditor = (props: { ast: ChapterNode }) => {
                         </div> : null
                 }
                 { renderNode(props.ast) }
-                { context && caretCoordinate ? <Toolbar focused={toolbarFocused} chapter={props.ast} context={context} executor={executeCommand}></Toolbar> : null }
                 
             </div>
         </CaretContext.Provider>
