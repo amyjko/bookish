@@ -180,28 +180,40 @@ export class ListNode extends Node<ListParentType> {
         if(parent === undefined)
             return [];
 
+        function addList(parent: ListParentType, numbered: boolean) {
+            if(items.length > 0) {
+                const newList = new ListNode(parent, items, numbered);
+                blocks.push(newList);
+                items = [];
+            }
+        }
+
         let blocks: (ParagraphNode | ListNode)[] = [];
         let items: ListNodeType[] = [];
         this.#items.forEach(item => {
             // If it's a list, recursively ask the sublist to construct a new sequence of blocks,
             // then insert any blocks in the blocks list, and any 
             if(item instanceof ListNode) {
+                // Create a list out of any pending items.
+                addList(parent, this.#numbered);
+                // Unwrap this sublist.
                 const newBlocks = item.unwrap(formats, container);
+                console.log(newBlocks.map(b => b.toBookdown()));
+                // Add the items that were unwrapped.
                 newBlocks.forEach(b => {
                     if(b instanceof ListNode)
                         items.push(b);
-                    else
+                    else {
+                        addList(parent, this.#numbered);
                         blocks.push(b);
+                    }
                 });
             }
             // If it's a format node that's being unwrapped, unwrap it.
             else if(formats.includes(item)) {
                 // Create a list out of any pending items.
-                if(items.length > 0) {
-                    const newList = new ListNode(parent, items, this.#numbered);
-                    blocks.push(newList);
-                    items = [];
-                }
+                addList(parent, this.#numbered);
+
                 // Create a paragraph with this format node as content.
                 const newParagraph = new ParagraphNode(container, 0);
                 newParagraph.setContent(item);
@@ -214,10 +226,8 @@ export class ListNode extends Node<ListParentType> {
         });
 
         // Create a list out of any pending items.
-        if(items.length > 0) {
-            const newList = new ListNode(parent, items, this.#numbered);
-            blocks.push(newList);
-        }
+        addList(parent, this.#numbered);
+
         // Return the new list of blocks.
         return blocks;
 
