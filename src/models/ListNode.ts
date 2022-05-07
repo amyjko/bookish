@@ -67,9 +67,13 @@ export class ListNode extends Node<ListParentType> {
     }
 
     removeChild(node: Node): void {
+        // Removing a format node means removing the item from the list.
         this.#items = this.#items.filter(item => item !== node);
         node.setParent(undefined);
 
+        // If the list is empty, it means removing the list.
+        if(this.#items.length === 0)
+            this.remove();
     }
 
     replaceChild(node: Node, replacement: ListNodeType): void {

@@ -28,6 +28,7 @@ export class FormatNode extends Node<FormatNodeParent> {
     getSegments() { return this.#segments; }
     setSegments(segs: FormatNodeSegmentType[]) { this.#segments = segs; }
     isEmpty() { return this.#segments.length === 0; }
+    isEmptyTextNode() { return this.#segments.length === 1 && this.#segments[0] instanceof TextNode && this.#segments[0].getText() === ""; }
     getLength() { return this.#segments.length; }
 
     toText(): string {

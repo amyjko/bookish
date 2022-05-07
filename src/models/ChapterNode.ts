@@ -333,20 +333,22 @@ export class ChapterNode extends BlocksNode {
         const commonAncestor = sortedRange.start.node.getCommonAncestor(sortedRange.end.node);
         if(commonAncestor === undefined)
             return range;
-        const formats = new Set<FormatNode>();
+        const formats: FormatNode[] = [];
         let insideSelection = false;
         commonAncestor.getNodes().forEach(node => {
             if(node === sortedRange.start.node)
                 insideSelection = true;
             const root = node instanceof TextNode ? node.getFormatRoot() : undefined;
             if(insideSelection && root)
-                formats.add(root);
+                formats.push(root);
             if(insideSelection && node === sortedRange.end.node)
                 insideSelection = false;
         });
 
         // Format each of the format roots as requested, accounting for the start and stop nodes.
         const newRanges: CaretRange[] = [];
+        const first = formats.length > 0 ? formats[0] : undefined;
+        const last = formats.length > 0 ? formats[formats.length - 1] : undefined;
         formats.forEach(root => {
 
             // The start is either the beginning of the format root or the start node, if this contains the start node.
@@ -356,7 +358,19 @@ export class ChapterNode extends BlocksNode {
             // Format the range and save the revised range!
             newRanges.push(root.editRange({ start: start, end: end }, format));
 
+            // If the format is empty and if it's not the first or last format, remove it (and implicitly it's parent, if it so desires.)
+            if(root.isEmptyTextNode() && root !== first && root !== last)
+                root.remove();
+
         });
+
+        // Merge the last node into the first.
+        if(first && last && first !== last) {
+            const newCaret = first.getLastCaret();
+            first.addSegment(last.copy(first));
+            last.remove();
+            return { start: newCaret, end: newCaret };
+        }
 
         // Return the new range.
         return { start: newRanges[0].start, end: newRanges[newRanges.length - 1].end };

@@ -42,7 +42,10 @@ export class ParagraphNode extends Node<BlockParentNode> {
         this.#content?.traverse(fn)
     }
 
-    removeChild(node: Node): void {}
+    removeChild(node: Node): void {
+        // Removing the format node means removing the whole paragraph.
+        this.remove();
+    }
 
     replaceChild(node: Node, replacement: FormatNode): void {
         if(this.#content === node)
