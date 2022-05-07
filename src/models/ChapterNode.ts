@@ -338,9 +338,16 @@ export class ChapterNode extends BlocksNode {
         commonAncestor.getNodes().forEach(node => {
             if(node === sortedRange.start.node)
                 insideSelection = true;
-            const root = node instanceof TextNode ? node.getFormatRoot() : undefined;
-            if(insideSelection && root)
-                formats.push(root);
+            const formatRoot = node instanceof TextNode ? node.getFormatRoot() : undefined;
+            if(insideSelection) {
+                // Remember the format root so we can format it below.
+                if(formatRoot)
+                    formats.push(formatRoot);
+                // If we encounter a block node in the ancestor between the selection and we're deleting, delete it.
+                if(format === undefined && !(node instanceof ParagraphNode) && node.getParent() === commonAncestor) {
+                    node.remove();
+                }
+            }
             if(insideSelection && node === sortedRange.end.node)
                 insideSelection = false;
         });
