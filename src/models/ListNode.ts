@@ -234,13 +234,11 @@ export class ListNode extends Node<ListParentType> {
 
     // Takes the given position, finds the root formatted node it is inside of, 
     // and replaces it with a list that contains the formatted node.
-    indent(caret: Caret) {
+    indent(format: FormatNode) {
 
         if(this.getLevel() >= 3)
             return;
 
-        // Find the root format
-        const format = caret.node.getFarthestParentMatching(n => n instanceof FormatNode) as FormatNode;
         const index = this.#items.indexOf(format);
 
         // If this isn't in this list, do nothing.
@@ -273,10 +271,9 @@ export class ListNode extends Node<ListParentType> {
 
     }
 
-    unindent(caret: Caret) {
+    unindent(format: FormatNode) {
 
         // Find the root format
-        const format = caret.node.getFarthestParentMatching(n => n instanceof FormatNode) as FormatNode;
         const index = this.#items.indexOf(format);
         const first = index === 0;
         const last = index === this.#items.length - 1;

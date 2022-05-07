@@ -190,6 +190,31 @@ function unwrapListItems(range: CaretRange): CaretRange {
 
 }
 
+function dentListItems(range: CaretRange, indent: boolean) {
+    // Find all of the formats in the range and indent them.
+    const ancestor = range.start.node.getCommonAncestor(range.end.node);
+    const nodes = ancestor?.getNodes();            
+    const formats = nodes?.filter(n => n instanceof FormatNode && n.getParent() instanceof ListNode) as FormatNode[];
+    const startIndex = nodes?.indexOf(range.start.node);
+    const endIndex = nodes?.indexOf(range.end.node);
+    if(formats === undefined || startIndex === undefined || endIndex === undefined)
+        return;
+    const first = startIndex < endIndex ? range.start.node : range.end.node;
+    const last = startIndex < endIndex ? range.end.node : range.start.node;
+    let inside = false;
+    formats.forEach(format => {
+        if(first.hasAncestor(format))
+            inside = true;
+        if(inside) {
+            const list = format.getParent();
+            if(list instanceof ListNode)
+                indent ? list.indent(format) : list.unindent(format);
+        }
+        if(last.hasAncestor(format))
+            inside = false;
+    });
+}
+
 function mergeAdjacentLists(blocks: BlocksNode) {
 
     const newBlocks: BlockNode[] = [];
@@ -651,8 +676,7 @@ export const commands: Command[] = [
         visible: context => context.list !== undefined,
         active: context => context.list !== undefined,
         handler: context => {
-            const list = context.start.node.closestParent(ListNode) as ListNode;
-            list.indent(context.start);
+            dentListItems(context.range, true);
             return { start: context.start, end: context.end };
         }
     },        
@@ -665,9 +689,7 @@ export const commands: Command[] = [
         visible: context => context.list !== undefined,
         active: context => context.list !== undefined && context.list.getParent() instanceof ListNode,
         handler: context => {
-            const list = context.start.node.closestParent(ListNode) as ListNode;
-            if(list)
-                list.unindent(context.start);
+            dentListItems(context.range, false);
             return { start: context.start, end: context.end };
         }
     },
