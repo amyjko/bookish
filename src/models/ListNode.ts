@@ -198,7 +198,6 @@ export class ListNode extends Node<ListParentType> {
                 addList(parent, this.#numbered);
                 // Unwrap this sublist.
                 const newBlocks = item.unwrap(formats, container);
-                console.log(newBlocks.map(b => b.toBookdown()));
                 // Add the items that were unwrapped.
                 newBlocks.forEach(b => {
                     if(b instanceof ListNode)
