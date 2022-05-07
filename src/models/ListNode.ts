@@ -24,6 +24,24 @@ export class ListNode extends Node<ListParentType> {
 
     getItems() { return this.#items; }
 
+    getLastItem(): FormatNode | undefined { return this.getFirstLastItem(false); }
+    getFirstItem(): FormatNode | undefined { return this.getFirstLastItem(true); }
+
+    getFirstLastItem(first: boolean): FormatNode | undefined {
+
+        if(this.#items.length === 0)
+            return undefined;
+
+        // If it's a format, return it.
+        const last = this.#items[first ? 0 : this.getLength() - 1];
+        if(last instanceof FormatNode)
+            return last;
+        
+        // Otherwise, recurse into the last item's list.
+        return last.getFirstLastItem(first);
+
+    }
+
     getLength() { return this.#items.length; }
 
     getLevel(): number {

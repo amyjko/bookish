@@ -420,6 +420,7 @@ export const commands: Command[] = [
                     if(currentParagraph && blocks) {
                         if(currentParagraph instanceof ParagraphNode) {
                             const previousBlock = blocks.getSiblingOf(currentParagraph, false);
+                            // If the block before this paragraph is a paragraph, merge the paragraphs.
                             if(previousBlock instanceof ParagraphNode) {
                                 const lastIndex = previousBlock.getContent().caretToTextIndex(previousBlock.getLastCaret());
                                 previousBlock.appendParagraph(currentParagraph);
@@ -427,6 +428,17 @@ export const commands: Command[] = [
                                 if(lastCaret)
                                     return { start: lastCaret, end: lastCaret };    
                             }
+                            // If the block before is a list node, merge the current paragraph to the last list item.
+                            else if(previousBlock instanceof ListNode) {
+                                const lastFormat = previousBlock.getLastItem();
+                                if(lastFormat) {
+                                    const newCaret = lastFormat.getLastCaret();
+                                    lastFormat.addSegment(currentParagraph.getContent().copy(lastFormat));
+                                    currentParagraph.remove();
+                                    return { start: newCaret, end: newCaret };
+                                }
+                            }
+                            // Otherwise, delete the block.
                             else {
                                 previousBlock?.remove();
                                 return context.range;
@@ -467,6 +479,17 @@ export const commands: Command[] = [
                                 const firstCaret = currentParagraph.getContent().textIndexToCaret(firstIndex);
                                 if(firstCaret)
                                     return { start: firstCaret, end: firstCaret };    
+                            }
+                            // If the block before is a list node, merge the current paragraph to the last list item.
+                            else if(nextBlock instanceof ListNode) {
+                                const firstFormat = nextBlock.getFirstItem();
+                                if(firstFormat) {
+                                    const newCaret = currentParagraph.getLastCaret();
+                                    currentParagraph.getContent().addSegment(firstFormat.copy(currentParagraph.getContent()));
+                                    // Delete the first item.
+                                    firstFormat.remove();
+                                    return { start: newCaret, end: newCaret };
+                                }
                             }
                             else {
                                 nextBlock?.remove();
