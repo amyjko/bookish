@@ -29,6 +29,7 @@ export type CaretState = {
     chapter: ChapterNode | undefined, 
     blocks: BlocksNode | undefined,
     paragraph: ParagraphNode | undefined,
+    includesList: boolean,
     list: ListNode | undefined,
     table: TableNode | undefined,
     format: FormatNode | undefined, 
@@ -348,6 +349,16 @@ const ChapterEditor = (props: { ast: ChapterNode }) => {
         if(caretRange === undefined)
             return undefined;
 
+        // Determine whether the range contains a list
+        const nodes = ast.getNodes();
+        let inside = false;
+        let includesList = false;
+        nodes.forEach(n => {
+            if(n === caretRange.start.node) inside = true;
+            if(inside && n.getClosestParentMatching(p => p instanceof ListNode) !== undefined) includesList = true;
+            if(n === caretRange.end.node) inside = false;
+        });
+
         return { 
             // We make a new range so that setCaretRange always causes a re-render
             range: { start: caretRange.start, end: caretRange.end },
@@ -358,6 +369,7 @@ const ChapterEditor = (props: { ast: ChapterNode }) => {
             blocks: caretRange.start.node.getClosestParentMatching(p => p instanceof BlocksNode) as BlocksNode,
             paragraph: caretRange.start.node.getClosestParentMatching(p => p instanceof ParagraphNode) as ParagraphNode,
             list: caretRange.start.node.getClosestParentMatching(p => p instanceof ListNode) as ListNode,
+            includesList: includesList,
             table: caretRange.start.node.getClosestParentMatching(p => p instanceof TableNode) as TableNode,
             format: (caretRange.end.node instanceof TextNode || caretRange.end.node instanceof AtomNode) ? caretRange.end.node.getFormatRoot() : undefined,
             startIsText: caretRange.start.node instanceof TextNode,

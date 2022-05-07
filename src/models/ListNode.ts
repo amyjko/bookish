@@ -3,6 +3,8 @@ import { FormatNode } from "./FormatNode";
 import { BlockParentNode } from "./BlockParentNode";
 import { Caret } from "./Caret";
 import { TextNode } from "./TextNode";
+import { ParagraphNode } from "./ParagraphNode";
+import { BlocksNode } from "./BlocksNode";
 
 export type ListParentType =  BlockParentNode | ListNode;
 export type ListNodeType = FormatNode | ListNode;
@@ -166,20 +168,53 @@ export class ListNode extends Node<ListParentType> {
         return list;
     }
 
-    copyItemsBeforeAfter(item: ListNodeType, before: boolean): ListNode | undefined {
+    // Generate a new list of paragraph and list nodes where the given formats are in paragraphs instead of in the list.
+    unwrap(formats: FormatNode[], container: BlocksNode): (ParagraphNode | ListNode)[] {
 
         const parent = this.getParent();
-        const index = this.#items.indexOf(item);
-        if(parent === undefined || index < 0)
-            return undefined;
-        const copy = this.copy(parent);
-        if(before)
-            // Delete items from anchor and after
-            copy.#items.splice(index);
-        else
-            // Delete items from 0 through the anchor
-            copy.#items.splice(0, index + 1);
-        return copy;
+        if(parent === undefined)
+            return [];
+
+        let blocks: (ParagraphNode | ListNode)[] = [];
+        let items: ListNodeType[] = [];
+        this.#items.forEach(item => {
+            // If it's a list, recursively ask the sublist to construct a new sequence of blocks,
+            // then insert any blocks in the blocks list, and any 
+            if(item instanceof ListNode) {
+                const newBlocks = item.unwrap(formats, container);
+                newBlocks.forEach(b => {
+                    if(b instanceof ListNode)
+                        items.push(b);
+                    else
+                        blocks.push(b);
+                });
+            }
+            // If it's a format node that's being unwrapped, unwrap it.
+            else if(formats.includes(item)) {
+                // Create a list out of any pending items.
+                if(items.length > 0) {
+                    const newList = new ListNode(parent, items, this.#numbered);
+                    blocks.push(newList);
+                    items = [];
+                }
+                // Create a paragraph with this format node as content.
+                const newParagraph = new ParagraphNode(container, 0);
+                newParagraph.setContent(item);
+                blocks.push(newParagraph);
+            }
+            // Otherwise, just add the item.
+            else {
+                items.push(item);
+            }
+        });
+
+        // Create a list out of any pending items.
+        if(items.length > 0) {
+            const newList = new ListNode(parent, items, this.#numbered);
+            blocks.push(newList);
+        }
+        // Return the new list of blocks.
+        return blocks;
 
     }
 

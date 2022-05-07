@@ -127,19 +127,67 @@ function convertRangeToListItem(range: CaretRange, numbered: boolean): CaretRang
     return range;
 }
 
-function unwrapListItem(blocks: BlocksNode, list: ListNode, format: FormatNode) {
-    // Duplicate the list
-    const before = list.copyItemsBeforeAfter(format, true);
-    const after = list.copyItemsBeforeAfter(format, false);
-    if(before && after) {
-        const newParagraph = new ParagraphNode(blocks);
-        newParagraph.setContent(format);
-        blocks.replaceChild(list, newParagraph);
-        if(before.getLength() > 0)
-        blocks.insertBefore(newParagraph, before);
-        if(after.getLength() > 0)
-        blocks.insertAfter(newParagraph, after);
+// Given an arbitrary selection, find all of the root list nodes within bounds
+// and convert any list items within the selection to paragraphs. The general
+// approach is to find all lists, and for the lists containing the start or end caret,
+// duplicate the list and convert everything included to paragraphs, and for all of the lists
+// between the start or end caret, convert the entire list to a paragraph.
+function unwrapListItems(range: CaretRange): CaretRange {
+
+    // Find the lists in range. The approach is to find all of the formats and all of the
+    // root list nodes of those formats. They have to be in the same document.
+    const ancestor = range.start.node.getCommonAncestor(range.end.node);
+    if(ancestor === undefined)
+        return range;
+
+    // Find the formats that the range start and stop in.
+    const startFormat = range.start.node.getClosestParentMatching(p => p instanceof FormatNode) as FormatNode;
+    const endFormat = range.end.node.getClosestParentMatching(p => p instanceof FormatNode) as FormatNode;
+    const blocks = ancestor instanceof BlocksNode ? ancestor : ancestor.getClosestParentMatching(p => p instanceof BlocksNode) as BlocksNode;
+
+    if(startFormat && endFormat && blocks) {
+        // Find all the formats in the common ancestor.
+        const formats: FormatNode[] = ancestor.getNodes().filter(p => p instanceof FormatNode) as FormatNode[];
+
+        // Sort the start and end format.
+        const reversed = formats.indexOf(startFormat) > formats.indexOf(endFormat);
+        const firstFormat = reversed ? endFormat : startFormat;
+        const lastFormat = reversed ? startFormat : endFormat;
+
+        // Loop through the formats in order and find the lists and list items that are contained in the selection.
+        let inside = false;
+        const listsToUnwrap: { list: ListNode, formats: FormatNode[] }[] = [];
+        formats.forEach(format => {
+            if(format === firstFormat)
+                inside = true;
+            if(inside) {
+                // Find the root list that contains the format.
+                const list = format.getFarthestParentMatching(n => n instanceof ListNode) as ListNode;
+                if(list !== undefined) {
+                    const listFormats = listsToUnwrap.find(f => f.list === list);
+                    if(listFormats)
+                        listFormats.formats.push(format);
+                    else
+                        listsToUnwrap.push({ list: list, formats: [ format ]});
+                }
+            }
+            if(format === lastFormat)
+                inside = false;
+        });
+
+        // Translate each existing list into a sequence of paragraphs and lists reflecting the desired edits,
+        // then insert after the existing list, then remove the existing list.
+        listsToUnwrap.forEach(set => {
+            console.log("Unwrap these in the list: " + set.formats.map(f => f.toBookdown()));
+            set.list.unwrap(set.formats, blocks).reverse().forEach(block => blocks.insertAfter(set.list, block));
+            set.list.remove();
+        });
+
     }
+
+    // Return the original range, since the format it was in should still exist.
+    return range;
+
 }
 
 // An ordered list of command specifications for keyboard and mouse input.
@@ -969,29 +1017,13 @@ export const commands: Command[] = [
     {
         label: "paragraph",
         icon: Paragraph,
-        description: "convert bulleted list item to paragraph",
+        description: "convert list item to paragraph",
         category: "list",
         control: true, alt: false, shift: true, key: "7",
-        visible: context => context.list !== undefined && !context.list.isNumbered(),
-        active: context => context.list !== undefined && !context.list.isNumbered(),
+        visible: context => context.includesList,
+        active: context => context.includesList,
         handler: context => {
-            if(!context.blocks || !context.list || !context.format) return context.range;
-            unwrapListItem(context.blocks, context.list, context.format);
-            return context.range;
+            return unwrapListItems(context.range);
         }
     },
-    {
-        label: "paragraph",
-        icon: Paragraph,
-        description: "convert numbered list item to paragraph",
-        category: "list",
-        control: true, alt: false, shift: true, key: "8",
-        visible: context => context.list !== undefined && context.list.isNumbered(),
-        active: context => context.list !== undefined && context.list.isNumbered(),
-        handler: context => {
-            if(!context.blocks || !context.list || !context.format) return context.range;
-            unwrapListItem(context.blocks, context.list, context.format);
-            return context.range;
-        }
-    }
 ];
