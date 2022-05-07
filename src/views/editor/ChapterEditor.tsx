@@ -497,12 +497,20 @@ const ChapterEditor = (props: { ast: ChapterNode }) => {
 
     }
 
+    function handleFocus() {
+        forceUpdate();
+    }
+
+    function handleUnfocus() {
+        forceUpdate();
+    }
+
     const isAtom = caretRange && caretRange.start.node instanceof AtomNode;
     const isSelection = caretRange && (caretRange.start.node !== caretRange.end.node || caretRange.start.index !== caretRange.end.index);
     const isItalic = caretRange && !isSelection && caretRange.start.node instanceof TextNode && caretRange.start.node.isItalic();
     const isBold = caretRange && !isSelection && caretRange.start.node instanceof TextNode && caretRange.start.node.isBold();
     const isLink = caretRange && !isSelection && caretRange.start.node.getClosestParentMatching(p => p instanceof LinkNode) !== undefined;
-    const focused = document.activeElement === editorRef.current;
+    const focused = document.activeElement === editorRef.current && document.hasFocus();
 
     const context = getCaretContext();
 
@@ -519,6 +527,8 @@ const ChapterEditor = (props: { ast: ChapterNode }) => {
                 onKeyDown={handleKeyDown}
                 onKeyUp={handleKeyUp}
                 onMouseDown={handleMouseDown}
+                onFocus={handleFocus}
+                onBlur={handleUnfocus}
                 tabIndex={0} // Makes the editor focusable.
                 >
                 { context && caretCoordinate ? <Toolbar chapter={props.ast} context={context} executor={executeCommand}></Toolbar> : null }
