@@ -178,7 +178,6 @@ function unwrapListItems(range: CaretRange): CaretRange {
         // Translate each existing list into a sequence of paragraphs and lists reflecting the desired edits,
         // then insert after the existing list, then remove the existing list.
         listsToUnwrap.forEach(set => {
-            console.log("Unwrap these in the list: " + set.formats.map(f => f.toBookdown()));
             set.list.unwrap(set.formats, blocks).reverse().forEach(block => blocks.insertAfter(set.list, block));
             set.list.remove();
         });
@@ -647,7 +646,8 @@ export const commands: Command[] = [
         active: context => context.list !== undefined && context.list.getParent() instanceof ListNode,
         handler: context => {
             const list = context.start.node.closestParent(ListNode) as ListNode;
-            list.unindent(context.start);
+            if(list)
+                list.unindent(context.start);
             return { start: context.start, end: context.end };
         }
     },
