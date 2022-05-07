@@ -47,7 +47,7 @@ export type Command = {
     control: boolean,
     alt: boolean,
     shift: boolean,
-    key?: string,
+    key?: string | string[],
     code?: string,
     visible: (context: CaretState) => boolean,
     active: (context: CaretState) => boolean,
@@ -1047,13 +1047,13 @@ export const commands: Command[] = [
     {
         label: "paragraph",
         icon: Paragraph,
-        description: "convert list item to paragraph",
+        description: "convert bulleted list item to paragraph",
         category: "list",
-        control: true, alt: false, shift: true, key: "7",
+        control: true, alt: false, shift: true, key: ["7", "8"],
         visible: context => context.includesList,
         active: context => context.includesList,
         handler: context => {
             return unwrapListItems(context.range);
         }
-    },
+    }
 ];

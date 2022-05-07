@@ -78,7 +78,7 @@ const Toolbar = (props: {
         const macOS = navigator.platform.indexOf('Mac') > -1;
         const controlSymbol = macOS ? "\u2318" : "Ctrl+";
         const altSymbol = macOS ? "\u2325" : "Alt+";
-        const key = command.key ? command.key : command.code ? command.code : "any";
+        const key = command.key ? (Array.isArray(command.key) ? command.key.join("/") : command.key) : command.code ? command.code : "any";
         const keyLabel = (key in keyLabels ? keyLabels[key] : key).toLocaleUpperCase();
         return `${command.control ? controlSymbol : ""}${command.alt ? altSymbol : ""}${command.shift ? "\u21E7" : ""}${keyLabel}`;
     }

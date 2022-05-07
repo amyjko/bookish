@@ -412,7 +412,7 @@ const ChapterEditor = (props: { ast: ChapterNode }) => {
             if( command.shift === event.shiftKey && 
                 command.alt === event.altKey &&
                 command.control === (event.ctrlKey || event.metaKey) &&
-                (command.key === undefined || command.key === event.key) &&
+                (command.key === undefined || command.key === event.key || (Array.isArray(command.key) && command.key.includes(event.key))) &&
                 (command.code === undefined || command.code === event.code) &&
                 command.active.call(undefined, context)) {
 
