@@ -359,7 +359,7 @@ const ChapterEditor = (props: { ast: ChapterNode }) => {
             paragraph: caretRange.start.node.getClosestParentMatching(p => p instanceof ParagraphNode) as ParagraphNode,
             list: caretRange.start.node.getClosestParentMatching(p => p instanceof ListNode) as ListNode,
             table: caretRange.start.node.getClosestParentMatching(p => p instanceof TableNode) as TableNode,
-            format: (caretRange.start.node instanceof TextNode || caretRange.start.node instanceof AtomNode) ? caretRange.start.node.getFormatRoot() : undefined,
+            format: (caretRange.end.node instanceof TextNode || caretRange.end.node instanceof AtomNode) ? caretRange.end.node.getFormatRoot() : undefined,
             startIsText: caretRange.start.node instanceof TextNode,
             endIsText: caretRange.end.node instanceof TextNode,
             startIsTextOrAtom: caretRange.start.node instanceof TextNode || caretRange.start.node instanceof AtomNode,
