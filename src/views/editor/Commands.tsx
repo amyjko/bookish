@@ -37,6 +37,7 @@ import Numbers from "../svg/numbers.svg";
 import Quote from "../svg/quote.svg";
 import Code from "../svg/code.svg";
 import { AtomNode } from "../../models/AtomNode";
+import { BlockNode } from "../../models/BlockNode";
 
 export type Command = {
     label?: string,
@@ -186,6 +187,25 @@ function unwrapListItems(range: CaretRange): CaretRange {
 
     // Return the original range, since the format it was in should still exist.
     return range;
+
+}
+
+function mergeAdjacentLists(blocks: BlocksNode) {
+
+    const newBlocks: BlockNode[] = [];
+    blocks.getBlocks().forEach(block => {
+        const previousBlock = newBlocks[newBlocks.length - 1];
+        if(previousBlock instanceof ListNode && block instanceof ListNode && previousBlock.isNumbered() === block.isNumbered()) {
+            block.getItems().forEach(item => {
+                previousBlock.append(item);
+            });
+        }
+        else {
+            newBlocks.push(block);
+        }
+    });
+
+    blocks.blocks = newBlocks;
 
 }
 
@@ -970,7 +990,10 @@ export const commands: Command[] = [
         active: context => context.list === undefined,
         handler: context => {
             if(!context.blocks) return context.range;
-            return convertRangeToListItem(context.range, false);
+            const newCaret = convertRangeToListItem(context.range, false);
+            if(context.blocks) 
+                mergeAdjacentLists(context.blocks);
+            return newCaret;
         }
     },
     {
@@ -982,8 +1005,11 @@ export const commands: Command[] = [
         visible: context => context.list === undefined,
         active: context => context.list === undefined,
         handler: context => {
-            if(!context.blocks) return context.range;
-            return convertRangeToListItem(context.range, true);
+            if(!context.blocks) return context.range;            
+            const newCaret = convertRangeToListItem(context.range, true);
+            if(context.blocks) 
+                mergeAdjacentLists(context.blocks);
+            return newCaret;
         }
     },
     {
@@ -997,6 +1023,8 @@ export const commands: Command[] = [
         handler: context => {
             if(!context.list) return context.range;
             context.list.setNumbered(false);
+            if(context.blocks) 
+                mergeAdjacentLists(context.blocks);
             return context.range;
         }
     },
@@ -1011,6 +1039,8 @@ export const commands: Command[] = [
         handler: context => {
             if(!context.list) return context.range;
             context.list.setNumbered(true);
+            if(context.blocks) 
+                mergeAdjacentLists(context.blocks);
             return context.range;
         }
     },

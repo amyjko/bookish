@@ -3,6 +3,7 @@ import { Node } from "./Node";
 import { BlockNode } from "./BlockNode";
 import { BlockParentNode } from "./BlockParentNode";
 import { NodeType } from "./NodeType";
+import { ListNode } from "./ListNode";
 
 export abstract class BlocksNode extends Node {
     
