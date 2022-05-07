@@ -39,7 +39,7 @@ export class ParagraphNode extends Node<BlockParentNode> {
     }
 
     traverseChildren(fn: (node: Node) => void): void {
-        this.#content?.traverse(fn)
+        this.#content?.traverse(fn);
     }
 
     removeChild(node: Node): void {

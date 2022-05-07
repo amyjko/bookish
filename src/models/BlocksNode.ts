@@ -59,6 +59,34 @@ export abstract class BlocksNode extends Node {
         return this.blocks[index + 1];
     }
 
+    getBlocksBetween(first: BlockNode, last: BlockNode): BlockNode[] | undefined {
+
+        const firstIndex = this.indexOf(first);
+        const lastIndex = this.indexOf(last);
+        if(firstIndex !== undefined && lastIndex !== undefined) {
+            // Swap to be in order.
+            if(firstIndex > lastIndex) {
+                const temp = first;
+                first = last;
+                last = temp;
+            }
+            const blocks = [];
+            let inside = false;
+            for(let i = 0; i < this.blocks.length; i++) {
+                let block = this.blocks[i];
+                if(block === first)
+                    inside = true;
+                if(inside)
+                    blocks.push(block);
+                if(block === last)
+                    break;
+            }
+            return blocks;
+        }
+        return undefined;
+
+    }
+
     append(block: BlockNode) {
         this.blocks.push(block);
     }

@@ -88,16 +88,42 @@ function deleteTableRowColumn(table: TableNode, format: FormatNode, row: boolean
 
 }
 
-function convertToListItem(range: CaretRange, blocks: BlocksNode, paragraph: ParagraphNode, list: ListNode | undefined, numbered: boolean): CaretRange {
-    if(!blocks || !paragraph) return range;
-    if(list) {
-        list.setNumbered(numbered);
-    } else {
+function convertRangeToListItem(range: CaretRange, numbered: boolean): CaretRange {
+    // Find the common ancestor of the selection.
+    const ancestor = range.start.node.getCommonAncestor(range.end.node);
+    const paragraph = ancestor?.getParent();
+    const blocks = paragraph?.getParent();
+
+    // If the common ancestor is a format in a paragraph, convert it to a list.
+    if(ancestor instanceof FormatNode && paragraph instanceof ParagraphNode && blocks instanceof BlocksNode) {
         const newList = new ListNode(blocks, [], numbered);
         const format = paragraph.getContent();
         newList.append(format);
         paragraph.replaceWith(newList);
     }
+    // If the common ancestor is a blocks node, convert all of the paragraphs in range to a list.
+    else if(ancestor instanceof BlocksNode) {
+        // Find all the paragraphs in the section.
+        let first = range.start.node instanceof TextNode && range.start.node.getParagraph();
+        let last = range.end.node instanceof TextNode && range.end.node.getParagraph();
+        if(first && last) {
+            const blocks = ancestor.getBlocksBetween(first, last);            
+            if(blocks) {
+                const paragraphs = blocks.filter(b => b instanceof ParagraphNode) as ParagraphNode[];
+                // Only format if it's a contiguous list of paragraphs.
+                if(blocks.length === paragraphs.length) {
+                    const newList = new ListNode(ancestor, [], numbered);
+                    ancestor.insertBefore(paragraphs[0], newList);
+                    paragraphs.forEach(p => {
+                        newList.append(p.getContent());
+                        p.remove();
+                    });
+                }
+            }
+        }
+    }
+
+    // Keep the range at the same location.
     return range;
 }
 
@@ -895,8 +921,8 @@ export const commands: Command[] = [
         visible: context => context.list === undefined,
         active: context => context.list === undefined,
         handler: context => {
-            if(!context.blocks || !context.paragraph) return context.range;
-            return convertToListItem(context.range, context.blocks, context.paragraph, context.list, false);
+            if(!context.blocks) return context.range;
+            return convertRangeToListItem(context.range, false);
         }
     },
     {
@@ -908,8 +934,8 @@ export const commands: Command[] = [
         visible: context => context.list === undefined,
         active: context => context.list === undefined,
         handler: context => {
-            if(!context.blocks || !context.paragraph) return context.range;
-            return convertToListItem(context.range, context.blocks, context.paragraph, context.list, true);
+            if(!context.blocks) return context.range;
+            return convertRangeToListItem(context.range, true);
         }
     },
     {
