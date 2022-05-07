@@ -124,7 +124,7 @@ export const commands: Command[] = [
         category: "table",
         control: false, alt: true, shift: false, key: "ArrowUp",
         visible: context => context.table !== undefined,
-        active: context => context.format !== undefined,
+        active: context => context.table !== undefined && context.format !== undefined,
         handler: context => {
             if(!context.table || !context.format) return context.range;
             const range = insertTableRowColumn(context.table, context.format, true, true);
@@ -137,7 +137,7 @@ export const commands: Command[] = [
         category: "table",
         control: false, alt: true, shift: false, key: "ArrowDown",
         visible: context => context.table !== undefined,
-        active: context => context.format !== undefined,
+        active: context => context.table !== undefined && context.format !== undefined,
         handler: context => {
             if(!context.table || !context.format) return context.range;
             const range = insertTableRowColumn(context.table, context.format, true, false);
@@ -150,7 +150,7 @@ export const commands: Command[] = [
         category: "table",
         control: false, alt: true, shift: false, key: "ArrowRight",
         visible: context => context.table !== undefined,
-        active: context => context.format !== undefined,
+        active: context => context.table !== undefined && context.format !== undefined,
         handler: context => {
             if(!context.table || !context.format) return context.range;
             const range = insertTableRowColumn(context.table, context.format, false, false);
@@ -163,7 +163,7 @@ export const commands: Command[] = [
         category: "table",
         control: false, alt: true, shift: false, key: "ArrowLeft",
         visible: context => context.table !== undefined,
-        active: context => context.format !== undefined,
+        active: context => context.table !== undefined && context.format !== undefined,
         handler: context => {
             if(!context.table || !context.format) return context.range;
             const range = insertTableRowColumn(context.table, context.format, false, true);
