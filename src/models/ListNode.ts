@@ -97,6 +97,11 @@ export class ListNode extends Node<ListParentType> {
         this.#items.unshift(item);
     }
 
+    insertAt(item: ListNodeType, index: number) {
+        item.setParent(this);
+        this.#items.splice(index, 0, item);
+    }
+
     insertAfter(item: ListNodeType, anchor: ListNodeType) {
         const index = this.#items.indexOf(anchor);
         if(index < 0)
@@ -281,8 +286,9 @@ export class ListNode extends Node<ListParentType> {
 
         // If first, insert the format before this list.
         if(first) {
+            const index = listParent.getItems().indexOf(this);
             this.removeChild(format);
-            listParent.insertBefore(format, this);
+            listParent.insertAt(format, index);
         }
         // If last, insert the format after this list.
         else if(last) {
