@@ -396,7 +396,7 @@ export const commands: Command[] = [
         category: "list",
         control: false, alt: false, shift: false, key: "Backspace",
         visible: context => false,
-        active: context => (context.start.node.getClosestParentMatching(p => p instanceof ListNode) as ListNode)?.atBeginningOfItem(context.start) !== undefined,
+        active: context => context.list?.atBeginningOfItem(context.start) === true,
         handler: context => {
             const list = context.start.node.getClosestParentMatching(p => p instanceof ListNode) as ListNode;
             const newCaret = list.backspaceItemContaining(context.start);
