@@ -455,8 +455,8 @@ export const commands: Command[] = [
         active: context => true,
         handler: context => {
             // If in a footnote, expand to the footnote.
-            if(context.footnote) {
-                const format = context.footnote.getMeta();
+            if(context.atom) {
+                const format = context.atom.getMeta();
                 return { start: format.getFirstCaret(), end: format.getLastCaret() };
             }
             else {
@@ -668,7 +668,7 @@ export const commands: Command[] = [
         category: "paragraph",
         control: false, alt: false, shift: false, key: "Enter",
         visible: context => false,
-        active: context => context.footnote === undefined && context.chapter !== undefined,
+        active: context => context.atom === undefined && context.chapter !== undefined,
         handler: context => {
             const caret = (context.chapter as ChapterNode).splitSelection(context.range);
             return { start: caret, end: caret };
@@ -831,11 +831,17 @@ export const commands: Command[] = [
         description: "insert comment",
         category: "annotation",
         control: true, alt: false, shift: false, key: "c",
-        visible: context => context.chapter !== undefined,
-        active: context => context.chapter !== undefined && context.startIsText && context.endIsText,
+        visible: context => context.chapter !== undefined && context.atom === undefined,
+        active: context => context.chapter !== undefined && context.atom === undefined && context.startIsText && context.endIsText,
         handler: context => {
-            const caret = context.chapter?.insertNodeAtSelection(context.range, (parent, text) => new CommentNode(parent, ""));
-            return caret ? { start: caret, end: caret} : context.range;
+            const caret = context.chapter?.insertNodeAtSelection(context.range, (parent, text) => {
+                const format = new FormatNode(parent, "", []);
+                format.addSegment(new TextNode(format, ""));
+                return new CommentNode(parent, format);
+            });
+            const comment = caret?.node as CommentNode;
+            const first = comment?.getMeta().getFirstCaret();
+            return first ? { start: first, end: first } : context.range;
         }
     },
     {
@@ -844,7 +850,7 @@ export const commands: Command[] = [
         description: "format as paragraph",
         category: "level",
         control: true, alt: true, shift: false, code: "Digit0",
-        visible: context => context.chapter !== undefined && context.footnote === undefined,
+        visible: context => context.chapter !== undefined && context.atom === undefined,
         active: context => context.paragraph !== undefined && context.paragraph.getLevel() !== 0,
         handler: context => {
             context.paragraph?.setLevel(0);
@@ -856,7 +862,7 @@ export const commands: Command[] = [
         description: "format as 1st level header",
         category: "level",
         control: true, alt: true, shift: false, code: "Digit1",
-        visible: context => context.chapter !== undefined && context.footnote === undefined,
+        visible: context => context.chapter !== undefined && context.atom === undefined,
         active: context => context.paragraph !== undefined && context.paragraph.getLevel() !== 1,
         handler: context => {
             context.paragraph?.setLevel(1);
@@ -868,7 +874,7 @@ export const commands: Command[] = [
         description: "format as 2nd level header",
         category: "level",
         control: true, alt: true, shift: false, code: "Digit2",
-        visible: context => context.chapter !== undefined && context.footnote === undefined,
+        visible: context => context.chapter !== undefined && context.atom === undefined,
         active: context => context.paragraph !== undefined && context.paragraph.getLevel() !== 2,
         handler: context => {
             context.paragraph?.setLevel(2);
@@ -880,7 +886,7 @@ export const commands: Command[] = [
         description: "format as 3rd level header",
         category: "level",
         control: true, alt: true, shift: false, code: "Digit3",
-        visible: context => context.chapter !== undefined && context.footnote === undefined,
+        visible: context => context.chapter !== undefined && context.atom === undefined,
         active: context => context.paragraph !== undefined && context.paragraph.getLevel() !== 3,
         handler: context => {
             context.paragraph?.setLevel(3);
@@ -1017,8 +1023,8 @@ export const commands: Command[] = [
         description: "convert paragraph to bulleted list item",
         category: "list",
         control: true, alt: false, shift: true, key: "7",
-        visible: context => context.list === undefined && context.footnote === undefined,
-        active: context => context.list === undefined && context.footnote === undefined,
+        visible: context => context.list === undefined && context.atom === undefined,
+        active: context => context.list === undefined && context.atom === undefined,
         handler: context => {
             if(!context.blocks) return context.range;
             const newCaret = convertRangeToListItem(context.range, false);
@@ -1033,8 +1039,8 @@ export const commands: Command[] = [
         description: "convert paragraph to numbered list item",
         category: "list",
         control: true, alt: false, shift: true, key: "8",
-        visible: context => context.list === undefined && context.footnote === undefined,
-        active: context => context.list === undefined && context.footnote === undefined,
+        visible: context => context.list === undefined && context.atom === undefined,
+        active: context => context.list === undefined && context.atom === undefined,
         handler: context => {
             if(!context.blocks) return context.range;            
             const newCaret = convertRangeToListItem(context.range, true);

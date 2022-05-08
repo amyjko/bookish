@@ -34,7 +34,7 @@ export type CaretState = {
     list: ListNode | undefined,
     table: TableNode | undefined,
     format: FormatNode | undefined, 
-    footnote: FootnoteNode | undefined,
+    atom: FootnoteNode | undefined,
     startIsText: boolean,
     endIsText: boolean,
     startIsTextOrAtom: boolean, 
@@ -372,7 +372,7 @@ const ChapterEditor = (props: { ast: ChapterNode }) => {
             blocks: caretRange.start.node.getClosestParentMatching(p => p instanceof BlocksNode) as BlocksNode,
             paragraph: caretRange.start.node.getClosestParentMatching(p => p instanceof ParagraphNode) as ParagraphNode,
             list: caretRange.start.node.getClosestParentMatching(p => p instanceof ListNode) as ListNode,
-            footnote: caretRange.start.node.getClosestParentMatching(p => p instanceof FootnoteNode) as FootnoteNode,
+            atom: caretRange.start.node.getClosestParentMatching(p => p instanceof AtomNode) as AtomNode<FormatNode>,
             includesList: includesList,
             table: caretRange.start.node.getClosestParentMatching(p => p instanceof TableNode) as TableNode,
             format: (caretRange.end.node instanceof TextNode || caretRange.end.node instanceof AtomNode) ? caretRange.end.node.getFormatRoot() : undefined,
@@ -446,16 +446,16 @@ const ChapterEditor = (props: { ast: ChapterNode }) => {
                 event.stopPropagation();
 
                 // If we've selected a FootnoteNode, navigate to the footnote text.
-                if(caretRange.start.node instanceof FootnoteNode) {
-                    const firstFootnoteCaret = caretRange.start.node.getMeta().getFirstCaret();
-                    setCaretRange({ start: firstFootnoteCaret, end: firstFootnoteCaret });
+                if(caretRange.start.node instanceof AtomNode) {
+                    const firstCaret = caretRange.start.node.getMeta().getFirstCaret();
+                    setCaretRange({ start: firstCaret, end: firstCaret });
                     return true;
                 }
-                else if(caretRange.start.node.isInside(FootnoteNode)) {
-                    const footnote = caretRange.start.node.getClosestParentMatching(p => p instanceof FootnoteNode);
-                    if(footnote) {
-                        const footnoteCaret = { node: footnote, index: 0 };
-                        setCaretRange({ start: footnoteCaret, end: footnoteCaret });
+                else if(caretRange.start.node.isInside(AtomNode)) {
+                    const atom = caretRange.start.node.getClosestParentMatching(p => p instanceof AtomNode);
+                    if(atom) {
+                        const atomCaret = { node: atom, index: 0 };
+                        setCaretRange({ start: atomCaret, end: atomCaret });
                         return true;
                     }
                 }
@@ -526,6 +526,7 @@ const ChapterEditor = (props: { ast: ChapterNode }) => {
     }
 
     const isAtom = caretRange && caretRange.start.node instanceof AtomNode;
+    const inAtom = caretRange && caretRange.start.node.inside(AtomNode);
     const isSelection = caretRange && (caretRange.start.node !== caretRange.end.node || caretRange.start.index !== caretRange.end.index);
     const isItalic = caretRange && !isSelection && caretRange.start.node instanceof TextNode && caretRange.start.node.isItalic();
     const isBold = caretRange && !isSelection && caretRange.start.node instanceof TextNode && caretRange.start.node.isBold();
@@ -542,7 +543,7 @@ const ChapterEditor = (props: { ast: ChapterNode }) => {
         focused: focused
     }}>
             <div 
-                className="bookish-chapter-editor"
+                className={`bookish-chapter-editor ${inAtom ? "bookish-chapter-editor-atom-focused" : ""}`}
                 ref={editorRef}
                 onKeyDown={handleKeyDown}
                 onKeyUp={handleKeyUp}

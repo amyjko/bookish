@@ -5,41 +5,26 @@ import { EditorContext } from '../page/Book';
 import { ChapterContext } from './Chapter';
 import Marginal from './Marginal';
 
+import CommentIcon from "../svg/comment.svg";
+import { renderNode } from './Renderer';
+import { CaretContext } from '../editor/ChapterEditor';
+
 const Comment = (props: { node: CommentNode }) => {
 
     const comment = props.node;
     const { chapter } = useContext(ChapterContext);
     const { editable } = useContext(EditorContext);
-    const [ editing, setEditing ] = useState(false);
-    const [ editedComment, setEditedComment ] = useState(comment.getMeta());
-    const ref = useRef<HTMLInputElement>(null);
+    const context = useContext(ChapterContext);
 
-    function edit() {
-        setEditing(true);
-    }
+    const caret = useContext(CaretContext);
 
     useEffect(() => {
-        if(ref && ref.current)
-            ref.current.focus();
-    }, [editing]);
+        if(context && context.layoutMarginals) {
+            context.layoutMarginals();
+        }
+    });
 
-    function handleChange(event: ChangeEvent<HTMLInputElement>) {
-
-        setEditedComment(event.target.value);
-        comment.setMeta(event.target.value);
-
-    }
-
-    const commentEditor = editing ?
-        <input 
-            className="bookish-app-comment-editor" 
-            type="text" 
-            value={editedComment} 
-            onChange={handleChange} 
-            onBlur={() => setEditing(false) }
-            ref={ref}
-        /> :
-        <span className="bookish-app-comment" onMouseDown={edit}>{comment.getMeta()}</span>
+    const focused = caret && caret.range && caret.range.start.node.hasAncestor(comment);
 
     return <Atom
         node={comment}
@@ -47,8 +32,8 @@ const Comment = (props: { node: CommentNode }) => {
             editable ?
             <Marginal 
                 id={"comment-" + chapter?.getComments().indexOf(comment)}
-                interactor={<span className="bookish-comment-symbol">•</span>}
-                content={commentEditor}
+                interactor={<span className="bookish-comment-symbol"><CommentIcon/></span>}
+                content={<span className={`bookish-app-comment ${focused ? "bookish-app-comment-focused" : ""}`}>{renderNode(comment.getMeta())}</span>}
             />
             :
             <></>

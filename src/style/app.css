@@ -214,6 +214,10 @@ input[type="text"].bookish-app-editable-error {
     outline-offset: var(--bookish-app-chrome-padding);
 }
 
+.bookish-chapter-editor.bookish-chapter-editor-atom-focused:focus {
+    outline: none;
+}
+
 .bookish-chapter-editor-caret {
     left: 0;
     top: 0;
@@ -304,6 +308,10 @@ input[type=text].bookish-editor-text-invalid {
     animation: 1s atom-selected infinite;
 }
 
+.bookish-comment-symbol svg {
+    height: 1em;
+}
+
 .bookish-app-comment {
     background: var(--bookish-app-chrome-background);
     border: 1px solid var(--bookish-app-chrome-border-color);
@@ -312,6 +320,10 @@ input[type=text].bookish-editor-text-invalid {
     font-size: var(--bookish-app-chrome-font-size);
     display: inline-block;
     line-height: 1.5em;
+}
+
+.bookish-app-comment-focused, .bookish-footnote-focused {
+    outline: 2px solid var(--bookish-highlight-color);
 }
 
 .bookish-app-switch {

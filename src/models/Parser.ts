@@ -888,16 +888,16 @@ export default class Parser {
         // Consume the opening %
         this.read();
 
+        const comment = new CommentNode(parent, new FormatNode(undefined, "", []));
+
         // Consume everything until the next %.
-        let comment = ""
-        while(this.more() && this.peek() !== "\n" && this.peek() !== "%")
-            comment = comment + this.read();
+        comment.setMeta(this.parseContent(comment, "%"));
 
         // Consume the closing %, if we didn't reach the end of input or a newline.
         if(this.peek() === "%")
             this.read();
 
-        return new CommentNode(parent, comment);
+        return comment;
 
     }
 
