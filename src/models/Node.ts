@@ -138,6 +138,11 @@ export abstract class Node<ParentType extends Node<any> = Node<any>> {
         return nodes;
     }
 
+    getIndexOf(node: Node): number | undefined {
+        const index = this.getNodes().indexOf(node);
+        return index >= 0 ? index : undefined;
+    }
+
     getSibling(next: boolean): Node<any> | undefined { return this.#parent?.getSiblingOf(this, next); }
 
     abstract getSiblingOf(child: Node, next: boolean): Node | undefined;

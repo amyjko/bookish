@@ -299,7 +299,7 @@ export class FormatNode extends Node<FormatNodeParent> {
         return this.editRange(range, undefined);
     }
 
-    // This monolith takes the given range, and if it's within the bounds of this FormatNode
+    // This function takes the given range, and if it's within the bounds of this FormatNode
     // either formats the given range with the given format (or deletes the range if the formed is undefined). 
     // It's approach is to scan through every atomic node and character and build a new tree according to the existing
     // tree, but with the requested modification.

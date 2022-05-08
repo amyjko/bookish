@@ -78,7 +78,17 @@ export class TextNode extends Node<TextNodeParent> {
     }
 
     getFormatRoot(): FormatNode | undefined {
+
+        // The format root is the highest format in the tree that contains this text.
+        // There is one exception to this, however: formats inside atom nodes shouldn't traverse
+        // past the atom node, since should be isolated from edits outside the atom.
+        const atom = this.getClosestParentMatching(p => p instanceof AtomNode) as AtomNode<FormatNode>;
+        if(atom && atom.getMeta() instanceof FormatNode)
+            return atom.getMeta();
+
+        // If this isn't in an atom, just return the highest format this is in.
         return this.getFarthestParentMatching(p => p instanceof FormatNode) as FormatNode;
+
     }
 
     getBlocks(): BlocksNode | undefined {
@@ -86,9 +96,10 @@ export class TextNode extends Node<TextNodeParent> {
     }
 
     getRoot(): FormatNode | ChapterNode | undefined {
+        const atom = this.getFarthestParentMatching(p => p instanceof AtomNode) as AtomNode<FormatNode>;
         const format = this.getFarthestParentMatching(p => p instanceof FormatNode) as FormatNode;
         const chapter = this.getFarthestParentMatching(p => p instanceof ChapterNode) as ChapterNode;
-        return chapter ? chapter : format ? format : undefined;
+        return atom ? atom.getMeta() : chapter ? chapter : format ? format : undefined;
     }
 
     next(index: number): Caret {

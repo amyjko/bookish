@@ -226,19 +226,25 @@ export class ChapterNode extends BlocksNode {
     // Swap them order if this is two text nodes that are reversed.
     sortRange(range: CaretRange): CaretRange {
 
-        if(!(range.start.node instanceof TextNode) || !(range.end.node instanceof TextNode))
+        const start = range.start.node;
+        const end = range.end.node;
+
+        // Find the common ancestor of the two nodes.
+        const ancestor = start.getCommonAncestor(end);
+
+        if(ancestor === undefined)
             return range;
 
-        // Where do these text nodes appear in the chapter?
-        let startIndex = this.getIndexOfTextNode(range.start.node);
-        let endIndex = this.getIndexOfTextNode(range.end.node);
+        // Where do these text nodes appear in the ancestor's node sequence?
+        let startIndex = ancestor.getIndexOf(start);
+        let endIndex = ancestor.getIndexOf(end);
 
         // Defensively verify that we could find the given nodes in the document.
         // If we can't, something is wrong upstream.
-        if(startIndex && startIndex < 0)
-            throw Error(`Could not find ${range.start.node.toBookdown()} in chapter.`);
-        if(endIndex && endIndex < 0)
-            throw Error(`Could not find ${range.end.node.toBookdown()} in chapter.`);
+        if(startIndex === undefined)
+            throw Error(`Could not find ${start.toBookdown()} in common ancestor.`);
+        if(endIndex === undefined)
+            throw Error(`Could not find ${end.toBookdown()} in common ancestor.`);
 
         // If we didn't find them, or the start is before the end, return the given range.
         return startIndex === undefined || endIndex === undefined || startIndex < endIndex ? 
@@ -404,7 +410,7 @@ export class ChapterNode extends BlocksNode {
         }
         else {
             const caret = this.insertNodeAtSelection(range, creator);
-            // Get the text node inside the new link.
+            // Get the text node inside the new atom.
             const textNode = caret.node as MetadataNode<any>;
             return { node: textNode.getText(), index: textNode.getText().getLength() }
         }

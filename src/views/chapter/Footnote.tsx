@@ -26,6 +26,13 @@ const Footnote = (props: { node: FootnoteNode }) => {
         }
     });
     
+    function handleMouseDown(event: React.MouseEvent) {
+        // This odd little statement prevents mouse events from bubbling up to the footnote symbol. This is key for two reasons:
+        // 1) clicks on the footnote select the footnote atom node itself
+        // 2) we want to be able to click on footnote text and we can't do that if the footnote sets the caret to the atom after clicks.
+        event?.stopPropagation();
+    }
+    
     return <Atom
         node={node}
         textView={
@@ -33,7 +40,7 @@ const Footnote = (props: { node: FootnoteNode }) => {
                 <Marginal 
                     id={"footnote-" + number}
                     interactor={<sup className="bookish-footnote-symbol">{letter}</sup>}
-                    content={<span className="bookish-footnote"><sup className="bookish-footnote-symbol">{letter}</sup> {renderNode(footnote)}</span>} 
+                    content={<span className="bookish-footnote" onMouseDown={handleMouseDown}><sup className="bookish-footnote-symbol">{letter}</sup> {renderNode(footnote)}</span>} 
                 />
             </span>
         }

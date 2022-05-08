@@ -454,15 +454,22 @@ export const commands: Command[] = [
         visible: context => false,
         active: context => true,
         handler: context => {
-            // Find the first and last caret of the entire chapter.
-            const text = context.chapter?.getTextNodes();
-            if(text && text.length > 0) {
-                return {
-                    start: { node: text[0], index: 0 },
-                    end: { node: text[text.length - 1], index: text[text.length - 1].getLength() }
-                }
+            // If in a footnote, expand to the footnote.
+            if(context.footnote) {
+                const format = context.footnote.getMeta();
+                return { start: format.getFirstCaret(), end: format.getLastCaret() };
             }
-            return context.range;
+            else {
+                // Find the first and last caret of the entire chapter.
+                const text = context.chapter?.getTextNodes();
+                if(text && text.length > 0) {
+                    return {
+                        start: { node: text[0], index: 0 },
+                        end: { node: text[text.length - 1], index: text[text.length - 1].getLength() }
+                    }
+                }
+                return context.range;
+            }
         }
     },
     {
@@ -661,12 +668,12 @@ export const commands: Command[] = [
         category: "paragraph",
         control: false, alt: false, shift: false, key: "Enter",
         visible: context => false,
-        active: context => context.chapter !== undefined,
+        active: context => context.footnote === undefined && context.chapter !== undefined,
         handler: context => {
             const caret = (context.chapter as ChapterNode).splitSelection(context.range);
             return { start: caret, end: caret };
         }
-    },        
+    },
     {
         label: "indent",
         icon: Indent,
@@ -835,7 +842,7 @@ export const commands: Command[] = [
         description: "format as paragraph",
         category: "level",
         control: true, alt: true, shift: false, code: "Digit0",
-        visible: context => context.chapter !== undefined,
+        visible: context => context.chapter !== undefined && context.footnote === undefined,
         active: context => context.paragraph !== undefined && context.paragraph.getLevel() !== 0,
         handler: context => {
             context.paragraph?.setLevel(0);
@@ -847,7 +854,7 @@ export const commands: Command[] = [
         description: "format as 1st level header",
         category: "level",
         control: true, alt: true, shift: false, code: "Digit1",
-        visible: context => context.chapter !== undefined,
+        visible: context => context.chapter !== undefined && context.footnote === undefined,
         active: context => context.paragraph !== undefined && context.paragraph.getLevel() !== 1,
         handler: context => {
             context.paragraph?.setLevel(1);
@@ -859,7 +866,7 @@ export const commands: Command[] = [
         description: "format as 2nd level header",
         category: "level",
         control: true, alt: true, shift: false, code: "Digit2",
-        visible: context => context.chapter !== undefined,
+        visible: context => context.chapter !== undefined && context.footnote === undefined,
         active: context => context.paragraph !== undefined && context.paragraph.getLevel() !== 2,
         handler: context => {
             context.paragraph?.setLevel(2);
@@ -871,7 +878,7 @@ export const commands: Command[] = [
         description: "format as 3rd level header",
         category: "level",
         control: true, alt: true, shift: false, code: "Digit3",
-        visible: context => context.chapter !== undefined,
+        visible: context => context.chapter !== undefined && context.footnote === undefined,
         active: context => context.paragraph !== undefined && context.paragraph.getLevel() !== 3,
         handler: context => {
             context.paragraph?.setLevel(3);
@@ -1008,8 +1015,8 @@ export const commands: Command[] = [
         description: "convert paragraph to bulleted list item",
         category: "list",
         control: true, alt: false, shift: true, key: "7",
-        visible: context => context.list === undefined,
-        active: context => context.list === undefined,
+        visible: context => context.list === undefined && context.footnote === undefined,
+        active: context => context.list === undefined && context.footnote === undefined,
         handler: context => {
             if(!context.blocks) return context.range;
             const newCaret = convertRangeToListItem(context.range, false);
@@ -1024,8 +1031,8 @@ export const commands: Command[] = [
         description: "convert paragraph to numbered list item",
         category: "list",
         control: true, alt: false, shift: true, key: "8",
-        visible: context => context.list === undefined,
-        active: context => context.list === undefined,
+        visible: context => context.list === undefined && context.footnote === undefined,
+        active: context => context.list === undefined && context.footnote === undefined,
         handler: context => {
             if(!context.blocks) return context.range;            
             const newCaret = convertRangeToListItem(context.range, true);
