@@ -796,7 +796,9 @@ export const commands: Command[] = [
         active: context => context.startIsText && context.endIsText,
         handler: context => {
             const caret = context.chapter?.insertNodeAtSelection(context.range, (parent, text) => new FootnoteNode(parent, text));
-            return caret ? { start: caret, end: caret} : context.range;
+            const footnote = caret?.node as FootnoteNode;
+            const first = footnote?.getMeta().getFirstCaret();
+            return first ? { start: first, end: first } : context.range;
         }
     },
     {
