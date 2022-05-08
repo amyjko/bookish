@@ -64,6 +64,10 @@ export abstract class Node<ParentType extends Node<any> = Node<any>> {
 
     }
 
+    isInside(type: Function) {
+        return this.getClosestParentMatching(p => p instanceof type) !== undefined;
+    }
+
     getClosestParentMatching(match: (node: Node) => boolean): Node | undefined {
 
         let parent = this.#parent;

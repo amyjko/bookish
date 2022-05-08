@@ -12,6 +12,7 @@ import { ListNode } from "../../models/ListNode";
 import { TableNode } from "../../models/TableNode";
 import { Command, commands } from "./Commands";
 import Toolbar from "./Toolbar";
+import { FootnoteNode } from "../../models/FootnoteNode";
 
 export const CaretContext = React.createContext<{ 
     range: CaretRange | undefined, 
@@ -441,6 +442,22 @@ const ChapterEditor = (props: { ast: ChapterNode }) => {
             else if(event.key === "Tab") {
                 event.preventDefault();
                 event.stopPropagation();
+
+                // If we've selected a FootnoteNode, navigate to the footnote text.
+                if(caretRange.start.node instanceof FootnoteNode) {
+                    const firstFootnoteCaret = caretRange.start.node.getMeta().getFirstCaret();
+                    setCaretRange({ start: firstFootnoteCaret, end: firstFootnoteCaret });
+                    return true;
+                }
+                else if(caretRange.start.node.isInside(FootnoteNode)) {
+                    const footnote = caretRange.start.node.getClosestParentMatching(p => p instanceof FootnoteNode);
+                    if(footnote) {
+                        const footnoteCaret = { node: footnote, index: 0 };
+                        setCaretRange({ start: footnoteCaret, end: footnoteCaret });
+                        return true;
+                    }
+                }
+
                 const controls = [
                     document.querySelector(".bookish-chapter-editor-toolbar input"),
                     document.querySelector(".bookish-chapter-editor-toolbar select"),
@@ -450,7 +467,7 @@ const ChapterEditor = (props: { ast: ChapterNode }) => {
                 if(match && match instanceof HTMLElement) {
                     match.focus();
                     return true;
-                }        
+                }
             }
 
         }
