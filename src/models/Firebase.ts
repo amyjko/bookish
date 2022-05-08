@@ -16,7 +16,7 @@ export const app = process.env.reader ? undefined : initializeApp({
 export const auth = process.env.reader ? undefined : getAuth();
 export const db = process.env.reader ? undefined : getFirestore();
 
-if(process.env.dev) {
+if(!process.env.reader && process.env.dev) {
   if(db)
     connectFirestoreEmulator(db, 'localhost', 8080);
   if(auth)
