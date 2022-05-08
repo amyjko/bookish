@@ -343,8 +343,8 @@ export class ChapterNode extends BlocksNode {
                 // Remember the format root so we can format it below.
                 if(formatRoot)
                     formats.push(formatRoot);
-                // If we encounter a block node in the ancestor between the selection and we're deleting, delete it.
-                if(format === undefined && !(node instanceof ParagraphNode) && node.getParent() === commonAncestor) {
+                // If we encounter a block node in a BlocksNode between the selection and we're deleting, delete it.
+                if(commonAncestor instanceof BlocksNode && format === undefined && !(node instanceof ParagraphNode) && node.getParent() === commonAncestor) {
                     node.remove();
                 }
             }
@@ -358,16 +358,18 @@ export class ChapterNode extends BlocksNode {
         const last = formats.length > 0 ? formats[formats.length - 1] : undefined;
         formats.forEach(root => {
 
-            // The start is either the beginning of the format root or the start node, if this contains the start node.
-            const start = (sortedRange.start.node as TextNode).getFormatRoot() === root ? sortedRange.start : { node: root.getFirstTextNode(), index: 0 };
-            // The end is either the end of the formatting root or the end node, if this contains the end node.
-            const end = (sortedRange.end.node as TextNode).getFormatRoot() === root ? sortedRange.end : { node: root.getLastTextNode(), index: root.getLastTextNode().getLength() };
-            // Format the range and save the revised range!
-            newRanges.push(root.editRange({ start: start, end: end }, format));
+            if(root.getLength() > 0) {
+                // The start is either the beginning of the format root or the start node, if this contains the start node.
+                const start = (sortedRange.start.node as TextNode).getFormatRoot() === root ? sortedRange.start : { node: root.getFirstTextNode(), index: 0 };
+                // The end is either the end of the formatting root or the end node, if this contains the end node.
+                const end = (sortedRange.end.node as TextNode).getFormatRoot() === root ? sortedRange.end : { node: root.getLastTextNode(), index: root.getLastTextNode().getLength() };
+                // Format the range and save the revised range!
+                newRanges.push(root.editRange({ start: start, end: end }, format));
 
-            // If the format is empty and if it's not the first or last format, remove it (and implicitly it's parent, if it so desires.)
-            if(root.isEmptyTextNode() && root !== first && root !== last)
-                root.remove();
+                // If the format is empty and if it's not the first or last format, remove it (and implicitly it's parent, if it so desires.)
+                if(root.isEmptyTextNode() && root !== first && root !== last)
+                    root.remove();
+            }
 
         });
 
