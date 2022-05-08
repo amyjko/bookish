@@ -53,6 +53,7 @@ const ChapterEditor = (props: { ast: ChapterNode }) => {
     const [ caretCoordinate, setCaretCoordinate ] = useState<{ x: number, y: number, height: number}>();
     const [ lastInputTime, setLastInputTime ] = useState<number>(0);
     const [ keyboardIdle, setKeyboardIdle ] = useState<boolean>(true);
+    const [ editorFocused, setEditorFocused ] = useState<boolean>(true);
  
     useEffect(() => {
     
@@ -498,11 +499,11 @@ const ChapterEditor = (props: { ast: ChapterNode }) => {
     }
 
     function handleFocus() {
-        forceUpdate();
+        setEditorFocused(true);
     }
 
     function handleUnfocus() {
-        forceUpdate();
+        setEditorFocused(false);
     }
 
     const isAtom = caretRange && caretRange.start.node instanceof AtomNode;
