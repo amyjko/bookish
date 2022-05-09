@@ -66,6 +66,7 @@ export class TextNode extends Node<TextNodeParent> {
 
     isItalic() { return this.getAncestors().filter(p => p instanceof FormatNode && p.getFormat() === "_").length > 0; }
     isBold() { return this.getAncestors().filter(p => p instanceof FormatNode && p.getFormat() === "*").length > 0; }
+    isEmpty() { return this.getLength() === 0; }
 
     clean() {}
 
@@ -104,14 +105,20 @@ export class TextNode extends Node<TextNodeParent> {
 
     next(index: number): Caret {
     
-        // If there are more characters, just go next.
-        if(index < this.#text.length)
-            return { node: this, index: index + 1 }
-        
         // Otherwise, find the next text node after this one.
         const next = this.getRoot()?.getNextTextOrAtom(this);
 
-        // If we don't have a chapter, return what we were given.
+        // If there are more characters, just go next.
+        if(index < this.#text.length) {
+            // If the next node is an empty node, go into it instead.
+            if(index + 1 === this.getLength() && next && next instanceof TextNode && next.isEmpty())
+                return { node: next, index: 0 };
+            // Otherwise, just go to the next position in this text node.
+            else
+                return { node: this, index: index + 1 };
+        }
+        
+        // If we don't have a root or nothing is next, just return what we were given.
         if(next === undefined)
             return { node: this, index: index };
 
@@ -128,15 +135,21 @@ export class TextNode extends Node<TextNodeParent> {
     }
 
     previous(index: number): Caret {
-    
-        // If there are more characters, just go next.
-        if(index > 0)
-            return { node: this, index: index - 1 }
-        
+
         // Otherwise, find the previous text node before this one.
         const previous = this.getRoot()?.getPreviousTextOrAtom(this);
+    
+        // If there are more characters, just go next.
+        if(index > 0) {
+            // If the next node is an empty node, go into it instead.
+            if(index - 1 === 0 && previous && previous instanceof TextNode && previous.isEmpty())
+                return { node: previous, index: previous.getLength() };
+            // Otherwise, just go to the previous position in this text node.
+            else
+                return { node: this, index: index - 1 };
+        }
 
-        // If we don't have a chapter, return what we were given.
+        // If we don't have a root or nothing is before, just return what we were given.
         if(previous === undefined)
             return { node: this, index: index };
 
