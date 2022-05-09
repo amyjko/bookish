@@ -315,38 +315,53 @@ export class FormatNode extends Node<FormatNodeParent> {
         const textStart = this.caretToTextIndex(range.start);
         const textEnd = this.caretToTextIndex(range.end);
 
+        // Remember if the selection is zero width.
+        let zeroWidthSelection = textStart === textEnd;
+
         // Find all of the content in the node so we can construct a new format tree with the old content.
         const everythingButFormats = 
             this.getNodes().filter(n => !(n instanceof FormatNode)) as (TextNode | AtomNode<any>)[];
 
         // Check if all of the selected content has the requested format so we can toggle it if so.
+        // It's already applied if we're deleting (in which case this doesn't apply) or all of the 
+        // non-format nodes in the format already have this format.
         let checkIndex = 0;
-        let checkingEmptyNode = false;
-        const alreadyApplied = format === undefined || everythingButFormats.every(node => {
-            // If it's text, and the current position is in range of the selection, does the position contain the requested format?
-            if(node instanceof TextNode && node.getParent() instanceof FormatNode) {
-                // If we have a zero-width selection, remember, so we can ignore it in the next text node at the same location.
-                if(node.getText().length === 0) {
-                    if(checkIndex === textStart && textStart === textEnd) {
-                        checkingEmptyNode = true;
-                        return (node.getParent() as FormatNode).getFormats().includes(format);
+        let editingEmptyNode = false;
+        let alreadyApplied = false;
+        
+        if(format === undefined)
+            alreadyApplied = true;
+        else
+            everythingButFormats.forEach(node => {
+                // If it's text, and the current position is in range of the selection, does the position contain the requested format?
+                if(node instanceof TextNode && node.getParent() instanceof FormatNode) {
+                    // If we're formatting an empty node we previously found, this node's formatting is irrelevant.
+                    if(editingEmptyNode) {}
+                    // If this node is empty but contains a zero-width selection, remember it, since this is the only node for which formats are relevant.
+                    else if(node.getText().length === 0) {
+                        if(checkIndex === textStart && zeroWidthSelection) {
+                            editingEmptyNode = true;
+                            alreadyApplied = (node.getParent() as FormatNode).getFormats().includes(format);
+                        }
                     }
-                    else return true;
-                }
-                // If it has longer than zero characters, formatting is applied if all characters in range the node have it applied.
-                else {
-                    let allFormatted = true;
-                    for(let i = 0; i < node.getText().length; i++) {
-                        if((!checkingEmptyNode && checkIndex === textStart && textStart === textEnd) || (checkIndex >= textStart && checkIndex < textEnd))
-                            allFormatted = allFormatted && (node.getParent() as FormatNode).getFormats().includes(format);
-                        checkIndex++;
+                    // If this node has more than zero characters, the formatting is all applied if the selection contains the entirety of this node's text
+                    // and this node's parent contains the formatting.
+                    else {
+                        const parentIsFormatted = (node.getParent() as FormatNode).getFormats().includes(format);
+                        const selectionContainsNode = (textStart >= checkIndex && textStart <= checkIndex + node.getLength()) || (textEnd >= checkIndex && textEnd <= checkIndex + node.getLength());
+                        const nodeContainsSelection = textStart >= checkIndex && textEnd <= checkIndex + node.getLength();
+                        checkIndex += node.getLength();
+                        if(!editingEmptyNode) {
+                            if(nodeContainsSelection)
+                                alreadyApplied = parentIsFormatted;
+                            else if(selectionContainsNode)
+                                alreadyApplied = alreadyApplied && parentIsFormatted;
+                        }
                     }
-                    return allFormatted;
                 }
-            }
-            // Treat all non-text as containing the requested format.
-            else return true;
-        });
+                // Treat all non-text as containing the requested format.
+                else return true;
+            });
 
         // Reformat everything. The strategy is to step through each character, atom node, and metadata node in this format node
         // and create a new series of formats that preserve existing formatting while applying new formatting to the selection.
@@ -356,7 +371,6 @@ export class FormatNode extends Node<FormatNodeParent> {
         let currentText = ""; // The current text we've accumulated, inserted before each format change and at the end.
         let formattingEmptyNode = false;
         let emptyNode = undefined;
-        let zeroWidthSelection = textStart === textEnd;
 
         function saveText() {
             if(currentText.length > 0) {
@@ -380,8 +394,8 @@ export class FormatNode extends Node<FormatNodeParent> {
                         }
                     }
                     else {
-                        // Process each character in the node.
-                        for(let i = 0; i < node.getText().length; i++) {
+                        // Process each character in the node, including the very last position.
+                        for(let i = 0; i <= node.getText().length; i++) {
 
                             // Determine the desired format for this character. Start with the current formats
                             // and if we're in the selected range, adjust them accordingly based on the current formats 
@@ -453,10 +467,14 @@ export class FormatNode extends Node<FormatNodeParent> {
                             });
 
                             // If there's a format we're applying, or we're outside the deletion range, append the current text.
-                            if(format !== undefined || !inRange())
-                                currentText += node.getText().charAt(i);
-                            textIndex++;
+                            // We don't do this if we're checking the very last index of the node, since there is no character after it.
+                            if(i < node.getLength()) {
+                                if(format !== undefined || !inRange())
+                                    currentText += node.getText().charAt(i);
+                                textIndex++;
+                            }
                         }
+
                     }
                 }
                 // Otherwise, handle a MetadataNode
