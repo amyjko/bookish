@@ -560,7 +560,7 @@ export class FormatNode extends Node<FormatNodeParent> {
 
     }
 
-    insertSegmentAt(segment: FormatNodeSegmentType, caret: Caret) : Caret {
+    insertSegmentAt(segment: FormatNodeSegmentType, caret: Caret) : Caret | undefined {
 
         if(!(caret.node instanceof TextNode))
             return caret;
@@ -568,7 +568,7 @@ export class FormatNode extends Node<FormatNodeParent> {
         // Verify that the caret's node is a segment in this node.
         const index = this.#segments.indexOf(caret.node);
         if(index < 0)
-            return caret;
+            return undefined;
 
         // Splice the text node.
         const left = new TextNode(this, caret.node.getText().substring(0, caret.index));

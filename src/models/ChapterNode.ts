@@ -218,8 +218,17 @@ export class ChapterNode extends BlocksNode {
         if (range.start.node !== range.end.node || range.start.index !== range.end.index)
             caret = this.removeRange(range);
 
+        // Get the nearest FormatNode parent of the revised text.
+        const newFormatted = caret.node.getClosestParentMatching(p => p instanceof FormatNode) as FormatNode;
+
         // Create and insert the into the formatted node.
-        return formatted.insertSegmentAt(nodeCreator.call(undefined, formatted, selectedText ? selectedText : ""), caret);
+        const newCaret = newFormatted.insertSegmentAt(nodeCreator.call(undefined, newFormatted, selectedText ? selectedText : ""), caret);
+
+        if(newCaret === undefined)
+            throw Error("Couldn't insert node at selection for some reason.");
+
+        // If there was a problem, just return the caret resulting from removing the text.
+        return newCaret;
 
     }
 
