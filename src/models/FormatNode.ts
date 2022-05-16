@@ -35,8 +35,8 @@ export class FormatNode extends Node<FormatNodeParent> {
         return this.#segments.map(segment => segment.toText()).join(" ");
     }
 
-    toBookdown(): string {
-        return (this.#format === "v" ? "^v" : this.#format) + this.#segments.map(s => s.toBookdown()).join("") + this.#format;
+    toBookdown(debug?: number): string {
+        return (this.#format === "v" ? "^v" : this.#format) + this.#segments.map(s => s.toBookdown(debug)).join("") + this.#format;
     }
 
     addSegment(node: FormatNodeSegmentType) {

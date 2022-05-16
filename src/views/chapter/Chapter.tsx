@@ -290,7 +290,7 @@ const Chapter = (props: { chapter: ChapterModel, book: Book, print?: boolean }) 
 				>
 				{
 					chapterAST ?
-						(editable ? <ChapterEditor ast={chapterAST} /> : renderNode(chapterAST)) :
+						(editable ? <ChapterEditor chapter={chapter} /> : renderNode(chapterAST)) :
 						null
 				}
 				</ChapterContext.Provider>

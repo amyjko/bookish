@@ -25,10 +25,10 @@ export class TextNode extends Node<TextNodeParent> {
 
     toText(): string { return this.#text; }
 
-    toBookdown() {
+    toBookdown(debug?: number): string {
 
         // Escape all characters with special meaning inside content nodes: _*`<^{~\[@% and :'s with no space after
-        return new String(this.#text)
+        let newString = new String(this.#text)
             .replace(/\\/g, '\\\\') // This has to go first! Otherwise it breaks all of the others below.
             .replace(/_/g, '\\_')
             .replace(/\*/g, '\\*')
@@ -40,7 +40,13 @@ export class TextNode extends Node<TextNodeParent> {
             .replace(/ %/g, ' \\%')
             .replace(/\[/g, '\\[')
             .replace(/@/g, '\\@')
-            .replace(/(:)([a-z])/g, '\\:$2')
+            .replace(/(:)([a-z])/g, '\\:$2');
+
+        // If we're trying to mark this node
+        if(debug === this.nodeID)
+            newString = "%debug%" + newString;
+
+        return newString;
 
     }
 

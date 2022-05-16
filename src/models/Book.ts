@@ -209,7 +209,7 @@ export default class Book {
         while(this.hasChapter("chapter" + number))
             number++;
 
-        const chapterRef = await addChapter(bookID, { text: "Unwritten chapter" })
+        const chapterRef = await addChapter(bookID, { text: "" })
 
         // Create a default chapter on this model
         const emptyChapter = {

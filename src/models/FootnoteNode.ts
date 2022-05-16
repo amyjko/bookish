@@ -14,7 +14,7 @@ export class FootnoteNode extends AtomNode<FormatNode> {
     }
 
     toText(): string { return this.getMeta().toText(); }
-    toBookdown(): string { return "{" + this.getMeta().toBookdown() + "}"; }
+    toBookdown(debug?: number): string { return "{" + this.getMeta().toBookdown(debug) + "}"; }
 
     copy(parent: FormatNode): FootnoteNode {
         const foot = new FootnoteNode(parent);

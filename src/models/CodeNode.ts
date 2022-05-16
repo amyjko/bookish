@@ -46,9 +46,9 @@ export class CodeNode extends Node<BlockParentNode> {
         return "";
     }
 
-    toBookdown(): String {
+    toBookdown(debug?: number): string {
         // Remember to escape any back ticks.
-        return "\n`" + (this.#language !== "plaintext" ? this.#language : "") + "\n" + this.#code.getText().replace(/`/g, '\\`') + "\n`" + (this.#position !== "|" ? this.#position : "") + this.#caption.toBookdown();
+        return "\n`" + (this.#language !== "plaintext" ? this.#language : "") + "\n" + this.#code.getText().replace(/`/g, '\\`') + "\n`" + (this.#position !== "|" ? this.#position : "") + this.#caption.toBookdown(debug);
     }
 
     traverseChildren(fn: (node: Node) => void): void {

@@ -8,7 +8,8 @@ export class LabelNode extends AtomNode<string> {
     }
 
     toText(): string { return ""; }
-    toBookdown(): string { return `:${this.getMeta()}`; }
+    // The trailing space is necessary for parsing.
+    toBookdown(debug?: number): string { return `:${this.getMeta()}`; }
     copy(parent: FormatNode): LabelNode { return new LabelNode(parent, this.getMeta()); }
 
 }

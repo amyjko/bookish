@@ -12,7 +12,7 @@ export class RuleNode extends Node<BlockParentNode> {
         return "";
     }
 
-    toBookdown(): String {
+    toBookdown(debug?: number): string {
         return "-";
     }
 

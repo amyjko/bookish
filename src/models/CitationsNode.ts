@@ -8,7 +8,7 @@ export class CitationsNode extends AtomNode<string[]> {
     }
 
     toText(): string { return ""; }
-    toBookdown(): string { return "<" + this.getMeta().join(",") + ">"; }
+    toBookdown(debug?: number): string { return "<" + this.getMeta().join(",") + ">"; }
     copy(parent: FormatNode): CitationsNode { return new CitationsNode(parent, [...this.getMeta()]); }
  
 }

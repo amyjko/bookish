@@ -36,6 +36,8 @@ import Bullets from "../svg/bullets.svg";
 import Numbers from "../svg/numbers.svg";
 import Quote from "../svg/quote.svg";
 import Code from "../svg/code.svg";
+import Undo from "../svg/undo.svg";
+import Redo from "../svg/redo.svg";
 import { AtomNode } from "../../models/AtomNode";
 import { BlockNode } from "../../models/BlockNode";
 
@@ -1091,6 +1093,45 @@ export const commands: Command[] = [
         active: context => context.includesList,
         handler: context => {
             return unwrapListItems(context.range);
+        }
+    },
+    {
+        label: "undo",
+        icon: Undo,
+        description: "undo the last command",
+        category: "history",
+        control: true, alt: false, shift: false, key: ["z"],
+        visible: context => true,
+        active: context => context.undoStack.length > 0 && context.undoPosition < context.undoStack.length - 1,
+        handler: context => {
+            return context.undo();
+        }
+    },
+    {
+        label: "redo",
+        icon: Redo,
+        description: "redo the most recently undone command",
+        category: "history",
+        control: true, alt: false, shift: true, key: ["z"],
+        visible: context => true,
+        active: context => context.undoPosition > 0,
+        handler: context => {
+            return context.redo();
+        }
+    },
+    {
+        label: "insert",
+        description: "insert character",
+        category: "text",
+        control: false, alt: false, shift: false, key: undefined,
+        visible: context => false,
+        active: context => true,
+        handler: (context, utilities, key) => {
+            if(context.chapter && key.length === 1) {
+                const caret = context.chapter.insertSelection(key, context.range);
+                return { start: caret, end: caret };
+            }
+            else return context.range;
         }
     }
 ];

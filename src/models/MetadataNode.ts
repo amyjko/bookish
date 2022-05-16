@@ -48,7 +48,7 @@ export abstract class MetadataNode<MetaType> extends Node<FormatNode> {
     }
 
     abstract toText(): string;
-    abstract toBookdown(): String;
+    abstract toBookdown(debug?: number): string;
     abstract copy(parent: FormatNode): MetadataNode<MetaType>;
 
 }

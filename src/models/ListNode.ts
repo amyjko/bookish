@@ -58,10 +58,10 @@ export class ListNode extends Node<ListParentType> {
         return this.#items.map(item => item.toText()).join(" ");
     }
 
-    toBookdown(): string {
+    toBookdown(debug?: number): string {
         return this.isNumbered() ?
-            this.#items.map((item, number) => (item instanceof ListNode ? "" : ((number + 1) + ".".repeat(this.getLevel())) + " ") + item.toBookdown()).join("\n") :
-            this.#items.map(item => (item instanceof ListNode ? "" : "*".repeat(this.getLevel()) + " ") + item.toBookdown()).join("\n");
+            this.#items.map((item, number) => (item instanceof ListNode ? "" : ((number + 1) + ".".repeat(this.getLevel())) + " ") + item.toBookdown(debug)).join("\n") :
+            this.#items.map(item => (item instanceof ListNode ? "" : "*".repeat(this.getLevel()) + " ") + item.toBookdown(debug)).join("\n");
     }
 
     traverseChildren(fn: (node: Node) => void): void {

@@ -15,7 +15,7 @@ export class ErrorNode extends Node {
         return "";
     }
 
-    toBookdown(): String { return this.#text ? this.#text : ""; }
+    toBookdown(debug?: number): string { return this.#text ? this.#text : ""; }
 
     traverseChildren(fn: (node: Node) => void): void {}
 

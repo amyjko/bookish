@@ -296,7 +296,7 @@ export default class Parser {
         let blocks: BlockNode[] = [];
 
         // Make the chapter node so we can pass it around.
-        const chapter = new ChapterNode(blocks, this.metadata)
+        const chapter = new ChapterNode(blocks, this.metadata);
 
         // Read any symbols declared for this chapter.
         this.parseSymbols(chapter);

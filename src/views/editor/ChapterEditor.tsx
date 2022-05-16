@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from "react"
 import { ChapterNode } from "../../models/ChapterNode";
-import { Caret, CaretRange } from "../../models/Caret";
+import { Caret, CaretRange, TextRange } from "../../models/Caret";
 import { LinkNode } from "../../models/LinkNode";
 import { ParagraphNode } from "../../models/ParagraphNode";
 import { TextNode } from "../../models/TextNode";
@@ -13,6 +13,7 @@ import { TableNode } from "../../models/TableNode";
 import { Command, commands } from "./Commands";
 import Toolbar from "./Toolbar";
 import { FootnoteNode } from "../../models/FootnoteNode";
+import Chapter from "../../models/Chapter";
 
 export const CaretContext = React.createContext<{ 
     range: CaretRange | undefined, 
@@ -39,16 +40,27 @@ export type CaretState = {
     endIsText: boolean,
     startIsTextOrAtom: boolean, 
     endIsTextOrAtom: boolean,
-    atParagraphStart: boolean
+    atParagraphStart: boolean,
+    undoStack: UndoState[],
+    undoPosition: number,
+    undo: () => CaretRange,
+    redo: () => CaretRange
+}
+
+export type UndoState = {
+    command: Command | undefined,
+    chapter: string,
+    range: TextRange
 }
 
 export type CaretUtilities = {
     getCaretOnLine: (caret: Caret, below: boolean) => Caret
 }
 
-const ChapterEditor = (props: { ast: ChapterNode }) => {
+const ChapterEditor = (props: { chapter: Chapter }) => {
 
-    const { ast } = props;
+    const { chapter } = props;
+    const parse = chapter.getAST();
     const editorRef = useRef<HTMLDivElement>(null);
 
     const [ caretRange, setCaretRange ] = useState<CaretRange>();
@@ -57,6 +69,13 @@ const ChapterEditor = (props: { ast: ChapterNode }) => {
     const [ keyboardIdle, setKeyboardIdle ] = useState<boolean>(true);
     const [ editorFocused, setEditorFocused ] = useState<boolean>(true);
  
+    const [ undoStack, setUndoStack ] = useState<UndoState[]>([]);
+    const [ undoPosition, setUndoPosition ] = useState<number>(-1);
+
+    if(parse === undefined)
+        return <></>;
+    const ast = parse;
+
     useEffect(() => {
     
         // Focus the editor on load.
@@ -209,6 +228,11 @@ const ChapterEditor = (props: { ast: ChapterNode }) => {
 
     function rangeToCaret(domNode: Node, rangeIndex: number) {
 
+        const chapterNode = chapter.getAST();
+
+        if(chapterNode === undefined)
+            return;
+
         // If it's a text node, find the closest TextNode parent
         if(domNode.nodeType === Node.TEXT_NODE) {
             let parent = domNode.parentNode;
@@ -216,7 +240,7 @@ const ChapterEditor = (props: { ast: ChapterNode }) => {
             while(parent && !(parent instanceof HTMLElement && parent.classList.contains("bookish-text")))
                 parent = parent.parentNode;
             if(parent && parent.dataset.nodeid) {
-                const node = ast.getNode(parseInt(parent.dataset.nodeid));
+                const node = chapterNode.getNode(parseInt(parent.dataset.nodeid));
                 if(node instanceof TextNode)
                     // Account for the zero-width spaces that we insert in order to make selections possible on empty text nodes.
                     return { node: node, index: Math.min(rangeIndex, node.getLength()) };
@@ -224,7 +248,7 @@ const ChapterEditor = (props: { ast: ChapterNode }) => {
         }
         // If it's an element, see if it has a nodeID and handle it accordingly.
         else if(domNode.nodeType === Node.ELEMENT_NODE && domNode instanceof HTMLElement && domNode.dataset.nodeid) {
-            const node = ast.getNode(parseInt(domNode.dataset.nodeid));
+            const node = chapterNode.getNode(parseInt(domNode.dataset.nodeid));
             // These assume that triple clicks on paragraphs in the browser choose text nodes for the selection start
             // and spans or paragraph nodes for the end.
             if(node instanceof ParagraphNode) {
@@ -348,6 +372,42 @@ const ChapterEditor = (props: { ast: ChapterNode }) => {
         return firstCaret !== undefined && firstCaret.node === caretRange.start.node && firstCaret.index === caretRange.start.index;
     }
 
+    function undo(): CaretRange {
+
+        // Grab the next state
+        let undoState = undoStack[undoPosition + 1];
+
+        // Restore the content of the chapter.
+        chapter.setText(undoState.chapter);
+        let node = chapter.getAST() as ChapterNode;
+
+        // Move the undo state down a position.
+        if(undoPosition < undoStack.length)
+            setUndoPosition(undoPosition + 1);
+
+        // Return the original caret.
+        return node.textRangeToCaret(undoState.range);
+
+    }
+
+    function redo(): CaretRange {
+
+        // Grab the next state
+        let undoState = undoStack[undoPosition - 1];
+
+        // Restore the content of the chapter.
+        chapter.setText(undoState.chapter);
+        let node = chapter.getAST() as ChapterNode;
+
+        // Move the undo state down a position.
+        if(undoPosition > 0)
+            setUndoPosition(undoPosition - 1);
+
+        // Return the original caret.
+        return node.textRangeToCaret(undoState.range);
+
+    }
+
     function getCaretContext(): CaretState | undefined {
         if(caretRange === undefined)
             return undefined;
@@ -380,7 +440,11 @@ const ChapterEditor = (props: { ast: ChapterNode }) => {
             endIsText: caretRange.end.node instanceof TextNode,
             startIsTextOrAtom: caretRange.start.node instanceof TextNode || caretRange.start.node instanceof AtomNode,
             endIsTextOrAtom: caretRange.end.node instanceof TextNode || caretRange.end.node instanceof AtomNode,
-            atParagraphStart: atParagraphStart()
+            atParagraphStart: atParagraphStart(),
+            undoStack: undoStack,
+            undoPosition: undoPosition,
+            undo: undo,
+            redo: redo
         };
     }
 
@@ -434,14 +498,8 @@ const ChapterEditor = (props: { ast: ChapterNode }) => {
         });
 
         if(unmatched) {
-            // If there's no modifier key pressed, and the key is one character, insert the character! This is a bit hacky: all but "Fn" are more than three characters.
-            if(context.chapter !== undefined && !event.metaKey && !event.ctrlKey && !event.altKey && event.key.length === 1) {
-                const caret = context.chapter.insertSelection(event.key, context.range);
-                setCaretRange({ start: caret, end: caret });
-                return true;
-            }
             // Toolbar navigation
-            else if(event.key === "Tab") {
+            if(event.key === "Tab") {
                 event.preventDefault();
                 event.stopPropagation();
 
@@ -477,17 +535,44 @@ const ChapterEditor = (props: { ast: ChapterNode }) => {
     }
 
     function executeCommand(command: Command, key: string) {
+
         const context = getCaretContext();
-        if(context) {
+        if(context && caretRange) {
+
+            // If the history is empty, record the current state.
+            let newStack: UndoState[] = undoStack.length > 0 ? undoStack : [{ 
+                chapter: ast.toBookdown(), 
+                command: undefined,
+                range: ast.caretRangeToTextRange(caretRange)
+                // If the undo position is beyond the front, clear everything before it, because we're changing history.
+            }]
+
             const newRange = command.handler.call(
                 undefined, 
                 context,
                 getUtilities(),
                 key
             );
-            if(newRange)
-                // Force a render
+
+            // If the command invoked produced a new range
+            if(newRange) {
+                // Set the range to force a rerender, assuming something in the document changed.
                 setCaretRange({ start: newRange.start, end: newRange.end });
+
+                // Save the copy in the undo stack if this isn't a navigation or selection state.
+                if(command.category !== "navigation" && command.category !== "selection" && command.category !== "history") {
+                    // Set the new undo stack, pre-pending the new command to the front.
+                    setUndoStack([{ 
+                        chapter: ast.toBookdown(),
+                        command: command,
+                        range: ast.caretRangeToTextRange(newRange)
+                        // If the undo position is beyond the front, clear everything before it, because we're changing history.
+                    }, ...(undoPosition > 0 ? newStack.slice(undoPosition) : newStack)]);
+
+                    // Set the undo position to the last index.
+                    setUndoPosition(0);
+                }
+            }
         }
     }
 
@@ -512,8 +597,9 @@ const ChapterEditor = (props: { ast: ChapterNode }) => {
 
     function forceUpdate() {
 
-        if(caretRange !== undefined)
+        if(caretRange !== undefined) {
             setCaretRange({ start: caretRange.start, end: caretRange.end }); 
+        }
 
     }
 
@@ -552,7 +638,7 @@ const ChapterEditor = (props: { ast: ChapterNode }) => {
                 onBlur={handleUnfocus}
                 tabIndex={0} // Makes the editor focusable.
                 >
-                { context && caretCoordinate ? <Toolbar chapter={props.ast} context={context} executor={executeCommand}></Toolbar> : null }
+                { context && caretCoordinate ? <Toolbar chapter={ast} context={context} executor={executeCommand}></Toolbar> : null }
                 {
                     // Draw a caret. We draw our own since this view isn't contentEditable and we can't show a caret.
                     // Customize the rendering based on the formatting applied to the text node.
@@ -566,11 +652,10 @@ const ChapterEditor = (props: { ast: ChapterNode }) => {
                             }}>
                         </div> : null
                 }
-                { renderNode(props.ast) }
-                
+                { renderNode(ast) }                
             </div>
         </CaretContext.Provider>
     ;
 }
 
-export default ChapterEditor
+export default ChapterEditor;

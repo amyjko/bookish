@@ -9,7 +9,7 @@ export class CommentNode extends AtomNode<FormatNode> {
     }
 
     toText(): string { return ""; }
-    toBookdown(): string { return "%" + this.getMeta().toBookdown() + "%"; }
+    toBookdown(debug?: number): string { return "%" + this.getMeta().toBookdown(debug) + "%"; }
     copy(parent: FormatNode): CommentNode { return new CommentNode(parent, this.getMeta()); }
 
 }

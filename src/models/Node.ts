@@ -26,12 +26,12 @@ export abstract class Node<ParentType extends Node<any> = Node<any>> {
     setID(id: number) { this.nodeID = id; }
 
     getChapter(): ChapterNode | undefined {
-        return this.#parent?.getChapter()
+        return this.#parent?.getChapter();
     }
 
     abstract toText(): String;
 
-    abstract toBookdown(): String;
+    abstract toBookdown(debug?: number): string;
 
     traverse(fn: (node: Node<any>) => void) : void {
         this.traverseChildren(fn);

@@ -36,7 +36,7 @@ export class ReferenceNode extends Node<ChapterNode> {
     clean() {}
     
     toText() { return this.authors + " "  + this.year + " " + this.title + " " + this.source + (this.summary ? this.summary : ""); }
-    toBookdown(): String {
+    toBookdown(debug?: number): string {
         return "";
     }
 

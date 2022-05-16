@@ -112,12 +112,12 @@ class Chapter {
 		this.wordCount = this.ast.toText().split(/\s+/).length;
 		this.index = this.computeIndex();
 
-		this.book.notifyListeners()
+		this.book.notifyListeners();
 	}
 
 	addAuthor(name: string) {
-        this.authors.push(name)
-		return this.update()
+        this.authors.push(name);
+		return this.update();
     }
 
 	getAuthors() { return this.authors; }

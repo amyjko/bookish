@@ -36,8 +36,8 @@ export class QuoteNode extends BlocksNode {
         return this.getBlocks().map(element => element.toText()).join(" ") + (this.#credit ? " " + this.#credit.toText() : "");
     }
 
-    toBookdown(): String {
-        return `"\n${this.getBlocks().map(element => element.toBookdown()).join("\n\n")}\n"${this.#position === "|" ? "" : this.#position}${this.#credit ? " " + this.#credit.toBookdown() : ""}`;
+    toBookdown(debug?: number): string {
+        return `"\n${this.getBlocks().map(element => element.toBookdown(debug)).join("\n\n")}\n"${this.#position === "|" ? "" : this.#position}${this.#credit ? " " + this.#credit.toBookdown(debug) : ""}`;
     }
 
     traverseChildren(fn: (node: Node) => void): void {

@@ -24,7 +24,7 @@ export class CalloutNode extends BlocksNode {
         return this.getBlocks().map(element => element.toText()).join(" ");
     }
 
-    toBookdown(): string {
+    toBookdown(debug?: number): string {
         return "=\n" + this.getBlocks().map(element => element.toText()).join("\n\n") + "\n=" + (this.#position !== "|" ? this.#position : "");
     }
 

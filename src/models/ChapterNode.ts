@@ -14,7 +14,7 @@ import { CitationsNode } from "./CitationsNode";
 import { LabelNode } from "./LabelNode";
 import { CommentNode } from "./CommentNode";
 import { BlocksNode } from "./BlocksNode";
-import { Caret, CaretRange } from "./Caret";
+import { Caret, CaretRange, TextRange } from "./Caret";
 
 export class ChapterNode extends BlocksNode {
 
@@ -49,7 +49,6 @@ export class ChapterNode extends BlocksNode {
         this.index.set(this.nextID, node);
         node.setID(this.nextID);
         this.nextID++;
-
     }
 
     unindexNode(node: Node) {
@@ -87,10 +86,10 @@ export class ChapterNode extends BlocksNode {
         return this.blocks.map(block => block.toText()).join(" ");
     }
 
-    toBookdown() {
+    toBookdown(debug?: number): string {
         // Render the symbols then all the blocks
         return Object.keys(this.#metadata.symbols).sort().map(name => `@${name}: ${this.#metadata.symbols[name]}\n\n`).join("") +
-            this.blocks.map(b => b.toBookdown()).join("\n\n");
+            this.blocks.map(b => b.toBookdown(debug)).join("\n\n");
     }
 
     getTextNodes(): TextNode[] {
@@ -104,6 +103,37 @@ export class ChapterNode extends BlocksNode {
     getIndexOfTextNode(node: TextNode): number | undefined {
         const text = this.getTextNodes();
         return text.indexOf(node);
+    }
+
+    // Convert node and index into text index by converting to Bookdown and then finding the index of the node.
+    caretToTextIndex(caret: Caret): number {
+        const debug = this.toBookdown(caret.node.nodeID);
+        const index = debug.indexOf("%debug%");
+        return index + caret.index;
+    }
+
+    textIndexToCaret(textIndex: number): Caret {
+        const textNodes = this.getTextNodes();
+        let i = 0; 
+        while(i < textNodes.length) {
+            const node = textNodes[i];
+            const debug = this.toBookdown(node.nodeID);
+            const index = debug.indexOf("%debug%");
+            if(textIndex >= index && textIndex <= index + node.getLength())
+                return { node: node, index: textIndex - index };
+            i++;
+        }
+        // Default to first caret
+        return { node: this.getTextNodes()[0], index: 0 };
+    }
+
+    // Convert text index to node by iterating through text nodes and finding the corresponding node.
+    textRangeToCaret(range: TextRange): CaretRange {
+        return { start: this.textIndexToCaret(range.start), end: this.textIndexToCaret(range.end) }; 
+    }
+
+    caretRangeToTextRange(range: CaretRange): TextRange {
+        return { start: this.caretToTextIndex(range.start), end: this.caretToTextIndex(range.end) };
     }
 
     getNextTextOrAtom(node: TextNode | AtomNode<any>): TextNode | AtomNode<any> | undefined {
@@ -138,11 +168,11 @@ export class ChapterNode extends BlocksNode {
         this.blocks[index] = replacement;
     }
 
-    copy(parent: Node): ChapterNode {
-        const blocks: BlockNode[] = []
-        const chap = new ChapterNode(blocks, this.#metadata)
-        this.blocks.forEach(b => blocks.push(b.copy(chap) as BlockNode))
-        return chap
+    copy(parent?: Node): ChapterNode {
+        const blocks: BlockNode[] = [];
+        const chap = new ChapterNode(blocks, this.#metadata);
+        this.blocks.forEach(b => blocks.push(b.copy(chap) as BlockNode));
+        return chap;
     }
 
     clean() {
