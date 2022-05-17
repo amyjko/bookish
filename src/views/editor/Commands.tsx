@@ -48,7 +48,7 @@ export type Command = {
     category: string,
     control: boolean,
     alt: boolean,
-    shift: boolean,
+    shift: boolean | undefined,
     key?: string | string[],
     code?: string,
     visible: (context: CaretState) => boolean,
@@ -1123,7 +1123,7 @@ export const commands: Command[] = [
         label: "insert",
         description: "insert character",
         category: "text",
-        control: false, alt: false, shift: false, key: undefined,
+        control: false, alt: false, shift: undefined, key: undefined,
         visible: context => false,
         active: context => true,
         handler: (context, utilities, key) => {

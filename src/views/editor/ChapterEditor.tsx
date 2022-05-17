@@ -477,7 +477,7 @@ const ChapterEditor = (props: { chapter: Chapter }) => {
         // Loop through the commands to see if there's a match.
         const unmatched = commands.every(command => {
             // If the keystroke and caret position matches the command signature, execute the command and update the caret range.
-            if( command.shift === event.shiftKey && 
+            if( (command.shift === undefined || command.shift === event.shiftKey) && 
                 command.alt === event.altKey &&
                 command.control === (event.ctrlKey || event.metaKey) &&
                 (command.key === undefined || command.key === event.key || (Array.isArray(command.key) && command.key.includes(event.key))) &&
