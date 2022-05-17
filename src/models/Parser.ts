@@ -318,19 +318,24 @@ export default class Parser {
         this.text = declarations + rest;
 
         // While there's more text, parse a line.
+        let trailingNewlines = 0;
         while(this.more()) {
+            trailingNewlines = 0;
             // Read a block
             const block = this.parseBlock(chapter);
             // Add it to the list if we parsed something.
             if(block !== null)
                 blocks.push(block);            
             // Read whitespace until we find the next thing.
-            while(this.peek() === " " || this.peek() === "\t" || this.peek() === "\n")
+            while(this.peek() === " " || this.peek() === "\t" || this.peek() === "\n") {
+                if(this.peek() === "\n")
+                    trailingNewlines++;
                 this.read();
+            }
         }
 
-        // If there are no blocks, just add an empty paragraph.
-        if(blocks.length === 0)
+        // If there are no blocks, or the chapter ended with two newlines, append an empty paragraph.
+        if(blocks.length === 0 || trailingNewlines > 1)
             blocks.push(new ParagraphNode(chapter));
 
         return chapter;
