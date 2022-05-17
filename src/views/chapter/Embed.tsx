@@ -23,6 +23,7 @@ const Embed = (props: { node: EmbedNode }) => {
 				:
 				url.includes("https://www.youtube.com") || 
 				url.includes("https://youtu.be") || 
+				url.includes("https://www.tiktok.com") || 
 				url.includes("vimeo.com") ?
 					<div className="bookish-figure-embed">
 						<iframe 
