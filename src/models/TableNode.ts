@@ -39,8 +39,10 @@ export class TableNode extends Node<BlockParentNode> {
     }
 
     toBookdown(debug?: number): string {
-        return this.#rows.map(row => `\n,${row.map(cell => cell.toBookdown(debug)).join("|")}`) + 
-            `\n${this.#position === "|" ? "" : this.#position}${this.#caption ? "" + this.#caption.toBookdown(debug) : ""}`;
+        return this.#rows.map(
+            row => 
+            `,${row.map(cell => cell.toBookdown(debug)).join("|")}`
+        ).join("\n") + `\n${this.#position === "|" ? "" : this.#position}${this.#caption ? "" + this.#caption.toBookdown(debug) : ""}`;
     }
 
     traverseChildren(fn: (node: Node) => void): void {
