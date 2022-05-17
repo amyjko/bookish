@@ -329,6 +329,10 @@ export default class Parser {
                 this.read();
         }
 
+        // If there are no blocks, just add an empty paragraph.
+        if(blocks.length === 0)
+            blocks.push(new ParagraphNode(chapter));
+
         return chapter;
 
     }

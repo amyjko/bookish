@@ -221,6 +221,9 @@ You can also include YouTube videos by using the same syntax as above, but just 
 
 |https://www.youtube.com/embed/v=317jz-PU7Mg|A video Amy made with her daughter back when Angry Birds was popular.|A YouTube video showing Angry Birds enacted in real life.|Amy J. Ko|
 
+|https://www.tiktok.com/@totouchanemu/video/6990181852803894533|A video Amy made with her daughter back when Angry Birds was popular.|A YouTube video showing Angry Birds enacted in real life.|Amy J. Ko|
+
+
 # Code
 
 You can include code by wrapping any text with a backtick \`:
