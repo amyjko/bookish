@@ -52,7 +52,7 @@ export type Command = {
     key?: string | string[],
     code?: string,
     visible: (context: CaretState) => boolean,
-    active: (context: CaretState) => boolean,
+    active: (context: CaretState, key?: string) => boolean,
     handler: (
         context: CaretState,
         utilities: CaretUtilities,
@@ -1125,7 +1125,7 @@ export const commands: Command[] = [
         category: "text",
         control: false, alt: false, shift: undefined, key: undefined,
         visible: context => false,
-        active: context => true,
+        active: (context, key) => key !== undefined && key.length === 1,
         handler: (context, utilities, key) => {
             if(context.chapter && key.length === 1) {
                 const caret = context.chapter.insertSelection(key, context.range);

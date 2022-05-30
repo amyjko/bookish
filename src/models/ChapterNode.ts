@@ -123,8 +123,9 @@ export class ChapterNode extends BlocksNode {
                 return { node: node, index: textIndex - index };
             i++;
         }
-        // Default to first caret
-        return { node: this.getTextNodes()[0], index: 0 };
+        // Default to last caret, since it's likely to be a missing space at the end.
+        const last = textNodes[textNodes.length -1];
+        return { node: last, index: last.getLength() };
     }
 
     // Convert text index to node by iterating through text nodes and finding the corresponding node.

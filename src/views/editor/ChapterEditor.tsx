@@ -482,7 +482,7 @@ const ChapterEditor = (props: { chapter: Chapter }) => {
                 command.control === (event.ctrlKey || event.metaKey) &&
                 (command.key === undefined || command.key === event.key || (Array.isArray(command.key) && command.key.includes(event.key))) &&
                 (command.code === undefined || command.code === event.code) &&
-                command.active.call(undefined, context)) {
+                command.active.call(undefined, context, event.key)) {
 
                     event.preventDefault();
                     event.stopPropagation();
@@ -503,8 +503,8 @@ const ChapterEditor = (props: { chapter: Chapter }) => {
                 event.preventDefault();
                 event.stopPropagation();
 
-                // If we've selected a FootnoteNode, navigate to the footnote text.
-                if(caretRange.start.node instanceof AtomNode) {
+                // If we've selected a FootnoteNode or Comment, navigate to the footnote or comment text.
+                if(caretRange.start.node instanceof AtomNode && caretRange.start.node.getMeta() instanceof FormatNode) {
                     const firstCaret = caretRange.start.node.getMeta().getFirstCaret();
                     setCaretRange({ start: firstCaret, end: firstCaret });
                     return true;
