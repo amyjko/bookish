@@ -334,7 +334,7 @@ export default class Parser {
             }
         }
 
-        // If there are no blocks, or the chapter ended with two newlines, append an empty paragraph.
+        // If there are no blocks, or the chapter ended with two newlines, append an empty paragraph with an empty format node and an empty text node.
         if(blocks.length === 0 || trailingNewlines > 1)
             blocks.push(new ParagraphNode(chapter));
 
@@ -837,10 +837,6 @@ export default class Parser {
         // Read the URL
         const url = this.readUntilNewlineOr("|");
 
-        // Error if missing URL.
-        if(url === "")
-            return new ErrorNode(parent, this.readUntilNewLine(), "Missing URL in embed.");
-
         if(this.peek() !== "|")
             return new ErrorNode(parent, this.readUntilNewLine(), "Missing '|' after URL in embed");
 
@@ -852,10 +848,6 @@ export default class Parser {
 
         if(this.peek() !== "|")
             return new ErrorNode(parent, this.readUntilNewLine(), "Missing '|' after description in embed");
-
-        // Error if missing description.
-        if(description === "")
-            return new ErrorNode(parent, this.readUntilNewLine(), "Missing image/video description in embed.");
         
         const embed = new EmbedNode(parent, url, description);
 
@@ -873,10 +865,6 @@ export default class Parser {
 
         // Parse the credit
         embed.setCredit(this.parseContent(embed, "|"));
-
-        // Error if missing credit.
-        if(embed.getCredit().toText().trim() === "")
-            return new ErrorNode(parent, this.readUntilNewLine(), "Missing credit in embed.");
         
         // Check for the closing delimeter
         if(this.peek() !== "|")

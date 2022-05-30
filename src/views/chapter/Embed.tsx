@@ -14,13 +14,10 @@ const Embed = (props: { node: EmbedNode }) => {
 	const caption = node.getCaption();
 
 	const { editable } = useContext(EditorContext);
-    const caret = useContext(CaretContext);
 
 	return <div className={"bookish-figure " + renderPosition(position)} data-nodeid={props.node.nodeID}>
 			{
-				url.trim().length === 0 ?
-					<div className="bookish-figure-unspecified">{ editable ? "Specify an image or video URL above." : "No image or video specified."}</div>
-				:
+				url.trim().length === 0 ? <div className="bookish-figure-unspecified">{ editable ? "Specify an image or video URL above." : "No image or video specified."}</div> :
 				url.includes("https://www.youtube.com") || 
 				url.includes("https://youtu.be") || 
 				url.includes("https://www.tiktok.com") || 

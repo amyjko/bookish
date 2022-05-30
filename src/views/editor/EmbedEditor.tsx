@@ -9,8 +9,7 @@ const EmbedEditor = (props: {
 }) => {
 
     const embed = props.embed;
-
-    const [ desc, setDesc ] = useState<string>(embed.getDescription());
+    const description = embed.getDescription();
 
     function isValidURL(url: string): boolean {
         // Is it a valid URL?
@@ -23,7 +22,6 @@ const EmbedEditor = (props: {
     }
 
     function handleDescriptionChange(e: ChangeEvent<HTMLInputElement>) {
-        setDesc(e.target.value);
         embed.setDescription(e.target.value);
     }
 
@@ -32,7 +30,7 @@ const EmbedEditor = (props: {
         URL <URLEditor url={embed.getURL()} valid={isValidURL(embed.getURL())} edit={(url: string) => embed.setURL(url)} />
         Description <input
             type="text"
-            value={desc}
+            value={description}
             placeholder="Describe the image or video for people who can't see it"
             onChange={handleDescriptionChange}
         />
