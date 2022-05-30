@@ -10,8 +10,9 @@ export class CommentNode extends AtomNode<FormatNode> {
 
     toText(): string { return ""; }
     toBookdown(debug?: number): string { 
-        // The space before the % is critical, as it enables parsing.
-        return `${debug === this.nodeID ? "%debug%" : ""} %${this.getMeta().toBookdown(debug)}%`; 
+        const previousText = this.getParent()?.getPreviousTextOrAtom(this)?.toBookdown();
+        // Insert a space before the % if there isn't one before this.
+        return `${previousText?.endsWith(" ") ? "" : " "}%${debug === this.nodeID ? "%debug%" : ""}${this.getMeta().toBookdown(debug)}%`; 
     }
     copy(parent: FormatNode): CommentNode { return new CommentNode(parent, this.getMeta()); }
 

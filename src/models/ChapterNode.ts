@@ -96,6 +96,10 @@ export class ChapterNode extends BlocksNode {
         return this.getNodes().filter(node => node instanceof TextNode) as TextNode[]
     }
 
+    getAtomNodes(): AtomNode<any>[] {
+        return this.getNodes().filter(node => node instanceof AtomNode) as AtomNode<any>[];
+    }
+
     getTextOrAtomNodes(): (TextNode | AtomNode<any>)[] {
         return this.getNodes().filter(node => node instanceof TextNode || node instanceof AtomNode) as (TextNode | AtomNode<any>)[]
     }
@@ -113,18 +117,36 @@ export class ChapterNode extends BlocksNode {
     }
 
     textIndexToCaret(textIndex: number): Caret {
+        // Find all of the text nodes in the main document.
         const textNodes = this.getTextNodes();
-        let i = 0; 
-        while(i < textNodes.length) {
-            const node = textNodes[i];
+
+        // Find all of the text nodes in atom nodes, since those have caret positions too.
+        const atomTextNodes = 
+            this.getAtomNodes()
+                // Only look at atoms with format nodes.
+                .filter((atom) => atom.getMeta() instanceof FormatNode)
+                // Map to the formats in those
+                .map((atom) => atom.getMeta()).
+                reduce((previous, current) => previous.concat(current.getTextNodes()), []);
+
+        const allNodes = textNodes.concat(atomTextNodes);
+
+        // Find the first node whose index contains the given text index.
+        const match = allNodes.find(node => {
             const debug = this.toBookdown(node.nodeID);
             const index = debug.indexOf("%debug%");
-            if(textIndex >= index && textIndex <= index + node.getLength())
-                return { node: node, index: textIndex - index };
-            i++;
+            return textIndex >= index && textIndex <= index + node.getLength();
+        });
+
+        // If we found match, return a corresponding caret.
+        if(match) {
+            const debug = this.toBookdown(match.nodeID);
+            const index = debug.indexOf("%debug%");
+            return { node: match, index: textIndex - index };
         }
+
         // Default to last caret, since it's likely to be a missing space at the end.
-        const last = textNodes[textNodes.length -1];
+        const last = textNodes[textNodes.length - 1];
         return { node: last, index: last.getLength() };
     }
 
