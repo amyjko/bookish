@@ -21,6 +21,7 @@ export class ChapterNode extends BlocksNode {
     #metadata: Bookkeeping;
     index: Map<number, Node>;
     nextID: number;
+    listeners: ((chapter: ChapterNode) => void)[];
 
     constructor(blocks: BlockNode[], metadata: Bookkeeping) {
         super(undefined, blocks, "chapter");
@@ -34,8 +35,10 @@ export class ChapterNode extends BlocksNode {
         // Start next ID at 0
         this.nextID = 0;
 
+        this.listeners = [];
+
         // Set the ID since super can't
-        this.indexNode(this)
+        this.indexNode(this);
 
     }
 
@@ -44,6 +47,22 @@ export class ChapterNode extends BlocksNode {
     }
 
     getBlocks() { return this.blocks; }
+
+    subscribe(listener: (chapter: ChapterNode) => void) {
+        this.listeners.push(listener);
+    }
+
+    unsubscribe(listener: (chapter: ChapterNode) => void) {
+        const index = this.listeners.indexOf(listener);
+        if(index >= 0)
+            this.listeners.splice(index, 1);
+    }
+
+    // Nodes use this to notify this chapter that they changed.
+    // Yuck, what a mutable mess.
+    changed() {
+        this.listeners.forEach(listener => listener.call(undefined, this));
+    }
 
     indexNode(node: Node) {
         this.index.set(this.nextID, node);

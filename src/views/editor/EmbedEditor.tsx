@@ -1,4 +1,4 @@
-import React, { ChangeEvent, useRef, useState } from 'react';
+import React, { ChangeEvent, useState } from 'react';
 import { Position } from '../../models/Position';
 import PositionEditor from "./PositionEditor";
 import { EmbedNode } from '../../models/EmbedNode';

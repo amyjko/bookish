@@ -27,6 +27,7 @@ export class TableNode extends Node<BlockParentNode> {
     getPosition() { return this.#position; }
     setPosition(position: Position) {
         this.#position = position;
+        this.getChapter()?.changed();
     }
 
     getCaption() { return this.#caption; }

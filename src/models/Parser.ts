@@ -660,7 +660,7 @@ export default class Parser {
         this.read();
 
         // Is there a position indicator?
-        quote.setPosition(this.parsePosition())
+        quote.setPosition(this.parsePosition());
         
         // Read any whitespace after the position indicator.
         this.readWhitespace();

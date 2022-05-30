@@ -30,6 +30,7 @@ export class QuoteNode extends BlocksNode {
 
     setPosition(position: Position) {
         this.#position = position;
+        this.getChapter()?.changed();
     }
 
     toText(): string {

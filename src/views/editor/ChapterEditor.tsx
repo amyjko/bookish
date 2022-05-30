@@ -94,9 +94,22 @@ const ChapterEditor = (props: { chapter: Chapter }) => {
         // Stop listening to selection changes
         return () => {
             document.removeEventListener("selectionchange", handleSelectionChange);
+            ast.unsubscribe(handleChapterChange);
         }
     
     }, []);
+
+    // Listen to changes on the chapter node, and change 
+    useEffect(() => {
+
+        // Listen to chapter changes
+        ast.subscribe(handleChapterChange);
+
+        return () => {
+            ast.unsubscribe(handleChapterChange);
+        }
+
+    }, [ ast, caretRange, undoStack ]);
 
     useEffect(() => {
         // Track time since last keystroke to control caret blinking behavior.
@@ -374,12 +387,18 @@ const ChapterEditor = (props: { chapter: Chapter }) => {
 
     function undo(): CaretRange {
 
+        // Unsubscribe from the ChapterNode we're about to abandon.
+        ast.unsubscribe(handleChapterChange);
+
         // Grab the next state
         let undoState = undoStack[undoPosition + 1];
 
         // Restore the content of the chapter.
         chapter.setText(undoState.chapter);
         let node = chapter.getAST() as ChapterNode;
+
+        // Listen to the new ChapterNode
+        node.subscribe(handleChapterChange);
 
         // Move the undo state down a position.
         if(undoPosition < undoStack.length)
@@ -392,12 +411,18 @@ const ChapterEditor = (props: { chapter: Chapter }) => {
 
     function redo(): CaretRange {
 
+        // Unsubscribe from the ChapterNode we're about to abandon.
+        ast.unsubscribe(handleChapterChange);
+
         // Grab the next state
         let undoState = undoStack[undoPosition - 1];
 
         // Restore the content of the chapter.
         chapter.setText(undoState.chapter);
         let node = chapter.getAST() as ChapterNode;
+
+        // Listen to the new ChapterNode
+        node.subscribe(handleChapterChange);
 
         // Move the undo state down a position.
         if(undoPosition > 0)
@@ -573,6 +598,20 @@ const ChapterEditor = (props: { chapter: Chapter }) => {
                     setUndoPosition(0);
                 }
             }
+        }
+    }
+
+    // This handles all non-command changes reported by the chapter's nodes (primarily toolbar edits).
+    function handleChapterChange(chapter: ChapterNode) {
+
+        // Whatever changed, add a snapshot to the stack.
+        if(caretRange) {
+            setUndoStack([{ 
+                chapter: ast.toBookdown(),
+                command: undefined,
+                range: ast.caretRangeToTextRange(caretRange)
+                // If the undo position is beyond the front, clear everything before it, because we're changing history.
+            }, ...undoStack]);
         }
     }
 

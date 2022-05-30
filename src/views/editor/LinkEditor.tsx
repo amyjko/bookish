@@ -12,12 +12,12 @@ const LinkEditor = (props: {
 
     const chapter = useContext(ChapterContext);
     const link = props.link;
-    const [ editedURL, setEditedURL ] = useState<string>(link.getMeta());
+    const url = link.getMeta();
+    // const [ editedURL, setEditedURL ] = useState<string>(link.getMeta());
     const caret = useContext(CaretContext);
 
     function handleChapterChange(e: ChangeEvent<HTMLSelectElement>) {
 
-        setEditedURL(e.target.value);
         link.setMeta(e.target.value);
 
     }
@@ -75,16 +75,16 @@ const LinkEditor = (props: {
         >
             <Unlink/>
         </button>
-        <select name="chapterID" onChange={handleChapterChange} value={editedURL}>
+        <select name="chapterID" onChange={handleChapterChange} value={url}>
             <option value="">URL</option>
             { options.map((option, index) => <option key={index} value={option.value}>{option.label}</option>) }
         </select>
-        <URLEditor url={editedURL} valid={isValid(editedURL)} edit={ url => { setEditedURL(url); link.setMeta(url); } } />
+        <URLEditor url={url} valid={isValid(url)} edit={ url => { link.setMeta(url); } } />
         {
-            isValid(editedURL) ?
+            isValid(url) ?
                 (
-                    isValidURL(editedURL) ? <span className="bookish-editor-note">This link will navigate to this URL.</span> :
-                    editedURL.indexOf(":") >= 0 ? <span className="bookish-editor-note">This link will navigate to this chapter label.</span> :
+                    isValidURL(url) ? <span className="bookish-editor-note">This link will navigate to this URL.</span> :
+                    url.indexOf(":") >= 0 ? <span className="bookish-editor-note">This link will navigate to this chapter label.</span> :
                     <span className="bookish-editor-note">This link will navigate to this chapter.</span>
                 ) :
                 <span className="bookish-editor-note bookish-editor-note-error">Choose a valid URL, chapter ID, or chapterID:labelID.</span>

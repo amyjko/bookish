@@ -27,11 +27,11 @@ export class EmbedNode extends Node<BlockParentNode> {
     getCredit() { return this.#credit; }
     getPosition() { return this.#position; }
 
-    setURL(url: string) { this.#url = url; }
-    setDescription(description: string) { this.#description = description; }
+    setURL(url: string) { this.#url = url; this.getChapter()?.changed(); }
+    setDescription(description: string) { this.#description = description; this.getChapter()?.changed(); }
     setCaption(caption: FormatNode) { this.#caption = caption; }
     setCredit(credit: FormatNode) { this.#credit = credit; }
-    setPosition(position: Position) { this.#position = position; }
+    setPosition(position: Position) { this.#position = position; this.getChapter()?.changed(); }
 
     toText(): string {
         return this.#caption.toText();

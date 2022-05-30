@@ -7,10 +7,10 @@ const QuoteEditor = (props: {
     quote: QuoteNode
 }) => {
 
-    const callout = props.quote;
+    const quote = props.quote;
 
     return <>
-        <PositionEditor value={callout.getPosition()} edit={(position: string) => callout.setPosition(position as Position)} />
+        <PositionEditor value={quote.getPosition()} edit={(position: string) => quote.setPosition(position as Position)} />
     </>
 
 }

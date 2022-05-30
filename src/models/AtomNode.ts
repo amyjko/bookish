@@ -16,7 +16,7 @@ export abstract class AtomNode<MetadataType> extends Node<FormatNode> {
     }
 
     getMeta() { return this.#meta; }
-    setMeta(meta: MetadataType) { this.#meta = meta; }
+    setMeta(meta: MetadataType) { this.#meta = meta; this.getChapter()?.changed(); }
 
     traverseChildren(fn: (node: Node) => void): void {}
     removeChild(node: Node<Node<any>>): void {}

@@ -16,7 +16,10 @@ export abstract class MetadataNode<MetaType> extends Node<FormatNode> {
     }
 
     getMeta() { return this.#meta }
-    setMeta(meta: MetaType) { this.#meta = meta; }
+    setMeta(meta: MetaType) { 
+        this.#meta = meta;
+        this.getChapter()?.changed();
+    }
 
     getText() { return this.#text; }
     setText(text: string) { this.#text = new TextNode(this, text); }

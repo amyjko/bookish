@@ -32,7 +32,7 @@ export class CodeNode extends Node<BlockParentNode> {
     getCode() { return this.#code.getText(); }
     getCaption() { return this.#caption; }
     getPosition() { return this.#position; }
-    setPosition(position: Position) { this.#position = position; }
+    setPosition(position: Position) { this.#position = position; this.getChapter()?.changed(); }
     getLanguage() { return this.#language; }
     setLanguage(language: string) { this.#language = language; }
     isExecutable() { return this.#executable; }
