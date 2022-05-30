@@ -129,7 +129,7 @@ const Toolbar = (props: {
     }
 
     function handleKeyDown(event: React.KeyboardEvent) {
-        // Return focus to th editor if someone presses an unhandled enter
+        // Return focus to the editor if someone presses an unhandled enter
         if(event.key === "Enter") {
             const editor = document.querySelector(".bookish-chapter-editor");
             if(editor instanceof HTMLElement) {
