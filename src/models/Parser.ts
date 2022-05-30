@@ -1021,8 +1021,8 @@ export default class Parser {
         if(this.peek() === ">")
             this.read();
 
-        // Trim any whitespace, then split by commas.
-        const citationList = citations.trim().split(",").map(citation => citation.trim());
+        // Trim any whitespace, then split by commas, then remove any empty IDs.
+        const citationList = citations.split(",").map(citation => citation.trim()).filter(citationID => citationID.length > 0);
 
         return new CitationsNode(parent, citationList);
 
@@ -1143,23 +1143,6 @@ export default class Parser {
 
         // Read the ]
         this.read();
-
-        // If it's internal, validate it.
-        if(!url.startsWith("http")) {
-
-            // Pull out any labels and just get the chapter name.
-            let chapter = url;
-            let label = null;
-            if(url.indexOf(":") >= 0) {
-                let parts = chapter.split(":");
-                chapter = parts[0];
-                label = parts[1];
-            }
-
-            if(chapter !== "" && this.book && !this.book.hasChapter(chapter))
-                return new ErrorNode(parent, undefined, "Unknown chapter name '" + url + "'");
-
-        }
 
         return new LinkNode(parent, text, url);
 
