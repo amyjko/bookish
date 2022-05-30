@@ -13,8 +13,10 @@ export class LabelNode extends AtomNode<string> {
 
     toBookdown(debug?: number): string {
         const id = this.getMeta();
+        const nextText = this.getParent()?.getNextTextOrAtom(this)?.toBookdown();
+
         // The trailing space after enables parsing. The error placeholder handles invalid empty label IDs.
-        return `${debug === this.nodeID ? "%debug%" : ""}:${id === "" ? ERROR_PLACEHOLDER : id} `; 
+        return `${debug === this.nodeID ? "%debug%" : ""}:${id === "" ? ERROR_PLACEHOLDER : id}${nextText?.startsWith(" ") ? "" : " "}`; 
     }
 
     copy(parent: FormatNode): LabelNode { return new LabelNode(parent, this.getMeta()); }
