@@ -1,135 +1,46 @@
-import type { ChapterNode } from "./ChapterNode";
-import { NodeType } from "./NodeType";
+import { ChapterNode } from "./ChapterNode";
 
-export abstract class Node<ParentType extends Node<any> = Node<any>> {
-    nodeID: number = -1;
-    type: NodeType;
-    #parent: ParentType | undefined;
+// A global node ID generator, for mapping views back to models.
+let nodeID = 1;
 
-    constructor(parent: ParentType | undefined, type: NodeType) {
+export abstract class Node<ParentType extends undefined | Node<any> = undefined | Node<any>> {
 
-        if (typeof type !== "string" || type.length === 0)
-            throw new Error("All nodes require a type string.");
-        this.type = type;
-        this.#parent = parent;
+    readonly nodeID: number;
 
-        const chapter = this.#parent?.getChapter()
-        if (chapter)
-            chapter.indexNode(this);
-
+    constructor() {
+        this.nodeID = nodeID++;
     }
 
-    getParent(): ParentType | undefined { return this.#parent; }
-    setParent(parent: ParentType | undefined): void { this.#parent = parent; }
-    inside(type: Function) { return this.getClosestParentMatching(p => p instanceof type) !== undefined; }
+    abstract toText(): string;
+    abstract toBookdown(parent: ParentType, debug?: number): string;
+    abstract getType(): string;
+    abstract traverseChildren(fn: (node: Node<any>) => void) : void;
+    abstract copy(): Node<any>;
 
-    setID(id: number) { this.nodeID = id; }
+    // Returns a new node with the given child node replaced, or the node as is if the given nodes were not a valid change.
+    abstract withChildReplaced(node: Node, replacement: Node | undefined): Node | undefined;
 
-    getChapter(): ChapterNode | undefined {
-        return this.#parent?.getChapter();
+    rootWithChildReplaced(root: Node, node: Node, replacement: Node | undefined): Node | undefined {        
+        const parent = root.getParentOf(this);
+        if(parent === undefined) return;
+        const newNode = this.withChildReplaced(node, replacement);
+        return parent.rootWithChildReplaced(root, this, newNode === undefined ? this : newNode);
     }
 
-    abstract toText(): String;
+    // In the given root, replaces this with the given node in the given root.
+    replace(root: Node, replacement: Node | undefined): Node | undefined {
 
-    abstract toBookdown(debug?: number): string;
+        const parent = root.getParentOf(this);
+        if(parent === undefined) return;
+        return parent.rootWithChildReplaced(root, this, replacement);
+
+    }
+    
+    getID() { return nodeID; }
 
     traverse(fn: (node: Node<any>) => void) : void {
         this.traverseChildren(fn);
         fn.call(undefined, this);
-    }
-    
-    abstract traverseChildren(fn: (node: Node<any>) => void) : void;
-
-    abstract copy(parent: ParentType): Node;
-
-    hasAncestor(node: Node<any>): boolean {
-
-        let parent = this.#parent;
-        while(parent) {
-            if(parent === node) return true;
-            parent = parent.#parent;
-        }
-        return false;
-
-    }
-
-    closestParent<T extends Node<any>>(type: Function): T | undefined {
-
-        let parent = this.#parent;
-        while(parent) {
-            if(parent instanceof type) return parent as unknown as T;
-            parent = parent.#parent;
-        }
-        return undefined;
-
-    }
-
-    isInside(type: Function) {
-        return this.getClosestParentMatching(p => p instanceof type) !== undefined;
-    }
-
-    getClosestParentMatching(match: (node: Node) => boolean): Node | undefined {
-
-        let parent = this.#parent;
-        while(parent) {
-            if(match.call(undefined, parent))
-                return parent;
-            parent = parent.#parent;
-        }
-        return undefined;
-
-    }
-
-    getFarthestParentMatching(match: (node: Node) => boolean): Node | undefined {
-
-        const matchingParents = this.getAncestors().filter(match);
-        return matchingParents.length > 0 ? matchingParents[matchingParents.length - 1] : undefined;
-
-    }
-
-    getAncestors() {
-
-        const ancestors = [];
-        let parent = this.#parent;
-        while(parent) {
-            ancestors.push(parent);
-            parent = parent.#parent;
-        }
-        return ancestors;
-
-    }
-
-    getCommonAncestor(node: Node): Node | undefined {
-
-        const thisParents = this.getAncestors();
-        const thatParents = node.getAncestors();
-
-        for(let i = 0; i < thisParents.length; i++) {
-            for(let j = 0; j < thatParents.length; j++) {
-                if(thisParents[i] === thatParents[j])
-                    return thisParents[i];
-            }
-        }
-        return undefined;
-
-    }
-
-    // Ask the parent to remove this, if there is one.
-    remove() : void { 
-        this.getChapter()?.unindexNode(this);
-        this.#parent?.removeChild(this);
-        this.#parent = undefined;
-    }
-
-    // Each node has its own way of removing a child.
-    abstract removeChild(node: Node): void;
-
-    // Each node has its own way of replacing a child.
-    abstract replaceChild(node: Node, replacement: Node): void;
-
-    replaceWith(replacement: Node): void {
-        this.#parent?.replaceChild(this, replacement);
-        this.getChapter()?.unindexNode(this);
     }
 
     getNodes(): Node[] {
@@ -143,11 +54,86 @@ export abstract class Node<ParentType extends Node<any> = Node<any>> {
         return index >= 0 ? index : undefined;
     }
 
-    getSibling(next: boolean): Node<any> | undefined { return this.#parent?.getSiblingOf(this, next); }
+    contains(node: Node) {
+        let found = false;
+        this.traverse(n => { if(n === node) found = true; });
+        return found;
+    }
 
-    abstract getSiblingOf(child: Node, next: boolean): Node | undefined;
+    abstract getParentOf(node: Node): Node | undefined;
 
-    // Delete nodes if they're empty.
-    abstract clean(): void;
+    getParent(root: Node): ParentType | undefined { return root.getParentOf(this) as ParentType | undefined; }
+
+    hasAncestor(root: Node, node: Node<any>): boolean {
+
+        let parent = root.getParentOf(this);
+        while(parent) {
+            if(parent === node) return true;
+            parent = root.getParentOf(parent);
+        }
+        return false;
+
+    }
+
+    closestParent<T extends Node<any>>(root: Node, type: Function): T | undefined {
+
+        let parent = root.getParentOf(this);
+        while(parent) {
+            if(parent instanceof type) return parent as unknown as T;
+            parent = root.getParentOf(parent);
+        }
+        return undefined;
+
+    }
+
+    isInside(root: Node, type: Function) {
+        return this.getClosestParentMatching(root, p => p instanceof type) !== undefined;
+    }
+
+    getClosestParentMatching(root: Node, match: (node: Node) => boolean): Node | undefined {
+
+        let parent = root.getParentOf(this);
+        while(parent) {
+            if(match.call(undefined, parent))
+                return parent;
+            parent = root.getParentOf(parent);
+        }
+        return undefined;
+
+    }
+
+    getFarthestParentMatching(root: Node, match: (node: Node) => boolean): Node | undefined {
+
+        const matchingParents = this.getAncestors(root).filter(match);
+        return matchingParents.length > 0 ? matchingParents[matchingParents.length - 1] : undefined;
+
+    }
+
+    getAncestors(root: Node) {
+
+        const ancestors = [];
+        let parent = root.getParentOf(this);
+        while(parent) {
+            ancestors.push(parent);
+            parent = root.getParentOf(parent);
+        }
+        return ancestors;
+
+    }
+
+    getCommonAncestor(root: Node, node: Node): Node | undefined {
+
+        const thisParents = this.getAncestors(root);
+        const thatParents = node.getAncestors(root);
+
+        for(let i = 0; i < thisParents.length; i++) {
+            for(let j = 0; j < thatParents.length; j++) {
+                if(thisParents[i] === thatParents[j])
+                    return thisParents[i];
+            }
+        }
+        return undefined;
+
+    }
 
 }

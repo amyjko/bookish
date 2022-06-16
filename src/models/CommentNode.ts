@@ -1,19 +1,37 @@
 import { AtomNode } from "./AtomNode";
+import { Caret } from "./Caret";
 import { FormatNode } from "./FormatNode";
+import { Node } from "./Node";
 
 export class CommentNode extends AtomNode<FormatNode> {
 
-    constructor(parent: FormatNode, comment: FormatNode) {
-        super(parent, comment, "comment");
-        comment.setParent(this);
+    constructor(comment: FormatNode) {
+        super(comment);
     }
 
+    getType() { return "comment"; }
     toText(): string { return ""; }
-    toBookdown(debug?: number): string { 
-        const previousText = this.getParent()?.getPreviousTextOrAtom(this)?.toBookdown();
+
+    getDefaultCaret(): Caret { return this.getMeta().getFirstCaret(); }
+
+    toBookdown(parent: FormatNode, debug?: number): string { 
+        const previousText = parent.getPreviousTextOrAtom(this)?.toBookdown(parent);
         // Insert a space before the % if there isn't one before this.
-        return `${previousText?.endsWith(" ") ? "" : " "}%${debug === this.nodeID ? "%debug%" : ""}${this.getMeta().toBookdown(debug)}%`; 
+        return `${previousText?.endsWith(" ") ? "" : " "}%${debug === this.nodeID ? "%debug%" : ""}${this.getMeta().toBookdown(this, debug)}%`; 
     }
-    copy(parent: FormatNode): CommentNode { return new CommentNode(parent, this.getMeta()); }
+
+    copy(): CommentNode { return new CommentNode(this.getMeta().copy()); }
+
+    withChildReplaced(node: Node, replacement: Node | undefined) {
+        return node instanceof FormatNode && replacement instanceof FormatNode && node === this.getMeta() ?
+            new CommentNode(replacement) : 
+            undefined;    
+    }
+
+    getParentOf(node: Node): Node | undefined {
+        return this.getMeta().getParentOf(node);
+    }
+
+    withMeta(comment: FormatNode) { return new CommentNode(comment); }
 
 }

@@ -108,11 +108,19 @@ class Chapter {
 	setText(text: string) {
 
 		this.text = text;
-		this.ast = Parser.parseChapter(this.book, this.text);
+		this.setAST(Parser.parseChapter(this.book, this.text));
+
+	}
+
+	setAST(node: ChapterNode) {
+
+		this.ast = node;
+		this.text = this.ast.toBookdown();
 		this.wordCount = this.ast.toText().split(/\s+/).length;
 		this.index = this.computeIndex();
 
 		this.book.notifyListeners();
+
 	}
 
 	addAuthor(name: string) {

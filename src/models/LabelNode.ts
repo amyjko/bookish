@@ -1,24 +1,34 @@
 import { AtomNode } from "./AtomNode";
+import { Caret } from "./Caret";
 import { FormatNode } from "./FormatNode";
+import { Node } from "./Node";
 
 const ERROR_PLACEHOLDER = "LABELNOIDERROR";
 
-export class LabelNode extends AtomNode<string> {
-    
-    constructor(parent: FormatNode, id: string) {
-        super(parent, id === ERROR_PLACEHOLDER ? "" : id, "label");
+export class LabelNode extends AtomNode<string> {    
+    constructor(id: string) {
+        super(id === ERROR_PLACEHOLDER ? "" : id);
     }
+
+    getType() { return "label"; }
+
+    getDefaultCaret(): Caret { return { node: this, index: 0 }; }
 
     toText(): string { return ""; }
 
-    toBookdown(debug?: number): string {
+    toBookdown(parent: FormatNode, debug?: number): string {
         const id = this.getMeta();
-        const nextText = this.getParent()?.getNextTextOrAtom(this)?.toBookdown();
+        const nextText = parent.getNextTextOrAtom(this)?.toBookdown(parent);
 
         // The trailing space after enables parsing. The error placeholder handles invalid empty label IDs.
         return `${debug === this.nodeID ? "%debug%" : ""}:${id === "" ? ERROR_PLACEHOLDER : id}${nextText?.startsWith(" ") ? "" : " "}`; 
     }
 
-    copy(parent: FormatNode): LabelNode { return new LabelNode(parent, this.getMeta()); }
+    getParentOf(node: Node): Node | undefined { return undefined; }
 
+    copy() { return new LabelNode(this.getMeta()); }
+
+    withMeta(id: string) { return new LabelNode(id); }
+    withChildReplaced(node: Node, replacement: Node | undefined){ return undefined; }
+    
 }

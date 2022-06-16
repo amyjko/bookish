@@ -1,8 +1,7 @@
-import { ChapterNode } from "./ChapterNode";
 import { Node } from "./Node";
 
+export class ReferenceNode extends Node<Node<any> | undefined> {
 
-export class ReferenceNode extends Node<ChapterNode> {
     authors: string;
     year: string;
     title: string;
@@ -11,8 +10,8 @@ export class ReferenceNode extends Node<ChapterNode> {
     summary: string | null;
     short: boolean;
 
-    constructor(chapter: ChapterNode | undefined, authors: string, year: string, title: string, source: string, url: string | null, summary: string | null, short: boolean) {
-        super(chapter, "reference");
+    constructor(authors: string, year: string, title: string, source: string, url: string | null, summary: string | null, short: boolean) {
+        super();
         this.authors = authors;
         this.year = year;
         this.title = title;
@@ -22,22 +21,21 @@ export class ReferenceNode extends Node<ChapterNode> {
         this.short = short;
     }
 
+    getType() { return "reference"; }
+
     traverseChildren(fn: (node: Node) => void): void {}
-
-    removeChild(node: Node): void {}
-    replaceChild(node: Node, replacement: Node): void {}
-
-    getSiblingOf(child: Node, next: boolean) { return undefined; }
-
-    copy(parent: ChapterNode): ReferenceNode {
-        return new ReferenceNode(parent, this.authors, this.year, this.title, this.source, this.url, this.summary, this.short);
-    }
-
-    clean() {}
+ 
+    getParentOf(node: Node): Node | undefined { return undefined; }
     
     toText() { return this.authors + " "  + this.year + " " + this.title + " " + this.source + (this.summary ? this.summary : ""); }
-    toBookdown(debug?: number): string {
+    toBookdown(parent: Node, debug?: number): string {
         return "";
+    }
+
+    withChildReplaced(node: Node, replacement: Node | undefined) { return undefined; }
+
+    copy(): ReferenceNode {
+        return new ReferenceNode(this.authors, this.year, this.title, this.source, this.url, this.summary, this.short);
     }
 
 }

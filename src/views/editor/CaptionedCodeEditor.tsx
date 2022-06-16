@@ -13,18 +13,19 @@ const CaptionedCodeEditor = (props: {
     const code = props.code;
     const caret = useContext(CaretContext);
 
+    // TODO Immutable: setPosition, setLanguage, setExecutable
     return <span>
         <PositionEditor
             value={code.getPosition()}
-            edit={(value: string) => code.setPosition(value as Position) }
+            edit={(value: string) => code.withPosition(value as Position) }
         />
-        <LanguageEditor language={code.getLanguage()} edit={lang => code.setLanguage(lang) } />
+        <LanguageEditor language={code.getLanguage()} edit={lang => code.withLanguage(lang) } />
         { code.getLanguage() !== "python" ? null : 
             <Switch
                 options={["executable", "read only"]}
                 value={code.isExecutable() ? "executable" : "read only"}
                 position=">"
-                edit={(value: string) => code.setExecutable(value === "executable")}
+                edit={(value: string) => code.withExecutable(value === "executable")}
             />
         }
 

@@ -1,25 +1,33 @@
 import { FormatNode } from "./FormatNode";
 import { AtomNode } from "./AtomNode";
-import { TextNode } from "./TextNode";
+import { Node } from "./Node";
+import { Caret } from "./Caret";
 
 export class FootnoteNode extends AtomNode<FormatNode> {
 
-    constructor(parent: FormatNode, text: string = "") {
-
-        super(parent, new FormatNode(undefined, "", []), "footnote");
-
-        this.getMeta().setParent(this);
-        this.getMeta().addSegment(new TextNode(this.getMeta(), text));
-
+    constructor(content?: FormatNode) {
+        super(content ? content : new FormatNode("", []));
     }
+
+    getType() { return "footnote"; }
+
+    getDefaultCaret(): Caret { return this.getMeta().getFirstCaret(); }
 
     toText(): string { return this.getMeta().toText(); }
-    toBookdown(debug?: number): string { return `${debug === this.nodeID ? "%debug%" : ""}{${this.getMeta().toBookdown(debug)}}`; }
+    toBookdown(parent: FormatNode, debug?: number): string { return `${debug === this.nodeID ? "%debug%" : ""}{${this.getMeta().toBookdown(this, debug)}}`; }
 
-    copy(parent: FormatNode): FootnoteNode {
-        const foot = new FootnoteNode(parent);
-        foot.setMeta(this.getMeta().copy(foot));
-        return foot;
+    copy(): FootnoteNode { return new FootnoteNode(this.getMeta().copy()); }
+
+    getParentOf(node: Node): Node | undefined {
+        return this.getMeta().getParentOf(node);
     }
-    
+
+    withChildReplaced(node: Node, replacement: Node | undefined) {    
+        return node instanceof FormatNode && replacement instanceof FormatNode && node === this.getMeta() ?
+            new FootnoteNode(replacement) :
+            undefined;
+    }
+
+    withMeta(footnote: FormatNode) { return new FootnoteNode(footnote); }
+
 }

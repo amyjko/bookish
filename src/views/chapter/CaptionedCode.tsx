@@ -24,8 +24,6 @@ const CaptionedCode = (props: { node: CodeNode}) => {
 
     const languages = [ "C", "C++", "CSS", "Go", "HTML", "Java", "JavaScript", "Markdown", "Plaintext", "Python", "TypeScript" ];
 
-    const editing = editable && caret && caret.range && caret.range.start.node.getClosestParentMatching(p => p === node);
-    
     return <div className={"bookish-figure " + renderPosition(node.getPosition())} data-nodeid={props.node.nodeID}>
         {
             editable ?

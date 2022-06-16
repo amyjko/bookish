@@ -89,6 +89,9 @@ const Toolbar = (props: {
 
     const context = props.context;
     const executor = props.executor;
+    const chapter = props.chapter;
+
+    if(chapter === undefined) return <></>;
 
     let categories = undefined;
     let commandsByCategory: {[key: string]: Command[]} = {};
@@ -119,12 +122,12 @@ const Toolbar = (props: {
 
         metaNode = 
             caretNode instanceof AtomNode ? caretNode :
-            caretNode instanceof TextNode ? caretNode.getParent() : 
+            caretNode instanceof TextNode ? caretNode.getParent(chapter) : 
             undefined;
 
-        calloutNode = caretNode.getClosestParentMatching(p => p instanceof CalloutNode) as CalloutNode;
-        quoteNode = caretNode.getClosestParentMatching(p => p instanceof QuoteNode) as QuoteNode;
-        embedNode = caretNode.getClosestParentMatching(p => p instanceof EmbedNode) as EmbedNode;
+        calloutNode = caretNode.getClosestParentMatching(chapter, p => p instanceof CalloutNode) as CalloutNode;
+        quoteNode = caretNode.getClosestParentMatching(chapter, p => p instanceof QuoteNode) as QuoteNode;
+        embedNode = caretNode.getClosestParentMatching(chapter, p => p instanceof EmbedNode) as EmbedNode;
 
     }
 
@@ -172,7 +175,7 @@ const Toolbar = (props: {
         { metaNode instanceof InlineCodeNode ? <ToolbarGroup icon={wrapIcon(Code)}><InlineCodeEditor code={metaNode}/></ToolbarGroup> : null }
         { metaNode instanceof CitationsNode ? <ToolbarGroup icon="Citations"><CitationsEditor citations={metaNode}/></ToolbarGroup> : null }
         { metaNode instanceof DefinitionNode ? <ToolbarGroup icon="Glossary"><DefinitionEditor definition={metaNode}/></ToolbarGroup> : null }
-        { metaNode instanceof CodeNode && context ? <ToolbarGroup icon={wrapIcon(Code)}><CaptionedCodeEditor code={context.start.node.getParent() as CodeNode}/></ToolbarGroup> : null }
+        { metaNode instanceof CodeNode && context ? <ToolbarGroup icon={wrapIcon(Code)}><CaptionedCodeEditor code={context.start.node.getParent(chapter) as CodeNode}/></ToolbarGroup> : null }
         { calloutNode ? <ToolbarGroup icon="Callout"><CalloutEditor callout={calloutNode} /></ToolbarGroup> : null }
         { quoteNode ? <ToolbarGroup icon="Quote"><QuoteEditor quote={quoteNode} /></ToolbarGroup> : null }
         { embedNode ? <ToolbarGroup icon="Image/Video"><EmbedEditor embed={embedNode} /></ToolbarGroup> : null }

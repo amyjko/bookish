@@ -1,10 +1,16 @@
 {
     "cSpell.words": [
+        "backmatter",
         "Bookdown",
+        "doppleganger",
         "esbuild",
+        "Firestore",
+        "nodeid",
         "smoothscroll",
         "svgr",
-        "uids"
+        "uids",
+        "Unfocus",
+        "unindex"
     ],
     "typescript.tsdk": "node_modules/typescript/lib"
 }

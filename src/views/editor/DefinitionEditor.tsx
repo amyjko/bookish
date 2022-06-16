@@ -26,7 +26,7 @@ const DefinitionEditor = (props: {
     function handleChange(e: ChangeEvent<HTMLSelectElement>) {
 
         setEditedGlossaryID(e.target.value);
-        definition.setMeta(e.target.value);
+        definition.withMeta(e.target.value);
 
         if(caret && caret.setCaretRange)
             caret.setCaretRange({ start: { node: definition.getText(), index: 0 }, end: { node: definition.getText(), index: 0 }});

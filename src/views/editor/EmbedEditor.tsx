@@ -22,12 +22,14 @@ const EmbedEditor = (props: {
     }
 
     function handleDescriptionChange(e: ChangeEvent<HTMLInputElement>) {
-        embed.setDescription(e.target.value);
+        // TODO Immutable
+        embed.withDescription(e.target.value);
     }
 
+    // TODO Immutable: setPosition, setURL
     return <>
-        Position <PositionEditor value={embed.getPosition()} edit={(position: string) => embed.setPosition(position as Position)} />
-        URL <URLEditor url={embed.getURL()} valid={isValidURL(embed.getURL())} edit={(url: string) => embed.setURL(url)} />
+        Position <PositionEditor value={embed.getPosition()} edit={(position: string) => embed.withPosition(position as Position)} />
+        URL <URLEditor url={embed.getURL()} valid={isValidURL(embed.getURL())} edit={(url: string) => embed.withURL(url)} />
         Description <input
             type="text"
             value={description}

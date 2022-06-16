@@ -9,8 +9,9 @@ const QuoteEditor = (props: {
 
     const quote = props.quote;
 
+    // TOOD Immutable: setPosition
     return <>
-        <PositionEditor value={quote.getPosition()} edit={(position: string) => quote.setPosition(position as Position)} />
+        <PositionEditor value={quote.getPosition()} edit={(position: string) => quote.withPosition(position as Position)} />
     </>
 
 }

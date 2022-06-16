@@ -1,34 +1,27 @@
+import { BlockNode } from "./BlockNode";
 import { Node } from "./Node";
 
-export class ErrorNode extends Node {
+export class ErrorNode extends BlockNode<Node | undefined> {
     #text: string | undefined;
     #error: string;
-    constructor(parent: Node | undefined, text: string | undefined, error: string) {
-        super(parent, "error");
+    constructor(text: string | undefined, error: string) {
+        super();
         this.#text = text;
         this.#error = error;
     }
 
+    getType() { return "error"; }
     getError() { return this.#error; }
+    getFormats() { return []; }
 
-    toText(): string {
-        return "";
-    }
-
-    toBookdown(debug?: number): string { return this.#text ? this.#text : ""; }
+    toText(): string { return ""; }
+    toBookdown(parent: Node, debug?: number): string { return this.#text ? this.#text : ""; }
 
     traverseChildren(fn: (node: Node) => void): void {}
+    getParentOf(node: Node): Node | undefined { return undefined; }
 
-    removeChild(node: Node): void {}
+    copy(): ErrorNode { return new ErrorNode(this.#text, this.#error); }
 
-    replaceChild(node: Node, replacement: Node): void {}
-
-    getSiblingOf(child: Node, next: boolean) { return undefined; }
-
-    copy(parent: Node): ErrorNode {
-        return new ErrorNode(parent, this.#text, this.#error);
-    }
-
-    clean() {}
+    withChildReplaced(node: Node, replacement: Node | undefined){ return undefined; }
 
 }

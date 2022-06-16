@@ -24,7 +24,7 @@ const Comment = (props: { node: CommentNode }) => {
         }
     });
 
-    const focused = caret && caret.range && caret.range.start.node.hasAncestor(comment);
+    const focused = caret && caret.range && chapter && caret.range.start.node.hasAncestor(chapter, comment);
 
     return <Atom
         node={comment}

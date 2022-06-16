@@ -7,25 +7,26 @@ import { ParagraphNode } from "./ParagraphNode";
 import { AtomNode } from "./AtomNode";
 import { CodeNode } from "./CodeNode";
 import { BlocksNode } from "./BlocksNode";
+import { Edit } from "../views/editor/Commands";
 
 export type TextNodeParent = FormatNode | MetadataNode<any> | CodeNode;
 
 export class TextNode extends Node<TextNodeParent> {
 
-    #text: string;
+    readonly #text: string;
 
-    constructor(parent: TextNodeParent, text: string) {
-        super(parent, "text");
+    constructor(text: string) {
+        super();
         this.#text = text;
     }
 
+    getType() { return "text"; }
     getText() { return this.#text; }
     getLength() { return this.#text.length; }
-    setText(text: string) { this.#text = text; }
 
     toText(): string { return this.#text; }
 
-    toBookdown(debug?: number): string {
+    toBookdown(parent: TextNodeParent, debug?: number): string {
 
         // Escape all characters with special meaning inside content nodes: _*`<^{~\[@% and :'s with no space after
         let newString = new String(this.#text)
@@ -51,68 +52,61 @@ export class TextNode extends Node<TextNodeParent> {
     }
 
     traverseChildren(fn: (node: Node) => void): void {}
+
+    copy() { return new TextNode(this.#text); }
+
+    // TODO This should probably just be a transformation, letting edits be formed by callers.
+    withCharacterInserted(root: Node, char: string, index: number): Edit {
+        const parent = root.getParentOf(this);
+        if(parent === undefined) return undefined;
+        const newText = new TextNode(this.#text.slice(0, index) + char + this.#text.slice(index));
+        const newRoot = parent.rootWithChildReplaced(root, this, newText);
+        const newCaret = { node: newText, index: index + 1 };
+        return newRoot === undefined ? undefined : { root: newRoot, range: { start: newCaret, end: newCaret } };
+    }
+
+    isItalic(root: Node) { return this.getAncestors(root).filter(p => p instanceof FormatNode && p.getFormat() === "_").length > 0; }
+    isBold(root: Node) { return this.getAncestors(root).filter(p => p instanceof FormatNode && p.getFormat() === "*").length > 0; }
     
-    removeChild(node: Node): void {}
-
-    replaceChild(node: Node, replacement: Node): void {}
-
-    getSiblingOf(child: Node, next: boolean) { return undefined; }
-
-    copy(parent: FormatNode) {
-        return new TextNode(parent, this.#text)
-    }
-
-    insert(char: string, index: number): Caret {
-        this.#text = this.#text.slice(0, index) + char + this.#text.slice(index);
-        return {
-            node: this,
-            index: index + 1
-        };
-    }
-
-    isItalic() { return this.getAncestors().filter(p => p instanceof FormatNode && p.getFormat() === "_").length > 0; }
-    isBold() { return this.getAncestors().filter(p => p instanceof FormatNode && p.getFormat() === "*").length > 0; }
     isEmpty() { return this.getLength() === 0; }
 
-    clean() {}
-
-    getParagraph(): ParagraphNode | undefined {
-        return this.getClosestParentMatching(p => p instanceof ParagraphNode) as ParagraphNode | undefined;
+    getParagraph(root: Node): ParagraphNode | undefined {
+        return this.closestParent<ParagraphNode>(root, ParagraphNode);
     }
 
-    getFormat(): FormatNode | undefined {
-        return this.getClosestParentMatching(p => p instanceof FormatNode) as FormatNode;
+    getFormat(root: Node): FormatNode | undefined {
+        return this.closestParent<FormatNode>(root, FormatNode);
     }
 
-    getFormatRoot(): FormatNode | undefined {
+    getFormatRoot(root: Node): FormatNode | undefined {
 
         // The format root is the highest format in the tree that contains this text.
         // There is one exception to this, however: formats inside atom nodes shouldn't traverse
         // past the atom node, since should be isolated from edits outside the atom.
-        const atom = this.getClosestParentMatching(p => p instanceof AtomNode) as AtomNode<FormatNode>;
+        const atom = this.getClosestParentMatching(root, p => p instanceof AtomNode) as AtomNode<FormatNode>;
         if(atom && atom.getMeta() instanceof FormatNode)
             return atom.getMeta();
 
         // If this isn't in an atom, just return the highest format this is in.
-        return this.getFarthestParentMatching(p => p instanceof FormatNode) as FormatNode;
+        return this.getFarthestParentMatching(root, p => p instanceof FormatNode) as FormatNode;
 
     }
 
-    getBlocks(): BlocksNode | undefined {
-        return this.getClosestParentMatching(p => p instanceof BlocksNode) as BlocksNode;
+    getBlocks(root: Node): BlocksNode<any> | undefined {
+        return this.closestParent<BlocksNode<any>>(root, BlocksNode);
     }
 
-    getRoot(): FormatNode | ChapterNode | undefined {
-        const atom = this.getFarthestParentMatching(p => p instanceof AtomNode) as AtomNode<FormatNode>;
-        const format = this.getFarthestParentMatching(p => p instanceof FormatNode) as FormatNode;
-        const chapter = this.getFarthestParentMatching(p => p instanceof ChapterNode) as ChapterNode;
+    getRoot(root: Node): FormatNode | ChapterNode | undefined {
+        const atom = this.getFarthestParentMatching(root, p => p instanceof AtomNode) as AtomNode<FormatNode>;
+        const format = this.getFarthestParentMatching(root, p => p instanceof FormatNode) as FormatNode;
+        const chapter = this.getFarthestParentMatching(root, p => p instanceof ChapterNode) as ChapterNode;
         return atom ? atom.getMeta() : chapter ? chapter : format ? format : undefined;
     }
 
-    next(index: number): Caret {
+    next(root: Node, index: number): Caret {
     
         // Otherwise, find the next text node after this one.
-        const next = this.getRoot()?.getNextTextOrAtom(this);
+        const next = this.getRoot(root)?.getNextTextOrAtom(this);
 
         // If there are more characters, just go next.
         if(index < this.#text.length) {
@@ -136,14 +130,14 @@ export class TextNode extends Node<TextNodeParent> {
         // Unless the next node is in a different paragraph, we skip the first index since it's equivalent to the last of this one.
         return next instanceof AtomNode ?
             { node: next, index: 0 } :
-            { node: next, index: this.getFormatRoot() !== next.getFormatRoot() ? 0 : Math.min(1, next.getLength()) };
+            { node: next, index: this.getFormatRoot(root) !== next.getFormatRoot(root) ? 0 : Math.min(1, next.getLength()) };
 
     }
 
-    previous(index: number): Caret {
+    previous(root: Node, index: number): Caret {
 
         // Otherwise, find the previous text node before this one.
-        const previous = this.getRoot()?.getPreviousTextOrAtom(this);
+        const previous = this.getRoot(root)?.getPreviousTextOrAtom(this);
     
         // If there are more characters, just go next.
         if(index > 0) {
@@ -167,11 +161,11 @@ export class TextNode extends Node<TextNodeParent> {
         // We skip the last index since it's the equivalent of this one's first.
         return previous instanceof AtomNode ?
             { node: previous, index: 0} :
-            { node: previous, index: this.getFormatRoot() !== previous.getFormatRoot() ? previous.#text.length : Math.max(0, previous.#text.length - 1) };
+            { node: previous, index: this.getFormatRoot(root) !== previous.getFormatRoot(root) ? previous.#text.length : Math.max(0, previous.#text.length - 1) };
 
     }
 
-    nextWord(index?: number): Caret {
+    nextWord(root: Node, index?: number): Caret {
 
         if(index === undefined)
             index = 0;
@@ -186,10 +180,10 @@ export class TextNode extends Node<TextNodeParent> {
             return { node: this, index: i };
 
         // Otherwise, find the next text node's next word boundary.
-        const paragraph = this.getParagraph();
+        const paragraph = this.getParagraph(root);
         const paragraphText = paragraph ? paragraph.getTextNodes() : undefined;
-        const nextNode = this.getRoot()?.getNextTextOrAtom(this);
-        const nextWord = nextNode?.nextWord();
+        const nextNode = this.getRoot(root)?.getNextTextOrAtom(this);
+        const nextWord = nextNode?.nextWord(root);
 
         // If there isn't one, just go to the end of this.
         if(paragraphText && nextNode && this === paragraphText[paragraphText.length - 1])
@@ -201,7 +195,7 @@ export class TextNode extends Node<TextNodeParent> {
 
     }
 
-    previousWord(index?: number): Caret {
+    previousWord(root: Node, index?: number): Caret {
 
         if(index === undefined)
             index = this.#text.length;
@@ -216,10 +210,10 @@ export class TextNode extends Node<TextNodeParent> {
             return { node: this, index: i };
 
         // Otherwise, find the next text node's next word boundary.
-        const paragraph = this.getParagraph();
+        const paragraph = this.getParagraph(root);
         const paragraphText = paragraph ? paragraph.getTextNodes() : undefined;
-        const previousNode = this.getRoot()?.getPreviousTextOrAtom(this);
-        const previousWord = previousNode?.previousWord();
+        const previousNode = this.getRoot(root)?.getPreviousTextOrAtom(this);
+        const previousWord = previousNode?.previousWord(root);
 
         // If there isn't one, just go to the end of this.
         if(paragraphText && previousNode && this === paragraphText[0])
@@ -230,5 +224,8 @@ export class TextNode extends Node<TextNodeParent> {
             return previousWord;
 
     }
+
+    withChildReplaced(node: Node, replacement: Node | undefined) { return undefined; }
+    getParentOf(node: Node): Node | undefined { return undefined; }
 
 }

@@ -18,7 +18,7 @@ const LinkEditor = (props: {
 
     function handleChapterChange(e: ChangeEvent<HTMLSelectElement>) {
 
-        link.setMeta(e.target.value);
+        link.withMeta(e.target.value);
 
     }
 
@@ -68,7 +68,7 @@ const LinkEditor = (props: {
         <button title="Remove link."
             onClick={(e) => {
                 if(chapter && chapter.chapter && caret && caret.range) {
-                    const newCaret = chapter.chapter.toggleAtom(caret.range, LinkNode, (parent, text) => new LinkNode(parent, text));
+                    const newCaret = chapter.chapter.toggleAtom(caret.range, LinkNode, text => new LinkNode(text));
                     caret.setCaretRange({ start: newCaret, end: newCaret });
                 }
             }}
@@ -79,7 +79,7 @@ const LinkEditor = (props: {
             <option value="">URL</option>
             { options.map((option, index) => <option key={index} value={option.value}>{option.label}</option>) }
         </select>
-        <URLEditor url={url} valid={isValid(url)} edit={ url => { link.setMeta(url); } } />
+        <URLEditor url={url} valid={isValid(url)} edit={ url => { link.withMeta(url); } } />
         {
             isValid(url) ?
                 (

@@ -13,8 +13,9 @@ const LabelEditor = (props: {
 
     function handleChange(e: ChangeEvent<HTMLInputElement>) {
 
+        // TODO Immutable
         // Update the model
-        label.setMeta(e.target.value);
+        label.withMeta(e.target.value);
 
     }
 

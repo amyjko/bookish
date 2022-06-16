@@ -9,8 +9,9 @@ const CalloutEditor = (props: {
 
     const callout = props.callout;
 
+    // TODO Immutable
     return <>
-        <PositionEditor value={callout.getPosition()} edit={(position: string) => callout.setPosition(position as Position)} />
+        <PositionEditor value={callout.getPosition()} edit={(position: string) => callout.withPosition(position as Position)} />
     </>
 
 }

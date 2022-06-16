@@ -3,52 +3,44 @@ import { BlockParentNode } from "./BlockParentNode";
 import { Position } from "./Position";
 import { FormatNode } from "./FormatNode";
 import { TextNode } from "./TextNode";
+import { BlockNode } from "./BlockNode";
 
-export class CodeNode extends Node<BlockParentNode> {
+export class CodeNode extends BlockNode<BlockParentNode> {
 
-    #code: TextNode;
-    #caption: FormatNode;
-    #position: Position;
-    #language: string;
-    #executable: boolean;
+    readonly #code: TextNode;
+    readonly #caption: FormatNode;
+    readonly #position: Position;
+    readonly #language: string;
+    readonly #executable: boolean;
 
-    constructor(parent: BlockParentNode, code: string, language: string, position: Position) {
-        super(parent, "code");
+    constructor(code: string, language: string, position: Position, caption?: FormatNode) {
+        super();
 
-        this.#code = new TextNode(this, code);
+        const executable = language.charAt(language.length - 1) === "!";
+
+        this.#code = new TextNode(code);
         this.#position = position;
-        this.#language = language ? language : "plaintext";
-        this.#executable = language.charAt(language.length - 1) === "!";
-
-        if (this.#executable)
-            this.#language = this.#language.slice(0, -1);
-
-        this.#caption = new FormatNode(this, "", []);
-        this.#caption.addSegment(new TextNode(this.#caption, ""));    
+        this.#language = executable ? language.slice(0, -1) : language;
+        this.#executable = executable;
+        this.#caption = caption === undefined ? new FormatNode("", [ new TextNode("")]) : caption;
 
     }
+
+    getType() { return "code"; }
 
     getCodeNode() { return this.#code; }
     getCode() { return this.#code.getText(); }
     getCaption() { return this.#caption; }
     getPosition() { return this.#position; }
-    setPosition(position: Position) { this.#position = position; this.getChapter()?.changed(); }
     getLanguage() { return this.#language; }
-    setLanguage(language: string) { this.#language = language; }
     isExecutable() { return this.#executable; }
-    setExecutable(executable: boolean) { this.#executable = executable; }
+    getFormats() { return [ this.#caption ]; }
 
-    setCaption(caption : FormatNode) {
-        this.#caption = caption;
-    }
+    toText() { return ""; }
 
-    toText() {
-        return "";
-    }
-
-    toBookdown(debug?: number): string {
+    toBookdown(parent: BlockParentNode, debug?: number): string {
         // Remember to escape any back ticks.
-        return "\n`" + (this.#language !== "plaintext" ? this.#language : "") + "\n" + this.#code.getText().replace(/`/g, '\\`') + "\n`" + (this.#position !== "|" ? this.#position : "") + this.#caption.toBookdown(debug);
+        return "\n`" + (this.#language !== "plaintext" ? this.#language : "") + "\n" + this.#code.getText().replace(/`/g, '\\`') + "\n`" + (this.#position !== "|" ? this.#position : "") + this.#caption.toBookdown(this, debug);
     }
 
     traverseChildren(fn: (node: Node) => void): void {
@@ -56,18 +48,28 @@ export class CodeNode extends Node<BlockParentNode> {
         this.#caption.traverse(fn);
     }
 
-    removeChild(node: Node): void {}
-
-    replaceChild(node: Node, replacement: Node): void {}
-
-    getSiblingOf(child: Node, next: boolean) { return undefined; }
-    
-    copy(parent: BlockParentNode): CodeNode {
-        const c = new CodeNode(parent, this.#code.getText(), this.#language, this.#position);
-        c.setCaption(this.#caption.copy(c));
-        return c;
+    copy(): CodeNode {
+        return new CodeNode(this.#code.getText(), this.#language, this.#position, this.#caption.copy());
     }
 
-    clean() {}
+    getParentOf(node: Node): Node | undefined {
+        return node == this.#code || node === this.#caption ? this : this.#caption.getParentOf(node);
+    }
+
+    withChildReplaced(node: Node, replacement: Node | undefined): CodeNode | undefined {
+        const newCode = node === this.#code && replacement instanceof TextNode ? replacement : undefined;
+        const newCaption = node === this.#caption && replacement instanceof FormatNode ? replacement : undefined;
+        return newCode || newCaption ? new CodeNode(
+            newCode ? newCode.getText() : this.#code.getText(), 
+            this.#language, 
+            this.#position, 
+            newCaption ? newCaption : this.#caption
+        ) : undefined;
+    }
+
+    withPosition(position: Position) { return new CodeNode(this.#code.getText(), this.#language, position, this.#caption); }
+    withLanguage(language: string) { return new CodeNode(this.#code.getText(), language, this.#position, this.#caption); }
+    withExecutable(executable: boolean) { return new CodeNode(this.#code.getText(), executable ? this.#language + "!" : this.#language, this.#position, this.#caption); }
+    withCaption(caption : FormatNode) { return new CodeNode(this.#code.getText(), this.#language, this.#position, caption); }
 
 }

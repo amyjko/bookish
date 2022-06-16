@@ -8,11 +8,10 @@ import { DefinitionNode } from "./DefinitionNode";
 import { EmbedNode } from "./EmbedNode";
 import { ErrorNode } from "./ErrorNode";
 import { FootnoteNode } from "./FootnoteNode";
-import { Format, FormatNodeSegmentType, FormatNode, FormatNodeParent } from "./FormatNode";
+import { Format, FormatNodeSegmentType, FormatNode } from "./FormatNode";
 import { InlineCodeNode } from "./InlineCodeNode";
 import { LabelNode } from "./LabelNode";
 import { LinkNode } from "./LinkNode";
-import { Node } from "./Node";
 import { ListNode, ListParentType } from "./ListNode";
 import { ParagraphNode } from "./ParagraphNode";
 import { QuoteNode } from "./QuoteNode";
@@ -21,8 +20,8 @@ import { RuleNode } from "./RuleNode";
 import { TableNode } from "./TableNode";
 import { TextNode } from "./TextNode";
 import { Position } from "./Position";
-import { BlockParentNode } from "./BlockParentNode";
 import { BlockNode } from "./BlockNode";
+import { BlockParentNode } from "./BlockParentNode";
 
 export type Bookkeeping = {
     symbols: Record<string, string>;
@@ -99,11 +98,11 @@ export default class Parser {
     }
 
     static parseContent(book: Book, text: string) {
-        return (new Parser(book, Parser.preprocessSymbols(book, text))).parseContent(undefined);
+        return (new Parser(book, Parser.preprocessSymbols(book, text))).parseContent();
     }
 
     static parseEmbed(book: Book, text: string) {
-        return (new Parser(book, Parser.preprocessSymbols(book, text))).parseEmbed(undefined);
+        return (new Parser(book, Parser.preprocessSymbols(book, text))).parseEmbed();
     }
 
     static parseReference(ref: string | Array<string>, book: Book, short=false) {
@@ -123,18 +122,18 @@ export default class Parser {
                 if(source.charAt(0) === "#") {
                     let src = book.getSource(source)
                     if(src === null)
-                        return new ErrorNode(undefined, undefined, "Unknown source " + source)
+                        return new ErrorNode(undefined, "Unknown source " + source)
                     else
                         source = src
                 }
 
-                return new ReferenceNode(undefined, authors, year, title, source, url, summary, short)
+                return new ReferenceNode(authors, year, title, source, url, summary, short)
             }
             else
-                return new ErrorNode(undefined, undefined, "Expected at least 4 items in the reference array, but found " + ref.length + ": " + ref.toString())
+                return new ErrorNode(undefined, "Expected at least 4 items in the reference array, but found " + ref.length + ": " + ref.toString())
         }
         else
-            return new ErrorNode(undefined, undefined, "Invalid reference: " + ref)
+            return new ErrorNode(undefined, "Invalid reference: " + ref)
 
     }
 
@@ -284,16 +283,9 @@ export default class Parser {
         return text;
     }
 
-    // Create and store an error
-    createError(parent: Node | undefined, text: string | undefined, message: string): ErrorNode {
-
-        return new ErrorNode(parent, text, message);
-
-    }
-
     parseChapter(): ChapterNode {
 
-        let blocks: BlockNode[] = [];
+        let blocks: BlockNode<BlockParentNode>[] = [];
 
         // Make the chapter node so we can pass it around.
         const chapter = new ChapterNode(blocks, this.metadata);
@@ -321,11 +313,8 @@ export default class Parser {
         let trailingNewlines = 0;
         while(this.more()) {
             trailingNewlines = 0;
-            // Read a block
-            const block = this.parseBlock(chapter);
-            // Add it to the list if we parsed something.
-            if(block !== null)
-                blocks.push(block);            
+            // Read a blocka add it to the list if we parsed something.
+            blocks.push(this.parseBlock());            
             // Read whitespace until we find the next thing.
             while(this.peek() === " " || this.peek() === "\t" || this.peek() === "\n") {
                 if(this.peek() === "\n")
@@ -336,7 +325,7 @@ export default class Parser {
 
         // If there are no blocks, or the chapter ended with two newlines, append an empty paragraph with an empty format node and an empty text node.
         if(blocks.length === 0 || trailingNewlines > 1)
-            blocks.push(new ParagraphNode(chapter));
+            blocks.push(new ParagraphNode());
 
         return chapter;
 
@@ -359,7 +348,6 @@ export default class Parser {
             // Names need to be letter and numbers only.
             if(!/^[a-zA-Z0-9]+$/.test(name)) {
                 new ErrorNode(
-                    parent,
                     this.readUntilNewLine(),
                     name.trim() === "" ? 
                         "Did you mean to declare a symbol? Use an @ symbol, then a name of only numbers and letters, then a colon, then whatever content you want it to represent." :
@@ -373,7 +361,7 @@ export default class Parser {
 
             // Name declarations need to be terminated with a colon before the block starts.
             if(!this.nextIs(":")) {
-                new ErrorNode(parent, this.readUntilNewLine(), "Symbol names are to be followed by a ':'");
+                new ErrorNode(this.readUntilNewLine(), "Symbol names are to be followed by a ':'");
                 return;
             }
 
@@ -387,7 +375,7 @@ export default class Parser {
             let startIndex = this.index;
 
             // Parse a block, any block.
-            this.parseBlock(parent);
+            this.parseBlock();
 
             // Remember the text we parsed.
             this.metadata.symbols[name] = this.text.substring(startIndex, this.index).trim();
@@ -400,7 +388,7 @@ export default class Parser {
 
     }
 
-    parseBlock(parent: ChapterNode | CalloutNode | QuoteNode): BlockNode {
+    parseBlock(): BlockNode<any> {
 
         // Read whitespace before the block.
         this.readWhitespace();
@@ -412,43 +400,43 @@ export default class Parser {
 
         // Parse and return a header if it starts with a hash
         if(this.nextIs("#"))
-            return this.parseHeader(parent);
+            return this.parseHeader();
         // Parse and return a horizontal rule if it starts with a dash
         else if(this.nextIs("-"))
-            return this.parseRule(parent);
+            return this.parseRule();
         // Parse and return an embed if it starts with a bar
         else if(this.nextIs("|"))
-            return this.parseEmbed(parent);
+            return this.parseEmbed();
         // Parse and return a bulleted or numbered list
         else if(this.nextMatches(bulletRE) || this.nextMatches(numberedRE))
-            return this.parseList(parent);
+            return this.parseList();
         // Parse and return a code block if it starts with `, some optional letters or a !, some whitespace, and a newline
         else if(this.nextMatches(/^`[a-zA-Z!]*[ \t]*\n/))
-            return this.parseCode(parent);
+            return this.parseCode();
         // Parse and return a quote block if it starts with "
         else if(this.nextMatches(/^"[ \t]*\n/))
-            return this.parseQuote(parent);
+            return this.parseQuote();
         // Parse and return a callout if the line starts with =
         else if(this.nextMatches(/^=[ \t]*\n/))
-            return this.parseCallout(parent);
+            return this.parseCallout();
         // Parse and return a table if the line starts with a ,
         else if(this.nextIs(","))
-            return this.parseTable(parent);
+            return this.parseTable();
         // Parse the text as paragraph;
         else
-            return this.parseParagraph(parent);
+            return this.parseParagraph();
 
     }
 
-    parseParagraph(parent: BlockParentNode): ParagraphNode {
+    parseParagraph(): ParagraphNode {
 
-        const paragraph = new ParagraphNode(parent)
-        paragraph.setContent(this.parseContent(paragraph))
+        const paragraph = new ParagraphNode()
+        paragraph.withContent(this.parseContent())
         return paragraph;
 
     }
 
-    parseHeader(parent: BlockParentNode): ParagraphNode {
+    parseHeader(): ParagraphNode {
 
         // Read a sequence of hashes
         let count = 0;
@@ -461,29 +449,29 @@ export default class Parser {
         this.readWhitespace();
 
         // Parse some content.
-        let header = new ParagraphNode(parent, Math.min(3, count));
-        header.setContent(this.parseContent(header));
+        let header = new ParagraphNode(Math.min(3, count));
+        header.withContent(this.parseContent());
         
         // Return a header node.
         return header;
 
     }
     
-    parseRule(parent: ChapterNode | CalloutNode | QuoteNode): RuleNode {
+    parseRule(): RuleNode {
 
         // Read until the end of the line. Ignore all text that follows.
         this.readUntilNewLine();
 
-        return new RuleNode(parent);
+        return new RuleNode();
 
     }
 
-    parseList(parent: ListParentType): ListNode {
+    parseList(): ListNode {
 
         let numbered = this.nextMatches(numberedRE);
 
         const items: (FormatNode | ListNode)[] = [];
-        const list = new ListNode(parent, items, numbered);
+        const list = new ListNode(items, numbered);
         let lastLevel = undefined;
         let currentLevel = undefined;
 
@@ -524,7 +512,7 @@ export default class Parser {
                 // Read the whitespace after the bullet.
                 this.readWhitespace();
                 // Parse content after the bullet.
-                items.push(this.parseContent(list));
+                items.push(this.parseContent());
             }
             // Otherwise, unread the stars, then either stop parsing or parse nested list.
             else {
@@ -550,7 +538,7 @@ export default class Parser {
                     break;
                 // Otherwise, it's greater, and we should read another list.
                 else {
-                    items.push(this.parseList(list));
+                    items.push(this.parseList());
                     // Reset the current level to the last level, so we expect another bullet at the same level.
                     currentLevel = lastLevel;
                 }
@@ -571,7 +559,7 @@ export default class Parser {
 
     }
 
-    parseCode(parent: BlockParentNode): CodeNode {
+    parseCode(): CodeNode {
 
         // Parse the back tick
         this.read();
@@ -604,13 +592,11 @@ export default class Parser {
 
         let position = this.parsePosition();
 
-        const node = new CodeNode(parent, code, language, position)
-
         // Read the caption. Note that parsing inline content stops at a newline, 
         // so if there's a line break after the last row, there won't be a caption.
-        node.setCaption(this.parseContent(node));
+        const caption = this.parseContent();
 
-        return node;
+        return new CodeNode(code, language, position, caption);
 
     }
 
@@ -631,10 +617,9 @@ export default class Parser {
 
     }
 
-    parseQuote(parent: BlockParentNode): QuoteNode {
+    parseQuote(): QuoteNode {
 
-        const blocks: BlockNode[] = [];
-        const quote = new QuoteNode(parent, blocks)
+        const blocks: BlockNode<BlockParentNode>[] = [];
 
         // Parse the ", then any whitespace, then the newline
         this.read();
@@ -647,7 +632,7 @@ export default class Parser {
 
         while(this.more() && !this.nextIs("\"")) {
             // Read a block
-            const block = this.parseBlock(quote);
+            const block = this.parseBlock();
             // Add it to the list if we parsed something.
             if(block !== null)
                 blocks.push(block);
@@ -660,22 +645,21 @@ export default class Parser {
         this.read();
 
         // Is there a position indicator?
-        quote.setPosition(this.parsePosition());
+        const position = this.parsePosition();
         
         // Read any whitespace after the position indicator.
         this.readWhitespace();
 
         // Read the credit.
-        quote.setCredit(this.nextIs("\n") ? undefined : this.parseContent(quote))
+        const credit = this.nextIs("\n") ? undefined : this.parseContent();
 
-        return quote;
+        return new QuoteNode(blocks, credit, position);
 
     }
 
-    parseCallout(parent: BlockParentNode): CalloutNode {
+    parseCallout(): CalloutNode {
 
-        const blocks: BlockNode[] = [];
-        const callout = new CalloutNode(parent, blocks)
+        const blocks: BlockNode<BlockParentNode>[] = [];
 
         // Parse the = ...
         this.read();
@@ -689,7 +673,7 @@ export default class Parser {
         // Then, read until we find a closing _
         while(this.more() && !this.nextIs("=")) {
             // Read a block
-            const block = this.parseBlock(callout);
+            const block = this.parseBlock();
             // Add it to the list if we parsed something.
             if(block !== null)
                 blocks.push(block);
@@ -702,19 +686,20 @@ export default class Parser {
         this.read();
 
         // Is there a position indicator?
-        callout.setPosition(this.parsePosition());
+        const position = this.parsePosition();
         
         // Read whitespace that follows.
         this.readWhitespace();
 
-        return callout;
+        return new CalloutNode(blocks, position);
+        ;
 
     }
 
-    parseTable(parent: BlockParentNode): TableNode {
+    parseTable(): TableNode {
 
         const rows: FormatNode[][] = [];
-        const table = new TableNode(parent, rows)
+
         // Parse rows until the lines stop starting with ,
         while(this.more() && this.nextIs(",")) {
 
@@ -729,7 +714,7 @@ export default class Parser {
                 this.readWhitespace();
 
                 // Read content until reaching another | or the end of the line.
-                row.push(this.parseContent(table, "|"));
+                row.push(this.parseContent("|"));
 
             }
 
@@ -742,22 +727,23 @@ export default class Parser {
         }
 
         // Read the position indicator if there is one.        
-        table.setPosition(this.parsePosition());
+        const position = this.parsePosition();
 
         // Read the caption. Note that parsing inline content stops at a newline, 
         // so if there's a line break after the last row, there won't be a caption.
-        table.setCaption(this.parseContent(table));
+        const caption = this.parseContent(undefined);
 
-        return table;
+        // Return the new table.
+        return new TableNode(rows, position, caption);
 
     }
 
     // The "awaiting" argument keeps track of upstream formatting. We don't need a stack here
     // because we don't allow infinite nesting of the same formatting type.
-    parseContent(parent: FormatNodeParent | undefined, awaiting?: string): FormatNode {
+    parseContent(awaiting?: string): FormatNode {
 
         const segments: FormatNodeSegmentType[] = [];
-        const content = new FormatNode(parent, "", segments);
+        const content = new FormatNode("", segments);
 
         // Read until hitting a delimiter.
         while(this.more() && !this.nextIs("\n")) {
@@ -767,32 +753,32 @@ export default class Parser {
 
             // Parse some formatted text
             if(next === "_" || next === "*")
-                segments.push(this.parseFormat(content, next));
+                segments.push(this.parseFormat(next));
             // Parse unformatted text
             else if(this.nextIs("`")) {
-                segments.push(this.parseInlineCode(content));
+                segments.push(this.parseInlineCode());
             }
             // Parse a citation list
             else if(this.nextIs("<"))
-                segments.push(this.parseCitations(content));
+                segments.push(this.parseCitations());
             // Parse sub/super scripts
             else if(this.nextIs("^"))
-                segments.push(this.parseSubSuperscripts(content));
+                segments.push(this.parseSubSuperscripts());
             // Parse a footnote
             else if(this.nextIs("{"))
-                segments.push(this.parseFootnote(content));
+                segments.push(this.parseFootnote());
             // Parse a definition
             else if(this.nextIs("~"))
-                segments.push(this.parseDefinition(content));
+                segments.push(this.parseDefinition());
             // Parse an escaped character
             else if(this.nextIs("\\"))
-                segments.push(this.parseEscaped(content));
+                segments.push(this.parseEscaped());
             // Parse a link
             else if(this.nextIs("["))
-               segments.push(this.parseLink(content));
+               segments.push(this.parseLink());
             // Parse inline comments
             else if(this.charBeforeNext() === " " && this.nextIs("%"))
-                segments.push(this.parseComment(content));
+                segments.push(this.parseComment());
             // Parse an unresolved symbol
             else if(next === "@") {
                 // Read the @, then the symbol name.
@@ -804,7 +790,7 @@ export default class Parser {
                     symbol = symbol + this.read();
                     next = this.peek();
                 }
-                segments.push(new ErrorNode(content, undefined, "Couldn't find symbol @" + symbol));
+                segments.push(new ErrorNode(undefined, "Couldn't find symbol @" + symbol));
 
             }
             // Parse a label
@@ -816,7 +802,7 @@ export default class Parser {
                 let text = "";
                 while(this.more() && (!awaiting || !this.nextIs(awaiting)) && !this.nextIsContentDelimiter() && !this.nextIs("\n"))
                     text = text + this.read();
-                segments.push(new TextNode(content, text));
+                segments.push(new TextNode(text));
             }
 
             // If we've reached a delimiter we're waiting for, then stop parsing, so it can handle it. Otherwise, we'll keep reading.
@@ -829,7 +815,7 @@ export default class Parser {
 
     }
 
-    parseEmbed(parent: BlockParentNode | undefined): EmbedNode | ErrorNode {
+    parseEmbed(): EmbedNode | ErrorNode {
 
         // Read |
         this.read();
@@ -838,7 +824,7 @@ export default class Parser {
         const url = this.readUntilNewlineOr("|");
 
         if(this.peek() !== "|")
-            return new ErrorNode(parent, this.readUntilNewLine(), "Missing '|' after URL in embed");
+            return new ErrorNode(this.readUntilNewLine(), "Missing '|' after URL in embed");
 
         // Read a |
         this.read();
@@ -847,54 +833,50 @@ export default class Parser {
         const description = this.readUntilNewlineOr("|");
 
         if(this.peek() !== "|")
-            return new ErrorNode(parent, this.readUntilNewLine(), "Missing '|' after description in embed");
+            return new ErrorNode(this.readUntilNewLine(), "Missing '|' after description in embed");
         
-        const embed = new EmbedNode(parent, url, description);
-
         // Read a |
         this.read();
 
         // Parse the caption
-        embed.setCaption(this.parseContent(embed, "|"));
+        const caption = this.parseContent("|");
 
         if(this.peek() !== "|")
-            return new ErrorNode(embed, this.readUntilNewLine(), "Missing '|' after caption in embed");
+            return new ErrorNode(this.readUntilNewLine(), "Missing '|' after caption in embed");
         
         // Read a |
         this.read();
 
         // Parse the credit
-        embed.setCredit(this.parseContent(embed, "|"));
+        const credit = this.parseContent("|");
         
         // Check for the closing delimeter
         if(this.peek() !== "|")
-            return new ErrorNode(parent, this.readUntilNewLine(), "Missing '|' after credit in embed.");
+            return new ErrorNode(this.readUntilNewLine(), "Missing '|' after credit in embed.");
 
         // Read a |
         this.read();
 
         // Is there a position indicator?
-        embed.setPosition(this.parsePosition());
+        const position = this.parsePosition();
 
-        return embed;
+        return new EmbedNode(url, description, caption, credit, position);
 
     }
 
-    parseComment(parent: FormatNode): CommentNode {
+    parseComment(): CommentNode {
 
         // Consume the opening %
         this.read();
 
-        const comment = new CommentNode(parent, new FormatNode(undefined, "", []));
-
         // Consume everything until the next %.
-        comment.setMeta(this.parseContent(comment, "%"));
+        const comment = this.parseContent("%");
 
         // Consume the closing %, if we didn't reach the end of input or a newline.
         if(this.peek() === "%")
             this.read();
 
-        return comment;
+        return new CommentNode(comment);
 
     }
 
@@ -911,11 +893,11 @@ export default class Parser {
             next = this.peek();
         }
 
-        return new LabelNode(parent, id);
+        return new LabelNode(id);
 
     }
 
-    parseFormat(parent: FormatNode, awaiting: string): FormatNode | ErrorNode {
+    parseFormat(awaiting: string): FormatNode | ErrorNode {
 
         // Remember what we're matching.
         const delimeter = this.read();
@@ -923,9 +905,9 @@ export default class Parser {
         let text = "";
 
         if(delimeter === null)
-            return new ErrorNode(parent, undefined, "Somehow parsing formatted text at end of file.");
+            return new ErrorNode(undefined, "Somehow parsing formatted text at end of file.");
 
-        const node = new FormatNode(parent, delimeter as Format, segments)
+        const node = new FormatNode(delimeter as Format, segments)
 
         // Read some content until reaching the delimiter or the end of the line
         while(this.more() && this.peek() !== delimeter && !this.nextIs("\n")) {
@@ -934,9 +916,9 @@ export default class Parser {
             if(this.nextIsContentDelimiter()) {
                 // If the text is a non-empty string, make a text node with what we've accumulated.
                 if(text !== "")
-                    segments.push(new TextNode(node, text));
+                    segments.push(new TextNode(text));
                 // Parse the formatted content.
-                segments.push(this.parseContent(node, awaiting));
+                segments.push(this.parseContent(awaiting));
                 // Reset the accumulator.
                 text = "";
             }
@@ -948,20 +930,20 @@ export default class Parser {
 
         // If there's more text, save it!
         if(text !== "")
-            segments.push(new TextNode(node, text));
+            segments.push(new TextNode(text));
 
         // Read the closing delimeter
         if(this.nextIs(delimeter))
             this.read();
         // If it wasn't closed, add an error
         else
-            segments.push(new ErrorNode(node, undefined, "Unclosed " + delimeter));
+            segments.push(new ErrorNode(undefined, "Unclosed " + delimeter));
         
         return node;
 
     }
 
-    parseInlineCode(parent: FormatNode): InlineCodeNode {
+    parseInlineCode(): InlineCodeNode {
 
         // Parse the back tick
         this.read();
@@ -994,11 +976,11 @@ export default class Parser {
         } else
             language = "plaintext"
 
-        return new InlineCodeNode(parent, code, language);
+        return new InlineCodeNode(code, language);
         
     }
 
-    parseCitations(parent: FormatNode): CitationsNode {
+    parseCitations(): CitationsNode {
         
         let citations = "";
 
@@ -1012,11 +994,11 @@ export default class Parser {
         // Trim any whitespace, then split by commas, then remove any empty IDs.
         const citationList = citations.split(",").map(citation => citation.trim()).filter(citationID => citationID.length > 0);
 
-        return new CitationsNode(parent, citationList);
+        return new CitationsNode(citationList);
 
     }
 
-    parseSubSuperscripts(parent: FormatNode): FormatNode {
+    parseSubSuperscripts(): FormatNode {
         
         // Read the ^
         this.read();
@@ -1030,10 +1012,10 @@ export default class Parser {
             superscript = false;
         }
 
-        const node = new FormatNode(parent, superscript ? "^" : "v", []);
+        const node = new FormatNode(superscript ? "^" : "v", []);
 
         // Parse the content
-        node.addSegment(this.parseContent(node, "^"));
+        node.withSegmentAppended(this.parseContent("^"));
 
         // Read the closing ^
         this.read();
@@ -1042,36 +1024,28 @@ export default class Parser {
 
     }
 
-    parseFootnote(parent: FormatNode): FootnoteNode {
-
-        let node = new FootnoteNode(parent);
+    parseFootnote(): FootnoteNode {
 
         // Read the {
         this.read();
 
         // Read the footnote content.
-        const footnote = this.parseContent(node, "}");
-        node.setMeta(footnote);
+        const footnote = this.parseContent("}");
 
         // Read the closing }
         this.read();
 
-        return node;
+        return new FootnoteNode(footnote);
 
     }
 
-    parseDefinition(parent: FormatNode): DefinitionNode {
-
-        const node = new DefinitionNode(parent);
+    parseDefinition(): DefinitionNode {
 
         // Read the ~
         this.read();
         
         // Read the phrase
         const text = this.readUntilNewlineOr("~");
-
-        // Set it.
-        node.setText(text);
 
         // Read the closing ~
         this.read();
@@ -1085,25 +1059,23 @@ export default class Parser {
             next = this.peek();
         }
 
-        node.setMeta(glossaryID);
-
-        return node;
+        return new DefinitionNode(text, glossaryID);
 
     }
 
-    parseEscaped(chapter: FormatNode): TextNode | ErrorNode {
+    parseEscaped(): TextNode | ErrorNode {
 
         // Skip the scape and just add the next character.
         this.read();
         const char = this.read();
         if(char)
-            return new TextNode(chapter, char);
+            return new TextNode(char);
 
-        return new ErrorNode(chapter, undefined, "Unterminated escape.");
+        return new ErrorNode(undefined, "Unterminated escape.");
 
     }
     
-    parseLink(parent: FormatNode): LinkNode | ErrorNode {
+    parseLink(): LinkNode | ErrorNode {
  
         // Read the [
         this.read();
@@ -1114,7 +1086,7 @@ export default class Parser {
         // Catch missing bars
         if(this.peek() !== "|") {
             this.readUntilNewLine();
-            return new ErrorNode(parent, undefined, "Missing '|' in link");
+            return new ErrorNode(undefined, "Missing '|' in link");
         }
 
         // Read the |
@@ -1126,13 +1098,13 @@ export default class Parser {
         // Catch missing closing
         if(this.peek() !== "]") {
             this.readUntilNewLine();
-            return new ErrorNode(parent, undefined, "Missing ] in link");
+            return new ErrorNode(undefined, "Missing ] in link");
         }
 
         // Read the ]
         this.read();
 
-        return new LinkNode(parent, text, url);
+        return new LinkNode(text, url);
 
     }
 

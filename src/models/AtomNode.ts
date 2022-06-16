@@ -3,104 +3,64 @@ import { Caret } from "./Caret";
 import { FormatNode } from "./FormatNode";
 import { Node } from "./Node";
 import { ParagraphNode } from "./ParagraphNode";
-import { NodeType } from "./NodeType";
 import { TextNode } from "./TextNode";
 
-
 export abstract class AtomNode<MetadataType> extends Node<FormatNode> {    
-    #meta: MetadataType;
+    
+    readonly #meta: MetadataType;
 
-    constructor(parent: FormatNode, meta: MetadataType, type: NodeType) {
-        super(parent, type);
+    constructor(meta: MetadataType) {
+        super();
         this.#meta = meta;
     }
 
     getMeta() { return this.#meta; }
-    setMeta(meta: MetadataType) { this.#meta = meta; this.getChapter()?.changed(); }
+
+    abstract getDefaultCaret(): Caret;
 
     traverseChildren(fn: (node: Node) => void): void {}
-    removeChild(node: Node<Node<any>>): void {}
-    replaceChild(node: Node<Node<any>>, replacement: Node<Node<any>>): void {}
-    getSiblingOf(child: Node<Node<any>>, next: boolean): Node<Node<any>> | undefined { return undefined; }
-    clean(): void {}
 
-    getRoot(): FormatNode | ChapterNode | undefined {
-        const format = this.getFarthestParentMatching(p => p instanceof FormatNode) as FormatNode;
-        const chapter = this.getFarthestParentMatching(p => p instanceof ChapterNode) as ChapterNode;
+    getRoot(root: Node): FormatNode | ChapterNode | undefined {
+        const format = this.getFarthestParentMatching(root, p => p instanceof FormatNode) as FormatNode;
+        const chapter = this.getFarthestParentMatching(root, p => p instanceof ChapterNode) as ChapterNode;
         return chapter ? chapter : format ? format : undefined;
     }
 
-    nextWord(index?: number): Caret {
-        const next = this.getRoot()?.getNextTextOrAtom(this);
+    nextWord(root: Node, index?: number): Caret {
+        const next = this.getRoot(root)?.getNextTextOrAtom(this);
         return next ?
             { node: next, index: 0 } :
             { node: this, index: 0 };
     }
 
-    previousWord(index?: number): Caret {
-        const previous = this.getRoot()?.getPreviousTextOrAtom(this);
+    previousWord(root: Node, index?: number): Caret {
+        const previous = this.getRoot(root)?.getPreviousTextOrAtom(this);
         return previous ?
             { node: previous, index: previous instanceof TextNode ? previous.getLength() : 0 } :
             { node: this, index: 0 };
     }
 
-    deleteForward(): Caret {
-        const root = this.getRoot();
-        const next = root?.getNextTextOrAtom(this);
-        const previous = root?.getNextTextOrAtom(this);
-
-        if(next) {
-            this.remove();
-            return { node: next, index: 0 };
-        }
-        if(previous) {
-            this.remove();
-            return { node: previous, index: previous instanceof TextNode ? previous.getLength() : 0 };
-        }
-
-        // All alone, don't do anything.
-        return { node: this, index: 0 };
-            
+    next(root: Node, index: number): Caret {
+        return this.nextWord(root);
     }
 
-    deleteBackward(): Caret {
-        const root = this.getRoot();
-        const next = root?.getPreviousTextOrAtom(this);
-        const previous = root?.getPreviousTextOrAtom(this);
-
-        if(previous) {
-            this.remove();
-            return { node: previous, index: previous instanceof TextNode ? previous.getLength() : 0 };
-        }
-        if(next) {
-            this.remove();
-            return { node: next, index: 0 };
-        }
-
-        // All alone, don't do anything.
-        return { node: this, index: 0 };
+    previous(root: Node, index: number): Caret {
+        return this.previousWord(root);
     }
 
-    next(index: number): Caret {
-        return this.nextWord();
+    getParagraph(root: Node): ParagraphNode | undefined {
+        return this.getClosestParentMatching(root, p => p instanceof ParagraphNode) as ParagraphNode;
     }
 
-    previous(index: number): Caret {
-        return this.previousWord();
-    }
-
-    getParagraph(): ParagraphNode | undefined {
-        return this.getClosestParentMatching(p => p instanceof ParagraphNode) as ParagraphNode;
-    }
-
-    getFormatRoot(): FormatNode | undefined {
-        return this.getFarthestParentMatching(p => p instanceof FormatNode) as FormatNode;
+    getFormatRoot(root: Node): FormatNode | undefined {
+        return this.getFarthestParentMatching(root, p => p instanceof FormatNode) as FormatNode;
     }
 
     getLength() { return 1; }
 
-    abstract toBookdown(debug?: number): string;
+    abstract toBookdown(parent: FormatNode, debug?: number): string;
     abstract toText(): string;
-    abstract copy(parent: FormatNode): AtomNode<any>;
+    abstract copy(): AtomNode<MetadataType>;
+    abstract withMeta(meta: MetadataType): AtomNode<MetadataType>;
 
 }

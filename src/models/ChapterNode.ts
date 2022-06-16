@@ -1,6 +1,5 @@
 import { Bookkeeping } from "./Parser";
 import { BlockNode } from "./BlockNode";
-import { BlockParentNode } from "./BlockParentNode";
 import { ErrorNode } from "./ErrorNode";
 import { TextNode } from "./TextNode";
 import { FootnoteNode } from "./FootnoteNode";
@@ -15,67 +14,31 @@ import { LabelNode } from "./LabelNode";
 import { CommentNode } from "./CommentNode";
 import { BlocksNode } from "./BlocksNode";
 import { Caret, CaretRange, TextRange } from "./Caret";
+import { Edit } from "../views/editor/Commands";
+import { BlockParentNode } from "./BlockParentNode";
 
-export class ChapterNode extends BlocksNode {
+export class ChapterNode extends BlocksNode<BlockParentNode> {
 
     #metadata: Bookkeeping;
-    index: Map<number, Node>;
-    nextID: number;
-    listeners: ((chapter: ChapterNode) => void)[];
 
-    constructor(blocks: BlockNode[], metadata: Bookkeeping) {
-        super(undefined, blocks, "chapter");
+    constructor(blocks: BlockNode<BlockParentNode>[], metadata: Bookkeeping) {
+        super(blocks);
 
         // Content extracted during parsing.
         this.#metadata = metadata;
 
-        // Start the node index empty
-        this.index = new Map();
-
-        // Start next ID at 0
-        this.nextID = 0;
-
-        this.listeners = [];
-
-        // Set the ID since super can't
-        this.indexNode(this);
-
     }
 
-    getChapter() {
-        return this;
+    getType() { return "chapter"; }
+    getFormats(): FormatNode[] { return []; }
+ 
+    getChapter() { return this; }
+
+    create(blocks: BlockNode<BlockParentNode>[]): BlocksNode<any> {
+        return new ChapterNode(blocks, this.#metadata);
     }
 
-    getBlocks() { return this.blocks; }
-
-    subscribe(listener: (chapter: ChapterNode) => void) {
-        this.listeners.push(listener);
-    }
-
-    unsubscribe(listener: (chapter: ChapterNode) => void) {
-        const index = this.listeners.indexOf(listener);
-        if(index >= 0)
-            this.listeners.splice(index, 1);
-    }
-
-    // Nodes use this to notify this chapter that they changed.
-    // Yuck, what a mutable mess.
-    changed() {
-        this.listeners.forEach(listener => listener.call(undefined, this));
-    }
-
-    indexNode(node: Node) {
-        this.index.set(this.nextID, node);
-        node.setID(this.nextID);
-        this.nextID++;
-    }
-
-    unindexNode(node: Node) {
-        if(node.nodeID)
-            this.index.delete(node.nodeID)
-    }
-
-    getNode(id: number) { return this.index.get(id); }
+    getNode(id: number) { return this.getNodes().filter(n => n.getID() === id); }
 
     getErrors(): ErrorNode[] { return this.getNodes().filter(n => n instanceof ErrorNode) as ErrorNode[]; }
     getCitations(): Set<string> { 
@@ -105,10 +68,10 @@ export class ChapterNode extends BlocksNode {
         return this.blocks.map(block => block.toText()).join(" ");
     }
 
-    toBookdown(debug?: number): string {
+    toBookdown(parent?: BlockParentNode, debug?: number): string {
         // Render the symbols then all the blocks
         return Object.keys(this.#metadata.symbols).sort().map(name => `@${name}: ${this.#metadata.symbols[name]}\n\n`).join("") +
-            this.blocks.map(b => b.toBookdown(debug)).join("\n\n");
+            this.blocks.map(b => b.toBookdown(this, debug)).join("\n\n");
     }
 
     getTextNodes(): TextNode[] {
@@ -130,7 +93,7 @@ export class ChapterNode extends BlocksNode {
 
     // Convert node and index into text index by converting to Bookdown and then finding the index of the node.
     caretToTextIndex(caret: Caret): number {
-        const debug = this.toBookdown(caret.node.nodeID);
+        const debug = this.toBookdown(undefined, caret.node.nodeID);
         const index = debug.indexOf("%debug%");
         return index + caret.index;
     }
@@ -152,14 +115,14 @@ export class ChapterNode extends BlocksNode {
 
         // Find the first node whose index contains the given text index.
         const match = allNodes.find(node => {
-            const debug = this.toBookdown(node.nodeID);
+            const debug = this.toBookdown(undefined, node.nodeID);
             const index = debug.indexOf("%debug%");
             return textIndex >= index && textIndex <= index + node.getLength();
         });
 
         // If we found match, return a corresponding caret.
         if(match) {
-            const debug = this.toBookdown(match.nodeID);
+            const debug = this.toBookdown(undefined, match.nodeID);
             const index = debug.indexOf("%debug%");
             return { node: match, index: textIndex - index };
         }
@@ -197,53 +160,52 @@ export class ChapterNode extends BlocksNode {
     }
 
     traverseChildren(fn: (node: Node) => void): void {
-        this.blocks.forEach(item => item.traverse(fn) )
+        this.blocks.forEach(item => item.traverse(fn));
     }
 
-    removeChild(node: Node): void {
-        this.blocks = this.blocks.filter(item => item !== node);
+    withChildReplaced(node: Node, replacement: Node | undefined) {
+
+        if(!(node instanceof BlockNode) || !(replacement instanceof BlockNode)) return;
+        const index = this.blocks.indexOf(node);
+
+        /// If we couldn't find the requested node, don't change anything.
+        if(index < 0)
+            return undefined;
+
+        // Make a new callout, assigning and re-parenting the replacement.
+        const blocks = replacement === undefined ?
+            [ ...this.blocks.slice(0, index), ...this.blocks.slice(index + 1)] :
+            [ ...this.blocks.slice(0, index), replacement, ...this.blocks.slice(index + 1) ];
+
+        return new ChapterNode(blocks, this.#metadata);
+
     }
 
-    replaceChild(node: Node, replacement: BlockNode): void {
-        const index = this.blocks.indexOf(node as BlockNode);
-        if(index < 0) return;
-        this.blocks[index] = replacement;
+    copy(): ChapterNode {
+        return new ChapterNode(this.blocks.map(b => b.copy()), this.#metadata);
     }
 
-    copy(parent?: Node): ChapterNode {
-        const blocks: BlockNode[] = [];
-        const chap = new ChapterNode(blocks, this.#metadata);
-        this.blocks.forEach(b => blocks.push(b.copy(chap) as BlockNode));
-        return chap;
-    }
+    insertSelection(char: string, range: CaretRange): Edit {
 
-    clean() {
-        // Clean all the nodes.
-        this.getNodes().forEach(n => n !== this ? n.clean() : undefined);
-    }
+        if(!(range.start.node instanceof TextNode))
+            return;
 
-    getSiblingOf(child: Node, next: boolean) {
-        return this.blocks[this.blocks.indexOf(child as BlockNode) + (next ? 1 : -1)];
-    }
+        // Insert at the start.
+        let insertionPoint = range.start;
 
-    insertSelection(char: string, range: CaretRange): Caret {
+        // If there's a selection, remove it before inserting, and insert at the caret returned.
+        if (range.start.node !== range.end.node || range.start.index !== range.end.index) {
+            // Try to remove the range.
+            let edit = this.removeRange(range);
+            // If we fail, fail to insert at the selection.
+            if(edit === undefined)
+                return;
+            insertionPoint = edit.range.start;
+        }
 
-        if(range.start.node instanceof TextNode) {        
- 
-            let caret = range.start;
-
-            // If there's a selection, remove it before inserting.
-            if (range.start.node !== range.end.node || range.start.index !== range.end.index)
-                caret = this.removeRange(range);
-
-            // Insert at the start position.
-            if(caret.node instanceof TextNode)
-                return caret.node.insert(char, caret.index);
-            else
-                return caret;
-
-        } else
-            return range.start;
+        // Insert at the start position.
+        if(insertionPoint.node instanceof TextNode)
+            return insertionPoint.node.withCharacterInserted(this, char, insertionPoint.index);
 
     }
 
@@ -270,37 +232,51 @@ export class ChapterNode extends BlocksNode {
         
     }
 
-    insertNodeAtSelection(range: CaretRange, nodeCreator: (parent: FormatNode, text: string) => FormatNodeSegmentType): Caret {
+    insertNodeAtSelection(range: CaretRange, nodeCreator: (text: string) => FormatNodeSegmentType): Edit | undefined {
 
+        let root: Node = this;
         let caret = range.start;
 
         // Only works at a text node.
-        if(!(caret.node instanceof TextNode))
-            return caret;
+        if(!(caret.node instanceof TextNode)) return;
 
         // Get the nearest FormatNode parent of the selected text.
-        const formatted = caret.node.getClosestParentMatching(p => p instanceof FormatNode) as FormatNode;
+        const formatted = caret.node.closestParent<FormatNode>(this, FormatNode);
 
         // Can't do anything if it's not in a formatted node.
-        if(formatted === undefined)
-            return caret;
+        if(formatted === undefined) return;
     
-        // If there's a selection, grab it's text and then remove the text.
+        // If there's a selection, grab it's text and then remove the text and update the root and text being edited.
         let selectedText = this.getSelectedText(range);
-        if (range.start.node !== range.end.node || range.start.index !== range.end.index)
-            caret = this.removeRange(range);
+        if (range.start.node !== range.end.node || range.start.index !== range.end.index) {
+            const edit = this.removeRange(range);
+            // Uh oh, fail.
+            if(edit === undefined) return;
+            root = edit.root;
+            caret = edit.range.start;
+        }
 
         // Get the nearest FormatNode parent of the revised text.
-        const newFormatted = caret.node.getClosestParentMatching(p => p instanceof FormatNode) as FormatNode;
+        const newFormatted = caret.node.closestParent<FormatNode>(this, FormatNode);
+        if(newFormatted === undefined) return;
 
         // Create and insert the into the formatted node.
-        const newCaret = newFormatted.insertSegmentAt(nodeCreator.call(undefined, newFormatted, selectedText ? selectedText : ""), caret);
+        const newNode = nodeCreator.call(undefined, selectedText ? selectedText : "");
+        const revisedFormat = newFormatted.insertSegmentAt(newNode, caret);
+        if(revisedFormat === undefined) return;
+        const newCaret = 
+            newNode instanceof AtomNode ? newNode.getDefaultCaret() :
+            newNode instanceof FormatNode ? newNode.getFirstCaret() :
+            newNode instanceof MetadataNode ? newNode.getMeta().getFirstCaret() :
+            { node: newNode, index: 0 };
 
-        if(newCaret === undefined)
-            throw Error("Couldn't insert node at selection for some reason.");
+        const newFormattedParent = root.getParentOf(newFormatted);
+        if(newFormattedParent === undefined) return;
+        const newRoot = newFormattedParent.rootWithChildReplaced(root, newFormatted, revisedFormat);
+        if(newRoot === undefined) return undefined;
 
-        // If there was a problem, just return the caret resulting from removing the text.
-        return newCaret;
+        // Return the edited tree.
+        return { root: newRoot, range: { start: newCaret, end: newCaret } };
 
     }
 
@@ -311,7 +287,7 @@ export class ChapterNode extends BlocksNode {
         const end = range.end.node;
 
         // Find the common ancestor of the two nodes.
-        const ancestor = start.getCommonAncestor(end);
+        const ancestor = start.getCommonAncestor(this, end);
 
         if(ancestor === undefined)
             return range;
@@ -323,9 +299,9 @@ export class ChapterNode extends BlocksNode {
         // Defensively verify that we could find the given nodes in the document.
         // If we can't, something is wrong upstream.
         if(startIndex === undefined)
-            throw Error(`Could not find ${start.toBookdown()} in common ancestor.`);
+            throw Error(`Could not find ${start.toBookdown(undefined)} in common ancestor.`);
         if(endIndex === undefined)
-            throw Error(`Could not find ${end.toBookdown()} in common ancestor.`);
+            throw Error(`Could not find ${end.toBookdown(undefined)} in common ancestor.`);
 
         // If we didn't find them, or the start is before the end, return the given range.
         return startIndex === undefined || endIndex === undefined || startIndex < endIndex ? 
@@ -347,21 +323,41 @@ export class ChapterNode extends BlocksNode {
 
     }
 
-    splitSelection(range: CaretRange): Caret {
+    splitSelection(range: CaretRange): Edit {
 
         let caret = range.start;
 
         // If there's a selection, remove it before inserting.
-        if (range.start.node !== range.end.node || range.start.index !== range.end.index)
-            caret = this.removeRange(range);
+        if (range.start.node !== range.end.node || range.start.index !== range.end.index) {
+            const edit = this.removeRange(range);
+            if(edit === undefined) return;
+            caret = edit.range.start;
+        }
     
-        // Find what paragraph it's in.
-        let paragraph = caret.node.closestParent<ParagraphNode>(ParagraphNode);
-        
+        // Find what paragraph the caret is in.
         // There are some contexts with no paragraphs. Return the start range given.
-        if(paragraph === undefined) return range.start;
+        const paragraph = caret.node.closestParent<ParagraphNode>(this, ParagraphNode);        
+        if(paragraph === undefined) return;
 
-        return paragraph.split(caret);
+        // Find the block the paragraph is in.
+        const blocks = paragraph.closestParent<BlocksNode<any>>(this, BlocksNode);
+        if(blocks === undefined) return;
+
+        // Split the paragraph in two.
+        const split = paragraph.split(caret);
+        if(split === undefined) return;
+        const [ first, last, newCaret ] = split;
+
+        const newBlocks = blocks
+            .withBlockInsertedBefore(paragraph, last)
+            ?.withBlockInsertedBefore(last, first)
+            ?.withoutBlock(paragraph);
+        if(newBlocks === undefined) return;
+
+        const newRoot = newBlocks.rootWithChildReplaced(this, blocks, newBlocks);
+        if(newRoot === undefined) return;
+
+        return { root: newRoot, range: { start: newCaret, end: newCaret }};
 
     }
 
@@ -371,7 +367,7 @@ export class ChapterNode extends BlocksNode {
         const redundant: Set<Node> = new Set<Node>()
         nodes.forEach(node1 => {
             nodes.forEach(node2 => {
-                if(node1 !== node2 && node1.hasAncestor(node2))
+                if(node1 !== node2 && node1.hasAncestor(this, node2))
                 nodes.add(node1)
             })
         })
@@ -381,122 +377,164 @@ export class ChapterNode extends BlocksNode {
         
     }
 
-    removeRange(range: CaretRange): Caret {
-        return this.editRange(range, undefined).start;
+    removeRange(range: CaretRange): Edit {
+        return this.editRange(range, undefined);
     }
 
-    editRange(range: CaretRange, format: Format | undefined): CaretRange {
+    removeAtom(atom: AtomNode<any>): Edit {
 
-        // If the range is an AtomNode and we're deleting, delete it.
-        if(format === undefined && (range.start.node instanceof AtomNode && range.end.node instanceof AtomNode)) {
-            let atom = range.start.node instanceof AtomNode ? range.start.node : range.end.node;
-            let newCaret = atom.previousWord();
-            if(newCaret.node === range.start.node)
-                newCaret = range.start.node.nextWord();
-            range.start.node.remove();
-            return { start: newCaret, end: newCaret };
-        }
+        // Find the format that contains the atom.
+        const format = atom.getFarthestParentMatching(this, p => p instanceof FormatNode) as FormatNode | undefined;
+        if(format === undefined) return;
+
+        // Find the text or atom node to the left and right of the atom to determine the new caret position.
+        const previous = format.getPreviousTextOrAtom(atom);
+        const next = format.getNextTextOrAtom(atom);
+        const newText = new TextNode("");
+
+        // If the format is otherwise empty, replace the atom with an empty text node
+        const newFormat = previous === undefined && next == undefined ?
+            format.withSegmentReplaced(atom, newText) :
+            format.withoutSegment(atom);
+
+        // New caret is left, or right, or empty text.
+        const newCaret = { node: previous ? previous : next ? next : newText, index: previous ? previous.getLength() : 0 };
+
+        // No format? Fail.
+        if(newFormat === undefined) return;
+
+        // Create a new chapter with the revised format.
+        const newRoot = format.replace(this, newFormat);
+        if(newRoot === undefined) return;
+
+        // Return the edited tree!
+        return { root: newRoot, range: { start: newCaret, end: newCaret }};
+
+    }
+
+    editRange(range: CaretRange, format: Format | undefined): Edit {
 
         // Only works on text nodes, atom nodes, and metadata nodes.
         if( !(range.start.node instanceof TextNode || range.start.node instanceof AtomNode) || 
             !(range.end.node instanceof TextNode || range.end.node instanceof AtomNode))
-            return range;
+            return;
+    
+        // Have we selected a single atom node for removal? Remove it and place the caret in the adjacent word.
+        if(format === undefined && (range.start.node instanceof AtomNode && range.end.node instanceof AtomNode && range.start.node === range.end.node))
+            return this.removeAtom(range.start.node);
 
         // Preserve the original range, since there are a few cases where we adjust it.
         let adjustedRange = range;
 
-        // If this a single point in format, and we're clearing formatting, just select the whole format.
+        // If this a single point in format, and we're clearing formatting, adjust the selection to the whole format.
         if(format === "" && range.start.node === range.end.node && range.start.index === range.end.index) {
-            const selection = range.start.node.getFormatRoot()?.getSelection();
-            if(selection)
-                adjustedRange = selection;
+            const selection = range.start.node.getFormatRoot(this)?.getSelection();
+            if(selection === undefined) return;
+            adjustedRange = selection;
         }
 
-        // Sort the range if it's out of order
+        // Remember the start and end text index.
+        const startTextIndex = this.caretToTextIndex(range.start);
+        const startEndIndex = this.caretToTextIndex(range.end);
+
+        // Sort the range if it's out of order, since the algorithm below assumes that it's ordered.
         const sortedRange = this.sortRange(adjustedRange);
 
-        // Find all of the format roots in the selection by finding the range's common ancestor,
-        // then finding all of the format roots between the start and end node, inclusive.
-        const commonAncestor = sortedRange.start.node.getCommonAncestor(sortedRange.end.node);
-        if(commonAncestor === undefined)
-            return range;
-        const formats: FormatNode[] = [];
+        // Find all of the block nodes between the start and end node, inclusive, in order, by looping
+        // through the nodes in the ancestor and identifying blocks. If there's no common ancestor, fail.
+        const commonAncestor = sortedRange.start.node.getCommonAncestor(this, sortedRange.end.node);
+        if(commonAncestor === undefined) return;
+
+        // Find all of the formatting roots included in the selection as well as any non-paragraph blocks so we can edit them.
+        // Start tracking when we hit the start node. Stop tracking when we hit the end node.
+        const blocksToEdit: BlockNode<BlockParentNode>[] = [];
         let insideSelection = false;
         commonAncestor.getNodes().forEach(node => {
-            if(node === sortedRange.start.node)
-                insideSelection = true;
-            const formatRoot = node instanceof TextNode ? node.getFormatRoot() : undefined;
-            if(insideSelection) {
-                // Remember the format root so we can format it below.
-                if(formatRoot)
-                    formats.push(formatRoot);
-                // If we encounter a block node in a BlocksNode between the selection and we're deleting, delete it.
-                if(commonAncestor instanceof BlocksNode && format === undefined && !(node instanceof ParagraphNode) && node.getParent() === commonAncestor) {
-                    node.remove();
-                }
-            }
-            if(insideSelection && node === sortedRange.end.node)
-                insideSelection = false;
+            if(node === sortedRange.start.node) insideSelection = true;
+            if(insideSelection && node instanceof BlockNode) blocksToEdit.push(node);
+            if(insideSelection && node === sortedRange.end.node) insideSelection = false;
         });
 
-        // Format each of the format roots as requested, accounting for the start and stop nodes.
-        const newRanges: CaretRange[] = [];
-        const first = formats.length > 0 ? formats[0] : undefined;
-        const last = formats.length > 0 ? formats[formats.length - 1] : undefined;
-        formats.forEach(root => {
-
-            if(root.getLength() > 0) {
-                // The start is either the beginning of the format root or the start node, if this contains the start node.
-                const start = (sortedRange.start.node as TextNode).getFormatRoot() === root ? sortedRange.start : { node: root.getFirstTextNode(), index: 0 };
-                // The end is either the end of the formatting root or the end node, if this contains the end node.
-                const end = (sortedRange.end.node as TextNode).getFormatRoot() === root ? sortedRange.end : { node: root.getLastTextNode(), index: root.getLastTextNode().getLength() };
-                // Format the range and save the revised range!
-                newRanges.push(root.editRange({ start: start, end: end }, format));
-
-                // If the format is empty and if it's not the first or last format, remove it (and implicitly it's parent, if it so desires.)
-                if(root.isEmptyTextNode() && root !== first && root !== last)
-                    root.remove();
+        // Edit each of the blocks as requested, accounting for the start and stop nodes, creating a new chapter as we go.
+        let newRoot: ChapterNode | undefined = this;
+        const newBlocks: BlockNode<BlockParentNode>[] = [];
+        for(let i = 0; i < blocksToEdit.length; i++ ) {
+            const block = blocksToEdit[i];
+            const parent = block.getParent(newRoot);
+            if(parent === undefined) return;
+            let newBlock: BlockNode<BlockParentNode> | undefined = block;
+            // Edit all of the formats in this block.
+            const formats = block.getFormats();
+            for(let j = 0; j < formats.length; j++) {
+                const formatToEdit = formats[j];
+                // The start is either the beginning of the paragraph or the start node, if this contains the start node.
+                const start = block.contains(sortedRange.start.node) ? sortedRange.start : { node: formatToEdit.getFirstTextNode(), index: 0 };
+                // The end is either the end of the paragraph or the end node, if this contains the end node.
+                const end = block.contains(sortedRange.end.node) ? sortedRange.end : { node: formatToEdit.getLastTextNode(), index: formatToEdit.getLastTextNode().getLength() };
+                // Format the range and replace it in this chapter! Bail on fail.
+                const editedFormat = formatToEdit.withFormat({ start: start, end: end }, format);
+                if(editedFormat === undefined) return;
+                // Create a new chapter tree with the new format, or if the new format is empty, without the paragraph altogether. Bail on fail.
+                newBlock = block.withChildReplaced(formatToEdit, editedFormat);
+                // Remember the new block we made.
+                if(newBlock !== undefined)
+                    newBlocks.push(newBlock);
             }
 
-        });
+            // If we're deleting, and it's not a paragraph, and there are more than two blocks, and we're deleting, replace the current block with nothing.
+            if(format === undefined && i > 0 && i < blocksToEdit.length - 1 && newBlock instanceof ParagraphNode && newBlock.getContent().isEmptyTextNode())
+                newBlock = undefined;
 
-        // Merge the last node into the first.
-        if(first && last && first !== last) {
-            const newCaret = first.getLastCaret();
-            first.addSegment(last.copy(first));
-            last.remove();
-            return { start: newCaret, end: newCaret };
+            // Replace the old block with the new block in the tree (or nothing). Bail on fail.
+            newRoot = block.replace(newRoot, newBlock) as ChapterNode;
+            if(newRoot == undefined) return;
+
         }
 
-        // Return the new range.
-        return { start: newRanges[0].start, end: newRanges[newRanges.length - 1].end };
+        // If deleting, and there are two distinct non-empty paragraphs we edited, merge them.
+        if(format === undefined && newBlocks.length > 2) {
+            const first = newBlocks[0];
+            const last = newBlocks[newBlocks.length - 1];
+            if(first instanceof ParagraphNode && last instanceof ParagraphNode) {
+                // Replace the first paragraph with the second merged.
+                newRoot = first.replace(newRoot, first.withContent(first.getContent().withSegmentsAppended(last.getContent()))) as ChapterNode;
+                if(newRoot === undefined) return;
+                // Replace the last with an empty paragraph.
+                newRoot = last.replace(newRoot, last.withContent(new FormatNode(last.getContent().getFormat(), [ new TextNode("")]))) as ChapterNode;
+                if(newRoot === undefined) return;
+            }
+        }
+
+        // Map the text indicies back to carets.
+        const startCaret = this.textIndexToCaret(startTextIndex);
+        const endCaret = format === undefined ? startCaret : this.textIndexToCaret(startEndIndex);
+
+        // Return the new root and the start and end of the range.
+        return { root: newRoot, range: { start: startCaret, end: endCaret } };
 
     }
 
     // If the caret is in an atom of the given type, remove it.
     // If it is not, wrap it.
-    toggleAtom<AtomType extends MetadataNode<any>>(range: CaretRange, type: Function, creator: (parent: FormatNode, text: string) => FormatNodeSegmentType): Caret | undefined {
+    toggleAtom<MetadataNodeType extends MetadataNode<any>>(range: CaretRange, type: Function, creator: (text: string) => FormatNodeSegmentType): Edit {
 
         // If the caret is already in a link node, remove it.
-        if(range.start.node.inside(type)) {
-            const atom = range.start.node.getClosestParentMatching(p => p instanceof type) as AtomType;
-            const formatted = atom.getParent();
-            if(formatted && formatted instanceof FormatNode) {
+        if(range.start.node.isInside(this, type)) {
+            const atom = range.start.node.getClosestParentMatching(this, p => p instanceof type) as MetadataNodeType;
+            const formatted = this.getParentOf(atom);
+            if(formatted !== undefined && formatted instanceof FormatNode) {
                 const index = formatted.caretToTextIndex(range.start);
-                atom.unwrap();
+                const newFormat = formatted.withSegmentReplaced(atom, atom.getMeta());
                 const newCaret = formatted.textIndexToCaret(index);
-                if(newCaret)
-                    return newCaret;
+                const parent = this.getParentOf(formatted);
+                if(parent === undefined || newFormat === undefined || newCaret === undefined) return;
+                const newRoot = parent.rootWithChildReplaced(this, formatted, newFormat);
+                if(newRoot === undefined) return;
+                return { root: newRoot, range: { start: newCaret, end: newCaret } };
             }
         }
-        else {
-            const caret = this.insertNodeAtSelection(range, creator);
-            // Get the text node inside the new atom.
-            const textNode = caret.node as MetadataNode<any>;
-            return { node: textNode.getText(), index: textNode.getText().getLength() }
-        }
-
-        return undefined;
+        else
+            return this.insertNodeAtSelection(range, creator);
 
     }
 

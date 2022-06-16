@@ -21,7 +21,7 @@ const Footnote = (props: { node: FootnoteNode }) => {
     let number = context.chapter.getFootnotes().indexOf(footnote);
     let letter = context.book.getFootnoteSymbol(number);
 
-    const focused = caret && caret.range && caret.range.start.node.hasAncestor(footnote);
+    const focused = caret && caret.range && caret.range.start.node.hasAncestor(context.chapter, footnote);
 
     // Position the marginals on every render.
     useEffect(() => {

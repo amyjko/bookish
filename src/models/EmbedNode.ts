@@ -2,43 +2,42 @@ import { Node } from "./Node";
 import { BlockParentNode } from "./BlockParentNode";
 import { Position } from "./Position";
 import { FormatNode } from "./FormatNode";
+import { TextNode } from "./TextNode";
+import { BlockNode } from "./BlockNode";
 
-export class EmbedNode extends Node<BlockParentNode> {
-    #url: string;
-    #description: string;
-    #caption: FormatNode;
-    #credit: FormatNode;
-    #position: Position;
+export class EmbedNode extends BlockNode<BlockParentNode | undefined> {
 
-    constructor(parent: BlockParentNode | undefined, url: string, description: string) {
-        super(parent, "embed");
+    readonly #url: string;
+    readonly #description: string;
+    readonly #caption: FormatNode;
+    readonly #credit: FormatNode;
+    readonly #position: Position;
+
+    constructor(url: string, description: string, caption?: FormatNode, credit?: FormatNode, position: Position="|") {
+
+        super();
+
         this.#url = url;
         this.#description = description;
-        this.#caption = new FormatNode(this, "", []);
-        this.#caption.addEmptyText();
-        this.#credit = new FormatNode(this, "", []);
-        this.#credit.addEmptyText();
-        this.#position = "|";
+        this.#caption = caption === undefined ? new FormatNode("", [ new TextNode("") ]) : caption;
+        this.#credit = credit == undefined ? new FormatNode("", [ new TextNode("") ]) : credit;
+        this.#position = position;
+
     }
+
+    getType() { return "embed"; }
 
     getURL() { return this.#url; }
     getDescription() { return this.#description; }
     getCaption() { return this.#caption; }
     getCredit() { return this.#credit; }
     getPosition() { return this.#position; }
+    getFormats() { return [ this.#caption, this.#credit ]; }
 
-    setURL(url: string) { this.#url = url; this.getChapter()?.changed(); }
-    setDescription(description: string) { this.#description = description; this.getChapter()?.changed(); }
-    setCaption(caption: FormatNode) { this.#caption = caption; }
-    setCredit(credit: FormatNode) { this.#credit = credit; }
-    setPosition(position: Position) { this.#position = position; this.getChapter()?.changed(); }
+    toText(): string { return this.#caption.toText(); }
 
-    toText(): string {
-        return this.#caption.toText();
-    }
-
-    toBookdown(debug?: number): string {
-        return `|${this.#url}|${this.#description}|${this.#caption.toBookdown(debug)}|${this.#credit.toBookdown(debug)}|`;
+    toBookdown(parent: BlockParentNode, debug?: number): string {
+        return `|${this.#url}|${this.#description}|${this.#caption.toBookdown(this, debug)}|${this.#credit.toBookdown(this, debug)}|`;
     }
 
     toJSON() {
@@ -55,20 +54,38 @@ export class EmbedNode extends Node<BlockParentNode> {
         this.#caption.traverse(fn);
     }
 
-    removeChild(node: Node): void {}
-    
-    replaceChild(node: Node, replacement: Node): void {}
+    getParentOf(node: Node): Node | undefined {
+        
+        const captionParent = this.#caption.getParentOf(node);
+        if(captionParent) return captionParent;
 
-    getSiblingOf(child: Node, next: boolean) { return undefined; }
+        const creditParent = this.#credit.getParentOf(node);
+        if(creditParent) return creditParent;
 
-    copy(parent: BlockParentNode): EmbedNode {
-        const node = new EmbedNode(parent, this.#url, this.#description);
-        node.#caption = this.#caption.copy(this);
-        node.#credit = this.#credit.copy(this);
-        node.#position = this.#position;
-        return node;
     }
 
-    clean() {}
+    copy(): EmbedNode {
+        return new EmbedNode(this.#url, this.#description, this.#caption.copy(), this.#credit.copy(), this.#position);
+    }
+
+    withChildReplaced(node: Node, replacement: Node | undefined) {
+        const newCaption = node === this.#caption && replacement instanceof FormatNode ? replacement : undefined;
+        const newCredit = node === this.#credit && replacement instanceof FormatNode ? replacement : undefined;
+        return newCaption || newCredit ?
+            new EmbedNode(
+                this.#url,
+                this.#description,
+                newCaption === undefined ? this.#caption : newCaption, 
+                newCredit === undefined ? this.#credit : newCredit, 
+                this.#position
+            ) :
+            undefined;    
+    }
+
+    withURL(url: string) { new EmbedNode(url, this.#description, this.#caption, this.#credit, this.#position); }
+    withDescription(description: string) { new EmbedNode(this.#url, description, this.#caption, this.#credit, this.#position); }
+    withCaption(caption: FormatNode) { new EmbedNode(this.#url, this.#description, caption, this.#credit, this.#position); }
+    withCredit(credit: FormatNode) { new EmbedNode(this.#url, this.#description, this.#caption, credit, this.#position); }
+    withPosition(position: Position) { new EmbedNode(this.#url, this.#description, this.#caption, this.#credit, position); }
 
 }

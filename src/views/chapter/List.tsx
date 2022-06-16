@@ -5,7 +5,7 @@ import { renderNode } from './Renderer'
 const List = (props: { node: ListNode}) => {
 
     const items = props.node.getItems().map((item, index) =>
-        item.type === "list" ?
+        item.getType() === "list" ?
             renderNode(item, "item-" + index) :
             <li key={"item-" + index}>{renderNode(item)}</li>
     );

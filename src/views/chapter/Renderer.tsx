@@ -49,11 +49,11 @@ const renderers: Record<string, (props: { node: any }) => JSX.Element> = {
 // Given a node and an optional ID to distinguish children in lists
 // find the function below to render it, call it, and return its value.
 const renderNode = (node: Node, key?: string) => {
-    
-    if(!(node.type in renderers))
-        throw Error(`Couldn't find a renderer for AST node type "${node.type}"`)
+    const type = node.getType();
+    if(!(type in renderers))
+        throw Error(`Couldn't find a renderer for AST node type "${type}"`)
 
-    const componentType: (props: { node: any }) => JSX.Element = renderers[node.type];
+    const componentType: (props: { node: any }) => JSX.Element = renderers[type];
 
     // Note: key is a React reserve name, so it's not actually passed as a prop to the element.
     return React.createElement(componentType, { node: node, key: key })

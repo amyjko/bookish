@@ -7,26 +7,31 @@ import { EmbedNode } from "./EmbedNode";
 import { Caret, CaretRange } from "./Caret";
 import { MetadataNode } from "./MetadataNode";
 import { AtomNode } from "./AtomNode";
+import { BlockParentNode } from "./BlockParentNode";
+import { ListNode } from "./ListNode";
+import { TableNode } from "./TableNode";
 
 export type Format = "" | "*" | "_" | "^" | "v";
 export type FormatNodeSegmentType = FormatNode | TextNode | ErrorNode | MetadataNode<any> | AtomNode<any>;
-export type FormatNodeParent = BlockNode | FormatNode | FootnoteNode | EmbedNode;
+export type FormatNodeParent = BlockNode<BlockParentNode> | FormatNode | FootnoteNode | EmbedNode | ListNode | TableNode | undefined;
 
 export class FormatNode extends Node<FormatNodeParent> {
-    #format: Format;
-    #segments: FormatNodeSegmentType[];
+    
+    readonly #format: Format;
+    readonly #segments: FormatNodeSegmentType[];
 
-    constructor(parent: FormatNodeParent | undefined, format: Format, segments: FormatNodeSegmentType[]) {
-        super(parent, "formatted");
+    constructor(format: Format, segments: FormatNodeSegmentType[]) {
+
+        super();
+
         this.#format = format;
         this.#segments = segments;
-        // Make sure parents are assigned correctly.
-        segments.forEach(seg => seg.setParent(this));
+        
     }
 
+    getType() { return "formatted"; }
     getFormat() { return this.#format; }
     getSegments() { return this.#segments; }
-    setSegments(segs: FormatNodeSegmentType[]) { this.#segments = segs; }
     isEmpty() { return this.#segments.length === 0; }
     isEmptyTextNode() { return this.#segments.length === 1 && this.#segments[0] instanceof TextNode && this.#segments[0].getText() === ""; }
     getLength() { return this.#segments.length; }
@@ -35,29 +40,16 @@ export class FormatNode extends Node<FormatNodeParent> {
         return this.#segments.map(segment => segment.toText()).join(" ");
     }
 
-    toBookdown(debug?: number): string {
-        return (this.#format === "v" ? "^v" : this.#format) + this.#segments.map(s => s.toBookdown(debug)).join("") + this.#format;
+    toBookdown(parent: FormatNodeParent, debug?: number): string {
+        return (this.#format === "v" ? "^v" : this.#format) + this.#segments.map(s => s.toBookdown(this, debug)).join("") + this.#format;
     }
 
-    addSegment(node: FormatNodeSegmentType) {
-        node.setParent(this);
-        this.#segments.push(node);
-    }
-
-    addEmptyText() {
-        this.addSegment(new TextNode(this, ""));
+    withSegmentAppended(segment: FormatNodeSegmentType): FormatNode {
+        return new FormatNode(this.#format, [ ...this.#segments, segment ]);
     }
 
     traverseChildren(fn: (node: Node) => void): void {
-        this.#segments.forEach(item => item.traverse(fn))
-    }
-
-    removeChild(node: Node): void {
-        // Remove the node, if we found it.
-        this.#segments = this.#segments.filter(item => item !== node);
-        // If this now has no segments, remove it.
-        if(this.#segments.length === 0)
-            this.remove();
+        this.#segments.forEach(item => item.traverse(fn));
     }
 
     getFirstTextNode(): TextNode {
@@ -70,121 +62,32 @@ export class FormatNode extends Node<FormatNodeParent> {
         return text[text.length - 1];
     }
 
-    replaceChild(node: Node, replacement: FormatNodeSegmentType): void {
-        // Find the given node's index.
-        const index = this.#segments.indexOf(node as FormatNodeSegmentType);
-        if(index < 0) return;
-        // Replace it.
-        replacement.setParent(this);
-        this.#segments[index] = replacement;
-        // Normalize the tree.
-        this.clean();
-    }
+    withSegmentReplaced(segment: FormatNodeSegmentType, replacement: FormatNodeSegmentType): FormatNode | undefined {
 
-    getSiblingOf(child: Node, next: boolean) { return this.#segments[this.#segments.indexOf(child as FormatNodeSegmentType) + (next ? 1 : -1)]; }
+        const index = this.#segments.indexOf(segment);
+        if(index < 0) return undefined;
 
-    copy(parent: FormatNodeParent) {
-        const node = new FormatNode(parent, this.#format, []);
-        this.#segments.forEach(s => node.addSegment(s.copy(node) as FormatNodeSegmentType));
-        return node;
-    }
+        const segments = this.#segments.slice();
+        segments[index] = replacement;
 
-    mergeText() {
-        // Are there any consecutive text nodes? Merge them.
-        let currentText: TextNode | undefined = undefined;
-        let textToRemove: TextNode[] = [];
-        for(let i = 0; i < this.#segments.length; i++) {
-            let node = this.#segments[i];
-            if(node instanceof TextNode) {
-                // Found the first one!
-                if(currentText === undefined)
-                    currentText = node;
-                // Slurp the current node's text
-                else {
-                    currentText.setText(currentText.getText() + node.getText());
-                    textToRemove.push(node);
-                }
-            }
-            // If not, reset the current text.
-            else
-                currentText = undefined;
-        }
-        textToRemove.forEach(n => n.remove());
+        return new FormatNode(this.#format, segments);
 
     }
 
-    mergeFormats() {
+    withoutSegment(segment: FormatNodeSegmentType): FormatNode | undefined {
 
-        // Go through each node in the segments list and flatten 
-        const merged: FormatNodeSegmentType[] = [];
-        while(this.getLength() > 0) {
-            const next = this.#segments.shift();
-            if(next) {
-                // If it's an empty text node, remove it.
-                if(next instanceof TextNode) {
-                    if(next.getLength() > 0)
-                        merged.push(next);
-                }
-                // If there's no previous node, just add the next node.
-                else if(merged.length === 0) {
-                    merged.push(next);
-                }
-                // Otherwise, base our action on the previous node
-                else {
-                    const previous = merged[merged.length - 1];
-                    // The previous and next nodes are the same format, merge next with previous.
-                    if(previous instanceof FormatNode && next instanceof FormatNode && previous.getFormat() === next.getFormat()) {
-                        // Merge the segments of the two nodes.
-                        next.getSegments().forEach(n => { previous.addSegment(n); });
-                    }
-                    // Otherwise just 
-                    else {
-                        merged.push(next);
-                    }
-                }
-            }
-        }
-        this.#segments = merged;
-
-        // Merge any adjacent text that we created.
-        this.mergeText();
+        const index = this.#segments.indexOf(segment);
+        if(index < 0) return undefined;
+        return new FormatNode(this.#format, this.#segments.slice().splice(index, 1));
 
     }
 
-    getFormatRoot(): FormatNode | undefined {
-        return this.getFarthestParentMatching(p => p instanceof FormatNode) as FormatNode;
+    withChildReplaced(node: Node, replacement: Node | undefined) {
+        return replacement === undefined ? this.withoutSegment(node as FormatNodeSegmentType) : this.withSegmentReplaced(node as FormatNodeSegmentType, replacement as FormatNodeSegmentType);
     }
 
-    isFormatRoot(): boolean {
-        return this.getFormatRoot() === this;
-    }
-
-    clean() {
-
-        // Clean all of the segments bottom up first.
-        this.#segments.forEach(s => s.clean());
-
-        // If this is empty and it's not the root, remove it.
-        if(this.#segments.length === 0 && this.getFormatRoot() !== this) { 
-            this.remove();
-            return;
-        }
-    
-        // Merge merge redundant formatted nodes
-        this.mergeFormats();
-
-        // If this is in a format with the same format as its parent, move this node's segments to the parent to flatten it.
-        const parent = this.getParent();
-        if(parent instanceof FormatNode && this.getFormat() === parent.getFormat()) {
-            this.#segments.forEach(seg => seg.setParent(parent));
-            const index = parent.getSegments().indexOf(this);
-            if(index < 0) throw Error("Uh oh, parentage is wrong.");
-            parent.#segments = parent.getSegments().slice(0, index).concat(this.getSegments()).concat(parent.getSegments().slice(index + 1));
-        }
-        
-        // If we ended up with no segments, put a placeholder.
-        this.addEmptyText();
-
+    copy(): FormatNode {
+        return new FormatNode(this.#format, this.#segments.map(s => s.copy()));
     }
 
     getTextNodes(): TextNode[] {
@@ -246,22 +149,21 @@ export class FormatNode extends Node<FormatNodeParent> {
     }
 
     // Creates two formatted nodes that split this node at the given caret location.
-    split(caret: Caret): FormatNode[] | undefined {
+    split(caret: Caret): [FormatNode, FormatNode] | undefined {
 
         // We can only copy if
         // ... this has a parent.
         // ... the given caret is in this formatted node.
         // ... the caret is on a text node.        
-        const parent = this.getParent();
-        if(parent === undefined || !caret.node.hasAncestor(this) || !(caret.node instanceof TextNode))
+        if(!(caret.node instanceof TextNode))
             return undefined;
 
         // Map the caret node to an index
         const nodeIndex  = this.getTextNodes().indexOf(caret.node);
 
         // Make two copies of this
-        const first = this.copy(parent);
-        const second = this.copy(parent);
+        const first = this.copy();
+        const second = this.copy();
 
         // Compute the equivalent caret for each
         // Find what index this node is in the paragraph so we can find its doppleganger in the copy.
@@ -269,8 +171,8 @@ export class FormatNode extends Node<FormatNodeParent> {
         const secondCaret = { node: second.getTextNodes()[nodeIndex], index: caret.index };
 
         // Delete everything after in the first, everything before in the second.
-        first.deleteRange({ start: firstCaret, end: first.getLastCaret() });
-        second.deleteRange({ start: second.getFirstCaret(), end: secondCaret });
+        first.withoutRange({ start: firstCaret, end: first.getLastCaret() });
+        second.withoutRange({ start: second.getFirstCaret(), end: secondCaret });
     
         // Here ya go caller!
         return [first, second];
@@ -288,28 +190,26 @@ export class FormatNode extends Node<FormatNodeParent> {
     }
 
     getSelection(): CaretRange {
-
         const first = this.getFirstTextNode();
         const last = this.getLastTextNode();
         return { start: { node: first, index: 0}, end: { node: last, index: last.getLength() } };
-
     }
 
-    deleteRange(range: CaretRange) {
-        return this.editRange(range, undefined);
+    withoutRange(range: CaretRange) {
+        return this.withFormat(range, undefined);
     }
 
     // This function takes the given range, and if it's within the bounds of this FormatNode
     // either formats the given range with the given format (or deletes the range if the formed is undefined). 
     // It's approach is to scan through every atomic node and character and build a new tree according to the existing
     // tree, but with the requested modification.
-    editRange(range: CaretRange, format: Format | undefined): CaretRange {
+    withFormat(range: CaretRange, format: Format | undefined): FormatNode | undefined {
 
         // This only transforms ranges that start and end with text nodes and for nodes in the same format node.
         if( !(range.start.node instanceof TextNode || range.start.node instanceof AtomNode) || 
             !(range.end.node instanceof TextNode || range.end.node instanceof AtomNode) || 
-            !(range.start.node.hasAncestor(this) && range.end.node.hasAncestor(this)))
-            return range;
+            !(this.contains(range.start.node) && this.contains(range.end.node)))
+            return;
 
         // Remember the text positions so we can return a new range in the new tree.
         const textStart = this.caretToTextIndex(range.start);
@@ -330,24 +230,25 @@ export class FormatNode extends Node<FormatNodeParent> {
         let alreadyApplied = false;
         
         if(format === undefined)
-            alreadyApplied = true;
+            alreadyApplied = true;        
         else
             everythingButFormats.forEach(node => {
+                const parent = this.getParentOf(node);
                 // If it's text, and the current position is in range of the selection, does the position contain the requested format?
-                if(node instanceof TextNode && node.getParent() instanceof FormatNode) {
+                if(node instanceof TextNode && parent instanceof FormatNode) {
                     // If we're formatting an empty node we previously found, this node's formatting is irrelevant.
                     if(editingEmptyNode) {}
                     // If this node is empty but contains a zero-width selection, remember it, since this is the only node for which formats are relevant.
                     else if(node.getText().length === 0) {
                         if(checkIndex === textStart && zeroWidthSelection) {
                             editingEmptyNode = true;
-                            alreadyApplied = (node.getParent() as FormatNode).getFormats().includes(format);
+                            alreadyApplied = parent.getFormats(this).includes(format);
                         }
                     }
                     // If this node has more than zero characters, the formatting is all applied if the selection contains the entirety of this node's text
                     // and this node's parent contains the formatting.
                     else {
-                        const parentIsFormatted = (node.getParent() as FormatNode).getFormats().includes(format);
+                        const parentIsFormatted = parent.getFormats(this).includes(format);
                         const selectionContainsNode = (textStart >= checkIndex && textStart <= checkIndex + node.getLength()) || (textEnd >= checkIndex && textEnd <= checkIndex + node.getLength());
                         const nodeContainsSelection = textStart >= checkIndex && textEnd <= checkIndex + node.getLength();
                         checkIndex += node.getLength();
@@ -365,7 +266,7 @@ export class FormatNode extends Node<FormatNodeParent> {
 
         // Reformat everything. The strategy is to step through each character, atom node, and metadata node in this format node
         // and create a new series of formats that preserve existing formatting while applying new formatting to the selection.
-        const newFormat = new FormatNode(this.getParent(), "", []); // The current formatter we're adding to.
+        let newFormat = new FormatNode("", []); // The current formatter we're adding to.
         let currentFormat = newFormat;
         let textIndex = 0;
         let currentText = ""; // The current text we've accumulated, inserted before each format change and at the end.
@@ -374,7 +275,8 @@ export class FormatNode extends Node<FormatNodeParent> {
 
         function saveText() {
             if(currentText.length > 0) {
-                currentFormat.addSegment(new TextNode(currentFormat, currentText));
+                // TODO Immutable
+                currentFormat.withSegmentAppended(new TextNode(currentText));
                 currentText = "";
             }
         }
@@ -384,8 +286,8 @@ export class FormatNode extends Node<FormatNodeParent> {
         }
 
         everythingButFormats.forEach(node => {
+            const parent = this.getParentOf(node);
             if(node instanceof TextNode) {
-                const parent = node.getParent();
                 if(parent instanceof FormatNode) {
                     // Remember we found an empty node so that we don't insert an extra one later.
                     if(node.getText().length === 0) {
@@ -400,8 +302,8 @@ export class FormatNode extends Node<FormatNodeParent> {
                             // Determine the desired format for this character. Start with the current formats
                             // and if we're in the selected range, adjust them accordingly based on the current formats 
                             // and the requested format. (If this is a range deletion, then we just stick with the existing formats).
-                            let formatter = node.getFormat();
-                            let desiredFormats = formatter ? formatter.getFormats() : [];
+                            let formatter = node.getFormat(this);
+                            let desiredFormats = formatter ? formatter.getFormats(this) : [];
                             if( format !== undefined && 
                                 ((textIndex === textStart && zeroWidthSelection) || inRange())) {
                                 // Remove all formatting if we were asked to.
@@ -416,7 +318,7 @@ export class FormatNode extends Node<FormatNodeParent> {
                             }
 
                             // Remove undesired formats.
-                            currentFormat.getFormats().forEach(current => {
+                            currentFormat.getFormats(newFormat).forEach(current => {
                                 // If the current format is not in the desired list, close the text
                                 // node and keep popping formats until we find the parent of the offending format.
                                 if(!desiredFormats.includes(current)) {
@@ -426,16 +328,18 @@ export class FormatNode extends Node<FormatNodeParent> {
 
                                     // Not sure this loop is necessary; we should always remove in the order we added.
                                     while(currentFormat.#format !== current)
-                                        currentFormat = currentFormat.getParent() as FormatNode;
-                                    currentFormat = currentFormat.getParent() as FormatNode;
+                                        currentFormat = currentFormat.getParent(newFormat) as FormatNode;
+                                    currentFormat = currentFormat.getParent(newFormat) as FormatNode;
 
                                     // If we have unformatted something at a zero-width range, create empty format node, add a text node in it and remember it so
                                     // we can place the caret in it.
                                     if(!formattingEmptyNode && textIndex === textStart && zeroWidthSelection) {
-                                        emptyNode = new TextNode(currentFormat, "");
-                                        currentFormat.addSegment(emptyNode);
-                                        const newDesiredFormat = new FormatNode(currentFormat, current, []);
-                                        currentFormat.addSegment(newDesiredFormat);
+                                        emptyNode = new TextNode("");
+                                        // TODO Immutable
+                                        currentFormat.withSegmentAppended(emptyNode);
+                                        const newDesiredFormat = new FormatNode(current, []);
+                                        // TODO Immutable
+                                        currentFormat.withSegmentAppended(newDesiredFormat);
                                         currentFormat = newDesiredFormat;
                                     }
 
@@ -446,21 +350,23 @@ export class FormatNode extends Node<FormatNodeParent> {
                             desiredFormats.forEach(desiredFormat => {
                                 // If the current format does not yet include the desired format,
                                 // close the text node and start a new format.
-                                if(!currentFormat.getFormats().includes(desiredFormat)) {
+                                if(!currentFormat.getFormats(newFormat).includes(desiredFormat)) {
 
                                     // Save any text that we've accumulated.
                                     saveText();
 
-                                    const newDesiredFormat = new FormatNode(currentFormat, desiredFormat, []);
-                                    currentFormat.addSegment(newDesiredFormat);
+                                    const newDesiredFormat = new FormatNode(desiredFormat, []);
+                                    // TODO Immutable
+                                    currentFormat.withSegmentAppended(newDesiredFormat);
                                     currentFormat = newDesiredFormat;
 
                                     // If we inserted an empty format node, add a text node in it and remember it so
                                     // we can place the caret in it.
                                     if(!formattingEmptyNode && textIndex === textStart && zeroWidthSelection) {
-                                        emptyNode = new TextNode(currentFormat, "");
-                                        currentFormat.addSegment(emptyNode);
-                                        currentFormat = newDesiredFormat.getParent() as FormatNode;
+                                        emptyNode = new TextNode("");
+                                        // TODO Immutable
+                                        currentFormat.withSegmentAppended(emptyNode);
+                                        currentFormat = newDesiredFormat.getParent(newFormat) as FormatNode;
                                     }
 
                                 }
@@ -491,9 +397,10 @@ export class FormatNode extends Node<FormatNodeParent> {
 
                     // Duplicate the MetadataNode but with new text. Erase the MetadataNode if the text is empty.
                     if(currentText.length > 0) {
-                        const newMeta = parent.copy(currentFormat);
-                        newMeta.setText(currentText);
-                        currentFormat.addSegment(newMeta);
+                        const newMeta = parent.copy();
+                        // TODO Immutable
+                        newMeta.withText(currentText);
+                        currentFormat.withSegmentAppended(newMeta);
                         currentText = "";
                     }
                 }
@@ -507,7 +414,7 @@ export class FormatNode extends Node<FormatNodeParent> {
                 // Add the atom immediately after, unless it's in the deletion range.
                 // We include both the start and end since AtomNode's text index is on both sides.
                 if(format !== undefined || textIndex < Math.min(textStart, textEnd) || textIndex >= Math.max(textStart, textEnd))
-                    currentFormat.addSegment(node);
+                    currentFormat.withSegmentAppended(node);
 
                 // Increment the text index, atoms count.
                 textIndex++;
@@ -519,67 +426,58 @@ export class FormatNode extends Node<FormatNodeParent> {
 
         // If it's empty, make sure there's one empty text node to type in.
         if(newFormat.getTextAndAtomNodes().length === 0)
-            newFormat.#segments = [ new TextNode(newFormat, "") ];
+            newFormat = newFormat.withSegmentAppended(new TextNode(""));
 
-        // Replace this format's segments with the new segments.
-        this.#segments = [];
-        newFormat.#segments.forEach(seg => this.addSegment(seg));
-
-        // If we made an empty node, place the caret in it.
-        if(emptyNode)
-            return { start: { node: emptyNode, index: 0 }, end: { node: emptyNode, index: 0}};
-        // If we formatted, convert the text selection back into a CaretRange, keeping selection on the same text.
-        else if(format !== undefined) {
-            const startCaret = this.textIndexToCaret(textStart);
-            const endCaret = this.textIndexToCaret(textEnd);
-            if(startCaret && endCaret)
-                return { start: startCaret, end: endCaret };
-        }
-        // If we deleted, just return the start position of the caret.
-        else {
-            const startCaret = this.textIndexToCaret(Math.min(textStart, textEnd));
-            if(startCaret)
-                return { start: startCaret, end: startCaret };
-        }
-
-        // This should never happen!
-        throw Error("Couldn't map original positions onto new formatting; something is very broken!");
+        return newFormat;
 
     }
 
-    getFormats(): Format[] {
+    getFormats(root: Node): Format[] {
 
         let format: FormatNodeParent | undefined = this;
         const formats: Format[] = [];
         while(format instanceof FormatNode) {
             if(format.#format !== "")
                 formats.push(format.#format);
-            format = format.getParent();
+            format = format.getParent(root);
         }
         return formats;
 
     }
 
-    insertSegmentAt(segment: FormatNodeSegmentType, caret: Caret) : Caret | undefined {
+    insertSegmentAt(segment: FormatNodeSegmentType, caret: Caret) : FormatNode | undefined {
 
         if(!(caret.node instanceof TextNode))
-            return caret;
+            return;
 
         // Verify that the caret's node is a segment in this node.
         const index = this.#segments.indexOf(caret.node);
         if(index < 0)
-            return undefined;
+            return;
 
         // Splice the text node.
-        const left = new TextNode(this, caret.node.getText().substring(0, caret.index));
-        const right = new TextNode(this, caret.node.getText().substring(caret.index));
+        const left = new TextNode(caret.node.getText().substring(0, caret.index));
+        const right = new TextNode(caret.node.getText().substring(caret.index));
 
         // Insert the new left, right and middle
-        this.#segments.splice(index, 1, left, segment, right);
+        return new FormatNode(this.#format, this.#segments.slice().splice(index, 1, left, segment, right));
 
-        // Return the first index in the new node's text node.
-        return { node: segment, index: 0 };
+    }
 
+    getParentOf(node: Node): Node | undefined {
+        return this.#segments.map(b => b === node ? this : b.getParentOf(node)).find(b => b !== undefined);
+    }
+
+    withoutContentBefore(caret: Caret): FormatNode | undefined {
+        return this.withoutRange({ start: this.getFirstCaret(), end: caret });
+    }
+
+    withoutContentAfter(caret: Caret): FormatNode | undefined {
+        return this.withoutRange({ start: caret, end: this.getLastCaret() });        
+    }
+
+    withSegmentsAppended(format: FormatNode): FormatNode {
+        return new FormatNode(this.#format, [ ... this.#segments, ... format.getSegments() ]);
     }
 
 }

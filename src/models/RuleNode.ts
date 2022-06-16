@@ -1,33 +1,21 @@
 import { Node } from "./Node";
 import { BlockParentNode } from "./BlockParentNode";
+import { BlockNode } from "./BlockNode";
 
-
-export class RuleNode extends Node<BlockParentNode> {
+export class RuleNode extends BlockNode<BlockParentNode> {
     
-    constructor(parent: BlockParentNode) {
-        super(parent, "rule");
+    constructor() {
+        super();
     }
 
-    toText(): string {
-        return "";
-    }
+    getType() { return "rule"; }
+    toText(): string { return ""; }
+    toBookdown(parent: BlockParentNode, debug?: number): string { return "-"; }
+    traverseChildren(fn: (node: Node) => void): void {} 
+    getParentOf(node: Node): Node | undefined { return undefined; }
+    getFormats() { return []; }
 
-    toBookdown(debug?: number): string {
-        return "-";
-    }
-
-    traverseChildren(fn: (node: Node) => void): void {}
- 
-    removeChild(node: Node): void {}
-
-    replaceChild(node: Node, replacement: Node): void {}
-
-    getSiblingOf(child: Node, next: boolean) { return undefined; }
-
-    copy(parent: BlockParentNode): RuleNode {
-        return new RuleNode(parent)
-    }
-
-    clean() {}
+    copy(): RuleNode { return new RuleNode(); }
+    withChildReplaced(node: Node, replacement: Node | undefined) { return undefined; }
 
 }
