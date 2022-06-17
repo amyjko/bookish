@@ -130,7 +130,7 @@ function convertRangeToListItem(root: Node, range: CaretRange, numbered: boolean
                 // Only format if it's a contiguous list of paragraphs.
                 if(blocks.length === paragraphs.length) {
                     const newList = new ListNode(paragraphs.map(p => p.getContent()), numbered);
-                    let newBlocks: BlocksNode<any> | undefined = ancestor;
+                    let newBlocks: BlocksNode | undefined = ancestor;
                     newBlocks = ancestor.withBlockInsertedBefore(paragraphs[0], newList);
                     while(newBlocks !== undefined && paragraphs.length > 0) {
                         const p = paragraphs.shift();
@@ -178,7 +178,7 @@ function unwrapListItems(root: Node, range: CaretRange): Edit {
     // Find the formats that the range start and stop in.
     const startFormat = range.start.node.closestParent<FormatNode>(root, FormatNode);
     const endFormat = range.end.node.closestParent<FormatNode>(root, FormatNode);
-    const blocks = ancestor instanceof BlocksNode ? ancestor : ancestor.closestParent<BlocksNode<any>>(root, BlocksNode);
+    const blocks = ancestor instanceof BlocksNode ? ancestor : ancestor.closestParent<BlocksNode>(root, BlocksNode);
 
     if(startFormat && endFormat && blocks) {
         // Find all the formats in the common ancestor.
@@ -276,7 +276,7 @@ function indentListItems(root: Node, range: CaretRange, indent: boolean): Edit {
 
 }
 
-function insertBlock(context: CaretState, block: BlockNode<any>): Node | undefined {
+function insertBlock(context: CaretState, block: BlockNode): Node | undefined {
 
     if(context.blocks && context.paragraph) {
         const newBlocks = context.blocks.withBlockInsertedBefore(context.paragraph, block);

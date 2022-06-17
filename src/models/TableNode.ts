@@ -1,5 +1,4 @@
 import { Node } from "./Node";
-import { BlockParentNode } from "./BlockParentNode";
 import { Position } from "./Position";
 import { FormatNode } from "./FormatNode";
 import { TextNode } from "./TextNode";
@@ -7,7 +6,7 @@ import { BlockNode } from "./BlockNode";
 
 export type Location = { row: number, column: number };
 
-export class TableNode extends BlockNode<BlockParentNode> {
+export class TableNode extends BlockNode {
 
     readonly #rows: FormatNode[][];
     readonly #caption: FormatNode | undefined;
@@ -37,7 +36,7 @@ export class TableNode extends BlockNode<BlockParentNode> {
         return this.#rows.map(row => row.map(cell => cell.toText()).join(", ")).join(", ");
     }
 
-    toBookdown(parent: BlockParentNode, debug?: number): string {
+    toBookdown(parent: Node, debug?: number): string {
         return this.#rows.map(
             row => 
             `,${row.map(cell => cell.toBookdown(this, debug)).join("|")}`

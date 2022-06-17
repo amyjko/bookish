@@ -1,8 +1,7 @@
 import { Node } from "./Node";
-import { BlockParentNode } from "./BlockParentNode";
 import { BlockNode } from "./BlockNode";
 
-export class RuleNode extends BlockNode<BlockParentNode> {
+export class RuleNode extends BlockNode {
     
     constructor() {
         super();
@@ -10,7 +9,7 @@ export class RuleNode extends BlockNode<BlockParentNode> {
 
     getType() { return "rule"; }
     toText(): string { return ""; }
-    toBookdown(parent: BlockParentNode, debug?: number): string { return "-"; }
+    toBookdown(parent: Node, debug?: number): string { return "-"; }
     traverseChildren(fn: (node: Node) => void): void {} 
     getParentOf(node: Node): Node | undefined { return undefined; }
     getFormats() { return []; }

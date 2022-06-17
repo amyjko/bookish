@@ -1,11 +1,10 @@
 import { Node } from "./Node";
-import { BlockParentNode } from "./BlockParentNode";
 import { Position } from "./Position";
 import { FormatNode } from "./FormatNode";
 import { TextNode } from "./TextNode";
 import { BlockNode } from "./BlockNode";
 
-export class EmbedNode extends BlockNode<BlockParentNode | undefined> {
+export class EmbedNode extends BlockNode {
 
     readonly #url: string;
     readonly #description: string;
@@ -36,7 +35,7 @@ export class EmbedNode extends BlockNode<BlockParentNode | undefined> {
 
     toText(): string { return this.#caption.toText(); }
 
-    toBookdown(parent: BlockParentNode, debug?: number): string {
+    toBookdown(parent: Node, debug?: number): string {
         return `|${this.#url}|${this.#description}|${this.#caption.toBookdown(this, debug)}|${this.#credit.toBookdown(this, debug)}|`;
     }
 

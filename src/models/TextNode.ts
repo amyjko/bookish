@@ -11,7 +11,7 @@ import { Edit } from "../views/editor/Commands";
 
 export type TextNodeParent = FormatNode | MetadataNode<any> | CodeNode;
 
-export class TextNode extends Node<TextNodeParent> {
+export class TextNode extends Node {
 
     readonly #text: string;
 
@@ -26,7 +26,7 @@ export class TextNode extends Node<TextNodeParent> {
 
     toText(): string { return this.#text; }
 
-    toBookdown(parent: TextNodeParent, debug?: number): string {
+    toBookdown(parent: Node, debug?: number): string {
 
         // Escape all characters with special meaning inside content nodes: _*`<^{~\[@% and :'s with no space after
         let newString = new String(this.#text)
@@ -92,8 +92,8 @@ export class TextNode extends Node<TextNodeParent> {
 
     }
 
-    getBlocks(root: Node): BlocksNode<any> | undefined {
-        return this.closestParent<BlocksNode<any>>(root, BlocksNode);
+    getBlocks(root: Node): BlocksNode | undefined {
+        return this.closestParent<BlocksNode>(root, BlocksNode);
     }
 
     getRoot(root: Node): FormatNode | ChapterNode | undefined {

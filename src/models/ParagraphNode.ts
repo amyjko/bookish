@@ -1,11 +1,10 @@
 import { Node } from "./Node";
 import { FormatNode } from "./FormatNode";
 import { BlockNode } from "./BlockNode";
-import { BlockParentNode } from "./BlockParentNode";
 import { TextNode } from "./TextNode";
 import { Caret, CaretRange } from "./Caret";
 
-export class ParagraphNode extends BlockNode<BlockParentNode> {
+export class ParagraphNode extends BlockNode {
 
     readonly #content: FormatNode;
     readonly #level: number;
@@ -28,7 +27,7 @@ export class ParagraphNode extends BlockNode<BlockParentNode> {
         return this.#content.toText();
     }
 
-    toBookdown(parent: BlockParentNode, debug?: number): string {
+    toBookdown(parent: Node, debug?: number): string {
         return (this.#level === 1 ? "# " : this.#level === 2 ? "## " : this.#level === 3 ? "### " : "") + this.#content.toBookdown(this, debug);
     }
 

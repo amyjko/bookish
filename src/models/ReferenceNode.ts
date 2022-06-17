@@ -1,6 +1,6 @@
 import { Node } from "./Node";
 
-export class ReferenceNode extends Node<Node<any> | undefined> {
+export class ReferenceNode extends Node {
 
     authors: string;
     year: string;

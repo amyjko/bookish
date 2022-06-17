@@ -3,7 +3,7 @@ import { ChapterNode } from "./ChapterNode";
 // A global node ID generator, for mapping views back to models.
 let nodeID = 1;
 
-export abstract class Node<ParentType extends undefined | Node<any> = undefined | Node<any>> {
+export abstract class Node {
 
     readonly nodeID: number;
 
@@ -12,10 +12,10 @@ export abstract class Node<ParentType extends undefined | Node<any> = undefined 
     }
 
     abstract toText(): string;
-    abstract toBookdown(parent: ParentType, debug?: number): string;
+    abstract toBookdown(parent: Node, debug?: number): string;
     abstract getType(): string;
-    abstract traverseChildren(fn: (node: Node<any>) => void) : void;
-    abstract copy(): Node<any>;
+    abstract traverseChildren(fn: (node: Node) => void) : void;
+    abstract copy(): Node;
 
     // Returns a new node with the given child node replaced, or the node as is if the given nodes were not a valid change.
     abstract withChildReplaced(node: Node, replacement: Node | undefined): Node | undefined;
@@ -38,7 +38,7 @@ export abstract class Node<ParentType extends undefined | Node<any> = undefined 
     
     getID() { return nodeID; }
 
-    traverse(fn: (node: Node<any>) => void) : void {
+    traverse(fn: (node: Node) => void) : void {
         this.traverseChildren(fn);
         fn.call(undefined, this);
     }
@@ -62,9 +62,9 @@ export abstract class Node<ParentType extends undefined | Node<any> = undefined 
 
     abstract getParentOf(node: Node): Node | undefined;
 
-    getParent(root: Node): ParentType | undefined { return root.getParentOf(this) as ParentType | undefined; }
+    getParent(root: Node): Node | undefined { return root.getParentOf(this); }
 
-    hasAncestor(root: Node, node: Node<any>): boolean {
+    hasAncestor(root: Node, node: Node): boolean {
 
         let parent = root.getParentOf(this);
         while(parent) {
@@ -75,7 +75,7 @@ export abstract class Node<ParentType extends undefined | Node<any> = undefined 
 
     }
 
-    closestParent<T extends Node<any>>(root: Node, type: Function): T | undefined {
+    closestParent<T extends Node>(root: Node, type: Function): T | undefined {
 
         let parent = root.getParentOf(this);
         while(parent) {

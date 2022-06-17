@@ -1,17 +1,16 @@
 import { Node } from "./Node";
 import { BlockNode } from "./BlockNode";
-import { BlockParentNode } from "./BlockParentNode";
 import { Position } from "./Position";
 import { FormatNode } from "./FormatNode";
 import { BlocksNode } from "./BlocksNode";
 import { TextNode } from "./TextNode";
 
-export class QuoteNode extends BlocksNode<BlockParentNode> {
+export class QuoteNode extends BlocksNode {
     
     readonly #credit: FormatNode | undefined;
     readonly #position: Position;
 
-    constructor(elements: BlockNode<BlockParentNode>[], credit?:FormatNode, position:Position="|") {
+    constructor(elements: BlockNode[], credit?:FormatNode, position:Position="|") {
 
         super(elements);
 
@@ -31,7 +30,7 @@ export class QuoteNode extends BlocksNode<BlockParentNode> {
         return this.getBlocks().map(element => element.toText()).join(" ") + (this.#credit ? " " + this.#credit.toText() : "");
     }
 
-    toBookdown(parent: BlockParentNode, debug?: number): string {
+    toBookdown(parent: Node, debug?: number): string {
         return `"\n${this.getBlocks().map(element => element.toBookdown(this, debug)).join("\n\n")}\n"${this.#position === "|" ? "" : this.#position}${this.#credit ? " " + this.#credit.toBookdown(this, debug) : ""}`;
     }
 
@@ -44,10 +43,10 @@ export class QuoteNode extends BlocksNode<BlockParentNode> {
 
     withChildReplaced(node: Node, replacement: Node | undefined) {
         // Replace a block.
-        const index = this.blocks.indexOf(node as BlockNode<BlockParentNode>);
+        const index = this.blocks.indexOf(node as BlockNode);
         if(index >= 0) {
             const newBlocks = this.blocks.slice();
-            newBlocks[index] = replacement as BlockNode<BlockParentNode>;
+            newBlocks[index] = replacement as BlockNode;
             return new QuoteNode(newBlocks, this.#credit, this.#position);
         }
         // Replace the credit.
@@ -55,7 +54,7 @@ export class QuoteNode extends BlocksNode<BlockParentNode> {
             return new QuoteNode(this.blocks, replacement, this.#position);
     }
 
-    create(blocks: BlockNode<BlockParentNode>[]): BlocksNode<any> { return new QuoteNode(blocks, this.#credit, this.#position); }
+    create(blocks: BlockNode[]): BlocksNode { return new QuoteNode(blocks, this.#credit, this.#position); }
 
     withCredit(credit: FormatNode | undefined): QuoteNode { return new QuoteNode(this.getBlocks(), credit, this.#position); }
     withPosition(position: Position): QuoteNode { return new QuoteNode(this.getBlocks(), this.#credit, position); }

@@ -12,7 +12,7 @@ import { Format, FormatNodeSegmentType, FormatNode } from "./FormatNode";
 import { InlineCodeNode } from "./InlineCodeNode";
 import { LabelNode } from "./LabelNode";
 import { LinkNode } from "./LinkNode";
-import { ListNode, ListParentType } from "./ListNode";
+import { ListNode } from "./ListNode";
 import { ParagraphNode } from "./ParagraphNode";
 import { QuoteNode } from "./QuoteNode";
 import { ReferenceNode } from "./ReferenceNode";
@@ -21,7 +21,6 @@ import { TableNode } from "./TableNode";
 import { TextNode } from "./TextNode";
 import { Position } from "./Position";
 import { BlockNode } from "./BlockNode";
-import { BlockParentNode } from "./BlockParentNode";
 
 export type Bookkeeping = {
     symbols: Record<string, string>;
@@ -285,7 +284,7 @@ export default class Parser {
 
     parseChapter(): ChapterNode {
 
-        let blocks: BlockNode<BlockParentNode>[] = [];
+        let blocks: BlockNode[] = [];
 
         // Make the chapter node so we can pass it around.
         const chapter = new ChapterNode(blocks, this.metadata);
@@ -388,7 +387,7 @@ export default class Parser {
 
     }
 
-    parseBlock(): BlockNode<any> {
+    parseBlock(): BlockNode {
 
         // Read whitespace before the block.
         this.readWhitespace();
@@ -619,7 +618,7 @@ export default class Parser {
 
     parseQuote(): QuoteNode {
 
-        const blocks: BlockNode<BlockParentNode>[] = [];
+        const blocks: BlockNode[] = [];
 
         // Parse the ", then any whitespace, then the newline
         this.read();
@@ -659,7 +658,7 @@ export default class Parser {
 
     parseCallout(): CalloutNode {
 
-        const blocks: BlockNode<BlockParentNode>[] = [];
+        const blocks: BlockNode[] = [];
 
         // Parse the = ...
         this.read();

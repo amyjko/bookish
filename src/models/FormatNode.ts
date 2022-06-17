@@ -7,15 +7,14 @@ import { EmbedNode } from "./EmbedNode";
 import { Caret, CaretRange } from "./Caret";
 import { MetadataNode } from "./MetadataNode";
 import { AtomNode } from "./AtomNode";
-import { BlockParentNode } from "./BlockParentNode";
 import { ListNode } from "./ListNode";
 import { TableNode } from "./TableNode";
 
 export type Format = "" | "*" | "_" | "^" | "v";
 export type FormatNodeSegmentType = FormatNode | TextNode | ErrorNode | MetadataNode<any> | AtomNode<any>;
-export type FormatNodeParent = BlockNode<BlockParentNode> | FormatNode | FootnoteNode | EmbedNode | ListNode | TableNode | undefined;
+export type FormatNodeParent = BlockNode | FormatNode | FootnoteNode | EmbedNode | ListNode | TableNode | undefined;
 
-export class FormatNode extends Node<FormatNodeParent> {
+export class FormatNode extends Node {
     
     readonly #format: Format;
     readonly #segments: FormatNodeSegmentType[];
@@ -40,7 +39,7 @@ export class FormatNode extends Node<FormatNodeParent> {
         return this.#segments.map(segment => segment.toText()).join(" ");
     }
 
-    toBookdown(parent: FormatNodeParent, debug?: number): string {
+    toBookdown(parent: Node, debug?: number): string {
         return (this.#format === "v" ? "^v" : this.#format) + this.#segments.map(s => s.toBookdown(this, debug)).join("") + this.#format;
     }
 
@@ -439,7 +438,7 @@ export class FormatNode extends Node<FormatNodeParent> {
         while(format instanceof FormatNode) {
             if(format.#format !== "")
                 formats.push(format.#format);
-            format = format.getParent(root);
+            format = format.getParent(root) as FormatNodeParent;
         }
         return formats;
 

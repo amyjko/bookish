@@ -1,14 +1,13 @@
 import { BlocksNode } from "./BlocksNode";
 import { Node } from "./Node";
 import { BlockNode } from "./BlockNode";
-import { BlockParentNode } from "./BlockParentNode";
 import { Position } from "./Position";
 
-export class CalloutNode extends BlocksNode<BlockParentNode> {
+export class CalloutNode extends BlocksNode {
     
     readonly #position: Position;
 
-    constructor(elements: BlockNode<BlockParentNode>[], position: Position="|") {
+    constructor(elements: BlockNode[], position: Position="|") {
         super(elements);
         this.#position = position;
     }
@@ -21,7 +20,7 @@ export class CalloutNode extends BlocksNode<BlockParentNode> {
         return this.getBlocks().map(element => element.toText()).join(" ");
     }
 
-    toBookdown(parent: BlockParentNode, debug?: number): string {
+    toBookdown(parent: Node, debug?: number): string {
         return "=\n" + this.getBlocks().map(element => element.toBookdown(this, debug)).join("\n\n") + "\n=" + (this.#position !== "|" ? this.#position : "");
     }
 
@@ -54,7 +53,7 @@ export class CalloutNode extends BlocksNode<BlockParentNode> {
 
     }
 
-    create(blocks: BlockNode<BlockParentNode>[]): CalloutNode {
+    create(blocks: BlockNode[]): CalloutNode {
         return new CalloutNode(blocks, this.#position);
     }
 

@@ -5,7 +5,7 @@ import { Node } from "./Node";
 import { ParagraphNode } from "./ParagraphNode";
 import { TextNode } from "./TextNode";
 
-export abstract class AtomNode<MetadataType> extends Node<FormatNode> {    
+export abstract class AtomNode<MetadataType> extends Node {
     
     readonly #meta: MetadataType;
 

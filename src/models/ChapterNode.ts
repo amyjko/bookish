@@ -15,13 +15,12 @@ import { CommentNode } from "./CommentNode";
 import { BlocksNode } from "./BlocksNode";
 import { Caret, CaretRange, TextRange } from "./Caret";
 import { Edit } from "../views/editor/Commands";
-import { BlockParentNode } from "./BlockParentNode";
 
-export class ChapterNode extends BlocksNode<BlockParentNode> {
+export class ChapterNode extends BlocksNode {
 
     #metadata: Bookkeeping;
 
-    constructor(blocks: BlockNode<BlockParentNode>[], metadata: Bookkeeping) {
+    constructor(blocks: BlockNode[], metadata: Bookkeeping) {
         super(blocks);
 
         // Content extracted during parsing.
@@ -34,7 +33,7 @@ export class ChapterNode extends BlocksNode<BlockParentNode> {
  
     getChapter() { return this; }
 
-    create(blocks: BlockNode<BlockParentNode>[]): BlocksNode<any> {
+    create(blocks: BlockNode[]): BlocksNode {
         return new ChapterNode(blocks, this.#metadata);
     }
 
@@ -68,7 +67,7 @@ export class ChapterNode extends BlocksNode<BlockParentNode> {
         return this.blocks.map(block => block.toText()).join(" ");
     }
 
-    toBookdown(parent?: BlockParentNode, debug?: number): string {
+    toBookdown(parent?: Node, debug?: number): string {
         // Render the symbols then all the blocks
         return Object.keys(this.#metadata.symbols).sort().map(name => `@${name}: ${this.#metadata.symbols[name]}\n\n`).join("") +
             this.blocks.map(b => b.toBookdown(this, debug)).join("\n\n");
@@ -299,9 +298,9 @@ export class ChapterNode extends BlocksNode<BlockParentNode> {
         // Defensively verify that we could find the given nodes in the document.
         // If we can't, something is wrong upstream.
         if(startIndex === undefined)
-            throw Error(`Could not find ${start.toBookdown(undefined)} in common ancestor.`);
+            throw Error(`Could not find in common ancestor.`);
         if(endIndex === undefined)
-            throw Error(`Could not find ${end.toBookdown(undefined)} in common ancestor.`);
+            throw Error(`Could not find in common ancestor.`);
 
         // If we didn't find them, or the start is before the end, return the given range.
         return startIndex === undefined || endIndex === undefined || startIndex < endIndex ? 
@@ -340,7 +339,7 @@ export class ChapterNode extends BlocksNode<BlockParentNode> {
         if(paragraph === undefined) return;
 
         // Find the block the paragraph is in.
-        const blocks = paragraph.closestParent<BlocksNode<any>>(this, BlocksNode);
+        const blocks = paragraph.closestParent<BlocksNode>(this, BlocksNode);
         if(blocks === undefined) return;
 
         // Split the paragraph in two.
@@ -447,7 +446,7 @@ export class ChapterNode extends BlocksNode<BlockParentNode> {
 
         // Find all of the formatting roots included in the selection as well as any non-paragraph blocks so we can edit them.
         // Start tracking when we hit the start node. Stop tracking when we hit the end node.
-        const blocksToEdit: BlockNode<BlockParentNode>[] = [];
+        const blocksToEdit: BlockNode[] = [];
         let insideSelection = false;
         commonAncestor.getNodes().forEach(node => {
             if(node === sortedRange.start.node) insideSelection = true;
@@ -457,12 +456,12 @@ export class ChapterNode extends BlocksNode<BlockParentNode> {
 
         // Edit each of the blocks as requested, accounting for the start and stop nodes, creating a new chapter as we go.
         let newRoot: ChapterNode | undefined = this;
-        const newBlocks: BlockNode<BlockParentNode>[] = [];
+        const newBlocks: BlockNode[] = [];
         for(let i = 0; i < blocksToEdit.length; i++ ) {
             const block = blocksToEdit[i];
             const parent = block.getParent(newRoot);
             if(parent === undefined) return;
-            let newBlock: BlockNode<BlockParentNode> | undefined = block;
+            let newBlock: BlockNode | undefined = block;
             // Edit all of the formats in this block.
             const formats = block.getFormats();
             for(let j = 0; j < formats.length; j++) {

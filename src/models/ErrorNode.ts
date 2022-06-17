@@ -1,7 +1,7 @@
 import { BlockNode } from "./BlockNode";
 import { Node } from "./Node";
 
-export class ErrorNode extends BlockNode<Node | undefined> {
+export class ErrorNode extends BlockNode {
     #text: string | undefined;
     #error: string;
     constructor(text: string | undefined, error: string) {

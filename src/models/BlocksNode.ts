@@ -1,41 +1,40 @@
 import { Node } from "./Node";
 import { BlockNode } from "./BlockNode";
 import { ListNode } from "./ListNode";
-import { BlockParentNode } from "./BlockParentNode";
 
-export abstract class BlocksNode<T extends (BlockParentNode | undefined)> extends BlockNode<T> {
+export abstract class BlocksNode extends BlockNode {
     
-    readonly blocks: BlockNode<T>[];
+    readonly blocks: BlockNode[];
 
-    constructor(elements: BlockNode<T>[]) {
+    constructor(elements: BlockNode[]) {
         super();
         this.blocks = elements;
     }
 
     getBlocks() { return this.blocks; }
 
-    indexOf(block: BlockNode<T>): number | undefined {
+    indexOf(block: BlockNode): number | undefined {
         const index = this.blocks.indexOf(block);
         return index < 0 ? undefined : index;
     }
 
-    contains(block: BlockNode<T>) { return this.indexOf(block) !== undefined; }
+    contains(block: BlockNode) { return this.indexOf(block) !== undefined; }
 
-    getBlockBefore(anchor: BlockNode<T>): BlockNode<T> | undefined {
+    getBlockBefore(anchor: BlockNode): BlockNode | undefined {
         const index = this.blocks.indexOf(anchor);
         if(index <= 0)
             return undefined;
         return this.blocks[index - 1];        
     }
 
-    getBlockAfter(anchor: BlockNode<T>): BlockNode<T> | undefined {
+    getBlockAfter(anchor: BlockNode): BlockNode | undefined {
         const index = this.blocks.indexOf(anchor);
         if(index < 0 || index > this.blocks.length - 2)
             return undefined;
         return this.blocks[index + 1];
     }
 
-    getBlocksBetween(first: BlockNode<T>, last: BlockNode<T>): BlockNode<T>[] | undefined {
+    getBlocksBetween(first: BlockNode, last: BlockNode): BlockNode[] | undefined {
 
         const firstIndex = this.indexOf(first);
         const lastIndex = this.indexOf(last);
@@ -67,7 +66,7 @@ export abstract class BlocksNode<T extends (BlockParentNode | undefined)> extend
         return this.blocks.map(b => b === node ? this : b.getParentOf(node)).find(b => b !== undefined);
     }
 
-    withBlockInserted(anchor: BlockNode<T>, block: BlockNode<T>, before: boolean): BlocksNode<T> | undefined {
+    withBlockInserted(anchor: BlockNode, block: BlockNode, before: boolean): BlocksNode | undefined {
         const index = this.blocks.indexOf(anchor);
         if(index < 0)
             return;
@@ -75,26 +74,26 @@ export abstract class BlocksNode<T extends (BlockParentNode | undefined)> extend
         return this.create(newBlocks);
     }
 
-    withoutBlock(block: BlockNode<T>): BlocksNode<any> {
+    withoutBlock(block: BlockNode): BlocksNode {
         return this.create(this.blocks.filter(n => n === block));
     }
 
-    withBlockInsertedBefore(anchor: BlockNode<T>, block: BlockNode<T>) {
+    withBlockInsertedBefore(anchor: BlockNode, block: BlockNode) {
         return this.withBlockInserted(anchor, block, true);
     }
 
-    withBlockInsertedAfter(anchor: BlockNode<T>, block: BlockNode<T>) {
+    withBlockInsertedAfter(anchor: BlockNode, block: BlockNode) {
         return this.withBlockInserted(anchor, block, false);
     }
 
-    withMergedAdjacentLists(): BlocksNode<T> {
+    withMergedAdjacentLists(): BlocksNode {
 
-        const newBlocks: BlockNode<T>[] = [];
+        const newBlocks: BlockNode[] = [];
         this.blocks.forEach(block => {
             const previousBlock = newBlocks[newBlocks.length - 1];
             // Are these two adjacent lists of the same style? Put all of the current block's list items in the previous block.
             if(previousBlock instanceof ListNode && block instanceof ListNode && previousBlock.isNumbered() === block.isNumbered())
-                newBlocks[newBlocks.length - 1] = previousBlock.withListAppended(block) as BlockNode<T>;
+                newBlocks[newBlocks.length - 1] = previousBlock.withListAppended(block) as BlockNode;
             else
                 newBlocks.push(block);
         });
@@ -103,6 +102,6 @@ export abstract class BlocksNode<T extends (BlockParentNode | undefined)> extend
     
     }
     
-    abstract create(blocks: BlockNode<T>[]): BlocksNode<T>;
+    abstract create(blocks: BlockNode[]): BlocksNode;
 
 }

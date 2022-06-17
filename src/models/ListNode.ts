@@ -9,7 +9,7 @@ import { BlockNode } from "./BlockNode";
 export type ListParentType =  BlockParentNode | ListNode;
 export type ListNodeType = FormatNode | ListNode;
 
-export class ListNode extends BlockNode<ListParentType> {
+export class ListNode extends BlockNode {
 
     readonly #numbered: boolean;
     readonly #items: ListNodeType[];
@@ -61,7 +61,7 @@ export class ListNode extends BlockNode<ListParentType> {
         return this.#items.map(item => item.toText()).join(" ");
     }
 
-    toBookdown(parent: ListParentType, debug?: number, level: number=1): string {
+    toBookdown(parent: Node, debug?: number, level: number=1): string {
         return this.isNumbered() ?
             this.#items.map((item, number) => (item instanceof ListNode ? "" : ((number + 1) + ".".repeat(level)) + " ") + item.toBookdown(this, debug, level + 1)).join("\n") :
             this.#items.map(item => (item instanceof ListNode ? "" : "*".repeat(level) + " ") + item.toBookdown(this, debug, level + 1)).join("\n");
@@ -170,7 +170,7 @@ export class ListNode extends BlockNode<ListParentType> {
     }
 
     // Recursively generate a new list of paragraph and list nodes where the given formats are in paragraphs instead of in the list.
-    unwrap(formats: FormatNode[], container: BlocksNode<any>): (ParagraphNode | ListNode)[] {
+    unwrap(formats: FormatNode[], container: BlocksNode): (ParagraphNode | ListNode)[] {
 
         const parent = container.getParentOf(this) as ListParentType;
         if(parent === undefined) return [];

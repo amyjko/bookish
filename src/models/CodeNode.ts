@@ -1,11 +1,10 @@
 import { Node } from "./Node";
-import { BlockParentNode } from "./BlockParentNode";
 import { Position } from "./Position";
 import { FormatNode } from "./FormatNode";
 import { TextNode } from "./TextNode";
 import { BlockNode } from "./BlockNode";
 
-export class CodeNode extends BlockNode<BlockParentNode> {
+export class CodeNode extends BlockNode {
 
     readonly #code: TextNode;
     readonly #caption: FormatNode;
@@ -38,7 +37,7 @@ export class CodeNode extends BlockNode<BlockParentNode> {
 
     toText() { return ""; }
 
-    toBookdown(parent: BlockParentNode, debug?: number): string {
+    toBookdown(parent: Node, debug?: number): string {
         // Remember to escape any back ticks.
         return "\n`" + (this.#language !== "plaintext" ? this.#language : "") + "\n" + this.#code.getText().replace(/`/g, '\\`') + "\n`" + (this.#position !== "|" ? this.#position : "") + this.#caption.toBookdown(this, debug);
     }
