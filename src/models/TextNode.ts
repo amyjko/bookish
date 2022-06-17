@@ -1,5 +1,4 @@
 import { MetadataNode } from "./MetadataNode";
-import { ChapterNode } from "./ChapterNode";
 import { Caret } from "./Caret";
 import { FormatNode } from "./FormatNode";
 import { Node } from "./Node";
@@ -8,6 +7,7 @@ import { AtomNode } from "./AtomNode";
 import { CodeNode } from "./CodeNode";
 import { BlocksNode } from "./BlocksNode";
 import { Edit } from "../views/editor/Commands";
+import { RootNode } from "./RootNode";
 
 export type TextNodeParent = FormatNode | MetadataNode<any> | CodeNode;
 
@@ -96,17 +96,10 @@ export class TextNode extends Node {
         return this.closestParent<BlocksNode>(root, BlocksNode);
     }
 
-    getRoot(root: Node): FormatNode | ChapterNode | undefined {
-        const atom = this.getFarthestParentMatching(root, p => p instanceof AtomNode) as AtomNode<FormatNode>;
-        const format = this.getFarthestParentMatching(root, p => p instanceof FormatNode) as FormatNode;
-        const chapter = this.getFarthestParentMatching(root, p => p instanceof ChapterNode) as ChapterNode;
-        return atom ? atom.getMeta() : chapter ? chapter : format ? format : undefined;
-    }
-
-    next(root: Node, index: number): Caret {
+    next(root: RootNode, index: number): Caret {
     
         // Otherwise, find the next text node after this one.
-        const next = this.getRoot(root)?.getNextTextOrAtom(this);
+        const next = root.getNextTextOrAtom(this);
 
         // If there are more characters, just go next.
         if(index < this.#text.length) {
@@ -134,10 +127,10 @@ export class TextNode extends Node {
 
     }
 
-    previous(root: Node, index: number): Caret {
+    previous(root: RootNode, index: number): Caret {
 
         // Otherwise, find the previous text node before this one.
-        const previous = this.getRoot(root)?.getPreviousTextOrAtom(this);
+        const previous = root.getPreviousTextOrAtom(this);
     
         // If there are more characters, just go next.
         if(index > 0) {
@@ -165,7 +158,7 @@ export class TextNode extends Node {
 
     }
 
-    nextWord(root: Node, index?: number): Caret {
+    nextWord(root: RootNode, index?: number): Caret {
 
         if(index === undefined)
             index = 0;
@@ -182,7 +175,7 @@ export class TextNode extends Node {
         // Otherwise, find the next text node's next word boundary.
         const paragraph = this.getParagraph(root);
         const paragraphText = paragraph ? paragraph.getTextNodes() : undefined;
-        const nextNode = this.getRoot(root)?.getNextTextOrAtom(this);
+        const nextNode = root.getNextTextOrAtom(this);
         const nextWord = nextNode?.nextWord(root);
 
         // If there isn't one, just go to the end of this.
@@ -195,7 +188,7 @@ export class TextNode extends Node {
 
     }
 
-    previousWord(root: Node, index?: number): Caret {
+    previousWord(root: RootNode, index?: number): Caret {
 
         if(index === undefined)
             index = this.#text.length;
@@ -212,7 +205,7 @@ export class TextNode extends Node {
         // Otherwise, find the next text node's next word boundary.
         const paragraph = this.getParagraph(root);
         const paragraphText = paragraph ? paragraph.getTextNodes() : undefined;
-        const previousNode = this.getRoot(root)?.getPreviousTextOrAtom(this);
+        const previousNode = root.getPreviousTextOrAtom(this);
         const previousWord = previousNode?.previousWord(root);
 
         // If there isn't one, just go to the end of this.

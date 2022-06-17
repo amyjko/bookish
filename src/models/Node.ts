@@ -1,5 +1,3 @@
-import { ChapterNode } from "./ChapterNode";
-
 // A global node ID generator, for mapping views back to models.
 let nodeID = 1;
 

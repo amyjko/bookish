@@ -313,7 +313,7 @@ export default class Parser {
         while(this.more()) {
             trailingNewlines = 0;
             // Read a blocka add it to the list if we parsed something.
-            blocks.push(this.parseBlock());            
+            blocks.push(this.parseBlock());
             // Read whitespace until we find the next thing.
             while(this.peek() === " " || this.peek() === "\t" || this.peek() === "\n") {
                 if(this.peek() === "\n")
@@ -428,11 +428,7 @@ export default class Parser {
     }
 
     parseParagraph(): ParagraphNode {
-
-        const paragraph = new ParagraphNode()
-        paragraph.withContent(this.parseContent())
-        return paragraph;
-
+        return new ParagraphNode(0, this.parseContent());
     }
 
     parseHeader(): ParagraphNode {
