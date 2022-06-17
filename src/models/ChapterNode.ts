@@ -261,7 +261,7 @@ export class ChapterNode extends BlocksNode {
 
         // Create and insert the into the formatted node.
         const newNode = nodeCreator.call(undefined, selectedText ? selectedText : "");
-        const revisedFormat = newFormatted.insertSegmentAt(newNode, caret);
+        const revisedFormat = newFormatted.withSegmentAt(newNode, caret);
         if(revisedFormat === undefined) return;
         const newCaret = 
             newNode instanceof AtomNode ? newNode.getDefaultCaret() :

@@ -1,12 +1,11 @@
 import { Node } from "./Node";
 import { FormatNode } from "./FormatNode";
-import { BlockParentNode } from "./BlockParentNode";
 import { Caret } from "./Caret";
 import { ParagraphNode } from "./ParagraphNode";
 import { BlocksNode } from "./BlocksNode";
 import { BlockNode } from "./BlockNode";
 
-export type ListParentType =  BlockParentNode | ListNode;
+export type ListParentType =  BlocksNode | ListNode;
 export type ListNodeType = FormatNode | ListNode;
 
 export class ListNode extends BlockNode {
