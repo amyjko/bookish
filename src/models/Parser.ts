@@ -444,11 +444,7 @@ export default class Parser {
         this.readWhitespace();
 
         // Parse some content.
-        let header = new ParagraphNode(Math.min(3, count));
-        header.withContent(this.parseContent());
-        
-        // Return a header node.
-        return header;
+        return new ParagraphNode(Math.min(3, count), this.parseContent());
 
     }
     
@@ -1007,10 +1003,7 @@ export default class Parser {
             superscript = false;
         }
 
-        const node = new FormatNode(superscript ? "^" : "v", []);
-
-        // Parse the content
-        node.withSegmentAppended(this.parseContent("^"));
+        const node = new FormatNode(superscript ? "^" : "v", [ this.parseContent("^") ]);
 
         // Read the closing ^
         this.read();
