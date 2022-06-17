@@ -10,18 +10,22 @@ import { FormatNode } from "../../models/FormatNode";
 import { BlocksNode } from "../../models/BlocksNode";
 import { ListNode } from "../../models/ListNode";
 import { TableNode } from "../../models/TableNode";
+import { Node as BookishNode } from "../../models/Node";
 import { Command, commands, Edit } from "./Commands";
 import Toolbar from "./Toolbar";
-import { FootnoteNode } from "../../models/FootnoteNode";
 import Chapter from "../../models/Chapter";
 
-export const CaretContext = React.createContext<{ 
+export type CaretContextType = { 
     range: CaretRange | undefined, 
     coordinate: { x: number, y: number} | undefined,
     setCaretRange: Function,
     forceUpdate: Function,
+    edit: (previous: BookishNode, edited: BookishNode) => void,
+    root: ChapterNode,
     focused: boolean
-} | undefined>(undefined);
+} | undefined;
+
+export const CaretContext = React.createContext<CaretContextType>(undefined);
 
 export type CaretState = {
     range: CaretRange,
@@ -539,15 +543,7 @@ const ChapterEditor = (props: { chapter: Chapter }) => {
         const context = getCaretContext();
         if(context && caretRange) {
 
-            // If the history is empty, record the current state.
-            let newStack: UndoState[] = undoStack.length > 0 ? undoStack : [{ 
-                chapter: ast.toBookdown(undefined), 
-                command: undefined,
-                range: ast.caretRangeToTextRange(caretRange)
-                // If the undo position is beyond the front, clear everything before it, because we're changing history.
-            }]
-
-            const results  = command.handler.call(
+            const results = command.handler.call(
                 undefined, 
                 context,
                 getUtilities(),
@@ -555,54 +551,55 @@ const ChapterEditor = (props: { chapter: Chapter }) => {
             );
 
             // If the command invoked produced a new range
-            if(results) {
-
+            if(results !== undefined && results.root instanceof ChapterNode) {
                 const { root, range } = results;
 
-                if(root instanceof ChapterNode) {
-                    const newChapter = root;
-
-                    if(command.category !== "navigation" && newChapter === ast)
-                        console.error(`Warning: immutability violation on ${command.description}`);
-                    
-                    // Change the chapter's AST.
-                    chapter.setAST(newChapter);
-
-                    // Set the range to force a rerender, assuming something in the document changed.
-                    setCaretRange({ start: range.start, end: range.end });
-
-                    // Save the copy in the undo stack if this isn't a navigation or selection state.
-                    if(command.category !== "navigation" && command.category !== "selection" && command.category !== "history") {
-                        // Set the new undo stack, pre-pending the new command to the front.
-                        setUndoStack([{ 
-                            chapter: newChapter.toBookdown(undefined),
-                            command: command,
-                            range: newChapter.caretRangeToTextRange(range)
-                            // If the undo position is beyond the front, clear everything before it, because we're changing history.
-                        }, ...(undoPosition > 0 ? newStack.slice(undoPosition) : newStack)]);
-
-                        // Set the undo position to the last index.
-                        setUndoPosition(0);
-                    }
-                
-                }
+                if(command.category !== "navigation" && root === ast)
+                    console.error(`Warning: immutability violation on ${command.description}`);
+        
+                // Set the range to force a rerender, assuming something in the document changed.
+                setCaretRange({ start: range.start, end: range.end });
+        
+                // Save the copy in the undo stack if this isn't a navigation or selection state.
+                if(command.category !== "navigation" && command.category !== "selection" && command.category !== "history")
+                    saveEdit(root, range, command);
             
             }
-            // TODO If there was no result, shake or something.
+            // TODO Immutable If there was no result, shake or something.
         }
     }
 
-    // This handles all non-command changes reported by the chapter's nodes (primarily toolbar edits).
-    function handleChapterChange(chapter: ChapterNode) {
+    function saveEdit(newChapter: ChapterNode, newRange: CaretRange, command?: Command) {
+        
+        // Change the chapter's AST.
+        chapter.setAST(newChapter);
 
-        // Whatever changed, add a snapshot to the stack.
+        // If the history is empty, record the current state.
+        const newStack: UndoState[] = undoStack.length > 0 ? undoStack : caretRange === undefined ? [] : [{ 
+            chapter: ast.toBookdown(undefined), 
+            command: undefined,
+            range: ast.caretRangeToTextRange(caretRange)
+            // If the undo position is beyond the front, clear everything before it, because we're changing history.
+        }];
+
+        // Set the new undo stack, pre-pending the new command to the front.
+        setUndoStack([{ 
+            chapter: newChapter.toBookdown(undefined),
+            command: command,
+            range: newChapter.caretRangeToTextRange(newRange)
+            // If the undo position is beyond the front, clear everything before it, because we're changing history.
+        }, ...(undoPosition > 0 ? newStack.slice(undoPosition) : newStack)]);
+
+        // Set the undo position to the last index.
+        setUndoPosition(0);
+
+    }
+
+    function editNode(previous: BookishNode, edited: BookishNode) {
         if(caretRange) {
-            setUndoStack([{ 
-                chapter: ast.toBookdown(undefined),
-                command: undefined,
-                range: ast.caretRangeToTextRange(caretRange)
-                // If the undo position is beyond the front, clear everything before it, because we're changing history.
-            }, ...undoStack]);
+            const newRoot = previous.replace(ast, edited);
+            if(newRoot === undefined || !(newRoot instanceof ChapterNode)) return;
+            saveEdit(newRoot, caretRange);
         }
     }
 
@@ -656,6 +653,8 @@ const ChapterEditor = (props: { chapter: Chapter }) => {
         coordinate: caretCoordinate, 
         setCaretRange: setCaretRange, 
         forceUpdate: forceUpdate,
+        edit: editNode,
+        root: ast,
         focused: focused
     }}>
             <div 

@@ -21,8 +21,7 @@ const CitationsEditor = (props: {
     function handleCitationsChange(newValue: MultiValue<{value: string, label: string}>) {
 
         let newCitations = newValue.map(val => val.value);
-        // TODO Immutable
-        citations.withMeta(newCitations);
+        caret?.edit(citations, citations.withMeta(newCitations));
         setEditedCitations(newCitations);
         // Hack to force re-render on chapter.
         if(caret && caret.range)

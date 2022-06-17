@@ -204,7 +204,7 @@ export class FormatNode extends Node {
     // tree, but with the requested modification.
     withFormat(range: CaretRange, format: Format | undefined): FormatNode | undefined {
 
-        // This only transforms ranges that start and end with text nodes and for nodes in the same format node.
+        // This only transforms ranges that start and end with text/atom nodes in this format node.
         if( !(range.start.node instanceof TextNode || range.start.node instanceof AtomNode) || 
             !(range.end.node instanceof TextNode || range.end.node instanceof AtomNode) || 
             !(this.contains(range.start.node) && this.contains(range.end.node)))

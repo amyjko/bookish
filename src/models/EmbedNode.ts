@@ -81,10 +81,10 @@ export class EmbedNode extends BlockNode {
             undefined;    
     }
 
-    withURL(url: string) { new EmbedNode(url, this.#description, this.#caption, this.#credit, this.#position); }
-    withDescription(description: string) { new EmbedNode(this.#url, description, this.#caption, this.#credit, this.#position); }
-    withCaption(caption: FormatNode) { new EmbedNode(this.#url, this.#description, caption, this.#credit, this.#position); }
-    withCredit(credit: FormatNode) { new EmbedNode(this.#url, this.#description, this.#caption, credit, this.#position); }
-    withPosition(position: Position) { new EmbedNode(this.#url, this.#description, this.#caption, this.#credit, position); }
+    withURL(url: string) { return new EmbedNode(url, this.#description, this.#caption, this.#credit, this.#position); }
+    withDescription(description: string) { return new EmbedNode(this.#url, description, this.#caption, this.#credit, this.#position); }
+    withCaption(caption: FormatNode) { return new EmbedNode(this.#url, this.#description, caption, this.#credit, this.#position); }
+    withCredit(credit: FormatNode) { return new EmbedNode(this.#url, this.#description, this.#caption, credit, this.#position); }
+    withPosition(position: Position) { return new EmbedNode(this.#url, this.#description, this.#caption, this.#credit, position); }
 
 }

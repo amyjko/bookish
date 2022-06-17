@@ -1,22 +1,18 @@
-import React, { ChangeEvent, useContext, useRef, useState } from "react";
+import React, { ChangeEvent, useContext } from "react";
 import { LabelNode } from "../../models/LabelNode";
 import { ChapterContext } from "../chapter/Chapter";
-import { EditorContext } from "../page/Book";
+import { CaretContext, CaretContextType } from "./ChapterEditor";
 
 const LabelEditor = (props: {
     label: LabelNode
 }) => {
 
     const context = useContext(ChapterContext);
-    const { editable } = useContext(EditorContext)
     const label = props.label;
+    const caret = useContext<CaretContextType>(CaretContext);
 
     function handleChange(e: ChangeEvent<HTMLInputElement>) {
-
-        // TODO Immutable
-        // Update the model
-        label.withMeta(e.target.value);
-
+        caret?.edit(label, label.withMeta(e.target.value));
     }
 
     function isValid() { 
