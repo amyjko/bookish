@@ -513,28 +513,4 @@ export class ChapterNode extends BlocksNode {
 
     }
 
-    // If the caret is in an atom of the given type, remove it.
-    // If it is not, wrap it.
-    toggleAtom<MetadataNodeType extends MetadataNode<any>>(range: CaretRange, type: Function, creator: (text: string) => FormatNodeSegmentType): Edit {
-
-        // If the caret is already in a link node, remove it.
-        if(range.start.node.isInside(this, type)) {
-            const atom = range.start.node.getClosestParentMatching(this, p => p instanceof type) as MetadataNodeType;
-            const formatted = this.getParentOf(atom);
-            if(formatted !== undefined && formatted instanceof FormatNode) {
-                const index = formatted.caretToTextIndex(range.start);
-                const newFormat = formatted.withSegmentReplaced(atom, atom.getMeta());
-                const newCaret = formatted.textIndexToCaret(index);
-                const parent = this.getParentOf(formatted);
-                if(parent === undefined || newFormat === undefined || newCaret === undefined) return;
-                const newRoot = parent.rootWithChildReplaced(this, formatted, newFormat);
-                if(newRoot === undefined) return;
-                return { root: newRoot, range: { start: newCaret, end: newCaret } };
-            }
-        }
-        else
-            return this.insertNodeAtSelection(range, creator);
-
-    }
-
 }

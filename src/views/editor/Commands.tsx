@@ -287,6 +287,17 @@ function insertBlock(context: CaretState, block: BlockNode): Node | undefined {
 
 }
 
+function unwrapMeta(context: CaretState): Edit {
+
+    if(context.format === undefined || context.meta === undefined) return;
+    const newFormat = context.format.withSegmentReplaced(context.meta, context.meta.getText());
+    if(newFormat === undefined) return;
+    const newRoot = context.format.replace(context.format, newFormat);
+    if(newRoot === undefined) return;
+    return { root: newRoot, range: context.range };
+
+}
+
 // An ordered list of command specifications for keyboard and mouse input.
 export const commands: Command[] = [
     {
@@ -812,7 +823,9 @@ export const commands: Command[] = [
         control: true, alt: false, shift: false, key: "j",
         visible: context => true,
         active: context => context.chapter !== undefined && context.startIsText && context.endIsText,
-        handler: context => context.chapter?.toggleAtom(context.range, InlineCodeNode, text => new InlineCodeNode(text))
+        handler: context => context.meta instanceof InlineCodeNode ? 
+            unwrapMeta(context) : 
+            context.chapter.insertNodeAtSelection(context.range, text => new InlineCodeNode(text))
     },
     {
         label: "sub\u2099",
@@ -837,12 +850,14 @@ export const commands: Command[] = [
     {
         label: "link ⚭",
         icon: Link,
-        description: "toggle link",
+        description: "link",
         category: "annotation",
         control: true, alt: false, shift: false, key: "k",
-        visible: context => true,
+        visible: context => context.format !== undefined,
         active: context => context.chapter !== undefined && context.startIsText && context.endIsText,
-        handler: context => context.chapter?.toggleAtom(context.range, LinkNode, text => new LinkNode(text))
+        handler: context => context.meta instanceof LinkNode ? 
+            unwrapMeta(context) : 
+            context.chapter.insertNodeAtSelection(context.range, text => new LinkNode(text))
     },
     {
         label: "glossary",
@@ -851,7 +866,9 @@ export const commands: Command[] = [
         control: true, alt: false, shift: false, key: "d",
         visible: context => context.chapter !== undefined,
         active: context => context.startIsText && context.endIsText,
-        handler: context => context.chapter?.toggleAtom(context.range, DefinitionNode, text => new DefinitionNode(text))
+        handler: context => context.meta instanceof DefinitionNode ? 
+            unwrapMeta(context) : 
+            context.chapter.insertNodeAtSelection(context.range, text => new DefinitionNode(text))
     },
     {
         label: "footnote",

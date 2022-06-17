@@ -11,10 +11,10 @@ const LinkEditor = (props: {
 }) => {
 
     const chapter = useContext(ChapterContext);
+    const caret = useContext(CaretContext);
+
     const link = props.link;
     const url = link.getMeta();
-    // const [ editedURL, setEditedURL ] = useState<string>(link.getMeta());
-    const caret = useContext(CaretContext);
 
     function handleChapterChange(e: ChangeEvent<HTMLSelectElement>) {
 
@@ -47,6 +47,7 @@ const LinkEditor = (props: {
         const [ chapterID, labelID ] = urlOrChapter.split(":");
         if(chapterID === undefined || labelID === undefined)
             return false;
+
         // The chapter ID is optional; if it's missing, it refers to this chapter.
         const correspondingChapter = chapterID === "" ? chapter.chapter : chapter.book.getChapter(chapterID)?.getAST();
         if(!correspondingChapter)
@@ -67,9 +68,10 @@ const LinkEditor = (props: {
     return <span>
         <button title="Remove link."
             onClick={(e) => {
-                if(chapter && chapter.chapter && caret && caret.range) {
-                    const newCaret = chapter.chapter.toggleAtom(caret.range, LinkNode, text => new LinkNode(text));
-                    caret.setCaretRange({ start: newCaret, end: newCaret });
+                if(caret?.context?.format) {
+                    const newFormat = caret.context.format.withSegmentReplaced(link, link.getText());
+                    if(newFormat)
+                        caret.edit(caret.context.format, newFormat);
                 }
             }}
         >

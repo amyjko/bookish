@@ -9,6 +9,7 @@ import { MetadataNode } from "./MetadataNode";
 import { AtomNode } from "./AtomNode";
 import { ListNode } from "./ListNode";
 import { TableNode } from "./TableNode";
+import { Edit } from "../views/editor/Commands";
 
 export type Format = "" | "*" | "_" | "^" | "v";
 export type FormatNodeSegmentType = FormatNode | TextNode | ErrorNode | MetadataNode<any> | AtomNode<any>;

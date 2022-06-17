@@ -14,12 +14,14 @@ import { Node as BookishNode } from "../../models/Node";
 import { Command, commands, Edit } from "./Commands";
 import Toolbar from "./Toolbar";
 import Chapter from "../../models/Chapter";
+import { MetadataNode } from "../../models/MetadataNode";
 
 export type CaretContextType = { 
     range: CaretRange | undefined, 
     coordinate: { x: number, y: number} | undefined,
     setCaretRange: Function,
     forceUpdate: Function,
+    context: CaretState | undefined,
     edit: (previous: BookishNode, edited: BookishNode) => void,
     root: ChapterNode,
     focused: boolean
@@ -40,6 +42,7 @@ export type CaretState = {
     table: TableNode | undefined,
     format: FormatNode | undefined, 
     atom: AtomNode<any> | undefined,
+    meta: MetadataNode<any> | undefined,
     startIsText: boolean,
     endIsText: boolean,
     startIsTextOrAtom: boolean, 
@@ -437,6 +440,7 @@ const ChapterEditor = (props: { chapter: Chapter }) => {
             paragraph: caretRange.start.node.getClosestParentMatching(ast, p => p instanceof ParagraphNode) as ParagraphNode,
             list: caretRange.start.node.getClosestParentMatching(ast, p => p instanceof ListNode) as ListNode,
             atom: caretRange.start.node.getClosestParentMatching(ast, p => p instanceof AtomNode) as AtomNode<FormatNode>,
+            meta: caretRange.start.node.getClosestParentMatching(ast, p => p instanceof MetadataNode) as MetadataNode<FormatNode>,
             includesList: includesList,
             table: caretRange.start.node.getClosestParentMatching(ast, p => p instanceof TableNode) as TableNode,
             format: (caretRange.end.node instanceof TextNode || caretRange.end.node instanceof AtomNode) ? caretRange.end.node.getFormatRoot(ast) : undefined,
@@ -565,7 +569,7 @@ const ChapterEditor = (props: { chapter: Chapter }) => {
                     saveEdit(root, range, command);
             
             }
-            // TODO Immutable If there was no result, shake or something.
+            // TODO If there was no result, shake or something.
         }
     }
 
@@ -579,7 +583,6 @@ const ChapterEditor = (props: { chapter: Chapter }) => {
             chapter: ast.toBookdown(), 
             command: undefined,
             range: ast.caretRangeToTextRange(caretRange)
-            // If the undo position is beyond the front, clear everything before it, because we're changing history.
         }];
 
         // Set the new undo stack, pre-pending the new command to the front.
@@ -654,6 +657,7 @@ const ChapterEditor = (props: { chapter: Chapter }) => {
         setCaretRange: setCaretRange, 
         forceUpdate: forceUpdate,
         edit: editNode,
+        context: context,
         root: ast,
         focused: focused
     }}>

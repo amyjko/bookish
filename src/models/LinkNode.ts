@@ -1,4 +1,3 @@
-import { FormatNode } from "./FormatNode";
 import { MetadataNode } from "./MetadataNode";
 import { Node } from "./Node";
 
