@@ -67,10 +67,10 @@ export class ChapterNode extends BlocksNode {
         return this.blocks.map(block => block.toText()).join(" ");
     }
 
-    toBookdown(parent?: Node, debug?: number): string {
+    toBookdown(debug?: number): string {
         // Render the symbols then all the blocks
         return Object.keys(this.#metadata.symbols).sort().map(name => `@${name}: ${this.#metadata.symbols[name]}\n\n`).join("") +
-            this.blocks.map(b => b.toBookdown(this, debug)).join("\n\n");
+            this.blocks.map(b => b.toBookdown(debug)).join("\n\n");
     }
 
     getTextNodes(): TextNode[] {
@@ -92,7 +92,7 @@ export class ChapterNode extends BlocksNode {
 
     // Convert node and index into text index by converting to Bookdown and then finding the index of the node.
     caretToTextIndex(caret: Caret): number {
-        const debug = this.toBookdown(undefined, caret.node.nodeID);
+        const debug = this.toBookdown(caret.node.nodeID);
         const index = debug.indexOf("%debug%");
         return index + caret.index;
     }
@@ -114,14 +114,14 @@ export class ChapterNode extends BlocksNode {
 
         // Find the first node whose index contains the given text index.
         const match = allNodes.find(node => {
-            const debug = this.toBookdown(undefined, node.nodeID);
+            const debug = this.toBookdown(node.nodeID);
             const index = debug.indexOf("%debug%");
             return textIndex >= index && textIndex <= index + node.getLength();
         });
 
         // If we found match, return a corresponding caret.
         if(match) {
-            const debug = this.toBookdown(undefined, match.nodeID);
+            const debug = this.toBookdown(match.nodeID);
             const index = debug.indexOf("%debug%");
             return { node: match, index: textIndex - index };
         }

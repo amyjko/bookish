@@ -14,8 +14,8 @@ export class LinkNode extends MetadataNode<string> {
         return this.getText().toText();
     }
 
-    toBookdown(parent: FormatNode, debug?: number): string {
-        return `[${this.getText().toBookdown(this, debug)}|${this.getMeta()}]`;
+    toBookdown(debug?: number): string {
+        return `[${this.getText().toBookdown(debug)}|${this.getMeta()}]`;
     }
 
     copy(): LinkNode {

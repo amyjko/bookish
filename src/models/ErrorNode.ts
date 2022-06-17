@@ -15,7 +15,7 @@ export class ErrorNode extends BlockNode {
     getFormats() { return []; }
 
     toText(): string { return ""; }
-    toBookdown(parent: Node, debug?: number): string { return this.#text ? this.#text : ""; }
+    toBookdown(debug?: number): string { return this.#text ? this.#text : ""; }
 
     traverseChildren(fn: (node: Node) => void): void {}
     getParentOf(node: Node): Node | undefined { return undefined; }

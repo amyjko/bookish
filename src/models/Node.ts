@@ -10,7 +10,7 @@ export abstract class Node {
     }
 
     abstract toText(): string;
-    abstract toBookdown(parent: Node, debug?: number): string;
+    abstract toBookdown(debug?: number): string;
     abstract getType(): string;
     abstract traverseChildren(fn: (node: Node) => void) : void;
     abstract copy(): Node;

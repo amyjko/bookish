@@ -52,7 +52,7 @@ export abstract class AtomNode<MetadataType> extends Node {
 
     getLength() { return 1; }
 
-    abstract toBookdown(parent: FormatNode, debug?: number): string;
+    abstract toBookdown(debug?: number, format?: FormatNode): string;
     abstract toText(): string;
     abstract copy(): AtomNode<MetadataType>;
     abstract withMeta(meta: MetadataType): AtomNode<MetadataType>;

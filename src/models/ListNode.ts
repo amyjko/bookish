@@ -61,10 +61,10 @@ export class ListNode extends BlockNode {
         return this.#items.map(item => item.toText()).join(" ");
     }
 
-    toBookdown(parent: Node, debug?: number, level: number=1): string {
+    toBookdown(debug?: number, level: number=1): string {
         return this.isNumbered() ?
-            this.#items.map((item, number) => (item instanceof ListNode ? "" : ((number + 1) + ".".repeat(level)) + " ") + item.toBookdown(this, debug, level + 1)).join("\n") :
-            this.#items.map(item => (item instanceof ListNode ? "" : "*".repeat(level) + " ") + item.toBookdown(this, debug, level + 1)).join("\n");
+            this.#items.map((item, number) => (item instanceof ListNode ? "" : ((number + 1) + ".".repeat(level)) + " ") + item.toBookdown(debug, level + 1)).join("\n") :
+            this.#items.map(item => (item instanceof ListNode ? "" : "*".repeat(level) + " ") + item.toBookdown(debug, level + 1)).join("\n");
     }
 
     traverseChildren(fn: (node: Node) => void): void {

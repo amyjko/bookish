@@ -26,7 +26,7 @@ export class TextNode extends Node {
 
     toText(): string { return this.#text; }
 
-    toBookdown(parent: Node, debug?: number): string {
+    toBookdown(debug?: number): string {
 
         // Escape all characters with special meaning inside content nodes: _*`<^{~\[@% and :'s with no space after
         let newString = new String(this.#text)

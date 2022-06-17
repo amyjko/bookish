@@ -28,9 +28,7 @@ export class ReferenceNode extends Node {
     getParentOf(node: Node): Node | undefined { return undefined; }
     
     toText() { return this.authors + " "  + this.year + " " + this.title + " " + this.source + (this.summary ? this.summary : ""); }
-    toBookdown(parent: Node, debug?: number): string {
-        return "";
-    }
+    toBookdown(debug?: number): string { return ""; }
 
     withChildReplaced(node: Node, replacement: Node | undefined) { return undefined; }
 

@@ -13,8 +13,8 @@ export class InlineCodeNode extends MetadataNode<string> {
         return this.getText().getText();
     }
 
-    toBookdown(parent: FormatNode, debug?: number): string {
-        return "`" + this.getText().toBookdown(this, debug).replace(/`/g, '\\`') + "`" + (this.getMeta() === "plaintext" ? "" : this.getMeta());
+    toBookdown(debug?: number): string {
+        return "`" + this.getText().toBookdown(debug).replace(/`/g, '\\`') + "`" + (this.getMeta() === "plaintext" ? "" : this.getMeta());
     }
 
     copy(): InlineCodeNode { return new InlineCodeNode(this.getText().getText(), this.getMeta()) }

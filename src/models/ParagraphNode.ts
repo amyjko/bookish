@@ -27,8 +27,8 @@ export class ParagraphNode extends BlockNode {
         return this.#content.toText();
     }
 
-    toBookdown(parent: Node, debug?: number): string {
-        return (this.#level === 1 ? "# " : this.#level === 2 ? "## " : this.#level === 3 ? "### " : "") + this.#content.toBookdown(this, debug);
+    toBookdown(debug?: number): string {
+        return (this.#level === 1 ? "# " : this.#level === 2 ? "## " : this.#level === 3 ? "### " : "") + this.#content.toBookdown(debug);
     }
 
     traverseChildren(fn: (node: Node) => void): void {

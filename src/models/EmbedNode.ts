@@ -35,8 +35,8 @@ export class EmbedNode extends BlockNode {
 
     toText(): string { return this.#caption.toText(); }
 
-    toBookdown(parent: Node, debug?: number): string {
-        return `|${this.#url}|${this.#description}|${this.#caption.toBookdown(this, debug)}|${this.#credit.toBookdown(this, debug)}|`;
+    toBookdown(debug?: number): string {
+        return `|${this.#url}|${this.#description}|${this.#caption.toBookdown(debug)}|${this.#credit.toBookdown(debug)}|`;
     }
 
     toJSON() {

@@ -39,8 +39,8 @@ export class FormatNode extends Node {
         return this.#segments.map(segment => segment.toText()).join(" ");
     }
 
-    toBookdown(parent: Node, debug?: number): string {
-        return (this.#format === "v" ? "^v" : this.#format) + this.#segments.map(s => s.toBookdown(this, debug)).join("") + this.#format;
+    toBookdown(debug?: number): string {
+        return (this.#format === "v" ? "^v" : this.#format) + this.#segments.map(s => s instanceof AtomNode ? s.toBookdown(debug, this) : s.toBookdown(debug)).join("") + this.#format;
     }
 
     withSegmentAppended(segment: FormatNodeSegmentType): FormatNode {

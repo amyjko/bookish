@@ -36,11 +36,11 @@ export class TableNode extends BlockNode {
         return this.#rows.map(row => row.map(cell => cell.toText()).join(", ")).join(", ");
     }
 
-    toBookdown(parent: Node, debug?: number): string {
+    toBookdown(debug?: number): string {
         return this.#rows.map(
             row => 
-            `,${row.map(cell => cell.toBookdown(this, debug)).join("|")}`
-        ).join("\n") + `\n${this.#position === "|" ? "" : this.#position}${this.#caption ? "" + this.#caption.toBookdown(this, debug) : ""}`;
+            `,${row.map(cell => cell.toBookdown(debug)).join("|")}`
+        ).join("\n") + `\n${this.#position === "|" ? "" : this.#position}${this.#caption ? "" + this.#caption.toBookdown(debug) : ""}`;
     }
 
     traverseChildren(fn: (node: Node) => void): void {

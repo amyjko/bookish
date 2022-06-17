@@ -576,7 +576,7 @@ const ChapterEditor = (props: { chapter: Chapter }) => {
 
         // If the history is empty, record the current state.
         const newStack: UndoState[] = undoStack.length > 0 ? undoStack : caretRange === undefined ? [] : [{ 
-            chapter: ast.toBookdown(undefined), 
+            chapter: ast.toBookdown(), 
             command: undefined,
             range: ast.caretRangeToTextRange(caretRange)
             // If the undo position is beyond the front, clear everything before it, because we're changing history.
@@ -584,7 +584,7 @@ const ChapterEditor = (props: { chapter: Chapter }) => {
 
         // Set the new undo stack, pre-pending the new command to the front.
         setUndoStack([{ 
-            chapter: newChapter.toBookdown(undefined),
+            chapter: newChapter.toBookdown(),
             command: command,
             range: newChapter.caretRangeToTextRange(newRange)
             // If the undo position is beyond the front, clear everything before it, because we're changing history.
