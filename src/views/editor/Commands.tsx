@@ -727,8 +727,15 @@ export const commands: Command[] = [
         visible: context => false,
         active: context => context.start.node.isInside(context.chapter, CodeNode),
         handler: context => {
-            if(context.start.node instanceof TextNode)
-                return context.start.node.withCharacterInserted(context.chapter, "\n", context.start.index);
+            if(!(context.start.node instanceof TextNode)) return;
+
+            const newText = context.start.node.withCharacterAt("\n", context.start.index);
+            if(newText === undefined) return;
+            const newRoot = context.start.node.replace(context.chapter, newText);
+            if(newRoot === undefined) return;
+            const newCaret = { node: newText, index: context.start.index + 1 };
+            return { root: newRoot, range: { start: newCaret, end: newCaret } };
+    
         }
     },
     {

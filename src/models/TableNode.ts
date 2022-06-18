@@ -82,6 +82,17 @@ export class TableNode extends BlockNode {
         }
     }
 
+    copy(): TableNode {
+        const rows: FormatNode[][] = [];
+        this.#rows.forEach(row => {
+            const cells: FormatNode[] = []
+            row.forEach(cell => cells.push(cell.copy()))
+            rows.push(cells)
+        })
+        return new TableNode(rows, this.#position, this.#caption ? this.#caption.copy() : undefined);
+
+    }
+
     withChildReplaced(node: Node, replacement: Node | undefined) {
 
         // If it's just the caption, make a new node with the new credit.
@@ -106,18 +117,6 @@ export class TableNode extends BlockNode {
                 return new TableNode(newRows, this.#position, this.#caption)
             }
         }
-
-    }
-
-
-    copy(): TableNode {
-        const rows: FormatNode[][] = [];
-        this.#rows.forEach(row => {
-            const cells: FormatNode[] = []
-            row.forEach(cell => cells.push(cell.copy()))
-            rows.push(cells)
-        })
-        return new TableNode(rows, this.#position, this.#caption ? this.#caption.copy() : undefined);
 
     }
 

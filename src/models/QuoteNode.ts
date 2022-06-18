@@ -40,6 +40,7 @@ export class QuoteNode extends BlocksNode {
     }
 
     copy(): QuoteNode { return new QuoteNode(this.blocks.map(b => b.copy())); }
+    create(blocks: BlockNode[]): BlocksNode { return new QuoteNode(blocks, this.#credit, this.#position); }
 
     withChildReplaced(node: Node, replacement: Node | undefined) {
         // Replace a block.
@@ -53,8 +54,6 @@ export class QuoteNode extends BlocksNode {
         if(this.#credit === node && replacement instanceof FormatNode)
             return new QuoteNode(this.blocks, replacement, this.#position);
     }
-
-    create(blocks: BlockNode[]): BlocksNode { return new QuoteNode(blocks, this.#credit, this.#position); }
 
     withCredit(credit: FormatNode | undefined): QuoteNode { return new QuoteNode(this.getBlocks(), credit, this.#position); }
     withPosition(position: Position): QuoteNode { return new QuoteNode(this.getBlocks(), this.#credit, position); }

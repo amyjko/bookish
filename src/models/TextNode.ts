@@ -6,7 +6,6 @@ import { ParagraphNode } from "./ParagraphNode";
 import { AtomNode } from "./AtomNode";
 import { CodeNode } from "./CodeNode";
 import { BlocksNode } from "./BlocksNode";
-import { Edit } from "../views/editor/Commands";
 import { RootNode } from "./RootNode";
 
 export type TextNodeParent = FormatNode | MetadataNode<any> | CodeNode;
@@ -23,6 +22,7 @@ export class TextNode extends Node {
     getType() { return "text"; }
     getText() { return this.#text; }
     getLength() { return this.#text.length; }
+    getParentOf(node: Node): Node | undefined { return undefined; }
 
     toText(): string { return this.#text; }
 
@@ -54,16 +54,6 @@ export class TextNode extends Node {
     traverseChildren(fn: (node: Node) => void): void {}
 
     copy() { return new TextNode(this.#text); }
-
-    // TODO This should probably just be a transformation, letting edits be formed by callers.
-    withCharacterInserted(root: Node, char: string, index: number): Edit {
-        const parent = root.getParentOf(this);
-        if(parent === undefined) return undefined;
-        const newText = new TextNode(this.#text.slice(0, index) + char + this.#text.slice(index));
-        const newRoot = parent.rootWithChildReplaced(root, this, newText);
-        const newCaret = { node: newText, index: index + 1 };
-        return newRoot === undefined ? undefined : { root: newRoot, range: { start: newCaret, end: newCaret } };
-    }
 
     isItalic(root: Node) { return this.getAncestors(root).filter(p => p instanceof FormatNode && p.getFormat() === "_").length > 0; }
     isBold(root: Node) { return this.getAncestors(root).filter(p => p instanceof FormatNode && p.getFormat() === "*").length > 0; }
@@ -219,6 +209,10 @@ export class TextNode extends Node {
     }
 
     withChildReplaced(node: Node, replacement: Node | undefined) { return undefined; }
-    getParentOf(node: Node): Node | undefined { return undefined; }
-
+    
+    withCharacterAt(char: string, index: number): TextNode | undefined {
+        if(index < 0 || index > this.#text.length) return undefined;
+        return new TextNode(this.#text.slice(0, index) + char + this.#text.slice(index));
+    }
+    
 }

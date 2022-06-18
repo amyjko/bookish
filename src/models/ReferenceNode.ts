@@ -30,10 +30,10 @@ export class ReferenceNode extends Node {
     toText() { return this.authors + " "  + this.year + " " + this.title + " " + this.source + (this.summary ? this.summary : ""); }
     toBookdown(debug?: number): string { return ""; }
 
-    withChildReplaced(node: Node, replacement: Node | undefined) { return undefined; }
-
     copy(): ReferenceNode {
         return new ReferenceNode(this.authors, this.year, this.title, this.source, this.url, this.summary, this.short);
     }
+
+    withChildReplaced(node: Node, replacement: Node | undefined) { return undefined; }
 
 }

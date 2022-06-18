@@ -202,9 +202,16 @@ export class ChapterNode extends BlocksNode {
             insertionPoint = edit.range.start;
         }
 
-        // Insert at the start position.
-        if(insertionPoint.node instanceof TextNode)
-            return insertionPoint.node.withCharacterInserted(this, char, insertionPoint.index);
+        // Not a text node? Fail.
+        if(!(insertionPoint.node instanceof TextNode)) return;
+
+        // Update the chapter with the new text node.
+        const newText = insertionPoint.node.withCharacterAt(char, insertionPoint.index);
+        if(newText === undefined) return;
+        const newRoot = insertionPoint.node.replace(this, newText);
+        if(newRoot === undefined) return;
+        const newCaret = { node: newText, index: insertionPoint.index + 1 };
+        return { root: newRoot, range: { start: newCaret, end: newCaret } };
 
     }
 
