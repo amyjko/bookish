@@ -28,9 +28,8 @@ test("Delete characters crossing format boundary", () => {
 
 test("Split", () => {
     const text = new TextNode("This is my paragraph. It is two sentences.");
-    const indexOfPeriod = text.getText().indexOf(".");
-    const caret = { node: text, index: indexOfPeriod };
+    const indexAfterPeriod = text.getText().indexOf(".") + 1;
+    const caret = { node: text, index: indexAfterPeriod };
     const format = new FormatNode("", [ text ]);
-    expect(format.split(caret)?.map(t => t.toBookdown()).join(" THEN ")).toBe("This is my paragraph.THEN It is two sentences.");
-
+    expect(format.split(caret)?.map(t => t.toBookdown()).join("THEN")).toBe("This is my paragraph.THEN It is two sentences.");
 })

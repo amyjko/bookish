@@ -264,7 +264,7 @@ export class FormatNode extends Node {
 
         // Reformat everything. The strategy is to step through each character, atom node, and metadata node in this format node
         // and create a new series of formats that preserve existing formatting while applying new formatting to the selection.
-        let newFormats = [ new FormatNode("", []) ]; // A stack of formats we're constructing.
+        let newFormats: { format: Format, segments: FormatNodeSegmentType[] }[] = [ { format: "", segments: [] } ]; // A stack of formats we're constructing.
         let textIndex = 0;
         let currentText = ""; // The current text we've accumulated, inserted before each format change and at the end.
         let formattingEmptyNode = false;
@@ -273,7 +273,7 @@ export class FormatNode extends Node {
         function saveText() {
             // If there's some text, update the current format with the current text, then reset it.
             if(currentText.length > 0) {
-                newFormats[0] = newFormats[0].withSegmentAppended(new TextNode(currentText));
+                newFormats[0].segments.push(new TextNode(currentText));
                 currentText = "";
             }
         }
@@ -283,7 +283,14 @@ export class FormatNode extends Node {
         }
 
         function getFormats() {
-            return newFormats.map(f => f.getFormat());
+            // We don't include non-formatted text in the list of formats applied.
+            return newFormats.map(f => f.format).filter(f => f !== "");
+        }
+
+        function finishFormat() {
+            const formatSpec = newFormats[0];
+            newFormats.shift();
+            newFormats[0].segments.push(new FormatNode(formatSpec.format, formatSpec.segments));
         }
 
         everythingButFormats.forEach(node => {
@@ -328,9 +335,10 @@ export class FormatNode extends Node {
                                     saveText();
 
                                     // Not sure this loop is necessary; we should always remove in the order we added.
-                                    while(newFormats[0].#format !== activeFormat)
-                                        newFormats.shift();
-                                    newFormats.shift();
+                                    while(newFormats[0].format !== activeFormat)
+                                        finishFormat();
+                                    // Do it one more time to close out the undesired format.
+                                    finishFormat();
 
                                     // If we have unformatted something at a zero-width range, create empty format node, add a text node in it and remember it so
                                     // we can place the caret in it.
@@ -338,13 +346,9 @@ export class FormatNode extends Node {
                                         // Remember the node for later, so we can place the caret in it.
                                         emptyNode = new TextNode("");
                                         // Append the empty node to the current format.
-                                        newFormats[0] = newFormats[0].withSegmentAppended(emptyNode);
-                                        // Create a new formatter with the active format after it.
-                                        const newDesiredFormat = new FormatNode(activeFormat, []);
-                                        // Append it to the current format.
-                                        newFormats[0] = newFormats[0].withSegmentAppended(newDesiredFormat);
-                                        // Add the new formatter to the stack to start adding text to it.
-                                        newFormats.unshift(newDesiredFormat);
+                                        newFormats[0].segments.push(emptyNode);
+                                        // Push a new format onto the stack to start adding to.
+                                        newFormats.unshift({ format: activeFormat, segments: [] });
                                     }
 
                                 }
@@ -359,19 +363,15 @@ export class FormatNode extends Node {
                                     // Save any text that we've accumulated in the curent format.
                                     saveText();
 
-                                    // Make a new format to contain the new format.
-                                    const newDesiredFormat = new FormatNode(desiredFormat, []);
-                                    // Append it to the current format.
-                                    newFormats[0] = newFormats[0].withSegmentAppended(newDesiredFormat);
-                                    // Push it to the stack to start adding stuff to it.
-                                    newFormats.unshift(newDesiredFormat);
+                                    // Add a new format onto the stack to start adding to.
+                                    newFormats.unshift({ format: desiredFormat, segments: [] });
 
                                     // If we inserted an empty format node, add a text node in it and remember it so
                                     // we can place the caret in it.
                                     if(!formattingEmptyNode && textIndex === textStart && zeroWidthSelection) {
                                         emptyNode = new TextNode("");
-                                        newFormats[0] = newFormats[0].withSegmentAppended(emptyNode);
-                                        newFormats.shift();
+                                        newFormats[0].segments.push(emptyNode);
+                                        finishFormat();
                                     }
                                 }
                             });
@@ -401,7 +401,7 @@ export class FormatNode extends Node {
                     // Duplicate the MetadataNode but with new text. Erase the MetadataNode if the text is empty
                     // by simply not adding one to this new format. Then, erase the text, since it was added in the metadata node.
                     if(currentText.length > 0) {
-                        newFormats[0] = newFormats[0].withSegmentAppended(parent.withText(currentText));
+                        newFormats[0].segments.push(parent.withText(currentText));
                         currentText = "";
                     }
                 }
@@ -415,7 +415,7 @@ export class FormatNode extends Node {
                 // Add the atom immediately after, unless it's in the deletion range.
                 // We include both the start and end since AtomNode's text index is on both sides.
                 if(format !== undefined || textIndex < Math.min(textStart, textEnd) || textIndex >= Math.max(textStart, textEnd))
-                    newFormats[0] = newFormats[0].withSegmentAppended(node);
+                    newFormats[0].segments.push(node);
 
                 // Increment the text index; atoms count for one character.
                 textIndex++;
@@ -425,16 +425,19 @@ export class FormatNode extends Node {
         // Save any remaining text that we've accumulated.
         saveText();
 
-        // Keep removing formats until we get to the original we created.
+        // Keep finishing formats until we get to the original we created.
         while(newFormats.length > 1)
-            newFormats.shift();
+            finishFormat();
+
+        // Create the final format.
+        const newFormat = new FormatNode(newFormats[0].format, newFormats[0].segments);
 
         // If after all that, it's empty, make sure there's one empty text node to type in.
-        if(newFormats[0].getTextAndAtomNodes().length === 0)
-            newFormats[0] = newFormats[0].withSegmentAppended(new TextNode(""));
+        if(newFormat.getTextAndAtomNodes().length === 0)
+            return new FormatNode("", [ new TextNode("") ]);
 
         // Return the newly formatted (or edited) format node!
-        return newFormats[0];
+        return newFormat;
 
     }
 
