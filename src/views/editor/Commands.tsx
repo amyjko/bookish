@@ -656,7 +656,7 @@ export const commands: Command[] = [
             }
             // Delete the range.
             else if(context.chapter instanceof ChapterNode)
-                context.chapter.removeRange({ start: context.start, end: context.end });
+                context.chapter.withoutRange({ start: context.start, end: context.end });
         }
     },
     {
@@ -717,7 +717,7 @@ export const commands: Command[] = [
             }
             // Delete the range
             else if(context.chapter instanceof ChapterNode)
-                return context.chapter.removeRange({ start: context.start, end: context.end });
+                return context.chapter.withoutRange({ start: context.start, end: context.end });
         }
     },
     {
@@ -769,8 +769,12 @@ export const commands: Command[] = [
         visible: context => false,
         active: context => context.atom === undefined && context.blocks !== undefined,
         handler: context => {
-            if(context.chapter)
-                return context.chapter.splitSelection(context.range);                
+            if(context.chapter) {
+                const edit = context.chapter.withSelectionSplit(context.range);
+                if(edit === undefined) return;
+                const [ blocks, caret ] = edit;
+                return { root: blocks, range: { start: caret, end: caret } };
+            }
         }
     },
     {
@@ -801,7 +805,7 @@ export const commands: Command[] = [
         control: true, alt: false, shift: false, key: "0",
         visible: context => true,
         active: context => context.chapter !== undefined && context.startIsText && context.endIsText,
-        handler: context => context.chapter.editRange(context.range, "")
+        handler: context => context.chapter.withRangeFormatted(context.range, "")
     },
     {
         label: "bold",
@@ -811,7 +815,7 @@ export const commands: Command[] = [
         visible: context => true,
         control: true, alt: false, shift: false, key: "b",
         active: context => context.chapter !== undefined && context.startIsText && context.endIsText,
-        handler: context => context.chapter.editRange(context.range, "*")
+        handler: context => context.chapter.withRangeFormatted(context.range, "*")
     },
     {
         description: "italic",
@@ -820,7 +824,7 @@ export const commands: Command[] = [
         control: true, alt: false, shift: false, key: "i",
         visible: context => true,
         active: context => context.chapter !== undefined && context.startIsText && context.endIsText,
-        handler: context => context.chapter.editRange(context.range, "_")
+        handler: context => context.chapter.withRangeFormatted(context.range, "_")
     },
     {
         label: "<code>",
@@ -832,7 +836,7 @@ export const commands: Command[] = [
         active: context => context.chapter !== undefined && context.startIsText && context.endIsText,
         handler: context => context.meta instanceof InlineCodeNode ? 
             unwrapMeta(context) : 
-            context.chapter.insertNodeAtSelection(context.range, text => new InlineCodeNode(text))
+            context.chapter.withSegmentAtSelection(context.range, text => new InlineCodeNode(text))
     },
     {
         label: "sub\u2099",
@@ -842,7 +846,7 @@ export const commands: Command[] = [
         control: true, alt: false, shift: false, key: ",",
         visible: context => true,
         active: context => context.chapter !== undefined && context.startIsText && context.endIsText,
-        handler: context => context.chapter.editRange(context.range, "v")
+        handler: context => context.chapter.withRangeFormatted(context.range, "v")
     },
     {
         label: "super\u207F",
@@ -852,7 +856,7 @@ export const commands: Command[] = [
         control: true, alt: false, shift: false, key: ".",
         visible: context => true,
         active: context => context.chapter !== undefined && context.startIsText && context.endIsText,
-        handler: context => context.chapter.editRange(context.range, "^")
+        handler: context => context.chapter.withRangeFormatted(context.range, "^")
     },
     {
         label: "link ⚭",
@@ -864,7 +868,7 @@ export const commands: Command[] = [
         active: context => context.chapter !== undefined && context.startIsText && context.endIsText,
         handler: context => context.meta instanceof LinkNode ? 
             unwrapMeta(context) : 
-            context.chapter.insertNodeAtSelection(context.range, text => new LinkNode(text))
+            context.chapter.withSegmentAtSelection(context.range, text => new LinkNode(text))
     },
     {
         label: "glossary",
@@ -875,7 +879,7 @@ export const commands: Command[] = [
         active: context => context.startIsText && context.endIsText,
         handler: context => context.meta instanceof DefinitionNode ? 
             unwrapMeta(context) : 
-            context.chapter.insertNodeAtSelection(context.range, text => new DefinitionNode(text))
+            context.chapter.withSegmentAtSelection(context.range, text => new DefinitionNode(text))
     },
     {
         label: "footnote",
@@ -884,7 +888,7 @@ export const commands: Command[] = [
         control: true, alt: false, shift: false, key: "f",
         visible: context => context.chapter !== undefined,
         active: context => context.startIsText && context.endIsText,
-        handler: context => context.chapter?.insertNodeAtSelection(context.range, text => new FootnoteNode(new FormatNode("", [ new TextNode(text) ])))
+        handler: context => context.chapter?.withSegmentAtSelection(context.range, text => new FootnoteNode(new FormatNode("", [ new TextNode(text) ])))
     },
     {
         label: "cite",
@@ -893,7 +897,7 @@ export const commands: Command[] = [
         control: true, alt: false, shift: false, key: "t",
         visible: context => context.chapter !== undefined,
         active: context => context.chapter !== undefined && context.startIsText && context.endIsText,
-        handler: context => context.chapter?.insertNodeAtSelection(context.range, text => new CitationsNode([]))
+        handler: context => context.chapter?.withSegmentAtSelection(context.range, text => new CitationsNode([]))
     },
     {
         label: "label",
@@ -902,7 +906,7 @@ export const commands: Command[] = [
         control: true, alt: false, shift: false, key: "l",
         visible: context => context.chapter !== undefined,
         active: context => context.chapter !== undefined && context.startIsText && context.endIsText,
-        handler: context => context.chapter?.insertNodeAtSelection(context.range, text => new LabelNode(""))
+        handler: context => context.chapter?.withSegmentAtSelection(context.range, text => new LabelNode(""))
     },
     {
         label: "comment",
@@ -912,7 +916,7 @@ export const commands: Command[] = [
         control: true, alt: false, shift: false, key: "c",
         visible: context => context.chapter !== undefined && context.atom === undefined,
         active: context => context.chapter !== undefined && context.atom === undefined && context.startIsText && context.endIsText,
-        handler: context => context.chapter?.insertNodeAtSelection(context.range, text => new CommentNode(new FormatNode("", [ new TextNode(text) ])))
+        handler: context => context.chapter?.withSegmentAtSelection(context.range, text => new CommentNode(new FormatNode("", [ new TextNode(text) ])))
     },
     {
         label: "paragraph",
@@ -1178,8 +1182,35 @@ export const commands: Command[] = [
         visible: context => false,
         active: (context, key) => key !== undefined && key.length === 1,
         handler: (context, utilities, key) => {
-            if(context.chapter && key.length === 1)
-                return context.chapter.insertSelection(key, context.range);
+            const range = context.range;
+            const char = key;
+            if(context.chapter && range instanceof TextNode && char.length === 1) {
+
+                // Insert at the start.
+                let insertionPoint = range.start;
+        
+                // If there's a selection, remove it before inserting, and insert at the caret returned.
+                if (range.start.node !== range.end.node || range.start.index !== range.end.index) {
+                    // Try to remove the range.
+                    let edit = context.chapter.withoutRange(range);
+                    // If we fail, fail to insert at the selection.
+                    if(edit === undefined)
+                        return;
+                    insertionPoint = edit.range.start;
+                }
+        
+                // Not a text node? Fail.
+                if(!(insertionPoint.node instanceof TextNode)) return;
+        
+                // Update the chapter with the new text node.
+                const newText = insertionPoint.node.withCharacterAt(char, insertionPoint.index);
+                if(newText === undefined) return;
+                const newRoot = insertionPoint.node.replace(context.chapter, newText);
+                if(newRoot === undefined) return;
+                const newCaret = { node: newText, index: insertionPoint.index + 1 };
+                return { root: newRoot, range: { start: newCaret, end: newCaret } };
+    
+            }
         }
     }
 ];
