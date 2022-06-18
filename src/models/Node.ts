@@ -15,7 +15,7 @@ export abstract class Node {
     abstract traverseChildren(fn: (node: Node) => void) : void;
     abstract copy(): Node;
 
-    // Returns a new node with the given child node replaced, or the node as is if the given nodes were not a valid change.
+    // Returns a new node with the given child node replaced, or undefined if it didn't contain such a child.
     abstract withChildReplaced(node: Node, replacement: Node | undefined): Node | undefined;
 
     rootWithChildReplaced(root: Node, node: Node, replacement: Node | undefined): Node | undefined {        

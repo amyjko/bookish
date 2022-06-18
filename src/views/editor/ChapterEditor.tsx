@@ -11,10 +11,12 @@ import { BlocksNode } from "../../models/BlocksNode";
 import { ListNode } from "../../models/ListNode";
 import { TableNode } from "../../models/TableNode";
 import { Node as BookishNode } from "../../models/Node";
-import { Command, commands, Edit } from "./Commands";
-import Toolbar from "./Toolbar";
 import Chapter from "../../models/Chapter";
 import { MetadataNode } from "../../models/MetadataNode";
+import { Edit } from "../../models/Edit";
+
+import { Command, commands } from "./Commands";
+import Toolbar from "./Toolbar";
 
 export type CaretContextType = { 
     range: CaretRange | undefined, 

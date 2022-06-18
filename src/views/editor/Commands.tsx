@@ -41,9 +41,7 @@ import Undo from "../svg/undo.svg";
 import Redo from "../svg/redo.svg";
 import { AtomNode } from "../../models/AtomNode";
 import { BlockNode } from "../../models/BlockNode";
-
-// Edits can either result in no change (represented by undefined) or a new root node and a selection in it.
-export type Edit = undefined | { root: Node, range: CaretRange };
+import { Edit } from "../../models/Edit";
 
 export type Command = {
     label?: string,
@@ -98,181 +96,6 @@ function deleteTableRowColumn(root: ChapterNode, table: TableNode, format: Forma
     if(!newFormat) return undefined;
     const newCaret = { node: newFormat.getTextNodes()[0], index: 0 };
     return { root: newRoot, range: { start: newCaret, end: newCaret } };
-
-}
-
-function convertRangeToListItem(root: Node, range: CaretRange, numbered: boolean): Edit {
-    // Find the common ancestor of the selection.
-    const ancestor = range.start.node.getCommonAncestor(root, range.end.node);
-    const paragraph = ancestor?.getParent(root);
-    const blocks = paragraph?.getParent(root);
-
-    // If the common ancestor is a format in a paragraph, convert it to a list.
-    if(ancestor instanceof FormatNode && paragraph instanceof ParagraphNode && blocks instanceof BlocksNode) {
-        const newRoot = paragraph.replace(root, new ListNode([ paragraph.getContent() ], numbered));
-        const newBlock = paragraph.getParent(root);
-        if(newRoot !== undefined && newBlock instanceof BlocksNode) {
-            const cleanedRoot = newBlock.replace(newRoot, newBlock.withMergedAdjacentLists());
-            if(cleanedRoot)
-                return { root: cleanedRoot, range: range }
-        }
-        
-    }
-    // If the common ancestor is a blocks node, convert all of the paragraphs in range to a list.
-    else if(ancestor instanceof BlocksNode) {
-        // Find all the paragraphs in the section.
-        let first = range.start.node instanceof TextNode && range.start.node.getParagraph(root);
-        let last = range.end.node instanceof TextNode && range.end.node.getParagraph(root);
-        if(first && last) {
-            const blocks = ancestor.getBlocksBetween(first, last);
-            if(blocks !== undefined) {
-                const paragraphs = blocks.filter(b => b instanceof ParagraphNode) as ParagraphNode[];
-                // Only format if it's a contiguous list of paragraphs.
-                if(blocks.length === paragraphs.length) {
-                    const newList = new ListNode(paragraphs.map(p => p.getContent()), numbered);
-                    let newBlocks: BlocksNode | undefined = ancestor;
-                    newBlocks = ancestor.withBlockInsertedBefore(paragraphs[0], newList);
-                    while(newBlocks !== undefined && paragraphs.length > 0) {
-                        const p = paragraphs.shift();
-                        if(p)
-                            newBlocks = newBlocks.withoutBlock(p);
-                    }
-                    if(newBlocks === undefined) return;
-                    const newRoot = ancestor.replace(root, newBlocks);
-                    if(newRoot === undefined) return;
-                    return { root: newRoot, range: range };
-                }
-            }
-        }
-    }
-
-}
-
-function styleAndCleanList(root: Node, list: ListNode, numbered: boolean): Node | undefined {
-
-    const newList = list.withStyle(numbered);
-    let newRoot = list.replace(root, newList);
-    if(newRoot === undefined) return;
-    const newBlocks = root.getParentOf(newList);
-    if(newBlocks instanceof BlocksNode) {
-        const cleanedBlocks = newBlocks.withMergedAdjacentLists();
-        newRoot = newBlocks.replace(newRoot, cleanedBlocks);
-        if(newRoot === undefined) return;
-    }
-    return newRoot;
-
-}
-
-// Given an arbitrary selection, find all of the root list nodes within bounds
-// and convert any list items within the selection to paragraphs. The general
-// approach is to find all lists, and for the lists containing the start or end caret,
-// duplicate the list and convert everything included to paragraphs, and for all of the lists
-// between the start or end caret, convert the entire list to a paragraph.
-function unwrapListItems(root: Node, range: CaretRange): Edit {
-
-    // Find the lists in range. The approach is to find all of the formats and all of the
-    // root list nodes of those formats. They have to be in the same document.
-    const ancestor = range.start.node.getCommonAncestor(root, range.end.node);
-    if(ancestor === undefined) return;
-
-    // Find the formats that the range start and stop in.
-    const startFormat = range.start.node.closestParent<FormatNode>(root, FormatNode);
-    const endFormat = range.end.node.closestParent<FormatNode>(root, FormatNode);
-    const blocks = ancestor instanceof BlocksNode ? ancestor : ancestor.closestParent<BlocksNode>(root, BlocksNode);
-
-    if(startFormat && endFormat && blocks) {
-        // Find all the formats in the common ancestor.
-        const formats: FormatNode[] = ancestor.getNodes().filter(p => p instanceof FormatNode) as FormatNode[];
-
-        // Sort the start and end format.
-        const reversed = formats.indexOf(startFormat) > formats.indexOf(endFormat);
-        const firstFormat = reversed ? endFormat : startFormat;
-        const lastFormat = reversed ? startFormat : endFormat;
-
-        // Loop through the formats in order and find the lists and list items that are contained in the selection.
-        let inside = false;
-        const listsToUnwrap: { list: ListNode, formats: FormatNode[] }[] = [];
-        formats.forEach(format => {
-            if(format === firstFormat)
-                inside = true;
-            if(inside) {
-                // Find the root list that contains the format.
-                const list = format.getFarthestParentMatching(root, n => n instanceof ListNode) as ListNode;
-                if(list !== undefined) {
-                    const listFormats = listsToUnwrap.find(f => f.list === list);
-                    if(listFormats)
-                        listFormats.formats.push(format);
-                    else
-                        listsToUnwrap.push({ list: list, formats: [ format ]});
-                }
-            }
-            if(format === lastFormat)
-                inside = false;
-        });
-
-        // Translate each existing list into a sequence of paragraphs and lists reflecting the desired edits,
-        // then insert after the existing list, then remove the existing list.
-        let newBlock = blocks;
-        let failed = false;
-        listsToUnwrap.forEach(set => {
-            const newBlocks = set.list.unwrap(set.formats, blocks).reverse();
-            newBlocks.forEach(block => { 
-                const inserted = blocks.withBlockInsertedAfter(set.list, block); 
-                if(inserted === undefined) { failed = true; return; }
-                newBlock = inserted;
-            });
-            newBlock = newBlock.withoutBlock(set.list);
-        });
-
-        if(failed) return;
-
-        // Replace the current blocks with the new blocks.
-        const newRoot = blocks.replace(root, newBlock);
-        if(newRoot === undefined) return;
-
-        // Return the original range, since the format it was in should still exist.
-        return { root: newRoot, range: range }
-
-    }
-
-}
-
-function indentListItems(root: Node, range: CaretRange, indent: boolean): Edit {
-    // Find all of the formats in list nodes in the range and indent them.
-    const ancestor = range.start.node.getCommonAncestor(root, range.end.node);
-    const nodes = ancestor?.getNodes();      
-    const formats = nodes?.filter(n => n instanceof FormatNode && root.getParentOf(n) instanceof ListNode) as FormatNode[];
-    const startIndex = nodes?.indexOf(range.start.node);
-    const endIndex = nodes?.indexOf(range.end.node);
-    
-    if(formats === undefined || startIndex === undefined || endIndex === undefined) return;
-    
-    // Loop through the formats in the range and indent or dedent them, constructing a new root.
-    const first = startIndex < endIndex ? range.start.node : range.end.node;
-    const last = startIndex < endIndex ? range.end.node : range.start.node;
-    let inside = false;
-    let failed = false;
-    formats.forEach(format => {
-        if(first.hasAncestor(root, format))
-            inside = true;
-        // If we're in the selection and the format is in a list, restructure it's list to indent/unindent it.
-        if(inside) {
-            const list = root.getParentOf(format);
-            if(list instanceof ListNode) {
-                const newList = indent ? list.indent(format) : list.unindent(root, format);
-                if(newList === undefined) { failed = true; return; }
-                const newRoot = list.replace(root, newList);
-                if(newRoot === undefined) { failed = true; return; }
-                // Update the root that we use to get parents so that we modify the new value on the next pass.
-                root = newRoot;
-            }
-        }
-        if(last.hasAncestor(root, format))
-            inside = false;
-    });
-
-    // We shouldn't need to update the range because we haven't modified the text nodes, just their position.
-    return failed ? undefined: { root: root, range: range };
 
 }
 
@@ -768,14 +591,7 @@ export const commands: Command[] = [
         control: false, alt: false, shift: false, key: "Enter",
         visible: context => false,
         active: context => context.atom === undefined && context.blocks !== undefined,
-        handler: context => {
-            if(context.chapter) {
-                const edit = context.chapter.withSelectionSplit(context.range);
-                if(edit === undefined) return;
-                const [ blocks, caret ] = edit;
-                return { root: blocks, range: { start: caret, end: caret } };
-            }
-        }
+        handler: context => context.chapter?.withSelectionSplit(context.range)
     },
     {
         label: "indent",
@@ -785,7 +601,7 @@ export const commands: Command[] = [
         control: false, alt: false, shift: false, key: "Tab",
         visible: context => context.list !== undefined,
         active: context => context.list !== undefined,
-        handler: context => indentListItems(context.chapter, context.range, true)
+        handler: context => context.blocks?.withListsIndented(context.chapter, context.range, true)
     },        
     {
         label: "unindent",
@@ -795,7 +611,7 @@ export const commands: Command[] = [
         control: false, alt: false, shift: true, key: "Tab",
         visible: context => context.list !== undefined,
         active: context => context.list !== undefined && context.list.isInside(context.chapter, ListNode),
-        handler: context => indentListItems(context.chapter, context.range, false)
+        handler: context => context.blocks?.withListsIndented(context.chapter, context.range, false)
     },
     {
         label: "plain",
@@ -1102,7 +918,7 @@ export const commands: Command[] = [
         control: true, alt: false, shift: true, key: "7",
         visible: context => context.list === undefined && context.atom === undefined,
         active: context => context.list === undefined && context.atom === undefined && context.blocks !== undefined,
-        handler: context => convertRangeToListItem(context.chapter, context.range, false)
+        handler: context => context.blocks?.withRangeAsList(context.chapter, context.range, false)
     },
     {
         label: "numbered",
@@ -1112,7 +928,7 @@ export const commands: Command[] = [
         control: true, alt: false, shift: true, key: "8",
         visible: context => context.list === undefined && context.atom === undefined,
         active: context => context.list === undefined && context.atom === undefined && context.blocks !== undefined,
-        handler: context => convertRangeToListItem(context.chapter, context.range, true)
+        handler: context => context.blocks?.withRangeAsList(context.chapter, context.range, true)
     },
     {
         label: "bulleted",
@@ -1124,7 +940,7 @@ export const commands: Command[] = [
         active: context => context.list !== undefined && context.list.isNumbered(),
         handler: context => {
             if(!context.list) return;
-            const newRoot = styleAndCleanList(context.chapter, context.list, false);
+            const newRoot = context.blocks?.withListAsStyle(context.chapter, context.list, false);
             if(newRoot === undefined) return;
             return { root: newRoot, range: context.range };
         }
@@ -1139,7 +955,7 @@ export const commands: Command[] = [
         active: context => context.list !== undefined && !context.list.isNumbered(),
         handler: context => {
             if(!context.list) return;
-            const newRoot = styleAndCleanList(context.chapter, context.list, true);
+            const newRoot = context.blocks?.withListAsStyle(context.chapter, context.list, true);
             if(newRoot === undefined) return;
             return { root: newRoot, range: context.range };
         }
@@ -1152,7 +968,7 @@ export const commands: Command[] = [
         control: true, alt: false, shift: true, key: ["7", "8"],
         visible: context => context.includesList,
         active: context => context.includesList,
-        handler: context => unwrapListItems(context.chapter, context.range)
+        handler: context => context.blocks?.withListsAsParagraphs(context.chapter, context.range)
     },
     {
         label: "undo",

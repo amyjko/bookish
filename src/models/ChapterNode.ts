@@ -74,11 +74,11 @@ export class ChapterNode extends BlocksNode {
 
     // Convert text index to node by iterating through text nodes and finding the corresponding node.
     textRangeToCaret(range: TextRange): CaretRange {
-        return { start: this.textIndexToCaret(range.start), end: this.textIndexToCaret(range.end) }; 
+        return { start: this.getTextIndexAsCaret(range.start), end: this.getTextIndexAsCaret(range.end) }; 
     }
 
     caretRangeToTextRange(range: CaretRange): TextRange {
-        return { start: this.caretToTextIndex(range.start), end: this.caretToTextIndex(range.end) };
+        return { start: this.getTextIndexOfCaret(range.start), end: this.getTextIndexOfCaret(range.end) };
     }
 
     getNextTextOrAtom(node: TextNode | AtomNode<any>): TextNode | AtomNode<any> | undefined {

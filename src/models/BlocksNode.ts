@@ -7,6 +7,7 @@ import { Format, FormatNode, FormatNodeSegmentType } from "./FormatNode";
 import { TextNode } from "./TextNode";
 import { AtomNode } from "./AtomNode";
 import { MetadataNode } from "./MetadataNode";
+import { Edit } from "./Edit";
 
 export abstract class BlocksNode extends BlockNode {
     
@@ -19,12 +20,12 @@ export abstract class BlocksNode extends BlockNode {
 
     getBlocks() { return this.blocks; }
 
-    indexOf(block: BlockNode): number | undefined {
+    getIndexOf(block: BlockNode): number | undefined {
         const index = this.blocks.indexOf(block);
         return index < 0 ? undefined : index;
     }
 
-    contains(block: BlockNode) { return this.indexOf(block) !== undefined; }
+    contains(block: BlockNode) { return this.getIndexOf(block) !== undefined; }
 
     getBlockBefore(anchor: BlockNode): BlockNode | undefined {
         const index = this.blocks.indexOf(anchor);
@@ -42,8 +43,8 @@ export abstract class BlocksNode extends BlockNode {
 
     getBlocksBetween(first: BlockNode, last: BlockNode): BlockNode[] | undefined {
 
-        const firstIndex = this.indexOf(first);
-        const lastIndex = this.indexOf(last);
+        const firstIndex = this.getIndexOf(first);
+        const lastIndex = this.getIndexOf(last);
         if(firstIndex !== undefined && lastIndex !== undefined) {
             // Swap to be in order.
             if(firstIndex > lastIndex) {
@@ -113,13 +114,13 @@ export abstract class BlocksNode extends BlockNode {
     }
 
     // Convert node and index into text index by converting to Bookdown and then finding the index of the node.
-    caretToTextIndex(caret: Caret): number {
+    getTextIndexOfCaret(caret: Caret): number {
         const debug = this.toBookdown(caret.node.nodeID);
         const index = debug.indexOf("%debug%");
         return index + caret.index;
     }
 
-    textIndexToCaret(textIndex: number): Caret {
+    getTextIndexAsCaret(textIndex: number): Caret {
         // Find all of the text nodes in the main document.
         const textNodes = this.getTextNodes();
 
@@ -154,6 +155,7 @@ export abstract class BlocksNode extends BlockNode {
     }
 
     // Swap them order if this is two text nodes that are reversed.
+    // TODO this should really be encapsulated with a caret range object of some sort, rather than here.
     sortRange(range: CaretRange): CaretRange {
 
         const start = range.start.node;
@@ -232,7 +234,7 @@ export abstract class BlocksNode extends BlockNode {
     
     }
 
-    withSelectionSplit(range: CaretRange): [ BlocksNode, Caret ] | undefined {
+    withSelectionSplit(range: CaretRange): Edit {
 
         let caret = range.start;
         let blocks: BlocksNode = this;
@@ -240,7 +242,7 @@ export abstract class BlocksNode extends BlockNode {
         // If there's a selection, remove it before inserting.
         if (range.start.node !== range.end.node || range.start.index !== range.end.index) {
             const edit = this.withoutRange(range);
-            if(edit === undefined) return;
+            if(edit === undefined || !(edit.root instanceof BlocksNode)) return;
             blocks = edit.root;
             caret = edit.range.start;
         }
@@ -262,15 +264,15 @@ export abstract class BlocksNode extends BlockNode {
             ?.withoutBlock(paragraph);
         if(newBlocks === undefined) return;
 
-        return [ newBlocks, newCaret ];
+        return { root: newBlocks, range: { start: newCaret, end: newCaret } };
 
     }
 
-    withoutRange(range: CaretRange): { root: BlocksNode, range: CaretRange } | undefined {
+    withoutRange(range: CaretRange): Edit {
         return this.withRangeFormatted(range, undefined);
     }
 
-    withoutAtom(atom: AtomNode<any>): { root: BlocksNode, range: CaretRange } | undefined {
+    withoutAtom(atom: AtomNode<any>): Edit {
 
         // Find the format that contains the atom.
         const format = atom.getFarthestParentMatching(this, p => p instanceof FormatNode) as FormatNode | undefined;
@@ -301,7 +303,7 @@ export abstract class BlocksNode extends BlockNode {
 
     }
 
-    withRangeFormatted(range: CaretRange, format: Format | undefined): { root: BlocksNode, range: CaretRange } | undefined {
+    withRangeFormatted(range: CaretRange, format: Format | undefined): Edit {
 
         // Only works on text nodes, atom nodes, and metadata nodes.
         if( !(range.start.node instanceof TextNode || range.start.node instanceof AtomNode) || 
@@ -324,8 +326,8 @@ export abstract class BlocksNode extends BlockNode {
         }
 
         // Remember the start and end text index.
-        const startTextIndex = this.caretToTextIndex(range.start);
-        const startEndIndex = this.caretToTextIndex(range.end);
+        const startTextIndex = this.getTextIndexOfCaret(range.start);
+        const startEndIndex = this.getTextIndexOfCaret(range.end);
 
         // Sort the range if it's out of order, since the algorithm below assumes that it's ordered.
         const sortedRange = this.sortRange(adjustedRange);
@@ -397,15 +399,15 @@ export abstract class BlocksNode extends BlockNode {
         }
 
         // Map the text indicies back to carets.
-        const startCaret = this.textIndexToCaret(startTextIndex);
-        const endCaret = format === undefined ? startCaret : this.textIndexToCaret(startEndIndex);
+        const startCaret = this.getTextIndexAsCaret(startTextIndex);
+        const endCaret = format === undefined ? startCaret : this.getTextIndexAsCaret(startEndIndex);
 
         // Return the new root and the start and end of the range.
         return { root: newRoot, range: { start: startCaret, end: endCaret } };
 
     }
 
-    withSegmentAtSelection(range: CaretRange, nodeCreator: (text: string) => FormatNodeSegmentType): { root: BlocksNode, range: CaretRange } | undefined {
+    withSegmentAtSelection(range: CaretRange, nodeCreator: (text: string) => FormatNodeSegmentType): Edit {
 
         let root: Node = this;
         let caret = range.start;
@@ -451,6 +453,179 @@ export abstract class BlocksNode extends BlockNode {
         // Return the edited tree.
         return { root: newRoot, range: { start: newCaret, end: newCaret } };
 
+    }
+
+    withRangeAsList(root: Node, range: CaretRange, numbered: boolean): Edit {
+
+        // Find the common ancestor of the selection.
+        const ancestor = range.start.node.getCommonAncestor(root, range.end.node);
+        const paragraph = ancestor?.getParent(root);
+        const blocks = paragraph?.getParent(root);
+    
+        // If the common ancestor is a format in a paragraph, convert it to a list.
+        if(ancestor instanceof FormatNode && paragraph instanceof ParagraphNode && blocks instanceof BlocksNode) {
+            const newRoot = paragraph.replace(root, new ListNode([ paragraph.getContent() ], numbered));
+            const newBlock = paragraph.getParent(root);
+            if(newRoot !== undefined && newBlock instanceof BlocksNode) {
+                const cleanedRoot = newBlock.replace(newRoot, newBlock.withMergedAdjacentLists());
+                if(cleanedRoot !== undefined && cleanedRoot instanceof BlocksNode)
+                    return { root: cleanedRoot, range: range }
+            }
+            
+        }
+        // If the common ancestor is a blocks node, convert all of the paragraphs in range to a list.
+        else if(ancestor instanceof BlocksNode) {
+            // Find all the paragraphs in the section.
+            let first = range.start.node instanceof TextNode && range.start.node.getParagraph(root);
+            let last = range.end.node instanceof TextNode && range.end.node.getParagraph(root);
+            if(first && last) {
+                const blocks = ancestor.getBlocksBetween(first, last);
+                if(blocks !== undefined) {
+                    const paragraphs = blocks.filter(b => b instanceof ParagraphNode) as ParagraphNode[];
+                    // Only format if it's a contiguous list of paragraphs.
+                    if(blocks.length === paragraphs.length) {
+                        const newList = new ListNode(paragraphs.map(p => p.getContent()), numbered);
+                        let newBlocks: BlocksNode | undefined = ancestor;
+                        newBlocks = ancestor.withBlockInsertedBefore(paragraphs[0], newList);
+                        while(newBlocks !== undefined && paragraphs.length > 0) {
+                            const p = paragraphs.shift();
+                            if(p)
+                                newBlocks = newBlocks.withoutBlock(p);
+                        }
+                        if(newBlocks === undefined) return;
+                        const newRoot = ancestor.replace(root, newBlocks);
+                        if(newRoot !== undefined && newRoot instanceof BlocksNode)
+                            return { root: newRoot, range: range };
+                    }
+                }
+            }
+        }
+    
+    }
+    
+    // Given an arbitrary selection, find all of the root list nodes within bounds
+    // and convert any list items within the selection to paragraphs. The general
+    // approach is to find all lists, and for the lists containing the start or end caret,
+    // duplicate the list and convert everything included to paragraphs, and for all of the lists
+    // between the start or end caret, convert the entire list to a paragraph.
+    withListsAsParagraphs(root: Node, range: CaretRange): Edit {
+
+        // Find the lists in range. The approach is to find all of the formats and all of the
+        // root list nodes of those formats. They have to be in the same document.
+        const ancestor = range.start.node.getCommonAncestor(root, range.end.node);
+        if(ancestor === undefined) return;
+
+        // Find the formats that the range start and stop in.
+        const startFormat = range.start.node.closestParent<FormatNode>(root, FormatNode);
+        const endFormat = range.end.node.closestParent<FormatNode>(root, FormatNode);
+        const blocks = ancestor instanceof BlocksNode ? ancestor : ancestor.closestParent<BlocksNode>(root, BlocksNode);
+
+        if(startFormat && endFormat && blocks) {
+            // Find all the formats in the common ancestor.
+            const formats: FormatNode[] = ancestor.getNodes().filter(p => p instanceof FormatNode) as FormatNode[];
+
+            // Sort the start and end format.
+            const reversed = formats.indexOf(startFormat) > formats.indexOf(endFormat);
+            const firstFormat = reversed ? endFormat : startFormat;
+            const lastFormat = reversed ? startFormat : endFormat;
+
+            // Loop through the formats in order and find the lists and list items that are contained in the selection.
+            let inside = false;
+            const listsToUnwrap: { list: ListNode, formats: FormatNode[] }[] = [];
+            formats.forEach(format => {
+                if(format === firstFormat)
+                    inside = true;
+                if(inside) {
+                    // Find the root list that contains the format.
+                    const list = format.getFarthestParentMatching(root, n => n instanceof ListNode) as ListNode;
+                    if(list !== undefined) {
+                        const listFormats = listsToUnwrap.find(f => f.list === list);
+                        if(listFormats)
+                            listFormats.formats.push(format);
+                        else
+                            listsToUnwrap.push({ list: list, formats: [ format ]});
+                    }
+                }
+                if(format === lastFormat)
+                    inside = false;
+            });
+
+            // Translate each existing list into a sequence of paragraphs and lists reflecting the desired edits,
+            // then insert after the existing list, then remove the existing list.
+            let newBlock = blocks;
+            let failed = false;
+            listsToUnwrap.forEach(set => {
+                const newBlocks = set.list.unwrap(set.formats, blocks).reverse();
+                newBlocks.forEach(block => { 
+                    const inserted = blocks.withBlockInsertedAfter(set.list, block); 
+                    if(inserted === undefined) { failed = true; return; }
+                    newBlock = inserted;
+                });
+                newBlock = newBlock.withoutBlock(set.list);
+            });
+
+            if(failed) return;
+
+            // Replace the current blocks with the new blocks.
+            const newRoot = blocks.replace(root, newBlock);
+            if(newRoot === undefined) return;
+
+            // Return the original range, since the format it was in should still exist.
+            return { root: newRoot, range: range }
+
+        }
+
+    }
+
+    withListsIndented(root: Node, range: CaretRange, indent: boolean): Edit {
+        // Find all of the formats in list nodes in the range and indent them.
+        const ancestor = range.start.node.getCommonAncestor(root, range.end.node);
+        const nodes = ancestor?.getNodes();      
+        const formats = nodes?.filter(n => n instanceof FormatNode && root.getParentOf(n) instanceof ListNode) as FormatNode[];
+        const startIndex = nodes?.indexOf(range.start.node);
+        const endIndex = nodes?.indexOf(range.end.node);
+        
+        if(formats === undefined || startIndex === undefined || endIndex === undefined) return;
+        
+        // Loop through the formats in the range and indent or dedent them, constructing a new root.
+        const first = startIndex < endIndex ? range.start.node : range.end.node;
+        const last = startIndex < endIndex ? range.end.node : range.start.node;
+        let inside = false;
+        let failed = false;
+        formats.forEach(format => {
+            if(first.hasAncestor(root, format))
+                inside = true;
+            // If we're in the selection and the format is in a list, restructure it's list to indent/unindent it.
+            if(inside) {
+                const list = root.getParentOf(format);
+                if(list instanceof ListNode) {
+                    const newList = indent ? list.indent(format) : list.unindent(root, format);
+                    if(newList === undefined) { failed = true; return; }
+                    const newRoot = list.replace(root, newList);
+                    if(newRoot === undefined) { failed = true; return; }
+                    // Update the root that we use to get parents so that we modify the new value on the next pass.
+                    root = newRoot;
+                }
+            }
+            if(last.hasAncestor(root, format))
+                inside = false;
+        });
+    
+        // We shouldn't need to update the range because we haven't modified the text nodes, just their position.
+        return failed ? undefined: { root: root, range: range };
+    
+    }
+
+    // This accounts for adjascent lists that end up with the same style.
+    withListAsStyle(root: Node, list: ListNode, numbered: boolean): BlocksNode | undefined {
+
+        const newList = list.withStyle(numbered);
+        let newRoot = list.replace(root, newList);
+        if(newRoot === undefined) return;
+        const newBlocks = root.getParentOf(newList);
+        if(newBlocks instanceof BlocksNode)
+            return newBlocks.withMergedAdjacentLists();
+    
     }
 
     abstract create(blocks: BlockNode[]): BlocksNode;
