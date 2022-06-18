@@ -35,22 +35,12 @@ export class ParagraphNode extends BlockNode {
         this.#content?.traverse(fn);
     }
 
-    withLevel(level: number): ParagraphNode { return new ParagraphNode(level, this.#content); }
-    withContent(content: FormatNode): ParagraphNode { return new ParagraphNode(this.#level, content); }
-
-    withChildReplaced(node: Node, replacement: Node | undefined) {
-        return node instanceof FormatNode && node === this.#content && replacement instanceof FormatNode ? 
-            new ParagraphNode(this.#level, replacement) : undefined;
-    }
-
     copy(): ParagraphNode { return new ParagraphNode(this.#level, this.#content.copy()); }
 
     getSelection(): CaretRange {
-
         const first = this.getFirstTextNode();
         const last = this.getLastTextNode();
         return { start: { node: first, index: 0}, end: { node: last, index: last.getLength() } };
-
     }
 
     getFirstTextNode(): TextNode { return this.getContent().getFirstTextNode(); }
@@ -64,11 +54,22 @@ export class ParagraphNode extends BlockNode {
         return this.getNodes().filter(n => n instanceof TextNode) as TextNode[];
     }
 
-    withParagraphAppended(paragraph : ParagraphNode): ParagraphNode {
-        return new ParagraphNode(this.#level, new FormatNode("", [ ... this.#content.getSegments(), ... paragraph.#content.getSegments() ]));
+    withLevel(level: number): ParagraphNode { return new ParagraphNode(level, this.#content); }
+    withContent(content: FormatNode): ParagraphNode { return new ParagraphNode(this.#level, content); }
+    withChildReplaced(node: Node, replacement: Node | undefined) {
+        return node instanceof FormatNode && node === this.#content && replacement instanceof FormatNode ? 
+            new ParagraphNode(this.#level, replacement) : 
+            undefined;
     }
 
-    split(caret: Caret): [ ParagraphNode, ParagraphNode, Caret ] | undefined {
+    withParagraphAppended(paragraph : ParagraphNode): ParagraphNode {
+        return new ParagraphNode(
+            this.#level, 
+            new FormatNode("", [ ... this.#content.getSegments(), ... paragraph.#content.getSegments() ])
+        );
+    }
+
+    split(caret: Caret): [ ParagraphNode, ParagraphNode ] | undefined {
 
         // If we weren't given a text node, do nothing.
         if(!(caret.node instanceof TextNode)) return;
@@ -80,21 +81,21 @@ export class ParagraphNode extends BlockNode {
         const lastTextNode = this.getLastTextNode();
         if(caret.node === lastTextNode && caret.index == lastTextNode.getLength()) {
             const newParagraph = new ParagraphNode();
-            return [ this, newParagraph, { node: newParagraph.getFirstTextNode(), index: 0 } ];
+            return [ this, newParagraph ];
         }
 
         // If the caret is in the first position of the paragraph, insert a new empty paragraph before.
         const firstTextNode = this.getFirstTextNode();
         if(caret.node === firstTextNode && caret.index == 0) {
             const newParagraph = new ParagraphNode();
-            return [ newParagraph, this, { node: newParagraph.getFirstTextNode(), index: 0 } ];
+            return [ newParagraph, this ];
         }
 
         // Otherwise, split the paragraph in two, with the caret at the beginning of the second.
         const before = this.#content.withoutContentBefore(caret);
         const after = this.#content.withoutContentAfter(caret);
         if(before === undefined || after === undefined) return;
-        return [ new ParagraphNode(this.#level, before), new ParagraphNode(this.#level, after), after.getFirstCaret() ];
+        return [ new ParagraphNode(this.#level, before), new ParagraphNode(this.#level, after) ];
         
     }
     

@@ -345,7 +345,8 @@ export class ChapterNode extends BlocksNode {
         // Split the paragraph in two.
         const split = paragraph.split(caret);
         if(split === undefined) return;
-        const [ first, last, newCaret ] = split;
+        const [ first, last ] = split;
+        const newCaret = last.getFirstCaret();
 
         const newBlocks = blocks
             .withBlockInsertedBefore(paragraph, last)
