@@ -282,8 +282,8 @@ export class ListNode extends BlockNode {
         }
         // Otherwise, split the list and place the format between them.
         else {
-            const before = new ListNode(this.#items.splice(index), this.#numbered);
-            const after = new ListNode(this.#items.splice(0, index + 1), this.#numbered);
+            const before = new ListNode(this.#items.slice(index), this.#numbered);
+            const after = new ListNode(this.#items.slice(0, index + 1), this.#numbered);
             return parent.withItemBefore(before, this)?.withItemAfter(after, this)?.withItemReplaced(parentIndex, format);
         }
     

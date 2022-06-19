@@ -79,13 +79,13 @@ export class ParagraphNode extends BlockNode {
 
         // If the caret is at the last position of the paragraph, insert a new empty paragraph.
         const lastTextNode = this.getLastTextNode();
-        if(caret.node === lastTextNode && caret.index == lastTextNode.getLength())
-            return [ this, new ParagraphNode() ];
+        if(caret.node === lastTextNode && caret.index === lastTextNode.getLength())
+            return [ this.copy(), new ParagraphNode() ];
 
         // If the caret is in the first position of the paragraph, insert a new empty paragraph before.
         const firstTextNode = this.getFirstTextNode();
-        if(caret.node === firstTextNode && caret.index == 0)
-            return [ new ParagraphNode(), this ];
+        if(caret.node === firstTextNode && caret.index === 0)
+            return [ new ParagraphNode(), this.copy() ];
 
         // Otherwise, split the paragraph in two, with the caret at the beginning of the second.
         const before = this.#content.withoutContentBefore(caret);

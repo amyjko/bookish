@@ -158,7 +158,9 @@ export class FormatNode extends Node {
 
         const index = this.#segments.indexOf(segment);
         if(index < 0) return undefined;
-        return new FormatNode(this.#format, this.#segments.slice().splice(index, 1));
+        const newSegments = this.#segments.slice();
+        newSegments.splice(index, 1);
+        return new FormatNode(this.#format, newSegments);
 
     }
 
@@ -469,7 +471,9 @@ export class FormatNode extends Node {
         const right = new TextNode(caret.node.getText().substring(caret.index));
 
         // Insert the new left, right and middle
-        return new FormatNode(this.#format, this.#segments.slice().splice(index, 1, left, segment, right));
+        const newSegments = this.#segments;
+        newSegments.splice(index, 1, left, segment, right);
+        return new FormatNode(this.#format, newSegments);
 
     }
 

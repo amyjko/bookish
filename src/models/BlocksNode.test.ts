@@ -1,4 +1,5 @@
 import { ChapterNode } from "./ChapterNode";
+import { FootnoteNode } from "./FootnoteNode";
 import { FormatNode } from "./FormatNode";
 import { ListNode } from "./ListNode";
 import { ParagraphNode } from "./ParagraphNode";
@@ -13,6 +14,10 @@ const lastText = "Last paragraph."
 const lastTextNode = new TextNode(lastText);
 const lastFormat = new FormatNode("", [ lastTextNode ]);
 const lastParagraph = new ParagraphNode(0, lastFormat)
+
+const footnoteText = new TextNode("This is my footnote.");
+const footnote = new FootnoteNode(new FormatNode("", [ footnoteText ]))
+
 const paragraphChapter = new ChapterNode([ firstParagraph, lastParagraph ])
 
 const numberedList = new ListNode([ firstFormat, lastFormat ], true)
@@ -56,5 +61,25 @@ test("Split selection", () => {
     const selectSplit = chapter.withSelectionSplit({ start: { node: firstTextNode, index: 5 }, end: { node: firstTextNode, index: 10 } })
     expect(selectSplit?.root.toBookdown()).toBe("First\n\ngraph.")
 
+    // Split at the beginning
+    const startCaret = { node: firstTextNode, index: 0 }
+    const startSplit = chapter.withSelectionSplit({ start: startCaret, end: startCaret })
+    expect(startSplit?.root.toBookdown()).toBe("\n\nFirst paragraph.")
+    
+    // Split at the end
+    const endCaret = { node: firstTextNode, index: 16 }
+    const endSplit = chapter.withSelectionSplit({ start: endCaret, end: endCaret })
+    expect(endSplit?.root.toBookdown()).toBe("First paragraph.\n\n")
+    
 })
 
+test("Without atom", () => {
+    const chapterAtomEnd = new ChapterNode([ new ParagraphNode(0, new FormatNode("", [ firstFormat, footnote ]))])
+    expect(chapterAtomEnd.withoutAtom(footnote)?.root.toBookdown()).toBe(`${firstText}`)
+
+    const chapterAtomBegin = new ChapterNode([ new ParagraphNode(0, new FormatNode("", [ footnote, firstFormat ]))])
+    expect(chapterAtomBegin.withoutAtom(footnote)?.root.toBookdown()).toBe(`${firstText}`)
+
+    const chapterAtomMiddle = new ChapterNode([ new ParagraphNode(0, new FormatNode("", [ firstFormat, footnote, lastFormat ]))])
+    expect(chapterAtomMiddle.withoutAtom(footnote)?.root.toBookdown()).toBe(`${firstText}${lastText}`)
+})

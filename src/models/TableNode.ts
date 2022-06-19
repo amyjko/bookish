@@ -132,7 +132,9 @@ export class TableNode extends BlockNode {
         for(let c = 0; c < columnCount; c++)
             column.push(new FormatNode("", [ new TextNode("") ]));
 
-        return new TableNode(this.#rows.slice().splice(index, 0, column), this.#position, this.#caption);
+        const newRows = this.#rows.slice();
+        newRows.splice(index, 0, column)
+        return new TableNode(newRows, this.#position, this.#caption);
 
     }
 
@@ -141,7 +143,9 @@ export class TableNode extends BlockNode {
         if(index < 0 || index >= this.#rows.length)
             return;
 
-        return new TableNode(this.#rows.slice().splice(index, 1), this.#position, this.#caption);
+        const newRows = this.#rows.slice();
+        newRows.splice(index, 1);
+        return new TableNode(newRows, this.#position, this.#caption);
 
     }
 
