@@ -220,7 +220,10 @@ export abstract class BlocksNode extends BlockNode {
             { start: range.end, end: range.start };
 
     }
-    
+ 
+    abstract create(blocks: BlockNode[]): BlocksNode;
+    abstract withChildReplaced(node: Node, replacement: Node | undefined): BlocksNode | undefined;
+
     withBlockInserted(anchor: BlockNode, block: BlockNode, before: boolean): BlocksNode | undefined {
         const index = this.blocks.indexOf(anchor);
         if(index < 0)
@@ -544,11 +547,14 @@ export abstract class BlocksNode extends BlockNode {
 
     }
 
-    withListsIndented(root: Node, range: CaretRange, indent: boolean): Edit {
+    withListsIndented(range: CaretRange, indent: boolean): BlocksNode | undefined {
+
+        let newBlocks: BlocksNode = this;
+
         // Find all of the formats in list nodes in the range and indent them.
-        const ancestor = range.start.node.getCommonAncestor(root, range.end.node);
-        const nodes = ancestor?.getNodes();      
-        const formats = nodes?.filter(n => n instanceof FormatNode && root.getParentOf(n) instanceof ListNode) as FormatNode[];
+        const ancestor = range.start.node.getCommonAncestor(newBlocks, range.end.node);
+        const nodes = ancestor?.getNodes();
+        const formats = nodes?.filter(n => n instanceof FormatNode && newBlocks.getParentOf(n) instanceof ListNode) as FormatNode[];
         const startIndex = nodes?.indexOf(range.start.node);
         const endIndex = nodes?.indexOf(range.end.node);
         
@@ -558,28 +564,40 @@ export abstract class BlocksNode extends BlockNode {
         const first = startIndex < endIndex ? range.start.node : range.end.node;
         const last = startIndex < endIndex ? range.end.node : range.start.node;
         let inside = false;
-        let failed = false;
-        formats.forEach(format => {
-            if(first.hasAncestor(root, format))
+        for(let i = 0; i < formats.length; i++) {
+            const format = formats[i];
+            if(first.hasAncestor(newBlocks, format))
                 inside = true;
             // If we're in the selection and the format is in a list, restructure it's list to indent/unindent it.
             if(inside) {
-                const list = root.getParentOf(format);
+                const list = newBlocks.getParentOf(format);
                 if(list instanceof ListNode) {
-                    const newList = indent ? list.withItemIndented(format) : list.withItemUnindented(root, format);
-                    if(newList === undefined) { failed = true; return; }
-                    const newRoot = list.replace(root, newList);
-                    if(newRoot === undefined) { failed = true; return; }
-                    // Update the root that we use to get parents so that we modify the new value on the next pass.
-                    root = newRoot;
+                    if(indent) {
+                        const newList = list.withItemIndented(format);
+                        if(newList === undefined) return;
+                        const blocksWithIndent = newBlocks.withChildReplaced(list, newList);
+                        if(blocksWithIndent === undefined) return;
+                        newBlocks = blocksWithIndent;
+                    } else {
+                        const parentList = list.getParentOf(format);
+                        if(parentList === undefined) return;
+                        // Do nothing to the item if it's list isn't a list.
+                        if(parentList instanceof ListNode) {
+                            // const newList = parentList.withItemUnindented(format);
+                            // if(newList === undefined) return;
+                            // const blocksWithIndent = newBlocks.withChildReplaced(list, newList);
+                            // if(blocksWithIndent === undefined) return;
+                            // newBlocks = blocksWithIndent;
+                        }
+                    }
                 }
             }
-            if(last.hasAncestor(root, format))
+            if(last.hasAncestor(newBlocks, format))
                 inside = false;
-        });
+        }
     
         // We shouldn't need to update the range because we haven't modified the text nodes, just their position.
-        return failed ? undefined: { root: root, range: range };
+        return newBlocks;
     
     }
 
@@ -594,7 +612,5 @@ export abstract class BlocksNode extends BlockNode {
             return newBlocks.withAdjacentListsMerged();
     
     }
-
-    abstract create(blocks: BlockNode[]): BlocksNode;
 
 }

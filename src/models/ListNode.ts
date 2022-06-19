@@ -23,6 +23,7 @@ export class ListNode extends BlockNode {
     getType() { return "list"; }
     isNumbered() { return this.#numbered; }
     getItems() { return this.#items; }
+    getListItems() { return this.#items.filter(i => i instanceof ListNode) as ListNode[]; }
     getLength() { return this.#items.length; }
     getLastItem(): FormatNode | undefined { return this.getFirstLastItem(false); }
     getFirstItem(): FormatNode | undefined { return this.getFirstLastItem(true); }
@@ -162,69 +163,67 @@ export class ListNode extends BlockNode {
         
     }
 
-    // Takes the given position, finds the root formatted node it is inside of, 
-    // and replaces it with a list that contains the formatted node.
+    // Recursively search for the given item and indent it, constructing a new list.
     withItemIndented(format: FormatNode): ListNode | undefined {
 
-        const index = this.#items.indexOf(format);
-        if(format === undefined || index < 0) return;
-
-        const beforeList = this.#items[index - 1];
-        const afterList = this.#items[index + 1];
-
-        // If the format is just after a list, move the format to the end of the list.
-        if(beforeList instanceof ListNode)
-            return this.withItemReplaced(index - 1, beforeList.withItemAppended(format))?.withoutItem(index);            
-        // If the format is just before a list, move the format to the beginning of the list.
-        else if(afterList instanceof ListNode)
-            return this.withItemReplaced(index + 1, afterList.withItemPrepended(format))?.withoutItem(index);
-        // Otherwise, make a new sub list node, add the format to it.
-        else
-            return this.withItemReplaced(index, new ListNode([ format ], this.#numbered));
+        // Check each item in the list to see if it matches...
+        for(let index = 0; index < this.#items.length; index++ ) {
+            const item = this.#items[index];
+            // Base case: does this list contain the item?
+            if(item === format) {
+                const beforeList = this.#items[index - 1];
+                const afterList = this.#items[index + 1];
+                // If the format is just after a list, move the format to the end of the list.
+                if(beforeList instanceof ListNode)
+                    return this.withItemReplaced(index - 1, beforeList.withItemAppended(format))?.withoutItem(index);            
+                // If the format is just before a list, move the format to the beginning of the list.
+                else if(afterList instanceof ListNode)
+                    return this.withItemReplaced(index + 1, afterList.withItemPrepended(format))?.withoutItem(index);
+                // Otherwise, make a new sub list node, add the format to it.
+                else
+                    return this.withItemReplaced(index, new ListNode([ format ], this.#numbered));
+            }
+            // If this is a sublist, see if it contains the item, and if so,
+            // replace this list with list that has the item indented.
+            else if(item instanceof ListNode){
+                const newList = item.withItemIndented(format);
+                if(newList !== undefined)
+                    return this.withItemReplaced(index, newList);    
+            }
+        }
+        // Otherwise, return nothing.
 
     }
 
-    // Returns a new parent list of this list.
-    withItemUnindented(root: Node, format: FormatNode): ListNode | undefined {
+    // Recursively search for the item and unindent it, constructing a new list.
+    withItemUnindented(format: FormatNode): ListNode | undefined {
 
-        // Find the root format
-        const index = this.#items.indexOf(format);
-
-        // If this isn't in this list, do nothing.
-        if(format === undefined || index < 0) return;
-
-        // Find the list parent
-        const parent = root.getParentOf(this);
-
-        // If this list isn't in a list, do nothing. There's nothing to indent.
-        if(!(parent instanceof ListNode)) return;
-
-        // Where is this list in the parent list?
-        const parentIndex = parent.getItems().indexOf(this);
-
-        // If first, insert the format before this list.
-        if(index === 0) {
-            const withoutItem = this.withoutItem(index);
-            if(withoutItem === undefined) return;
-            return withoutItem.getLength() > 0 ? 
-                parent.withItemReplaced(parentIndex, withoutItem)?.withItemAt(format, parentIndex) :
-                parent.withItemAt(format, parentIndex);
+        // Check each sublist in the list to see if any has the item so we can unindent it into this.
+        for(let index = 0; index < this.#items.length; index++ ) {
+            const list = this.#items[index];
+            if(list instanceof ListNode) {
+                const match = list.#items.indexOf(format);
+                // If we found it in this sublist, extract it here!
+                if(match >= 0) {
+                    const before = new ListNode(list.#items.slice(0, match), this.#numbered);
+                    const after = new ListNode(list.#items.slice(match + 1), this.#numbered);
+                    let newItems: ListNodeType[] = this.#items.slice(0, index);
+                    if(before.getLength() > 0) newItems.push(before);
+                    newItems.push(format);
+                    if(after.getLength() > 0) newItems.push(after);
+                    newItems = newItems.concat(this.#items.slice(index + 1));
+                    return new ListNode(newItems, this.#numbered);
+                }
+                // If the sublist doesn't have it, see if it's sublist does
+                else {
+                    const unindented = list.withItemUnindented(format);
+                    if(unindented !== undefined)
+                        return this.withItemReplaced(index, unindented);
+                }
+            }
         }
-        // If last, insert the format after this list.
-        else if(index === this.#items.length - 1) {
-            const withoutItem = this.withoutItem(index);
-            if(withoutItem === undefined) return;
-            return withoutItem.getLength() > 0 ?
-                parent.withItemReplaced(parentIndex, withoutItem)?.withItemAt(format, parentIndex + 1) :
-                parent.withItemAt(format, parentIndex);
-        }
-        // Otherwise, split the list and place the format between them.
-        else {
-            const before = new ListNode(this.#items.slice(index), this.#numbered);
-            const after = new ListNode(this.#items.slice(0, index + 1), this.#numbered);
-            return parent.withItemBefore(before, this)?.withItemAfter(after, this)?.withItemReplaced(parentIndex, format);
-        }
-    
+        // Otherwise, return nothing, indicating no match.
+
     }
 
     withChildReplaced(node: Node, replacement: Node | undefined) {         

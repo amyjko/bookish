@@ -43,16 +43,23 @@ export class QuoteNode extends BlocksNode {
     create(blocks: BlockNode[]): BlocksNode { return new QuoteNode(blocks, this.#credit, this.#position); }
 
     withChildReplaced(node: Node, replacement: Node | undefined) {
-        // Replace a block.
-        const index = this.blocks.indexOf(node as BlockNode);
-        if(index >= 0) {
-            const newBlocks = this.blocks.slice();
-            newBlocks[index] = replacement as BlockNode;
-            return new QuoteNode(newBlocks, this.#credit, this.#position);
-        }
+
         // Replace the credit.
         if(this.#credit === node && replacement instanceof FormatNode)
             return new QuoteNode(this.blocks, replacement, this.#position);
+    
+        // Replace a block.
+        if(replacement !== undefined && !(replacement instanceof BlockNode)) return;
+        const index = this.blocks.indexOf(node as BlockNode);
+        if(index < 0) return;
+
+        // Make a new blocks node, assigning and re-parenting the replacement.
+        const blocks = replacement === undefined ?
+            [ ...this.blocks.slice(0, index), ...this.blocks.slice(index + 1)] :
+            [ ...this.blocks.slice(0, index), replacement, ...this.blocks.slice(index + 1) ];
+
+        return new QuoteNode(blocks, this.#credit, this.#position);
+
     }
 
     withCredit(credit: FormatNode | undefined): QuoteNode { return new QuoteNode(this.getBlocks(), credit, this.#position); }

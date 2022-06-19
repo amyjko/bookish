@@ -112,7 +112,7 @@ export class ChapterNode extends BlocksNode {
         if(index < 0)
             return undefined;
 
-        // Make a new callout, assigning and re-parenting the replacement.
+        // Make a new blocks node, assigning and re-parenting the replacement.
         const blocks = replacement === undefined ?
             [ ...this.blocks.slice(0, index), ...this.blocks.slice(index + 1)] :
             [ ...this.blocks.slice(0, index), replacement, ...this.blocks.slice(index + 1) ];

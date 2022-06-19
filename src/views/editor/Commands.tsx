@@ -601,7 +601,14 @@ export const commands: Command[] = [
         control: false, alt: false, shift: false, key: "Tab",
         visible: context => context.list !== undefined,
         active: context => context.list !== undefined,
-        handler: context => context.blocks?.withListsIndented(context.chapter, context.range, true)
+        handler: context => {
+            if(context.blocks === undefined) return;
+            const newBlocks = context.blocks.withListsIndented(context.range, true);
+            if(newBlocks === undefined) return;
+            const newRoot = context.blocks.replace(context.chapter, newBlocks);
+            if(newRoot === undefined) return;
+            return { root: newRoot, range: context.range }
+        }
     },        
     {
         label: "unindent",
@@ -611,7 +618,14 @@ export const commands: Command[] = [
         control: false, alt: false, shift: true, key: "Tab",
         visible: context => context.list !== undefined,
         active: context => context.list !== undefined && context.list.isInside(context.chapter, ListNode),
-        handler: context => context.blocks?.withListsIndented(context.chapter, context.range, false)
+        handler: context => {
+            if(context.blocks === undefined) return;
+            const newBlocks = context.blocks.withListsIndented(context.range, false);
+            if(newBlocks === undefined) return;
+            const newRoot = context.blocks.replace(context.chapter, newBlocks);
+            if(newRoot === undefined) return;
+            return { root: newRoot, range: context.range }
+        }
     },
     {
         label: "plain",
