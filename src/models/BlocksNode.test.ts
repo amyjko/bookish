@@ -23,6 +23,11 @@ const paragraphChapter = new ChapterNode([ firstParagraph, lastParagraph ])
 const numberedList = new ListNode([ firstFormat, lastFormat ], true)
 const bulletedList = new ListNode([ firstFormat, lastFormat ], false)
 
+const beforeBold = new TextNode("I am a ");
+const bold = new TextNode("bold");
+const afterBold = new TextNode(" word.");
+const boldChapter = new ChapterNode([new ParagraphNode(0, new FormatNode("", [ beforeBold, new FormatNode("*", [ bold ]), afterBold ]))])
+
 test("Insert a block", () => {
     expect(paragraphChapter.withBlockInserted(firstParagraph, new RuleNode(), true)?.toBookdown()).toBe(`-\n\n${firstText}\n\n${lastText}`)
     expect(paragraphChapter.withBlockInserted(firstParagraph, new RuleNode(), false)?.toBookdown()).toBe(`${firstText}\n\n-\n\n${lastText}`)
@@ -40,11 +45,33 @@ test("Merge adjascent lists", () => {
 })
 
 test("Format range", () => {
-    const bold = paragraphChapter.withRangeFormatted(
-        { start: { node: firstTextNode, index: 6 }, end: { node: firstTextNode, index: 10 }}, 
-        "*"
-    )
-    expect(bold?.root.toBookdown()).toBe(`First *para*graph.\n\n${lastText}`);
+    // Bold part of a paragraph.
+    expect(paragraphChapter.withRangeFormatted({ start: { node: firstTextNode, index: 6 }, end: { node: firstTextNode, index: 10 }}, "*")?.root.toBookdown())
+        .toBe(`First *para*graph.\n\n${lastText}`)
+
+    // Remove part of a paragraph.
+    expect(paragraphChapter.withRangeFormatted({ start: { node: firstTextNode, index: 6 }, end: { node: firstTextNode, index: 10 }}, undefined)?.root.toBookdown())
+        .toBe(`First graph.\n\n${lastText}`)
+
+    // Unbold the bold part of a paragraph with the selection outside the bold.
+    expect(boldChapter.withRangeFormatted({ start: { node: beforeBold, index: beforeBold.getLength() }, end: { node: afterBold, index: 0 }}, "")?.root.toBookdown())
+        .toBe(`I am a bold word.`)
+
+    // Unbold the bold part of a paragraph with the selection inside the bold.
+    expect(boldChapter.withRangeFormatted({ start: { node: bold, index: 0 }, end: { node: bold, index: bold.getLength() }}, "")?.root.toBookdown())
+        .toBe(`I am a bold word.`)
+
+    // Expand the bold part of a paragraph.
+    expect(boldChapter.withRangeFormatted({ start: { node: beforeBold, index: beforeBold.getLength() - 2 }, end: { node: afterBold, index: 0 }}, "*")?.root.toBookdown())
+        .toBe(`I am *a bold* word.`)
+
+    // Delete across a paragraph boundary.
+    expect(paragraphChapter.withRangeFormatted({ start: { node: firstTextNode, index: 6 }, end: { node: lastTextNode, index: 4 }}, undefined)?.root.toBookdown())
+        .toBe(`First \n\n paragraph.`)
+
+    // Bold across a paragraph boundary.
+    expect(paragraphChapter.withRangeFormatted({ start: { node: firstTextNode, index: 6 }, end: { node: lastTextNode, index: 4 }}, "*")?.root.toBookdown())
+        .toBe(`First *paragraph.*\n\n*Last* paragraph.`)
 })
 
 test("Split selection", () => {

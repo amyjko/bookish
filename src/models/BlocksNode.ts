@@ -172,15 +172,13 @@ export abstract class BlocksNode extends BlockNode {
             return range;
 
         // Where do these text nodes appear in the ancestor's node sequence?
-        let startIndex = ancestor.getIndexOf(start);
-        let endIndex = ancestor.getIndexOf(end);
+        let startIndex = ancestor.getNodes().indexOf(start);
+        let endIndex = ancestor.getNodes().indexOf(end);
 
         // Defensively verify that we could find the given nodes in the document.
         // If we can't, something is wrong upstream.
-        if(startIndex === undefined)
-            throw Error(`Could not find in common ancestor.`);
-        if(endIndex === undefined)
-            throw Error(`Could not find in common ancestor.`);
+        if(startIndex < 0 || endIndex < 0)
+            throw Error(`Couldn't find caret range node(s) in this tree.`);
 
         // If we didn't find them, or the start is before the end, return the given range.
         return startIndex === undefined || endIndex === undefined || startIndex < endIndex ? 
