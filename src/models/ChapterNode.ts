@@ -19,11 +19,11 @@ export class ChapterNode extends BlocksNode {
 
     #metadata: Bookkeeping;
 
-    constructor(blocks: BlockNode[], metadata: Bookkeeping) {
+    constructor(blocks: BlockNode[], metadata?: Bookkeeping) {
         super(blocks);
 
         // Content extracted during parsing.
-        this.#metadata = metadata;
+        this.#metadata = metadata === undefined ? { symbols: {} } : metadata;
 
     }
 

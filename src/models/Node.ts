@@ -19,9 +19,13 @@ export abstract class Node {
     abstract withChildReplaced(node: Node, replacement: Node | undefined): Node | undefined;
 
     rootWithChildReplaced(root: Node, node: Node, replacement: Node | undefined): Node | undefined {        
-        const parent = root.getParentOf(this);
-        if(parent === undefined) return;
+        // Create a new version of this node with the replacement.
         const newNode = this.withChildReplaced(node, replacement);
+        // See if there's a parent.
+        const parent = root.getParentOf(this);
+        // If not, return the new node.
+        if(parent === undefined) return newNode;
+        // If there is a parent, return a modfied version of the parent with the new node.
         return parent.rootWithChildReplaced(root, this, newNode === undefined ? this : newNode);
     }
 

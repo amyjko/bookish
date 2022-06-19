@@ -9,7 +9,7 @@ export class RuleNode extends BlockNode {
 
     getType() { return "rule"; }
     toText(): string { return ""; }
-    toBookdown(debug?: number): string { return "\n\n-\n\n"; }
+    toBookdown(debug?: number): string { return "-"; }
     traverseChildren(fn: (node: Node) => void): void {} 
     getParentOf(node: Node): Node | undefined { return undefined; }
     getFormats() { return []; }

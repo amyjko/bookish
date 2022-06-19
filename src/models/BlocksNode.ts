@@ -69,6 +69,10 @@ export abstract class BlocksNode extends BlockNode {
 
     }
 
+    getBlockOfCaret(caret: Caret): BlockNode | undefined {
+        return caret.node.closestParent<BlockNode>(this, BlockNode);
+    }
+
     getParentOf(node: Node): Node | undefined {
         return this.blocks.map(b => b === node ? this : b.getParentOf(node)).find(b => b !== undefined);
     }
@@ -202,12 +206,13 @@ export abstract class BlocksNode extends BlockNode {
         const index = this.blocks.indexOf(anchor);
         if(index < 0)
             return;
-        const newBlocks = this.blocks.slice(0).splice(index + (before ? 0 : 1), 0, block);
+        const newBlocks = this.blocks.slice(0);
+        newBlocks.splice(index + (before ? 0 : 1), 0, block);
         return this.create(newBlocks);
     }
 
     withoutBlock(block: BlockNode): BlocksNode {
-        return this.create(this.blocks.filter(n => n === block));
+        return this.create(this.blocks.filter(n => n !== block));
     }
 
     withBlockInsertedBefore(anchor: BlockNode, block: BlockNode) {
@@ -218,7 +223,7 @@ export abstract class BlocksNode extends BlockNode {
         return this.withBlockInserted(anchor, block, false);
     }
 
-    withMergedAdjacentLists(): BlocksNode {
+    withAdjacentListsMerged(): BlocksNode {
 
         const newBlocks: BlockNode[] = [];
         this.blocks.forEach(block => {
@@ -241,7 +246,7 @@ export abstract class BlocksNode extends BlockNode {
 
         // If there's a selection, remove it before inserting.
         if (range.start.node !== range.end.node || range.start.index !== range.end.index) {
-            const edit = this.withoutRange(range);
+            const edit = blocks.withoutRange(range);
             if(edit === undefined || !(edit.root instanceof BlocksNode)) return;
             blocks = edit.root;
             caret = edit.range.start;
@@ -249,7 +254,7 @@ export abstract class BlocksNode extends BlockNode {
     
         // Find what paragraph the caret is in.
         // There are some contexts with no paragraphs. Return the start range given.
-        const paragraph = caret.node.closestParent<ParagraphNode>(this, ParagraphNode);        
+        const paragraph = caret.node.closestParent<ParagraphNode>(blocks, ParagraphNode);        
         if(paragraph === undefined) return;
 
         // Split the paragraph in two.
@@ -258,9 +263,9 @@ export abstract class BlocksNode extends BlockNode {
         const [ first, last ] = split;
         const newCaret = last.getFirstCaret();
 
-        const newBlocks = this
-            .withBlockInsertedBefore(paragraph, last)
-            ?.withBlockInsertedBefore(last, first)
+        const newBlocks = blocks
+            .withBlockInsertedBefore(paragraph, first)
+            ?.withBlockInsertedAfter(paragraph, last)
             ?.withoutBlock(paragraph);
         if(newBlocks === undefined) return;
 
@@ -332,19 +337,19 @@ export abstract class BlocksNode extends BlockNode {
         // Sort the range if it's out of order, since the algorithm below assumes that it's ordered.
         const sortedRange = this.sortRange(adjustedRange);
 
-        // Find all of the block nodes between the start and end node, inclusive, in order, by looping
-        // through the nodes in the ancestor and identifying blocks. If there's no common ancestor, fail.
-        const commonAncestor = sortedRange.start.node.getCommonAncestor(this, sortedRange.end.node);
-        if(commonAncestor === undefined) return;
+        // Find the start and end block the carets reside in. Bail on fail.
+        const startBlock = this.getBlockOfCaret(sortedRange.start);
+        const endBlock = sortedRange.end === sortedRange.start ? startBlock : this.getBlockOfCaret(sortedRange.end);
+        if(startBlock === undefined || endBlock === undefined) return;
 
-        // Find all of the formatting roots included in the selection as well as any non-paragraph blocks so we can edit them.
+        // Find all of the blocks between the start and end blocks.
         // Start tracking when we hit the start node. Stop tracking when we hit the end node.
         const blocksToEdit: BlockNode[] = [];
         let insideSelection = false;
-        commonAncestor.getNodes().forEach(node => {
-            if(node === sortedRange.start.node) insideSelection = true;
+        this.getNodes().filter(n => n instanceof BlockNode).forEach(node => {
+            if(node === startBlock) insideSelection = true;
             if(insideSelection && node instanceof BlockNode) blocksToEdit.push(node);
-            if(insideSelection && node === sortedRange.end.node) insideSelection = false;
+            if(insideSelection && node === endBlock) insideSelection = false;
         });
 
         // Edit each of the blocks as requested, accounting for the start and stop nodes, creating a new chapter as we go.
@@ -399,8 +404,8 @@ export abstract class BlocksNode extends BlockNode {
         }
 
         // Map the text indicies back to carets.
-        const startCaret = this.getTextIndexAsCaret(startTextIndex);
-        const endCaret = format === undefined ? startCaret : this.getTextIndexAsCaret(startEndIndex);
+        const startCaret = newRoot.getTextIndexAsCaret(startTextIndex);
+        const endCaret = format === undefined ? startCaret : newRoot.getTextIndexAsCaret(startEndIndex);
 
         // Return the new root and the start and end of the range.
         return { root: newRoot, range: { start: startCaret, end: endCaret } };
@@ -467,7 +472,7 @@ export abstract class BlocksNode extends BlockNode {
             const newRoot = paragraph.replace(root, new ListNode([ paragraph.getContent() ], numbered));
             const newBlock = paragraph.getParent(root);
             if(newRoot !== undefined && newBlock instanceof BlocksNode) {
-                const cleanedRoot = newBlock.replace(newRoot, newBlock.withMergedAdjacentLists());
+                const cleanedRoot = newBlock.replace(newRoot, newBlock.withAdjacentListsMerged());
                 if(cleanedRoot !== undefined && cleanedRoot instanceof BlocksNode)
                     return { root: cleanedRoot, range: range }
             }
@@ -624,7 +629,7 @@ export abstract class BlocksNode extends BlockNode {
         if(newRoot === undefined) return;
         const newBlocks = root.getParentOf(newList);
         if(newBlocks instanceof BlocksNode)
-            return newBlocks.withMergedAdjacentLists();
+            return newBlocks.withAdjacentListsMerged();
     
     }
 
