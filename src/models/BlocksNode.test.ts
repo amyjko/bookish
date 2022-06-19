@@ -91,22 +91,38 @@ test("Split selection", () => {
     // Split at the beginning
     const startCaret = { node: firstTextNode, index: 0 }
     const startSplit = chapter.withSelectionSplit({ start: startCaret, end: startCaret })
-    expect(startSplit?.root.toBookdown()).toBe("\n\nFirst paragraph.")
+    expect(startSplit?.root.toBookdown()).toBe(`\n\n${firstText}`)
     
     // Split at the end
     const endCaret = { node: firstTextNode, index: 16 }
     const endSplit = chapter.withSelectionSplit({ start: endCaret, end: endCaret })
-    expect(endSplit?.root.toBookdown()).toBe("First paragraph.\n\n")
+    expect(endSplit?.root.toBookdown()).toBe(`${firstText}\n\n`)
     
 })
 
 test("Without atom", () => {
     const chapterAtomEnd = new ChapterNode([ new ParagraphNode(0, new FormatNode("", [ firstFormat, footnote ]))])
-    expect(chapterAtomEnd.withoutAtom(footnote)?.root.toBookdown()).toBe(`${firstText}`)
+    expect(chapterAtomEnd.withoutAtom(footnote)?.root.toBookdown())
+        .toBe(`${firstText}`)
 
     const chapterAtomBegin = new ChapterNode([ new ParagraphNode(0, new FormatNode("", [ footnote, firstFormat ]))])
-    expect(chapterAtomBegin.withoutAtom(footnote)?.root.toBookdown()).toBe(`${firstText}`)
+    expect(chapterAtomBegin.withoutAtom(footnote)?.root.toBookdown())
+        .toBe(`${firstText}`)
 
     const chapterAtomMiddle = new ChapterNode([ new ParagraphNode(0, new FormatNode("", [ firstFormat, footnote, lastFormat ]))])
-    expect(chapterAtomMiddle.withoutAtom(footnote)?.root.toBookdown()).toBe(`${firstText}${lastText}`)
+    expect(chapterAtomMiddle.withoutAtom(footnote)?.root.toBookdown())
+        .toBe(`${firstText}${lastText}`)
+})
+
+test("Insert atom", () => {
+    const endOfFirst = { node: firstTextNode, index: firstTextNode.getLength()}
+
+    // Insert empty footnote
+    expect(paragraphChapter.withSegmentAtSelection({ start: endOfFirst, end: endOfFirst }, text => new FootnoteNode(new FormatNode("", [new TextNode(text)])))?.root.toBookdown())
+        .toBe(`${firstText}{}\n\n${lastText}`)
+
+    // Convert selection to footnote
+    expect(paragraphChapter.withSegmentAtSelection({ start: { node: firstTextNode, index: 6}, end: { node: firstTextNode, index: 15} }, text => new FootnoteNode(new FormatNode("", [new TextNode(text)])))?.root.toBookdown())
+        .toBe(`First {paragraph}.\n\n${lastText}`)
+
 })

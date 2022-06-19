@@ -473,7 +473,7 @@ export class FormatNode extends Node {
         const right = new TextNode(caret.node.getText().substring(caret.index));
 
         // Insert the new left, right and middle
-        const newSegments = this.#segments;
+        const newSegments = this.#segments.slice();
         newSegments.splice(index, 1, left, segment, right);
         return new FormatNode(this.#format, newSegments);
 

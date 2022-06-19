@@ -204,7 +204,7 @@ export abstract class BlocksNode extends BlockNode {
         const index = this.blocks.indexOf(anchor);
         if(index < 0)
             return;
-        const newBlocks = this.blocks.slice(0);
+        const newBlocks = this.blocks.slice();
         newBlocks.splice(index + (before ? 0 : 1), 0, block);
         return this.create(newBlocks);
     }
@@ -412,30 +412,31 @@ export abstract class BlocksNode extends BlockNode {
 
     withSegmentAtSelection(range: CaretRange, nodeCreator: (text: string) => FormatNodeSegmentType): Edit {
 
-        let root: Node = this;
+        let blocks: BlocksNode = this;
         let caret = range.start;
 
         // Only works at a text node.
         if(!(caret.node instanceof TextNode)) return;
 
         // Get the nearest FormatNode parent of the selected text.
-        const formatted = caret.node.closestParent<FormatNode>(this, FormatNode);
+        const formatted = caret.node.closestParent<FormatNode>(blocks, FormatNode);
 
         // Can't do anything if it's not in a formatted node.
         if(formatted === undefined) return;
     
         // If there's a selection, grab it's text and then remove the text and update the root and text being edited.
-        let selectedText = this.getSelectedText(range);
+        let selectedText = blocks.getSelectedText(range);
         if (range.start.node !== range.end.node || range.start.index !== range.end.index) {
-            const edit = this.withoutRange(range);
-            // Uh oh, fail.
-            if(edit === undefined) return;
-            root = edit.root;
+            // Try to remove the selected text. Bail on fail.
+            const edit = blocks.withoutRange(range);
+            if(edit === undefined || !(edit.root instanceof BlocksNode)) return;
+            // Update the tree we're manipulating.
+            blocks = edit.root;
             caret = edit.range.start;
         }
 
         // Get the nearest FormatNode parent of the revised text.
-        const newFormatted = caret.node.closestParent<FormatNode>(this, FormatNode);
+        const newFormatted = caret.node.closestParent<FormatNode>(blocks, FormatNode);
         if(newFormatted === undefined) return;
 
         // Create and insert the into the formatted node.
@@ -448,9 +449,9 @@ export abstract class BlocksNode extends BlockNode {
             newNode instanceof MetadataNode ? newNode.getMeta().getFirstCaret() :
             { node: newNode, index: 0 };
 
-        const newFormattedParent = root.getParentOf(newFormatted);
+        const newFormattedParent = blocks.getParentOf(newFormatted);
         if(newFormattedParent === undefined) return;
-        const newRoot = newFormattedParent.rootWithChildReplaced(root, newFormatted, revisedFormat);
+        const newRoot = newFormattedParent.rootWithChildReplaced(blocks, newFormatted, revisedFormat);
         if(newRoot === undefined || !(newRoot instanceof BlocksNode)) return undefined;
 
         // Return the edited tree.
