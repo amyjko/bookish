@@ -918,7 +918,13 @@ export const commands: Command[] = [
         control: true, alt: false, shift: true, key: "7",
         visible: context => context.list === undefined && context.atom === undefined,
         active: context => context.list === undefined && context.atom === undefined && context.blocks !== undefined,
-        handler: context => context.blocks?.withRangeAsList(context.chapter, context.range, false)
+        handler: context => {
+            const newBlocks = context.blocks?.withRangeAsList(context.range, false);
+            if(newBlocks === undefined) return;
+            const newRoot = context.blocks?.replace(context.chapter, newBlocks);
+            if(newRoot === undefined) return;
+            return { root: newRoot, range: context.range };
+        }
     },
     {
         label: "numbered",
@@ -928,7 +934,13 @@ export const commands: Command[] = [
         control: true, alt: false, shift: true, key: "8",
         visible: context => context.list === undefined && context.atom === undefined,
         active: context => context.list === undefined && context.atom === undefined && context.blocks !== undefined,
-        handler: context => context.blocks?.withRangeAsList(context.chapter, context.range, true)
+        handler: context => {
+            const newBlocks = context.blocks?.withRangeAsList(context.range, false);
+            if(newBlocks === undefined) return;
+            const newRoot = context.blocks?.replace(context.chapter, newBlocks);
+            if(newRoot === undefined) return;
+            return { root: newRoot, range: context.range };
+        }
     },
     {
         label: "bulleted",

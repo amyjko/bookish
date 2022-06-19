@@ -33,7 +33,7 @@ export abstract class Node {
     replace(root: Node, replacement: Node | undefined): Node | undefined {
 
         const parent = root.getParentOf(this);
-        if(parent === undefined) return;
+        if(parent === undefined) return replacement;
         return parent.rootWithChildReplaced(root, this, replacement);
 
     }

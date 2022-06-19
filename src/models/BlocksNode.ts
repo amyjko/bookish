@@ -69,6 +69,27 @@ export abstract class BlocksNode extends BlockNode {
 
     }
 
+    getBlocksInRange(range: CaretRange): BlockNode[] | undefined {
+
+        // Find the start and end block the carets reside in. Bail on fail.
+        const startBlock = this.getBlockOfCaret(range.start);
+        const endBlock = range.end === range.start ? startBlock : this.getBlockOfCaret(range.end);
+        if(startBlock === undefined || endBlock === undefined) return;
+
+        // Find all of the blocks between the start and end blocks.
+        // Start tracking when we hit the start node. Stop tracking when we hit the end node.
+        const blocksToEdit: BlockNode[] = [];
+        let insideSelection = false;
+        this.getNodes().filter(n => n instanceof BlockNode).forEach(node => {
+            if(node === startBlock) insideSelection = true;
+            if(insideSelection && node instanceof BlockNode) blocksToEdit.push(node);
+            if(insideSelection && node === endBlock) insideSelection = false;
+        });
+
+        return blocksToEdit;
+
+    }
+
     getBlockOfCaret(caret: Caret): BlockNode | undefined {
         return caret.node.closestParent<BlockNode>(this, BlockNode);
     }
@@ -335,20 +356,8 @@ export abstract class BlocksNode extends BlockNode {
         // Sort the range if it's out of order, since the algorithm below assumes that it's ordered.
         const sortedRange = this.sortRange(adjustedRange);
 
-        // Find the start and end block the carets reside in. Bail on fail.
-        const startBlock = this.getBlockOfCaret(sortedRange.start);
-        const endBlock = sortedRange.end === sortedRange.start ? startBlock : this.getBlockOfCaret(sortedRange.end);
-        if(startBlock === undefined || endBlock === undefined) return;
-
-        // Find all of the blocks between the start and end blocks.
-        // Start tracking when we hit the start node. Stop tracking when we hit the end node.
-        const blocksToEdit: BlockNode[] = [];
-        let insideSelection = false;
-        this.getNodes().filter(n => n instanceof BlockNode).forEach(node => {
-            if(node === startBlock) insideSelection = true;
-            if(insideSelection && node instanceof BlockNode) blocksToEdit.push(node);
-            if(insideSelection && node === endBlock) insideSelection = false;
-        });
+        const blocksToEdit = this.getBlocksInRange(sortedRange);
+        if(blocksToEdit === undefined) return;
 
         // Edit each of the blocks as requested, accounting for the start and stop nodes, creating a new chapter as we go.
         let newRoot: BlocksNode | undefined = this;
@@ -459,51 +468,48 @@ export abstract class BlocksNode extends BlockNode {
 
     }
 
-    withRangeAsList(root: Node, range: CaretRange, numbered: boolean): Edit {
+    withRangeAsList(range: CaretRange, numbered: boolean): BlocksNode | undefined {
 
-        // Find the common ancestor of the selection.
-        const ancestor = range.start.node.getCommonAncestor(root, range.end.node);
-        const paragraph = ancestor?.getParent(root);
-        const blocks = paragraph?.getParent(root);
-    
-        // If the common ancestor is a format in a paragraph, convert it to a list.
-        if(ancestor instanceof FormatNode && paragraph instanceof ParagraphNode && blocks instanceof BlocksNode) {
-            const newRoot = paragraph.replace(root, new ListNode([ paragraph.getContent() ], numbered));
-            const newBlock = paragraph.getParent(root);
-            if(newRoot !== undefined && newBlock instanceof BlocksNode) {
-                const cleanedRoot = newBlock.replace(newRoot, newBlock.withAdjacentListsMerged());
-                if(cleanedRoot !== undefined && cleanedRoot instanceof BlocksNode)
-                    return { root: cleanedRoot, range: range }
+        const sortedRange = this.sortRange(range);
+        const blocksInRange = this.getBlocksInRange(sortedRange);
+        if(blocksInRange === undefined) return;
+        // Only format if every block selected is a paragraph node. Non-paragraphs can't be in lists.
+        if(!blocksInRange.every(b => b instanceof ParagraphNode)) return;
+
+        // Split the blocks into groups with shared parents.
+        const sequences: ParagraphNode[][] = [[]];
+        let previous: ParagraphNode | undefined = undefined;
+        blocksInRange.forEach(block => {
+            if(previous === undefined || block.getParent(this) === previous.getParent(this))
+                sequences[sequences.length - 1].push(block as ParagraphNode);
+            else {
+                sequences.push([ block as ParagraphNode ])
             }
-            
-        }
-        // If the common ancestor is a blocks node, convert all of the paragraphs in range to a list.
-        else if(ancestor instanceof BlocksNode) {
-            // Find all the paragraphs in the section.
-            let first = range.start.node instanceof TextNode && range.start.node.getParagraph(root);
-            let last = range.end.node instanceof TextNode && range.end.node.getParagraph(root);
-            if(first && last) {
-                const blocks = ancestor.getBlocksBetween(first, last);
-                if(blocks !== undefined) {
-                    const paragraphs = blocks.filter(b => b instanceof ParagraphNode) as ParagraphNode[];
-                    // Only format if it's a contiguous list of paragraphs.
-                    if(blocks.length === paragraphs.length) {
-                        const newList = new ListNode(paragraphs.map(p => p.getContent()), numbered);
-                        let newBlocks: BlocksNode | undefined = ancestor;
-                        newBlocks = ancestor.withBlockInsertedBefore(paragraphs[0], newList);
-                        while(newBlocks !== undefined && paragraphs.length > 0) {
-                            const p = paragraphs.shift();
-                            if(p)
-                                newBlocks = newBlocks.withoutBlock(p);
-                        }
-                        if(newBlocks === undefined) return;
-                        const newRoot = ancestor.replace(root, newBlocks);
-                        if(newRoot !== undefined && newRoot instanceof BlocksNode)
-                            return { root: newRoot, range: range };
-                    }
-                }
+            previous = block as ParagraphNode;
+        });
+
+        // For each sequence, create a list of all of the paragraphs in it.
+        let newBlocks: BlocksNode = this;
+        for(let i = 0; i < sequences.length; i++) {
+            const sequence = sequences[i];
+            // Make the new list
+            const newList = new ListNode(sequence.map(p => p.getContent()), numbered);
+            // Insert the new list
+            const blocksParent: BlocksNode | undefined = sequence[0].getParent(newBlocks) as BlocksNode;
+            if(blocksParent === undefined) return;
+            let newSequenceBlocks = blocksParent.withBlockInsertedBefore(sequence[0], newList);
+            // Remove all of the old paragraphs
+            for(let j = 0; j < sequence.length; j++) {
+                newSequenceBlocks = newSequenceBlocks?.withoutBlock(sequence[j]);
+                if(newSequenceBlocks === undefined) return;
             }
+            // Replace the blocks parent with the new blocks.
+            const newRoot = blocksParent.replace(newBlocks, newSequenceBlocks);
+            if(newRoot === undefined || !(newRoot instanceof BlocksNode)) return;
+            newBlocks = newRoot;
         }
+
+        return newBlocks;
     
     }
     

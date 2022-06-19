@@ -1,3 +1,4 @@
+import { CalloutNode } from "./CalloutNode";
 import { ChapterNode } from "./ChapterNode";
 import { FootnoteNode } from "./FootnoteNode";
 import { FormatNode } from "./FormatNode";
@@ -124,5 +125,25 @@ test("Insert atom", () => {
     // Convert selection to footnote
     expect(paragraphChapter.withSegmentAtSelection({ start: { node: firstTextNode, index: 6}, end: { node: firstTextNode, index: 15} }, text => new FootnoteNode(new FormatNode("", [new TextNode(text)])))?.root.toBookdown())
         .toBe(`First {paragraph}.\n\n${lastText}`)
+
+})
+
+test("Convert range to list", () => {
+
+    // Convert a single paragraph to a list item.
+    expect(paragraphChapter.withRangeAsList({ start: { node: firstTextNode, index: 0}, end: { node: firstTextNode, index: 0 }}, false)?.toBookdown())
+        .toBe(`* ${firstText}\n\n${lastText}`)
+
+    // Convert two paragraphs to a single list
+    expect(paragraphChapter.withRangeAsList({ start: { node: firstTextNode, index: 0}, end: { node: lastTextNode, index: 0 }}, true)?.toBookdown())
+        .toBe(`1. ${firstText}\n2. ${lastText}`)
+
+    // Convert paragraphs that span a blocks boundary to separate lists.
+    expect(new ChapterNode([ firstParagraph, new CalloutNode([ lastParagraph ]) ]).withRangeAsList({ start: { node: firstTextNode, index: 0 }, end: { node: lastTextNode, index: 0 }}, true)?.toBookdown())
+        .toBe(`1. ${firstText}\n\n=\n1. ${lastText}\n=`)
+
+    // Convert non-paragraphs to lists
+    expect(new ChapterNode([ numberedList ]).withRangeAsList({ start: { node: firstTextNode, index: 0 }, end: { node: lastTextNode, index: 0 }}, true))
+    .toBeUndefined()
 
 })
