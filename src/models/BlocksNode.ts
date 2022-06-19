@@ -570,26 +570,14 @@ export abstract class BlocksNode extends BlockNode {
                 inside = true;
             // If we're in the selection and the format is in a list, restructure it's list to indent/unindent it.
             if(inside) {
-                const list = newBlocks.getParentOf(format);
+                // Find the root list node of the format.
+                const list = format.getFarthestParentMatching(newBlocks, n => n instanceof ListNode);
                 if(list instanceof ListNode) {
-                    if(indent) {
-                        const newList = list.withItemIndented(format);
-                        if(newList === undefined) return;
-                        const blocksWithIndent = newBlocks.withChildReplaced(list, newList);
-                        if(blocksWithIndent === undefined) return;
-                        newBlocks = blocksWithIndent;
-                    } else {
-                        const parentList = list.getParentOf(format);
-                        if(parentList === undefined) return;
-                        // Do nothing to the item if it's list isn't a list.
-                        if(parentList instanceof ListNode) {
-                            // const newList = parentList.withItemUnindented(format);
-                            // if(newList === undefined) return;
-                            // const blocksWithIndent = newBlocks.withChildReplaced(list, newList);
-                            // if(blocksWithIndent === undefined) return;
-                            // newBlocks = blocksWithIndent;
-                        }
-                    }
+                    const newList = indent ? list.withItemIndented(format) : list.withItemUnindented(format);
+                    if(newList === undefined) return;
+                    const blocksWithIndent = newBlocks.withChildReplaced(list, newList);
+                    if(blocksWithIndent === undefined) return;
+                    newBlocks = blocksWithIndent;
                 }
             }
             if(last.hasAncestor(newBlocks, format))

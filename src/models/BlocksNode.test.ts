@@ -188,22 +188,22 @@ test("Convert lists to paragraphs", () => {
 
 })
 
-// test("Indent/unindent list items", () => {
+test("Indent/unindent list items", () => {
 
-//     expect(new ChapterNode([ numberedList ]).withListsIndented(
-//         { start: { node: firstTextNode, index: 0 }, end: { node: firstTextNode, index: 0 }},
-//         true
-//     )?.toBookdown()).toBe("1.. First paragraph.\n2. Last paragraph.")
+    expect(new ChapterNode([ numberedList ]).withListsIndented(
+        { start: { node: firstTextNode, index: 0 }, end: { node: firstTextNode, index: 0 }},
+        true
+    )?.toBookdown()).toBe("1.. First paragraph.\n2. Last paragraph.")
 
-//     const indented = new ChapterNode([ numberedList ]).withListsIndented(
-//         { start: { node: firstTextNode, index: 0 }, end: { node: lastTextNode, index: 0 }},
-//         true
-//     )
-//     expect(indented?.toBookdown()).toBe("1.. First paragraph.\n2.. Last paragraph.")
+    const indented = new ChapterNode([ numberedList ]).withListsIndented(
+        { start: { node: firstTextNode, index: 0 }, end: { node: lastTextNode, index: 0 }},
+        true
+    )
+    expect(indented?.toBookdown()).toBe("1.. First paragraph.\n2.. Last paragraph.")
 
-//     expect(indented?.withListsIndented(
-//         { start: { node: firstTextNode, index: 0 }, end: { node: lastTextNode, index: 0 }},
-//         false
-//     )?.toBookdown()).toBe("1. First paragraph.\n2. Last paragraph.")
+    expect(indented?.withListsIndented(
+        { start: { node: firstTextNode, index: 0 }, end: { node: lastTextNode, index: 0 }},
+        false
+    )?.toBookdown()).toBe("1. First paragraph.\n2. Last paragraph.")
 
-// })
+})
