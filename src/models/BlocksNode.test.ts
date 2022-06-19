@@ -22,7 +22,7 @@ const footnote = new FootnoteNode(new FormatNode("", [ footnoteText ]))
 const paragraphChapter = new ChapterNode([ firstParagraph, lastParagraph ])
 
 const numberedList = new ListNode([ firstFormat, lastFormat ], true)
-const bulletedList = new ListNode([ firstFormat, lastFormat ], false)
+const bulletedList = new ListNode([ firstFormat.copy(), lastFormat.copy() ], false)
 
 const beforeBold = new TextNode("I am a ");
 const bold = new TextNode("bold");
@@ -128,22 +128,62 @@ test("Insert atom", () => {
 
 })
 
-test("Convert range to list", () => {
+test("Convert paragraphs to lists", () => {
 
     // Convert a single paragraph to a list item.
-    expect(paragraphChapter.withRangeAsList({ start: { node: firstTextNode, index: 0}, end: { node: firstTextNode, index: 0 }}, false)?.toBookdown())
+    expect(paragraphChapter.withParagraphsAsLists({ start: { node: firstTextNode, index: 0}, end: { node: firstTextNode, index: 0 }}, false)?.toBookdown())
         .toBe(`* ${firstText}\n\n${lastText}`)
 
     // Convert two paragraphs to a single list
-    expect(paragraphChapter.withRangeAsList({ start: { node: firstTextNode, index: 0}, end: { node: lastTextNode, index: 0 }}, true)?.toBookdown())
+    expect(paragraphChapter.withParagraphsAsLists({ start: { node: firstTextNode, index: 0}, end: { node: lastTextNode, index: 0 }}, true)?.toBookdown())
         .toBe(`1. ${firstText}\n2. ${lastText}`)
 
     // Convert paragraphs that span a blocks boundary to separate lists.
-    expect(new ChapterNode([ firstParagraph, new CalloutNode([ lastParagraph ]) ]).withRangeAsList({ start: { node: firstTextNode, index: 0 }, end: { node: lastTextNode, index: 0 }}, true)?.toBookdown())
+    expect(new ChapterNode([ firstParagraph, new CalloutNode([ lastParagraph ]) ]).withParagraphsAsLists({ start: { node: firstTextNode, index: 0 }, end: { node: lastTextNode, index: 0 }}, true)?.toBookdown())
         .toBe(`1. ${firstText}\n\n=\n1. ${lastText}\n=`)
 
     // Convert non-paragraphs to lists
-    expect(new ChapterNode([ numberedList ]).withRangeAsList({ start: { node: firstTextNode, index: 0 }, end: { node: lastTextNode, index: 0 }}, true))
+    expect(new ChapterNode([ numberedList ]).withParagraphsAsLists({ start: { node: firstTextNode, index: 0 }, end: { node: lastTextNode, index: 0 }}, true))
     .toBeUndefined()
+
+})
+
+test("Convert lists to paragraphs", () => {
+
+    // Convert lists to paragraphs
+    expect(new ChapterNode([ numberedList ]).withListsAsParagraphs({ start: { node: firstTextNode, index: 0 }, end: { node: firstTextNode, index: 5 }})?.toBookdown())
+        .toBe(`${firstText}\n\n${lastText}`)
+
+    // Convert both items to paragraphs.
+    expect(new ChapterNode([ numberedList ]).withListsAsParagraphs({ start: { node: firstTextNode, index: 0 }, end: { node: lastTextNode, index: 5 }})?.toBookdown())
+        .toBe(`${firstText}\n\n${lastText}`)
+
+    // Convert non-list to paragraphs.
+    expect(paragraphChapter.withListsAsParagraphs({ start: { node: firstTextNode, index: 0 }, end: { node: lastTextNode, index: 5 }})?.toBookdown())
+        .toBeUndefined()
+
+    // Convert two contiguous lists to paragraphs.
+    expect(new ChapterNode([ numberedList, bulletedList ]).withListsAsParagraphs({ start: { node: firstTextNode, index: 0 }, end: { node: bulletedList.getFirstItem()?.getFirstTextNode() as TextNode, index: 0 }})?.toBookdown())
+        .toBe(`${firstText}\n\n${lastText}\n\n${firstText}\n\n${lastText}`)
+
+    // Convert two non-contiguous lists to paragraphs.
+    expect(new ChapterNode([ numberedList, new ParagraphNode(0, new FormatNode("", [ new TextNode("Intruder!") ])), bulletedList ]).withListsAsParagraphs({ start: { node: firstTextNode, index: 0 }, end: { node: bulletedList.getFirstItem()?.getFirstTextNode() as TextNode, index: 0 }})?.toBookdown())
+        .toBe(`${firstText}\n\n${lastText}\n\nIntruder!\n\n${firstText}\n\n${lastText}`)
+
+    // Convert various subparts of a nested list into paragraphs.
+    const oneText = new TextNode("one");
+    const twoText = new TextNode("two");
+    const threeText = new TextNode("three");
+    const fourText = new TextNode("four");
+    const list = new ListNode([ new FormatNode("", [ oneText] ), new ListNode([ new FormatNode("", [ twoText ]), new FormatNode("", [ threeText ])], true), new FormatNode("", [ fourText ])], true)
+
+    expect(new ChapterNode([ list ] ).withListsAsParagraphs({ start: { node: oneText, index: 0 }, end: { node: fourText, index: 0 }})?.toBookdown())
+        .toBe(`${oneText.getText()}\n\n${twoText.getText()}\n\n${threeText.getText()}\n\n${fourText.getText()}`)
+
+    expect(new ChapterNode([ list ] ).withListsAsParagraphs({ start: { node: oneText, index: 0 }, end: { node: twoText, index: 0 }})?.toBookdown())
+        .toBe(`${oneText.getText()}\n\n${twoText.getText()}\n\n${threeText.getText()}\n\n${fourText.getText()}`)
+
+    expect(new ChapterNode([ list ] ).withListsAsParagraphs({ start: { node: twoText, index: 0 }, end: { node: threeText, index: 0 }})?.toBookdown())
+        .toBe(`${oneText.getText()}\n\n${twoText.getText()}\n\n${threeText.getText()}\n\n${fourText.getText()}`)
 
 })

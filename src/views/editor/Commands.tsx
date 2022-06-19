@@ -919,7 +919,7 @@ export const commands: Command[] = [
         visible: context => context.list === undefined && context.atom === undefined,
         active: context => context.list === undefined && context.atom === undefined && context.blocks !== undefined,
         handler: context => {
-            const newBlocks = context.blocks?.withRangeAsList(context.range, false);
+            const newBlocks = context.blocks?.withParagraphsAsLists(context.range, false);
             if(newBlocks === undefined) return;
             const newRoot = context.blocks?.replace(context.chapter, newBlocks);
             if(newRoot === undefined) return;
@@ -935,7 +935,7 @@ export const commands: Command[] = [
         visible: context => context.list === undefined && context.atom === undefined,
         active: context => context.list === undefined && context.atom === undefined && context.blocks !== undefined,
         handler: context => {
-            const newBlocks = context.blocks?.withRangeAsList(context.range, false);
+            const newBlocks = context.blocks?.withParagraphsAsLists(context.range, false);
             if(newBlocks === undefined) return;
             const newRoot = context.blocks?.replace(context.chapter, newBlocks);
             if(newRoot === undefined) return;
@@ -980,7 +980,14 @@ export const commands: Command[] = [
         control: true, alt: false, shift: true, key: ["7", "8"],
         visible: context => context.includesList,
         active: context => context.includesList,
-        handler: context => context.blocks?.withListsAsParagraphs(context.chapter, context.range)
+        handler: context => {
+            if(context.blocks === undefined) return;
+            const newBlocks = context.blocks.withListsAsParagraphs(context.range);
+            if(newBlocks === undefined) return;
+            const newRoot = context.blocks.replace(context.chapter, newBlocks);
+            if(newRoot === undefined) return;
+            return { root: newRoot, range: context.range }
+        }
     },
     {
         label: "undo",

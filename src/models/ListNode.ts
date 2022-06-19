@@ -21,16 +21,12 @@ export class ListNode extends BlockNode {
     }
 
     getType() { return "list"; }
-
     isNumbered() { return this.#numbered; }
-
     getItems() { return this.#items; }
-
+    getLength() { return this.#items.length; }
     getLastItem(): FormatNode | undefined { return this.getFirstLastItem(false); }
     getFirstItem(): FormatNode | undefined { return this.getFirstLastItem(true); }
-
     getFormats() { return this.#items.filter(i => i instanceof FormatNode) as FormatNode[]; }
-
     getFirstLastItem(first: boolean): FormatNode | undefined {
 
         if(this.#items.length === 0)
@@ -45,8 +41,6 @@ export class ListNode extends BlockNode {
         return last.getFirstLastItem(first);
 
     }
-
-    getLength() { return this.#items.length; }
 
     getLevel(root: Node): number {
         const parent = root.getParentOf(this);
@@ -168,65 +162,9 @@ export class ListNode extends BlockNode {
         
     }
 
-    // Recursively generate a new list of paragraph and list nodes where the given formats are in paragraphs instead of in the list.
-    unwrap(formats: FormatNode[], container: BlocksNode): (ParagraphNode | ListNode)[] {
-
-        const parent = container.getParentOf(this) as ListParentType;
-        if(parent === undefined) return [];
-
-        function addList(parent: ListParentType, numbered: boolean) {
-            if(items.length > 0) {
-                const newList = new ListNode(items, numbered);
-                blocks.push(newList);
-                items = [];
-            }
-        }
-
-        let blocks: (ParagraphNode | ListNode)[] = [];
-        let items: ListNodeType[] = [];
-        this.#items.forEach(item => {
-            // If it's a list, recursively ask the sub-list to construct a new sequence of blocks,
-            // then insert any blocks in the blocks list, and any 
-            if(item instanceof ListNode) {
-                // Create a list out of any pending items.
-                addList(parent, this.#numbered);
-                // Unwrap this sub list.
-                const newBlocks = item.unwrap(formats, container);
-                // Add the items that were unwrapped.
-                newBlocks.forEach(b => {
-                    if(b instanceof ListNode)
-                        items.push(b);
-                    else {
-                        addList(parent, this.#numbered);
-                        blocks.push(b);
-                    }
-                });
-            }
-            // If it's a format node that's being unwrapped, unwrap it.
-            else if(formats.includes(item)) {
-                // Create a list out of any pending items.
-                addList(parent, this.#numbered);
-
-                // Create a paragraph with this format node as content.
-                blocks.push(new ParagraphNode(0, item));
-            }
-            // Otherwise, just add the item.
-            else {
-                items.push(item);
-            }
-        });
-
-        // Create a list out of any pending items.
-        addList(parent, this.#numbered);
-
-        // Return the new list of blocks.
-        return blocks;
-
-    }
-
     // Takes the given position, finds the root formatted node it is inside of, 
     // and replaces it with a list that contains the formatted node.
-    indent(format: FormatNode): ListNode | undefined {
+    withItemIndented(format: FormatNode): ListNode | undefined {
 
         const index = this.#items.indexOf(format);
         if(format === undefined || index < 0) return;
@@ -247,7 +185,7 @@ export class ListNode extends BlockNode {
     }
 
     // Returns a new parent list of this list.
-    unindent(root: Node, format: FormatNode): ListNode | undefined {
+    withItemUnindented(root: Node, format: FormatNode): ListNode | undefined {
 
         // Find the root format
         const index = this.#items.indexOf(format);

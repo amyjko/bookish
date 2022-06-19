@@ -468,7 +468,7 @@ export abstract class BlocksNode extends BlockNode {
 
     }
 
-    withRangeAsList(range: CaretRange, numbered: boolean): BlocksNode | undefined {
+    withParagraphsAsLists(range: CaretRange, numbered: boolean): BlocksNode | undefined {
 
         const sortedRange = this.sortRange(range);
         const blocksInRange = this.getBlocksInRange(sortedRange);
@@ -513,77 +513,34 @@ export abstract class BlocksNode extends BlockNode {
     
     }
     
-    // Given an arbitrary selection, find all of the root list nodes within bounds
-    // and convert any list items within the selection to paragraphs. The general
-    // approach is to find all lists, and for the lists containing the start or end caret,
-    // duplicate the list and convert everything included to paragraphs, and for all of the lists
-    // between the start or end caret, convert the entire list to a paragraph.
-    withListsAsParagraphs(root: Node, range: CaretRange): Edit {
+    withListsAsParagraphs(range: CaretRange): BlocksNode | undefined {
+        
+        let newBlocks: BlocksNode = this;
+        const sortedRange = this.sortRange(range);
+        const blocksInRange = this.getBlocksInRange(sortedRange);
+        if(blocksInRange === undefined) return;
+        // Convert all of the lists into their root lists, since we only convert entire lists, not parts of lists.
+        const listsInRange = blocksInRange.filter(l => l instanceof ListNode);
+        const listRootsInRange = [ ... new Set(listsInRange.map(l => l.getParent(this) instanceof ListNode ? l.getFarthestParentMatching(this, m => m instanceof ListNode) : l).filter(n => n !== undefined)) ] as ListNode[];
+        if(listRootsInRange.length === 0) return undefined;
 
-        // Find the lists in range. The approach is to find all of the formats and all of the
-        // root list nodes of those formats. They have to be in the same document.
-        const ancestor = range.start.node.getCommonAncestor(root, range.end.node);
-        if(ancestor === undefined) return;
-
-        // Find the formats that the range start and stop in.
-        const startFormat = range.start.node.closestParent<FormatNode>(root, FormatNode);
-        const endFormat = range.end.node.closestParent<FormatNode>(root, FormatNode);
-        const blocks = ancestor instanceof BlocksNode ? ancestor : ancestor.closestParent<BlocksNode>(root, BlocksNode);
-
-        if(startFormat && endFormat && blocks) {
-            // Find all the formats in the common ancestor.
-            const formats: FormatNode[] = ancestor.getNodes().filter(p => p instanceof FormatNode) as FormatNode[];
-
-            // Sort the start and end format.
-            const reversed = formats.indexOf(startFormat) > formats.indexOf(endFormat);
-            const firstFormat = reversed ? endFormat : startFormat;
-            const lastFormat = reversed ? startFormat : endFormat;
-
-            // Loop through the formats in order and find the lists and list items that are contained in the selection.
-            let inside = false;
-            const listsToUnwrap: { list: ListNode, formats: FormatNode[] }[] = [];
-            formats.forEach(format => {
-                if(format === firstFormat)
-                    inside = true;
-                if(inside) {
-                    // Find the root list that contains the format.
-                    const list = format.getFarthestParentMatching(root, n => n instanceof ListNode) as ListNode;
-                    if(list !== undefined) {
-                        const listFormats = listsToUnwrap.find(f => f.list === list);
-                        if(listFormats)
-                            listFormats.formats.push(format);
-                        else
-                            listsToUnwrap.push({ list: list, formats: [ format ]});
-                    }
-                }
-                if(format === lastFormat)
-                    inside = false;
-            });
-
-            // Translate each existing list into a sequence of paragraphs and lists reflecting the desired edits,
-            // then insert after the existing list, then remove the existing list.
-            let newBlock = blocks;
-            let failed = false;
-            listsToUnwrap.forEach(set => {
-                const newBlocks = set.list.unwrap(set.formats, blocks).reverse();
-                newBlocks.forEach(block => { 
-                    const inserted = blocks.withBlockInsertedAfter(set.list, block); 
-                    if(inserted === undefined) { failed = true; return; }
-                    newBlock = inserted;
-                });
-                newBlock = newBlock.withoutBlock(set.list);
-            });
-
-            if(failed) return;
-
-            // Replace the current blocks with the new blocks.
-            const newRoot = blocks.replace(root, newBlock);
-            if(newRoot === undefined) return;
-
-            // Return the original range, since the format it was in should still exist.
-            return { root: newRoot, range: range }
-
+        // For each list in the range, convert all items in range to paragraphs.
+        for(let i = 0; i < listRootsInRange.length; i ++) {
+            const list = listRootsInRange[i];
+            const paragraphs = list.getNodes().filter(n => n instanceof FormatNode).map(f => new ParagraphNode(0, f as FormatNode)) as ParagraphNode[];
+            // Insert in reverse order to keep them in order, since the list is our anchor.
+            for(let j = paragraphs.length - 1; j >= 0; j--) {
+                const paragraph = paragraphs[j];
+                const insertedBlocks = newBlocks.withBlockInsertedAfter(list, paragraph);
+                if(insertedBlocks === undefined) return;
+                newBlocks = insertedBlocks;
+            }
+            const withoutList = newBlocks.withoutBlock(list);
+            if(withoutList === undefined) return;
+            newBlocks = withoutList;
         }
+
+        return newBlocks;
 
     }
 
@@ -609,7 +566,7 @@ export abstract class BlocksNode extends BlockNode {
             if(inside) {
                 const list = root.getParentOf(format);
                 if(list instanceof ListNode) {
-                    const newList = indent ? list.indent(format) : list.unindent(root, format);
+                    const newList = indent ? list.withItemIndented(format) : list.withItemUnindented(root, format);
                     if(newList === undefined) { failed = true; return; }
                     const newRoot = list.replace(root, newList);
                     if(newRoot === undefined) { failed = true; return; }
