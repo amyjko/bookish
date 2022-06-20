@@ -101,9 +101,8 @@ export class ChapterNode extends BlocksNode {
 
     getChildren() { return this.blocks }
 
-    withChildReplaced(node: Node, replacement: Node | undefined) {
+    withChildReplaced(node: BlockNode, replacement: BlockNode | undefined) {
 
-        if(!(node instanceof BlockNode) || !(replacement instanceof BlockNode)) return;
         const index = this.blocks.indexOf(node);
 
         /// If we couldn't find the requested node, don't change anything.

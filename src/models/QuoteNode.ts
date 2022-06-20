@@ -39,7 +39,7 @@ export class QuoteNode extends BlocksNode {
     copy() { return new QuoteNode(this.blocks.map(b => b.copy())) as this; }
     create(blocks: BlockNode[]): BlocksNode { return new QuoteNode(blocks, this.#credit, this.#position); }
 
-    withChildReplaced(node: Node, replacement: Node | undefined) {
+    withChildReplaced(node: BlockNode | FormatNode, replacement: BlockNode | FormatNode | undefined) {
 
         // Replace the credit.
         if(this.#credit === node && replacement instanceof FormatNode)

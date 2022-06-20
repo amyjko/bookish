@@ -360,11 +360,11 @@ export abstract class BlocksNode extends BlockNode {
         if(blocksToEdit === undefined) return;
 
         // Edit each of the blocks as requested, accounting for the start and stop nodes, creating a new chapter as we go.
-        let newRoot: BlocksNode | undefined = this;
+        let newBlocksRoot: BlocksNode | undefined = this;
         const newBlocks: BlockNode[] = [];
         for(let i = 0; i < blocksToEdit.length; i++ ) {
             const block = blocksToEdit[i];
-            const parent = block.getParent(newRoot);
+            const parent = block.getParent(newBlocksRoot);
             if(parent === undefined) return;
             let newBlock: BlockNode | undefined = block;
             // Edit all of the formats in this block.
@@ -390,10 +390,9 @@ export abstract class BlocksNode extends BlockNode {
                 newBlock = undefined;
 
             // Replace the old block with the new block in the tree (or nothing). Bail on fail.
-            const updatedRoot = newRoot.withNodeReplaced(block, newBlock);
-            if(newRoot === undefined) return;
-            newRoot = updatedRoot as BlocksNode;
-
+            const updatedRoot = newBlocksRoot.withNodeReplaced(block, newBlock);
+            if(updatedRoot === undefined) return;
+            newBlocksRoot = updatedRoot;
         }
 
         // If deleting, and there are two distinct non-empty paragraphs we edited, merge them.
@@ -402,20 +401,20 @@ export abstract class BlocksNode extends BlockNode {
             const last = newBlocks[newBlocks.length - 1];
             if(first instanceof ParagraphNode && last instanceof ParagraphNode) {
                 // Replace the first paragraph with the second merged.
-                newRoot = newRoot.withNodeReplaced(first, first.withContent(first.getContent().withSegmentsAppended(last.getContent())));
-                if(newRoot === undefined) return;
+                newBlocksRoot = newBlocksRoot.withNodeReplaced(first, first.withContent(first.getContent().withSegmentsAppended(last.getContent())));
+                if(newBlocksRoot === undefined) return;
                 // Replace the last with an empty paragraph.
-                newRoot = newRoot.withNodeReplaced(last, last.withContent(new FormatNode(last.getContent().getFormat(), [ new TextNode("")])));
-                if(newRoot === undefined) return;
+                newBlocksRoot = newBlocksRoot.withNodeReplaced(last, last.withContent(new FormatNode(last.getContent().getFormat(), [ new TextNode("")])));
+                if(newBlocksRoot === undefined) return;
             }
         }
 
         // Map the text indicies back to carets.
-        const startCaret = newRoot.getTextIndexAsCaret(startTextIndex);
-        const endCaret = format === undefined ? startCaret : newRoot.getTextIndexAsCaret(startEndIndex);
+        const startCaret = newBlocksRoot.getTextIndexAsCaret(startTextIndex);
+        const endCaret = format === undefined ? startCaret : newBlocksRoot.getTextIndexAsCaret(startEndIndex);
 
         // Return the new root and the start and end of the range.
-        return { root: newRoot, range: { start: startCaret, end: endCaret } };
+        return { root: newBlocksRoot, range: { start: startCaret, end: endCaret } };
 
     }
 

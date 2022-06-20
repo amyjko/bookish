@@ -34,11 +34,8 @@ export class CalloutNode extends BlocksNode {
 
     withPosition(position: Position): CalloutNode { return new CalloutNode(this.getBlocks(), position); }
 
-    withChildReplaced(node: Node, replacement: Node | undefined) {
+    withChildReplaced(node: BlockNode, replacement: BlockNode | undefined) {
     
-        if(!(node instanceof BlockNode) || !(replacement instanceof BlockNode))
-            return;
-
         const index = this.blocks.indexOf(node);
         if(index < 0)
             return;

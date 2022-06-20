@@ -410,9 +410,17 @@ export const commands: Command[] = [
         visible: context => false,
         active: context => context.chapter !== undefined,
         handler: context => {
-            const edit = context.blocks?.withoutAdjacentContent(context.start, false);
-            if(edit === undefined) return;
-            return chapterWithNode(context, context.blocks, edit.root, () => edit.range.start)
+            if(context.blocks === undefined) return;
+            if(context.isSelection) {
+                const edit = context.blocks.withoutRange(context.range);
+                if(edit === undefined) return;
+                return chapterWithNode(context, context.blocks, edit.root, () => edit.range.start)
+            }
+            else {
+                const edit = context.blocks?.withoutAdjacentContent(context.start, false);
+                if(edit === undefined) return;
+                return chapterWithNode(context, context.blocks, edit.root, () => edit.range.start)
+            }
         }
     },
     {
@@ -422,9 +430,17 @@ export const commands: Command[] = [
         visible: context => false,
         active: context => context.chapter !== undefined,
         handler: context => {
-            const edit = context.blocks?.withoutAdjacentContent(context.start, true);
-            if(edit === undefined) return;
-            return chapterWithNode(context, context.blocks, edit.root, () => edit.range.start)
+            if(context.blocks === undefined) return;
+            if(context.isSelection) {
+                const edit = context.blocks.withoutRange(context.range);
+                if(edit === undefined) return;
+                return chapterWithNode(context, context.blocks, edit.root, () => edit.range.start)
+            }
+            else {
+                const edit = context.blocks?.withoutAdjacentContent(context.start, true);
+                if(edit === undefined) return;
+                return chapterWithNode(context, context.blocks, edit.root, () => edit.range.start)
+            }
         }
     },
     {
