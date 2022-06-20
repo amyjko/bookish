@@ -85,6 +85,13 @@ export class ListNode extends BlockNode {
         return index;
     }
 
+    getItem(index: number): ListNodeType | undefined {
+        if(index < 0 || index >= this.#items.length) return;
+        return this.#items[index];
+    }
+
+    getFirstCaret(): Caret | undefined { return this.#items.length === 0 ? undefined: this.#items[0].getFirstCaret() }
+
     copy(): this {
         return new ListNode(this.#items.map(i => i.copy()), this.#numbered) as this;
     }
@@ -102,7 +109,7 @@ export class ListNode extends BlockNode {
     }
 
     withItemAt(item: ListNodeType, index: number): ListNode | undefined {
-        if(index < 0 || index >= this.#items.length) return;
+        if(index < 0 || index > this.#items.length) return;
         const newItems = this.#items.slice();
         newItems.splice(index, 0, item);
         return new ListNode(newItems, this.#numbered);
@@ -129,11 +136,17 @@ export class ListNode extends BlockNode {
         return new ListNode(newItems, this.#numbered);
     }
 
-    withoutItem(index: number): ListNode | undefined {
+    withoutItemAt(index: number): ListNode | undefined {
         if(index < 0 || index >= this.#items.length) return;
         const newItems = this.#items.slice();
         newItems.splice(index, 1);
         return new ListNode(newItems, this.#numbered);
+    }
+
+    withoutItem(item: FormatNode): ListNode | undefined {
+        const index = this.#items.indexOf(item);
+        if(index < 0) return;
+        return this.withoutItemAt(index);
     }
 
     withListAppended(list: ListNode): ListNode {
@@ -152,12 +165,24 @@ export class ListNode extends BlockNode {
         // Remember where to place the caret.
         const newCaretIndex = previousItem.caretToTextIndex(previousItem.getLastCaret());
         const mergedItem = previousItem.withSegmentsAppended(deletedItem);
-        const newList = this.withItemReplaced(index - 1, mergedItem)?.withoutItem(index);
+        const newList = this.withItemReplaced(index - 1, mergedItem)?.withoutItemAt(index);
         if(newList === undefined) return;
         const newCaret = mergedItem.textIndexToCaret(newCaretIndex);
         if(newCaret === undefined) return;
         return [ newList, newCaret ];
         
+    }
+
+    withItemSplit(caret: Caret): ListNode | undefined {
+
+        // Which item contains the caret?
+        const item = this.#items.find(i => i instanceof FormatNode && i.contains(caret.node)) as FormatNode | undefined;
+        if(item === undefined) return;
+        const parts = item.split(caret);
+        if(parts === undefined) return;
+        const [ first, second ] = parts;
+        return this.withItemAfter(second, item)?.withItemAfter(first, item)?.withoutItem(item);
+
     }
 
     // Recursively search for the given item and indent it, constructing a new list.
@@ -172,10 +197,10 @@ export class ListNode extends BlockNode {
                 const afterList = this.#items[index + 1];
                 // If the format is just after a list, move the format to the end of the list.
                 if(beforeList instanceof ListNode)
-                    return this.withItemReplaced(index - 1, beforeList.withItemAppended(format))?.withoutItem(index);            
+                    return this.withItemReplaced(index - 1, beforeList.withItemAppended(format))?.withoutItemAt(index);            
                 // If the format is just before a list, move the format to the beginning of the list.
                 else if(afterList instanceof ListNode)
-                    return this.withItemReplaced(index + 1, afterList.withItemPrepended(format))?.withoutItem(index);
+                    return this.withItemReplaced(index + 1, afterList.withItemPrepended(format))?.withoutItemAt(index);
                 // Otherwise, make a new sub list node, add the format to it.
                 else
                     return this.withItemReplaced(index, new ListNode([ format ], this.#numbered));

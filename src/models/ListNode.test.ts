@@ -27,7 +27,13 @@ test("Insert items", () => {
 
 test("Remove items", () => {
     expect(shortList.withItemReplaced(1, fourFormat)?.toBookdown()).toBe(`* one\n* four\n* three`)
-    expect(shortList.withoutItem(0)?.toBookdown()).toBe(`* two\n* three`)
+    expect(shortList.withoutItemAt(0)?.toBookdown()).toBe(`* two\n* three`)
+})
+
+test("Split", () => {
+    expect(shortList.withItemSplit({ node: threeText, index: 2})?.toBookdown())
+        .toBe("* one\n* two\n* th\n* ree")
+
 })
 
 test("Merge", () => {

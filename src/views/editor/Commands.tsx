@@ -476,7 +476,7 @@ export const commands: Command[] = [
                                     if(firstFormatParent === undefined || !(firstFormatParent instanceof ListNode)) return;
                                     const index = firstFormatParent.getIndexOf(firstFormat);
                                     if(index === undefined) return;
-                                    const listWithoutFormat = firstFormatParent.withoutItem(index);
+                                    const listWithoutFormat = firstFormatParent.withoutItemAt(index);
                                     if(listWithoutFormat === undefined) return;
                                     const newRoot = context.chapter.withNodeReplaced(firstFormatParent, listWithoutFormat);
                                     if(newRoot === undefined) return;
@@ -524,20 +524,14 @@ export const commands: Command[] = [
         category: "list",
         control: false, alt: false, shift: false, key: "Enter",
         visible: context => false,
-        active: context => context.start.node.getClosestParentOfType<ListNode>(context.chapter, ListNode) !== undefined,
-        handler: context => {
-            const list = context.start.node.getClosestParentOfType<ListNode>(context.chapter, ListNode);
-            const format = context.start.node.getClosestParentOfType<FormatNode>(context.chapter, FormatNode);
-            if(format === undefined) return;
-            const parts = format.split(context.start);
-            if(list === undefined || parts === undefined) return;
-            const [ first, second ] = parts;
-            const formatIndex = list.getIndexOf(format);
-            if(formatIndex === undefined) return;
-            const newList = list.withItemAfter(second, format)?.withItemAfter(first, format)?.withoutItem(formatIndex);
-            const newCaret = { node: second.getTextNodes()[0], index: 0 };
-            return chapterWithNode(context, list, newList, list => newCaret);
-        }
+        active: context => context.format !== undefined && context.list !== undefined,
+        handler: context => chapterWithNode(context, context.list, context.list?.withItemSplit(context.range.start), newList => {
+            const index = context.list?.getItemContaining(context.range.start);
+            if(index === undefined) return;
+            const item = (newList as ListNode).getItem(index);
+            if(item === undefined) return;
+            return item.getFirstCaret();
+        })
     },
     {
         description: "split paragraph",
