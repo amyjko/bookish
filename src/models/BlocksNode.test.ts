@@ -245,7 +245,7 @@ test("Backspace/delete", () => {
         .toBe(`Before\n\n1. irst paragraph.\n2. ${lastText}\n\nAfter`)
     // Can't forward delete into a list
     expect(listChapter.withoutAdjacentContent({ node: beforeText, index: beforeText.getLength() }, true)?.root.toBookdown())
-        .toBeUndefined()
+        .toBe(`Before${firstText}\n\n1. ${lastText}\n\nAfter`)
     // Backspace a paragraph into the last list item
     expect(listChapter.withoutAdjacentContent({ node: afterText, index: 0 }, false)?.root.toBookdown())
         .toBe(`Before\n\n1. ${firstText}\n2. ${lastText}After`)

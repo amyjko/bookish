@@ -623,8 +623,20 @@ export abstract class BlocksNode extends BlockNode {
                     }
                     // If the block adjacent is a list node, merge the paragraph to the list's first/last item.
                     else if(adjacentBlock instanceof ListNode) {
-                        if(!next) {
-                            const format = next ? adjacentBlock.getFirstItem() : adjacentBlock.getLastItem();
+                        // If we're going forwards, put the first list item into the paragraph.
+                        if(next) {
+                            const format = adjacentBlock.getFirstItem();
+                            if(format !== undefined) {
+                                const newParagraph = parent.withContent(parent.getContent().withSegmentsAppended(format));
+                                const newBlocks = blocks.withNodeReplaced(parent, newParagraph)?.withNodeReplaced(format, undefined);
+                                if(newBlocks === undefined) return;
+                                return { root: newBlocks, range: { start: caret, end: caret }}
+                            }
+                        } 
+                        // If we're going backwards, get the last format of the list and insert the paragraph's content into it,
+                        // then remove the paragraph from the blocks.
+                        else {
+                            const format = adjacentBlock.getLastItem();
                             if(format !== undefined) {
                                 const newFormat = format.withSegmentAppended(parent.getContent());
                                 const newBlocks = blocks.withNodeReplaced(format, newFormat)?.withoutBlock(parent);
