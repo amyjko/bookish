@@ -1,6 +1,5 @@
 import { CalloutNode } from "../../models/CalloutNode";
-import { Caret, CaretRange } from "../../models/Caret";
-import { ChapterNode } from "../../models/ChapterNode";
+import { Caret } from "../../models/Caret";
 import { CitationsNode } from "../../models/CitationsNode";
 import { CodeNode } from "../../models/CodeNode";
 import { CommentNode } from "../../models/CommentNode";
@@ -17,7 +16,6 @@ import { QuoteNode } from "../../models/QuoteNode";
 import { RuleNode } from "../../models/RuleNode";
 import { TableNode } from "../../models/TableNode";
 import { TextNode } from "../../models/TextNode";
-import { AtomNode } from "../../models/AtomNode";
 import { Edit } from "../../models/Edit";
 import { Node } from "../../models/Node";
 
@@ -829,7 +827,6 @@ export const commands: Command[] = [
             const range = context.range;
             const char = key;
             if(char.length === 1) {
-
                 // Insert at the start.
                 let insertionPoint = range.start;
         
