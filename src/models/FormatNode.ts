@@ -176,10 +176,10 @@ export class FormatNode extends Node {
 
     }
 
-    withChildReplaced(node: Node, replacement: Node | undefined) {
+    withChildReplaced(node: FormatNodeSegmentType, replacement: FormatNodeSegmentType | undefined) {
         return replacement === undefined ? 
-            this.withoutSegment(node as FormatNodeSegmentType) as this : 
-            this.withSegmentReplaced(node as FormatNodeSegmentType, replacement as FormatNodeSegmentType) as this;
+            this.withoutSegment(node) as this : 
+            this.withSegmentReplaced(node, replacement) as this;
     }
 
     // Creates two formatted nodes that split this node at the given caret location.
