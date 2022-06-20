@@ -560,7 +560,7 @@ const ChapterEditor = (props: { chapter: Chapter }) => {
             if(results !== undefined && results.root instanceof ChapterNode) {
                 const { root, range } = results;
 
-                if(command.category !== "navigation" && root === ast)
+                if(root === ast && command.category !== "navigation" && command.category !== "selection")
                     console.error(`Warning: immutability violation on ${command.description}`);
         
                 // Set the range to force a rerender, assuming something in the document changed.
