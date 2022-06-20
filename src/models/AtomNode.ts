@@ -18,7 +18,10 @@ export abstract class AtomNode<MetadataType> extends Node {
 
     abstract getDefaultCaret(): Caret;
 
-    getChildren() { return [] }
+    // Include the meta node if it's a node, to include it in normal operations.
+    // We special case it in other places to avoid breaking other conventions (such as formatting changes, which
+    // the atom node should be isolated from).
+    getChildren() { return this.#meta instanceof Node ? [ this.#meta ] : [] }
 
     nextWord(root: RootNode, index?: number): Caret {
         const next = root.getNextTextOrAtom(this);
