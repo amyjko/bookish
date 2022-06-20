@@ -417,8 +417,8 @@ export class FormatNode extends Node {
                 saveText();
 
                 // Add the atom immediately after, unless it's in the deletion range.
-                // We include both the start and end since AtomNode's text index is on both sides.
-                if(format !== undefined || textIndex < Math.min(textStart, textEnd) || textIndex >= Math.max(textStart, textEnd))
+                // We include the start indexx  since AtomNode's text index is on the left.
+                if(format !== undefined || (textIndex <= Math.min(textStart, textEnd) || textIndex > Math.max(textStart, textEnd)))
                     newFormats[0].segments.push(node);
 
                 // Increment the text index; atoms count for one character.

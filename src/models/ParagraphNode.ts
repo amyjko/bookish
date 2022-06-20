@@ -18,10 +18,21 @@ export class ParagraphNode extends BlockNode {
     }
 
     getType() { return "paragraph"; }
-
     getLevel() { return this.#level; }
     getContent() { return this.#content; }
     getFormats() { return [ this.#content ]; }
+    getChildren() { return [ this.#content ] }
+    getFirstTextNode(): TextNode { return this.getContent().getFirstTextNode(); }
+    getLastTextNode(): TextNode { return this.getContent().getLastTextNode(); }
+    getTextNodes(): TextNode[] { return this.getNodes().filter(n => n instanceof TextNode) as TextNode[]; }
+    getFirstCaret(): Caret { return this.#content.getFirstCaret(); }
+    getLastCaret(): Caret { return this.#content.getLastCaret(); }
+    getSelection(): CaretRange {
+        const first = this.getFirstTextNode();
+        const last = this.getLastTextNode();
+        return { start: { node: first, index: 0}, end: { node: last, index: last.getLength() } };
+    }
+    getParentOf(node: Node): Node | undefined { return node === this.#content ? this : this.#content.getParentOf(node); }
 
     toText(): string {
         return this.#content.toText();
@@ -31,34 +42,9 @@ export class ParagraphNode extends BlockNode {
         return (this.#level === 1 ? "# " : this.#level === 2 ? "## " : this.#level === 3 ? "### " : "") + this.#content.toBookdown(debug);
     }
 
-    getChildren() { return [ this.#content ] }
-
-    copy() { return new ParagraphNode(this.#level, this.#content.copy()) as this; }
-
-    getSelection(): CaretRange {
-        const first = this.getFirstTextNode();
-        const last = this.getLastTextNode();
-        return { start: { node: first, index: 0}, end: { node: last, index: last.getLength() } };
-    }
-
-    getFirstTextNode(): TextNode { return this.getContent().getFirstTextNode(); }
-
-    getLastTextNode(): TextNode { return this.getContent().getLastTextNode(); }
-
-    getFirstCaret(): Caret { return this.#content.getFirstCaret(); }
-    getLastCaret(): Caret { return this.#content.getLastCaret(); }
-
-    getTextNodes(): TextNode[] {
-        return this.getNodes().filter(n => n instanceof TextNode) as TextNode[];
-    }
-
     withLevel(level: number): ParagraphNode { return new ParagraphNode(level, this.#content); }
+
     withContent(content: FormatNode): ParagraphNode { return new ParagraphNode(this.#level, content); }
-    withChildReplaced(node: Node, replacement: Node | undefined) {
-        return node instanceof FormatNode && node === this.#content && replacement instanceof FormatNode ? 
-            new ParagraphNode(this.#level, replacement) as this : 
-            undefined;
-    }
 
     withParagraphAppended(paragraph : ParagraphNode): ParagraphNode {
         return new ParagraphNode(
@@ -92,7 +78,13 @@ export class ParagraphNode extends BlockNode {
         return [ new ParagraphNode(this.#level, after), new ParagraphNode(this.#level, before) ];
         
     }
-    
-    getParentOf(node: Node): Node | undefined { return node === this.#content ? this : this.#content.getParentOf(node); }
+
+    copy() { return new ParagraphNode(this.#level, this.#content.copy()) as this; }
+
+    withChildReplaced(node: Node, replacement: Node | undefined) {
+        return node instanceof FormatNode && node === this.#content && replacement instanceof FormatNode ? 
+            new ParagraphNode(this.#level, replacement) as this : 
+            undefined;
+    }
 
 }
