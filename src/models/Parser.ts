@@ -587,7 +587,7 @@ export default class Parser {
         // so if there's a line break after the last row, there won't be a caption.
         const caption = this.parseContent();
 
-        return new CodeNode(code, language, position, caption);
+        return new CodeNode(new TextNode(code), language, position, caption);
 
     }
 
