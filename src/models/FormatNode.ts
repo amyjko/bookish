@@ -46,9 +46,7 @@ export class FormatNode extends Node {
         return (this.#format === "v" ? "^v" : this.#format) + this.#segments.map(s => s instanceof AtomNode ? s.toBookdown(debug, this) : s.toBookdown(debug)).join("") + this.#format;
     }
 
-    traverseChildren(fn: (node: Node) => void): void {
-        this.#segments.forEach(item => item.traverse(fn));
-    }
+    getChildren() { return this.#segments; }
 
     getFirstTextNode(): TextNode {
         const text = this.getTextNodes();
@@ -60,8 +58,8 @@ export class FormatNode extends Node {
         return text[text.length - 1];
     }
 
-    copy(): FormatNode {
-        return new FormatNode(this.#format, this.#segments.map(s => s.copy()));
+    copy(): this {
+        return new FormatNode(this.#format, this.#segments.map(s => s.copy())) as this;
     }
 
     getTextNodes(): TextNode[] {
@@ -165,7 +163,9 @@ export class FormatNode extends Node {
     }
 
     withChildReplaced(node: Node, replacement: Node | undefined) {
-        return replacement === undefined ? this.withoutSegment(node as FormatNodeSegmentType) : this.withSegmentReplaced(node as FormatNodeSegmentType, replacement as FormatNodeSegmentType);
+        return replacement === undefined ? 
+            this.withoutSegment(node as FormatNodeSegmentType) as this : 
+            this.withSegmentReplaced(node as FormatNodeSegmentType, replacement as FormatNodeSegmentType) as this;
     }
 
     // Creates two formatted nodes that split this node at the given caret location.

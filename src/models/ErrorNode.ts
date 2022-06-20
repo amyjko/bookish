@@ -17,10 +17,10 @@ export class ErrorNode extends BlockNode {
     toText(): string { return ""; }
     toBookdown(debug?: number): string { return this.#text ? this.#text : ""; }
 
-    traverseChildren(fn: (node: Node) => void): void {}
+    getChildren() { return []; }
     getParentOf(node: Node): Node | undefined { return undefined; }
 
-    copy(): ErrorNode { return new ErrorNode(this.#text, this.#error); }
+    copy() { return new ErrorNode(this.#text, this.#error) as this; }
 
     withChildReplaced(node: Node, replacement: Node | undefined){ return undefined; }
 

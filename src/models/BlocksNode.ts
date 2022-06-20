@@ -222,7 +222,6 @@ export abstract class BlocksNode extends BlockNode {
     }
  
     abstract create(blocks: BlockNode[]): BlocksNode;
-    abstract withChildReplaced(node: Node, replacement: Node | undefined): BlocksNode | undefined;
 
     withBlockInserted(anchor: BlockNode, block: BlockNode, before: boolean): BlocksNode | undefined {
         const index = this.blocks.indexOf(anchor);
@@ -590,14 +589,9 @@ export abstract class BlocksNode extends BlockNode {
     }
 
     // This accounts for adjascent lists that end up with the same style.
-    withListAsStyle(root: Node, list: ListNode, numbered: boolean): BlocksNode | undefined {
+    withListAsStyle(list: ListNode, numbered: boolean): BlocksNode | undefined {
 
-        const newList = list.withStyle(numbered);
-        let newRoot = list.replace(root, newList);
-        if(newRoot === undefined) return;
-        const newBlocks = root.getParentOf(newList);
-        if(newBlocks instanceof BlocksNode)
-            return newBlocks.withAdjacentListsMerged();
+        return this.withDescendantReplaced(list, list.withStyle(numbered))?.withAdjacentListsMerged();
     
     }
 

@@ -17,8 +17,8 @@ export class LinkNode extends MetadataNode<string> {
         return `[${this.getText().toBookdown(debug)}|${this.getMeta()}]`;
     }
 
-    copy(): LinkNode {
-        return new LinkNode(this.getText().getText(), this.getMeta());
+    copy() {
+        return new LinkNode(this.getText().getText(), this.getMeta()) as this;
     }
 
     getParentOf(node: Node): Node | undefined { return undefined; }

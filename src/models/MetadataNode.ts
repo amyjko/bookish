@@ -20,8 +20,7 @@ export abstract class MetadataNode<MetaType> extends Node {
     abstract withText(text: string): MetadataNode<MetaType>;
     abstract toText(): string;
     abstract toBookdown(debug?: number): string;
-    abstract copy(): MetadataNode<MetaType>;
 
-    traverseChildren(fn: (node: Node) => void): void { this.#text.traverse(fn); }
+    getChildren() { return [ this.#text ] }
 
 }

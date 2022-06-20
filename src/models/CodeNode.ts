@@ -48,20 +48,17 @@ export class CodeNode extends BlockNode {
                 this.#caption.toBookdown(debug);
     }
 
-    traverseChildren(fn: (node: Node) => void): void {
-        this.#code.traverse(fn);
-        this.#caption.traverse(fn);
-    }
+    getChildren() { return [ this.#code, this.#caption ] }
 
-    copy(): CodeNode {
-        return new CodeNode(this.#code.getText(), this.#language, this.#position, this.#caption.copy());
+    copy() {
+        return new CodeNode(this.#code.getText(), this.#language, this.#position, this.#caption.copy()) as this;
     }
 
     getParentOf(node: Node): Node | undefined {
         return node == this.#code || node === this.#caption ? this : this.#caption.getParentOf(node);
     }
 
-    withChildReplaced(node: Node, replacement: Node | undefined): CodeNode | undefined {
+    withChildReplaced(node: Node, replacement: Node | undefined) {
         const newCode = node === this.#code && replacement instanceof TextNode ? replacement : undefined;
         const newCaption = node === this.#caption && replacement instanceof FormatNode ? replacement : undefined;
         return newCode || newCaption ? new CodeNode(
@@ -69,7 +66,7 @@ export class CodeNode extends BlockNode {
             this.#language, 
             this.#position, 
             newCaption ? newCaption : this.#caption
-        ) : undefined;
+        ) as this : undefined;
     }
 
     withPosition(position: Position) { return new CodeNode(this.#code.getText(), this.#language, position, this.#caption); }

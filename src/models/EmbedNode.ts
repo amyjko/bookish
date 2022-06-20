@@ -48,10 +48,7 @@ export class EmbedNode extends BlockNode {
         };
     }
 
-    traverseChildren(fn: (node: Node) => void): void {
-        this.#credit.traverse(fn);
-        this.#caption.traverse(fn);
-    }
+    getChildren() { return [ this.#credit, this.#caption ]; }
 
     getParentOf(node: Node): Node | undefined {
         
@@ -63,8 +60,8 @@ export class EmbedNode extends BlockNode {
 
     }
 
-    copy(): EmbedNode {
-        return new EmbedNode(this.#url, this.#description, this.#caption.copy(), this.#credit.copy(), this.#position);
+    copy() {
+        return new EmbedNode(this.#url, this.#description, this.#caption.copy(), this.#credit.copy(), this.#position) as this;
     }
 
     withChildReplaced(node: Node, replacement: Node | undefined) {
@@ -77,7 +74,7 @@ export class EmbedNode extends BlockNode {
                 newCaption === undefined ? this.#caption : newCaption, 
                 newCredit === undefined ? this.#credit : newCredit, 
                 this.#position
-            ) :
+            ) as this :
             undefined;    
     }
 

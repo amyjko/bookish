@@ -34,19 +34,16 @@ export class QuoteNode extends BlocksNode {
         return `"\n${this.getBlocks().map(element => element.toBookdown(debug)).join("\n\n")}\n"${this.#position === "|" ? "" : this.#position}${this.#credit ? " " + this.#credit.toBookdown(debug) : ""}`;
     }
 
-    traverseChildren(fn: (node: Node) => void): void {
-        this.getBlocks().forEach(item => item.traverse(fn))
-        this.#credit?.traverse(fn)
-    }
+    getChildren(): Node[] { return this.#credit === undefined ? this.blocks : [ ...this.blocks, this.#credit ]; }
 
-    copy(): QuoteNode { return new QuoteNode(this.blocks.map(b => b.copy())); }
+    copy() { return new QuoteNode(this.blocks.map(b => b.copy())) as this; }
     create(blocks: BlockNode[]): BlocksNode { return new QuoteNode(blocks, this.#credit, this.#position); }
 
     withChildReplaced(node: Node, replacement: Node | undefined) {
 
         // Replace the credit.
         if(this.#credit === node && replacement instanceof FormatNode)
-            return new QuoteNode(this.blocks, replacement, this.#position);
+            return new QuoteNode(this.blocks, replacement, this.#position) as this;
     
         // Replace a block.
         if(replacement !== undefined && !(replacement instanceof BlockNode)) return;
@@ -58,7 +55,7 @@ export class QuoteNode extends BlocksNode {
             [ ...this.blocks.slice(0, index), ...this.blocks.slice(index + 1)] :
             [ ...this.blocks.slice(0, index), replacement, ...this.blocks.slice(index + 1) ];
 
-        return new QuoteNode(blocks, this.#credit, this.#position);
+        return new QuoteNode(blocks, this.#credit, this.#position) as this;
 
     }
 

@@ -23,15 +23,15 @@ export class ReferenceNode extends Node {
 
     getType() { return "reference"; }
 
-    traverseChildren(fn: (node: Node) => void): void {}
+    getChildren() { return [] }
  
     getParentOf(node: Node): Node | undefined { return undefined; }
     
     toText() { return this.authors + " "  + this.year + " " + this.title + " " + this.source + (this.summary ? this.summary : ""); }
     toBookdown(debug?: number): string { return ""; }
 
-    copy(): ReferenceNode {
-        return new ReferenceNode(this.authors, this.year, this.title, this.source, this.url, this.summary, this.short);
+    copy() {
+        return new ReferenceNode(this.authors, this.year, this.title, this.source, this.url, this.summary, this.short) as this;
     }
 
     withChildReplaced(node: Node, replacement: Node | undefined) { return undefined; }

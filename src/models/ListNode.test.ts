@@ -1,4 +1,3 @@
-import { ChapterNode } from "./ChapterNode";
 import { FormatNode } from "./FormatNode";
 import { ListNode } from "./ListNode";
 import { TextNode } from "./TextNode";

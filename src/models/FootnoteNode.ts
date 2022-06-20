@@ -16,15 +16,15 @@ export class FootnoteNode extends AtomNode<FormatNode> {
     toText(): string { return this.getMeta().toText(); }
     toBookdown(debug?: number): string { return `${debug === this.nodeID ? "%debug%" : ""}{${this.getMeta().toBookdown(debug)}}`; }
 
-    copy(): FootnoteNode { return new FootnoteNode(this.getMeta().copy()); }
+    copy() { return new FootnoteNode(this.getMeta().copy()) as this; }
 
     getParentOf(node: Node): Node | undefined {
         return this.getMeta().getParentOf(node);
     }
 
-    withChildReplaced(node: Node, replacement: Node | undefined) {    
+    withChildReplaced(node: Node, replacement: Node | undefined) {
         return node instanceof FormatNode && replacement instanceof FormatNode && node === this.getMeta() ?
-            new FootnoteNode(replacement) :
+            new FootnoteNode(replacement) as this :
             undefined;
     }
 

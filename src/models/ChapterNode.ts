@@ -99,9 +99,7 @@ export class ChapterNode extends BlocksNode {
             undefined;
     }
 
-    traverseChildren(fn: (node: Node) => void): void {
-        this.blocks.forEach(item => item.traverse(fn));
-    }
+    getChildren() { return this.blocks }
 
     withChildReplaced(node: Node, replacement: Node | undefined) {
 
@@ -117,12 +115,12 @@ export class ChapterNode extends BlocksNode {
             [ ...this.blocks.slice(0, index), ...this.blocks.slice(index + 1)] :
             [ ...this.blocks.slice(0, index), replacement, ...this.blocks.slice(index + 1) ];
 
-        return new ChapterNode(blocks, this.#metadata);
+        return new ChapterNode(blocks, this.#metadata) as this;
 
     }
 
-    copy(): ChapterNode {
-        return new ChapterNode(this.blocks.map(b => b.copy()), this.#metadata);
+    copy() {
+        return new ChapterNode(this.blocks.map(b => b.copy()), this.#metadata) as this;
     }
 
     removeRedundantChildren(nodes: Set<Node>) {

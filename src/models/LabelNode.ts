@@ -26,7 +26,7 @@ export class LabelNode extends AtomNode<string> {
 
     getParentOf(node: Node): Node | undefined { return undefined; }
 
-    copy() { return new LabelNode(this.getMeta()); }
+    copy() { return new LabelNode(this.getMeta()) as this; }
 
     withMeta(id: string) { return new LabelNode(id); }
     withChildReplaced(node: Node, replacement: Node | undefined){ return undefined; }

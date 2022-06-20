@@ -207,3 +207,10 @@ test("Indent/unindent list items", () => {
     )?.toBookdown()).toBe("1. First paragraph.\n2. Last paragraph.")
 
 })
+
+test("Style lists", () => {
+
+    expect(new ChapterNode([ numberedList ]).withListAsStyle(numberedList, false)?.toBookdown())
+        .toBe(`* ${firstText}\n* ${lastText}`)
+
+})

@@ -24,14 +24,12 @@ export class CalloutNode extends BlocksNode {
         return "=\n" + this.getBlocks().map(element => element.toBookdown(debug)).join("\n\n") + "\n=" + (this.#position !== "|" ? this.#position : "");
     }
 
-    traverseChildren(fn: (node: Node) => void): void {
-        this.getBlocks().forEach(item => item.traverse(fn) )
-    }
+    getChildren() { return this.getBlocks(); }
 
     getFormats() { return []; }
 
-    copy(): CalloutNode {
-        return new CalloutNode(this.blocks.map(e => e.copy()), this.#position);
+    copy() {
+        return new CalloutNode(this.blocks.map(e => e.copy()), this.#position) as this;
     }
 
     withPosition(position: Position): CalloutNode { return new CalloutNode(this.getBlocks(), position); }
@@ -43,13 +41,13 @@ export class CalloutNode extends BlocksNode {
 
         const index = this.blocks.indexOf(node);
         if(index < 0)
-            return undefined;
+            return;
 
         const blocks = replacement === undefined ?
             [ ...this.blocks.slice(0, index), ...this.blocks.slice(index + 1)] :
             [ ...this.blocks.slice(0, index), replacement, ...this.blocks.slice(index + 1) ];
 
-        return new CalloutNode(blocks, this.#position);
+        return new CalloutNode(blocks, this.#position) as this;
 
     }
 

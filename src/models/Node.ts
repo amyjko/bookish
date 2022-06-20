@@ -12,11 +12,10 @@ export abstract class Node {
     abstract toText(): string;
     abstract toBookdown(debug?: number): string;
     abstract getType(): string;
-    abstract traverseChildren(fn: (node: Node) => void) : void;
-    abstract copy(): Node;
+    abstract copy(): this;
 
     // Returns a new node with the given child node replaced, or undefined if it didn't contain such a child.
-    abstract withChildReplaced(node: Node, replacement: Node | undefined): Node | undefined;
+    abstract withChildReplaced(node: Node, replacement: Node | undefined): this | undefined;
 
     rootWithChildReplaced(root: Node, node: Node, replacement: Node | undefined): Node | undefined {        
         // Create a new version of this node with the replacement.
@@ -30,19 +29,46 @@ export abstract class Node {
     }
 
     // In the given root, replaces this with the given node in the given root.
-    replace(root: Node, replacement: Node | undefined): Node | undefined {
+    replace(root: Node, replacement: this | undefined): Node | undefined {
 
         const parent = root.getParentOf(this);
         if(parent === undefined) return replacement;
         return parent.rootWithChildReplaced(root, this, replacement);
 
     }
+
+    // Traverse this node's children, trying to replace the given node with the replacement node.
+    withDescendantReplaced(node: Node, replacement: Node): this | undefined {
+
+        // Find all the children
+        const children = this.getChildren();
+        // Search each one for a match.
+        for(let i = 0; i < children.length; i++) {
+            const child = children[i];
+            // If we found the child, return a new version of this node with the child replaced.
+            if(child === node)
+                return this.withChildReplaced(node, replacement);
+            
+            // Does this child have it? If so, return a version of this node with the revised child.
+            const revisedChild = child.withDescendantReplaced(node, replacement);
+            if(revisedChild !== undefined)
+                return this.withChildReplaced(child, revisedChild);
+        }
+
+    }
     
     getID() { return nodeID; }
+
+    abstract getChildren(): Node[];
 
     traverse(fn: (node: Node) => void) : void {
         this.traverseChildren(fn);
         fn.call(undefined, this);
+    }
+
+    traverseChildren(fn: (node: Node) => void) : void {
+        const children = this.getChildren();
+        children.forEach(child => child.traverse(fn));
     }
 
     getNodes(): Node[] {

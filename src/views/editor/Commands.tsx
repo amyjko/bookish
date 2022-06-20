@@ -456,7 +456,7 @@ export const commands: Command[] = [
                                     const newFormat = lastFormat.withSegmentAppended(currentParagraph.getContent());
                                     const newRootWithFormat = newFormat.replace(context.chapter, lastFormat);
                                     if(newRootWithFormat === undefined) return;
-                                    const newRootWithoutParagraph = currentParagraph.replace(newRootWithFormat, blocks.withoutBlock(currentParagraph));
+                                    const newRootWithoutParagraph = blocks.replace(newRootWithFormat, blocks.withoutBlock(currentParagraph));
                                     if(newRootWithoutParagraph === undefined) return;
                                     return { root: newRootWithoutParagraph, range: { start: newCaret, end: newCaret } };
                                 }
@@ -965,8 +965,10 @@ export const commands: Command[] = [
         visible: context => context.blocks !== undefined && context.list !== undefined && context.list.isNumbered(),
         active: context => context.list !== undefined && context.list.isNumbered(),
         handler: context => {
-            if(!context.list) return;
-            const newRoot = context.blocks?.withListAsStyle(context.chapter, context.list, false);
+            if(!context.list || !context.blocks) return;
+            const newBlocks = context.blocks?.withListAsStyle(context.list, false);
+            if(newBlocks === undefined) return;
+            const newRoot = context.chapter.withDescendantReplaced(context.blocks, newBlocks);
             if(newRoot === undefined) return;
             return { root: newRoot, range: context.range };
         }
@@ -980,8 +982,10 @@ export const commands: Command[] = [
         visible: context => context.blocks !== undefined && context.list !== undefined && !context.list.isNumbered(),
         active: context => context.list !== undefined && !context.list.isNumbered(),
         handler: context => {
-            if(!context.list) return;
-            const newRoot = context.blocks?.withListAsStyle(context.chapter, context.list, true);
+            if(!context.list || !context.blocks) return;
+            const newBlocks = context.blocks?.withListAsStyle(context.list, true);
+            if(newBlocks === undefined) return;
+            const newRoot = context.chapter.withDescendantReplaced(context.blocks, newBlocks);
             if(newRoot === undefined) return;
             return { root: newRoot, range: context.range };
         }

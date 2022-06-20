@@ -10,11 +10,11 @@ export class RuleNode extends BlockNode {
     getType() { return "rule"; }
     toText(): string { return ""; }
     toBookdown(debug?: number): string { return "-"; }
-    traverseChildren(fn: (node: Node) => void): void {} 
+    getChildren() { return [] }
     getParentOf(node: Node): Node | undefined { return undefined; }
     getFormats() { return []; }
 
-    copy(): RuleNode { return new RuleNode(); }
+    copy() { return new RuleNode() as this; }
     withChildReplaced(node: Node, replacement: Node | undefined) { return undefined; }
 
 }

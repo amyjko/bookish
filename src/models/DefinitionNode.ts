@@ -18,8 +18,8 @@ export class DefinitionNode extends MetadataNode<string> {
         return `~${this.getText().toBookdown(debug)}~${this.getMeta()}`; 
     }
 
-    copy(): DefinitionNode {
-        return new DefinitionNode(this.getText().getText(), this.getMeta());
+    copy() {
+        return new DefinitionNode(this.getText().getText(), this.getMeta()) as this;
     }
 
     withChildReplaced(node: Node, replacement: Node | undefined){ return undefined; }

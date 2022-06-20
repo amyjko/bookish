@@ -31,11 +31,9 @@ export class ParagraphNode extends BlockNode {
         return (this.#level === 1 ? "# " : this.#level === 2 ? "## " : this.#level === 3 ? "### " : "") + this.#content.toBookdown(debug);
     }
 
-    traverseChildren(fn: (node: Node) => void): void {
-        this.#content?.traverse(fn);
-    }
+    getChildren() { return [ this.#content ] }
 
-    copy(): ParagraphNode { return new ParagraphNode(this.#level, this.#content.copy()); }
+    copy() { return new ParagraphNode(this.#level, this.#content.copy()) as this; }
 
     getSelection(): CaretRange {
         const first = this.getFirstTextNode();
@@ -58,7 +56,7 @@ export class ParagraphNode extends BlockNode {
     withContent(content: FormatNode): ParagraphNode { return new ParagraphNode(this.#level, content); }
     withChildReplaced(node: Node, replacement: Node | undefined) {
         return node instanceof FormatNode && node === this.#content && replacement instanceof FormatNode ? 
-            new ParagraphNode(this.#level, replacement) : 
+            new ParagraphNode(this.#level, replacement) as this : 
             undefined;
     }
 

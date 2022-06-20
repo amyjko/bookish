@@ -51,9 +51,9 @@ export class TextNode extends Node {
 
     }
 
-    traverseChildren(fn: (node: Node) => void): void {}
+    getChildren() { return []; }
 
-    copy() { return new TextNode(this.#text); }
+    copy() { return new TextNode(this.#text) as this; }
 
     isItalic(root: Node) { return this.getAncestors(root).filter(p => p instanceof FormatNode && p.getFormat() === "_").length > 0; }
     isBold(root: Node) { return this.getAncestors(root).filter(p => p instanceof FormatNode && p.getFormat() === "*").length > 0; }

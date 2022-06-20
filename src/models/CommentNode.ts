@@ -20,11 +20,11 @@ export class CommentNode extends AtomNode<FormatNode> {
         return `${previousText?.endsWith(" ") ? "" : " "}%${debug === this.nodeID ? "%debug%" : ""}${this.getMeta().toBookdown(debug)}%`; 
     }
 
-    copy(): CommentNode { return new CommentNode(this.getMeta().copy()); }
+    copy() { return new CommentNode(this.getMeta().copy()) as this; }
 
     withChildReplaced(node: Node, replacement: Node | undefined) {
         return node instanceof FormatNode && replacement instanceof FormatNode && node === this.getMeta() ?
-            new CommentNode(replacement) : 
+            new CommentNode(replacement) as this : 
             undefined;    
     }
 

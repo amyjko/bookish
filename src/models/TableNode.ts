@@ -43,9 +43,12 @@ export class TableNode extends BlockNode {
         ).join("\n") + `\n${this.#position === "|" ? "" : this.#position}${this.#caption ? "" + this.#caption.toBookdown(debug) : ""}`;
     }
 
-    traverseChildren(fn: (node: Node) => void): void {
-        this.#rows.forEach(row => row.forEach(cell => cell.traverse(fn)))
-        this.#caption?.traverse(fn)
+    getChildren() {
+        const children = [];
+        this.#rows.forEach(row => row.forEach(cell => children.push(cell)));
+        if(this.#caption !== undefined)
+            children.push(this.#caption);
+        return children;
     }
 
     locate(format: FormatNode): Location | undefined {
@@ -82,14 +85,14 @@ export class TableNode extends BlockNode {
         }
     }
 
-    copy(): TableNode {
+    copy() {
         const rows: FormatNode[][] = [];
         this.#rows.forEach(row => {
             const cells: FormatNode[] = []
             row.forEach(cell => cells.push(cell.copy()))
             rows.push(cells)
         })
-        return new TableNode(rows, this.#position, this.#caption ? this.#caption.copy() : undefined);
+        return new TableNode(rows, this.#position, this.#caption ? this.#caption.copy() : undefined) as this;
 
     }
 
@@ -97,7 +100,7 @@ export class TableNode extends BlockNode {
 
         // If it's just the caption, make a new node with the new credit.
         if(node === this.#caption && replacement instanceof FormatNode)
-            return new TableNode(this.#rows, this.#position, replacement);
+            return new TableNode(this.#rows, this.#position, replacement) as this;
 
         // If it's a cell, update the cell.
         if(node instanceof FormatNode && replacement instanceof FormatNode) {
@@ -114,7 +117,7 @@ export class TableNode extends BlockNode {
             if(updateRow < this.#rows.length && updateColumn >= 0) {
                 const newRows = this.#rows.map(row => [ ... row ]);
                 newRows[updateRow][updateColumn] = replacement;
-                return new TableNode(newRows, this.#position, this.#caption)
+                return new TableNode(newRows, this.#position, this.#caption) as this;
             }
         }
 

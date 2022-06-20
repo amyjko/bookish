@@ -61,9 +61,7 @@ export class ListNode extends BlockNode {
             this.#items.map(item => (item instanceof ListNode ? "" : "*".repeat(level) + " ") + item.toBookdown(debug, level + 1)).join("\n");
     }
 
-    traverseChildren(fn: (node: Node) => void): void {
-        this.#items.forEach(item => item.traverse(fn))
-    }
+    getChildren() { return this.#items; }
 
     getParentOf(node: Node): Node | undefined {
         return this.#items.map(b => b === node ? this : b.getParentOf(node)).find(b => b !== undefined);
@@ -88,8 +86,8 @@ export class ListNode extends BlockNode {
         return index;
     }
 
-    copy(): ListNode {
-        return new ListNode(this.#items.map(i => i.copy()), this.#numbered);
+    copy(): this {
+        return new ListNode(this.#items.map(i => i.copy()), this.#numbered) as this;
     }
 
     withStyle(numbered: boolean) { 
@@ -226,14 +224,14 @@ export class ListNode extends BlockNode {
 
     }
 
-    withChildReplaced(node: Node, replacement: Node | undefined) {         
+    withChildReplaced(node: Node, replacement: Node | undefined): this | undefined {
         if(!(node instanceof FormatNode) && !(node instanceof ListNode)) return;
         if(replacement !== undefined && !(replacement instanceof FormatNode) && !(replacement instanceof ListNode)) return;
         const index = this.#items.indexOf(node);
         if(index < 0) return;
         return new ListNode(replacement === undefined ?
             [ ...this.#items.slice(0, index), ...this.#items.slice(index + 1)] :
-            [ ...this.#items.slice(0, index), replacement, ...this.#items.slice(index + 1) ], this.#numbered);
+            [ ...this.#items.slice(0, index), replacement, ...this.#items.slice(index + 1) ], this.#numbered) as this;
     }
 
 }

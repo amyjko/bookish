@@ -18,7 +18,7 @@ export abstract class AtomNode<MetadataType> extends Node {
 
     abstract getDefaultCaret(): Caret;
 
-    traverseChildren(fn: (node: Node) => void): void {}
+    getChildren() { return [] }
 
     nextWord(root: RootNode, index?: number): Caret {
         const next = root.getNextTextOrAtom(this);
@@ -54,7 +54,6 @@ export abstract class AtomNode<MetadataType> extends Node {
 
     abstract toBookdown(debug?: number, format?: FormatNode): string;
     abstract toText(): string;
-    abstract copy(): AtomNode<MetadataType>;
     abstract withMeta(meta: MetadataType): AtomNode<MetadataType>;
 
 }
