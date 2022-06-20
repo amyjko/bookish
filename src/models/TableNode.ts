@@ -105,8 +105,8 @@ export class TableNode extends BlockNode {
             // Does this table contain node we're replacing?
             let updateRow = 0;
             let updateColumn = -1;
-            for(let i = 0; i < this.#rows.length; i++) {
-                updateColumn = this.#rows[i].indexOf(node);
+            for(; updateRow < this.#rows.length; updateRow++) {
+                updateColumn = this.#rows[updateRow].indexOf(node);
                 if(updateColumn >= 0) break;
             }
 
