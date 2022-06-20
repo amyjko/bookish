@@ -39,6 +39,7 @@ import Quote from "../svg/quote.svg";
 import Code from "../svg/code.svg";
 import Undo from "../svg/undo.svg";
 import Redo from "../svg/redo.svg";
+import { AtomNode } from "../../models/AtomNode";
 
 export type Command = {
     label?: string,
@@ -163,7 +164,7 @@ export const commands: Command[] = [
         visible: context => false,
         active: context => context.endIsTextOrAtom,
         handler: context => {
-            if(context.end.node instanceof TextNode) {
+            if(context.end.node instanceof TextNode || context.end.node instanceof AtomNode) {
                 const newCaret = context.end.node.previous(context.chapter, context.end.index)
                 return { root: context.chapter, range: {start: newCaret, end: newCaret } }
             }
@@ -176,7 +177,7 @@ export const commands: Command[] = [
         visible: context => false,
         active: context => context.endIsTextOrAtom,
         handler: context => {
-            if(context.end.node instanceof TextNode) {
+            if(context.end.node instanceof TextNode || context.end.node instanceof AtomNode) {
                 const previous = context.end.node.previousWord(context.chapter, context.end.index);
                 return { root: context.chapter, range: { start: previous, end: previous } };
             }
@@ -189,8 +190,10 @@ export const commands: Command[] = [
         visible: context => false,
         active: context => context.format !== undefined,
         handler: context => {
-            const first = (context.format as FormatNode).getFirstTextNode();
-            return { root: context.chapter, range: { start: { node: first, index: 0 }, end: { node: first, index: 0 }}}
+            if(context.format !== undefined) {
+                const first = context.format.getFirstTextNode();
+                return { root: context.chapter, range: { start: { node: first, index: 0 }, end: { node: first, index: 0 }}}
+            }
         }
     },
     {
@@ -200,8 +203,10 @@ export const commands: Command[] = [
         visible: context => false,
         active: context => context.endIsTextOrAtom,
         handler: context => {
-            const previous = (context.end.node as TextNode).previous(context.chapter, context.end.index);
-            return { root: context.chapter, range: { start: context.start, end: previous } };
+            if(context.end.node instanceof TextNode || context.end.node instanceof AtomNode) {
+                const previous = context.end.node.previous(context.chapter, context.end.index);
+                return { root: context.chapter, range: { start: context.start, end: previous } };
+            }
         }
     },
     {
@@ -211,8 +216,10 @@ export const commands: Command[] = [
         visible: context => false,
         active: context => context.endIsTextOrAtom,
         handler: context => {
-            const previous = (context.end.node as TextNode).previousWord(context.chapter, context.end.index);
-            return { root: context.chapter, range: { start: context.start, end: previous } };
+            if(context.end.node instanceof TextNode || context.end.node instanceof AtomNode) {
+                const previous = context.end.node.previousWord(context.chapter, context.end.index);
+                return { root: context.chapter, range: { start: context.start, end: previous } };
+            }
         }
     },
     {
@@ -222,8 +229,10 @@ export const commands: Command[] = [
         visible: context => false,
         active: context => context.format !== undefined,
         handler: context => {
-            const first = (context.format as FormatNode).getFirstTextNode();
-            return { root: context.chapter, range: { start: context.start, end: { node: first, index: 0 } } };
+            if(context.format !== undefined) {
+                const first = context.format.getFirstTextNode();
+                return { root: context.chapter, range: { start: context.start, end: { node: first, index: 0 } } };
+            }
         }
     },
     {
@@ -233,8 +242,10 @@ export const commands: Command[] = [
         visible: context => false,
         active: context => context.endIsTextOrAtom,
         handler: context => {
-            const next = (context.end.node as TextNode).next(context.chapter, context.end.index);
-            return { root: context.chapter, range: { start: next, end: next } };
+            if(context.end.node instanceof TextNode || context.end.node instanceof AtomNode) {
+                const next = context.end.node.next(context.chapter, context.end.index);
+                return { root: context.chapter, range: { start: next, end: next } };
+            }
         }
     },
     {
@@ -244,8 +255,10 @@ export const commands: Command[] = [
         visible: context => false,
         active: context => context.endIsTextOrAtom,
         handler: context => {
-            const next = (context.end.node as TextNode).nextWord(context.chapter, context.end.index);
-            return { root: context.chapter, range: { start: next, end: next } }
+            if(context.end.node instanceof TextNode || context.end.node instanceof AtomNode) {
+                const next = context.end.node.nextWord(context.chapter, context.end.index);
+                return { root: context.chapter, range: { start: next, end: next } }
+            }
         }
     },
     {
@@ -255,9 +268,11 @@ export const commands: Command[] = [
         visible: context => false,
         active: context => context.format !== undefined,
         handler: context => {
-            const last = (context.format as FormatNode).getLastTextNode();
-            const caret = { node: last, index: last.getLength() };
-            return { root: context.chapter, range: { start: caret, end: caret} };
+            if(context.format !== undefined) {
+                const last = context.format.getLastTextNode();
+                const caret = { node: last, index: last.getLength() };
+                return { root: context.chapter, range: { start: caret, end: caret} };
+            }
         }
     },
     {
@@ -267,8 +282,10 @@ export const commands: Command[] = [
         visible: context => false,
         active: context => context.endIsTextOrAtom,
         handler: context => {
-            const previous = (context.end.node as TextNode).next(context.chapter, context.end.index);
-            return { root: context.chapter, range: { start: context.start, end: previous } };
+            if(context.end.node instanceof TextNode || context.end.node instanceof AtomNode) {
+                const previous = context.end.node.next(context.chapter, context.end.index);
+                return { root: context.chapter, range: { start: context.start, end: previous } };
+            }
         }
     },
     {
@@ -278,8 +295,10 @@ export const commands: Command[] = [
         visible: context => false,
         active: context => context.endIsTextOrAtom,
         handler: context => {
-            const previous = (context.end.node as TextNode).nextWord(context.chapter, context.end.index);
-            return { root: context.chapter, range: { start: context.start, end: previous } };
+            if(context.end.node instanceof TextNode || context.end.node instanceof AtomNode) {
+                const previous = context.end.node.nextWord(context.chapter, context.end.index);
+                return { root: context.chapter, range: { start: context.start, end: previous } };
+            }
         }
     },
     {
@@ -289,8 +308,10 @@ export const commands: Command[] = [
         visible: context => false,
         active: context => context.format !== undefined,
         handler: context => {
-            const last = (context.format as FormatNode).getLastTextNode();
-            return { root: context.chapter, range: { start: context.start, end: { node: last, index: last.getLength() } } };
+            if(context.format !== undefined) {
+                const last = context.format.getLastTextNode();
+                return { root: context.chapter, range: { start: context.start, end: { node: last, index: last.getLength() } } };
+            }
         }
     },
     {
