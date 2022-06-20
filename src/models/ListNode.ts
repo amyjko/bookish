@@ -23,6 +23,7 @@ export class ListNode extends BlockNode {
     getType() { return "list"; }
     isNumbered() { return this.#numbered; }
     getItems() { return this.#items; }
+    getChildren() { return this.#items; }
     getListItems() { return this.#items.filter(i => i instanceof ListNode) as ListNode[]; }
     getLength() { return this.#items.length; }
     getLastItem(): FormatNode | undefined { return this.getFirstLastItem(false); }
@@ -60,8 +61,6 @@ export class ListNode extends BlockNode {
             this.#items.map((item, number) => (item instanceof ListNode ? "" : ((number + 1) + ".".repeat(level)) + " ") + item.toBookdown(debug, level + 1)).join("\n") :
             this.#items.map(item => (item instanceof ListNode ? "" : "*".repeat(level) + " ") + item.toBookdown(debug, level + 1)).join("\n");
     }
-
-    getChildren() { return this.#items; }
 
     getParentOf(node: Node): Node | undefined {
         return this.#items.map(b => b === node ? this : b.getParentOf(node)).find(b => b !== undefined);
@@ -103,9 +102,9 @@ export class ListNode extends BlockNode {
     }
 
     withItemAt(item: ListNodeType, index: number): ListNode | undefined {
-        if(index < 0 || index >= this.#items.length)
-            return;
-        const newItems = this.#items.slice().splice(index, 0, item);
+        if(index < 0 || index >= this.#items.length) return;
+        const newItems = this.#items.slice();
+        newItems.splice(index, 0, item);
         return new ListNode(newItems, this.#numbered);
     }
 
@@ -224,9 +223,7 @@ export class ListNode extends BlockNode {
 
     }
 
-    withChildReplaced(node: Node, replacement: Node | undefined): this | undefined {
-        if(!(node instanceof FormatNode) && !(node instanceof ListNode)) return;
-        if(replacement !== undefined && !(replacement instanceof FormatNode) && !(replacement instanceof ListNode)) return;
+    withChildReplaced(node: ListNodeType, replacement: ListNodeType | undefined): this | undefined {
         const index = this.#items.indexOf(node);
         if(index < 0) return;
         return new ListNode(replacement === undefined ?
