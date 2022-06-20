@@ -71,7 +71,7 @@ export class FormatNode extends Node {
         return this.getNodes().filter(n => n instanceof TextNode || n instanceof AtomNode) as (TextNode | AtomNode<any>)[];
     }
 
-    getAdjascentTextOrAtom(node: TextNode | AtomNode<any>, next: boolean): TextNode | AtomNode<any> | undefined {
+    getAdjacentTextOrAtom(node: TextNode | AtomNode<any>, next: boolean): TextNode | AtomNode<any> | undefined {
         const text = this.getTextAndAtomNodes();
         const index = text.indexOf(node);
         return index === undefined ? undefined :
@@ -81,24 +81,24 @@ export class FormatNode extends Node {
     }
 
     getNextTextOrAtom(node: TextNode | AtomNode<any>): TextNode | AtomNode<any> | undefined {
-        return this.getAdjascentTextOrAtom(node, true);
+        return this.getAdjacentTextOrAtom(node, true);
     }
 
     getPreviousTextOrAtom(node: TextNode | AtomNode<any>): TextNode | AtomNode<any> | undefined {
-        return this.getAdjascentTextOrAtom(node, false);
+        return this.getAdjacentTextOrAtom(node, false);
     }
 
     getAdjacentCaret(caret: Caret, next: boolean): Caret | undefined {
         if(!(caret.node instanceof TextNode) && !(caret.node instanceof AtomNode)) return;
         // Is there an adjascent caret in the current text node? If so, return it.
         if(caret.node instanceof TextNode) {
-            const adjascentText = next ? caret.node.getNextCaret(caret.index) : caret.node.getPreviousCaret(caret.index);
-            if(adjascentText !== undefined) return adjascentText;
+            const adjacentText = next ? caret.node.getNextCaret(caret.index) : caret.node.getPreviousCaret(caret.index);
+            if(adjacentText !== undefined) return adjacentText;
         }
         // If there's not, is there an adjascent caret in the sequence of text and atom nodes?
-        const adjascentNode = this.getAdjascentTextOrAtom(caret.node, next);
-        if(adjascentNode !== undefined)
-            return { node: adjascentNode, index: !next && adjascentNode instanceof TextNode ? adjascentNode.getLength() - 1 : 0 }
+        const adjacentNode = this.getAdjacentTextOrAtom(caret.node, next);
+        if(adjacentNode !== undefined)
+            return { node: adjacentNode, index: !next && adjacentNode instanceof TextNode ? adjacentNode.getLength() - 1 : 0 }
         // Otherwise, there is no adjascent caret.
         return undefined;
     }
