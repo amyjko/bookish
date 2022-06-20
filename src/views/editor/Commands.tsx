@@ -563,7 +563,7 @@ export const commands: Command[] = [
         description: "toggle code",
         category: "text",
         control: true, alt: false, shift: false, key: "j",
-        visible: context => true,
+        visible: context => (context.atom === undefined && context.meta === undefined) || context.meta instanceof InlineCodeNode,
         active: context => context.chapter !== undefined && context.startIsText && context.endIsText,
         handler: context => context.meta instanceof InlineCodeNode ? 
             chapterWithNode(context, context.format, context.format?.withSegmentReplaced(context.meta, context.meta.getText())) : 
@@ -575,7 +575,7 @@ export const commands: Command[] = [
         description: "link",
         category: "annotation",
         control: true, alt: false, shift: false, key: "k",
-        visible: context => context.format !== undefined,
+        visible: context => (context.atom === undefined && context.meta === undefined) || context.meta instanceof LinkNode,
         active: context => context.chapter !== undefined && context.startIsText && context.endIsText,
         handler: context => context.meta instanceof LinkNode ? 
             chapterWithNode(context, context.format, context.format?.withSegmentReplaced(context.meta, context.meta.getText())) : 
@@ -586,10 +586,10 @@ export const commands: Command[] = [
         description: "toggle definition",
         category: "annotation",
         control: true, alt: false, shift: false, key: "d",
-        visible: context => context.chapter !== undefined,
+        visible: context => (context.atom === undefined && context.meta === undefined) || context.meta instanceof DefinitionNode,
         active: context => context.startIsText && context.endIsText,
         handler: context => context.meta instanceof DefinitionNode ? 
-        chapterWithNode(context, context.format, context.format?.withSegmentReplaced(context.meta, context.meta.getText())) : 
+            chapterWithNode(context, context.format, context.format?.withSegmentReplaced(context.meta, context.meta.getText())) : 
             context.chapter.withSegmentAtSelection(context.range, text => new DefinitionNode(new TextNode(text)))
     },
     {
@@ -597,7 +597,7 @@ export const commands: Command[] = [
         description: "insert footnote",
         category: "annotation",
         control: true, alt: false, shift: false, key: "f",
-        visible: context => context.chapter !== undefined,
+        visible: context => context.atom === undefined && context.meta === undefined,
         active: context => context.startIsText && context.endIsText,
         handler: context => context.chapter?.withSegmentAtSelection(context.range, text => new FootnoteNode(new FormatNode("", [ new TextNode(text) ])))
     },
@@ -606,7 +606,7 @@ export const commands: Command[] = [
         description: "insert citations",
         category: "annotation",
         control: true, alt: false, shift: false, key: "t",
-        visible: context => context.chapter !== undefined,
+        visible: context => (context.atom === undefined && context.meta === undefined),
         active: context => context.chapter !== undefined && context.startIsText && context.endIsText,
         handler: context => context.chapter?.withSegmentAtSelection(context.range, text => new CitationsNode([]))
     },
@@ -615,7 +615,7 @@ export const commands: Command[] = [
         description: "insert label",
         category: "annotation",
         control: true, alt: false, shift: false, key: "l",
-        visible: context => context.chapter !== undefined,
+        visible: context => (context.atom === undefined && context.meta === undefined),
         active: context => context.chapter !== undefined && context.startIsText && context.endIsText,
         handler: context => context.chapter?.withSegmentAtSelection(context.range, text => new LabelNode(""))
     },
@@ -625,7 +625,7 @@ export const commands: Command[] = [
         description: "insert comment",
         category: "annotation",
         control: true, alt: false, shift: false, key: "c",
-        visible: context => context.chapter !== undefined && context.atom === undefined,
+        visible: context => (context.atom === undefined && context.meta === undefined),
         active: context => context.chapter !== undefined && context.atom === undefined && context.startIsText && context.endIsText,
         handler: context => context.chapter?.withSegmentAtSelection(context.range, text => new CommentNode(new FormatNode("", [ new TextNode(text) ])))
     },
