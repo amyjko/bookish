@@ -1,6 +1,5 @@
-import { BlocksNode } from "../../models/BlocksNode";
 import { CalloutNode } from "../../models/CalloutNode";
-import { CaretRange } from "../../models/Caret";
+import { Caret, CaretRange } from "../../models/Caret";
 import { ChapterNode } from "../../models/ChapterNode";
 import { CitationsNode } from "../../models/CitationsNode";
 import { CodeNode } from "../../models/CodeNode";
@@ -18,7 +17,10 @@ import { QuoteNode } from "../../models/QuoteNode";
 import { RuleNode } from "../../models/RuleNode";
 import { TableNode } from "../../models/TableNode";
 import { TextNode } from "../../models/TextNode";
+import { AtomNode } from "../../models/AtomNode";
+import { Edit } from "../../models/Edit";
 import { Node } from "../../models/Node";
+
 import { CaretState, CaretUtilities } from "./ChapterEditor";
 
 // From: https://thenounproject.com/browse/collection-icon/minio-text-editor-bold-13520/?p=1
@@ -39,10 +41,6 @@ import Quote from "../svg/quote.svg";
 import Code from "../svg/code.svg";
 import Undo from "../svg/undo.svg";
 import Redo from "../svg/redo.svg";
-import { AtomNode } from "../../models/AtomNode";
-import { BlockNode } from "../../models/BlockNode";
-import { Edit } from "../../models/Edit";
-import { RootNode } from "../../models/RootNode";
 
 export type Command = {
     label?: string,
@@ -62,65 +60,45 @@ export type Command = {
         key: string) => Edit
 }
 
-function insertTableRowColumn(root: ChapterNode, table: TableNode, format: FormatNode, row: boolean, before: boolean): Edit {
+function insertTableRowColumn(context: CaretState, table: TableNode, format: FormatNode, row: boolean, before: boolean): Edit {
     const location = table.locate(format);
-    if(location) {
-        // Make the new table.
-        const newTable = row ? table.withNewRow(location.row + (before ? 0 : 1)): table.withNewColumn(location.column + (before ? 0 : 1));
-        if(newTable === undefined) return;
+    if(location === undefined) return;
+    return chapterWithNode(
+        context, 
+        table, 
+        row ? table.withNewRow(location.row + (before ? 0 : 1)): table.withNewColumn(location.column + (before ? 0 : 1)),
+        t => ((t as TableNode).getCell(location.row + (row && !before ? 1 : 0), location.column + (!row && !before ? 1 : 0)) as FormatNode).getFirstCaret()
+    )
+}
 
-        const newRoot = root.withNodeReplaced(table, newTable);
-        if(newRoot === undefined) return;
-
-        const newFormat = table.getCell(location.row + (row && !before ? 1 : 0), location.column + (!row && !before ? 1 : 0));
-        if(newFormat) {
-            const newCaret = { node: newFormat.getTextNodes()[0], index: 0 };
-            return { root: newRoot, range: { start: newCaret, end: newCaret } };
+function deleteTableRowColumn(context: CaretState, table: TableNode, format: FormatNode, row: boolean): Edit {
+    const location = table.locate(format);
+    if(location === undefined) return;
+    return chapterWithNode(
+        context,
+        table,
+        row ? table.withoutRow(location.row) : table.withoutColumn(location.column),
+        t => {
+            return (row ?
+                (t as TableNode).getCell(location.row === table.getRowCount() ? location.row - 1 : location.row, location.column) :
+                (t as TableNode).getCell(location.row, location.column === table.getColumnCount() ? location.column - 1 : location.column))?.getFirstCaret();
         }
-    }
-    return undefined;
+    )
 }
 
-function deleteTableRowColumn(root: ChapterNode, table: TableNode, format: FormatNode, row: boolean): Edit {
-    const location = table.locate(format);
-    if(!location) return undefined;
+// A helper function that encapsulates boilerplate for replacing a node in a root and updating a caret.
+function chapterWithNode(context: CaretState, original: Node | undefined, replacement: Node | undefined, range?: (node: Node) => Caret | undefined): Edit | undefined {
 
-    const newTable = row ? table.withoutRow(location.row) : table.withoutColumn(location.column);
-    if(newTable === undefined) return;
-
-    const newRoot = root.withNodeReplaced(table, newTable);
-    if(newRoot === undefined || !(newRoot instanceof ChapterNode)) return;
-
-    const newFormat = row ?
-        table.getCell(location.row === table.getRowCount() ? location.row - 1 : location.row, location.column) :
-        table.getCell(location.row, location.column === table.getColumnCount() ? location.column - 1 : location.column)
-    if(!newFormat) return undefined;
-    const newCaret = { node: newFormat.getTextNodes()[0], index: 0 };
-    return { root: newRoot, range: { start: newCaret, end: newCaret } };
-
-}
-
-function unwrapMeta(context: CaretState): Edit {
-
-    if(context.format === undefined || context.meta === undefined) return;
-    const newFormat = context.format.withSegmentReplaced(context.meta, context.meta.getText());
-    if(newFormat === undefined) return;
-    const newRoot = context.chapter.withNodeReplaced(context.format, newFormat);
-    if(newRoot === undefined) return;
-    return { root: newRoot, range: context.range };
-
-}
-
-function chapterWithNode(context: CaretState, original: Node | undefined, replacement: Node | undefined, range?: CaretRange): Edit | undefined {
-
-    // If there was no replacement, do nothing.
+    // If there was no original or replacement, do nothing. Saves commands from having to check.
     if(original === undefined || replacement === undefined) return;
-    // Make the new root.
+    // Make the new root. Bail on fail.
     const newRoot = context.chapter.withNodeReplaced(original, replacement);
-    // If it failed, do nothing.
     if(newRoot === undefined) return;
+    // Generate a new caret based on the replacement, if there's a generator. Bail on fail.
+    const newCaret = range?.call(undefined, replacement);
+    if(range !== undefined && newCaret === undefined) return;
     // Return the edit
-    return { root: newRoot, range: range === undefined ? context.range : range }
+    return { root: newRoot, range: newCaret !== undefined ? { start: newCaret, end: newCaret } : context.range }
 
 }
 
@@ -135,7 +113,7 @@ export const commands: Command[] = [
         active: context => context.table !== undefined && context.format !== undefined,
         handler: context => {
             if(!context.table || !context.format) return;
-            return insertTableRowColumn(context.chapter, context.table, context.format, true, true);
+            return insertTableRowColumn(context, context.table, context.format, true, true);
         }
     },
     {
@@ -147,7 +125,7 @@ export const commands: Command[] = [
         active: context => context.table !== undefined && context.format !== undefined,
         handler: context => {
             if(!context.table || !context.format) return;
-            return insertTableRowColumn(context.chapter, context.table, context.format, true, false);
+            return insertTableRowColumn(context, context.table, context.format, true, false);
         }
     },
     {
@@ -159,7 +137,7 @@ export const commands: Command[] = [
         active: context => context.table !== undefined && context.format !== undefined,
         handler: context => {
             if(!context.table || !context.format) return;
-            return insertTableRowColumn(context.chapter, context.table, context.format, false, false);
+            return insertTableRowColumn(context, context.table, context.format, false, false);
         }
     },
     {
@@ -171,7 +149,7 @@ export const commands: Command[] = [
         active: context => context.table !== undefined && context.format !== undefined,
         handler: context => {
             if(!context.table || !context.format) return;
-            return insertTableRowColumn(context.chapter, context.table, context.format, false, true);
+            return insertTableRowColumn(context, context.table, context.format, false, true);
         }
     },
     {
@@ -183,7 +161,7 @@ export const commands: Command[] = [
         active: context => context.format !== undefined && context.table !== undefined && context.table.getRowCount() > 1,
         handler: context => {
             if(!context.table || !context.format) return;
-            return deleteTableRowColumn(context.chapter, context.table, context.format, true);
+            return deleteTableRowColumn(context, context.table, context.format, true);
         }
     },
     {
@@ -195,7 +173,7 @@ export const commands: Command[] = [
         active: context => context.format !== undefined && context.table !== undefined && context.table.getColumnCount() > 1,
         handler: context => {
             if(!context.table || !context.format) return;
-            return deleteTableRowColumn(context.chapter, context.table, context.format, false);
+            return deleteTableRowColumn(context, context.table, context.format, false);
         }
     },
     {
@@ -420,7 +398,7 @@ export const commands: Command[] = [
                 const edit = context.list.withItemMergedBackwards(index);
                 if(edit === undefined) return;
                 const [ newList, newCaret ] = edit;
-                return chapterWithNode(context, context.list, newList, { start: newCaret, end: newCaret });
+                return chapterWithNode(context, context.list, newList, newList => newCaret );
             }
         }
     },
@@ -550,12 +528,11 @@ export const commands: Command[] = [
             if(!(context.start.node instanceof TextNode)) return;
             const newText = context.start.node.withCharacterAt("\n", context.start.index);
             if(newText === undefined) return;
-            const newCaret = { node: newText, index: context.start.index + 1 };
             return chapterWithNode(
                 context, 
                 context.start.node, 
                 newText,
-                { start: newCaret, end: newCaret }
+                text => { return { node: text, index: context.start.index + 1 } }
             );
     
         }
@@ -577,7 +554,7 @@ export const commands: Command[] = [
             if(formatIndex === undefined) return;
             const newList = list.withItemAfter(second, format)?.withItemAfter(first, format)?.withoutItem(formatIndex);
             const newCaret = { node: second.getTextNodes()[0], index: 0 };
-            return chapterWithNode(context, list, newList, { start: newCaret, end: newCaret });
+            return chapterWithNode(context, list, newList, list => newCaret);
         }
     },
     {
@@ -654,7 +631,7 @@ export const commands: Command[] = [
         visible: context => true,
         active: context => context.chapter !== undefined && context.startIsText && context.endIsText,
         handler: context => context.meta instanceof InlineCodeNode ? 
-            unwrapMeta(context) : 
+            chapterWithNode(context, context.format, context.format?.withSegmentReplaced(context.meta, context.meta.getText())) : 
             context.chapter.withSegmentAtSelection(context.range, text => new InlineCodeNode(text))
     },
     {
@@ -686,7 +663,7 @@ export const commands: Command[] = [
         visible: context => context.format !== undefined,
         active: context => context.chapter !== undefined && context.startIsText && context.endIsText,
         handler: context => context.meta instanceof LinkNode ? 
-            unwrapMeta(context) : 
+        chapterWithNode(context, context.format, context.format?.withSegmentReplaced(context.meta, context.meta.getText())) : 
             context.chapter.withSegmentAtSelection(context.range, text => new LinkNode(text))
     },
     {
@@ -697,7 +674,7 @@ export const commands: Command[] = [
         visible: context => context.chapter !== undefined,
         active: context => context.startIsText && context.endIsText,
         handler: context => context.meta instanceof DefinitionNode ? 
-            unwrapMeta(context) : 
+        chapterWithNode(context, context.format, context.format?.withSegmentReplaced(context.meta, context.meta.getText())) : 
             context.chapter.withSegmentAtSelection(context.range, text => new DefinitionNode(text))
     },
     {
@@ -798,9 +775,12 @@ export const commands: Command[] = [
             if(context.blocks && context.paragraph) {
                 // Make a new callout node with an empty paragraph, insert it before the paragraph the caret is in, and place the caret inside the empty paragraph.
                 const newParagraph = new ParagraphNode();
-                const newCallout = new CalloutNode([ newParagraph ]);
-                const newCaret = { node: newParagraph.getContent().getSegments()[0], index: 0 };
-                return chapterWithNode(context, context.blocks, context.blocks.withBlockInsertedBefore(context.paragraph, newCallout), { start: newCaret, end: newCaret });
+                return chapterWithNode(
+                    context, 
+                    context.blocks, 
+                    context.blocks.withBlockInsertedBefore(context.paragraph, new CalloutNode([ newParagraph ])), 
+                    callout => { return { node: newParagraph.getContent().getSegments()[0], index: 0 }; }
+                );
             }
         } 
     },
@@ -816,10 +796,12 @@ export const commands: Command[] = [
             if(context.blocks && context.paragraph) {
                 // Make a new quote and place the caret inside the quote's first empty paragraph.
                 const newParagraph = new ParagraphNode();
-                const newQuote = new QuoteNode([ newParagraph ]);
-                const newText = newParagraph.getContent().getSegments()[0];
-                const newCaret = { node: newText, index: 0 };
-                return chapterWithNode(context, context.blocks, context.blocks.withBlockInsertedBefore(context.paragraph, newQuote), { start: newCaret, end: newCaret });
+                return chapterWithNode(
+                    context, 
+                    context.blocks, 
+                    context.blocks.withBlockInsertedBefore(context.paragraph, new QuoteNode([ newParagraph ])),
+                    quote => newParagraph.getFirstCaret()
+                );
             }
         } 
     },
@@ -833,10 +815,13 @@ export const commands: Command[] = [
         active: context => context.blocks !== undefined && context.atParagraphStart,
         handler: context => {
             if(context.blocks && context.paragraph) {
-                // Place the caret inside the code's code node.
                 const newCode = new CodeNode("", "plaintext", "|");
-                const newCaret = { node: newCode.getCodeNode(), index: 0 };
-                return chapterWithNode(context, context.blocks, context.blocks.withBlockInsertedBefore(context.paragraph, newCode), { start: newCaret, end: newCaret });
+                return chapterWithNode(
+                    context, 
+                    context.blocks, 
+                    context.blocks.withBlockInsertedBefore(context.paragraph, newCode), 
+                    code => { return { node: newCode.getCodeNode(), index: 0 } }
+                );
             }
         } 
     },
@@ -852,9 +837,12 @@ export const commands: Command[] = [
             if(context.blocks && context.paragraph) {
                 // Place the caret inside the code's code node.
                 const newEmbed = new EmbedNode("", "");
-                const text = newEmbed.getCaption().getFirstTextNode();
-                const newCaret = { node: text, index: 0 };
-                return chapterWithNode(context, context.blocks, context.blocks.withBlockInsertedBefore(context.paragraph, newEmbed), { start: newCaret, end: newCaret });
+                return chapterWithNode(
+                    context, 
+                    context.blocks, 
+                    context.blocks.withBlockInsertedBefore(context.paragraph, newEmbed), 
+                    embed => newEmbed.getCaption().getFirstCaret()
+                );
             }
         } 
     },
@@ -875,8 +863,12 @@ export const commands: Command[] = [
                         newRows[r].push(new FormatNode("", [ new TextNode("")]));
                 }
                 const newTable = new TableNode(newRows, "|", new FormatNode("", [ new TextNode("")]));
-                const newCaret = { node: newTable.getRows()[0][0].getTextNodes()[0], index: 0 };
-                return chapterWithNode(context, context.blocks, context.blocks.withBlockInsertedBefore(context.paragraph, newTable), { start: newCaret, end: newCaret });
+                return chapterWithNode(
+                    context, 
+                    context.blocks, 
+                    context.blocks.withBlockInsertedBefore(context.paragraph, newTable), 
+                    table => { return { node: newTable.getRows()[0][0].getTextNodes()[0], index: 0 } }
+                );
             }
         } 
     },
@@ -979,10 +971,11 @@ export const commands: Command[] = [
                 if(!(insertionPoint.node instanceof TextNode)) return;
         
                 // Update the chapter with the new text node.
-                const newText = insertionPoint.node.withCharacterAt(char, insertionPoint.index);
-                if(newText === undefined) return;
-                const newCaret = { node: newText, index: insertionPoint.index + 1 };
-                return chapterWithNode(context, insertionPoint.node, newText, { start: newCaret, end: newCaret });
+                return chapterWithNode(
+                    context, 
+                    insertionPoint.node,
+                    insertionPoint.node.withCharacterAt(char, insertionPoint.index), 
+                    text => { return { node: text, index: insertionPoint.index + 1 }});
     
             }
         }
