@@ -1,10 +1,11 @@
 import { MetadataNode } from "./MetadataNode";
 import { Node } from "./Node";
+import { TextNode } from "./TextNode";
 
 export class LinkNode extends MetadataNode<string> {
     
-    constructor(text: string = "", url: string = "") {
-        super(text, url);
+    constructor(text?: TextNode, url: string = "") {
+        super(text === undefined ? new TextNode("") : text, url);
     }
 
     getType() { return "link"; }
@@ -18,14 +19,12 @@ export class LinkNode extends MetadataNode<string> {
     }
 
     copy() {
-        return new LinkNode(this.getText().getText(), this.getMeta()) as this;
+        return new LinkNode(this.getText(), this.getMeta()) as this;
     }
 
     getParentOf(node: Node): Node | undefined { return undefined; }
 
-    withChildReplaced(node: Node, replacement: Node | undefined) { return undefined; }
-
-    withMeta(meta: string): MetadataNode<string> { return new LinkNode(this.getText().getText(), meta); }
-    withText(text: string): MetadataNode<string> { return new LinkNode(text, this.getMeta()); }
+    withMeta(meta: string): MetadataNode<string> { return new LinkNode(this.getText(), meta); }
+    withText(text: TextNode): MetadataNode<string> { return new LinkNode(text, this.getMeta()); }
 
 }

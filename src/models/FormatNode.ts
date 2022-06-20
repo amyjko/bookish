@@ -419,7 +419,7 @@ export class FormatNode extends Node {
                     // Duplicate the MetadataNode but with new text. Erase the MetadataNode if the text is empty
                     // by simply not adding one to this new format. Then, erase the text, since it was added in the metadata node.
                     if(currentText.length > 0) {
-                        newFormats[0].segments.push(parent.withText(currentText));
+                        newFormats[0].segments.push(parent.withText(new TextNode(currentText)));
                         currentText = "";
                     }
                 }

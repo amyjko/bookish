@@ -1,10 +1,10 @@
 import { MetadataNode } from "./MetadataNode";
-import { FormatNode } from "./FormatNode";
 import { Node } from "./Node";
+import { TextNode } from "./TextNode";
 
 export class InlineCodeNode extends MetadataNode<string> {
-    constructor(code: string = "", language: string = "plaintext") {
-        super(code, language);
+    constructor(code?: TextNode, language: string = "plaintext") {
+        super(code === undefined ? new TextNode("") : code, language);
     }
 
     getType() { return "inline-code"; }
@@ -17,13 +17,11 @@ export class InlineCodeNode extends MetadataNode<string> {
         return "`" + this.getText().toBookdown(debug).replace(/`/g, '\\`') + "`" + (this.getMeta() === "plaintext" ? "" : this.getMeta());
     }
 
-    copy() { return new InlineCodeNode(this.getText().getText(), this.getMeta()) as this }
-
-    withChildReplaced(node: Node, replacement: Node | undefined){ return undefined; }
+    copy() { return new InlineCodeNode(this.getText(), this.getMeta()) as this }
 
     getParentOf(node: Node): Node | undefined { return undefined; }
 
-    withMeta(meta: string): MetadataNode<string> { return new InlineCodeNode(this.getText().getText(), meta); }
-    withText(text: string): MetadataNode<string> { return new InlineCodeNode(text, this.getMeta()); }
+    withMeta(meta: string): MetadataNode<string> { return new InlineCodeNode(this.getText(), meta); }
+    withText(text: TextNode): MetadataNode<string> { return new InlineCodeNode(text, this.getMeta()); }
 
 }

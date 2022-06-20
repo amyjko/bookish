@@ -547,7 +547,7 @@ export const commands: Command[] = [
         active: context => context.chapter !== undefined && context.startIsText && context.endIsText,
         handler: context => context.meta instanceof InlineCodeNode ? 
             chapterWithNode(context, context.format, context.format?.withSegmentReplaced(context.meta, context.meta.getText())) : 
-            context.chapter.withSegmentAtSelection(context.range, text => new InlineCodeNode(text))
+            context.chapter.withSegmentAtSelection(context.range, text => new InlineCodeNode(new TextNode(text)))
     },
     {
         label: "link ⚭",
@@ -559,7 +559,7 @@ export const commands: Command[] = [
         active: context => context.chapter !== undefined && context.startIsText && context.endIsText,
         handler: context => context.meta instanceof LinkNode ? 
             chapterWithNode(context, context.format, context.format?.withSegmentReplaced(context.meta, context.meta.getText())) : 
-            context.chapter.withSegmentAtSelection(context.range, text => new LinkNode(text))
+            context.chapter.withSegmentAtSelection(context.range, text => new LinkNode(new TextNode(text)))
     },
     {
         label: "glossary",
@@ -570,7 +570,7 @@ export const commands: Command[] = [
         active: context => context.startIsText && context.endIsText,
         handler: context => context.meta instanceof DefinitionNode ? 
         chapterWithNode(context, context.format, context.format?.withSegmentReplaced(context.meta, context.meta.getText())) : 
-            context.chapter.withSegmentAtSelection(context.range, text => new DefinitionNode(text))
+            context.chapter.withSegmentAtSelection(context.range, text => new DefinitionNode(new TextNode(text)))
     },
     {
         label: "footnote",

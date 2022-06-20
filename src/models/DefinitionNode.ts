@@ -1,11 +1,12 @@
 import { FormatNode } from "./FormatNode";
 import { MetadataNode } from "./MetadataNode";
 import { Node } from "./Node";
+import { TextNode } from "./TextNode";
 
 export class DefinitionNode extends MetadataNode<string> {
     
-    constructor(phrase: string = "", glossaryID: string = "") {
-        super(phrase, glossaryID);
+    constructor(phrase?: TextNode, glossaryID: string = "") {
+        super(phrase === undefined ? new TextNode("") : phrase, glossaryID);
     }
 
     getType() { return "definition"; }
@@ -19,13 +20,12 @@ export class DefinitionNode extends MetadataNode<string> {
     }
 
     copy() {
-        return new DefinitionNode(this.getText().getText(), this.getMeta()) as this;
+        return new DefinitionNode(this.getText(), this.getMeta()) as this;
     }
 
-    withChildReplaced(node: Node, replacement: Node | undefined){ return undefined; }
     getParentOf(node: Node): Node | undefined { return undefined; }
         
-    withMeta(meta: string): MetadataNode<string> { return new DefinitionNode(this.getText().getText(), meta); }
-    withText(text: string): MetadataNode<string> { return new DefinitionNode(text, this.getMeta()); }
+    withMeta(meta: string): MetadataNode<string> { return new DefinitionNode(this.getText(), meta); }
+    withText(text: TextNode): MetadataNode<string> { return new DefinitionNode(text, this.getMeta()); }
 
 }

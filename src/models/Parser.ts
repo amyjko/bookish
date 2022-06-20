@@ -967,7 +967,7 @@ export default class Parser {
         } else
             language = "plaintext"
 
-        return new InlineCodeNode(code, language);
+        return new InlineCodeNode(new TextNode(code), language);
         
     }
 
@@ -1047,7 +1047,7 @@ export default class Parser {
             next = this.peek();
         }
 
-        return new DefinitionNode(text, glossaryID);
+        return new DefinitionNode(new TextNode(text), glossaryID);
 
     }
 
@@ -1092,7 +1092,7 @@ export default class Parser {
         // Read the ]
         this.read();
 
-        return new LinkNode(text, url);
+        return new LinkNode(new TextNode(text), url);
 
     }
 
