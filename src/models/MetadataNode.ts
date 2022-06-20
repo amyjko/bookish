@@ -21,6 +21,7 @@ export abstract class MetadataNode<MetaType> extends Node {
     abstract toBookdown(debug?: number): string;
 
     getChildren() { return [ this.#text ] }
+    getParentOf(node: Node): Node | undefined { return this.#text === node ? this : undefined; }
 
     withChildReplaced(node: TextNode, replacement: TextNode | undefined) {
         if(this.#text === node && replacement !== undefined)

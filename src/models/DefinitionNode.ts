@@ -1,6 +1,4 @@
-import { FormatNode } from "./FormatNode";
 import { MetadataNode } from "./MetadataNode";
-import { Node } from "./Node";
 import { TextNode } from "./TextNode";
 
 export class DefinitionNode extends MetadataNode<string> {
@@ -22,8 +20,6 @@ export class DefinitionNode extends MetadataNode<string> {
     copy() {
         return new DefinitionNode(this.getText(), this.getMeta()) as this;
     }
-
-    getParentOf(node: Node): Node | undefined { return undefined; }
         
     withMeta(meta: string): MetadataNode<string> { return new DefinitionNode(this.getText(), meta); }
     withText(text: TextNode): MetadataNode<string> { return new DefinitionNode(text, this.getMeta()); }
