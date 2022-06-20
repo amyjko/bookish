@@ -455,7 +455,7 @@ export abstract class BlocksNode extends BlockNode {
         const newCaret = 
             newNode instanceof AtomNode ? newNode.getDefaultCaret() :
             newNode instanceof FormatNode ? newNode.getFirstCaret() :
-            newNode instanceof MetadataNode ? newNode.getMeta().getFirstCaret() :
+            newNode instanceof MetadataNode ? { node: newNode.getText(), index: 0 } :
             { node: newNode, index: 0 };
 
         const newBlocks = blocks.withNodeReplaced(newFormatted, revisedFormat);

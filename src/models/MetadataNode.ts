@@ -1,5 +1,4 @@
 import { Node } from "./Node";
-import { FormatNode } from "./FormatNode";
 import { TextNode } from "./TextNode";
 
 export abstract class MetadataNode<MetaType> extends Node {
