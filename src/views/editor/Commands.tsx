@@ -455,7 +455,7 @@ export const commands: Command[] = [
         handler: context => chapterWithNode(context, context.list, context.list?.withItemSplit(context.range.start), newList => {
             const index = context.list?.getItemContaining(context.range.start);
             if(index === undefined) return;
-            const item = (newList as ListNode).getItem(index);
+            const item = (newList as ListNode).getItem(index + 1);
             if(item === undefined) return;
             return item.getFirstCaret();
         })
