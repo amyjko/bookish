@@ -88,7 +88,7 @@ export class FormatNode extends Node {
         return this.getAdjascentTextOrAtom(node, false);
     }
 
-    getAdjascentCaret(caret: Caret, next: boolean): Caret | undefined {
+    getAdjacentCaret(caret: Caret, next: boolean): Caret | undefined {
         if(!(caret.node instanceof TextNode) && !(caret.node instanceof AtomNode)) return;
         // Is there an adjascent caret in the current text node? If so, return it.
         if(caret.node instanceof TextNode) {
@@ -509,11 +509,12 @@ export class FormatNode extends Node {
         // Confirm that this caret is in this format.
         if(!this.contains(caret.node)) return;
         // Is there an adjascent caret? Return nothing if not.
-        const adjascentCaret = this.getAdjascentCaret(caret, next);
-        if(adjascentCaret === undefined) return;
+        const adjacentCaret = this.getAdjacentCaret(caret, next);
+        if(adjacentCaret === undefined) return;
+        // If next, keep the caret in place, otherwise go to the adjacent caret position.
+        const textIndex = this.caretToTextIndex(next ? caret : adjacentCaret);
         // If there is one, try removing everything between this and the adjascent caret.
-        const textIndex = this.caretToTextIndex(adjascentCaret);
-        const newFormat = this.withoutRange({ start: caret, end: adjascentCaret });
+        const newFormat = this.withoutRange({ start: caret, end: adjacentCaret });
         const newCaret = newFormat?.textIndexToCaret(textIndex);
         if(newFormat === undefined || newCaret === undefined) return;
         return { root: newFormat, range: { start: newCaret, end: newCaret } };
