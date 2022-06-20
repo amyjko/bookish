@@ -10,7 +10,6 @@ export class FootnoteNode extends AtomNode<FormatNode> {
     }
 
     getType() { return "footnote"; }
-
     getDefaultCaret(): Caret { return this.getMeta().getFirstCaret(); }
 
     toText(): string { return this.getMeta().toText(); }
@@ -22,8 +21,8 @@ export class FootnoteNode extends AtomNode<FormatNode> {
         return this.getMeta().getParentOf(node);
     }
 
-    withChildReplaced(node: Node, replacement: Node | undefined) {
-        return node instanceof FormatNode && replacement instanceof FormatNode && node === this.getMeta() ?
+    withChildReplaced(node: FormatNode, replacement: FormatNode | undefined) {
+        return node === this.getMeta() && replacement !== undefined ?
             new FootnoteNode(replacement) as this :
             undefined;
     }
