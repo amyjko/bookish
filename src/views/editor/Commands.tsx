@@ -86,7 +86,7 @@ function deleteTableRowColumn(context: CaretState, table: TableNode, format: For
 }
 
 // A helper function that encapsulates boilerplate for replacing a node in a root and updating a caret.
-function chapterWithNode(context: CaretState, original: Node | undefined, replacement: Node | undefined, range?: (node: Node) => Caret | undefined): Edit | undefined {
+function chapterWithNode(context: CaretState, original: Node | undefined, replacement: Node | undefined, caret?: (node: Node) => Caret | undefined): Edit | undefined {
 
     // If there was no original or replacement, do nothing. Saves commands from having to check.
     if(original === undefined || replacement === undefined) return;
@@ -94,8 +94,8 @@ function chapterWithNode(context: CaretState, original: Node | undefined, replac
     const newRoot = context.chapter.withNodeReplaced(original, replacement);
     if(newRoot === undefined) return;
     // Generate a new caret based on the replacement, if there's a generator. Bail on fail.
-    const newCaret = range?.call(undefined, replacement);
-    if(range !== undefined && newCaret === undefined) return;
+    const newCaret = caret?.call(undefined, replacement);
+    if(caret !== undefined && newCaret === undefined) return;
     // Return the edit
     return { root: newRoot, range: newCaret !== undefined ? { start: newCaret, end: newCaret } : context.range }
 
@@ -466,7 +466,11 @@ export const commands: Command[] = [
         control: false, alt: false, shift: false, key: "Enter",
         visible: context => false,
         active: context => context.atom === undefined && context.blocks !== undefined,
-        handler: context => context.chapter.withSelectionSplit(context.range)
+        handler: context => {
+            const edit = context.blocks?.withSelectionSplit(context.range);
+            if(edit === undefined) return;
+            return chapterWithNode(context, context.blocks, edit.root, () => edit.range.start)
+        }
     },
     {
         label: "indent",
