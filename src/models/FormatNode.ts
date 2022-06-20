@@ -9,6 +9,7 @@ import { MetadataNode } from "./MetadataNode";
 import { AtomNode } from "./AtomNode";
 import { ListNode } from "./ListNode";
 import { TableNode } from "./TableNode";
+import { Edit } from "./Edit";
 
 export type Format = "" | "*" | "_" | "^" | "v";
 export type FormatNodeSegmentType = FormatNode | TextNode | ErrorNode | MetadataNode<any> | AtomNode<any>;
@@ -70,22 +71,36 @@ export class FormatNode extends Node {
         return this.getNodes().filter(n => n instanceof TextNode || n instanceof AtomNode) as (TextNode | AtomNode<any>)[];
     }
 
-    getNextTextOrAtom(node: TextNode | AtomNode<any>): TextNode | AtomNode<any> | undefined {
-        // Otherwise, find the next text node after this one.
+    getAdjascentTextOrAtom(node: TextNode | AtomNode<any>, next: boolean): TextNode | AtomNode<any> | undefined {
         const text = this.getTextAndAtomNodes();
         const index = text.indexOf(node);
         return index === undefined ? undefined :
-            index < text.length - 1 ? text[index + 1] :
-            undefined;
+            (next ? 
+                (index >= 0 && index < text.length - 1 ? text[index + 1] : undefined) : 
+                (index > 0 && index <= text.length ? text[index - 1] : undefined));
+    }
+
+    getNextTextOrAtom(node: TextNode | AtomNode<any>): TextNode | AtomNode<any> | undefined {
+        return this.getAdjascentTextOrAtom(node, true);
     }
 
     getPreviousTextOrAtom(node: TextNode | AtomNode<any>): TextNode | AtomNode<any> | undefined {
-        // Otherwise, find the next text node after this one.
-        const text = this.getTextAndAtomNodes();
-        const index = text.indexOf(node);
-        return index === undefined ? undefined :
-            index > 0 ? text[index - 1] :
-            undefined;
+        return this.getAdjascentTextOrAtom(node, false);
+    }
+
+    getAdjascentCaret(caret: Caret, next: boolean): Caret | undefined {
+        if(!(caret.node instanceof TextNode) && !(caret.node instanceof AtomNode)) return;
+        // Is there an adjascent caret in the current text node? If so, return it.
+        if(caret.node instanceof TextNode) {
+            const adjascentText = next ? caret.node.getNextCaret(caret.index) : caret.node.getPreviousCaret(caret.index);
+            if(adjascentText !== undefined) return adjascentText;
+        }
+        // If there's not, is there an adjascent caret in the sequence of text and atom nodes?
+        const adjascentNode = this.getAdjascentTextOrAtom(caret.node, next);
+        if(adjascentNode !== undefined)
+            return { node: adjascentNode, index: !next && adjascentNode instanceof TextNode ? adjascentNode.getLength() - 1 : 0 }
+        // Otherwise, there is no adjascent caret.
+        return undefined;
     }
 
     caretToTextIndex(caret: Caret): number {
@@ -101,7 +116,6 @@ export class FormatNode extends Node {
                 break;
             }
         }
-
         return index;
 
     }
@@ -140,7 +154,7 @@ export class FormatNode extends Node {
         return new FormatNode(this.#format, [ ...this.#segments, segment ]);
     }
 
-    withSegmentReplaced(segment: FormatNodeSegmentType, replacement: FormatNodeSegmentType): FormatNode | undefined {
+    withSegmentReplaced(segment: FormatNodeSegmentType, replacement: FormatNodeSegmentType): this | undefined {
 
         const index = this.#segments.indexOf(segment);
         if(index < 0) return undefined;
@@ -148,17 +162,17 @@ export class FormatNode extends Node {
         const segments = this.#segments.slice();
         segments[index] = replacement;
 
-        return new FormatNode(this.#format, segments);
+        return new FormatNode(this.#format, segments) as this;
 
     }
 
-    withoutSegment(segment: FormatNodeSegmentType): FormatNode | undefined {
+    withoutSegment(segment: FormatNodeSegmentType): this | undefined {
 
         const index = this.#segments.indexOf(segment);
         if(index < 0) return undefined;
         const newSegments = this.#segments.slice();
         newSegments.splice(index, 1);
-        return new FormatNode(this.#format, newSegments);
+        return new FormatNode(this.#format, newSegments) as this;
 
     }
 
@@ -489,6 +503,20 @@ export class FormatNode extends Node {
 
     withSegmentsAppended(format: FormatNode): FormatNode {
         return new FormatNode(this.#format, [ ... this.#segments, ... format.getSegments() ]);
+    }
+
+    withoutCharacter(caret: Caret, next: boolean): Edit | undefined {
+        // Confirm that this caret is in this format.
+        if(!this.contains(caret.node)) return;
+        // Is there an adjascent caret? Return nothing if not.
+        const adjascentCaret = this.getAdjascentCaret(caret, next);
+        if(adjascentCaret === undefined) return;
+        // If there is one, try removing everything between this and the adjascent caret.
+        const textIndex = this.caretToTextIndex(adjascentCaret);
+        const newFormat = this.withoutRange({ start: caret, end: adjascentCaret });
+        const newCaret = newFormat?.textIndexToCaret(textIndex);
+        if(newFormat === undefined || newCaret === undefined) return;
+        return { root: newFormat, range: { start: newCaret, end: newCaret } };
     }
 
 }

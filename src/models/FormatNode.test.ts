@@ -33,3 +33,24 @@ test("Split", () => {
     const format = new FormatNode("", [ text ]);
     expect(format.split(caret)?.map(t => t.toBookdown()).join("THEN")).toBe("This is my paragraph.THEN It is two sentences.");
 })
+
+test("Backspace/delete", () => {
+
+    const first = new TextNode("Hello, my name is ");
+    const second = new TextNode("Amy");
+    const third = new TextNode(".");
+    const format = new FormatNode("", [ first, new FormatNode("*", [ second ]), third ]);
+
+    expect(format.withoutCharacter({ node: first, index: 5}, false)?.root.toBookdown())
+        .toBe("Hell, my name is *Amy*.")
+    expect(format.withoutCharacter({ node: first, index: 5}, true)?.root.toBookdown())
+        .toBe("Hello my name is *Amy*.")
+    expect(format.withoutCharacter({ node: second, index: 0}, false)?.root.toBookdown())
+        .toBe("Hello, my name is*Amy*.")
+    expect(format.withoutCharacter({ node: second, index: 0}, true)?.root.toBookdown())
+        .toBe("Hello, my name is *my*.")
+    expect(format.withoutCharacter({ node: first, index: 0}, false)?.root.toBookdown())
+        .toBeUndefined()
+    expect(format.withoutCharacter({ node: third, index: 1}, true)?.root.toBookdown())
+        .toBeUndefined()
+})

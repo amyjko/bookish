@@ -25,8 +25,6 @@ export abstract class BlocksNode extends BlockNode {
         return index < 0 ? undefined : index;
     }
 
-    contains(block: BlockNode) { return this.getIndexOf(block) !== undefined; }
-
     getBlockBefore(anchor: BlockNode): BlockNode | undefined {
         const index = this.blocks.indexOf(anchor);
         if(index <= 0)
@@ -588,9 +586,65 @@ export abstract class BlocksNode extends BlockNode {
 
     // This accounts for adjascent lists that end up with the same style.
     withListAsStyle(list: ListNode, numbered: boolean): BlocksNode | undefined {
-
         return this.withNodeReplaced(list, list.withStyle(numbered))?.withAdjacentListsMerged();
-    
+    }
+
+    // Removes the character before or after the current caret
+    withoutAdjacentContent(caret: Caret, next: boolean): Edit | undefined {
+
+        // Confirm that this caret is in this tree. Bail on fail.
+        if(!this.contains(caret.node)) return;
+
+        // Find the parents of the node.
+        const parents = this.getParentsOf(caret.node);
+        while(parents && parents.length > 0) {
+            const parent = parents.pop();
+            // Ask the format node it's in to edit it, and return if successful.
+            if(parent instanceof FormatNode) {
+                const editedFormat = parent.withoutCharacter(caret, next);
+                // If it failed, let a parent try.
+                if(editedFormat !== undefined) {
+                    const newBlocks = this.withNodeReplaced(parent, editedFormat.root);
+                    if(newBlocks === undefined) return;
+                    return { root: newBlocks, range: editedFormat.range }
+                }
+            }
+            // If it's at the beginning of the paragraph, and there's a previous paragraph, merge with the previous paragraph.
+            else if(parent instanceof ParagraphNode) {
+                const firstCaret = next ? parent.getLastCaret() : parent.getFirstCaret();
+                const adjacentBlock = next ? this.getBlockAfter(parent) : this.getBlockBefore(parent);
+                const blocks = parents[parents.length - 1] as BlocksNode;
+                // Is this the first/last caret of the paragraph and there's an adjascent block? Try deleting something.
+                if(firstCaret.node === caret.node && firstCaret.index === caret.index && adjacentBlock !== undefined) {
+                    // If the block adjacent this paragraph is a paragraph, merge the paragraph into the adjascent paragraph.
+                    if(adjacentBlock instanceof ParagraphNode) {
+                        const newBlocks = this.withNodeReplaced(blocks, blocks.withChildReplaced(adjacentBlock, next ? adjacentBlock.withParagraphPrepended(parent) : adjacentBlock.withParagraphAppended(parent))?.withoutBlock(parent));
+                        if(newBlocks === undefined) return;
+                        return { root: newBlocks, range: { start: caret, end: caret }}
+                    }
+                    // If the block adjacent is a list node, merge the paragraph to the list's first/last item.
+                    else if(adjacentBlock instanceof ListNode) {
+                        if(!next) {
+                            const format = next ? adjacentBlock.getFirstItem() : adjacentBlock.getLastItem();
+                            if(format !== undefined) {
+                                const newFormat = format.withSegmentAppended(parent.getContent());
+                                const newBlocks = blocks.withNodeReplaced(format, newFormat)?.withoutBlock(parent);
+                                const newCaret = parent.getContent().getFirstCaret();
+                                if(newBlocks === undefined) return;
+                                return { root: newBlocks, range: { start: newCaret, end: newCaret }}
+                            }
+                        }
+                    }
+                    // Otherwise, return a root without the previous block, deleting it.
+                    else {
+                        const newBlocks = this.withNodeReplaced(blocks, blocks.withoutBlock(adjacentBlock));
+                        return newBlocks === undefined ? undefined : { root: newBlocks, range: { start: caret, end: caret }}
+                    }
+                }
+            }
+        }
+        // No parent could handle it. Fail!
+
     }
 
 }

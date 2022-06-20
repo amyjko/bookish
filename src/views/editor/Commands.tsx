@@ -391,54 +391,9 @@ export const commands: Command[] = [
         visible: context => false,
         active: context => context.chapter !== undefined,
         handler: context => {
-
-            if(context.start.node instanceof TextNode && context.start.node === context.end.node && context.start.index === context.end.index) {
-                // If we're right at the beginning of a paragraph, ask it's block node to backspace over the previous block.
-                const firstCaret = context.start.node.getFormatRoot(context.chapter)?.getFirstCaret();
-                if(firstCaret && firstCaret.node === context.start.node && firstCaret.index === context.start.index) {
-                    const blocks = context.start.node.getBlocks(context.chapter);
-                    const currentParagraph = context.start.node.getParagraph(context.chapter);
-                    if(currentParagraph && blocks) {
-                        if(currentParagraph instanceof ParagraphNode) {
-                            const previousBlock = blocks.getBlockBefore(currentParagraph);
-                            // If the block before this paragraph is a paragraph, merge the paragraphs.
-                            if(previousBlock instanceof ParagraphNode) {
-                                const lastIndex = previousBlock.getContent().caretToTextIndex(previousBlock.getLastCaret());
-                                const newRoot = context.chapter.withNodeReplaced(previousBlock, previousBlock.withParagraphAppended(currentParagraph));
-                                const lastCaret = previousBlock.getContent().textIndexToCaret(lastIndex);
-                                if(newRoot && lastCaret)
-                                    return { root: newRoot, range: { start: lastCaret, end: lastCaret } }; 
-                            }
-                            // If the block before is a list node, merge the current paragraph to the last list item.
-                            else if(previousBlock instanceof ListNode) {
-                                const lastFormat = previousBlock.getLastItem();
-                                if(lastFormat) {
-                                    const newCaret = lastFormat.getLastCaret();
-                                    const newFormat = lastFormat.withSegmentAppended(currentParagraph.getContent());
-                                    const newRootWithFormat = context.chapter.withNodeReplaced(newFormat, lastFormat);
-                                    if(newRootWithFormat === undefined) return;
-                                    const newRootWithoutParagraph = newRootWithFormat.withNodeReplaced(blocks, blocks.withoutBlock(currentParagraph));
-                                    if(newRootWithoutParagraph === undefined) return;
-                                    return { root: newRootWithoutParagraph, range: { start: newCaret, end: newCaret } };
-                                }
-                            }
-                            // Otherwise, return a root without the previous block, deleting it.
-                            else if(previousBlock) {
-                                return chapterWithNode(context, blocks, blocks.withoutBlock(previousBlock));
-                            }
-                        }
-                    }
-                    // Do nothing if there's no blocks node.
-                    return;
-                }
-                // Otherwise, if the current caret isn't a selection, expand the range to select the previous caret position to delete it.
-                if(context.end.node instanceof TextNode || context.end.node instanceof AtomNode)
-                    context.end = context.end.node.previous(context.chapter, context.end.index);
-
-            }
-            // Delete the range.
-            else if(context.chapter instanceof ChapterNode)
-                context.chapter.withoutRange({ start: context.start, end: context.end });
+            const edit = context.blocks?.withoutAdjacentContent(context.start, false);
+            if(edit === undefined) return;
+            return chapterWithNode(context, context.blocks, edit.root, () => edit.range.start)
         }
     },
     {
@@ -448,56 +403,9 @@ export const commands: Command[] = [
         visible: context => false,
         active: context => context.chapter !== undefined,
         handler: context => {
-            if(context.start.node instanceof TextNode && context.start.node === context.end.node && context.start.index === context.end.index) {
-                // If we're right at the end of a paragraph, ask it's block node to backspace over the previous block.
-                const lastCaret = context.start.node.getFormatRoot(context.chapter)?.getLastCaret();
-                if(lastCaret && lastCaret.node === context.start.node && lastCaret.index === context.start.index) {
-                    const blocks = context.start.node.getBlocks(context.chapter);
-                    const currentParagraph = context.start.node.getParagraph(context.chapter);
-                    if(currentParagraph && blocks) {
-                        if(currentParagraph instanceof ParagraphNode) {
-                            const nextBlock = blocks.getBlockAfter(currentParagraph);
-                            // If the block after this paragraph is a paragraph, merge the paragraphs.
-                            if(nextBlock instanceof ParagraphNode) {
-                                const firstIndex = currentParagraph.getContent().caretToTextIndex(currentParagraph.getLastCaret());
-                                const newRoot = context.chapter.withNodeReplaced(currentParagraph, currentParagraph.withParagraphAppended(nextBlock));
-                                const firstCaret = currentParagraph.getContent().textIndexToCaret(firstIndex);
-                                if(newRoot && firstCaret)
-                                    return { root: newRoot, range: { start: firstCaret, end: firstCaret } }; 
-                            }
-                            // If the block before is a list node, merge the current paragraph to the last list item.
-                            else if(nextBlock instanceof ListNode) {
-                                const firstFormat = nextBlock.getFirstItem();
-                                if(firstFormat) {
-                                    const newCaret = currentParagraph.getLastCaret();
-                                    const newParagraph = new ParagraphNode(currentParagraph.getLevel(), currentParagraph.getContent().withSegmentAppended(firstFormat));
-                                    const newRootWithMerge = context.chapter.withNodeReplaced(currentParagraph, newParagraph);
-                                    const firstFormatParent = newRootWithMerge?.getParentOf(firstFormat);
-                                    if(firstFormatParent === undefined || !(firstFormatParent instanceof ListNode)) return;
-                                    const index = firstFormatParent.getIndexOf(firstFormat);
-                                    if(index === undefined) return;
-                                    const listWithoutFormat = firstFormatParent.withoutItemAt(index);
-                                    if(listWithoutFormat === undefined) return;
-                                    const newRoot = context.chapter.withNodeReplaced(firstFormatParent, listWithoutFormat);
-                                    if(newRoot === undefined) return;
-                                    return { root: newRoot, range: { start: newCaret, end: newCaret } };
-                                }
-                            }
-                            else if(nextBlock) {
-                                return chapterWithNode(context, blocks, blocks.withoutBlock(nextBlock));
-                            }
-                        }
-                    }
-                    // Do nothing if there's no blocks node.
-                    return;
-                }
-                // Otherwise, if the current caret isn't a selection, expand the range to select the previous caret position to delete it.
-                if(context.end.node instanceof TextNode || context.end.node instanceof AtomNode)
-                    context.end = context.end.node.next(context.chapter, context.end.index);
-            }
-            // Delete the range
-            else if(context.chapter instanceof ChapterNode)
-                return context.chapter.withoutRange({ start: context.start, end: context.end });
+            const edit = context.blocks?.withoutAdjacentContent(context.start, true);
+            if(edit === undefined) return;
+            return chapterWithNode(context, context.blocks, edit.root, () => edit.range.start)
         }
     },
     {

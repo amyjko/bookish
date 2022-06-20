@@ -86,6 +86,14 @@ export class TextNode extends Node {
         return this.getClosestParentOfType<BlocksNode>(root, BlocksNode);
     }
 
+    getNextCaret(index: number): Caret | undefined {
+        return index < this.#text.length ? { node: this, index: index + 1 } : undefined
+    }
+
+    getPreviousCaret(index: number): Caret | undefined {
+        return index > 0 ? { node: this, index: index - 1 } : undefined
+    }
+
     next(root: RootNode, index: number): Caret {
     
         // Otherwise, find the next text node after this one.

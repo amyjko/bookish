@@ -4,6 +4,7 @@ import { FootnoteNode } from "./FootnoteNode";
 import { FormatNode } from "./FormatNode";
 import { ListNode } from "./ListNode";
 import { ParagraphNode } from "./ParagraphNode";
+import { QuoteNode } from "./QuoteNode";
 import { RuleNode } from "./RuleNode";
 import { TextNode } from "./TextNode";
 
@@ -212,5 +213,46 @@ test("Style lists", () => {
 
     expect(new ChapterNode([ numberedList ]).withListAsStyle(numberedList, false)?.toBookdown())
         .toBe(`* ${firstText}\n* ${lastText}`)
+
+})
+
+test("Backspace/delete", () => {
+
+    const chapter = new ChapterNode([ firstParagraph, lastParagraph ]);
+
+    expect(chapter.withoutAdjacentContent({ node: lastTextNode, index: 1}, true)?.root.toBookdown())
+        .toBe(`${firstText}\n\nLst paragraph.`)
+    expect(chapter.withoutAdjacentContent({ node: lastTextNode, index: 1}, false)?.root.toBookdown())
+        .toBe(`${firstText}\n\nast paragraph.`)
+    expect(chapter.withoutAdjacentContent({ node: lastTextNode, index: 0}, false)?.root.toBookdown())
+        .toBe(`${firstText}${lastText}`)
+    expect(chapter.withoutAdjacentContent({ node: firstTextNode, index: firstTextNode.getLength()}, true)?.root.toBookdown())
+        .toBe(`${firstText}${lastText}`)
+    expect(chapter.withoutAdjacentContent({ node: firstTextNode, index: 0}, false)?.root.toBookdown())
+        .toBeUndefined()
+
+    const beforeText = new TextNode("Before");
+    const beforeParagraph = new ParagraphNode(0, new FormatNode("", [ beforeText ]));
+    const afterText = new TextNode("After");
+    const afterParagraph = new ParagraphNode(0, new FormatNode("", [ afterText ]));
+    const listChapter = new ChapterNode([ beforeParagraph, numberedList, afterParagraph ]);
+
+    // Do nothing when backspacing at the beginning of a list.
+    expect(listChapter.withoutAdjacentContent({ node: firstTextNode, index: 0 }, false)?.root.toBookdown())
+        .toBeUndefined()
+    // Delete a character in a list
+    expect(listChapter.withoutAdjacentContent({ node: firstTextNode, index: 0 }, true)?.root.toBookdown())
+        .toBe(`Before\n\n1. irst paragraph.\n2. ${lastText}\n\nAfter`)
+    // Can't forward delete into a list
+    expect(listChapter.withoutAdjacentContent({ node: beforeText, index: beforeText.getLength() }, true)?.root.toBookdown())
+        .toBeUndefined()
+    // Backspace a paragraph into the last list item
+    expect(listChapter.withoutAdjacentContent({ node: afterText, index: 0 }, false)?.root.toBookdown())
+        .toBe(`Before\n\n1. ${firstText}\n2. ${lastText}After`)
+
+    // Backspace over a block
+    const quoteChapter = new ChapterNode([ new QuoteNode([]), firstParagraph ]);
+    expect(quoteChapter.withoutAdjacentContent({ node: firstTextNode, index: 0}, false)?.root.toBookdown())
+        .toBe(`${firstText}`)
 
 })

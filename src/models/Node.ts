@@ -33,15 +33,16 @@ export abstract class Node {
 
     getID() { return nodeID; }
 
-    traverse(fn: (node: Node) => void) : void {
-        this.traverseChildren(fn);
-        fn.call(undefined, this);
+    traverse(fn: (node: Node, parents: Node[]) => void, parents?: Node[]) : void {
+        const path = parents === undefined ? [ this ] : [ ...parents, this ]
+        this.traverseChildren(fn, path);
+        fn.call(undefined, this, path);
     }
 
     // Traverses each of the children of this node.
-    traverseChildren(fn: (node: Node) => void) : void {
+    traverseChildren(fn: (node: Node, parents: Node[]) => void, parents: Node[]) : void {
         const children = this.getChildren();
-        children.forEach(child => child.traverse(fn));
+        children.forEach(child => child.traverse(fn, parents));
     }
 
     // Depth first sequence of all nodes in this tree.
@@ -62,6 +63,15 @@ export abstract class Node {
         let found = false;
         this.traverse(n => { if(n === node) found = true; });
         return found;
+    }
+
+    getParentsOf(node: Node): Node[] | undefined {
+        let parents = undefined;
+        this.traverse((n, p) => { if(n === node) parents = p; });
+        if(parents === undefined) return;
+        const withoutNode = [ ... parents ];
+        withoutNode.pop();
+        return withoutNode;
     }
 
     getParent(root: Node): Node | undefined { return root.getParentOf(this); }

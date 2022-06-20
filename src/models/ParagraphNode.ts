@@ -49,7 +49,14 @@ export class ParagraphNode extends BlockNode {
     withParagraphAppended(paragraph : ParagraphNode): ParagraphNode {
         return new ParagraphNode(
             this.#level, 
-            new FormatNode("", [ ... this.#content.getSegments(), ... paragraph.#content.getSegments() ])
+            new FormatNode("", [ ...this.#content.getSegments(), ...paragraph.#content.getSegments() ])
+        );
+    }
+
+    withParagraphPrepended(paragraph : ParagraphNode): ParagraphNode {
+        return new ParagraphNode(
+            this.#level, 
+            new FormatNode("", [ ...paragraph.#content.getSegments(), ...this.#content.getSegments(),  ])
         );
     }
 
