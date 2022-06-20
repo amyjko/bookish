@@ -61,11 +61,11 @@ export class TextNode extends Node {
     isEmpty() { return this.getLength() === 0; }
 
     getParagraph(root: Node): ParagraphNode | undefined {
-        return this.closestParent<ParagraphNode>(root, ParagraphNode);
+        return this.getClosestParentOfType<ParagraphNode>(root, ParagraphNode);
     }
 
     getFormat(root: Node): FormatNode | undefined {
-        return this.closestParent<FormatNode>(root, FormatNode);
+        return this.getClosestParentOfType<FormatNode>(root, FormatNode);
     }
 
     getFormatRoot(root: Node): FormatNode | undefined {
@@ -83,7 +83,7 @@ export class TextNode extends Node {
     }
 
     getBlocks(root: Node): BlocksNode | undefined {
-        return this.closestParent<BlocksNode>(root, BlocksNode);
+        return this.getClosestParentOfType<BlocksNode>(root, BlocksNode);
     }
 
     next(root: RootNode, index: number): Caret {

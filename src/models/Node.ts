@@ -3,92 +3,66 @@ let nodeID = 1;
 
 export abstract class Node {
 
+    // A globally unique identifier, helpful for mapping things back to nodes.
     readonly nodeID: number;
 
     constructor() {
         this.nodeID = nodeID++;
     }
 
+    // Returns space-separated text in the string, helpful for searching.
     abstract toText(): string;
+    
+    // Returns a syntactically valid Bookdown string representing the node.
     abstract toBookdown(debug?: number): string;
+    
+    // Returns a string represent the type of node this is.
     abstract getType(): string;
+    
+    // Returns an exact copy of this now.
     abstract copy(): this;
-
+    
     // Returns a new node with the given child node replaced, or undefined if it didn't contain such a child.
     abstract withChildReplaced(node: Node, replacement: Node | undefined): this | undefined;
-
-    rootWithChildReplaced(root: Node, node: Node, replacement: Node | undefined): Node | undefined {        
-        // Create a new version of this node with the replacement.
-        const newNode = this.withChildReplaced(node, replacement);
-        // See if there's a parent.
-        const parent = root.getParentOf(this);
-        // If not, return the new node.
-        if(parent === undefined) return newNode;
-        // If there is a parent, return a modfied version of the parent with the new node.
-        return parent.rootWithChildReplaced(root, this, newNode === undefined ? this : newNode);
-    }
-
-    // In the given root, replaces this with the given node in the given root.
-    replace(root: Node, replacement: this | undefined): Node | undefined {
-
-        const parent = root.getParentOf(this);
-        if(parent === undefined) return replacement;
-        return parent.rootWithChildReplaced(root, this, replacement);
-
-    }
-
-    // Traverse this node's children, trying to replace the given node with the replacement node.
-    withDescendantReplaced(node: Node, replacement: Node): this | undefined {
-
-        // Find all the children
-        const children = this.getChildren();
-        // Search each one for a match.
-        for(let i = 0; i < children.length; i++) {
-            const child = children[i];
-            // If we found the child, return a new version of this node with the child replaced.
-            if(child === node)
-                return this.withChildReplaced(node, replacement);
-            
-            // Does this child have it? If so, return a version of this node with the revised child.
-            const revisedChild = child.withDescendantReplaced(node, replacement);
-            if(revisedChild !== undefined)
-                return this.withChildReplaced(child, revisedChild);
-        }
-
-    }
     
-    getID() { return nodeID; }
-
+    // Returns an ordered list of the child nodes.
     abstract getChildren(): Node[];
+
+    // Recursively returns the parent of the given node.
+    abstract getParentOf(node: Node): Node | undefined;
+
+    getID() { return nodeID; }
 
     traverse(fn: (node: Node) => void) : void {
         this.traverseChildren(fn);
         fn.call(undefined, this);
     }
 
+    // Traverses each of the children of this node.
     traverseChildren(fn: (node: Node) => void) : void {
         const children = this.getChildren();
         children.forEach(child => child.traverse(fn));
     }
 
+    // Depth first sequence of all nodes in this tree.
     getNodes(): Node[] {
         const nodes: Node[] = [];
         this.traverse(node => nodes.push(node));
         return nodes;
     }
 
+    // An index of the given node in the depth-first traversal of the nodes.
     getIndexOf(node: Node): number | undefined {
         const index = this.getNodes().indexOf(node);
         return index >= 0 ? index : undefined;
     }
 
+    // True if this tree contains the given node.
     contains(node: Node) {
         let found = false;
         this.traverse(n => { if(n === node) found = true; });
         return found;
     }
-
-    abstract getParentOf(node: Node): Node | undefined;
 
     getParent(root: Node): Node | undefined { return root.getParentOf(this); }
 
@@ -103,7 +77,7 @@ export abstract class Node {
 
     }
 
-    closestParent<T extends Node>(root: Node, type: Function): T | undefined {
+    getClosestParentOfType<T extends Node>(root: Node, type: Function): T | undefined {
 
         let parent = root.getParentOf(this);
         while(parent) {
@@ -164,4 +138,27 @@ export abstract class Node {
 
     }
 
+    // Traverse this node's children, trying to replace the given node with the replacement node (or nothing, if allowed)
+    withNodeReplaced(node: Node, replacement: Node | undefined): this | undefined {
+
+        // Is this the node we're replacing? Return the replacement.
+        if(node === this) return replacement as this;
+
+        // Find all the children
+        const children = this.getChildren();
+        // Search each one for a match.
+        for(let i = 0; i < children.length; i++) {
+            const child = children[i];
+            // If we found the child, return a new version of this node with the child replaced.
+            if(child === node)
+                return this.withChildReplaced(node, replacement);
+            
+            // Does this child have it? If so, return a version of this node with the revised child.
+            const revisedChild = child.withNodeReplaced(node, replacement);
+            if(revisedChild !== undefined)
+                return this.withChildReplaced(child, revisedChild);
+        }
+
+    }
+    
 }

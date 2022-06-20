@@ -602,7 +602,7 @@ const ChapterEditor = (props: { chapter: Chapter }) => {
 
     function editNode(previous: BookishNode, edited: BookishNode) {
         if(caretRange) {
-            const newRoot = previous.replace(ast, edited);
+            const newRoot = ast.withNodeReplaced(previous, edited);
             if(newRoot === undefined || !(newRoot instanceof ChapterNode)) return;
             saveEdit(newRoot, caretRange);
         }

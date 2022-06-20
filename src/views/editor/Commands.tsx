@@ -42,6 +42,7 @@ import Redo from "../svg/redo.svg";
 import { AtomNode } from "../../models/AtomNode";
 import { BlockNode } from "../../models/BlockNode";
 import { Edit } from "../../models/Edit";
+import { RootNode } from "../../models/RootNode";
 
 export type Command = {
     label?: string,
@@ -68,7 +69,7 @@ function insertTableRowColumn(root: ChapterNode, table: TableNode, format: Forma
         const newTable = row ? table.withNewRow(location.row + (before ? 0 : 1)): table.withNewColumn(location.column + (before ? 0 : 1));
         if(newTable === undefined) return;
 
-        const newRoot = table.replace(root, newTable);
+        const newRoot = root.withNodeReplaced(table, newTable);
         if(newRoot === undefined) return;
 
         const newFormat = table.getCell(location.row + (row && !before ? 1 : 0), location.column + (!row && !before ? 1 : 0));
@@ -87,7 +88,7 @@ function deleteTableRowColumn(root: ChapterNode, table: TableNode, format: Forma
     const newTable = row ? table.withoutRow(location.row) : table.withoutColumn(location.column);
     if(newTable === undefined) return;
 
-    const newRoot = table.replace(root, newTable);
+    const newRoot = root.withNodeReplaced(table, newTable);
     if(newRoot === undefined || !(newRoot instanceof ChapterNode)) return;
 
     const newFormat = row ?
@@ -99,25 +100,27 @@ function deleteTableRowColumn(root: ChapterNode, table: TableNode, format: Forma
 
 }
 
-function insertBlock(context: CaretState, block: BlockNode): Node | undefined {
-
-    if(context.blocks && context.paragraph) {
-        const newBlocks = context.blocks.withBlockInsertedBefore(context.paragraph, block);
-        if(newBlocks === undefined) return;
-        const newRoot = context.blocks.replace(context.chapter, newBlocks);
-        return newRoot;
-    }
-
-}
-
 function unwrapMeta(context: CaretState): Edit {
 
     if(context.format === undefined || context.meta === undefined) return;
     const newFormat = context.format.withSegmentReplaced(context.meta, context.meta.getText());
     if(newFormat === undefined) return;
-    const newRoot = context.format.replace(context.format, newFormat);
+    const newRoot = context.chapter.withNodeReplaced(context.format, newFormat);
     if(newRoot === undefined) return;
     return { root: newRoot, range: context.range };
+
+}
+
+function chapterWithNode(context: CaretState, original: Node | undefined, replacement: Node | undefined, range?: CaretRange): Edit | undefined {
+
+    // If there was no replacement, do nothing.
+    if(original === undefined || replacement === undefined) return;
+    // Make the new root.
+    const newRoot = context.chapter.withNodeReplaced(original, replacement);
+    // If it failed, do nothing.
+    if(newRoot === undefined) return;
+    // Return the edit
+    return { root: newRoot, range: range === undefined ? context.range : range }
 
 }
 
@@ -417,9 +420,7 @@ export const commands: Command[] = [
                 const edit = context.list.withItemMergedBackwards(index);
                 if(edit === undefined) return;
                 const [ newList, newCaret ] = edit;
-                const newRoot = context.list.replace(context.chapter, newList);
-                if(newRoot === undefined) return;
-                return { root: newRoot, range: { start: newCaret, end: newCaret }};
+                return chapterWithNode(context, context.list, newList, { start: newCaret, end: newCaret });
             }
         }
     },
@@ -443,7 +444,7 @@ export const commands: Command[] = [
                             // If the block before this paragraph is a paragraph, merge the paragraphs.
                             if(previousBlock instanceof ParagraphNode) {
                                 const lastIndex = previousBlock.getContent().caretToTextIndex(previousBlock.getLastCaret());
-                                const newRoot = previousBlock.replace(context.chapter, previousBlock.withParagraphAppended(currentParagraph));
+                                const newRoot = context.chapter.withNodeReplaced(previousBlock, previousBlock.withParagraphAppended(currentParagraph));
                                 const lastCaret = previousBlock.getContent().textIndexToCaret(lastIndex);
                                 if(newRoot && lastCaret)
                                     return { root: newRoot, range: { start: lastCaret, end: lastCaret } }; 
@@ -454,18 +455,16 @@ export const commands: Command[] = [
                                 if(lastFormat) {
                                     const newCaret = lastFormat.getLastCaret();
                                     const newFormat = lastFormat.withSegmentAppended(currentParagraph.getContent());
-                                    const newRootWithFormat = newFormat.replace(context.chapter, lastFormat);
+                                    const newRootWithFormat = context.chapter.withNodeReplaced(newFormat, lastFormat);
                                     if(newRootWithFormat === undefined) return;
-                                    const newRootWithoutParagraph = blocks.replace(newRootWithFormat, blocks.withoutBlock(currentParagraph));
+                                    const newRootWithoutParagraph = newRootWithFormat.withNodeReplaced(blocks, blocks.withoutBlock(currentParagraph));
                                     if(newRootWithoutParagraph === undefined) return;
                                     return { root: newRootWithoutParagraph, range: { start: newCaret, end: newCaret } };
                                 }
                             }
                             // Otherwise, return a root without the previous block, deleting it.
                             else if(previousBlock) {
-                                const newBlocks = blocks.replace(context.chapter, blocks.withoutBlock(previousBlock));
-                                if(newBlocks === undefined) return;
-                                return { root: newBlocks, range: context.range }
+                                return chapterWithNode(context, blocks, blocks.withoutBlock(previousBlock));
                             }
                         }
                     }
@@ -501,7 +500,7 @@ export const commands: Command[] = [
                             // If the block after this paragraph is a paragraph, merge the paragraphs.
                             if(nextBlock instanceof ParagraphNode) {
                                 const firstIndex = currentParagraph.getContent().caretToTextIndex(currentParagraph.getLastCaret());
-                                const newRoot = currentParagraph.replace(context.chapter, currentParagraph.withParagraphAppended(nextBlock));
+                                const newRoot = context.chapter.withNodeReplaced(currentParagraph, currentParagraph.withParagraphAppended(nextBlock));
                                 const firstCaret = currentParagraph.getContent().textIndexToCaret(firstIndex);
                                 if(newRoot && firstCaret)
                                     return { root: newRoot, range: { start: firstCaret, end: firstCaret } }; 
@@ -512,22 +511,20 @@ export const commands: Command[] = [
                                 if(firstFormat) {
                                     const newCaret = currentParagraph.getLastCaret();
                                     const newParagraph = new ParagraphNode(currentParagraph.getLevel(), currentParagraph.getContent().withSegmentAppended(firstFormat));
-                                    const newRootWithMerge = currentParagraph.replace(context.chapter, newParagraph);
+                                    const newRootWithMerge = context.chapter.withNodeReplaced(currentParagraph, newParagraph);
                                     const firstFormatParent = newRootWithMerge?.getParentOf(firstFormat);
                                     if(firstFormatParent === undefined || !(firstFormatParent instanceof ListNode)) return;
                                     const index = firstFormatParent.getIndexOf(firstFormat);
                                     if(index === undefined) return;
                                     const listWithoutFormat = firstFormatParent.withoutItem(index);
                                     if(listWithoutFormat === undefined) return;
-                                    const newRoot = firstFormatParent.replace(context.chapter, listWithoutFormat);
+                                    const newRoot = context.chapter.withNodeReplaced(firstFormatParent, listWithoutFormat);
                                     if(newRoot === undefined) return;
                                     return { root: newRoot, range: { start: newCaret, end: newCaret } };
                                 }
                             }
                             else if(nextBlock) {
-                                const newBlocks = blocks.replace(context.chapter, blocks.withoutBlock(nextBlock));
-                                if(newBlocks === undefined) return;
-                                return { root: newBlocks, range: context.range }
+                                return chapterWithNode(context, blocks, blocks.withoutBlock(nextBlock));
                             }
                         }
                     }
@@ -551,13 +548,15 @@ export const commands: Command[] = [
         active: context => context.start.node.isInside(context.chapter, CodeNode),
         handler: context => {
             if(!(context.start.node instanceof TextNode)) return;
-
             const newText = context.start.node.withCharacterAt("\n", context.start.index);
             if(newText === undefined) return;
-            const newRoot = context.start.node.replace(context.chapter, newText);
-            if(newRoot === undefined) return;
             const newCaret = { node: newText, index: context.start.index + 1 };
-            return { root: newRoot, range: { start: newCaret, end: newCaret } };
+            return chapterWithNode(
+                context, 
+                context.start.node, 
+                newText,
+                { start: newCaret, end: newCaret }
+            );
     
         }
     },
@@ -566,23 +565,19 @@ export const commands: Command[] = [
         category: "list",
         control: false, alt: false, shift: false, key: "Enter",
         visible: context => false,
-        active: context => context.start.node.closestParent<ListNode>(context.chapter, ListNode) !== undefined,
+        active: context => context.start.node.getClosestParentOfType<ListNode>(context.chapter, ListNode) !== undefined,
         handler: context => {
-            const list = context.start.node.closestParent<ListNode>(context.chapter, ListNode);
-            const format = context.start.node.closestParent<FormatNode>(context.chapter, FormatNode);
+            const list = context.start.node.getClosestParentOfType<ListNode>(context.chapter, ListNode);
+            const format = context.start.node.getClosestParentOfType<FormatNode>(context.chapter, FormatNode);
             if(format === undefined) return;
             const parts = format.split(context.start);
-            if(list === undefined || parts === undefined)
-                return;
+            if(list === undefined || parts === undefined) return;
             const [ first, second ] = parts;
             const formatIndex = list.getIndexOf(format);
             if(formatIndex === undefined) return;
             const newList = list.withItemAfter(second, format)?.withItemAfter(first, format)?.withoutItem(formatIndex);
-            if(newList === undefined) return;
-            const newRoot = list.replace(context.chapter, newList);
-            if(newRoot === undefined) return;
             const newCaret = { node: second.getTextNodes()[0], index: 0 };
-            return { root: newRoot, range: { start: newCaret, end: newCaret} };
+            return chapterWithNode(context, list, newList, { start: newCaret, end: newCaret });
         }
     },
     {
@@ -604,10 +599,7 @@ export const commands: Command[] = [
         handler: context => {
             if(context.blocks === undefined) return;
             const newBlocks = context.blocks.withListsIndented(context.range, true);
-            if(newBlocks === undefined) return;
-            const newRoot = context.blocks.replace(context.chapter, newBlocks);
-            if(newRoot === undefined) return;
-            return { root: newRoot, range: context.range }
+            return chapterWithNode(context, context.blocks, newBlocks);
         }
     },        
     {
@@ -621,10 +613,7 @@ export const commands: Command[] = [
         handler: context => {
             if(context.blocks === undefined) return;
             const newBlocks = context.blocks.withListsIndented(context.range, false);
-            if(newBlocks === undefined) return;
-            const newRoot = context.blocks.replace(context.chapter, newBlocks);
-            if(newRoot === undefined) return;
-            return { root: newRoot, range: context.range }
+            return chapterWithNode(context, context.blocks, newBlocks);
         }
     },
     {
@@ -757,10 +746,8 @@ export const commands: Command[] = [
         visible: context => context.chapter !== undefined && context.atom === undefined,
         active: context => context.paragraph !== undefined && context.paragraph.getLevel() !== 0,
         handler: context => {
-            if(context.paragraph === undefined || context.chapter === undefined) return;
-            const newRoot = context.paragraph.replace(context.chapter, context.paragraph?.withLevel(0));
-            if(newRoot)
-                return { root: newRoot, range: context.range }
+            if(context.paragraph === undefined) return;
+            return chapterWithNode(context, context.paragraph, context.paragraph.withLevel(0));
         }
     },
     {
@@ -770,12 +757,7 @@ export const commands: Command[] = [
         control: true, alt: true, shift: false, code: "Digit1",
         visible: context => context.chapter !== undefined && context.atom === undefined,
         active: context => context.paragraph !== undefined && context.paragraph.getLevel() !== 1,
-        handler: context => {
-            if(context.paragraph === undefined || context.chapter === undefined) return;
-            const newRoot = context.paragraph.replace(context.chapter, context.paragraph?.withLevel(1));
-            if(newRoot)
-                return { root: newRoot, range: context.range }
-        }
+        handler: context => chapterWithNode(context, context.paragraph, context.paragraph?.withLevel(1))
     },
     {
         label: "h2",
@@ -784,12 +766,7 @@ export const commands: Command[] = [
         control: true, alt: true, shift: false, code: "Digit2",
         visible: context => context.chapter !== undefined && context.atom === undefined,
         active: context => context.paragraph !== undefined && context.paragraph.getLevel() !== 2,
-        handler: context => {
-            if(context.paragraph === undefined || context.chapter === undefined) return;
-            const newRoot = context.paragraph.replace(context.chapter, context.paragraph?.withLevel(2));
-            if(newRoot)
-                return { root: newRoot, range: context.range }
-        }
+        handler: context => chapterWithNode(context, context.paragraph, context.paragraph?.withLevel(2))
     },
     {
         label: "h3",
@@ -798,12 +775,7 @@ export const commands: Command[] = [
         control: true, alt: true, shift: false, code: "Digit3",
         visible: context => context.chapter !== undefined && context.atom === undefined,
         active: context => context.paragraph !== undefined && context.paragraph.getLevel() !== 3,
-        handler: context => {
-            if(context.paragraph === undefined || context.chapter === undefined) return;
-            const newRoot = context.paragraph.replace(context.chapter, context.paragraph?.withLevel(3));
-            if(newRoot)
-                return { root: newRoot, range: context.range }
-        }
+        handler: context => chapterWithNode(context, context.paragraph, context.paragraph?.withLevel(3))
     },
     {
         label: "\u2014",
@@ -812,13 +784,7 @@ export const commands: Command[] = [
         control: true, alt: false, shift: true, key: "h",
         visible: context => context.blocks !== undefined && context.atParagraphStart,
         active: context => context.blocks !== undefined && context.atParagraphStart,
-        handler: context => {
-            if(context.blocks && context.paragraph) {
-                const newRoot = insertBlock(context, new RuleNode());
-                if(newRoot)
-                    return{ root: newRoot, range: context.range };
-            }
-        } 
+        handler: context => context.paragraph ? chapterWithNode(context, context.blocks, context.blocks?.withBlockInsertedBefore(context.paragraph, new RuleNode())) : undefined
     },
     {
         label: "callout",
@@ -834,9 +800,7 @@ export const commands: Command[] = [
                 const newParagraph = new ParagraphNode();
                 const newCallout = new CalloutNode([ newParagraph ]);
                 const newCaret = { node: newParagraph.getContent().getSegments()[0], index: 0 };
-                const newRoot = insertBlock(context, newCallout);
-                if(newRoot)
-                    return { root: newRoot, range: { start: newCaret, end: newCaret } };
+                return chapterWithNode(context, context.blocks, context.blocks.withBlockInsertedBefore(context.paragraph, newCallout), { start: newCaret, end: newCaret });
             }
         } 
     },
@@ -855,9 +819,7 @@ export const commands: Command[] = [
                 const newQuote = new QuoteNode([ newParagraph ]);
                 const newText = newParagraph.getContent().getSegments()[0];
                 const newCaret = { node: newText, index: 0 };
-                const newRoot = insertBlock(context, newQuote);
-                if(newRoot)
-                    return { root: newRoot, range: { start: newCaret, end: newCaret } };
+                return chapterWithNode(context, context.blocks, context.blocks.withBlockInsertedBefore(context.paragraph, newQuote), { start: newCaret, end: newCaret });
             }
         } 
     },
@@ -874,9 +836,7 @@ export const commands: Command[] = [
                 // Place the caret inside the code's code node.
                 const newCode = new CodeNode("", "plaintext", "|");
                 const newCaret = { node: newCode.getCodeNode(), index: 0 };
-                const newRoot = insertBlock(context, newCode);
-                if(newRoot)
-                    return { root: newRoot, range: { start: newCaret, end: newCaret } };
+                return chapterWithNode(context, context.blocks, context.blocks.withBlockInsertedBefore(context.paragraph, newCode), { start: newCaret, end: newCaret });
             }
         } 
     },
@@ -894,9 +854,7 @@ export const commands: Command[] = [
                 const newEmbed = new EmbedNode("", "");
                 const text = newEmbed.getCaption().getFirstTextNode();
                 const newCaret = { node: text, index: 0 };
-                const newRoot = insertBlock(context, newEmbed);
-                if(newRoot)
-                    return { root: newRoot, range: { start: newCaret, end: newCaret } };
+                return chapterWithNode(context, context.blocks, context.blocks.withBlockInsertedBefore(context.paragraph, newEmbed), { start: newCaret, end: newCaret });
             }
         } 
     },
@@ -918,9 +876,7 @@ export const commands: Command[] = [
                 }
                 const newTable = new TableNode(newRows, "|", new FormatNode("", [ new TextNode("")]));
                 const newCaret = { node: newTable.getRows()[0][0].getTextNodes()[0], index: 0 };
-                const newRoot = insertBlock(context, newTable);
-                if(newRoot)
-                    return { root: newRoot, range: { start: newCaret, end: newCaret } };
+                return chapterWithNode(context, context.blocks, context.blocks.withBlockInsertedBefore(context.paragraph, newTable), { start: newCaret, end: newCaret });
             }
         } 
     },
@@ -932,13 +888,7 @@ export const commands: Command[] = [
         control: true, alt: false, shift: true, key: "7",
         visible: context => context.list === undefined && context.atom === undefined,
         active: context => context.list === undefined && context.atom === undefined && context.blocks !== undefined,
-        handler: context => {
-            const newBlocks = context.blocks?.withParagraphsAsLists(context.range, false);
-            if(newBlocks === undefined) return;
-            const newRoot = context.blocks?.replace(context.chapter, newBlocks);
-            if(newRoot === undefined) return;
-            return { root: newRoot, range: context.range };
-        }
+        handler: context => chapterWithNode(context, context.blocks, context.blocks?.withParagraphsAsLists(context.range, false))
     },
     {
         label: "numbered",
@@ -948,13 +898,7 @@ export const commands: Command[] = [
         control: true, alt: false, shift: true, key: "8",
         visible: context => context.list === undefined && context.atom === undefined,
         active: context => context.list === undefined && context.atom === undefined && context.blocks !== undefined,
-        handler: context => {
-            const newBlocks = context.blocks?.withParagraphsAsLists(context.range, false);
-            if(newBlocks === undefined) return;
-            const newRoot = context.blocks?.replace(context.chapter, newBlocks);
-            if(newRoot === undefined) return;
-            return { root: newRoot, range: context.range };
-        }
+        handler: context => chapterWithNode(context, context.blocks, context.blocks?.withParagraphsAsLists(context.range, true))
     },
     {
         label: "bulleted",
@@ -964,14 +908,7 @@ export const commands: Command[] = [
         control: true, alt: false, shift: true, key: "7",
         visible: context => context.blocks !== undefined && context.list !== undefined && context.list.isNumbered(),
         active: context => context.list !== undefined && context.list.isNumbered(),
-        handler: context => {
-            if(!context.list || !context.blocks) return;
-            const newBlocks = context.blocks?.withListAsStyle(context.list, false);
-            if(newBlocks === undefined) return;
-            const newRoot = context.chapter.withDescendantReplaced(context.blocks, newBlocks);
-            if(newRoot === undefined) return;
-            return { root: newRoot, range: context.range };
-        }
+        handler: context => context.list ? chapterWithNode(context, context.blocks, context.blocks?.withListAsStyle(context.list, false)) : undefined
     },
     {
         label: "numbered",
@@ -981,14 +918,7 @@ export const commands: Command[] = [
         control: true, alt: false, shift: true, key: "8",
         visible: context => context.blocks !== undefined && context.list !== undefined && !context.list.isNumbered(),
         active: context => context.list !== undefined && !context.list.isNumbered(),
-        handler: context => {
-            if(!context.list || !context.blocks) return;
-            const newBlocks = context.blocks?.withListAsStyle(context.list, true);
-            if(newBlocks === undefined) return;
-            const newRoot = context.chapter.withDescendantReplaced(context.blocks, newBlocks);
-            if(newRoot === undefined) return;
-            return { root: newRoot, range: context.range };
-        }
+        handler: context => context.list ? chapterWithNode(context, context.blocks, context.blocks?.withListAsStyle(context.list, true)) : undefined
     },
     {
         label: "paragraph",
@@ -998,14 +928,7 @@ export const commands: Command[] = [
         control: true, alt: false, shift: true, key: ["7", "8"],
         visible: context => context.includesList,
         active: context => context.includesList,
-        handler: context => {
-            if(context.blocks === undefined) return;
-            const newBlocks = context.blocks.withListsAsParagraphs(context.range);
-            if(newBlocks === undefined) return;
-            const newRoot = context.blocks.replace(context.chapter, newBlocks);
-            if(newRoot === undefined) return;
-            return { root: newRoot, range: context.range }
-        }
+        handler: context => chapterWithNode(context, context.blocks, context.blocks?.withListsAsParagraphs(context.range))
     },
     {
         label: "undo",
@@ -1058,10 +981,8 @@ export const commands: Command[] = [
                 // Update the chapter with the new text node.
                 const newText = insertionPoint.node.withCharacterAt(char, insertionPoint.index);
                 if(newText === undefined) return;
-                const newRoot = insertionPoint.node.replace(context.chapter, newText);
-                if(newRoot === undefined) return;
                 const newCaret = { node: newText, index: insertionPoint.index + 1 };
-                return { root: newRoot, range: { start: newCaret, end: newCaret } };
+                return chapterWithNode(context, insertionPoint.node, newText, { start: newCaret, end: newCaret });
     
             }
         }

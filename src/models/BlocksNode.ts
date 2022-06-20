@@ -91,7 +91,7 @@ export abstract class BlocksNode extends BlockNode {
     }
 
     getBlockOfCaret(caret: Caret): BlockNode | undefined {
-        return caret.node.closestParent<BlockNode>(this, BlockNode);
+        return caret.node.getClosestParentOfType<BlockNode>(this, BlockNode);
     }
 
     getParentOf(node: Node): Node | undefined {
@@ -275,7 +275,7 @@ export abstract class BlocksNode extends BlockNode {
     
         // Find what paragraph the caret is in.
         // There are some contexts with no paragraphs. Return the start range given.
-        const paragraph = caret.node.closestParent<ParagraphNode>(blocks, ParagraphNode);        
+        const paragraph = caret.node.getClosestParentOfType<ParagraphNode>(blocks, ParagraphNode);        
         if(paragraph === undefined) return;
 
         // Split the paragraph in two.
@@ -321,8 +321,8 @@ export abstract class BlocksNode extends BlockNode {
         if(newFormat === undefined) return;
 
         // Create a new chapter with the revised format.
-        const newRoot = format.replace(this, newFormat);
-        if(newRoot === undefined || !(newRoot instanceof BlocksNode)) return;
+        const newRoot = this.withNodeReplaced(format, newFormat);
+        if(newRoot === undefined) return;
 
         // Return the edited tree!
         return { root: newRoot, range: { start: newCaret, end: newCaret } };
@@ -392,8 +392,8 @@ export abstract class BlocksNode extends BlockNode {
                 newBlock = undefined;
 
             // Replace the old block with the new block in the tree (or nothing). Bail on fail.
-            const updatedRoot = block.replace(newRoot, newBlock);
-            if(newRoot === undefined || !(newRoot instanceof BlocksNode)) return;
+            const updatedRoot = newRoot.withNodeReplaced(block, newBlock);
+            if(newRoot === undefined) return;
             newRoot = updatedRoot as BlocksNode;
 
         }
@@ -404,10 +404,10 @@ export abstract class BlocksNode extends BlockNode {
             const last = newBlocks[newBlocks.length - 1];
             if(first instanceof ParagraphNode && last instanceof ParagraphNode) {
                 // Replace the first paragraph with the second merged.
-                newRoot = first.replace(newRoot, first.withContent(first.getContent().withSegmentsAppended(last.getContent()))) as BlocksNode;
+                newRoot = newRoot.withNodeReplaced(first, first.withContent(first.getContent().withSegmentsAppended(last.getContent())));
                 if(newRoot === undefined) return;
                 // Replace the last with an empty paragraph.
-                newRoot = last.replace(newRoot, last.withContent(new FormatNode(last.getContent().getFormat(), [ new TextNode("")]))) as BlocksNode;
+                newRoot = newRoot.withNodeReplaced(last, last.withContent(new FormatNode(last.getContent().getFormat(), [ new TextNode("")])));
                 if(newRoot === undefined) return;
             }
         }
@@ -430,7 +430,7 @@ export abstract class BlocksNode extends BlockNode {
         if(!(caret.node instanceof TextNode)) return;
 
         // Get the nearest FormatNode parent of the selected text.
-        const formatted = caret.node.closestParent<FormatNode>(blocks, FormatNode);
+        const formatted = caret.node.getClosestParentOfType<FormatNode>(blocks, FormatNode);
 
         // Can't do anything if it's not in a formatted node.
         if(formatted === undefined) return;
@@ -447,7 +447,7 @@ export abstract class BlocksNode extends BlockNode {
         }
 
         // Get the nearest FormatNode parent of the revised text.
-        const newFormatted = caret.node.closestParent<FormatNode>(blocks, FormatNode);
+        const newFormatted = caret.node.getClosestParentOfType<FormatNode>(blocks, FormatNode);
         if(newFormatted === undefined) return;
 
         // Create and insert the into the formatted node.
@@ -460,13 +460,11 @@ export abstract class BlocksNode extends BlockNode {
             newNode instanceof MetadataNode ? newNode.getMeta().getFirstCaret() :
             { node: newNode, index: 0 };
 
-        const newFormattedParent = blocks.getParentOf(newFormatted);
-        if(newFormattedParent === undefined) return;
-        const newRoot = newFormattedParent.rootWithChildReplaced(blocks, newFormatted, revisedFormat);
-        if(newRoot === undefined || !(newRoot instanceof BlocksNode)) return undefined;
+        const newBlocks = blocks.withNodeReplaced(newFormatted, revisedFormat);
+        if(newBlocks === undefined) return;
 
         // Return the edited tree.
-        return { root: newRoot, range: { start: newCaret, end: newCaret } };
+        return { root: newBlocks, range: { start: newCaret, end: newCaret } };
 
     }
 
@@ -506,7 +504,7 @@ export abstract class BlocksNode extends BlockNode {
                 if(newSequenceBlocks === undefined) return;
             }
             // Replace the blocks parent with the new blocks.
-            const newRoot = blocksParent.replace(newBlocks, newSequenceBlocks);
+            const newRoot = newBlocks.withNodeReplaced(blocksParent, newSequenceBlocks);
             if(newRoot === undefined || !(newRoot instanceof BlocksNode)) return;
             newBlocks = newRoot;
         }
@@ -591,7 +589,7 @@ export abstract class BlocksNode extends BlockNode {
     // This accounts for adjascent lists that end up with the same style.
     withListAsStyle(list: ListNode, numbered: boolean): BlocksNode | undefined {
 
-        return this.withDescendantReplaced(list, list.withStyle(numbered))?.withAdjacentListsMerged();
+        return this.withNodeReplaced(list, list.withStyle(numbered))?.withAdjacentListsMerged();
     
     }
 
