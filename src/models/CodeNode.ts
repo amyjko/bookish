@@ -12,12 +12,12 @@ export class CodeNode extends BlockNode {
     readonly #language: string;
     readonly #executable: boolean;
 
-    constructor(code: string, language: string, position: Position, caption?: FormatNode) {
+    constructor(code: TextNode, language: string, position: Position, caption?: FormatNode) {
         super();
 
         const executable = language.charAt(language.length - 1) === "!";
 
-        this.#code = new TextNode(code);
+        this.#code = code;
         this.#position = position;
         this.#language = executable ? language.slice(0, -1) : language;
         this.#executable = executable;
@@ -51,7 +51,7 @@ export class CodeNode extends BlockNode {
     getChildren() { return [ this.#code, this.#caption ] }
 
     copy() {
-        return new CodeNode(this.#code.getText(), this.#language, this.#position, this.#caption.copy()) as this;
+        return new CodeNode(this.#code.copy(), this.#language, this.#position, this.#caption.copy()) as this;
     }
 
     getParentOf(node: Node): Node | undefined {
@@ -62,16 +62,16 @@ export class CodeNode extends BlockNode {
         const newCode = node === this.#code && replacement instanceof TextNode ? replacement : undefined;
         const newCaption = node === this.#caption && replacement instanceof FormatNode ? replacement : undefined;
         return newCode || newCaption ? new CodeNode(
-            newCode ? newCode.getText() : this.#code.getText(), 
+            newCode ? newCode : this.#code, 
             this.#language, 
             this.#position, 
             newCaption ? newCaption : this.#caption
         ) as this : undefined;
     }
 
-    withPosition(position: Position) { return new CodeNode(this.#code.getText(), this.#language, position, this.#caption); }
-    withLanguage(language: string) { return new CodeNode(this.#code.getText(), language, this.#position, this.#caption); }
-    withExecutable(executable: boolean) { return new CodeNode(this.#code.getText(), executable ? this.#language + "!" : this.#language, this.#position, this.#caption); }
-    withCaption(caption : FormatNode) { return new CodeNode(this.#code.getText(), this.#language, this.#position, caption); }
+    withPosition(position: Position) { return new CodeNode(this.#code, this.#language, position, this.#caption); }
+    withLanguage(language: string) { return new CodeNode(this.#code, language, this.#position, this.#caption); }
+    withExecutable(executable: boolean) { return new CodeNode(this.#code, executable ? this.#language + "!" : this.#language, this.#position, this.#caption); }
+    withCaption(caption : FormatNode) { return new CodeNode(this.#code, this.#language, this.#position, caption); }
 
 }

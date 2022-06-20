@@ -710,7 +710,7 @@ export const commands: Command[] = [
         active: context => context.blocks !== undefined && context.atParagraphStart,
         handler: context => {
             if(context.blocks && context.paragraph) {
-                const newCode = new CodeNode("", "plaintext", "|");
+                const newCode = new CodeNode(new TextNode(""), "plaintext", "|");
                 return chapterWithNode(
                     context, 
                     context.blocks, 
