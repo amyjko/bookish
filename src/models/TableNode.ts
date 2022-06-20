@@ -37,10 +37,8 @@ export class TableNode extends BlockNode {
     }
 
     toBookdown(debug?: number): string {
-        return this.#rows.map(
-            row => 
-            `,${row.map(cell => cell.toBookdown(debug)).join("|")}`
-        ).join("\n") + `\n${this.#position === "|" ? "" : this.#position}${this.#caption ? "" + this.#caption.toBookdown(debug) : ""}`;
+        return this.#rows.map(row => `,${row.map(cell => cell.toBookdown(debug)).join("|")}`).join("\n") + 
+            `\n${this.#position === "|" ? "" : this.#position}${this.#caption ? "" + this.#caption.toBookdown(debug) : ""}`;
     }
 
     getChildren() {
@@ -60,7 +58,6 @@ export class TableNode extends BlockNode {
                     return { row: r, column: c };
             }
         }
-        return undefined;
 
     }
 
@@ -96,7 +93,7 @@ export class TableNode extends BlockNode {
 
     }
 
-    withChildReplaced(node: Node, replacement: Node | undefined) {
+    withChildReplaced(node: FormatNode, replacement: FormatNode | undefined) {
 
         // If it's just the caption, make a new node with the new credit.
         if(node === this.#caption && replacement instanceof FormatNode)
@@ -123,7 +120,7 @@ export class TableNode extends BlockNode {
 
     }
 
-    withRowInserted(index: number): TableNode | undefined {
+    withNewRow(index: number): TableNode | undefined {
 
         if(index < 0 || index > this.#rows.length) return;
 
@@ -141,38 +138,35 @@ export class TableNode extends BlockNode {
 
     }
 
-    withRowDeleted(index: number): TableNode | undefined {
+    withoutRow(index: number): TableNode | undefined {
 
-        if(index < 0 || index >= this.#rows.length)
-            return;
-
+        if(index < 0 || index >= this.#rows.length) return;
         const newRows = this.#rows.slice();
         newRows.splice(index, 1);
         return new TableNode(newRows, this.#position, this.#caption);
 
     }
 
-    withColumnDeleted(index: number): TableNode | undefined {
+    withoutColumn(index: number): TableNode | undefined {
 
-        if(index < 0 || index >= this.getColumnCount())
-            return;
-
+        if(index < 0 || index >= this.getColumnCount()) return;
         const newRows = this.#rows.slice();
         for(let r = 0; r < this.#rows.length; r++)
             newRows[r].splice(index, 1);
-
         return new TableNode(newRows, this.#position, this.#caption);
 
     }
 
-    withColumnInserted(index: number): TableNode | undefined {
+    withNewColumn(index: number): TableNode | undefined {
 
         if(this.#rows.length > 0 && (index < 0 || index > this.#rows[0].length)) return;
 
         // Figure out how many rows the table has and add a column 
         const newRows = this.#rows.slice();
-        for(let r = 0; r < this.#rows.length; r++)
+        for(let r = 0; r < this.#rows.length; r++) {
+            newRows[r] = newRows[r].slice();
             newRows[r].splice(index, 0, new FormatNode("", [ new TextNode("") ]));
+        }
         return new TableNode(newRows, this.#position, this.#caption);
 
     }

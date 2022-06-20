@@ -65,7 +65,7 @@ function insertTableRowColumn(root: ChapterNode, table: TableNode, format: Forma
     const location = table.locate(format);
     if(location) {
         // Make the new table.
-        const newTable = row ? table.withRowInserted(location.row + (before ? 0 : 1)): table.withColumnInserted(location.column + (before ? 0 : 1));
+        const newTable = row ? table.withNewRow(location.row + (before ? 0 : 1)): table.withNewColumn(location.column + (before ? 0 : 1));
         if(newTable === undefined) return;
 
         const newRoot = table.replace(root, newTable);
@@ -84,7 +84,7 @@ function deleteTableRowColumn(root: ChapterNode, table: TableNode, format: Forma
     const location = table.locate(format);
     if(!location) return undefined;
 
-    const newTable = row ? table.withRowDeleted(location.row) : table.withColumnDeleted(location.column);
+    const newTable = row ? table.withoutRow(location.row) : table.withoutColumn(location.column);
     if(newTable === undefined) return;
 
     const newRoot = table.replace(root, newTable);
