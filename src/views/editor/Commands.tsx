@@ -518,18 +518,6 @@ export const commands: Command[] = [
         handler: context => context.chapter.withRangeFormatted(context.range, "_")
     },
     {
-        label: "<code>",
-        icon: Code,
-        description: "toggle code",
-        category: "text",
-        control: true, alt: false, shift: false, key: "j",
-        visible: context => true,
-        active: context => context.chapter !== undefined && context.startIsText && context.endIsText,
-        handler: context => context.meta instanceof InlineCodeNode ? 
-            chapterWithNode(context, context.format, context.format?.withSegmentReplaced(context.meta, context.meta.getText())) : 
-            context.chapter.withSegmentAtSelection(context.range, text => new InlineCodeNode(text))
-    },
-    {
         label: "sub\u2099",
         icon: Subscript,
         description: "subscript",
@@ -550,6 +538,18 @@ export const commands: Command[] = [
         handler: context => context.chapter.withRangeFormatted(context.range, "^")
     },
     {
+        label: "<code>",
+        icon: Code,
+        description: "toggle code",
+        category: "text",
+        control: true, alt: false, shift: false, key: "j",
+        visible: context => true,
+        active: context => context.chapter !== undefined && context.startIsText && context.endIsText,
+        handler: context => context.meta instanceof InlineCodeNode ? 
+            chapterWithNode(context, context.format, context.format?.withSegmentReplaced(context.meta, context.meta.getText())) : 
+            context.chapter.withSegmentAtSelection(context.range, text => new InlineCodeNode(text))
+    },
+    {
         label: "link ⚭",
         icon: Link,
         description: "link",
@@ -558,7 +558,7 @@ export const commands: Command[] = [
         visible: context => context.format !== undefined,
         active: context => context.chapter !== undefined && context.startIsText && context.endIsText,
         handler: context => context.meta instanceof LinkNode ? 
-        chapterWithNode(context, context.format, context.format?.withSegmentReplaced(context.meta, context.meta.getText())) : 
+            chapterWithNode(context, context.format, context.format?.withSegmentReplaced(context.meta, context.meta.getText())) : 
             context.chapter.withSegmentAtSelection(context.range, text => new LinkNode(text))
     },
     {

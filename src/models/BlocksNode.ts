@@ -349,13 +349,13 @@ export abstract class BlocksNode extends BlockNode {
             adjustedRange = selection;
         }
 
-        // Remember the start and end text index.
-        const startTextIndex = this.getTextIndexOfCaret(range.start);
-        const startEndIndex = this.getTextIndexOfCaret(range.end);
-
         // Sort the range if it's out of order, since the algorithm below assumes that it's ordered.
         const sortedRange = this.sortRange(adjustedRange);
 
+        // Remember the start and end text index.
+        const startTextIndex = this.getTextIndexOfCaret(sortedRange.start);
+        const startEndIndex = this.getTextIndexOfCaret(sortedRange.end);
+        
         const blocksToEdit = this.getBlocksInRange(sortedRange);
         if(blocksToEdit === undefined) return;
 
