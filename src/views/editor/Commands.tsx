@@ -111,10 +111,7 @@ export const commands: Command[] = [
         control: false, alt: true, shift: false, key: "ArrowUp",
         visible: context => context.table !== undefined,
         active: context => context.table !== undefined && context.format !== undefined,
-        handler: context => {
-            if(!context.table || !context.format) return;
-            return insertTableRowColumn(context, context.table, context.format, true, true);
-        }
+        handler: context => context.table !== undefined && context.format !== undefined ? insertTableRowColumn(context, context.table, context.format, true, true) : undefined
     },
     {
         label: "row ↓",
@@ -123,10 +120,7 @@ export const commands: Command[] = [
         control: false, alt: true, shift: false, key: "ArrowDown",
         visible: context => context.table !== undefined,
         active: context => context.table !== undefined && context.format !== undefined,
-        handler: context => {
-            if(!context.table || !context.format) return;
-            return insertTableRowColumn(context, context.table, context.format, true, false);
-        }
+        handler: context => context.table !== undefined && context.format !== undefined ? insertTableRowColumn(context, context.table, context.format, true, false) : undefined
     },
     {
         label: "col →",
@@ -135,10 +129,7 @@ export const commands: Command[] = [
         control: false, alt: true, shift: false, key: "ArrowRight",
         visible: context => context.table !== undefined,
         active: context => context.table !== undefined && context.format !== undefined,
-        handler: context => {
-            if(!context.table || !context.format) return;
-            return insertTableRowColumn(context, context.table, context.format, false, false);
-        }
+        handler: context => context.table !== undefined && context.format !== undefined ? insertTableRowColumn(context, context.table, context.format, false, false) : undefined
     },
     {
         label: "col ←",
@@ -147,10 +138,7 @@ export const commands: Command[] = [
         control: false, alt: true, shift: false, key: "ArrowLeft",
         visible: context => context.table !== undefined,
         active: context => context.table !== undefined && context.format !== undefined,
-        handler: context => {
-            if(!context.table || !context.format) return;
-            return insertTableRowColumn(context, context.table, context.format, false, true);
-        }
+        handler: context => context.table !== undefined && context.format !== undefined ? insertTableRowColumn(context, context.table, context.format, false, true) : undefined
     },
     {
         label: "\u232B row",
@@ -159,10 +147,7 @@ export const commands: Command[] = [
         control: false, alt: true, shift: false, key: "Backspace",
         visible: context => context.table !== undefined,
         active: context => context.format !== undefined && context.table !== undefined && context.table.getRowCount() > 1,
-        handler: context => {
-            if(!context.table || !context.format) return;
-            return deleteTableRowColumn(context, context.table, context.format, true);
-        }
+        handler: context => context.format !== undefined && context.table !== undefined ? deleteTableRowColumn(context, context.table, context.format, true) : undefined
     },
     {
         label: "\u232B col",
@@ -171,10 +156,7 @@ export const commands: Command[] = [
         control: false, alt: true, shift: true, key: "Backspace",
         visible: context => context.table !== undefined,
         active: context => context.format !== undefined && context.table !== undefined && context.table.getColumnCount() > 1,
-        handler: context => {
-            if(!context.table || !context.format) return;
-            return deleteTableRowColumn(context, context.table, context.format, false);
-        }
+        handler: context => context.format !== undefined && context.table !== undefined ? deleteTableRowColumn(context, context.table, context.format, false) : undefined
     },
     {
         description: "move to previous character",
@@ -563,7 +545,7 @@ export const commands: Command[] = [
         control: false, alt: false, shift: false, key: "Enter",
         visible: context => false,
         active: context => context.atom === undefined && context.blocks !== undefined,
-        handler: context => context.chapter?.withSelectionSplit(context.range)
+        handler: context => context.chapter.withSelectionSplit(context.range)
     },
     {
         label: "indent",
@@ -573,11 +555,7 @@ export const commands: Command[] = [
         control: false, alt: false, shift: false, key: "Tab",
         visible: context => context.list !== undefined,
         active: context => context.list !== undefined,
-        handler: context => {
-            if(context.blocks === undefined) return;
-            const newBlocks = context.blocks.withListsIndented(context.range, true);
-            return chapterWithNode(context, context.blocks, newBlocks);
-        }
+        handler: context => chapterWithNode(context, context.blocks, context.blocks?.withListsIndented(context.range, true))
     },        
     {
         label: "unindent",
@@ -587,11 +565,7 @@ export const commands: Command[] = [
         control: false, alt: false, shift: true, key: "Tab",
         visible: context => context.list !== undefined,
         active: context => context.list !== undefined && context.list.isInside(context.chapter, ListNode),
-        handler: context => {
-            if(context.blocks === undefined) return;
-            const newBlocks = context.blocks.withListsIndented(context.range, false);
-            return chapterWithNode(context, context.blocks, newBlocks);
-        }
+        handler: context => chapterWithNode(context, context.blocks, context.blocks?.withListsIndented(context.range, false))
     },
     {
         label: "plain",
@@ -952,7 +926,7 @@ export const commands: Command[] = [
         handler: (context, utilities, key) => {
             const range = context.range;
             const char = key;
-            if(context.chapter && range instanceof TextNode && char.length === 1) {
+            if(char.length === 1) {
 
                 // Insert at the start.
                 let insertionPoint = range.start;
@@ -962,8 +936,7 @@ export const commands: Command[] = [
                     // Try to remove the range.
                     let edit = context.chapter.withoutRange(range);
                     // If we fail, fail to insert at the selection.
-                    if(edit === undefined)
-                        return;
+                    if(edit === undefined) return;
                     insertionPoint = edit.range.start;
                 }
         
