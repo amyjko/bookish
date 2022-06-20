@@ -42,10 +42,6 @@ export abstract class AtomNode<MetadataType> extends Node {
         return this.previousWord(root);
     }
 
-    getParagraph(root: Node): ParagraphNode | undefined {
-        return this.getClosestParentMatching(root, p => p instanceof ParagraphNode) as ParagraphNode;
-    }
-
     getFormatRoot(root: Node): FormatNode | undefined {
         return this.getFarthestParentMatching(root, p => p instanceof FormatNode) as FormatNode;
     }
