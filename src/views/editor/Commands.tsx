@@ -867,18 +867,20 @@ export const commands: Command[] = [
         active: (context, key) => key !== undefined && key.length === 1,
         handler: (context, utilities, key) => {
             const range = context.range;
-            if(key.length === 1 && context.blocks !== undefined) {
+            if(key.length === 1 && context.format !== undefined) {
                 // Insert at the start.
                 let insertionPoint = range.start;
-                let newBlocks: BlocksNode | undefined = context.blocks;
+                let newNode: Node | undefined = context.format;
+                let originalNode: Node = context.format;
 
                 // If there's a selection, remove it before inserting, and insert at the caret returned.
-                if(context.isSelection) {
+                if(context.isSelection && context.blocks !== undefined) {
                     // Try to remove the range.
-                    let edit = newBlocks.withoutRange(range);
+                    let edit = context.blocks.withoutRange(range);
                     // If we fail, fail to insert at the selection.
                     if(edit === undefined || !(edit.root instanceof BlocksNode)) return;
-                    newBlocks = edit.root;
+                    newNode = edit.root;
+                    originalNode = context.blocks;
                     insertionPoint = edit.range.start;
                 }
         
@@ -890,11 +892,11 @@ export const commands: Command[] = [
                 if(newText === undefined) return;
 
                 // Replace the text.
-                newBlocks = newBlocks.withNodeReplaced(insertionPoint.node, newText);
-                if(newBlocks === undefined) return;
+                newNode = newNode.withNodeReplaced(insertionPoint.node, newText);
+                if(newNode === undefined) return;
 
                 // Update the chapter
-                return chapterWithNode(context, context.blocks, newBlocks, () => { return { node: newText, index: insertionPoint.index + 1 }});
+                return chapterWithNode(context, originalNode, newNode, () => { return { node: newText, index: insertionPoint.index + 1 }});
     
             }
         }
