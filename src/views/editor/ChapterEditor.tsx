@@ -431,6 +431,8 @@ const ChapterEditor = (props: { chapter: Chapter }) => {
             if(n === caretRange.end.node) inside = false;
         });
 
+        const parents = ast.getParentsOf(caretRange.start.node);
+
         return { 
             // We make a new range so that setCaretRange always causes a re-render
             range: { start: caretRange.start, end: caretRange.end },
@@ -438,13 +440,13 @@ const ChapterEditor = (props: { chapter: Chapter }) => {
             end: caretRange.end,
             isSelection: caretRange.start.node !== caretRange.end.node || caretRange.start.index !== caretRange.end.index,
             chapter: ast,
-            blocks: caretRange.start.node.getClosestParentMatching(ast, p => p instanceof BlocksNode) as BlocksNode,
-            paragraph: caretRange.start.node.getClosestParentMatching(ast, p => p instanceof ParagraphNode) as ParagraphNode,
-            list: caretRange.start.node.getClosestParentMatching(ast, p => p instanceof ListNode) as ListNode,
-            atom: caretRange.start.node.getClosestParentMatching(ast, p => p instanceof AtomNode) as AtomNode<FormatNode>,
-            meta: caretRange.start.node.getClosestParentMatching(ast, p => p instanceof MetadataNode) as MetadataNode<FormatNode>,
+            blocks: parents?.find(n => n instanceof BlocksNode) as BlocksNode,
+            paragraph: parents?.find(n => n instanceof ParagraphNode) as ParagraphNode,
+            list: parents?.find(n => n instanceof ListNode) as ListNode,
+            atom: parents?.find(n => n instanceof AtomNode) as AtomNode<any>,
+            meta: parents?.find(n => n instanceof MetadataNode) as MetadataNode<FormatNode>,
             includesList: includesList,
-            table: caretRange.start.node.getClosestParentMatching(ast, p => p instanceof TableNode) as TableNode,
+            table: parents?.find(n => n instanceof TableNode) as TableNode,
             format: (caretRange.end.node instanceof TextNode || caretRange.end.node instanceof AtomNode) ? caretRange.end.node.getFormatRoot(ast) : undefined,
             startIsText: caretRange.start.node instanceof TextNode,
             endIsText: caretRange.end.node instanceof TextNode,
