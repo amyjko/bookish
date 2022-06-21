@@ -166,7 +166,7 @@ export const commands: Command[] = [
         active: context => context.endIsTextOrAtom,
         handler: context => {
             if(context.end.node instanceof TextNode || context.end.node instanceof AtomNode) {
-                const newCaret = context.end.node.previous(context.chapter, context.end.index)
+                const newCaret = context.end.node.previous(context.chapter, context.end.index);
                 return { root: context.chapter, range: {start: newCaret, end: newCaret } }
             }
         }
