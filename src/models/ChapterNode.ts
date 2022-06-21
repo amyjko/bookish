@@ -36,7 +36,7 @@ export class ChapterNode extends BlocksNode {
         return new ChapterNode(blocks, this.#metadata);
     }
 
-    getNode(id: number) { return this.getNodes().filter(n => n.getID() === id); }
+    getNode(id: number) { return this.getNodes().find(n => n.getID() === id); }
 
     getErrors(): ErrorNode[] { return this.getNodes().filter(n => n instanceof ErrorNode) as ErrorNode[]; }
     getCitations(): Set<string> { 
