@@ -40,6 +40,7 @@ import Code from "../svg/code.svg";
 import Undo from "../svg/undo.svg";
 import Redo from "../svg/redo.svg";
 import { AtomNode } from "../../models/AtomNode";
+import { BlocksNode } from "../../models/BlocksNode";
 
 export type Command = {
     label?: string,
@@ -866,29 +867,34 @@ export const commands: Command[] = [
         active: (context, key) => key !== undefined && key.length === 1,
         handler: (context, utilities, key) => {
             const range = context.range;
-            const char = key;
-            if(char.length === 1) {
+            if(key.length === 1 && context.blocks !== undefined) {
                 // Insert at the start.
                 let insertionPoint = range.start;
-        
+                let newBlocks: BlocksNode | undefined = context.blocks;
+
                 // If there's a selection, remove it before inserting, and insert at the caret returned.
-                if (range.start.node !== range.end.node || range.start.index !== range.end.index) {
+                if(context.isSelection) {
                     // Try to remove the range.
-                    let edit = context.chapter.withoutRange(range);
+                    let edit = newBlocks.withoutRange(range);
                     // If we fail, fail to insert at the selection.
-                    if(edit === undefined) return;
+                    if(edit === undefined || !(edit.root instanceof BlocksNode)) return;
+                    newBlocks = edit.root;
                     insertionPoint = edit.range.start;
                 }
         
                 // Not a text node? Fail.
                 if(!(insertionPoint.node instanceof TextNode)) return;
-        
-                // Update the chapter with the new text node.
-                return chapterWithNode(
-                    context, 
-                    insertionPoint.node,
-                    insertionPoint.node.withCharacterAt(char, insertionPoint.index), 
-                    text => { return { node: text, index: insertionPoint.index + 1 }});
+
+                // Update the text node.
+                const newText = insertionPoint.node.withCharacterAt(key, insertionPoint.index);
+                if(newText === undefined) return;
+
+                // Replace the text.
+                newBlocks = newBlocks.withNodeReplaced(insertionPoint.node, newText);
+                if(newBlocks === undefined) return;
+
+                // Update the chapter
+                return chapterWithNode(context, context.blocks, newBlocks, () => { return { node: newText, index: insertionPoint.index + 1 }});
     
             }
         }
