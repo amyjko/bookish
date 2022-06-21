@@ -6,8 +6,8 @@ import { Node } from "./Node";
 const ERROR_PLACEHOLDER = "LABELNOIDERROR";
 
 export class LabelNode extends AtomNode<string> {    
-    constructor(id: string) {
-        super(id === ERROR_PLACEHOLDER ? "" : id);
+    constructor(newID: string) {
+        super(newID === ERROR_PLACEHOLDER ? "" : newID);
     }
 
     getType() { return "label"; }
@@ -28,7 +28,7 @@ export class LabelNode extends AtomNode<string> {
 
     copy() { return new LabelNode(this.getMeta()) as this; }
 
-    withMeta(id: string) { return new LabelNode(id); }
+    withMeta(newID: string) { return new LabelNode(newID); }
     withChildReplaced(node: Node, replacement: Node | undefined){ return undefined; }
     
 }

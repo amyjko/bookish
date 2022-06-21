@@ -16,10 +16,12 @@ const LinkEditor = (props: {
     const link = props.link;
     const url = link.getMeta();
 
+    function saveEdit(value: string) {
+        caret?.edit(link, link.withMeta(value));
+    }
+
     function handleChapterChange(e: ChangeEvent<HTMLSelectElement>) {
-
-        link.withMeta(e.target.value);
-
+        saveEdit(e.target.value);
     }
 
     function isValidURL(url: string) {
@@ -81,7 +83,7 @@ const LinkEditor = (props: {
             <option value="">URL</option>
             { options.map((option, index) => <option key={index} value={option.value}>{option.label}</option>) }
         </select>
-        <URLEditor url={url} valid={isValid(url)} edit={ url => { link.withMeta(url); } } />
+        <URLEditor url={url} valid={isValid(url)} edit={ url => { saveEdit(url); } } />
         {
             isValid(url) ?
                 (

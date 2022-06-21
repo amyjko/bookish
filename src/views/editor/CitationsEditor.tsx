@@ -13,8 +13,6 @@ const CitationsEditor = (props: {
     const book = context.book;
     const caret = useContext(CaretContext);
 
-    const [ editedCitations, setEditedCitations ] = useState<string[]>(citations.getMeta());
-
     if(book === undefined)
         return null;
 
@@ -22,10 +20,6 @@ const CitationsEditor = (props: {
 
         let newCitations = newValue.map(val => val.value);
         caret?.edit(citations, citations.withMeta(newCitations));
-        setEditedCitations(newCitations);
-        // Hack to force re-render on chapter.
-        if(caret && caret.range)
-            caret.setCaretRange({ start: caret.range.start, end: caret.range.end });
 
     }
 
@@ -34,12 +28,12 @@ const CitationsEditor = (props: {
             isMulti 
             className="bookish-editor-select"
             placeholder="Choose one or more citations."
-            value={ editedCitations.map(val => { return { value: val, label: val }; }) }
+            value={ citations.getMeta().map(val => { return { value: val, label: val }; }) }
             options={Object.keys(book.getReferences()).sort().map(citationID => { return {value: citationID, label: citationID }; })} 
             onChange={handleCitationsChange}
         />
         {
-            editedCitations.length === 0 ?
+            citations.getMeta().length === 0 ?
                 <span className="bookish-editor-note bookish-editor-note-error">Choose at least one citation.</span> :
                 null
         }

@@ -31,7 +31,7 @@ export abstract class Node {
     // Recursively returns the parent of the given node.
     abstract getParentOf(node: Node): Node | undefined;
 
-    getID() { return nodeID; }
+    getID() { return this.nodeID; }
 
     traverse(fn: (node: Node, parents: Node[]) => void, parents?: Node[]) : void {
         const path = parents === undefined ? [ this ] : [ ...parents, this ]

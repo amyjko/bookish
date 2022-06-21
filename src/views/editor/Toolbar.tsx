@@ -68,7 +68,6 @@ const categoryIcons: {[key:string]: Function} = {
 }
 
 const Toolbar = (props: { 
-    chapter?: ChapterNode, 
     context?: CaretState, 
     executor?: (command: Command, key: string) => void
     },
@@ -89,7 +88,7 @@ const Toolbar = (props: {
 
     const context = props.context;
     const executor = props.executor;
-    const chapter = props.chapter;
+    const chapter = props.context?.chapter;
 
     if(chapter === undefined) return <></>;
 

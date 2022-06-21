@@ -77,7 +77,6 @@ const ChapterEditor = (props: { chapter: Chapter }) => {
     const [ lastInputTime, setLastInputTime ] = useState<number>(0);
     const [ keyboardIdle, setKeyboardIdle ] = useState<boolean>(true);
     const [ editorFocused, setEditorFocused ] = useState<boolean>(true);
- 
     const [ undoStack, setUndoStack ] = useState<UndoState[]>([]);
     const [ undoPosition, setUndoPosition ] = useState<number>(-1);
 
@@ -561,16 +560,17 @@ const ChapterEditor = (props: { chapter: Chapter }) => {
             // If the command invoked produced a new range
             if(results !== undefined && results.root instanceof ChapterNode) {
                 const { root, range } = results;
+                const newRange = { start: range.start, end: range.end };
 
                 if(root === ast && command.category !== "navigation" && command.category !== "selection")
                     console.error(`Warning: immutability violation on ${command.description}`);
         
                 // Set the range to force a rerender, assuming something in the document changed.
-                setCaretRange({ start: range.start, end: range.end });
+                setCaretRange(newRange);
         
                 // Save the copy in the undo stack if this isn't a navigation or selection state.
                 if(command.category !== "navigation" && command.category !== "selection" && command.category !== "history")
-                    saveEdit(root, range, command);
+                    saveEdit(root, newRange, command);
             
             }
             // TODO If there was no result, shake or something.
@@ -605,8 +605,14 @@ const ChapterEditor = (props: { chapter: Chapter }) => {
     function editNode(previous: BookishNode, edited: BookishNode) {
         if(caretRange) {
             const newRoot = ast.withNodeReplaced(previous, edited);
-            if(newRoot === undefined || !(newRoot instanceof ChapterNode)) return;
-            saveEdit(newRoot, caretRange);
+            if(newRoot === undefined) return;
+            saveEdit(newRoot, { start: caretRange.start, end: caretRange.end });
+
+            // Update the range if the current range contains the previous node. This will generally
+            // be true any time a selected atom node is edited.
+            if(caretRange.start.node === previous)
+                setCaretRange({ start: { node: edited, index: 0 }, end: { node: edited, index: 0 }});
+
         }
     }
 
@@ -675,7 +681,7 @@ const ChapterEditor = (props: { chapter: Chapter }) => {
                 onBlur={handleUnfocus}
                 tabIndex={0} // Makes the editor focusable.
                 >
-                { context && caretCoordinate ? <Toolbar chapter={ast} context={context} executor={executeCommand}></Toolbar> : null }
+                { context && caretCoordinate ? <Toolbar context={context} executor={executeCommand}></Toolbar> : null }
                 {
                     // Draw a caret. We draw our own since this view isn't contentEditable and we can't show a caret.
                     // Customize the rendering based on the formatting applied to the text node.

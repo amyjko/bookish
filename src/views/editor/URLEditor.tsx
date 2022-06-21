@@ -7,10 +7,7 @@ const URLEditor = (props: {
 }) => {
 
     function handleURLChange(e: ChangeEvent<HTMLInputElement>) {
-
-        // Update the view
-        props.edit.call(undefined, e.target.value);
-    
+        props.edit.call(undefined, e.target.value);    
     }
 
     return <input 

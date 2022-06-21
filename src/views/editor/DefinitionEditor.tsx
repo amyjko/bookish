@@ -11,7 +11,6 @@ const DefinitionEditor = (props: {
     const context = useContext<ChapterContextType>(ChapterContext);
     const book = context.book;
     const caret = useContext(CaretContext);
-    const [ editedGlossaryID, setEditedGlossaryID ] = useState<string>(definition.getMeta());
     const selectRef = useRef<HTMLSelectElement>(null);
  
     // If there's no context, render nothing.
@@ -24,13 +23,7 @@ const DefinitionEditor = (props: {
         return null;
 
     function handleChange(e: ChangeEvent<HTMLSelectElement>) {
-
-        setEditedGlossaryID(e.target.value);
-        definition.withMeta(e.target.value);
-
-        if(caret && caret.setCaretRange)
-            caret.setCaretRange({ start: { node: definition.getText(), index: 0 }, end: { node: definition.getText(), index: 0 }});
-
+        caret?.edit(definition, definition.withMeta(e.target.value))
     }
 
     // Sort the glossary entries by phrase
@@ -40,14 +33,14 @@ const DefinitionEditor = (props: {
         <select 
             ref={selectRef} 
             tabIndex={0} 
-            value={editedGlossaryID} 
+            value={definition.getMeta()} 
             onChange={handleChange}
         >
             <option value=""></option>
             { entries.map((entry, index) => <option key={index} value={entry.glossaryID}>{entry.phrase}</option>)}
         </select>
         {
-            editedGlossaryID in glossary ?
+            definition.getMeta() in glossary ?
                 null :
                 <span className="bookish-editor-note bookish-editor-note-error">Choose a glossary entry to link to this phrase.</span>
         }
