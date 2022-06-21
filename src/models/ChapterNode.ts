@@ -29,7 +29,6 @@ export class ChapterNode extends BlocksNode {
 
     getType() { return "chapter"; }
     getFormats(): FormatNode[] { return []; }
- 
     getChapter() { return this; }
 
     create(blocks: BlockNode[]): BlocksNode {
@@ -37,7 +36,6 @@ export class ChapterNode extends BlocksNode {
     }
 
     getNode(id: number) { return this.getNodes().find(n => n.getID() === id); }
-
     getErrors(): ErrorNode[] { return this.getNodes().filter(n => n instanceof ErrorNode) as ErrorNode[]; }
     getCitations(): Set<string> { 
         const citations = new Set<string>();

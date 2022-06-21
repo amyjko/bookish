@@ -16,9 +16,9 @@
 		"build-dev": "npm run build-clean; npm run build-scripts-dev; npm run build-assets; npm run build-examples; npm run build-typecheck; npm run test",
 		"build-prod": "npm run build-clean; npm run build-assets; npm run build-scripts-prod",
 		"deploy": "npm run build-prod; firebase deploy",
-		"test": "jest",
+		"test": "jest --colors",
 		"run": "firebase emulators:start",
-		"watch": "watch 'npm run build-dev' ./src"
+		"watch": "watch --color=always 'npm run build-dev' ./src"
 	},
 	"devDependencies": {
 		"@babel/core": "^7.16.7",
