@@ -165,7 +165,9 @@ export abstract class BlocksNode extends BlockNode {
             return textIndex >= index && textIndex <= index + node.getLength();
         });
 
-        // If we found match, return a corresponding caret.
+        // If we found match, return a corresponding caret by converting this whole
+        // node to a bookdown string and then finding the index of the match in the string,
+        // then subtracting the match from the given text index in the string.
         if(match) {
             const debug = this.toBookdown(match.nodeID);
             const index = debug.indexOf("%debug%");
@@ -354,8 +356,8 @@ export abstract class BlocksNode extends BlockNode {
 
         // Remember the start and end text index.
         const startTextIndex = this.getTextIndexOfCaret(sortedRange.start);
-        const startEndIndex = this.getTextIndexOfCaret(sortedRange.end);
-        
+        const endTextIndex = this.getTextIndexOfCaret(sortedRange.end);
+
         const blocksToEdit = this.getBlocksInRange(sortedRange);
         if(blocksToEdit === undefined) return;
 
@@ -396,7 +398,7 @@ export abstract class BlocksNode extends BlockNode {
         }
 
         // If deleting, and there are two distinct non-empty paragraphs we edited, merge them.
-        if(format === undefined && newBlocks.length > 2) {
+        if(format === undefined && newBlocks.length >= 2 && newBlocks) {
             const first = newBlocks[0];
             const last = newBlocks[newBlocks.length - 1];
             if(first instanceof ParagraphNode && last instanceof ParagraphNode) {
@@ -411,7 +413,8 @@ export abstract class BlocksNode extends BlockNode {
 
         // Map the text indicies back to carets.
         const startCaret = newBlocksRoot.getTextIndexAsCaret(startTextIndex);
-        const endCaret = format === undefined ? startCaret : newBlocksRoot.getTextIndexAsCaret(startEndIndex);
+        // If we deleted, then the end caret should be the same as the start.
+        const endCaret = format === undefined ? startCaret : newBlocksRoot.getTextIndexAsCaret(endTextIndex);
 
         // Return the new root and the start and end of the range.
         return { root: newBlocksRoot, range: { start: startCaret, end: endCaret } };
