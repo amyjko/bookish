@@ -79,10 +79,10 @@ export class ParagraphNode extends BlockNode {
             return [ new ParagraphNode(), this.copy() ];
 
         // Otherwise, split the paragraph in two, with the caret at the beginning of the second.
-        const before = this.#content.withoutContentBefore(caret);
-        const after = this.#content.withoutContentAfter(caret);
-        if(before === undefined || after === undefined) return;
-        return [ new ParagraphNode(this.#level, after), new ParagraphNode(this.#level, before) ];
+        const before = this.#content.withoutContentAfter(caret);
+        const after = this.#content.withoutContentBefore(caret);
+        if(after === undefined || before === undefined) return;
+        return [ new ParagraphNode(this.#level, before), new ParagraphNode(this.#level, after) ];
         
     }
 

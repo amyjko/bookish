@@ -189,20 +189,12 @@ export class FormatNode extends Node {
         // ... this has a parent.
         // ... the given caret is in this formatted node.
         // ... the caret is on a text node.        
-        if(!(caret.node instanceof TextNode))
+        if(!(caret.node instanceof TextNode) || !this.contains(caret.node))
             return undefined;
 
-        // Map the caret node to an index
-        const nodeIndex  = this.getTextNodes().indexOf(caret.node);
-
-        // Compute the equivalent caret for each
-        // Find what index this node is in the paragraph so we can find its doppleganger in the copy.
-        const firstCaret = { node: this.getTextNodes()[nodeIndex], index: caret.index };
-        const secondCaret = { node: this.getTextNodes()[nodeIndex], index: caret.index };
-
         // Delete everything after in the first, everything before in the second.
-        const first = this.withoutRange({ start: firstCaret, end: this.getLastCaret() });
-        const second = this.withoutRange({ start: this.getFirstCaret(), end: secondCaret });
+        const first = this.withoutRange({ start: caret, end: this.getLastCaret() });
+        const second = this.withoutRange({ start: this.getFirstCaret(), end: caret });
 
         if(first !== undefined && second !== undefined)
             return [first, second];
