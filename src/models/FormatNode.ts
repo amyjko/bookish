@@ -231,9 +231,10 @@ export class FormatNode extends Node {
         // Remember if the selection is zero width.
         let zeroWidthSelection = textStart === textEnd;
 
-        // Find all of the content in the node so we can construct a new format tree with the old content.
+        // Find all of the content in the node, except for format nodes and decendants of atom nodes that have format nodes,
+        // to construct a new format tree with the old content.
         const everythingButFormats = 
-            this.getNodes().filter(n => !(n instanceof FormatNode));
+            this.getNodes().filter(n => !(n instanceof FormatNode) && n.getClosestParentOfType(this, AtomNode) === undefined);
 
         // Check if all of the selected content has the requested format so we can toggle it if so.
         let checkIndex = 0; // This tracks the current location in our scan.

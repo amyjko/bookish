@@ -18,7 +18,7 @@ export class FootnoteNode extends AtomNode<FormatNode> {
     copy() { return new FootnoteNode(this.getMeta().copy()) as this; }
 
     getParentOf(node: Node): Node | undefined {
-        return this.getMeta().getParentOf(node);
+        return node === this.getMeta() ? this : this.getMeta().getParentOf(node);
     }
 
     withChildReplaced(node: FormatNode, replacement: FormatNode | undefined) {

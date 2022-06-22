@@ -29,7 +29,7 @@ export class CommentNode extends AtomNode<FormatNode> {
     }
 
     getParentOf(node: Node): Node | undefined {
-        return this.getMeta().getParentOf(node);
+        return node === this.getMeta() ? this : this.getMeta().getParentOf(node);
     }
 
     withMeta(comment: FormatNode) { return new CommentNode(comment); }
