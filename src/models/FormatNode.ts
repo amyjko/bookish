@@ -311,8 +311,8 @@ export class FormatNode extends Node {
         function finishFormat() {
             const formatSpec = newFormats[0];
             newFormats.shift();
-            // Keep it clean by only adding the format node if it's not empty.
-            if(formatSpec.segments.length > 0)
+            // Keep the new format clean by only adding the format node if it's not empty, or if it's a zero width selection.
+            if(formatSpec.segments.length > 0 || (zeroWidthSelection && textIndex === selectionStartIndex))
                 newFormats[0].segments.push(new FormatNode(formatSpec.format, formatSpec.segments));
         }
 

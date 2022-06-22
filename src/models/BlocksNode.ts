@@ -152,16 +152,21 @@ export abstract class BlocksNode extends BlockNode {
         const nodes = this.getTextOrAtomNodes();
 
         // Find the first node that contains the given text index.
-        const match = nodes.find(node => {
+        const matches = nodes.filter(node => {
             const index = this.getTextAndAtomsAsTaggedText(node.nodeID).indexOf("%debug%");
             return textIndex >= index && textIndex <= index + node.getLength();
         });
 
-        // If we found match, return a corresponding caret by converting this whole
-        // node to a bookdown string and then finding the index of the match in the string,
-        // then subtracting the match from the given text index in the string.
-        if(match)
+        if(matches.length > 0) {
+            // If we found multiple matches, prefer the empty node.
+            const empty = matches.find(m => m instanceof TextNode && m.isEmpty());
+            const match = empty !== undefined ? empty : matches[0];
+
+            // If we found match, return a corresponding caret by converting this whole
+            // node to a bookdown string and then finding the index of the match in the string,
+            // then subtracting the match from the given text index in the string.
             return { node: match, index: textIndex - nodes.map(node => node.toBookdown(match.nodeID)).join("").indexOf("%debug%") };
+        }
 
     }
 
