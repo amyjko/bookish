@@ -225,11 +225,11 @@ export class FormatNode extends Node {
             return;
 
         // Remember the text positions so we can return a new range in the new tree.
-        const textStart = this.caretToTextIndex(range.start);
-        const textEnd = this.caretToTextIndex(range.end);
+        const selectionStartIndex = this.caretToTextIndex(range.start);
+        const selectionEndIndex = this.caretToTextIndex(range.end);
 
         // Remember if the selection is zero width.
-        let zeroWidthSelection = textStart === textEnd;
+        let zeroWidthSelection = selectionStartIndex === selectionEndIndex;
 
         // Find all of the content in the node, except for format nodes and decendants of atom nodes that have format nodes,
         // to construct a new format tree with the old content.
@@ -239,7 +239,7 @@ export class FormatNode extends Node {
         // Check if all of the selected content has the requested format so we can toggle it if so.
         let checkIndex = 0; // This tracks the current location in our scan.
         let editingEmptyNode = false; // This remembers the special case of the caret being inside an empty text node.
-        let alreadyApplied = false; // We assume it's not applied until proven otherwise.
+        let alreadyApplied: boolean | undefined = undefined; // We assume it's not applied until proven otherwise.
         
         // It's already applied if we're deleting (in which case this doesn't apply).
         if(format === undefined)
@@ -255,7 +255,7 @@ export class FormatNode extends Node {
                     if(editingEmptyNode) {}
                     // If this node is empty but contains a zero-width selection, remember it, since this is the only node for which formats are relevant.
                     else if(node.getText().length === 0) {
-                        if(checkIndex === textStart && zeroWidthSelection) {
+                        if(checkIndex === selectionStartIndex && zeroWidthSelection) {
                             editingEmptyNode = true;
                             alreadyApplied = parent.getFormats(this).includes(format);
                         }
@@ -264,20 +264,23 @@ export class FormatNode extends Node {
                     // and this node's parent contains the formatting.
                     else {
                         const parentIsFormatted = parent.getFormats(this).includes(format);
-                        const selectionContainsNode = (textStart >= checkIndex && textStart <= checkIndex + node.getLength()) || (textEnd >= checkIndex && textEnd <= checkIndex + node.getLength());
-                        const nodeContainsSelection = textStart >= checkIndex && textEnd <= checkIndex + node.getLength();
+                        const selectionContainsNode = selectionStartIndex <= checkIndex && checkIndex + node.getLength() <= selectionEndIndex;
+                        const nodeContainsSelection = selectionStartIndex >= checkIndex && selectionEndIndex <= checkIndex + node.getLength();
                         checkIndex += node.getLength();
                         if(!editingEmptyNode) {
                             if(nodeContainsSelection)
                                 alreadyApplied = parentIsFormatted;
                             else if(selectionContainsNode)
-                                alreadyApplied = alreadyApplied && parentIsFormatted;
+                                alreadyApplied = alreadyApplied === undefined ? parentIsFormatted : alreadyApplied && parentIsFormatted;
                         }
                     }
                 }
                 // Treat all non-text as containing the requested format.
                 else return true;
             });
+
+        if(alreadyApplied === undefined)
+            alreadyApplied = false;
 
         // Reformat everything. The strategy is to step through each character, atom node, and metadata node in this format node
         // and create a new series of formats that preserve existing formatting while applying new formatting to the selection.
@@ -296,7 +299,7 @@ export class FormatNode extends Node {
         }
 
         function inRange() {
-            return textIndex >= Math.min(textStart, textEnd) && textIndex < Math.max(textStart, textEnd);
+            return textIndex >= Math.min(selectionStartIndex, selectionEndIndex) && textIndex < Math.max(selectionStartIndex, selectionEndIndex);
         }
 
         function getFormats() {
@@ -318,7 +321,7 @@ export class FormatNode extends Node {
                 if(parent instanceof FormatNode) {
                     // Remember we found an empty node so that we don't insert an extra one later.
                     if(node.getText().length === 0) {
-                        if(textIndex === textStart && zeroWidthSelection) {
+                        if(textIndex === selectionStartIndex && zeroWidthSelection) {
                             formattingEmptyNode = true;
                         }
                     }
@@ -332,7 +335,7 @@ export class FormatNode extends Node {
                             let formatter = node.getFormat(this);
                             let desiredFormats = formatter ? formatter.getFormats(this) : [];
                             if( format !== undefined && 
-                                ((textIndex === textStart && zeroWidthSelection) || inRange())) {
+                                ((textIndex === selectionStartIndex && zeroWidthSelection) || inRange())) {
                                 // Remove all formatting if we were asked to.
                                 if(format === "")
                                     desiredFormats = [];
@@ -361,7 +364,7 @@ export class FormatNode extends Node {
 
                                     // If we have unformatted something at a zero-width range, create empty format node, add a text node in it and remember it so
                                     // we can place the caret in it.
-                                    if(!formattingEmptyNode && textIndex === textStart && zeroWidthSelection) {
+                                    if(!formattingEmptyNode && textIndex === selectionStartIndex && zeroWidthSelection) {
                                         // Remember the node for later, so we can place the caret in it.
                                         emptyNode = new TextNode("");
                                         // Append the empty node to the current format.
@@ -387,7 +390,7 @@ export class FormatNode extends Node {
 
                                     // If we inserted an empty format node, add a text node in it and remember it so
                                     // we can place the caret in it.
-                                    if(!formattingEmptyNode && textIndex === textStart && zeroWidthSelection) {
+                                    if(!formattingEmptyNode && textIndex === selectionStartIndex && zeroWidthSelection) {
                                         emptyNode = new TextNode("");
                                         newFormats[0].segments.push(emptyNode);
                                         finishFormat();
@@ -433,7 +436,7 @@ export class FormatNode extends Node {
 
                 // Add the atom immediately after, unless it's in the deletion range.
                 // We include the start indexx  since AtomNode's text index is on the left.
-                if(format !== undefined || (textIndex <= Math.min(textStart, textEnd) || textIndex > Math.max(textStart, textEnd)))
+                if(format !== undefined || (textIndex <= Math.min(selectionStartIndex, selectionEndIndex) || textIndex > Math.max(selectionStartIndex, selectionEndIndex)))
                     newFormats[0].segments.push(node);
 
                 // Increment the text index; atoms count for one character.
