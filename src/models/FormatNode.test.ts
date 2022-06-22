@@ -7,6 +7,12 @@ test("Bold first two characters", () => {
     expect(format.withFormat({ start: { node: text, index: 0 }, end: { node: text, index: 2 }}, "*")?.toBookdown()).toBe("*He*llo");
 })
 
+test("Unbold word", () => {
+    const text = new TextNode("Hello");
+    const format = new FormatNode("", [ new FormatNode("*", [ text ] ) ]);
+    expect(format.withFormat({ start: { node: text, index: 0 }, end: { node: text, index: 5 }}, "")?.toBookdown()).toBe("Hello");
+})
+
 test("Bold single caret position", () => {
     const text = new TextNode("Hello");
     const format = new FormatNode("", [ text ]);

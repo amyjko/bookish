@@ -239,14 +239,16 @@ export class FormatNode extends Node {
         // Check if all of the selected content has the requested format so we can toggle it if so.
         let checkIndex = 0; // This tracks the current location in our scan.
         let editingEmptyNode = false; // This remembers the special case of the caret being inside an empty text node.
-        let alreadyApplied: boolean | undefined = undefined; // We assume it's not applied until proven otherwise.
+        let alreadyApplied = false; // We assume it's not applied until proven otherwise.
+        let nodeCount = 0;
+        let nodesWithFormat = 0;
         
         // It's already applied if we're deleting (in which case this doesn't apply).
         if(format === undefined)
             alreadyApplied = true;        
         // Otherwise, formatting is already applied if all of the non-format nodes already have this format.
         // We need to know this so we can toggle the format off.
-        else
+        else {
             everythingButFormats.forEach(node => {
                 const parent = this.getParentOf(node);
                 // If it's text, and the current position is in range of the selection, does the position contain the requested format?
@@ -264,23 +266,22 @@ export class FormatNode extends Node {
                     // and this node's parent contains the formatting.
                     else {
                         const parentIsFormatted = parent.getFormats(this).includes(format);
-                        const selectionContainsNode = selectionStartIndex <= checkIndex && checkIndex + node.getLength() <= selectionEndIndex;
+                        const selectionContainsNode = (selectionStartIndex > checkIndex && selectionStartIndex < checkIndex + node.getLength() - 1) || (selectionEndIndex > checkIndex && selectionEndIndex < checkIndex + node.getLength() - 1)
                         const nodeContainsSelection = selectionStartIndex >= checkIndex && selectionEndIndex <= checkIndex + node.getLength();
                         checkIndex += node.getLength();
-                        if(!editingEmptyNode) {
-                            if(nodeContainsSelection)
-                                alreadyApplied = parentIsFormatted;
-                            else if(selectionContainsNode)
-                                alreadyApplied = alreadyApplied === undefined ? parentIsFormatted : alreadyApplied && parentIsFormatted;
+                        if(nodeContainsSelection || selectionContainsNode) {
+                            nodeCount++;
+                            if(parentIsFormatted) nodesWithFormat++;
                         }
                     }
                 }
                 // Treat all non-text as containing the requested format.
                 else return true;
             });
+            if(nodeCount > 0 && nodesWithFormat === nodeCount)
+                alreadyApplied = true;
 
-        if(alreadyApplied === undefined)
-            alreadyApplied = false;
+        }
 
         // Reformat everything. The strategy is to step through each character, atom node, and metadata node in this format node
         // and create a new series of formats that preserve existing formatting while applying new formatting to the selection.
