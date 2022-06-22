@@ -68,8 +68,8 @@ test("Format range", () => {
         .toBe(`I am *a bold* word.`)
 
     // Delete across a paragraph boundary.
-    expect(paragraphChapter.withRangeFormatted({ start: { node: firstTextNode, index: 6 }, end: { node: lastTextNode, index: 4 }}, undefined)?.root.toBookdown())
-        .toBe(`First \n\n paragraph.`)
+    expect(paragraphChapter.withoutRange({ start: { node: firstTextNode, index: 6 }, end: { node: lastTextNode, index: 5 }}, undefined)?.root.toBookdown())
+        .toBe(`First paragraph.`)
 
     // Bold across a paragraph boundary.
     expect(paragraphChapter.withRangeFormatted({ start: { node: firstTextNode, index: 6 }, end: { node: lastTextNode, index: 4 }}, "*")?.root.toBookdown())

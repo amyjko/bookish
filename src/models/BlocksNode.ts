@@ -405,8 +405,8 @@ export abstract class BlocksNode extends BlockNode {
                 // Replace the first paragraph with the second merged.
                 newBlocksRoot = newBlocksRoot.withNodeReplaced(first, first.withContent(first.getContent().withSegmentsAppended(last.getContent())));
                 if(newBlocksRoot === undefined) return;
-                // Replace the last with an empty paragraph.
-                newBlocksRoot = newBlocksRoot.withNodeReplaced(last, last.withContent(new FormatNode(last.getContent().getFormat(), [ new TextNode("")])));
+                // Remove the last paragraph.
+                newBlocksRoot = newBlocksRoot.withNodeReplaced(last, undefined);
                 if(newBlocksRoot === undefined) return;
             }
         }
