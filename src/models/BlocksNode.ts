@@ -136,47 +136,33 @@ export abstract class BlocksNode extends BlockNode {
         
     }
 
-    // Convert node and index into text index by converting to Bookdown and then finding the index of the node.
-    getTextIndexOfCaret(caret: Caret): number {
-        const debug = this.toBookdown(caret.node.nodeID);
-        const index = debug.indexOf("%debug%");
-        return index + caret.index;
+    getTextAndAtomsAsTaggedText(nodeID: number) {
+        return this.getTextOrAtomNodes().map(node => node.toBookdown(nodeID)).join("");
     }
 
-    getTextIndexAsCaret(textIndex: number): Caret {
-        // Find all of the text nodes in the main document.
-        const textNodes = this.getTextNodes();
+    // Convert node and index into text index by converting to Bookdown and then finding the index of the node.
+    getTextIndexOfCaret(caret: Caret): number {
+        // Get a list of all text and atom nodes, map them to just text with a marker for the matching node,
+        // find the index of that marker, and add the caret's index.
+        return this.getTextAndAtomsAsTaggedText(caret.node.nodeID).indexOf("%debug%") + caret.index;
+    }
 
-        // Find all of the text nodes in atom nodes, since those have caret positions too.
-        const atomTextNodes = 
-            this.getAtomNodes()
-                // Only look at atoms with format nodes.
-                .filter((atom) => atom.getMeta() instanceof FormatNode)
-                // Map to the formats in those
-                .map((atom) => atom.getMeta()).
-                reduce((previous, current) => previous.concat(current.getTextNodes()), []);
+    getTextIndexAsCaret(textIndex: number): Caret | undefined {
 
-        const allNodes = textNodes.concat(atomTextNodes);
+        const nodes = this.getTextOrAtomNodes();
 
-        // Find the first node whose index contains the given text index.
-        const match = allNodes.find(node => {
-            const debug = this.toBookdown(node.nodeID);
-            const index = debug.indexOf("%debug%");
+        // Find the first node that contains the given text index.
+        const match = nodes.find(node => {
+            const index = this.getTextAndAtomsAsTaggedText(node.nodeID).indexOf("%debug%");
             return textIndex >= index && textIndex <= index + node.getLength();
         });
 
         // If we found match, return a corresponding caret by converting this whole
         // node to a bookdown string and then finding the index of the match in the string,
         // then subtracting the match from the given text index in the string.
-        if(match) {
-            const debug = this.toBookdown(match.nodeID);
-            const index = debug.indexOf("%debug%");
-            return { node: match, index: textIndex - index };
-        }
+        if(match)
+            return { node: match, index: textIndex - nodes.map(node => node.toBookdown(match.nodeID)).join("").indexOf("%debug%") };
 
-        // Default to last caret, since it's likely to be a missing space at the end.
-        const last = textNodes[textNodes.length - 1];
-        return { node: last, index: last.getLength() };
     }
 
     // Swap them order if this is two text nodes that are reversed.
@@ -415,6 +401,8 @@ export abstract class BlocksNode extends BlockNode {
         const startCaret = newBlocksRoot.getTextIndexAsCaret(startTextIndex);
         // If we deleted, then the end caret should be the same as the start.
         const endCaret = format === undefined ? startCaret : newBlocksRoot.getTextIndexAsCaret(endTextIndex);
+
+        if(startCaret === undefined || endCaret === undefined) return;
 
         // Return the new root and the start and end of the range.
         return { root: newBlocksRoot, range: { start: startCaret, end: endCaret } };

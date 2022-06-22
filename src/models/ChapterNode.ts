@@ -71,8 +71,11 @@ export class ChapterNode extends BlocksNode {
     }
 
     // Convert text index to node by iterating through text nodes and finding the corresponding node.
-    textRangeToCaret(range: TextRange): CaretRange {
-        return { start: this.getTextIndexAsCaret(range.start), end: this.getTextIndexAsCaret(range.end) }; 
+    textRangeToCaret(range: TextRange): CaretRange | undefined {
+        const start = this.getTextIndexAsCaret(range.start);
+        const end = this.getTextIndexAsCaret(range.end);
+        if(start === undefined || end === undefined) return;
+        return { start: start, end: end }; 
     }
 
     caretRangeToTextRange(range: CaretRange): TextRange {

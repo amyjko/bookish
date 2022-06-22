@@ -394,7 +394,9 @@ const ChapterEditor = (props: { chapter: Chapter }) => {
             setUndoPosition(undoPosition + 1);
 
         // Return the original caret.
-        return { root: node, range: node.textRangeToCaret(undoState.range) };
+        const range = node.textRangeToCaret(undoState.range);
+        if(range === undefined) return;
+        return { root: node, range: range };
 
     }
 
@@ -412,7 +414,9 @@ const ChapterEditor = (props: { chapter: Chapter }) => {
             setUndoPosition(undoPosition - 1);
 
         // Return the original caret.
-        return { root: node, range: node.textRangeToCaret(undoState.range) };
+        const range = node.textRangeToCaret(undoState.range);
+        if(range === undefined) return;
+        return { root: node, range: range };
 
     }
 
