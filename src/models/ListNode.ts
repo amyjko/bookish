@@ -164,6 +164,7 @@ export class ListNode extends BlockNode {
 
         // Remember where to place the caret.
         const newCaretIndex = previousItem.caretToTextIndex(previousItem.getLastCaret());
+        if(newCaretIndex === undefined) return;
         const mergedItem = previousItem.withSegmentsAppended(deletedItem);
         const newList = this.withItemReplaced(index - 1, mergedItem)?.withoutItemAt(index);
         if(newList === undefined) return;

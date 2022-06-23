@@ -23,6 +23,8 @@ export class TextNode extends Node {
     getText() { return this.#text; }
     getLength() { return this.#text.length; }
     getParentOf(node: Node): Node | undefined { return undefined; }
+    getFirstCaret(): Caret { return { node: this, index: 0}; }
+    getLastCaret(): Caret { return { node: this, index: this.#text.length }; }
 
     toText(): string { return this.#text; }
 

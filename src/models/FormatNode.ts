@@ -74,6 +74,7 @@ export class FormatNode extends Node {
     }
 
     getAdjacentTextOrAtom(node: TextNode | AtomNode<any>, next: boolean): TextNode | AtomNode<any> | undefined {
+        // Find all of the text and atom nodes not in atom nodes in this node.
         const text = this.getTextAndAtomNodes().filter(n => { 
             const atomAncestor = n.getClosestParentOfType(this, AtomNode);
             return atomAncestor === undefined || (atomAncestor instanceof AtomNode && atomAncestor.getMeta() === this);
@@ -102,13 +103,19 @@ export class FormatNode extends Node {
         }
         // If there's not, is there an adjascent caret in the sequence of text and atom nodes?
         const adjacentNode = this.getAdjacentTextOrAtom(caret.node, next);
-        if(adjacentNode !== undefined)
-            return { node: adjacentNode, index: !next && adjacentNode instanceof TextNode ? adjacentNode.getLength() - 1 : 0 }
+        if(adjacentNode !== undefined) {
+            // Normally we skip over node boundaries because they look identical to each other.
+            // But some nodes are zero length, so we have to account for that.
+            return { node: adjacentNode, index: 
+                next ? (adjacentNode instanceof TextNode ? (adjacentNode.isEmpty() ? 0 : 1) : 0) :
+                (adjacentNode instanceof TextNode ? (adjacentNode.isEmpty() ? 0 : adjacentNode.getLength() - 1) : 0)
+            }
+        }
         // Otherwise, there is no adjascent caret.
         return undefined;
     }
 
-    caretToTextIndex(caret: Caret): number {
+    caretToTextIndex(caret: Caret): number | undefined {
 
         const nodes = this.getTextAndAtomNodes();
         let index = 0;
@@ -116,12 +123,10 @@ export class FormatNode extends Node {
             const t = nodes[i];
             if(t !== caret.node)
                 index += t.getLength();
-            else {
-                index += caret.index;
-                break;
-            }
+            else
+                return index + caret.index;
         }
-        return index;
+        return undefined;
 
     }
 
@@ -229,6 +234,8 @@ export class FormatNode extends Node {
         const selectionStartIndex = this.caretToTextIndex(range.start);
         const selectionEndIndex = this.caretToTextIndex(range.end);
 
+        if(selectionStartIndex === undefined || selectionEndIndex === undefined) return;
+
         // Remember if the selection is zero width.
         let zeroWidthSelection = selectionStartIndex === selectionEndIndex;
 
@@ -301,7 +308,7 @@ export class FormatNode extends Node {
         }
 
         function inRange() {
-            return textIndex >= Math.min(selectionStartIndex, selectionEndIndex) && textIndex < Math.max(selectionStartIndex, selectionEndIndex);
+            return textIndex >= Math.min(selectionStartIndex as number, selectionEndIndex as number) && textIndex < Math.max(selectionStartIndex as number, selectionEndIndex as number);
         }
 
         function getFormats() {
@@ -529,13 +536,28 @@ export class FormatNode extends Node {
         // Is there an adjascent caret? Return nothing if not.
         const adjacentCaret = this.getAdjacentCaret(caret, next);
         if(adjacentCaret === undefined) return;
-        // If next, keep the caret in place, otherwise go to the adjacent caret position.
-        const textIndex = this.caretToTextIndex(next ? caret : adjacentCaret);
-        // If there is one, try removing everything between this and the adjascent caret.
-        const newFormat = this.withoutRange({ start: caret, end: adjacentCaret });
-        const newCaret = newFormat?.textIndexToCaret(textIndex);
-        if(newFormat === undefined || newCaret === undefined) return;
-        return { root: newFormat, range: { start: newCaret, end: newCaret } };
+
+        // Handle each case differently
+        if(caret.node instanceof AtomNode) {
+            const newFormat = this.withNodeReplaced(caret.node, undefined);
+            if(newFormat === undefined) return;
+            return { root: newFormat, range: { start: adjacentCaret, end: adjacentCaret }}
+        }
+        else if(adjacentCaret.node instanceof AtomNode) {
+            const newFormat = this.withNodeReplaced(adjacentCaret.node, undefined);
+            if(newFormat === undefined) return;
+            return { root: newFormat, range: { start: caret, end: caret }}
+        }
+        else {
+            // If next, keep the caret in place, otherwise go to the adjacent caret position.
+            const textIndex = this.caretToTextIndex(next ? caret : adjacentCaret);
+            if(textIndex === undefined) return;
+            // If there is one, try removing everything between this and the adjascent caret.
+            const newFormat = this.withoutRange({ start: caret, end: adjacentCaret });
+            const newCaret = newFormat?.textIndexToCaret(textIndex);
+            if(newFormat === undefined || newCaret === undefined) return;
+            return { root: newFormat, range: { start: newCaret, end: newCaret } };
+        }
     }
 
 }

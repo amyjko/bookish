@@ -181,8 +181,11 @@ export abstract class BlocksNode extends BlockNode {
         const adjacentCaretInFormat = format.getAdjacentCaret(caret, next);
         if(adjacentCaretInFormat !== undefined) return adjacentCaretInFormat;
 
-        // If there's no adjacent caret, find the adjascent format.
-        const formats = this.getNodes().filter(n => n instanceof FormatNode && !(n.getParent(this) instanceof AtomNode)) as FormatNode[];
+        // If there's no adjacent caret, find the adjascent root format.
+        const formats = this.getNodes().filter(n => {
+            const parent = n.getParent(this);
+            return n instanceof FormatNode && !(parent instanceof AtomNode) && !(parent instanceof FormatNode);
+        }) as FormatNode[];
         const index = formats.indexOf(format);
         const adjacentFormat = index < 0 || formats.length === 0 ? undefined : formats[index + (next ? 1 : -1 )];
         if(adjacentFormat === undefined) return;
