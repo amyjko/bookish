@@ -451,8 +451,21 @@ export class FormatNode extends Node {
 
                 // Add the atom immediately after, unless it's in the deletion range.
                 // We include the start index since AtomNode's text index is on the left.
-                if(format !== undefined || textIndex < selectionStartIndex || textIndex > selectionEndIndex)
-                    newFormats[0].segments.push(node);
+                if(format !== undefined || textIndex < selectionStartIndex || textIndex > selectionEndIndex) {
+
+                    // Does the atom node have a format? Format it!
+                    let newAtom = node;
+                    const atomMeta = node.getMeta();
+                    if(atomMeta instanceof FormatNode) {
+                        if(atomMeta.contains(range.start.node) && atomMeta.contains(range.end.node)) {
+                            const newFormat = atomMeta.withFormat(range, format);
+                            newAtom = node.withMeta(newFormat);
+                        }
+                    }
+                    // Add the formatted atom if there is one.
+                    newFormats[0].segments.push(newAtom !== undefined ? newAtom : node);
+
+                }
 
                 // Increment the text index; atoms count for one character.
                 textIndex++;
