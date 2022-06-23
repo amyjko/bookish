@@ -7,7 +7,7 @@ import { TextNode } from "./TextNode";
 
 export class QuoteNode extends BlocksNode {
     
-    readonly #credit: FormatNode | undefined;
+    readonly #credit: FormatNode;
     readonly #position: Position;
 
     constructor(elements: BlockNode[], credit?:FormatNode, position:Position="|") {
@@ -24,7 +24,7 @@ export class QuoteNode extends BlocksNode {
     getCredit() { return this.#credit; }
     getPosition() { return this.#position; }
 
-    getFormats() { return this.#credit ? [ this.#credit ] : []; }
+    getFormats() { return [ this.#credit ]; }
 
     toText(): string {
         return this.getBlocks().map(element => element.toText()).join(" ") + (this.#credit ? " " + this.#credit.toText() : "");
@@ -34,7 +34,14 @@ export class QuoteNode extends BlocksNode {
         return `"\n${this.getBlocks().map(element => element.toBookdown(debug)).join("\n\n")}\n"${this.#position === "|" ? "" : this.#position}${this.#credit ? " " + this.#credit.toBookdown(debug) : ""}`;
     }
 
-    getChildren(): Node[] { return this.#credit === undefined ? this.blocks : [ ...this.blocks, this.#credit ]; }
+    getChildren(): Node[] { return [ ...this.blocks, this.#credit ]; }
+
+    getParentOf(node: Node): Node | undefined {
+        if(node === this.#credit) return this;
+        const creditParent = this.#credit.getParentOf(node);
+        if(creditParent !== undefined) return creditParent;
+        return super.getParentOf(node);
+    }
 
     copy() { return new QuoteNode(this.blocks.map(b => b.copy())) as this; }
     create(blocks: BlockNode[]): BlocksNode { return new QuoteNode(blocks, this.#credit, this.#position); }

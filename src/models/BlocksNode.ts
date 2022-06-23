@@ -104,7 +104,7 @@ export abstract class BlocksNode extends BlockNode {
         return this.getNodes().filter(node => node instanceof AtomNode) as AtomNode<any>[];
     }
 
-    getTextOrAtomNodes(): (TextNode | AtomNode<any>)[] {
+    getTextAndAtomNodes(): (TextNode | AtomNode<any>)[] {
         return this.getNodes().filter(node => node instanceof TextNode || node instanceof AtomNode) as (TextNode | AtomNode<any>)[]
     }
 
@@ -137,7 +137,7 @@ export abstract class BlocksNode extends BlockNode {
     }
 
     getTextAndAtomsAsTaggedText(nodeID: number) {
-        return this.getTextOrAtomNodes().map(node => node.toBookdown(nodeID)).join("");
+        return this.getTextAndAtomNodes().map(node => node.toBookdown(nodeID)).join("");
     }
 
     // Convert node and index into text index by converting to Bookdown and then finding the index of the node.
@@ -149,7 +149,7 @@ export abstract class BlocksNode extends BlockNode {
 
     getTextIndexAsCaret(textIndex: number): Caret | undefined {
 
-        const nodes = this.getTextOrAtomNodes();
+        const nodes = this.getTextAndAtomNodes();
 
         // Find the first node that contains the given text index.
         const matches = nodes.filter(node => {
@@ -168,6 +168,26 @@ export abstract class BlocksNode extends BlockNode {
             return { node: match, index: textIndex - nodes.map(node => node.toBookdown(match.nodeID)).join("").indexOf("%debug%") };
         }
 
+    }
+
+    getAdjacentCaret(caret: Caret, next: boolean): Caret | undefined {
+    
+        if(!this.contains(caret.node)) return;
+
+        const format = caret.node.getFarthestParentMatching(this, n => n instanceof FormatNode) as FormatNode;
+        if(!(format instanceof FormatNode)) return;
+
+        // Find the format that contains the caret and return the adjacent caret if there is one.
+        const adjacentCaretInFormat = format.getAdjacentCaret(caret, next);
+        if(adjacentCaretInFormat !== undefined) return adjacentCaretInFormat;
+
+        // If there's no adjacent caret, find the adjascent format.
+        const formats = this.getNodes().filter(n => n instanceof FormatNode && !(n.getParent(this) instanceof AtomNode)) as FormatNode[];
+        const index = formats.indexOf(format);
+        const adjacentFormat = index < 0 || formats.length === 0 ? undefined : formats[index + (next ? 1 : -1 )];
+        if(adjacentFormat === undefined) return;
+        return next ? adjacentFormat.getFirstCaret() : adjacentFormat.getLastCaret();
+    
     }
 
     // Swap them order if this is two text nodes that are reversed.
@@ -275,13 +295,21 @@ export abstract class BlocksNode extends BlockNode {
         const [ first, last ] = split;
         const newCaret = last.getFirstCaret();
 
-        const newBlocks = blocks
+        // Find the paragraph's blocks node.
+        const paragraphBlocks = paragraph.getParent(blocks);
+        if(!(paragraphBlocks instanceof BlocksNode)) return;
+
+        const newBlocks = paragraphBlocks
             .withBlockInsertedBefore(paragraph, first)
             ?.withBlockInsertedAfter(paragraph, last)
             ?.withoutBlock(paragraph);
         if(newBlocks === undefined) return;
 
-        return { root: newBlocks, range: { start: newCaret, end: newCaret } };
+        // Replace the paragraphs blocks in these blocks.
+        const newRoot = blocks.withNodeReplaced(paragraphBlocks, newBlocks);
+        if(newRoot === undefined) return;
+
+        return { root: newRoot, range: { start: newCaret, end: newCaret } };
 
     }
 

@@ -94,68 +94,6 @@ export class TextNode extends Node {
         return index > 0 ? { node: this, index: index - 1 } : undefined
     }
 
-    next(root: RootNode, index: number): Caret {
-    
-        // Otherwise, find the next text node after this one.
-        const next = root.getNextTextOrAtom(this);
-
-        // If there are more characters, just go next.
-        if(index < this.#text.length) {
-            // If the next node is an empty node, go into it instead.
-            if(index + 1 === this.getLength() && next && next instanceof TextNode && next.isEmpty())
-                return { node: next, index: 0 };
-            // Otherwise, just go to the next position in this text node.
-            else
-                return { node: this, index: index + 1 };
-        }
-        
-        // If we don't have a root or nothing is next, just return what we were given.
-        if(next === undefined)
-            return { node: this, index: index };
-
-        // If this is the last node, return the end of this node.
-        if(next === this)
-            return { node: this, index: this.#text.length };
-
-        // Otherwise, return the beginning of the next node.
-        // Unless the next node is in a different paragraph, we skip the first index since it's equivalent to the last of this one.
-        return next instanceof AtomNode ?
-            { node: next, index: 0 } :
-            { node: next, index: this.getFormatRoot(root) !== next.getFormatRoot(root) ? 0 : Math.min(1, next.getLength()) };
-
-    }
-
-    previous(root: RootNode, index: number): Caret {
-
-        // Otherwise, find the previous text node before this one.
-        const previous = root.getPreviousTextOrAtom(this);
-    
-        // If there are more characters, just go next.
-        if(index > 0) {
-            // If the next node is an empty node, go into it instead.
-            if(index - 1 === 0 && previous && previous instanceof TextNode && previous.isEmpty())
-                return { node: previous, index: previous.getLength() };
-            // Otherwise, just go to the previous position in this text node.
-            else
-                return { node: this, index: index - 1 };
-        }
-
-        // If we don't have a root or nothing is before, just return what we were given.
-        if(previous === undefined)
-            return { node: this, index: index };
-
-        // If this is the first node, return the beginning of this node.
-        if(previous === this)
-            return { node: this, index: 0 };
-
-        // Otherwise, return the beginning of the next node.
-        // We skip the last index since it's the equivalent of this one's first.
-        return previous instanceof AtomNode ?
-            { node: previous, index: 0} :
-            { node: previous, index: this.getFormatRoot(root) !== previous.getFormatRoot(root) ? previous.#text.length : Math.max(0, previous.#text.length - 1) };
-
-    }
-
     nextWord(root: RootNode, index?: number): Caret {
 
         if(index === undefined)

@@ -67,12 +67,17 @@ export class FormatNode extends Node {
         return this.getNodes().filter(n => n instanceof TextNode) as TextNode[];
     }
 
+    // Get all text or atom nodes in this format, except for any inside an atom node,
+    // as this is used for navigation and editing, and they should be isolated from that.
     getTextAndAtomNodes(): (TextNode | AtomNode<any>)[] {
-        return this.getNodes().filter(n => n instanceof TextNode || n instanceof AtomNode) as (TextNode | AtomNode<any>)[];
+        return this.getNodes().filter(n => (n instanceof TextNode || n instanceof AtomNode)) as (TextNode | AtomNode<any>)[];
     }
 
     getAdjacentTextOrAtom(node: TextNode | AtomNode<any>, next: boolean): TextNode | AtomNode<any> | undefined {
-        const text = this.getTextAndAtomNodes();
+        const text = this.getTextAndAtomNodes().filter(n => { 
+            const atomAncestor = n.getClosestParentOfType(this, AtomNode);
+            return atomAncestor === undefined || (atomAncestor instanceof AtomNode && atomAncestor.getMeta() === this);
+        });
         const index = text.indexOf(node);
         return index === undefined ? undefined :
             (next ? 
@@ -105,10 +110,10 @@ export class FormatNode extends Node {
 
     caretToTextIndex(caret: Caret): number {
 
-        const text = this.getTextAndAtomNodes();
+        const nodes = this.getTextAndAtomNodes();
         let index = 0;
-        for(let i = 0; i < text.length; i++) {
-            const t = text[i];
+        for(let i = 0; i < nodes.length; i++) {
+            const t = nodes[i];
             if(t !== caret.node)
                 index += t.getLength();
             else {
@@ -148,6 +153,10 @@ export class FormatNode extends Node {
         const first = this.getFirstTextNode();
         const last = this.getLastTextNode();
         return { start: { node: first, index: 0}, end: { node: last, index: last.getLength() } };
+    }
+
+    withSegmentPrepended(segment: FormatNodeSegmentType): FormatNode {
+        return new FormatNode(this.#format, [ segment, ...this.#segments ]);
     }
 
     withSegmentAppended(segment: FormatNodeSegmentType): FormatNode {
@@ -226,7 +235,7 @@ export class FormatNode extends Node {
         // Find all of the content in the node, except for format nodes and decendants of atom nodes that have format nodes,
         // to construct a new format tree with the old content.
         const everythingButFormats = 
-            this.getNodes().filter(n => !(n instanceof FormatNode) && n.getClosestParentOfType(this, AtomNode) === undefined);
+            this.getNodes().filter(n => !(n instanceof FormatNode));
 
         // Check if all of the selected content has the requested format so we can toggle it if so.
         let checkIndex = 0; // This tracks the current location in our scan.
@@ -311,7 +320,13 @@ export class FormatNode extends Node {
         everythingButFormats.forEach(node => {
             const parent = this.getParentOf(node);
             if(node instanceof TextNode) {
-                if(parent instanceof FormatNode) {
+                // If this is a text node in an atom node we're not formatting the atom node's format, then just
+                // account for it's length, but do nothing else.
+                const atomAncestor = node.getClosestParentOfType(this, AtomNode);
+                if(atomAncestor instanceof AtomNode && atomAncestor.getMeta() !== this && atomAncestor.getMeta() instanceof FormatNode) {
+                    textIndex += node.getLength();
+                }
+                else if(parent instanceof FormatNode) {
                     // Remember we found an empty node so that we don't insert an extra one later.
                     if(node.getText().length === 0) {
                         if(textIndex === selectionStartIndex && zeroWidthSelection) {
@@ -428,8 +443,8 @@ export class FormatNode extends Node {
                 saveText();
 
                 // Add the atom immediately after, unless it's in the deletion range.
-                // We include the start indexx  since AtomNode's text index is on the left.
-                if(format !== undefined || (textIndex <= Math.min(selectionStartIndex, selectionEndIndex) || textIndex > Math.max(selectionStartIndex, selectionEndIndex)))
+                // We include the start index since AtomNode's text index is on the left.
+                if(format !== undefined || textIndex < selectionStartIndex || textIndex > selectionEndIndex)
                     newFormats[0].segments.push(node);
 
                 // Increment the text index; atoms count for one character.
@@ -445,13 +460,19 @@ export class FormatNode extends Node {
             finishFormat();
 
         // Create the final format.
-        const newFormat = new FormatNode(newFormats[0].format, newFormats[0].segments);
+        let newFormat = new FormatNode(newFormats[0].format, newFormats[0].segments);
 
         // If after all that, it's empty, make sure there's one empty text node to type in.
         if(newFormat.getTextAndAtomNodes().length === 0)
-            return new FormatNode("", [ new TextNode("") ]);
+            newFormat = new FormatNode("", [ new TextNode("") ]);
+        // If it starts or ends with an atom, insert an empty node so that text can be inserted before or after.
+        else {
+            if(newFormat.#segments[0] instanceof AtomNode)
+                newFormat = newFormat.withSegmentPrepended(new TextNode(""));
+            if(newFormat.#segments[newFormat.getLength() - 1] instanceof AtomNode)
+                newFormat = newFormat.withSegmentAppended(new TextNode(""));
+        }
 
-        // Return the newly formatted (or edited) format node!
         return newFormat;
 
     }

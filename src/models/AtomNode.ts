@@ -37,14 +37,6 @@ export abstract class AtomNode<MetadataType> extends Node {
             { node: this, index: 0 };
     }
 
-    next(root: RootNode, index: number): Caret {
-        return this.nextWord(root);
-    }
-
-    previous(root: RootNode, index: number): Caret {
-        return this.previousWord(root);
-    }
-
     getFormatRoot(root: Node): FormatNode | undefined {
         return this.getFarthestParentMatching(root, p => p instanceof FormatNode) as FormatNode;
     }

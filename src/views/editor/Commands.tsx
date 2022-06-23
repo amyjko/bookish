@@ -166,8 +166,9 @@ export const commands: Command[] = [
         active: context => context.endIsTextOrAtom,
         handler: context => {
             if(context.end.node instanceof TextNode || context.end.node instanceof AtomNode) {
-                const newCaret = context.end.node.previous(context.chapter, context.end.index);
-                return { root: context.chapter, range: {start: newCaret, end: newCaret } }
+                const nextCaret = context.chapter.getAdjacentCaret(context.end, false);
+                if(nextCaret === undefined) return;
+                return { root: context.chapter, range: { start: nextCaret, end: nextCaret }};
             }
         }
     },
@@ -205,7 +206,8 @@ export const commands: Command[] = [
         active: context => context.endIsTextOrAtom,
         handler: context => {
             if(context.end.node instanceof TextNode || context.end.node instanceof AtomNode) {
-                const previous = context.end.node.previous(context.chapter, context.end.index);
+                const previous = context.chapter.getAdjacentCaret(context.end, false);
+                if(previous === undefined) return;
                 return { root: context.chapter, range: { start: context.start, end: previous } };
             }
         }
@@ -244,8 +246,9 @@ export const commands: Command[] = [
         active: context => context.endIsTextOrAtom,
         handler: context => {
             if(context.end.node instanceof TextNode || context.end.node instanceof AtomNode) {
-                const next = context.end.node.next(context.chapter, context.end.index);
-                return { root: context.chapter, range: { start: next, end: next } };
+                const nextCaret = context.blocks?.getAdjacentCaret(context.end, true);
+                if(nextCaret === undefined) return;
+                return { root: context.chapter, range: { start: nextCaret, end: nextCaret }};
             }
         }
     },
@@ -284,8 +287,9 @@ export const commands: Command[] = [
         active: context => context.endIsTextOrAtom,
         handler: context => {
             if(context.end.node instanceof TextNode || context.end.node instanceof AtomNode) {
-                const previous = context.end.node.next(context.chapter, context.end.index);
-                return { root: context.chapter, range: { start: context.start, end: previous } };
+                const next = context.chapter.getAdjacentCaret(context.end, true);
+                if(next === undefined) return;
+                return { root: context.chapter, range: { start: context.start, end: next } };
             }
         }
     },

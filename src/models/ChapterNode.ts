@@ -84,7 +84,7 @@ export class ChapterNode extends BlocksNode {
 
     getNextTextOrAtom(node: TextNode | AtomNode<any>): TextNode | AtomNode<any> | undefined {
         // Otherwise, find the next text node after this one.
-        const nodes = this.getTextOrAtomNodes();
+        const nodes = this.getTextAndAtomNodes();
         const index = nodes.indexOf(node);
         return index === undefined ? undefined :
             index < nodes.length - 1 ? nodes[index + 1] :
@@ -93,7 +93,7 @@ export class ChapterNode extends BlocksNode {
 
     getPreviousTextOrAtom(node: TextNode | AtomNode<any>): TextNode | AtomNode<any> | undefined {
         // Otherwise, find the next text node after this one.
-        const nodes = this.getTextOrAtomNodes();
+        const nodes = this.getTextAndAtomNodes();
         const index = nodes.indexOf(node);
         return index === undefined ? undefined :
             index > 0 ? nodes[index - 1] :

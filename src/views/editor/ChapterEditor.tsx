@@ -316,7 +316,8 @@ const ChapterEditor = (props: { chapter: Chapter }) => {
         if(caret.node instanceof TextNode || caret.node instanceof AtomNode) {
             // Find the position of the current start node.
             const startCoordinate = getCaretCoordinate(caret);
-            let candidate = below ? caret.node.next(ast, caret.index) : caret.node.previous(ast, caret.index);
+            let candidate = ast.getAdjacentCaret(caret, below);
+            if(candidate === undefined) return caret;
             let previousCandidate = undefined;
             let previousCoordinate = undefined;
             if(startCoordinate) {
@@ -347,7 +348,8 @@ const ChapterEditor = (props: { chapter: Chapter }) => {
                     }
 
                     // Get the next candidate to consider.
-                    const nextCandidate = below ? candidate.node.next(ast, candidate.index) : candidate.node.previous(ast, candidate.index);
+                    const nextCandidate = ast.getAdjacentCaret(candidate, below);
+                    if(nextCandidate === undefined) break;
 
                     // If the caret didn't move, we stop searching, something is wrong.
                     if(nextCandidate.node === candidate.node && nextCandidate.index === candidate.index) {
