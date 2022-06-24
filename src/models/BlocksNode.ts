@@ -463,8 +463,8 @@ export abstract class BlocksNode extends BlockNode {
             }
             
             // If we're deleting, and this block is an empty a paragraph or list that's not the first or last block, remove the block.
-            if(format === undefined && i > 0 && i < blocksToEdit.length - 1) {
-                if(newBlock instanceof ParagraphNode && newBlock.getContent().isEmptyText())
+            if(format === undefined) {
+                if(newBlock instanceof ParagraphNode && i > 0 && i < blocksToEdit.length - 1 && newBlock.getContent().isEmptyText())
                    newBlock = undefined;
                 else if(newBlock instanceof ListNode && newBlock.isEmpty())
                     newBlock = undefined;
