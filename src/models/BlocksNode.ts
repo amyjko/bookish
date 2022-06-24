@@ -426,10 +426,14 @@ export abstract class BlocksNode extends BlockNode {
             const block = blocksToEdit[i];
             const parent = block.getParent(newBlocksRoot);
             if(parent === undefined) return;
+
             let newBlock: BlockNode | undefined = block;
             // Edit all of the formats in this block.
             const formats = block.getFormats();
+            // We keep track of these so that we can merge formats in lests together after item deletion.
             const editedFormats = [];
+
+            // Loop through and edit all of the formats in the selection.
             for(let j = 0; j < formats.length; j++) {
                 const formatToEdit = formats[j];
 
@@ -447,6 +451,7 @@ export abstract class BlocksNode extends BlockNode {
                     newBlock = newBlock.withChildReplaced(formatToEdit, removeFormat ? undefined : editedFormat);
                     if(newBlock === undefined) return;
 
+                    // Ignore the removed formats, we just want to merge the ones that remain.
                     if(!removeFormat)
                         editedFormats.push(editedFormat);
                 }
