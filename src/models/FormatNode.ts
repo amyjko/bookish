@@ -33,7 +33,7 @@ export class FormatNode extends Node {
     getFormat() { return this.#format; }
     getSegments() { return this.#segments; }
     isEmpty() { return this.#segments.length === 0; }
-    isEmptyTextNode() { return this.#segments.length === 1 && this.#segments[0] instanceof TextNode && this.#segments[0].getText() === ""; }
+    isEmptyText() { return this.#segments.length === 1 && this.#segments[0] instanceof TextNode && this.#segments[0].getText() === ""; }
     getLength() { return this.#segments.length; }
     getParentOf(node: Node): Node | undefined {
         return this.#segments.map(b => b === node ? this : b.getParentOf(node)).find(b => b !== undefined);
@@ -144,13 +144,16 @@ export class FormatNode extends Node {
 
     }
 
-    getFirstCaret(): Caret {
+    getFirstCaret(): Caret | undefined {
+        const text = this.getTextNodes();
+        if(text.length === 0) return undefined;
         return { node: this.getTextNodes()[0], index: 0 };
     }
 
-    getLastCaret(): Caret {
-        const nodes = this.getTextNodes();
-        const last = nodes[nodes.length - 1];
+    getLastCaret(): Caret | undefined {
+        const text= this.getTextNodes();
+        if(text.length === 0) return undefined;
+        const last = text[text.length - 1];
         return { node: last, index: last.getLength() };
     }
 
@@ -206,9 +209,13 @@ export class FormatNode extends Node {
         if(!(caret.node instanceof TextNode) || !this.contains(caret.node))
             return undefined;
 
+        const firstCaret = this.getFirstCaret();
+        const lastCaret = this.getLastCaret();
+        if(firstCaret === undefined || lastCaret === undefined) return undefined;
+
         // Delete everything after in the first, everything before in the second.
-        const first = this.withoutRange({ start: caret, end: this.getLastCaret() });
-        const second = this.withoutRange({ start: this.getFirstCaret(), end: caret });
+        const first = this.withoutRange({ start: caret, end: lastCaret });
+        const second = this.withoutRange({ start: firstCaret, end: caret });
 
         if(first !== undefined && second !== undefined)
             return [first, second];
@@ -532,11 +539,15 @@ export class FormatNode extends Node {
     }
 
     withoutContentBefore(caret: Caret): FormatNode | undefined {
-        return this.withoutRange({ start: this.getFirstCaret(), end: caret });
+        const firstCaret = this.getFirstCaret();
+        if(firstCaret === undefined) return;
+        return this.withoutRange({ start: firstCaret, end: caret });
     }
 
     withoutContentAfter(caret: Caret): FormatNode | undefined {
-        return this.withoutRange({ start: caret, end: this.getLastCaret() });        
+        const lastCaret = this.getLastCaret();
+        if(lastCaret === undefined) return;
+        return this.withoutRange({ start: caret, end: lastCaret });        
     }
 
     withSegmentsAppended(format: FormatNode): FormatNode {

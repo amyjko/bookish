@@ -25,8 +25,8 @@ export class ParagraphNode extends BlockNode {
     getFirstTextNode(): TextNode { return this.getContent().getFirstTextNode(); }
     getLastTextNode(): TextNode { return this.getContent().getLastTextNode(); }
     getTextNodes(): TextNode[] { return this.getNodes().filter(n => n instanceof TextNode) as TextNode[]; }
-    getFirstCaret(): Caret { return this.#content.getFirstCaret(); }
-    getLastCaret(): Caret { return this.#content.getLastCaret(); }
+    getFirstCaret(): Caret | undefined { return this.#content.getFirstCaret(); }
+    getLastCaret(): Caret | undefined { return this.#content.getLastCaret(); }
     getSelection(): CaretRange {
         const first = this.getFirstTextNode();
         const last = this.getLastTextNode();

@@ -12,7 +12,7 @@ export class CommentNode extends AtomNode<FormatNode> {
     getType() { return "comment"; }
     toText(): string { return ""; }
 
-    getDefaultCaret(): Caret { return this.getMeta().getFirstCaret(); }
+    getDefaultCaret(): Caret | undefined { return this.getMeta().getFirstCaret(); }
 
     toBookdown(debug?: number, format?: FormatNode): string { 
         const previousText = format?.getPreviousTextOrAtom(this)?.toBookdown();

@@ -250,6 +250,10 @@ test("Backspace/delete", () => {
     expect(listChapter.withoutAdjacentContent({ node: afterText, index: 0 }, false)?.root.toBookdown())
         .toBe(`Before\n\n1. ${firstText}\n2. ${lastText}After`)
 
+    // Select two list items for deletion.
+    expect(listChapter.withoutRange({ start: { node: firstTextNode, index: 0}, end: { node: lastTextNode, index: 5 }})?.root.toBookdown())
+        .toBe(`Before\n\n1. paragraph.\n\nAfter`);
+
     // Backspace over a block
     const quoteChapter = new ChapterNode([ new QuoteNode([]), firstParagraph ]);
     expect(quoteChapter.withoutAdjacentContent({ node: firstTextNode, index: 0}, false)?.root.toBookdown())

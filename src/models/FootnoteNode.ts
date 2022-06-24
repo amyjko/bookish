@@ -10,7 +10,7 @@ export class FootnoteNode extends AtomNode<FormatNode> {
     }
 
     getType() { return "footnote"; }
-    getDefaultCaret(): Caret { return this.getMeta().getFirstCaret(); }
+    getDefaultCaret(): Caret | undefined { return this.getMeta().getFirstCaret(); }
 
     toText(): string { return this.getMeta().toText(); }
     toBookdown(debug?: number): string { return `${debug === this.nodeID ? "%debug%" : ""}{${this.getMeta().toBookdown(debug)}}`; }

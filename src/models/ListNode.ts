@@ -22,6 +22,7 @@ export class ListNode extends BlockNode {
 
     getType() { return "list"; }
     isNumbered() { return this.#numbered; }
+    isEmpty() { return this.#items.length === 0 }
     getItems() { return this.#items; }
     getChildren() { return this.#items; }
     getListItems() { return this.#items.filter(i => i instanceof ListNode) as ListNode[]; }
@@ -163,7 +164,9 @@ export class ListNode extends BlockNode {
         if(!(deletedItem instanceof FormatNode) || !(previousItem instanceof FormatNode)) return;
 
         // Remember where to place the caret.
-        const newCaretIndex = previousItem.caretToTextIndex(previousItem.getLastCaret());
+        const lastCaret = previousItem.getLastCaret();
+        if(lastCaret === undefined) return;
+        const newCaretIndex = previousItem.caretToTextIndex(lastCaret);
         if(newCaretIndex === undefined) return;
         const mergedItem = previousItem.withSegmentsAppended(deletedItem);
         const newList = this.withItemReplaced(index - 1, mergedItem)?.withoutItemAt(index);

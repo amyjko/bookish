@@ -16,7 +16,7 @@ export abstract class AtomNode<MetadataType> extends Node {
 
     getMeta() { return this.#meta; }
 
-    abstract getDefaultCaret(): Caret;
+    abstract getDefaultCaret(): Caret | undefined;
 
     // Include the meta node if it's a node, to include it in normal operations.
     // We special case it in other places to avoid breaking other conventions (such as formatting changes, which

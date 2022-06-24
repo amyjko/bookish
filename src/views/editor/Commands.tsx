@@ -392,23 +392,6 @@ export const commands: Command[] = [
         }
     },
     {
-        description: "delete list item",
-        category: "list",
-        control: false, alt: false, shift: false, key: "Backspace",
-        visible: context => false,
-        active: context => context.list?.atBeginningOfItem(context.chapter, context.start) === true,
-        handler: context => {
-            if(context.list) {
-                const index = context.list.getItemContaining(context.start);
-                if(index === undefined) return;
-                const edit = context.list.withItemMergedBackwards(index);
-                if(edit === undefined) return;
-                const [ newList, newCaret ] = edit;
-                return chapterWithNode(context, context.list, newList, newList => newCaret );
-            }
-        }
-    },
-    {
         description: "delete previous character",
         category: "text",
         control: false, alt: false, shift: false, key: "Backspace",
