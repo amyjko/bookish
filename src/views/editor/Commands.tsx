@@ -41,6 +41,7 @@ import Undo from "../svg/undo.svg";
 import Redo from "../svg/redo.svg";
 import { AtomNode } from "../../models/AtomNode";
 import { BlocksNode } from "../../models/BlocksNode";
+import { ChapterNode } from "../../models/ChapterNode";
 
 export type Command = {
     label?: string,
@@ -612,7 +613,7 @@ export const commands: Command[] = [
         icon: Comment,
         description: "insert comment",
         category: "annotation",
-        control: true, alt: false, shift: false, key: "c",
+        control: true, alt: false, shift: false, key: "'",
         visible: context => (context.atom === undefined && context.meta === undefined),
         active: context => context.chapter !== undefined && context.atom === undefined && context.startIsText && context.endIsText,
         handler: context => context.chapter?.withSegmentAtSelection(context.range, text => new CommentNode(new FormatNode("", [ new TextNode(text) ])))
@@ -844,6 +845,75 @@ export const commands: Command[] = [
         visible: context => true,
         active: context => context.undoPosition > 0,
         handler: context => context.redo()
+    },
+    {
+        label: "cut",
+        description: "delete the selected content and copy it to the clipboard",
+        category: "clipboard",
+        control: true, alt: false, shift: false, key: ["x"],
+        visible: context => true,
+        active: context => context.blocks !== undefined && context.isSelection,
+        handler: context => { 
+            if(context.blocks === undefined) return;
+            // Save the copied content to the clipboard
+            const copy = context.blocks.copyRange(context.range);
+            const edit = context.blocks.withoutRange(context.range);
+            if(edit === undefined) return;
+
+            context.setClipboard(copy);
+
+            return chapterWithNode(context, context.blocks, edit.root, () => edit.range.start);
+        }
+    },
+    {
+        label: "copy",
+        description: "copy the selected content to the clipboard",
+        category: "clipboard",
+        control: true, alt: false, shift: false, key: ["c"],
+        visible: context => true,
+        active: context => context.blocks !== undefined && context.isSelection,
+        handler: context => { 
+            if(context.blocks === undefined) return;
+        
+            // Save the copied content to the clipboard
+            const copy = context.blocks.copyRange(context.range);
+            context.setClipboard(copy);
+            return undefined;
+        
+        }
+    },
+    {
+        label: "paste",
+        description: "paste the content from the clipboard",
+        category: "clipboard",
+        control: true, alt: false, shift: false, key: ["v"],
+        visible: context => true,
+        active: context => context.clipboard !== undefined, 
+        handler: context => { 
+            if(context.clipboard === undefined || context.chapter === undefined) return;
+
+            // Track revisions in these two variables.
+            let newChapter = context.chapter;
+            let newCaret = context.start;
+
+            // Is there any text to remove? Remove it first.
+            if(context.isSelection) {
+                const edit = newChapter.withoutRange(context.range);
+                if(edit === undefined || !(edit.root instanceof ChapterNode)) return;
+                newChapter = edit.root;
+                newCaret = edit.range.start;
+            }
+
+            // Insert the node at the caret.
+            const edit = context.chapter.withNodeInserted(newCaret, context.clipboard);
+            if(edit === undefined || !(edit.root instanceof ChapterNode)) return;
+            newChapter = edit.root;
+            newCaret = edit.range.start
+
+            // Insert the node at the caret.
+            return { root: newChapter, range: { start: newCaret, end: newCaret }};
+
+        }
     },
     {
         label: "insert",

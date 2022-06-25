@@ -53,8 +53,12 @@ export type CaretState = {
     undoStack: UndoState[],
     undoPosition: number,
     undo: () => Edit,
-    redo: () => Edit
+    redo: () => Edit,
+    clipboard: Clipboard,
+    setClipboard: React.Dispatch<React.SetStateAction<Clipboard>>
 }
+
+export type Clipboard = undefined | FormatNode | BlocksNode;
 
 export type UndoState = {
     command: Command | undefined,
@@ -79,6 +83,7 @@ const ChapterEditor = (props: { chapter: Chapter }) => {
     const [ editorFocused, setEditorFocused ] = useState<boolean>(true);
     const [ undoStack, setUndoStack ] = useState<UndoState[]>([]);
     const [ undoPosition, setUndoPosition ] = useState<number>(-1);
+    const [ clipboard, setClipboard ] = useState<Clipboard>(undefined);
 
     if(parse === undefined)
         return <></>;
@@ -461,7 +466,9 @@ const ChapterEditor = (props: { chapter: Chapter }) => {
             undoStack: undoStack,
             undoPosition: undoPosition,
             undo: undo,
-            redo: redo
+            redo: redo,
+            clipboard: clipboard,
+            setClipboard: setClipboard
         };
     }
 

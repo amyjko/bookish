@@ -265,6 +265,41 @@ export abstract class BlocksNode extends BlockNode {
  
     abstract create(blocks: BlockNode[]): BlocksNode;
 
+    copyRange(range: CaretRange): FormatNode | BlocksNode {
+
+        // If the selection is contained within a format node...
+        //   Construct a FormatNode with the selection and return it.
+        // Otherwise...
+        //   Identify all of the blocks in the range
+        //   Copy the selected part of the first block
+        //   Copy all of the middle blocks, if there are any
+        //   Copy the selected part of the last block
+        //   Return the new blocks node
+
+        // Create a format or blocks node containing the copied content.
+        return new FormatNode("", [ new TextNode("Hi") ]);
+    }
+
+    withNodeInserted(caret: Caret, node: FormatNode | BlocksNode): Edit {
+
+        // If the node is a format node...
+        //   Insert its segments into the current format node at the caret location.
+        // If the node is a blocks node
+        //   If the caret's format node root is not in a blocks node
+        //     Bail; we can't insert things into it.
+        //   Otherwise...
+        //     If the first block is a paragraph
+        //       Merge it's format into the current format
+        //     Otherwise
+        //       Add it after the current paragraph
+        //     Add the rest of the blocks after the paragraph inserted or inserted into
+        // Return the revised blocks node.
+
+        // If a format, insert the format’s segments in the current format, and if blocks, 
+        // combine the first block with the current block, and insert additional blocks after it
+        return { root: this.copy(), range: { start: caret, end: caret }}
+    }
+
     withBlockInserted(anchor: BlockNode, block: BlockNode, before: boolean): BlocksNode | undefined {
         const index = this.blocks.indexOf(anchor);
         if(index < 0)

@@ -10,6 +10,7 @@ import Block from "../svg/block.svg";
 import List from "../svg/list.svg";
 import LinkIcon from "../svg/link.svg";
 import Code from "../svg/code.svg";
+import Scissors from "../svg/scissors.svg";
 
 import { TextNode } from "../../models/TextNode";
 import { AtomNode } from "../../models/AtomNode";
@@ -51,16 +52,18 @@ const categoryOrder: {[key:string] : number } = {
     "navigation": 1,
     "selection": 2,
     "text": 3,
-    "annotation": 4,
-    "paragraph": 5,
-    "level": 6,
-    "list": 7,
-    "table": 8,
-    "block": 9,
+    "clipboard": 4, 
+    "annotation": 5,
+    "paragraph": 6,
+    "level": 7,
+    "list": 8,
+    "table": 9,
+    "block": 10,
 }
 
 const categoryIcons: {[key:string]: Function} = {
     "text": Text,
+    "clipboard": Scissors,
     "annotation": Hash,
     "level": Level,
     "block": Block,
