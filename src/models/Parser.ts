@@ -734,7 +734,6 @@ export default class Parser {
     parseContent(awaiting?: string): FormatNode {
 
         const segments: FormatNodeSegmentType[] = [];
-        const content = new FormatNode("", segments);
 
         // Read until hitting a delimiter.
         while(this.more() && !this.nextIs("\n")) {
@@ -786,7 +785,7 @@ export default class Parser {
             }
             // Parse a label
             else if(next === ":" && charAfterNext !== null && charAfterNext.match(/[a-z]/i)) {
-                segments.push(this.parseLabel(content));
+                segments.push(this.parseLabel());
             }
             // Keep reading text until finding a delimiter.
             else {
@@ -802,7 +801,7 @@ export default class Parser {
 
         }
 
-        return content;
+        return new FormatNode("", segments);
 
     }
 
@@ -871,7 +870,7 @@ export default class Parser {
 
     }
 
-    parseLabel(parent: FormatNode): LabelNode | ErrorNode {
+    parseLabel(): LabelNode | ErrorNode {
 
         // Consume the :
         this.read();

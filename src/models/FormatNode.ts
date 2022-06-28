@@ -25,8 +25,15 @@ export class FormatNode extends Node {
         super();
 
         this.#format = format;
-        this.#segments = segments;
-        
+        // Remove consecutive empty text nodes.
+        this.#segments = segments.filter(
+            (item, position, list) => { 
+                if(position === 0 || !(item instanceof TextNode) || item.getLength() > 0) return true;
+                const previous = list[position - 1];
+                return !(previous instanceof TextNode && previous.getLength() === 0);
+            }
+        );
+
     }
 
     getType() { return "formatted"; }

@@ -788,11 +788,19 @@ export abstract class BlocksNode extends BlockNode {
                 const blocks = parents[parents.length - 1] as BlocksNode;
                 // Is this the first/last caret of the paragraph and there's an adjascent block? Try deleting something.
                 if(firstCaret.node === caret.node && firstCaret.index === caret.index && adjacentBlock !== undefined) {
-                    // If the block adjacent this paragraph is a paragraph, merge the paragraph into the adjascent paragraph.
+                    // If the block adjacent this paragraph is a paragraph, merge the paragraph into the adjacent paragraph.
                     if(adjacentBlock instanceof ParagraphNode) {
-                        const newBlocks = this.withNodeReplaced(blocks, blocks.withChildReplaced(adjacentBlock, next ? adjacentBlock.withParagraphPrepended(parent) : adjacentBlock.withParagraphAppended(parent))?.withoutBlock(parent));
+                        const currentCaret = next ? parent.getLastCaret() : adjacentBlock.getLastCaret();
+                        if(currentCaret === undefined) return;
+                        const textIndex = next ? parent.getContent().caretToTextIndex(currentCaret) : adjacentBlock.getContent().caretToTextIndex(currentCaret);
+                        if(textIndex === undefined) return;
+                        const mergedParagraph = next ? adjacentBlock.withParagraphPrepended(parent) : adjacentBlock.withParagraphAppended(parent);
+                        if(mergedParagraph === undefined) return;
+                        const newBlocks = this.withNodeReplaced(blocks, blocks.withChildReplaced(adjacentBlock, mergedParagraph)?.withoutBlock(parent));
                         if(newBlocks === undefined) return;
-                        return { root: newBlocks, range: { start: caret, end: caret }}
+                        const newCaret = mergedParagraph.getContent().textIndexToCaret(textIndex);
+                        if(newCaret === undefined) return;
+                        return { root: newBlocks, range: { start: newCaret, end: newCaret }};
                     }
                     // If the block adjacent is a list node, merge the paragraph to the list's first/last item.
                     else if(adjacentBlock instanceof ListNode) {
