@@ -96,8 +96,8 @@ export default class Parser {
         return (new Parser(book, book ? Parser.preprocessSymbols(book, text) : text)).parseChapter();
     }
 
-    static parseContent(book: Book, text: string) {
-        return (new Parser(book, Parser.preprocessSymbols(book, text))).parseContent();
+    static parseFormat(book: Book, text: string) {
+        return (new Parser(book, Parser.preprocessSymbols(book, text))).parseFormat();
     }
 
     static parseEmbed(book: Book, text: string) {
@@ -107,7 +107,7 @@ export default class Parser {
     static parseReference(ref: string | Array<string>, book: Book, short=false) {
 
         if(typeof ref === "string")
-            return Parser.parseContent(book, ref);
+            return Parser.parseFormat(book, ref);
         else if(Array.isArray(ref)) {
             // APA Format. Could eventually support multiple formats.
             if(ref.length >= 4) {
@@ -428,7 +428,7 @@ export default class Parser {
     }
 
     parseParagraph(): ParagraphNode {
-        return new ParagraphNode(0, this.parseContent());
+        return new ParagraphNode(0, this.parseFormat());
     }
 
     parseHeader(): ParagraphNode {
@@ -444,7 +444,7 @@ export default class Parser {
         this.readWhitespace();
 
         // Parse some content.
-        return new ParagraphNode(Math.min(3, count), this.parseContent());
+        return new ParagraphNode(Math.min(3, count), this.parseFormat());
 
     }
     
@@ -503,7 +503,7 @@ export default class Parser {
                 // Read the whitespace after the bullet.
                 this.readWhitespace();
                 // Parse content after the bullet.
-                items.push(this.parseContent());
+                items.push(this.parseFormat());
             }
             // Otherwise, unread the stars, then either stop parsing or parse nested list.
             else {
@@ -585,7 +585,7 @@ export default class Parser {
 
         // Read the caption. Note that parsing inline content stops at a newline, 
         // so if there's a line break after the last row, there won't be a caption.
-        const caption = this.parseContent();
+        const caption = this.parseFormat();
 
         return new CodeNode(new TextNode(code), language, position, caption);
 
@@ -642,7 +642,7 @@ export default class Parser {
         this.readWhitespace();
 
         // Read the credit.
-        const credit = this.nextIs("\n") ? undefined : this.parseContent();
+        const credit = this.nextIs("\n") ? undefined : this.parseFormat();
 
         return new QuoteNode(blocks, credit, position);
 
@@ -705,7 +705,7 @@ export default class Parser {
                 this.readWhitespace();
 
                 // Read content until reaching another | or the end of the line.
-                row.push(this.parseContent("|"));
+                row.push(this.parseFormat("|"));
 
             }
 
@@ -722,7 +722,7 @@ export default class Parser {
 
         // Read the caption. Note that parsing inline content stops at a newline, 
         // so if there's a line break after the last row, there won't be a caption.
-        const caption = this.parseContent();
+        const caption = this.parseFormat();
 
         // Return the new table.
         return new TableNode(rows, position, caption);
@@ -731,7 +731,7 @@ export default class Parser {
 
     // The "awaiting" argument keeps track of upstream formatting. We don't need a stack here
     // because we don't allow infinite nesting of the same formatting type.
-    parseContent(awaiting?: string): FormatNode {
+    parseFormat(awaiting?: string): FormatNode {
 
         const segments: FormatNodeSegmentType[] = [];
 
@@ -743,7 +743,7 @@ export default class Parser {
 
             // Parse some formatted text
             if(next === "_" || next === "*")
-                segments.push(this.parseFormat(next));
+                segments.push(this.parseBoldItalic(next));
             // Parse unformatted text
             else if(this.nextIs("`")) {
                 segments.push(this.parseInlineCode());
@@ -829,7 +829,7 @@ export default class Parser {
         this.read();
 
         // Parse the caption
-        const caption = this.parseContent("|");
+        const caption = this.parseFormat("|");
 
         if(this.peek() !== "|")
             return new ErrorNode(this.readUntilNewLine(), "Missing '|' after caption in embed");
@@ -838,7 +838,7 @@ export default class Parser {
         this.read();
 
         // Parse the credit
-        const credit = this.parseContent("|");
+        const credit = this.parseFormat("|");
         
         // Check for the closing delimeter
         if(this.peek() !== "|")
@@ -860,7 +860,7 @@ export default class Parser {
         this.read();
 
         // Consume everything until the next %.
-        const comment = this.parseContent("%");
+        const comment = this.parseFormat("%");
 
         // Consume the closing %, if we didn't reach the end of input or a newline.
         if(this.peek() === "%")
@@ -887,7 +887,7 @@ export default class Parser {
 
     }
 
-    parseFormat(awaiting: string): FormatNode | ErrorNode {
+    parseBoldItalic(awaiting: string): FormatNode | ErrorNode {
 
         // Remember what we're matching.
         const delimeter = this.read();
@@ -908,7 +908,7 @@ export default class Parser {
                 if(text !== "")
                     segments.push(new TextNode(text));
                 // Parse the formatted content.
-                segments.push(this.parseContent(awaiting));
+                segments.push(this.parseFormat(awaiting));
                 // Reset the accumulator.
                 text = "";
             }
@@ -1002,7 +1002,7 @@ export default class Parser {
             superscript = false;
         }
 
-        const node = new FormatNode(superscript ? "^" : "v", [ this.parseContent("^") ]);
+        const node = new FormatNode(superscript ? "^" : "v", [ this.parseFormat("^") ]);
 
         // Read the closing ^
         this.read();
@@ -1017,7 +1017,7 @@ export default class Parser {
         this.read();
 
         // Read the footnote content.
-        const footnote = this.parseContent("}");
+        const footnote = this.parseFormat("}");
 
         // Read the closing }
         this.read();

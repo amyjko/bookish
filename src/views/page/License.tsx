@@ -22,11 +22,11 @@ const License = (props: { book: Book }) => {
 					multiline
 					save={text => book.setLicense(text)}
 				>
-					{ renderNode(Parser.parseContent(book, book.getLicense())) }
+					{ renderNode(Parser.parseFormat(book, book.getLicense())) }
 				</TextEditor>
 			</>
 			:
-			renderNode(Parser.parseContent(book, book.getLicense()))
+			renderNode(Parser.parseFormat(book, book.getLicense()))
 
 		}
 		</p>

@@ -710,7 +710,7 @@ export const commands: Command[] = [
                     context, 
                     context.blocks, 
                     context.blocks.withBlockInsertedBefore(context.paragraph, new CalloutNode([ newParagraph ])), 
-                    callout => { return { node: newParagraph.getContent().getSegments()[0], index: 0 }; }
+                    callout => { return { node: newParagraph.getFormat().getSegments()[0], index: 0 }; }
                 );
             }
         } 

@@ -6,15 +6,13 @@ import { FootnoteNode } from "./FootnoteNode";
 import { EmbedNode } from "./EmbedNode";
 import { Node } from "./Node";
 import { ParagraphNode } from "./ParagraphNode";
-import { Format, FormatNode, FormatNodeSegmentType } from "./FormatNode";
-import { MetadataNode } from "./MetadataNode";
+import { FormatNode } from "./FormatNode";
 import { AtomNode } from "./AtomNode";
 import { CitationsNode } from "./CitationsNode";
 import { LabelNode } from "./LabelNode";
 import { CommentNode } from "./CommentNode";
 import { BlocksNode } from "./BlocksNode";
-import { Caret, CaretRange, TextRange } from "./Caret";
-import { Edit } from "./Edit";
+import { CaretRange, TextRange } from "./Caret";
 
 export class ChapterNode extends BlocksNode {
 
@@ -62,13 +60,13 @@ export class ChapterNode extends BlocksNode {
     }
 
     toText(): string {
-        return this.blocks.map(block => block.toText()).join(" ");
+        return this.getBlocks().map(block => block.toText()).join(" ");
     }
 
     toBookdown(debug?: number): string {
         // Render the symbols then all the blocks
         return Object.keys(this.#metadata.symbols).sort().map(name => `@${name}: ${this.#metadata.symbols[name]}\n\n`).join("") +
-            this.blocks.map(b => b.toBookdown(debug)).join("\n\n");
+            this.getBlocks().map(b => b.toBookdown(debug)).join("\n\n");
     }
 
     // Convert text index to node by iterating through text nodes and finding the corresponding node.
@@ -101,11 +99,11 @@ export class ChapterNode extends BlocksNode {
             undefined;
     }
 
-    getChildren() { return this.blocks }
+    getChildren() { return this.getBlocks() }
 
     withChildReplaced(node: BlockNode, replacement: BlockNode | undefined) {
 
-        const index = this.blocks.indexOf(node);
+        const index = this.getBlocks().indexOf(node);
 
         /// If we couldn't find the requested node, don't change anything.
         if(index < 0)
@@ -113,15 +111,15 @@ export class ChapterNode extends BlocksNode {
 
         // Make a new blocks node, assigning and re-parenting the replacement.
         const blocks = replacement === undefined ?
-            [ ...this.blocks.slice(0, index), ...this.blocks.slice(index + 1)] :
-            [ ...this.blocks.slice(0, index), replacement, ...this.blocks.slice(index + 1) ];
+            [ ...this.getBlocks().slice(0, index), ...this.getBlocks().slice(index + 1)] :
+            [ ...this.getBlocks().slice(0, index), replacement, ...this.getBlocks().slice(index + 1) ];
 
         return new ChapterNode(blocks, this.#metadata) as this;
 
     }
 
     copy() {
-        return new ChapterNode(this.blocks.map(b => b.copy()), this.#metadata) as this;
+        return new ChapterNode(this.getBlocks().map(b => b.copy()), this.#metadata) as this;
     }
 
     copyRange(range: CaretRange): Node | undefined {

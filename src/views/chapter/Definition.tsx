@@ -42,7 +42,7 @@ const Definition = (props: { node: DefinitionNode}) => {
                             entry === undefined ? 
                                 <span className="bookish-error">Unknown glossary entry "{ glossaryID }"</span> :
                                 <>
-                                    <strong className="bookish-definition-entry-phrase">{entry.phrase}</strong>: { renderNode(Parser.parseContent(context.book, entry.definition), "definition") }
+                                    <strong className="bookish-definition-entry-phrase">{entry.phrase}</strong>: { renderNode(Parser.parseFormat(context.book, entry.definition), "definition") }
                                     { entry.synonyms && entry.synonyms.length > 0 ? <span className="bookish-definition-entry-synonyms"><br/><br/>{entry.synonyms.join(", ")}</span> : null }
                                 </>
                         }

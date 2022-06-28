@@ -48,7 +48,7 @@ const Glossary = (props: { book: Book }) => {
 								<tr key={"definition" + index}>
 									<td><strong>{glossary[key].phrase}</strong></td>
 									<td>
-										{ renderNode(Parser.parseContent(book, glossary[key].definition)) }
+										{ renderNode(Parser.parseFormat(book, glossary[key].definition)) }
 										{ <span><br/><br/><em>{glossary[key].synonyms?.join(", ")}</em></span> ?? null }
 									</td>
 								</tr>

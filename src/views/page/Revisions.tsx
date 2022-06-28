@@ -17,7 +17,7 @@ const Revisions = (props: { book: Book }) => {
 					<h2 className="bookish-header" id="revisions">Revisions</h2>
 					<ul>
 						{book.getRevisions().map((revision, index) => {
-							return <li key={"revision" + index}><em>{revision[0]}</em>. { renderNode(Parser.parseContent(book, revision[1])) }</li>;
+							return <li key={"revision" + index}><em>{revision[0]}</em>. { renderNode(Parser.parseFormat(book, revision[1])) }</li>;
 						})}
 					</ul>
 				</>	

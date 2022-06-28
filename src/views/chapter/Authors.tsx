@@ -36,10 +36,10 @@ const Authors = (
                                 label={'Author name editor'} 
                                 save={text => props.edit.call(undefined, index, text)}
                             >
-                                {renderNode(Parser.parseContent(book, author))}
+                                {renderNode(Parser.parseFormat(book, author))}
                             </TextEditor>
                             :
-                            <span key={"author" + index}>{renderNode(Parser.parseContent(book, author))}</span>
+                            <span key={"author" + index}>{renderNode(Parser.parseFormat(book, author))}</span>
                         : <span key={"author" + index}>{author}</span>
                     ,
                     index < authors.length - 1 ? (", ") : null

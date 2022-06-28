@@ -303,7 +303,7 @@ const TableOfContents = (props: { book: Book }) => {
 		<h2 className="bookish-header" id="citation">Citation</h2>
 
 		<p>
-			{ book.getAuthors().map(author => Parser.parseContent(book, author).toText()).join(", ") } ({(new Date()).getFullYear() }). <em>{book.getTitle()}</em>. { location.protocol+'//'+location.host+location.pathname }, <em>retrieved { (new Date()).toLocaleDateString("en-US")}</em>.
+			{ book.getAuthors().map(author => Parser.parseFormat(book, author).toText()).join(", ") } ({(new Date()).getFullYear() }). <em>{book.getTitle()}</em>. { location.protocol+'//'+location.host+location.pathname }, <em>retrieved { (new Date()).toLocaleDateString("en-US")}</em>.
 		</p>
 
 		<Revisions book={book} />

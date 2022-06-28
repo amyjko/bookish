@@ -4,7 +4,7 @@ import { Position } from "./Position";
 import { FormatNode } from "./FormatNode";
 import { BlocksNode } from "./BlocksNode";
 import { TextNode } from "./TextNode";
-import { Caret, CaretRange } from "./Caret";
+import { CaretRange } from "./Caret";
 
 export class QuoteNode extends BlocksNode {
     
@@ -35,7 +35,7 @@ export class QuoteNode extends BlocksNode {
         return `"\n${this.getBlocks().map(element => element.toBookdown(debug)).join("\n\n")}\n"${this.#position === "|" ? "" : this.#position}${this.#credit ? this.#credit.toBookdown(debug) : ""}`;
     }
 
-    getChildren(): Node[] { return [ ...this.blocks, this.#credit ]; }
+    getChildren(): Node[] { return [ ...this.getBlocks(), this.#credit ]; }
 
     getParentOf(node: Node): Node | undefined {
         if(node === this.#credit) return this;
@@ -44,24 +44,24 @@ export class QuoteNode extends BlocksNode {
         return super.getParentOf(node);
     }
 
-    copy() { return new QuoteNode(this.blocks.map(b => b.copy())) as this; }
+    copy() { return new QuoteNode(this.getBlocks().map(b => b.copy())) as this; }
     create(blocks: BlockNode[]): BlocksNode { return new QuoteNode(blocks, this.#credit, this.#position); }
 
     withChildReplaced(node: BlockNode | FormatNode, replacement: BlockNode | FormatNode | undefined) {
 
         // Replace the credit.
         if(this.#credit === node && replacement instanceof FormatNode)
-            return new QuoteNode(this.blocks, replacement, this.#position) as this;
+            return new QuoteNode(this.getBlocks(), replacement, this.#position) as this;
     
         // Replace a block.
         if(replacement !== undefined && !(replacement instanceof BlockNode)) return;
-        const index = this.blocks.indexOf(node as BlockNode);
+        const index = this.getBlocks().indexOf(node as BlockNode);
         if(index < 0) return;
 
         // Make a new blocks node, assigning and re-parenting the replacement.
         const blocks = replacement === undefined ?
-            [ ...this.blocks.slice(0, index), ...this.blocks.slice(index + 1)] :
-            [ ...this.blocks.slice(0, index), replacement, ...this.blocks.slice(index + 1) ];
+            [ ...this.getBlocks().slice(0, index), ...this.getBlocks().slice(index + 1)] :
+            [ ...this.getBlocks().slice(0, index), replacement, ...this.getBlocks().slice(index + 1) ];
 
         return new QuoteNode(blocks, this.#credit, this.#position) as this;
 
@@ -75,7 +75,7 @@ export class QuoteNode extends BlocksNode {
         const newQuote = super.withContentInRange(range);
         if(newQuote === undefined) return;
 
-        const newCredit = this.blocks.find(b => b.contains(range.end.node)) !== undefined ? new FormatNode("", [ new TextNode() ]) : this.#credit.withContentInRange(range);
+        const newCredit = this.getBlocks().find(b => b.contains(range.end.node)) !== undefined ? new FormatNode("", [ new TextNode() ]) : this.#credit.withContentInRange(range);
         return newQuote.withNodeReplaced(this.#credit, newCredit) as this;
 
     }

@@ -11,32 +11,32 @@ import { Edit } from "./Edit";
 
 export abstract class BlocksNode extends BlockNode {
     
-    readonly blocks: BlockNode[];
+    readonly #blocks: BlockNode[];
 
     constructor(elements: BlockNode[]) {
         super();
-        this.blocks = elements;
+        this.#blocks = elements;
     }
 
-    getBlocks() { return this.blocks; }
+    getBlocks() { return this.#blocks; }
 
     getIndexOf(block: BlockNode): number | undefined {
-        const index = this.blocks.indexOf(block);
+        const index = this.#blocks.indexOf(block);
         return index < 0 ? undefined : index;
     }
 
     getBlockBefore(anchor: BlockNode): BlockNode | undefined {
-        const index = this.blocks.indexOf(anchor);
+        const index = this.#blocks.indexOf(anchor);
         if(index <= 0)
             return undefined;
-        return this.blocks[index - 1];        
+        return this.#blocks[index - 1];        
     }
 
     getBlockAfter(anchor: BlockNode): BlockNode | undefined {
-        const index = this.blocks.indexOf(anchor);
-        if(index < 0 || index > this.blocks.length - 2)
+        const index = this.#blocks.indexOf(anchor);
+        if(index < 0 || index > this.#blocks.length - 2)
             return undefined;
-        return this.blocks[index + 1];
+        return this.#blocks[index + 1];
     }
 
     getBlocksBetween(first: BlockNode, last: BlockNode): BlockNode[] | undefined {
@@ -52,8 +52,8 @@ export abstract class BlocksNode extends BlockNode {
             }
             const blocks = [];
             let inside = false;
-            for(let i = 0; i < this.blocks.length; i++) {
-                let block = this.blocks[i];
+            for(let i = 0; i < this.#blocks.length; i++) {
+                let block = this.#blocks[i];
                 if(block === first)
                     inside = true;
                 if(inside)
@@ -93,7 +93,7 @@ export abstract class BlocksNode extends BlockNode {
     }
 
     getParentOf(node: Node): Node | undefined {
-        return this.blocks.map(b => b === node ? this : b.getParentOf(node)).find(b => b !== undefined);
+        return this.#blocks.map(b => b === node ? this : b.getParentOf(node)).find(b => b !== undefined);
     }
 
     getTextNodes(): TextNode[] {
@@ -285,15 +285,15 @@ export abstract class BlocksNode extends BlockNode {
         let foundStart = false;
         let foundEnd = false;
         const newBlocks: BlockNode[] = [];
-        for(let i = 0; i < this.blocks.length; i++) {
-            if(this.blocks[i].contains(range.start.node)) foundStart = true;
+        for(let i = 0; i < this.#blocks.length; i++) {
+            if(this.#blocks[i].contains(range.start.node)) foundStart = true;
             if( ((containsStart && foundStart) || !containsStart) && 
                 ((containsEnd && !foundEnd) || !containsEnd)) {
-                const newBlock = this.blocks[i].withContentInRange(range);
+                const newBlock = this.#blocks[i].withContentInRange(range);
                 if(newBlock === undefined) return;
                 newBlocks.push(newBlock);
             }
-            if(this.blocks[i].contains(range.end.node)) foundEnd = true;
+            if(this.#blocks[i].contains(range.end.node)) foundEnd = true;
         }
 
         return this.create(newBlocks) as this;
@@ -301,23 +301,23 @@ export abstract class BlocksNode extends BlockNode {
     }
 
     withBlockInserted(anchor: BlockNode, block: BlockNode, before: boolean): BlocksNode | undefined {
-        const index = this.blocks.indexOf(anchor);
+        const index = this.#blocks.indexOf(anchor);
         if(index < 0)
             return;
-        const newBlocks = this.blocks.slice();
+        const newBlocks = this.#blocks.slice();
         newBlocks.splice(index + (before ? 0 : 1), 0, block);
         return this.create(newBlocks);
     }
 
     withBlockAppended(block: BlockNode): BlocksNode {
-        let newBlocks = this.blocks.slice();
+        let newBlocks = this.#blocks.slice();
         newBlocks.push(block);
         return this.create(newBlocks);
 
     }
 
     withoutBlock(block: BlockNode): BlocksNode {
-        return this.create(this.blocks.filter(n => n !== block));
+        return this.create(this.#blocks.filter(n => n !== block));
     }
 
     withBlockInsertedBefore(anchor: BlockNode, block: BlockNode) {
@@ -331,7 +331,7 @@ export abstract class BlocksNode extends BlockNode {
     withAdjacentListsMerged(): BlocksNode {
 
         const newBlocks: BlockNode[] = [];
-        this.blocks.forEach(block => {
+        this.#blocks.forEach(block => {
             const previousBlock = newBlocks[newBlocks.length - 1];
             // Are these two adjacent lists of the same style? Put all of the current block's list items in the previous block.
             if(previousBlock instanceof ListNode && block instanceof ListNode && previousBlock.isNumbered() === block.isNumbered())
@@ -504,7 +504,7 @@ export abstract class BlocksNode extends BlockNode {
             
             // If we're deleting, and this block is an empty a paragraph or list that's not the first or last block, remove the block.
             if(format === undefined) {
-                if(newBlock instanceof ParagraphNode && i > 0 && i < blocksToEdit.length - 1 && newBlock.getContent().isEmptyText())
+                if(newBlock instanceof ParagraphNode && i > 0 && i < blocksToEdit.length - 1 && newBlock.getFormat().isEmptyText())
                    newBlock = undefined;
                 else if(newBlock instanceof ListNode && newBlock.isEmpty())
                     newBlock = undefined;
@@ -528,7 +528,7 @@ export abstract class BlocksNode extends BlockNode {
                 const last = newBlocks[newBlocks.length - 1];
                 if(first instanceof ParagraphNode && last instanceof ParagraphNode) {
                     // Replace the first paragraph with the second merged.
-                    newBlocksRoot = newBlocksRoot.withNodeReplaced(first, first.withContent(first.getContent().withSegmentsAppended(last.getContent())));
+                    newBlocksRoot = newBlocksRoot.withNodeReplaced(first, first.withContent(first.getFormat().withSegmentsAppended(last.getFormat())));
                     if(newBlocksRoot === undefined) return;
                     // Remove the last paragraph.
                     newBlocksRoot = newBlocksRoot.withNodeReplaced(last, undefined);
@@ -539,7 +539,7 @@ export abstract class BlocksNode extends BlockNode {
         }
 
         // If we ended up with nothing, then create an empty paragraph.
-        if(newBlocksRoot.blocks.length === 0) {
+        if(newBlocksRoot.#blocks.length === 0) {
             const newParagraph = new ParagraphNode();
             newBlocksRoot = newBlocksRoot.withBlockAppended(newParagraph);
             const newCaret = newParagraph.getFirstCaret();
@@ -632,7 +632,7 @@ export abstract class BlocksNode extends BlockNode {
         for(let i = 0; i < sequences.length; i++) {
             const sequence = sequences[i];
             // Make the new list
-            const newList = new ListNode(sequence.map(p => p.getContent()), numbered);
+            const newList = new ListNode(sequence.map(p => p.getFormat()), numbered);
             // Insert the new list
             const blocksParent: BlocksNode | undefined = sequence[0].getParent(newBlocks) as BlocksNode;
             if(blocksParent === undefined) return;
@@ -792,13 +792,13 @@ export abstract class BlocksNode extends BlockNode {
                     if(adjacentBlock instanceof ParagraphNode) {
                         const currentCaret = next ? parent.getLastCaret() : adjacentBlock.getLastCaret();
                         if(currentCaret === undefined) return;
-                        const textIndex = next ? parent.getContent().caretToTextIndex(currentCaret) : adjacentBlock.getContent().caretToTextIndex(currentCaret);
+                        const textIndex = next ? parent.getFormat().caretToTextIndex(currentCaret) : adjacentBlock.getFormat().caretToTextIndex(currentCaret);
                         if(textIndex === undefined) return;
                         const mergedParagraph = next ? adjacentBlock.withParagraphPrepended(parent) : adjacentBlock.withParagraphAppended(parent);
                         if(mergedParagraph === undefined) return;
                         const newBlocks = this.withNodeReplaced(blocks, blocks.withChildReplaced(adjacentBlock, mergedParagraph)?.withoutBlock(parent));
                         if(newBlocks === undefined) return;
-                        const newCaret = mergedParagraph.getContent().textIndexToCaret(textIndex);
+                        const newCaret = mergedParagraph.getFormat().textIndexToCaret(textIndex);
                         if(newCaret === undefined) return;
                         return { root: newBlocks, range: { start: newCaret, end: newCaret }};
                     }
@@ -808,7 +808,7 @@ export abstract class BlocksNode extends BlockNode {
                         if(next) {
                             const format = adjacentBlock.getFirstItem();
                             if(format !== undefined) {
-                                const newParagraph = parent.withContent(parent.getContent().withSegmentsAppended(format));
+                                const newParagraph = parent.withContent(parent.getFormat().withSegmentsAppended(format));
                                 const newBlocks = blocks.withNodeReplaced(parent, newParagraph)?.withNodeReplaced(format, undefined);
                                 if(newBlocks === undefined) return;
                                 return { root: newBlocks, range: { start: caret, end: caret }}
@@ -819,9 +819,9 @@ export abstract class BlocksNode extends BlockNode {
                         else {
                             const format = adjacentBlock.getLastItem();
                             if(format !== undefined) {
-                                const newFormat = format.withSegmentAppended(parent.getContent());
+                                const newFormat = format.withSegmentAppended(parent.getFormat());
                                 const newBlocks = blocks.withNodeReplaced(format, newFormat)?.withoutBlock(parent);
-                                const newCaret = parent.getContent().getFirstCaret();
+                                const newCaret = parent.getFormat().getFirstCaret();
                                 if(newBlocks === undefined || newCaret === undefined) return;
                                 return { root: newBlocks, range: { start: newCaret, end: newCaret }}
                             }
@@ -847,7 +847,7 @@ export abstract class BlocksNode extends BlockNode {
         // If there are none, do nothing.
         if(blocks.length === 0) return;
         // Find the block in this blocks node that contains the caret.
-        const anchor = this.blocks.find(b => b.contains(caret.node));
+        const anchor = this.#blocks.find(b => b.contains(caret.node));
         if(anchor === undefined) return;
 
         let lastInsert = anchor;

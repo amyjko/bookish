@@ -1,6 +1,6 @@
 import { db } from "./Firebase"
-import { collection, getDocs, getDoc, setDoc, doc, addDoc, query, where, limit, deleteDoc, DocumentReference } from "firebase/firestore"
-import Book, { BookPreview, BookSpecification, ChapterContent, ChapterSpecification } from "./Book"
+import { collection, getDocs, getDoc, setDoc, doc, addDoc, query, where, deleteDoc, DocumentReference } from "firebase/firestore"
+import Book, { BookPreview, BookSpecification, ChapterContent } from "./Book"
 import Chapter from "./Chapter"
 
 
