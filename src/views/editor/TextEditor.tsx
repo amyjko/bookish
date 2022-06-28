@@ -1,5 +1,4 @@
-import React, { KeyboardEvent, useEffect, useRef, useState, useContext } from "react"
-import { EditorContext } from "../page/Book"
+import React, { KeyboardEvent, useEffect, useRef, useState } from "react"
 
 enum Status {
     Viewing,

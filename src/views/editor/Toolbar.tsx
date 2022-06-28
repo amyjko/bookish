@@ -72,7 +72,8 @@ const categoryIcons: {[key:string]: Function} = {
 
 const Toolbar = (props: { 
     context?: CaretState, 
-    executor?: (command: Command, key: string) => void
+    executor?: (command: Command, key: string) => void,
+    saving?: undefined | string
     },
 ) => {
 
@@ -181,6 +182,7 @@ const Toolbar = (props: {
         { calloutNode ? <ToolbarGroup icon="Callout"><CalloutEditor callout={calloutNode} /></ToolbarGroup> : null }
         { quoteNode ? <ToolbarGroup icon="Quote"><QuoteEditor quote={quoteNode} /></ToolbarGroup> : null }
         { embedNode ? <ToolbarGroup icon="Image/Video"><EmbedEditor embed={embedNode} /></ToolbarGroup> : null }
+        { props.saving === undefined ? null : <em>{props.saving}</em>}
 
     </div>
 

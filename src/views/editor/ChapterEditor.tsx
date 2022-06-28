@@ -70,6 +70,8 @@ export type CaretUtilities = {
     getCaretOnLine: (caret: Caret, below: boolean) => Caret
 }
 
+const IDLE_TIME = 500;
+
 const ChapterEditor = (props: { chapter: Chapter }) => {
 
     const { chapter } = props;
@@ -84,6 +86,7 @@ const ChapterEditor = (props: { chapter: Chapter }) => {
     const [ undoStack, setUndoStack ] = useState<UndoState[]>([]);
     const [ undoPosition, setUndoPosition ] = useState<number>(-1);
     const [ clipboard, setClipboard ] = useState<Clipboard>(undefined);
+    const [ saving, setSaving ] = useState<undefined | string>(undefined);
 
     if(parse === undefined)
         return <></>;
@@ -112,10 +115,29 @@ const ChapterEditor = (props: { chapter: Chapter }) => {
     }, []);
 
     useEffect(() => {
-        // Track time since last keystroke to control caret blinking behavior.
-        const keystrokeTimer = setInterval(() => setKeyboardIdle((Date.now() - lastInputTime) > 300), 300);
+        // When input happens, set a timer and then see if idle time has elapsed. If it ihas, Track time since last keystroke to control caret blinking behavior.
+        setSaving("Editing...")
+        const keystrokeTimer = setTimeout(() => { 
+            // Remember that we're idle so we can render things accordingly.
+            const isIdle = Date.now() - lastInputTime > IDLE_TIME;
+            if(isIdle) {
+                setKeyboardIdle(true);
+                const promise = chapter.update();
+                if(promise) {
+                    setSaving("Saving...")
+                    promise.then(() => {
+                        setSaving("Saved.")
+                    })
+                    .catch((message: Error) => {
+                        setSaving("Unable to save :(")
+                    })
+                }
+            }
+            // Save
+        }, IDLE_TIME);
         return () => {
-            clearInterval(keystrokeTimer);
+            // Clear the timer if we're unmounting or re-rendering.
+            clearTimeout(keystrokeTimer);
         }
     }, [lastInputTime])
 
@@ -694,7 +716,7 @@ const ChapterEditor = (props: { chapter: Chapter }) => {
                 onBlur={handleUnfocus}
                 tabIndex={0} // Makes the editor focusable.
                 >
-                { context && caretCoordinate ? <Toolbar context={context} executor={executeCommand}></Toolbar> : null }
+                { context && caretCoordinate ? <Toolbar context={context} executor={executeCommand} saving={saving}></Toolbar> : null }
                 {
                     // Draw a caret. We draw our own since this view isn't contentEditable and we can't show a caret.
                     // Customize the rendering based on the formatting applied to the text node.

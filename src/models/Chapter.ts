@@ -24,6 +24,7 @@ class Chapter {
 	ast: ChapterNode | undefined;
 	index: Record<string, Array<Match>> | undefined;
 	wordCount: number | undefined;
+	dirty: number; // True if the chapter text was updated but is not saved.
 
     constructor(book: Book, spec: ChapterSpecification) {
 
@@ -36,6 +37,8 @@ class Chapter {
         this.numbered = spec.numbered === true || spec.numbered === undefined;
         this.section = spec.section ? spec.section : undefined;
 		this.forthcoming = spec.forthcoming === true;
+
+		this.dirty = 0;
 
 		// If the chapter has text, then parse it, count searchable words, and compute an index.
 		if(spec.text)
@@ -52,8 +55,12 @@ class Chapter {
     }
 
 	update() {
-		this.book.notifyListeners()
-		return updateBook(this.book)
+		if(this.dirty > 0) {
+			this.dirty--;
+			this.book.notifyListeners()		
+			return updateBook(this.book)
+		}
+		else return new Promise<void>(() => {})
 	}
 
 	toObject() {
@@ -81,26 +88,29 @@ class Chapter {
 
 	getChapterID() { return this.chapterID; }
 	setChapterID(id: string) {
-		const previousID = this.chapterID;
 		this.chapterID = id;
+		this.dirty++;
 		return this.update()
 	}
 
     getSection(): string | undefined { return this.section; }
 	setSection(section: string) {
 		this.section = section;
+		this.dirty++;
 		return this.update()
 	}
 
 	isForthcoming() { return this.forthcoming; }
 	async setForthcoming(forthcoming: boolean) {
 		this.forthcoming = forthcoming;
+		this.dirty++;
 		return this.update()
 	}
 
 	isNumbered() { return this.numbered; }
 	async setNumbered(numbered: boolean) {
 		this.numbered = numbered;
+		this.dirty++;
 		return this.update()
 	}
 
@@ -115,16 +125,19 @@ class Chapter {
 	setAST(node: ChapterNode) {
 
 		this.ast = node;
-		this.text = this.ast.toBookdown();
+		const newText = this.ast.toBookdown();
+		if(this.text === newText) return;
+		this.text = newText;
 		this.wordCount = this.ast.toText().split(/\s+/).length;
 		this.index = this.computeIndex();
-
+		this.dirty++;
 		this.book.notifyListeners();
 
 	}
 
 	addAuthor(name: string) {
         this.authors.push(name);
+		this.dirty++;
 		return this.update();
     }
 
@@ -132,18 +145,21 @@ class Chapter {
     setAuthor(index: number, name: string) {
         if(index >= 0 && index < this.authors.length)
             this.authors[index] = name;
+		this.dirty++;
 		return this.update()
 	}
 
     removeAuthor(index: number) {
         if(index >= 0 && index < this.authors.length)
             this.authors.splice(index, 1)
+		this.dirty++;
 		return this.update()
 	}
 
 	getTitle() { return this.title; }
 	async setTitle(title: string) {
 		this.title = title;
+		this.dirty++;
 		return this.update()
 	}
 
