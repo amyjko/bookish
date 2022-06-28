@@ -17,7 +17,6 @@ import { Edit } from "../../models/Edit";
 
 import { Command, commands } from "./Commands";
 import Toolbar from "./Toolbar";
-import { BlockNode } from "../../models/BlockNode";
 
 export type CaretContextType = { 
     range: CaretRange | undefined, 
