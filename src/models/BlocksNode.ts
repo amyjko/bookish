@@ -483,7 +483,7 @@ export abstract class BlocksNode extends BlockNode {
                     const removeFormat = block instanceof ListNode && editedFormat.isEmptyText();
 
                     // Create a new chapter tree with the new format, or if the new format is empty, without the paragraph altogether. Bail on fail.
-                    newBlock = newBlock.withChildReplaced(formatToEdit, removeFormat ? undefined : editedFormat);
+                    newBlock = newBlock.withNodeReplaced(formatToEdit, removeFormat ? undefined : editedFormat);
                     if(newBlock === undefined) return;
 
                     // Ignore the removed formats, we just want to merge the ones that remain.

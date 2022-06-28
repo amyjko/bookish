@@ -22,14 +22,16 @@ export class ListNode extends BlockNode {
 
     getType() { return "list"; }
     isNumbered() { return this.#numbered; }
-    isEmpty() { return this.#items.length === 0 }
+    isEmpty(): boolean { return this.#items.length === 0 || this.#items.every(i => i instanceof ListNode && i.isEmpty()) }
     getItems() { return this.#items; }
     getChildren() { return this.#items; }
     getListItems() { return this.#items.filter(i => i instanceof ListNode) as ListNode[]; }
     getLength() { return this.#items.length; }
     getLastItem(): FormatNode | undefined { return this.getFirstLastItem(false); }
     getFirstItem(): FormatNode | undefined { return this.getFirstLastItem(true); }
-    getFormats() { return this.#items.filter(i => i instanceof FormatNode) as FormatNode[]; }
+    getFormats(): FormatNode[] { 
+        return this.#items.reduce((previous: FormatNode[], current: ListNodeType) => previous.concat(current instanceof FormatNode ? [ current ] : current.getFormats()), []) as FormatNode[];
+    }
     getFirstLastItem(first: boolean): FormatNode | undefined {
 
         if(this.#items.length === 0)
