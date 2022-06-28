@@ -3,6 +3,7 @@ import { FormatNode } from "./FormatNode";
 import { Caret, CaretRange } from "./Caret";
 import { BlocksNode } from "./BlocksNode";
 import { BlockNode } from "./BlockNode";
+import { Edit } from "./Edit";
 
 export type ListParentType =  BlocksNode | ListNode;
 export type ListNodeType = FormatNode | ListNode;
@@ -278,6 +279,44 @@ export class ListNode extends BlockNode {
             if(this.#items[i].contains(range.end.node)) foundEnd = true;
         }
         return new ListNode(newItems, this.#numbered) as this;
+    }
+
+    withNodeInserted(caret: Caret, node: Node): Edit {
+        if(!this.contains(caret.node)) return;
+        if(!(node instanceof ListNode)) return;
+
+        // Find the anchor item.
+        const anchor = this.#items.find(i => i.contains(caret.node));
+        if(anchor === undefined) return;
+
+        const items = node.getItems();
+
+        let lastItem = anchor;
+        let newList: ListNode | undefined = this;
+        while(items.length > 0) {
+            let item = items.shift();
+            if(item === undefined) return;
+            // Insert all of the node's items into this list, merging the first.
+            if(lastItem === anchor) {
+                const edit = anchor.withNodeInserted(caret, item);
+                if(edit === undefined || !(edit.root instanceof FormatNode)) return;
+                item = edit.root;
+                newList = newList.withChildReplaced(anchor, item);
+            }
+            else {
+                newList = newList.withItemAfter(item, lastItem);
+            }
+            if(newList === undefined) return;
+            // Remember where we inserted.
+            lastItem = item;
+        }
+
+        // The caret should be the last item inserted.
+        const newCaret = lastItem instanceof FormatNode ? lastItem.getLastCaret() : lastItem.getLastItem()?.getLastCaret();
+        if(newCaret === undefined) return;
+
+        return { root: newList, range: { start: newCaret, end: newCaret }}
+
     }
 
 }

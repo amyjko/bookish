@@ -1,4 +1,5 @@
-import { CaretRange } from "./Caret";
+import { Caret, CaretRange } from "./Caret";
+import { Edit } from "./Edit";
 
 // A global node ID generator, for mapping views back to models.
 let nodeID = 1;
@@ -67,6 +68,7 @@ export abstract class Node {
         return found;
     }
 
+    // Returns a list of the given node's parents in this tree, from root to direct parent.
     getParentsOf(node: Node): Node[] | undefined {
         let parents = undefined;
         this.traverse((n, p) => { if(n === node) parents = p; });
@@ -177,4 +179,8 @@ export abstract class Node {
     // If there's a problem, it returns undefined. Assumes the range is sorted in parse order.
     abstract withContentInRange(range: CaretRange): this | undefined;
     
+    // By default, a node doesn't know how to insert anything into itself. Subclasses
+    // are responsible for overriding this if they want to support specific insertions.
+    withNodeInserted(caret: Caret, node: Node): Edit { return undefined; }
+
 }

@@ -13,7 +13,8 @@ import { CitationsNode } from "./CitationsNode";
 import { LabelNode } from "./LabelNode";
 import { CommentNode } from "./CommentNode";
 import { BlocksNode } from "./BlocksNode";
-import { CaretRange, TextRange } from "./Caret";
+import { Caret, CaretRange, TextRange } from "./Caret";
+import { Edit } from "./Edit";
 
 export class ChapterNode extends BlocksNode {
 
@@ -123,22 +124,6 @@ export class ChapterNode extends BlocksNode {
         return new ChapterNode(this.blocks.map(b => b.copy()), this.#metadata) as this;
     }
 
-    removeRedundantChildren(nodes: Set<Node>) {
-
-        // Remove any nodes whose parents are also in the list, as they would be redundant to format.
-        const redundant: Set<Node> = new Set<Node>()
-        nodes.forEach(node1 => {
-            nodes.forEach(node2 => {
-                if(node1 !== node2 && node1.hasAncestor(this, node2))
-                nodes.add(node1)
-            })
-        })
-
-        // Remove any redundant nodes from the deletion list.
-        redundant.forEach(node => nodes.delete(node));
-        
-    }
-
     copyRange(range: CaretRange): Node | undefined {
         const sortedRange = this.sortRange(range);
         // Find the common ancestor of the range, then ask it to copy the portion of it selected and produce a node.
@@ -146,5 +131,5 @@ export class ChapterNode extends BlocksNode {
         if(commonAncestor === undefined) return;
         return commonAncestor.withContentInRange(sortedRange);
     }
-
+    
 }

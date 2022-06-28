@@ -856,8 +856,8 @@ export const commands: Command[] = [
         handler: context => { 
             if(context.blocks === undefined) return;
             // Save the copied content to the clipboard
-            const copy = context.blocks.withContentInRange(context.range);
-            const edit = context.blocks.withoutRange(context.range);
+            const copy = context.chapter.copyRange(context.range);
+            const edit = context.chapter.withoutRange(context.range);
             if(edit === undefined) return;
 
             context.setClipboard(copy);
@@ -875,7 +875,7 @@ export const commands: Command[] = [
         handler: context => { 
             if(context.blocks === undefined) return;        
             // Save the copied content to the clipboard
-            const copy = context.blocks.withContentInRange(context.range);
+            const copy = context.chapter.copyRange(context.range);
             if(copy !== undefined)
                 context.setClipboard(copy);
             return undefined;
@@ -904,14 +904,27 @@ export const commands: Command[] = [
                 newCaret = edit.range.start;
             }
 
-            // Insert the node at the caret.
-            const edit = context.chapter.withBlocksInserted(newCaret, context.clipboard);
-            if(edit === undefined || !(edit.root instanceof ChapterNode)) return;
-            newChapter = edit.root;
-            newCaret = edit.range.start
+            // Find the parents of the caret node, from nearest to furthest
+            const parents = context.chapter.getParentsOf(newCaret.node);
+            if(parents === undefined) return;
+
+            // Pop parents, nearest to farthest, searching for one that handles an insertion.
+            let edit = undefined;
+            let parent = undefined;
+            while(parents.length > 0) {
+                parent = parents.pop();
+                if(parent === undefined) break;
+                // It's critical that we insert a copy and not the node in case people copy multiple times. A node can only appear once in a tree.
+                edit = parent.withNodeInserted(newCaret, context.clipboard.copy());
+                if(edit !== undefined) break;
+            }
 
             // Insert the node at the caret.
-            return { root: newChapter, range: { start: newCaret, end: newCaret }};
+            if(parent !== undefined && edit !== undefined) {
+                const newChapter = context.chapter.withNodeReplaced(parent, edit.root);
+                if(newChapter === undefined) return;
+                return { root: newChapter, range: edit.range};
+            }
 
         }
     },

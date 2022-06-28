@@ -59,7 +59,7 @@ export type CaretState = {
     setClipboard: React.Dispatch<React.SetStateAction<Clipboard>>
 }
 
-export type Clipboard = undefined | BlocksNode;
+export type Clipboard = undefined | BookishNode;
 
 export type UndoState = {
     command: Command | undefined,

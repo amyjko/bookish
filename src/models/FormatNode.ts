@@ -610,4 +610,22 @@ export class FormatNode extends Node {
         }
     }
 
+    withNodeInserted(caret: Caret, node: Node): Edit {
+        // The caret node has to be one of the nodes in this format to insert.
+        const index = this.#segments.indexOf(caret.node as FormatNodeSegmentType);
+        if(index < 0) return;
+        // The inserted node has to be a segment type.
+        if(!(node instanceof FormatNode || node instanceof TextNode || node instanceof MetadataNode || node instanceof AtomNode)) return;
+
+        const newFormat = this.withSegmentAt(node, caret);
+        const newCaret = 
+            node instanceof AtomNode ? node.getDefaultCaret() :
+            node instanceof FormatNode ? node.getLastCaret() :
+            node instanceof MetadataNode ? { node: node.getText(), index: node.getText().getLength() } :
+            { node: node, index: node.getLength() };
+        if(newFormat === undefined || newCaret === undefined) return;
+        return { root: newFormat, range: { start: newCaret, end: newCaret }};
+
+    }
+
 }

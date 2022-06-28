@@ -300,23 +300,6 @@ export abstract class BlocksNode extends BlockNode {
 
     }
 
-    withBlocksInserted(caret: Caret, blocks: BlocksNode): Edit {
-
-        //   If the caret's format node root is not in a blocks node
-        //     Bail; we can't insert things into it.
-        //   Otherwise...
-        //     If the first block is a paragraph
-        //       Merge it's format into the current format
-        //     Otherwise
-        //       Add it after the current paragraph
-        //     Add the rest of the blocks after the paragraph inserted or inserted into
-        // Return the revised blocks node.
-
-        // If a format, insert the format’s segments in the current format, and if blocks, 
-        // combine the first block with the current block, and insert additional blocks after it
-        return { root: this.copy(), range: { start: caret, end: caret }}
-    }
-
     withBlockInserted(anchor: BlockNode, block: BlockNode, before: boolean): BlocksNode | undefined {
         const index = this.blocks.indexOf(anchor);
         if(index < 0)
@@ -845,6 +828,65 @@ export abstract class BlocksNode extends BlockNode {
             }
         }
         // No parent could handle it. Fail!
+
+    }
+
+    withNodeInserted(caret: Caret, node: Node): Edit {
+        // The caret's node must be in this tree.
+        if(!this.contains(caret.node)) return;
+        // Get the blocks to insert.
+        const blocks = node instanceof BlocksNode ? node.getBlocks() : node instanceof BlockNode ? [ node ] : [];
+        // If there are none, do nothing.
+        if(blocks.length === 0) return;
+        // Find the block in this blocks node that contains the caret.
+        const anchor = this.blocks.find(b => b.contains(caret.node));
+        if(anchor === undefined) return;
+
+        let lastInsert = anchor;
+        let newBlocks: BlocksNode | undefined = this;
+        while(blocks.length > 0) {
+            // Get the block to insert
+            let newBlock = blocks.shift();
+            if(newBlock === undefined) return;
+
+            // If we're inserting after the anchor and the anchor is a paragraph and the block to insert is a paragraph, merge them.
+            if(lastInsert === anchor && anchor instanceof ParagraphNode && newBlock instanceof ParagraphNode) {
+                newBlock = anchor.withParagraphAppended(newBlock);
+                if(newBlock === undefined) return;
+                newBlocks = newBlocks.withChildReplaced(anchor, newBlock);
+            }
+            // If we're inserting after the anchor and the anchor is a list and the block to insert is a list, merge them.
+            else if(lastInsert === anchor && anchor instanceof ListNode && newBlock instanceof ListNode) {
+                const edit = anchor.withNodeInserted(caret, newBlock);
+                if(edit === undefined || !(edit.root instanceof BlockNode)) return;
+                newBlock = edit.root;
+                newBlocks = newBlocks.withChildReplaced(anchor, newBlock);
+            }
+            // Otherwise just insert the block after the last insert, including if it was the anchor block.
+            else {
+                newBlocks = newBlocks.withBlockInsertedAfter(lastInsert, newBlock);
+            }
+            // Bail on fail.
+            if(newBlocks === undefined) return;
+            // Remember what we inserted so we can insert after it.
+            lastInsert = newBlock;
+        }
+
+        // Set the caret to the last caret of the last insert, and if there isn't one, insert an empty paragraph so we can.
+        const formats = lastInsert.getFormats();
+        let newCaret = undefined;
+        if(formats.length === 0) {
+            const newParagraph = new ParagraphNode(0, new FormatNode("", [ new TextNode() ]));
+            newCaret = newParagraph.getFirstCaret();
+            newBlocks = newBlocks.withBlockInsertedAfter(lastInsert, newParagraph);
+            if(newCaret === undefined || newBlocks === undefined) return;
+        }
+        else {
+            newCaret = formats[formats.length - 1].getLastCaret();
+            if(newCaret === undefined) return;
+        }
+
+        return { root: newBlocks, range: { start: newCaret, end: newCaret }}
 
     }
 
