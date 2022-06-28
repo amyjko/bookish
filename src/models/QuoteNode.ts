@@ -16,7 +16,7 @@ export class QuoteNode extends BlocksNode {
         super(elements);
 
         this.#position = position;
-        this.#credit = credit === undefined ? new FormatNode("", [ new TextNode("") ]) : credit;
+        this.#credit = credit === undefined ? new FormatNode("", [ new TextNode() ]) : credit;
 
     }
 

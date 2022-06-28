@@ -3,7 +3,7 @@ import { TextNode } from "./TextNode";
 
 export class InlineCodeNode extends MetadataNode<string> {
     constructor(code?: TextNode, language: string = "plaintext") {
-        super(code === undefined ? new TextNode("") : code, language);
+        super(code === undefined ? new TextNode() : code, language);
     }
 
     getType() { return "inline-code"; }

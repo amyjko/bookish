@@ -388,7 +388,7 @@ export class FormatNode extends Node {
                                     // we can place the caret in it.
                                     if(!formattingEmptyNode && textIndex === selectionStartIndex && zeroWidthSelection) {
                                         // Remember the node for later, so we can place the caret in it.
-                                        emptyNode = new TextNode("");
+                                        emptyNode = new TextNode();
                                         // Append the empty node to the current format.
                                         newFormats[0].segments.push(emptyNode);
                                         // Push a new format onto the stack to start adding to.
@@ -413,7 +413,7 @@ export class FormatNode extends Node {
                                     // If we inserted an empty format node, add a text node in it and remember it so
                                     // we can place the caret in it.
                                     if(!formattingEmptyNode && textIndex === selectionStartIndex && zeroWidthSelection) {
-                                        emptyNode = new TextNode("");
+                                        emptyNode = new TextNode();
                                         newFormats[0].segments.push(emptyNode);
                                         finishFormat();
                                     }
@@ -491,13 +491,13 @@ export class FormatNode extends Node {
 
         // If after all that, it's empty, make sure there's one empty text node to type in.
         if(newFormat.getTextAndAtomNodes().length === 0)
-            newFormat = new FormatNode("", [ new TextNode("") ]);
+            newFormat = new FormatNode("", [ new TextNode() ]);
         // If it starts or ends with an atom, insert an empty node so that text can be inserted before or after.
         else {
             if(newFormat.#segments[0] instanceof AtomNode)
-                newFormat = newFormat.withSegmentPrepended(new TextNode(""));
+                newFormat = newFormat.withSegmentPrepended(new TextNode());
             if(newFormat.#segments[newFormat.getLength() - 1] instanceof AtomNode)
-                newFormat = newFormat.withSegmentAppended(new TextNode(""));
+                newFormat = newFormat.withSegmentAppended(new TextNode());
         }
 
         return newFormat;

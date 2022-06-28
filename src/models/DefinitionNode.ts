@@ -4,7 +4,7 @@ import { TextNode } from "./TextNode";
 export class DefinitionNode extends MetadataNode<string> {
     
     constructor(phrase?: TextNode, glossaryID: string = "") {
-        super(phrase === undefined ? new TextNode("") : phrase, glossaryID);
+        super(phrase === undefined ? new TextNode() : phrase, glossaryID);
     }
 
     getType() { return "definition"; }

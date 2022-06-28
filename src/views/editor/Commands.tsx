@@ -720,7 +720,7 @@ export const commands: Command[] = [
         active: context => context.blocks !== undefined && context.atParagraphStart,
         handler: context => {
             if(context.blocks && context.paragraph) {
-                const newCode = new CodeNode(new TextNode(""), "plaintext", "|");
+                const newCode = new CodeNode(new TextNode(), "plaintext", "|");
                 return chapterWithNode(
                     context, 
                     context.blocks, 
@@ -765,9 +765,9 @@ export const commands: Command[] = [
                 const newRows: FormatNode[][] = [[], [], []];
                 for(let r = 0; r < Math.max(1, 3); r++) {
                     for(let c = 0; c < Math.max(1, 3); c++)
-                        newRows[r].push(new FormatNode("", [ new TextNode("")]));
+                        newRows[r].push(new FormatNode("", [ new TextNode()]));
                 }
-                const newTable = new TableNode(newRows, "|", new FormatNode("", [ new TextNode("")]));
+                const newTable = new TableNode(newRows, "|", new FormatNode("", [ new TextNode()]));
                 return chapterWithNode(
                     context, 
                     context.blocks, 

@@ -400,7 +400,7 @@ export abstract class BlocksNode extends BlockNode {
         // Find the text or atom node to the left and right of the atom to determine the new caret position.
         const previous = format.getPreviousTextOrAtom(atom);
         const next = format.getNextTextOrAtom(atom);
-        const newText = new TextNode("");
+        const newText = new TextNode();
 
         // If the format is otherwise empty, replace the atom with an empty text node
         const newFormat = previous === undefined && next == undefined ?
@@ -765,7 +765,7 @@ export abstract class BlocksNode extends BlockNode {
                 // Delete the list!
                 else {
                     if(parent instanceof ListNode) {
-                        const newFormat = new FormatNode("", [ new TextNode("")]);
+                        const newFormat = new FormatNode("", [ new TextNode()]);
                         const newBlocks = this.withNodeReplaced(parent, newFormat);
                         const newCaret = newFormat.getFirstCaret();
                         if(newBlocks === undefined || newCaret === undefined) return;

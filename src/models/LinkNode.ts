@@ -4,7 +4,7 @@ import { TextNode } from "./TextNode";
 export class LinkNode extends MetadataNode<string> {
     
     constructor(text?: TextNode, url: string = "") {
-        super(text === undefined ? new TextNode("") : text, url);
+        super(text === undefined ? new TextNode() : text, url);
     }
 
     getType() { return "link"; }
