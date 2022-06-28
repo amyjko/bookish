@@ -1,5 +1,5 @@
 import { AtomNode } from "./AtomNode";
-import { Caret } from "./Caret";
+import { Caret, CaretRange } from "./Caret";
 import { FormatNode } from "./FormatNode";
 import { Node } from "./Node";
 
@@ -33,5 +33,11 @@ export class CommentNode extends AtomNode<FormatNode> {
     }
 
     withMeta(comment: FormatNode) { return new CommentNode(comment); }
+
+    withContentInRange(range: CaretRange): this | undefined { 
+        const newFormat = this.getMeta().withContentInRange(range);
+        if(newFormat === undefined) return;
+        return this.withMeta(newFormat) as this;    
+    }
 
 }

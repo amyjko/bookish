@@ -3,6 +3,7 @@ import { Position } from "./Position";
 import { FormatNode } from "./FormatNode";
 import { TextNode } from "./TextNode";
 import { BlockNode } from "./BlockNode";
+import { CaretRange } from "./Caret";
 
 export class EmbedNode extends BlockNode {
 
@@ -48,13 +49,13 @@ export class EmbedNode extends BlockNode {
         };
     }
 
-    getChildren() { return [ this.#credit, this.#caption ]; }
+    getChildren() { return [ this.#caption, this.#credit ]; }
 
     getParentOf(node: Node): Node | undefined {
-        
+
+        if(node === this.#caption || node === this.#credit) return this;
         const captionParent = this.#caption.getParentOf(node);
         if(captionParent) return captionParent;
-
         const creditParent = this.#credit.getParentOf(node);
         if(creditParent) return creditParent;
 
@@ -83,5 +84,16 @@ export class EmbedNode extends BlockNode {
     withCaption(caption: FormatNode) { return new EmbedNode(this.#url, this.#description, caption, this.#credit, this.#position); }
     withCredit(credit: FormatNode) { return new EmbedNode(this.#url, this.#description, this.#caption, credit, this.#position); }
     withPosition(position: Position) { return new EmbedNode(this.#url, this.#description, this.#caption, this.#credit, position); }
+    
+    withContentInRange(range: CaretRange): this | undefined {
+
+        if(!this.contains(range.start.node) && !this.contains(range.end.node)) return this.copy();
+        const newCaption = this.#credit.contains(range.start.node) ? new FormatNode("", [ new TextNode() ] ) : this.#caption.withContentInRange(range);
+        const newCredit = this.#caption.contains(range.end.node) ? new FormatNode("", [ new TextNode() ] ) : this.#credit.withContentInRange(range);
+        if(newCaption === undefined || newCredit === undefined) return;
+
+        return new EmbedNode(this.#url, this.#description, newCaption, newCredit, this.#position) as this;
+        
+    }
 
 }

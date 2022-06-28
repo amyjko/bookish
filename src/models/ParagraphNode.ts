@@ -94,4 +94,10 @@ export class ParagraphNode extends BlockNode {
             undefined;
     }
 
+    withContentInRange(range: CaretRange): this | undefined {
+        const newFormat = this.#content.withContentInRange(range);
+        if(newFormat === undefined) return;
+        return new ParagraphNode(this.#level, newFormat) as this;
+    }
+
 }

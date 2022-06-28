@@ -1,11 +1,14 @@
 import { CalloutNode } from "./CalloutNode";
 import { ChapterNode } from "./ChapterNode";
+import { CodeNode } from "./CodeNode";
+import { EmbedNode } from "./EmbedNode";
 import { FootnoteNode } from "./FootnoteNode";
 import { FormatNode } from "./FormatNode";
 import { ListNode } from "./ListNode";
 import { ParagraphNode } from "./ParagraphNode";
 import { QuoteNode } from "./QuoteNode";
 import { RuleNode } from "./RuleNode";
+import { TableNode } from "./TableNode";
 import { TextNode } from "./TextNode";
 
 const firstText = "First paragraph."
@@ -258,5 +261,131 @@ test("Backspace/delete", () => {
     const quoteChapter = new ChapterNode([ new QuoteNode([]), firstParagraph ]);
     expect(quoteChapter.withoutAdjacentContent({ node: firstTextNode, index: 0}, false)?.root.toBookdown())
         .toBe(`${firstText}`)
+
+})
+
+test("Copy/paste", () => {
+    // Build a document with everything.
+    const sentence1 = new TextNode("Hello, I am a sentence.")
+    const paragraph1 = new ParagraphNode(0, new FormatNode("", [ sentence1 ]))
+
+    const sentence2 = new TextNode("Hello, I am another sentence.")
+    const boldSentence3 = new TextNode(" Can you believe my size?")
+    const paragraph2 = new ParagraphNode(0, new FormatNode("", [ sentence2, new FormatNode("*", [ boldSentence3 ]) ]))
+
+    const sentence3 = new TextNode("Lonely last.")
+    const paragraph3 = new ParagraphNode(0, new FormatNode("", [ sentence3 ]))
+
+    const imageCaption = new TextNode("no image")
+    const imageCredit = new TextNode("Amy")
+    const image = new EmbedNode("nope", "nothing", new FormatNode("", [ imageCaption ]), new FormatNode("", [ imageCredit ]))
+
+    const js = new TextNode("let a = 1;");
+    const code = new CodeNode(js, "js", "|", new FormatNode("", [ new TextNode("assignment")]))
+
+    const item1 = new TextNode("one")
+    const item1a = new TextNode("one a")
+    const item2 = new TextNode("two")
+    const item3 = new TextNode("three")
+    const list = new ListNode([ new FormatNode("", [ item1 ]), new ListNode([ new FormatNode("", [ item1a ]) ], true), new FormatNode("", [ item2 ]), new FormatNode("", [ item3 ]) ], true)
+
+    const afterList = new TextNode("Post-list");
+    const afterListParagraph = new ParagraphNode(0, new FormatNode("", [ afterList ]));
+
+    const cellr1c1 = new TextNode("a");
+    const cellr1c2 = new TextNode("b");
+    const cellr1c3 = new TextNode("c");
+    const cellr2c1 = new TextNode("d");
+    const cellr2c2 = new TextNode("e");
+    const cellr2c3 = new TextNode("f");
+    const cellr3c1 = new TextNode("g");
+    const cellr3c2 = new TextNode("h");
+    const cellr3c3 = new TextNode("i");
+    const table = new TableNode([
+        [ new FormatNode("", [ cellr1c1 ]), new FormatNode("", [ cellr1c2 ]), new FormatNode("", [ cellr1c3 ])],
+        [ new FormatNode("", [ cellr2c1 ]), new FormatNode("", [ cellr2c2 ]), new FormatNode("", [ cellr2c3 ])],
+        [ new FormatNode("", [ cellr3c1 ]), new FormatNode("", [ cellr3c2 ]), new FormatNode("", [ cellr3c3 ])]
+    ])
+
+    const calloutOne = new TextNode("one")
+    const calloutTwo = new TextNode("two")
+    const calloutThree = new TextNode("three")
+    const callout = new CalloutNode([ new ParagraphNode(0, new FormatNode("", [ calloutOne ])), new ParagraphNode(0, new FormatNode("", [ calloutTwo ])), new ParagraphNode(0, new FormatNode("", [ calloutThree ]))])
+
+    const quoteOne = new TextNode("I'm tired")
+    const quoteCredit = new TextNode("Boomy")
+    const quote = new QuoteNode([ new ParagraphNode(0, new FormatNode("", [ quoteOne ]))], new FormatNode("", [ quoteCredit ]))
+
+    const chapter = new ChapterNode([ paragraph1, paragraph2, paragraph3, image, code, list, afterListParagraph, table, callout, quote ]);
+
+    const partialSegment = chapter.copyRange({ start: { node: sentence1, index: 12}, end: { node: sentence1, index: 22 }})
+    const reversedPartialSegment = chapter.copyRange({ start: { node: sentence1, index: 22}, end: { node: sentence1, index: 12 }})
+    const consecutivePartialParagraphs = chapter.copyRange({ start: { node: sentence1, index: 12}, end: { node: sentence2, index: 5 }})
+    const threeParagraphs = chapter.copyRange({ start: { node: sentence1, index: sentence1.getLength() - 1 }, end: { node: sentence3, index: 6 }})
+
+    // Paragraphs
+    expect(partialSegment?.toBookdown())
+        .toBe("a sentence")
+    expect(reversedPartialSegment?.toBookdown())
+        .toBe("a sentence")
+    expect(consecutivePartialParagraphs?.toBookdown())
+        .toBe("a sentence.\n\nHello")
+    expect(threeParagraphs?.toBookdown())
+        .toBe(`.\n\n${sentence2.toBookdown()}*${boldSentence3.toBookdown()}*\n\nLonely`)
+
+    const partialImageCaption = chapter.copyRange({ start: { node: imageCaption, index: 3}, end: { node: imageCaption, index: 8 }})
+    const partialImageCredit = chapter.copyRange({ start: { node: imageCredit, index: 2}, end: { node: imageCredit, index: 3 }})
+    const imageCaptionAndCredit = chapter.copyRange({ start: { node: imageCaption, index: 3}, end: { node: imageCredit, index: 1 }})
+    const paragraphAndImage = chapter.copyRange({ start: { node: sentence3, index: 7}, end: { node: imageCaption, index: 2 }})
+    
+    // Images
+    expect(partialImageCaption?.toBookdown())
+        .toBe(`image`)
+    expect(partialImageCredit?.toBookdown())
+        .toBe(`y`)
+    expect(imageCaptionAndCredit?.toBookdown())
+        .toBe(`|nope|nothing|image|A|`)
+    expect(paragraphAndImage?.toBookdown())
+        .toBe(`last.\n\n|nope|nothing|no||`)
+
+    const imageAndCode = chapter.copyRange({ start: { node: imageCredit, index: 0}, end: { node: js, index: 3 }})
+    
+    // Code
+    expect(imageAndCode?.toBookdown())
+        .toBe(`|nope|nothing||Amy|\n\n\`js\nlet\n\``)
+
+    const partialList = chapter.copyRange({ start: { node: item1a, index: 4}, end: { node: item2, index: 1 }})
+    const partialListAndParagraph = chapter.copyRange({ start: { node: item2, index: 0}, end: { node: afterList, index: 4 }})
+    
+    // Lists
+    expect(partialList?.toBookdown())
+        .toBe(`1.. a\n2. t`)
+    expect(partialListAndParagraph?.toBookdown())
+        .toBe(`1. two\n2. three\n\nPost`)
+
+    // Tables
+    const partialTable = chapter.copyRange({ start: { node: cellr2c2, index: 0 }, end: { node: cellr3c2, index: 1 }})
+    const partialTableAndParagraph = chapter.copyRange({ start: { node: afterListParagraph, index: 0 }, end: { node: cellr1c2, index: 1 }})
+    
+    expect(partialTable?.toBookdown())
+        .toBe(`,|e|f\n,g|h|\n`)
+    expect(partialTableAndParagraph?.toBookdown())
+        .toBe(`Post-list\n\n,a|b|\n`)
+
+    // Callouts
+    const partialCallout = chapter.copyRange({ start: { node: calloutOne, index: 0 }, end: { node: calloutTwo, index: 1 }})
+    const partialTableAndCallout = chapter.copyRange({ start: { node: cellr3c3, index: 0 }, end: { node: calloutTwo, index: 3 }})
+
+    expect(partialCallout?.toBookdown())
+        .toBe(`=\none\n\nt\n=`)
+    expect(partialTableAndCallout?.toBookdown())
+        .toBe(`,||i\n\n\n=\none\n\ntwo\n=`)
+
+    // Quote
+    const partialQuote = chapter.copyRange({ start: { node: quoteOne, index: 4 }, end: { node: quoteCredit, index: 4 }})
+    const partialCalloutAndQuote = chapter.copyRange({ start: { node: calloutThree, index: 0 }, end: { node: quoteOne, index: 9 }})
+
+    expect(partialCalloutAndQuote?.toBookdown())
+        .toBe(`=\nthree\n=\n\n"\nI'm tired\n"`)
 
 })

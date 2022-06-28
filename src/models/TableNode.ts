@@ -3,20 +3,21 @@ import { Position } from "./Position";
 import { FormatNode } from "./FormatNode";
 import { TextNode } from "./TextNode";
 import { BlockNode } from "./BlockNode";
+import { Caret, CaretRange } from "./Caret";
 
 export type Location = { row: number, column: number };
 
 export class TableNode extends BlockNode {
 
     readonly #rows: FormatNode[][];
-    readonly #caption: FormatNode | undefined;
+    readonly #caption: FormatNode;
     readonly #position: Position;
 
     constructor(rows: FormatNode[][], position?: Position, caption?: FormatNode) {
         super();
         this.#rows = rows;
         this.#position = position ? position : "|";
-        this.#caption = caption;
+        this.#caption = caption === undefined ? new FormatNode("", [ new TextNode() ]) : caption;
     }
 
     getType() { return "table"; }
@@ -169,6 +170,48 @@ export class TableNode extends BlockNode {
         }
         return new TableNode(newRows, this.#position, this.#caption);
 
+    }
+
+    withContentInRange(range: CaretRange): this | undefined {
+
+        const containsStart = this.contains(range.start.node);
+        const containsEnd = this.contains(range.end.node);
+        if(!containsStart && !containsEnd) return this.copy();
+
+        // If it contains the start, skip rows until we find the cell with the start node.
+        // If it contains the end, skip rows after we find the cell with the end node.
+        let r = 0, c = 0;
+        let foundStart = false;
+        let foundEnd = false;
+        let newRows: FormatNode[][] = [];
+        for(; r < this.#rows.length; r++, c = 0) {
+            const row = this.#rows[r];
+            
+            // Skip this row if this table contains the start node and we haven't found it and the row doesn't contain it
+            if(containsStart && !foundStart && row.find(r => r.contains(range.start.node)) === undefined)
+                continue;
+            // Stop if we found the end row.
+            if(containsEnd && foundEnd)
+                break;
+
+            newRows.push([] as FormatNode[]);
+            for(; c < row.length; c++) {
+                if(!foundStart && row[c].contains(range.start.node)) foundStart = true;
+                const newCell = row[c].withContentInRange(range);
+                if(newCell === undefined) return;
+                newRows[newRows.length - 1].push(
+                    (((containsStart && foundStart) || !containsStart) && ((containsEnd && !foundEnd) || !containsEnd)) ? 
+                        newCell : 
+                        new FormatNode("", [ new TextNode() ]));
+                if(row[c].contains(range.end.node)) foundEnd = true;
+            }
+
+        }
+
+        const newCaption = this.#caption.withContentInRange(range);
+        if(newCaption === undefined) return;
+
+        return new TableNode(newRows, this.#position, newCaption) as this;
     }
 
 }

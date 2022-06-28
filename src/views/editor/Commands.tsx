@@ -856,7 +856,7 @@ export const commands: Command[] = [
         handler: context => { 
             if(context.blocks === undefined) return;
             // Save the copied content to the clipboard
-            const copy = context.blocks.copyRange(context.range);
+            const copy = context.blocks.withContentInRange(context.range);
             const edit = context.blocks.withoutRange(context.range);
             if(edit === undefined) return;
 
@@ -873,11 +873,11 @@ export const commands: Command[] = [
         visible: context => true,
         active: context => context.blocks !== undefined && context.isSelection,
         handler: context => { 
-            if(context.blocks === undefined) return;
-        
+            if(context.blocks === undefined) return;        
             // Save the copied content to the clipboard
-            const copy = context.blocks.copyRange(context.range);
-            context.setClipboard(copy);
+            const copy = context.blocks.withContentInRange(context.range);
+            if(copy !== undefined)
+                context.setClipboard(copy);
             return undefined;
         
         }
@@ -905,7 +905,7 @@ export const commands: Command[] = [
             }
 
             // Insert the node at the caret.
-            const edit = context.chapter.withNodeInserted(newCaret, context.clipboard);
+            const edit = context.chapter.withBlocksInserted(newCaret, context.clipboard);
             if(edit === undefined || !(edit.root instanceof ChapterNode)) return;
             newChapter = edit.root;
             newCaret = edit.range.start

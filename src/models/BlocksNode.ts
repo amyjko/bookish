@@ -113,6 +113,16 @@ export abstract class BlocksNode extends BlockNode {
         return text.indexOf(node);
     }
 
+    getFirstCaret(): Caret | undefined {
+        const text = this.getTextNodes();
+        return text.length === 0 ? undefined : { node: text[0], index: 0 };
+    }
+
+    getLastCaret(): Caret | undefined {
+        const text = this.getTextNodes();
+        return text.length === 0 ? undefined : { node: text[text.length - 1], index: text[text.length - 1].getLength() };
+    }
+
     getSelectedText(range: CaretRange): string | undefined {
 
         if(!(range.start.node instanceof TextNode) || !(range.end.node instanceof TextNode))
@@ -265,26 +275,33 @@ export abstract class BlocksNode extends BlockNode {
  
     abstract create(blocks: BlockNode[]): BlocksNode;
 
-    copyRange(range: CaretRange): FormatNode | BlocksNode {
+    withContentInRange(range: CaretRange): this | undefined {
 
-        // If the selection is contained within a format node...
-        //   Construct a FormatNode with the selection and return it.
-        // Otherwise...
-        //   Identify all of the blocks in the range
-        //   Copy the selected part of the first block
-        //   Copy all of the middle blocks, if there are any
-        //   Copy the selected part of the last block
-        //   Return the new blocks node
+        const containsStart = this.contains(range.start.node);
+        const containsEnd = this.contains(range.end.node);
 
-        // Create a format or blocks node containing the copied content.
-        return new FormatNode("", [ new TextNode("Hi") ]);
+        if(!containsStart && !containsEnd) return this.copy();
+
+        let foundStart = false;
+        let foundEnd = false;
+        const newBlocks: BlockNode[] = [];
+        for(let i = 0; i < this.blocks.length; i++) {
+            if(this.blocks[i].contains(range.start.node)) foundStart = true;
+            if( ((containsStart && foundStart) || !containsStart) && 
+                ((containsEnd && !foundEnd) || !containsEnd)) {
+                const newBlock = this.blocks[i].withContentInRange(range);
+                if(newBlock === undefined) return;
+                newBlocks.push(newBlock);
+            }
+            if(this.blocks[i].contains(range.end.node)) foundEnd = true;
+        }
+
+        return this.create(newBlocks) as this;
+
     }
 
-    withNodeInserted(caret: Caret, node: FormatNode | BlocksNode): Edit {
+    withBlocksInserted(caret: Caret, blocks: BlocksNode): Edit {
 
-        // If the node is a format node...
-        //   Insert its segments into the current format node at the caret location.
-        // If the node is a blocks node
         //   If the caret's format node root is not in a blocks node
         //     Bail; we can't insert things into it.
         //   Otherwise...

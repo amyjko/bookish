@@ -1,3 +1,4 @@
+import { CaretRange } from "./Caret";
 import { Node } from "./Node";
 import { TextNode } from "./TextNode";
 
@@ -26,6 +27,12 @@ export abstract class MetadataNode<MetaType> extends Node {
     withChildReplaced(node: TextNode, replacement: TextNode | undefined) {
         if(this.#text === node && replacement !== undefined)
             return this.withText(replacement) as this;
+    }
+
+    withContentInRange(range: CaretRange): this | undefined { 
+        const selectedText = this.#text.withContentInRange(range);
+        if(selectedText === undefined) return undefined;
+        return this.withText(selectedText) as this;    
     }
 
 }

@@ -1,7 +1,7 @@
 import { FormatNode } from "./FormatNode";
 import { AtomNode } from "./AtomNode";
 import { Node } from "./Node";
-import { Caret } from "./Caret";
+import { Caret, CaretRange } from "./Caret";
 
 export class FootnoteNode extends AtomNode<FormatNode> {
 
@@ -28,5 +28,11 @@ export class FootnoteNode extends AtomNode<FormatNode> {
     }
 
     withMeta(footnote: FormatNode) { return new FootnoteNode(footnote); }
+
+    withContentInRange(range: CaretRange): this | undefined { 
+        const newFormat = this.getMeta().withContentInRange(range);
+        if(newFormat === undefined) return;
+        return this.withMeta(newFormat) as this;    
+    }
 
 }

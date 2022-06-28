@@ -1,3 +1,4 @@
+import { CaretRange } from "./Caret";
 import { Node } from "./Node";
 
 export class ReferenceNode extends Node {
@@ -35,5 +36,7 @@ export class ReferenceNode extends Node {
     }
 
     withChildReplaced(node: Node, replacement: Node | undefined) { return undefined; }
+
+    withContentInRange(range: CaretRange): this | undefined { return this.copy(); }
 
 }

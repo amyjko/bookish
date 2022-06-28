@@ -4,6 +4,7 @@ import { Position } from "./Position";
 import { FormatNode } from "./FormatNode";
 import { BlocksNode } from "./BlocksNode";
 import { TextNode } from "./TextNode";
+import { Caret, CaretRange } from "./Caret";
 
 export class QuoteNode extends BlocksNode {
     
@@ -31,7 +32,7 @@ export class QuoteNode extends BlocksNode {
     }
 
     toBookdown(debug?: number): string {
-        return `"\n${this.getBlocks().map(element => element.toBookdown(debug)).join("\n\n")}\n"${this.#position === "|" ? "" : this.#position}${this.#credit ? " " + this.#credit.toBookdown(debug) : ""}`;
+        return `"\n${this.getBlocks().map(element => element.toBookdown(debug)).join("\n\n")}\n"${this.#position === "|" ? "" : this.#position}${this.#credit ? this.#credit.toBookdown(debug) : ""}`;
     }
 
     getChildren(): Node[] { return [ ...this.blocks, this.#credit ]; }
@@ -68,5 +69,15 @@ export class QuoteNode extends BlocksNode {
 
     withCredit(credit: FormatNode | undefined): QuoteNode { return new QuoteNode(this.getBlocks(), credit, this.#position); }
     withPosition(position: Position): QuoteNode { return new QuoteNode(this.getBlocks(), this.#credit, position); }
+
+    withContentInRange(range: CaretRange): this | undefined {
+        // First get the blocks in range.
+        const newQuote = super.withContentInRange(range);
+        if(newQuote === undefined) return;
+
+        const newCredit = this.blocks.find(b => b.contains(range.end.node)) !== undefined ? new FormatNode("", [ new TextNode() ]) : this.#credit.withContentInRange(range);
+        return newQuote.withNodeReplaced(this.#credit, newCredit) as this;
+
+    }
 
 }

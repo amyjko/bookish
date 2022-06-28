@@ -1,7 +1,6 @@
 import { Node } from "./Node";
 import { FormatNode } from "./FormatNode";
-import { Caret } from "./Caret";
-import { ParagraphNode } from "./ParagraphNode";
+import { Caret, CaretRange } from "./Caret";
 import { BlocksNode } from "./BlocksNode";
 import { BlockNode } from "./BlockNode";
 
@@ -258,6 +257,27 @@ export class ListNode extends BlockNode {
         return new ListNode(replacement === undefined ?
             [ ...this.#items.slice(0, index), ...this.#items.slice(index + 1)] :
             [ ...this.#items.slice(0, index), replacement, ...this.#items.slice(index + 1) ], this.#numbered) as this;
+    }
+
+    withContentInRange(range: CaretRange): this | undefined {
+        const containsStart = this.contains(range.start.node);
+        const containsEnd = this.contains(range.end.node);
+        if(!containsStart && !containsEnd) return this.copy();
+
+        const newItems = [];
+        let foundStart = false;
+        let foundEnd = false;
+        for(let i = 0; i < this.#items.length; i++) {
+            if(this.#items[i].contains(range.start.node)) foundStart = true;
+            if(((containsStart && foundStart) || !containsStart) &&
+               ((containsEnd && !foundEnd) || !containsEnd)) {
+                const newItem = this.#items[i].withContentInRange(range);
+                if(newItem === undefined) return;
+                newItems.push(newItem);
+            }
+            if(this.#items[i].contains(range.end.node)) foundEnd = true;
+        }
+        return new ListNode(newItems, this.#numbered) as this;
     }
 
 }

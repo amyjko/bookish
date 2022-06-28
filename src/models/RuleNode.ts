@@ -1,5 +1,6 @@
 import { Node } from "./Node";
 import { BlockNode } from "./BlockNode";
+import { Caret, CaretRange } from "./Caret";
 
 export class RuleNode extends BlockNode {
     
@@ -16,5 +17,6 @@ export class RuleNode extends BlockNode {
 
     copy() { return new RuleNode() as this; }
     withChildReplaced(node: Node, replacement: Node | undefined) { return undefined; }
+    withContentInRange(range: CaretRange): this | undefined { return this.copy(); }
 
 }

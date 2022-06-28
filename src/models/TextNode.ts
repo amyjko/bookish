@@ -1,5 +1,5 @@
 import { MetadataNode } from "./MetadataNode";
-import { Caret } from "./Caret";
+import { Caret, CaretRange } from "./Caret";
 import { FormatNode } from "./FormatNode";
 import { Node } from "./Node";
 import { ParagraphNode } from "./ParagraphNode";
@@ -14,7 +14,7 @@ export class TextNode extends Node {
 
     readonly #text: string;
 
-    constructor(text: string) {
+    constructor(text: string="") {
         super();
         this.#text = text;
     }
@@ -163,4 +163,12 @@ export class TextNode extends Node {
         return new TextNode(this.#text.slice(0, index) + char + this.#text.slice(index));
     }
     
+    withContentInRange(range: CaretRange): this | undefined { 
+
+        const includesStart = range.start.node === this;
+        const includesEnd = range.end.node === this;
+        return new TextNode(this.#text.substring(includesStart ? range.start.index : 0, includesEnd ? range.end.index : this.#text.length)) as this;
+
+    }
+
 }

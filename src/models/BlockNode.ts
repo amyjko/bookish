@@ -1,3 +1,4 @@
+import { Caret } from "./Caret";
 import { FormatNode } from "./FormatNode";
 import { Node } from "./Node";
 

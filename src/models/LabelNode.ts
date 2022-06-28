@@ -1,5 +1,5 @@
 import { AtomNode } from "./AtomNode";
-import { Caret } from "./Caret";
+import { Caret, CaretRange } from "./Caret";
 import { FormatNode } from "./FormatNode";
 import { Node } from "./Node";
 
@@ -31,4 +31,6 @@ export class LabelNode extends AtomNode<string> {
     withMeta(newID: string) { return new LabelNode(newID); }
     withChildReplaced(node: Node, replacement: Node | undefined){ return undefined; }
     
+    withContentInRange(range: CaretRange): this | undefined { return this.copy(); }
+
 }

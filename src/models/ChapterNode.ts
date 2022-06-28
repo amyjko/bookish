@@ -139,4 +139,12 @@ export class ChapterNode extends BlocksNode {
         
     }
 
+    copyRange(range: CaretRange): Node | undefined {
+        const sortedRange = this.sortRange(range);
+        // Find the common ancestor of the range, then ask it to copy the portion of it selected and produce a node.
+        const commonAncestor = sortedRange.start.node.getCommonAncestor(this, sortedRange.end.node);
+        if(commonAncestor === undefined) return;
+        return commonAncestor.withContentInRange(sortedRange);
+    }
+
 }

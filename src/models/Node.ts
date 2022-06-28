@@ -1,3 +1,5 @@
+import { CaretRange } from "./Caret";
+
 // A global node ID generator, for mapping views back to models.
 let nodeID = 1;
 
@@ -170,5 +172,9 @@ export abstract class Node {
         }
 
     }
+
+    // Given a range, return either a full copy of the node, or a partial copy if it contains the range.
+    // If there's a problem, it returns undefined. Assumes the range is sorted in parse order.
+    abstract withContentInRange(range: CaretRange): this | undefined;
     
 }

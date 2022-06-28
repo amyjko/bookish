@@ -1,5 +1,5 @@
 import { AtomNode } from "./AtomNode";
-import { Caret } from "./Caret";
+import { Caret, CaretRange } from "./Caret";
 import { Node } from "./Node";
 
 export class CitationsNode extends AtomNode<string[]> {
@@ -17,5 +17,6 @@ export class CitationsNode extends AtomNode<string[]> {
     
     withMeta(citations: string[]) { return new CitationsNode(citations); }
     withChildReplaced(node: Node, replacement: Node){ return undefined; }
+    withContentInRange(range: CaretRange): this | undefined { return this.copy(); }
 
 }

@@ -3,6 +3,7 @@ import { Position } from "./Position";
 import { FormatNode } from "./FormatNode";
 import { TextNode } from "./TextNode";
 import { BlockNode } from "./BlockNode";
+import { Caret, CaretRange } from "./Caret";
 
 export class CodeNode extends BlockNode {
 
@@ -39,7 +40,7 @@ export class CodeNode extends BlockNode {
 
     toBookdown(debug?: number): string {
         // Remember to escape any back ticks.
-        return "\n`" + 
+        return "`" + 
                 (this.#language !== "plaintext" ? this.#language : "") + 
                 "\n" + 
                 this.#code.getText().replace(/`/g, '\\`') + 
@@ -73,5 +74,13 @@ export class CodeNode extends BlockNode {
     withLanguage(language: string) { return new CodeNode(this.#code, language, this.#position, this.#caption); }
     withExecutable(executable: boolean) { return new CodeNode(this.#code, executable ? this.#language + "!" : this.#language, this.#position, this.#caption); }
     withCaption(caption : FormatNode) { return new CodeNode(this.#code, this.#language, this.#position, caption); }
+    
+    withContentInRange(range: CaretRange): this | undefined {
+        if(!this.contains(range.start.node) && !this.contains(range.end.node)) return this.copy();
+        const newCode = this.#caption.contains(range.start.node) ? new TextNode() : this.#code.withContentInRange(range);
+        const newCaption = range.end.node === this.#code ? new FormatNode("", [ new TextNode() ] ) : this.#caption.withContentInRange(range);
+        if(newCode === undefined || newCaption === undefined) return;
+        return new CodeNode(newCode, this.#language, this.#position, newCaption) as this;
+    }
 
 }

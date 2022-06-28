@@ -539,15 +539,41 @@ export class FormatNode extends Node {
     }
 
     withoutContentBefore(caret: Caret): FormatNode | undefined {
-        const firstCaret = this.getFirstCaret();
-        if(firstCaret === undefined) return;
-        return this.withoutRange({ start: firstCaret, end: caret });
+        return this.withContentAt(caret, false);
     }
 
     withoutContentAfter(caret: Caret): FormatNode | undefined {
-        const lastCaret = this.getLastCaret();
-        if(lastCaret === undefined) return;
-        return this.withoutRange({ start: caret, end: lastCaret });        
+        return this.withContentAt(caret, true);
+    }
+
+    withContentAt(caret: Caret, before: boolean): FormatNode | undefined {
+        let range = undefined;
+        if(before) {
+            const lastCaret = this.getLastCaret();
+            if(lastCaret === undefined) return;
+            range = { start: caret, end: lastCaret }            
+        } else {
+            const firstCaret = this.getFirstCaret();
+            if(firstCaret === undefined) return;
+            range = { start: firstCaret, end: caret};
+        }
+        return this.withoutRange(range);
+    }
+
+    withContentInRange(range: CaretRange): this | undefined {
+        const containsStart = this.contains(range.start.node);
+        const containsEnd = this.contains(range.end.node);
+        if(!containsStart && !containsEnd) return this.copy();
+        const startCaret = containsStart ? range.start : this.getFirstCaret();
+        const endCaret = containsEnd ? range.end : this.getLastCaret();
+        if(startCaret === undefined || endCaret === undefined) return;
+        const startIndex = this.caretToTextIndex(startCaret);
+        const endIndex = this.caretToTextIndex(endCaret);
+        if(startIndex === undefined || endIndex === undefined) return;
+        const withoutBefore = this.withoutContentBefore(startCaret);
+        const revisedEndCaret = withoutBefore?.textIndexToCaret(endIndex - startIndex);
+        if(revisedEndCaret === undefined) return;
+        return withoutBefore?.withoutContentAfter(revisedEndCaret) as this;
     }
 
     withSegmentsAppended(format: FormatNode): FormatNode {

@@ -722,7 +722,7 @@ export default class Parser {
 
         // Read the caption. Note that parsing inline content stops at a newline, 
         // so if there's a line break after the last row, there won't be a caption.
-        const caption = this.parseContent(undefined);
+        const caption = this.parseContent();
 
         // Return the new table.
         return new TableNode(rows, position, caption);
