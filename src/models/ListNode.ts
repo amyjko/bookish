@@ -159,21 +159,38 @@ export class ListNode extends BlockNode {
         if(index <= 0 || index >= this.#items.length) return;
 
         const deletedItem = this.#items[index];
-        const previousItem = this.#items[index - 1];
+        let previousItem = this.#items[index - 1];
 
-        if(!(deletedItem instanceof FormatNode) || !(previousItem instanceof FormatNode)) return;
+        if(!(deletedItem instanceof FormatNode)) return;
 
-        // Remember where to place the caret.
-        const lastCaret = previousItem.getLastCaret();
-        if(lastCaret === undefined) return;
-        const newCaretIndex = previousItem.caretToTextIndex(lastCaret);
-        if(newCaretIndex === undefined) return;
-        const mergedItem = previousItem.withSegmentsAppended(deletedItem);
-        const newList = this.withItemReplaced(index - 1, mergedItem)?.withoutItemAt(index);
-        if(newList === undefined) return;
-        const newCaret = mergedItem.textIndexToCaret(newCaretIndex);
-        if(newCaret === undefined) return;
-        return [ newList, newCaret ];
+        // If the previous item is a list, find it's last item.
+        if(previousItem instanceof ListNode) {
+            const lastItem = previousItem.getLastItem();
+            if(lastItem === undefined) return;
+            const lastCaret = lastItem.getLastCaret();
+            if(lastCaret === undefined) return;
+            const newCaretIndex = lastItem.caretToTextIndex(lastCaret);
+            if(newCaretIndex === undefined) return;
+            const mergedItem = lastItem.withSegmentsAppended(deletedItem);
+            const newSublist = previousItem.withChildReplaced(lastItem, mergedItem);
+            if(newSublist === undefined) return;
+            const newList = this.withChildReplaced(previousItem, newSublist)?.withoutItemAt(index);
+            if(newList === undefined) return;
+            const newCaret = mergedItem.textIndexToCaret(newCaretIndex);
+            if(newCaret === undefined) return;
+            return [ newList, newCaret ];
+        } else {
+            const lastCaret = previousItem.getLastCaret();
+            if(lastCaret === undefined) return;
+            const newCaretIndex = previousItem.caretToTextIndex(lastCaret);
+            if(newCaretIndex === undefined) return;
+            const mergedItem = previousItem.withSegmentsAppended(deletedItem);
+            const newList = this.withItemReplaced(index - 1, mergedItem)?.withoutItemAt(index);
+            if(newList === undefined) return;
+            const newCaret = mergedItem.textIndexToCaret(newCaretIndex);
+            if(newCaret === undefined) return;
+            return [ newList, newCaret ];
+        }
         
     }
 

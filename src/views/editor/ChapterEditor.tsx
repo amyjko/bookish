@@ -442,7 +442,7 @@ const ChapterEditor = (props: { chapter: Chapter }) => {
             if(n === caretRange.end.node) inside = false;
         });
 
-        const parents = ast.getParentsOf(caretRange.start.node);
+        const parents = ast.getParentsOf(caretRange.start.node)?.reverse();
 
         return { 
             // We make a new range so that setCaretRange always causes a re-render

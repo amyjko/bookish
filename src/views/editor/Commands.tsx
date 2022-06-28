@@ -457,14 +457,40 @@ export const commands: Command[] = [
         category: "list",
         control: false, alt: false, shift: false, key: "Enter",
         visible: context => false,
-        active: context => context.format !== undefined && context.list !== undefined,
-        handler: context => chapterWithNode(context, context.list, context.list?.withItemSplit(context.range.start), newList => {
-            const index = context.list?.getItemContaining(context.range.start);
-            if(index === undefined) return;
-            const item = (newList as ListNode).getItem(index + 1);
-            if(item === undefined) return;
-            return item.getFirstCaret();
-        })
+        active: context => context.list !== undefined,
+        handler: context => {
+            if(context.list === undefined) return;
+            const lastItem = context.list.getLastItem();
+            const lastCaret = lastItem?.getLastCaret();
+            // If we're at the last item in the list and it's empty, then add a
+            if(lastItem !== undefined && lastCaret !== undefined && lastCaret.node instanceof TextNode && lastCaret.node.getLength() === 0 && lastCaret.node === context.end.node && lastCaret.index === context.end.index) {
+                const listParent = context.list.getParent(context.chapter);
+                if(listParent instanceof ListNode) {
+                    const newSublist = context.list.withoutItem(lastItem);
+                    if(newSublist === undefined) return;
+                    const newListWithoutSublistItem = listParent.withChildReplaced(context.list, newSublist);
+                    if(newListWithoutSublistItem === undefined) return;
+                    const newListWithSublistItem = newListWithoutSublistItem.withItemAfter(lastItem, newSublist);
+                    if(newListWithSublistItem === undefined) return;                    
+                    return chapterWithNode(context, listParent, newListWithSublistItem, n => lastCaret)
+                }
+                else if(listParent instanceof BlocksNode) {
+                    const listWithoutItem = context.list.withoutItem(lastItem);
+                    if(listWithoutItem === undefined) return;
+                    const newBlocks = listParent.withChildReplaced(context.list, listWithoutItem)?.withBlockInsertedAfter(listWithoutItem, new ParagraphNode(0, lastItem));
+                    if(newBlocks === undefined) return;
+                    return chapterWithNode(context, listParent, newBlocks, n => lastCaret );
+                }
+            }
+            else
+                return chapterWithNode(context, context.list, context.list?.withItemSplit(context.range.start), newList => {
+                    const index = context.list?.getItemContaining(context.range.start);
+                    if(index === undefined) return;
+                    const item = (newList as ListNode).getItem(index + 1);
+                    if(item === undefined) return;
+                    return item.getFirstCaret();
+                })
+        }
     },
     {
         description: "split paragraph",
