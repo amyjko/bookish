@@ -168,8 +168,8 @@ export const commands: Command[] = [
         handler: context => {
             if(context.end.node instanceof TextNode || context.end.node instanceof AtomNode) {
                 const nextCaret = context.chapter.getAdjacentCaret(context.end, false);
-                if(nextCaret === undefined) return;
-                return { root: context.chapter, range: { start: nextCaret, end: nextCaret }};
+                const sortedRange = context.chapter.sortRange(context.range);
+                return { root: context.chapter, range: nextCaret === undefined ? { start: sortedRange.start, end: sortedRange.start } : { start: nextCaret, end: nextCaret }};
             }
         }
     },
@@ -248,8 +248,9 @@ export const commands: Command[] = [
         handler: context => {
             if(context.end.node instanceof TextNode || context.end.node instanceof AtomNode) {
                 const nextCaret = context.blocks?.getAdjacentCaret(context.end, true);
-                if(nextCaret === undefined) return;
-                return { root: context.chapter, range: { start: nextCaret, end: nextCaret }};
+                const sortedRange = context.chapter.sortRange(context.range);
+                // If there is no next caret, move the caret to the largest of the current start and end.
+                return { root: context.chapter, range: nextCaret === undefined ? { start: sortedRange.end, end: sortedRange.end } : { start: nextCaret, end: nextCaret }};
             }
         }
     },

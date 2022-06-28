@@ -101,7 +101,7 @@ export class FormatNode extends Node {
             const adjacentText = next ? caret.node.getNextCaret(caret.index) : caret.node.getPreviousCaret(caret.index);
             if(adjacentText !== undefined) return adjacentText;
         }
-        // If there's not, is there an adjascent caret in the sequence of text and atom nodes?
+        // If there's not, is there an adjacent caret in the sequence of text and atom nodes?
         const adjacentNode = this.getAdjacentTextOrAtom(caret.node, next);
         if(adjacentNode !== undefined) {
             // Normally we skip over node boundaries because they look identical to each other.
