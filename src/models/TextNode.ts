@@ -162,6 +162,11 @@ export class TextNode extends Node {
         if(index < 0 || index > this.#text.length) return undefined;
         return new TextNode(this.#text.slice(0, index) + char + this.#text.slice(index));
     }
+
+    withoutRange(range: CaretRange): TextNode | undefined {
+        if(range.start.node !== this && range.end.node !== this) return;
+        return new TextNode(this.#text.substring(0, range.start.index) + this.#text.substring(range.end.index));
+    }
     
     withContentInRange(range: CaretRange): this | undefined { 
 

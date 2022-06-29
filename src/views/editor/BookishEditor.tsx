@@ -19,6 +19,7 @@ import { Command, commands } from "./Commands";
 import Toolbar from "./Toolbar";
 import Parser from "../../models/Parser";
 import { ChapterContext, ChapterContextType } from "../chapter/Chapter";
+import { CodeNode } from "../../models/CodeNode";
 
 export type CaretContextType = { 
     range: CaretRange | undefined, 
@@ -43,6 +44,7 @@ export type CaretState = {
     blocks: BlocksNode | undefined,
     paragraph: ParagraphNode | undefined,
     includesList: boolean,
+    code: CodeNode | undefined,
     list: ListNode | undefined,
     table: TableNode | undefined,
     format: FormatNode | undefined, 
@@ -488,6 +490,7 @@ const BookishEditor = <RootType extends RootNode>(props: {
             root: editedNode,
             blocks: parents?.find(n => n instanceof BlocksNode) as BlocksNode,
             paragraph: parents?.find(n => n instanceof ParagraphNode) as ParagraphNode,
+            code: parents?.find(n => n instanceof CodeNode) as CodeNode,
             list: parents?.find(n => n instanceof ListNode) as ListNode,
             atom: parents?.find(n => n instanceof AtomNode) as AtomNode<any>,
             meta: parents?.find(n => n instanceof MetadataNode) as MetadataNode<FormatNode>,

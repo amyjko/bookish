@@ -8,6 +8,7 @@ import { TextNode } from "./TextNode";
 import { AtomNode } from "./AtomNode";
 import { MetadataNode } from "./MetadataNode";
 import { Edit } from "./Edit";
+import { CodeNode } from "./CodeNode";
 
 export abstract class BlocksNode extends BlockNode {
     
@@ -160,19 +161,38 @@ export abstract class BlocksNode extends BlockNode {
     getAdjacentCaret(caret: Caret, next: boolean): Caret | undefined {
     
         if(!this.contains(caret.node)) return;
+        
+        // Navigate from code node.
+        const code = caret.node.getFarthestParentMatching(this, n => n instanceof CodeNode) as CodeNode;
+        if(code && caret.node === code.getCodeNode()) {
+            // Get the adjacent text node.
+            const newCaret = next ? caret.node.getNextCaret(caret.index) : caret.node.getPreviousCaret(caret.index);
+            if(newCaret !== undefined) return newCaret;
+            // Otherwise, get the adjacent format's first/last caret.
+            if(next) return code.getCaption().getFirstCaret();
+            // If there's no adjacent caret, find the adjacent root format.
+            const blocks = this.getNodes().filter(n => n instanceof BlockNode) as BlockNode[];
+            const codeIndex = blocks.indexOf(code);
+            if(codeIndex <= 0) return;
+            const adjacentBlock = blocks[codeIndex - 1];
+            const adjacentFormats = adjacentBlock.getFormats();
+            const adjacentFormat = adjacentFormats[adjacentFormats.length - 1];
+            return adjacentFormat.getLastCaret();
+        }
 
         const format = caret.node.getFarthestParentMatching(this, n => n instanceof FormatNode) as FormatNode;
-        if(!(format instanceof FormatNode)) return;
+        if(format === undefined) return;
 
         // Find the format that contains the caret and return the adjacent caret if there is one.
         const adjacentCaretInFormat = format.getAdjacentCaret(caret, next);
         if(adjacentCaretInFormat !== undefined) return adjacentCaretInFormat;
 
-        // If there's no adjacent caret, find the adjascent root format.
+        // If there's no adjacent caret in the root format, find the adjacent format or code.
         const formats = this.getNodes().filter(n => {
             const parent = n.getParent(this);
-            return n instanceof FormatNode && !(parent instanceof AtomNode) && !(parent instanceof FormatNode);
-        }) as FormatNode[];
+            return (n instanceof TextNode && parent instanceof CodeNode) || (n instanceof FormatNode && !(parent instanceof AtomNode) && !(parent instanceof FormatNode));
+        }) as (TextNode | FormatNode)[];
+
         const index = formats.indexOf(format);
         const adjacentFormat = index < 0 || formats.length === 0 ? undefined : formats[index + (next ? 1 : -1 )];
         if(adjacentFormat === undefined) return;

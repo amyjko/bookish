@@ -965,23 +965,34 @@ export const commands: Command[] = [
         active: (context, key) => key !== undefined && key.length === 1,
         handler: (context, utilities, key) => {
             const range = context.range;
-            if(key.length === 1 && context.format !== undefined) {
+            if(key.length === 1) {
                 // Insert at the start.
-                let insertionPoint = range.start;
-                let newRoot: Node | undefined = context.format;
-                let originalRoot: Node = context.format;
+                let sortedRange = range.start.node.sortRange(range);
+                let insertionPoint = sortedRange.start;
+                let newRoot: RootNode | undefined = context.root;
+
+                // Not a text node? Fail.
+                if(!(insertionPoint.node instanceof TextNode)) return;
 
                 // If there's a selection, remove it before inserting, and insert at the caret returned.
                 if(context.isSelection) {
-                    // Try to remove the range.
-                    let edit = context.root.withRangeFormatted(range, undefined);
-                    // If we fail, fail to insert at the selection.
-                    if(edit === undefined) return;
-                    newRoot = edit.root;
-                    originalRoot = context.root;
-                    insertionPoint = edit.range.start;
+                    if(context.code) {
+                        if(context.code.getCodeNode() === sortedRange.start.node) {
+                            const newText = insertionPoint.node.withoutRange(sortedRange);
+                            if(newText === undefined) return;
+                            insertionPoint = { node: newText, index: sortedRange.start.index };
+                        }
+                    }
+                    else {
+                        // Try to remove the range.
+                        let edit = context.root.withRangeFormatted(sortedRange, undefined);
+                        // If we fail, fail to insert at the selection.
+                        if(edit === undefined) return;
+                        newRoot = edit.root as RootNode;
+                        insertionPoint = edit.range.start;
+                    }
                 }
-        
+
                 // Not a text node? Fail.
                 if(!(insertionPoint.node instanceof TextNode)) return;
 
@@ -990,11 +1001,11 @@ export const commands: Command[] = [
                 if(newText === undefined) return;
 
                 // Replace the text.
-                newRoot = newRoot.withNodeReplaced(insertionPoint.node, newText);
+                newRoot = newRoot.withNodeReplaced(sortedRange.start.node, newText);
                 if(newRoot === undefined) return;
 
                 // Update the chapter
-                return rootWithNode(context, originalRoot, newRoot, () => { return { node: newText, index: insertionPoint.index + 1 }});
+                return rootWithNode(context, context.root, newRoot, () => { return { node: newText, index: insertionPoint.index + 1 }});
     
             }
         }
