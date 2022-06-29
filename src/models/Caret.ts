@@ -1,5 +1,7 @@
+import { AtomNode } from "./AtomNode";
 import { Node } from "./Node";
+import { TextNode } from "./TextNode";
 
-export type Caret = { node: Node; index: number; };
+export type Caret = { node: TextNode | AtomNode<any>; index: number; };
 export type CaretRange = { start: Caret; end: Caret; };
 export type TextRange = { start: number, end: number };

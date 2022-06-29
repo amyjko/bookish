@@ -570,7 +570,7 @@ const BookishEditor = <RootType extends RootNode>(props: {
                     return true;
                 }
                 else if(caretRange.start.node.isInside(editedNode, AtomNode)) {
-                    const atom = caretRange.start.node.getClosestParentMatching(editedNode, p => p instanceof AtomNode);
+                    const atom = caretRange.start.node.getClosestParentOfType<AtomNode<any>>(editedNode, AtomNode);
                     if(atom) {
                         const atomCaret = { node: atom, index: 0 };
                         setCaretRange({ start: atomCaret, end: atomCaret });
@@ -674,7 +674,7 @@ const BookishEditor = <RootType extends RootNode>(props: {
 
             // Update the range if the current range contains the previous node. This will generally
             // be true any time a selected atom node is edited.
-            if(caretRange.start.node === previous)
+            if(caretRange.start.node === previous && (edited instanceof AtomNode || edited instanceof TextNode))
                 setCaretRange({ start: { node: edited, index: 0 }, end: { node: edited, index: 0 }});
 
         }

@@ -627,7 +627,8 @@ export class FormatNode extends Node {
             newNode instanceof AtomNode ? newNode.getDefaultCaret() :
             newNode instanceof FormatNode ? newNode.getFirstCaret() :
             newNode instanceof MetadataNode ? { node: newNode.getText(), index: 0 } :
-            { node: newNode, index: 0 };
+            newNode instanceof TextNode ? { node: newNode, index: 0 } :
+            undefined;
 
         if(newCaret === undefined) return;
         return { root: revisedFormat, range: { start: newCaret, end: newCaret }}

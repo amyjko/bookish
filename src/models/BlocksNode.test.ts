@@ -365,7 +365,7 @@ test("Copy/paste", () => {
 
     // Tables
     const partialTable = chapter.copyRange({ start: { node: cellr2c2, index: 0 }, end: { node: cellr3c2, index: 1 }})
-    const partialTableAndParagraph = chapter.copyRange({ start: { node: afterListParagraph, index: 0 }, end: { node: cellr1c2, index: 1 }})
+    const partialTableAndParagraph = chapter.copyRange({ start: { node: afterList, index: 0 }, end: { node: cellr1c2, index: 1 }})
     
     expect(partialTable?.toBookdown())
         .toBe(`,|e|f\n,g|h|\n`)

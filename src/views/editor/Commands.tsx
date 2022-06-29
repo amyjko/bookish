@@ -42,6 +42,7 @@ import Redo from "../svg/redo.svg";
 import { AtomNode } from "../../models/AtomNode";
 import { BlocksNode } from "../../models/BlocksNode";
 import { ChapterNode } from "../../models/ChapterNode";
+import { RootNode } from "../../models/RootNode";
 
 export type Command = {
     label?: string,
@@ -88,7 +89,7 @@ function deleteTableRowColumn(context: CaretState, table: TableNode, format: For
 }
 
 // A helper function that encapsulates boilerplate for replacing a node in a root and updating a caret.
-function rootWithNode(context: CaretState, original: Node | undefined, replacement: Node | undefined, caret?: (node: Node) => Caret | undefined): Edit | undefined {
+function rootWithNode<NodeType extends Node>(context: CaretState, original: NodeType | undefined, replacement: NodeType | undefined, caret?: (node: NodeType) => Caret | undefined): Edit | undefined {
 
     // If there was no original or replacement, do nothing. Saves commands from having to check.
     if(original === undefined || replacement === undefined) return;
@@ -404,12 +405,12 @@ export const commands: Command[] = [
             if(context.isSelection) {
                 const edit = context.root.withRangeFormatted(context.range, undefined);
                 if(edit === undefined) return;
-                return rootWithNode(context, context.root, edit.root, () => edit.range.start)
+                return rootWithNode<RootNode>(context, context.root, edit.root as RootNode, () => edit.range.start)
             }
             else {
                 const edit = context.root.withoutAdjacentContent(context.start, false);
                 if(edit === undefined) return;
-                return rootWithNode(context, context.root, edit.root, () => edit.range.start)
+                return rootWithNode<RootNode>(context, context.root, edit.root as RootNode, () => edit.range.start)
             }
         }
     },
@@ -424,12 +425,12 @@ export const commands: Command[] = [
             if(context.isSelection) {
                 const edit = context.root.withRangeFormatted(context.range, undefined);
                 if(edit === undefined) return;
-                return rootWithNode(context, context.root, edit.root, () => edit.range.start)
+                return rootWithNode<RootNode>(context, context.root, edit.root as RootNode, () => edit.range.start)
             }
             else {
                 const edit = context.root.withoutAdjacentContent(context.start, true);
                 if(edit === undefined) return;
-                return rootWithNode(context, context.root, edit.root, () => edit.range.start)
+                return rootWithNode<RootNode>(context, context.root, edit.root as RootNode, () => edit.range.start)
             }
         }
     },
@@ -710,7 +711,7 @@ export const commands: Command[] = [
                     context, 
                     context.blocks, 
                     context.blocks.withBlockInsertedBefore(context.paragraph, new CalloutNode([ newParagraph ])), 
-                    callout => { return { node: newParagraph.getFormat().getSegments()[0], index: 0 }; }
+                    callout => newParagraph.getFirstCaret()
                 );
             }
         } 
@@ -889,7 +890,7 @@ export const commands: Command[] = [
 
             context.setClipboard(copy);
 
-            return rootWithNode(context, context.root, edit.root, () => edit.range.start);
+            return rootWithNode<RootNode>(context, context.root, edit.root as RootNode, () => edit.range.start);
         }
     },
     {
