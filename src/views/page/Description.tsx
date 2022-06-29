@@ -20,6 +20,7 @@ const Description = (props: { book: Book }) => {
 				<BookishEditor 
 					ast={descriptionNode} 
 					save={(node: ChapterNode | FormatNode) => book.setDescription(node.toBookdown())}
+					chapter={false}
 				/>
 				:
 				renderNode(descriptionNode)

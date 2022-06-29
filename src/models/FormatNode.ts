@@ -158,6 +158,13 @@ export class FormatNode extends Node {
         return { start: startIndex, end: endIndex };
     }
 
+    textRangeToCaret(range: TextRange): CaretRange | undefined {
+        const start = this.textIndexToCaret(range.start);
+        const end = this.textIndexToCaret(range.end);
+        if(start === undefined || end === undefined) return;
+        return { start: start, end: end }; 
+    }
+
     getFirstCaret(): Caret | undefined {
         const text = this.getTextNodes();
         if(text.length === 0) return undefined;

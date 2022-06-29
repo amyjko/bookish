@@ -61,20 +61,21 @@ const categoryOrder: {[key:string] : number } = {
     "block": 10,
 }
 
-const categoryIcons: {[key:string]: Function} = {
+const categoryIcons: {[key:string]: Function | string} = {
     "text": Text,
     "clipboard": Scissors,
     "annotation": Hash,
     "level": Level,
     "block": Block,
-    "list": List
+    "list": List,
+    "history": "\u2026"
 }
 
 const Toolbar = (props: { 
     context?: CaretState, 
     executor?: (command: Command, key: string) => void,
     saving?: undefined | string,
-    visible: boolean
+    visible?: boolean
     },
 ) => {
 
@@ -87,8 +88,8 @@ const Toolbar = (props: {
         return `${command.control ? controlSymbol : ""}${command.alt ? altSymbol : ""}${command.shift ? "\u21E7" : ""}${keyLabel}`;
     }
 
-    function wrapIcon(icon: Function) {
-        return <span className='bookish-chapter-editor-toolbar-icon'>{icon.call(undefined)}</span>;
+    function wrapIcon(icon: Function | string) {
+        return <span className='bookish-chapter-editor-toolbar-icon'>{icon instanceof Function ? icon.call(undefined) : icon}</span>;
     }
 
     const context = props.context;
@@ -108,7 +109,7 @@ const Toolbar = (props: {
     if(context !== undefined) {
 
         // Filter the commands by those interactive with a mouse and active.
-        const visible = commands.filter(command => command.visible.call(undefined, context));
+        const visible = commands.filter(command => command.visible === true || (command.visible instanceof Function && command.visible.call(undefined, context)));
 
         // Extract the active categories and sort them
         categories = 
@@ -148,7 +149,7 @@ const Toolbar = (props: {
     }
 
     // Render command categories.
-    return <div className="bookish-chapter-editor-toolbar" onKeyDown={handleKeyDown} style={{visibility: props.visible ? "visible" : "hidden"}}>
+    return <div className="bookish-chapter-editor-toolbar" onKeyDown={handleKeyDown} style={{visibility: props.visible === true || props.visible === undefined ? "visible" : "hidden"}}>
         <Header/>
         {
         context && categories && props.executor ?
@@ -162,7 +163,7 @@ const Toolbar = (props: {
                                 .map((command, index) =>
                                     <button 
                                         key={index}
-                                        disabled={!command.active.call(undefined, context)}
+                                        disabled={command.active === false || (command.active instanceof Function && command.active.call(undefined, context) === false)}
                                         title={command.description + " " + getShortcutDescription(command)}
                                         onClick={() => executor?.call(undefined, command, "")}
                                     >

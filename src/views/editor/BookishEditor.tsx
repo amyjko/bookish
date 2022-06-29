@@ -34,6 +34,7 @@ export type CaretContextType = {
 export const CaretContext = React.createContext<CaretContextType>(undefined);
 
 export type CaretState = {
+    chapter: boolean,
     range: CaretRange,
     start: Caret,
     end: Caret,
@@ -76,7 +77,8 @@ const IDLE_TIME = 500;
 
 const BookishEditor = <RootType extends RootNode>(props: { 
     ast: RootType,
-    save: (node: RootType) => Promise<void> | undefined
+    save: (node: RootType) => Promise<void> | undefined,
+    chapter: boolean
 }) => {
 
     const editorRef = useRef<HTMLDivElement>(null);
@@ -414,7 +416,9 @@ const BookishEditor = <RootType extends RootNode>(props: {
         let undoState = undoStack[undoPosition + 1];
 
         // Restore the content of the chapter.
-        let node = Parser.parseChapter(chapterContext.book, undoState.bookdown);
+        let node = props.ast instanceof ChapterNode ? 
+            Parser.parseChapter(chapterContext.book, undoState.bookdown) : 
+            Parser.parseFormat(chapterContext.book, undoState.bookdown)
         setEditedNode(node as RootType);
 
         // Move the undo state down a position.
@@ -434,7 +438,9 @@ const BookishEditor = <RootType extends RootNode>(props: {
         let undoState = undoStack[undoPosition - 1];
 
         // Restore the content of the chapter.
-        let node = Parser.parseChapter(chapterContext.book, undoState.bookdown);
+        let node = props.ast instanceof ChapterNode ? 
+            Parser.parseChapter(chapterContext.book, undoState.bookdown) : 
+            Parser.parseFormat(chapterContext.book, undoState.bookdown)
         setEditedNode(node as RootType);
 
         // Move the undo state down a position.
@@ -466,6 +472,7 @@ const BookishEditor = <RootType extends RootNode>(props: {
 
         return { 
             // We make a new range so that setCaretRange always causes a re-render
+            chapter: props.chapter,
             range: { start: caretRange.start, end: caretRange.end },
             start: caretRange.start,
             end: caretRange.end,
@@ -527,7 +534,7 @@ const BookishEditor = <RootType extends RootNode>(props: {
                 command.control === (event.ctrlKey || event.metaKey) &&
                 (command.key === undefined || command.key === event.key || (Array.isArray(command.key) && command.key.includes(event.key))) &&
                 (command.code === undefined || command.code === event.code) &&
-                command.active.call(undefined, context, event.key)) {
+                (command.active === true || (command.active instanceof Function && command.active.call(undefined, context, event.key)))) {
 
                     event.preventDefault();
                     event.stopPropagation();

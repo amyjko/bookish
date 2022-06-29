@@ -53,8 +53,8 @@ export type Command = {
     shift: boolean | undefined,
     key?: string | string[],
     code?: string,
-    visible: (context: CaretState) => boolean,
-    active: (context: CaretState, key?: string) => boolean,
+    visible: boolean | ((context: CaretState) => boolean),
+    active: boolean | ((context: CaretState, key?: string) => boolean),
     handler: (
         context: CaretState,
         utilities: CaretUtilities,
@@ -177,7 +177,7 @@ export const commands: Command[] = [
         description: "move to previous word",
         category: "navigation",
         control: false, alt: true, shift: false, key: "ArrowLeft",
-        visible: context => false,
+        visible: false,
         active: context => context.endIsTextOrAtom,
         handler: context => {
             if(context.end.node instanceof TextNode || context.end.node instanceof AtomNode) {
@@ -190,7 +190,7 @@ export const commands: Command[] = [
         description: "move to paragraph start",
         category: "navigation",
         control: true, alt: false, shift: false, key: "ArrowLeft",
-        visible: context => false,
+        visible: false,
         active: context => context.format !== undefined,
         handler: context => {
             if(context.format !== undefined) {
@@ -203,7 +203,7 @@ export const commands: Command[] = [
         description: "expand selection to previous character",
         category: "selection",
         control: false, alt: false, shift: true, key: "ArrowLeft",
-        visible: context => false,
+        visible: false,
         active: context => context.endIsTextOrAtom,
         handler: context => {
             if(context.end.node instanceof TextNode || context.end.node instanceof AtomNode) {
@@ -217,7 +217,7 @@ export const commands: Command[] = [
         description: "expand selection to previous word",
         category: "selection",
         control: false, alt: true, shift: true, key: "ArrowLeft",
-        visible: context => false,
+        visible: false,
         active: context => context.endIsTextOrAtom,
         handler: context => {
             if(context.end.node instanceof TextNode || context.end.node instanceof AtomNode) {
@@ -230,7 +230,7 @@ export const commands: Command[] = [
         description: "expand selection to start",
         category: "selection",
         control: true, alt: false, shift: true, key: "ArrowLeft",
-        visible: context => false,
+        visible: false,
         active: context => context.format !== undefined,
         handler: context => {
             if(context.format !== undefined) {
@@ -243,7 +243,7 @@ export const commands: Command[] = [
         description: "move to next character",
         category: "navigation",
         control: false, alt: false, shift: false, key: "ArrowRight",
-        visible: context => false,
+        visible: false,
         active: context => context.endIsTextOrAtom,
         handler: context => {
             if(context.end.node instanceof TextNode || context.end.node instanceof AtomNode) {
@@ -258,7 +258,7 @@ export const commands: Command[] = [
         description: "move to next word",
         category: "navigation",
         control: false, alt: true, shift: false, key: "ArrowRight",
-        visible: context => false,
+        visible: false,
         active: context => context.endIsTextOrAtom,
         handler: context => {
             if(context.end.node instanceof TextNode || context.end.node instanceof AtomNode) {
@@ -271,7 +271,7 @@ export const commands: Command[] = [
         description: "move to paragraph end",
         category: "navigation",
         control: true, alt: false, shift: false, key: "ArrowRight",
-        visible: context => false,
+        visible: false,
         active: context => context.format !== undefined,
         handler: context => {
             if(context.format !== undefined) {
@@ -285,7 +285,7 @@ export const commands: Command[] = [
         description: "expand selection to next character",
         category: "selection",
         control: false, alt: false, shift: true, key: "ArrowRight",
-        visible: context => false,
+        visible: false,
         active: context => context.endIsTextOrAtom,
         handler: context => {
             if(context.end.node instanceof TextNode || context.end.node instanceof AtomNode) {
@@ -299,7 +299,7 @@ export const commands: Command[] = [
         description: "expand selection to next word",
         category: "selection",
         control: false, alt: true, shift: true, key: "ArrowRight",
-        visible: context => false,
+        visible: false,
         active: context => context.endIsTextOrAtom,
         handler: context => {
             if(context.end.node instanceof TextNode || context.end.node instanceof AtomNode) {
@@ -312,7 +312,7 @@ export const commands: Command[] = [
         description: "expand selection to end",
         category: "selection",
         control: true, alt: false, shift: true, key: "ArrowRight",
-        visible: context => false,
+        visible: false,
         active: context => context.format !== undefined,
         handler: context => {
             if(context.format !== undefined) {
@@ -325,7 +325,7 @@ export const commands: Command[] = [
         description: "expand selection to all",
         category: "selection",
         control: true, alt: false, shift: false, key: "a",
-        visible: context => false,
+        visible: false,
         active: context => true,
         handler: context => {
             // If in a footnote, expand to the footnote.
@@ -353,7 +353,7 @@ export const commands: Command[] = [
         description: "move up one line",
         category: "navigation",
         control: false, alt: false, shift: false, key: "ArrowUp",
-        visible: context => false,
+        visible: false,
         active: context => context.startIsTextOrAtom,
         handler: (context, utilities) => {
             const above = utilities.getCaretOnLine(context.start, false);
@@ -364,7 +364,7 @@ export const commands: Command[] = [
         description: "move selection up one line",
         category: "selection",
         control: false, alt: false, shift: true, key: "ArrowUp",
-        visible: context => false,
+        visible: false,
         active: context => context.startIsTextOrAtom,
         handler: (context, utilities) => {
             const above = utilities.getCaretOnLine(context.end, false);
@@ -375,7 +375,7 @@ export const commands: Command[] = [
         description: "move up down line",
         category: "navigation",
         control: false, alt: false, shift: false, key: "ArrowDown",
-        visible: context => false,
+        visible: false,
         active: context => context.startIsTextOrAtom,
         handler: (context, utilities) => {
             const below = utilities.getCaretOnLine(context.start, true);
@@ -386,7 +386,7 @@ export const commands: Command[] = [
         description: "move selection down one line",
         category: "selection",
         control: false, alt: false, shift: true, key: "ArrowDown",
-        visible: context => false,
+        visible: false,
         active: context => context.startIsTextOrAtom,
         handler: (context, utilities) => {
             const below = utilities.getCaretOnLine(context.end, true);
@@ -397,8 +397,8 @@ export const commands: Command[] = [
         description: "delete previous character",
         category: "text",
         control: false, alt: false, shift: false, key: "Backspace",
-        visible: context => false,
-        active: context => context.root !== undefined,
+        visible: false,
+        active: true,
         handler: context => {
             if(context.root === undefined) return;
             if(context.isSelection) {
@@ -417,8 +417,8 @@ export const commands: Command[] = [
         description: "delete next character",
         category: "text",
         control: false, alt: false, shift: false, key: "Delete",
-        visible: context => false,
-        active: context => context.root !== undefined,
+        visible: false,
+        active: true,
         handler: context => {
             if(context.root === undefined) return;
             if(context.isSelection) {
@@ -437,7 +437,7 @@ export const commands: Command[] = [
         description: "insert code newline",
         category: "text",
         control: false, alt: false, shift: false, key: "Enter",
-        visible: context => false,
+        visible: false,
         active: context => context.start.node.isInside(context.root, CodeNode),
         handler: context => {
             if(!(context.start.node instanceof TextNode)) return;
@@ -456,7 +456,7 @@ export const commands: Command[] = [
         description: "split list item",
         category: "list",
         control: false, alt: false, shift: false, key: "Enter",
-        visible: context => false,
+        visible: false,
         active: context => context.list !== undefined,
         handler: context => {
             if(context.list === undefined) return;
@@ -496,7 +496,7 @@ export const commands: Command[] = [
         description: "split paragraph",
         category: "paragraph",
         control: false, alt: false, shift: false, key: "Enter",
-        visible: context => false,
+        visible: false,
         active: context => context.atom === undefined && context.blocks !== undefined,
         handler: context => {
             const edit = context.blocks?.withSelectionSplit(context.range);
@@ -530,8 +530,8 @@ export const commands: Command[] = [
         description: "clear formatting",
         category: "text",
         control: true, alt: false, shift: false, key: "0",
-        visible: context => true,
-        active: context => context.root !== undefined && context.startIsText && context.endIsText,
+        visible: true,
+        active: context => context.startIsText || context.endIsText,
         handler: context => context.root.withRangeFormatted(context.range, "")
     },
     {
@@ -539,9 +539,9 @@ export const commands: Command[] = [
         icon: Bold,
         description: "bold",
         category: "text",
-        visible: context => true,
         control: true, alt: false, shift: false, key: "b",
-        active: context => context.root !== undefined && context.startIsText && context.endIsText,
+        visible: true,
+        active: context => context.startIsText || context.endIsText,
         handler: context => context.root.withRangeFormatted(context.range, "*")
     },
     {
@@ -549,8 +549,8 @@ export const commands: Command[] = [
         icon: Italic,
         category: "text",
         control: true, alt: false, shift: false, key: "i",
-        visible: context => true,
-        active: context => context.root !== undefined && context.startIsText && context.endIsText,
+        visible: true,
+        active: context => context.startIsText || context.endIsText,
         handler: context => context.root.withRangeFormatted(context.range, "_")
     },
     {
@@ -559,8 +559,8 @@ export const commands: Command[] = [
         description: "subscript",
         category: "text",
         control: true, alt: false, shift: false, key: ",",
-        visible: context => true,
-        active: context => context.root !== undefined && context.startIsText && context.endIsText,
+        visible: true,
+        active: context => context.startIsText || context.endIsText,
         handler: context => context.root.withRangeFormatted(context.range, "v")
     },
     {
@@ -569,19 +569,19 @@ export const commands: Command[] = [
         description: "superscript",
         category: "text",
         control: true, alt: false, shift: false, key: ".",
-        visible: context => true,
-        active: context => context.root !== undefined && context.startIsText && context.endIsText,
+        visible: true,
+        active: context => context.startIsText || context.endIsText,
         handler: context => context.root.withRangeFormatted(context.range, "^")
     },
     {
         label: "<code>",
         icon: Code,
         description: "toggle code",
-        category: "text",
+        category: "annotation",
         control: true, alt: false, shift: false, key: "j",
-        visible: context => (context.atom === undefined && context.meta === undefined) || context.meta instanceof InlineCodeNode,
-        active: context => context.root !== undefined && context.startIsText && context.endIsText,
-        handler: context => context.meta instanceof InlineCodeNode ? 
+        visible: true,
+        active: context => context.startIsText || context.endIsText,
+        handler: context => context.meta instanceof InlineCodeNode ?
             rootWithNode(context, context.format, context.format?.withSegmentReplaced(context.meta, context.meta.getText())) : 
             context.root.withSegmentAtSelection(context.range, text => new InlineCodeNode(new TextNode(text)))
     },
@@ -591,8 +591,8 @@ export const commands: Command[] = [
         description: "toggle link",
         category: "annotation",
         control: true, alt: false, shift: false, key: "k",
-        visible: context => (context.atom === undefined && context.meta === undefined) || context.meta instanceof LinkNode,
-        active: context => context.root !== undefined && context.startIsText && context.endIsText,
+        visible: true,
+        active: context => (context.atom === undefined && context.meta === undefined) || context.meta instanceof LinkNode,
         handler: context => context.meta instanceof LinkNode ? 
             rootWithNode(context, context.format, context.format?.withSegmentReplaced(context.meta, context.meta.getText())) : 
             context.root.withSegmentAtSelection(context.range, text => new LinkNode(new TextNode(text)))
@@ -602,8 +602,8 @@ export const commands: Command[] = [
         description: "toggle definition",
         category: "annotation",
         control: true, alt: false, shift: false, key: "d",
-        visible: context => (context.root instanceof ChapterNode && context.atom === undefined && context.meta === undefined) || context.meta instanceof DefinitionNode,
-        active: context => context.root instanceof ChapterNode && context.startIsText && context.endIsText,
+        visible: context => context.chapter && context.atom === undefined && context.meta === undefined,
+        active: context => context.chapter && context.atom === undefined && context.meta === undefined,
         handler: context => context.meta instanceof DefinitionNode ? 
             rootWithNode(context, context.format, context.format?.withSegmentReplaced(context.meta, context.meta.getText())) : 
             context.root.withSegmentAtSelection(context.range, text => new DefinitionNode(new TextNode(text)))
@@ -613,8 +613,8 @@ export const commands: Command[] = [
         description: "insert footnote",
         category: "annotation",
         control: true, alt: false, shift: false, key: "f",
-        visible: context => context.root instanceof ChapterNode && context.atom === undefined && context.meta === undefined,
-        active: context => context.root instanceof ChapterNode && context.startIsText && context.endIsText,
+        visible: context => context.chapter && context.atom === undefined && context.meta === undefined,
+        active: context => context.chapter && context.atom === undefined && context.meta === undefined,
         handler: context => context.root.withSegmentAtSelection(context.range, text => new FootnoteNode(new FormatNode("", [ new TextNode(text) ])))
     },
     {
@@ -622,8 +622,8 @@ export const commands: Command[] = [
         description: "insert citations",
         category: "annotation",
         control: true, alt: false, shift: false, key: "t",
-        visible: context => context.root instanceof ChapterNode && context.atom === undefined && context.meta === undefined,
-        active: context => context.root instanceof ChapterNode && context.startIsText && context.endIsText,
+        visible: context => context.chapter && context.atom === undefined && context.meta === undefined,
+        active: context => context.chapter && context.atom === undefined && context.meta === undefined,
         handler: context => context.root.withSegmentAtSelection(context.range, text => new CitationsNode([]))
     },
     {
@@ -631,8 +631,8 @@ export const commands: Command[] = [
         description: "insert label",
         category: "annotation",
         control: true, alt: false, shift: false, key: "l",
-        visible: context => context.root instanceof ChapterNode && context.atom === undefined && context.meta === undefined,
-        active: context => context.root instanceof ChapterNode && context.startIsText && context.endIsText,
+        visible: context => context.chapter && context.atom === undefined && context.meta === undefined,
+        active: context => context.chapter && context.atom === undefined && context.meta === undefined,
         handler: context => context.root.withSegmentAtSelection(context.range, text => new LabelNode(""))
     },
     {
@@ -641,8 +641,8 @@ export const commands: Command[] = [
         description: "insert comment",
         category: "annotation",
         control: true, alt: false, shift: false, key: "'",
-        visible: context => context.root instanceof ChapterNode && context.atom === undefined && context.meta === undefined,
-        active: context => context.root instanceof ChapterNode && context.root !== undefined && context.atom === undefined && context.startIsText && context.endIsText,
+        visible: context => context.chapter && context.atom === undefined && context.meta === undefined,
+        active: context => context.chapter && context.atom === undefined && context.meta === undefined,
         handler: context => context.root.withSegmentAtSelection(context.range, text => new CommentNode(new FormatNode("", [ new TextNode(text) ])))
     },
     {
@@ -651,7 +651,7 @@ export const commands: Command[] = [
         description: "format as paragraph",
         category: "level",
         control: true, alt: true, shift: false, code: "Digit0",
-        visible: context => context.root !== undefined && context.atom === undefined,
+        visible: context => context.paragraph !== undefined && context.paragraph.getLevel() !== 0,
         active: context => context.paragraph !== undefined && context.paragraph.getLevel() !== 0,
         handler: context => {
             if(context.paragraph === undefined) return;
@@ -663,7 +663,7 @@ export const commands: Command[] = [
         description: "format as 1st level header",
         category: "level",
         control: true, alt: true, shift: false, code: "Digit1",
-        visible: context => context.root !== undefined && context.atom === undefined,
+        visible: context => context.paragraph !== undefined,
         active: context => context.paragraph !== undefined && context.paragraph.getLevel() !== 1,
         handler: context => rootWithNode(context, context.paragraph, context.paragraph?.withLevel(1))
     },
@@ -672,7 +672,7 @@ export const commands: Command[] = [
         description: "format as 2nd level header",
         category: "level",
         control: true, alt: true, shift: false, code: "Digit2",
-        visible: context => context.root !== undefined && context.atom === undefined,
+        visible: context => context.paragraph !== undefined,
         active: context => context.paragraph !== undefined && context.paragraph.getLevel() !== 2,
         handler: context => rootWithNode(context, context.paragraph, context.paragraph?.withLevel(2))
     },
@@ -681,7 +681,7 @@ export const commands: Command[] = [
         description: "format as 3rd level header",
         category: "level",
         control: true, alt: true, shift: false, code: "Digit3",
-        visible: context => context.root !== undefined && context.atom === undefined,
+        visible: context => context.paragraph !== undefined,
         active: context => context.paragraph !== undefined && context.paragraph.getLevel() !== 3,
         handler: context => rootWithNode(context, context.paragraph, context.paragraph?.withLevel(3))
     },
@@ -809,8 +809,8 @@ export const commands: Command[] = [
         description: "convert paragraph to bulleted list item",
         category: "list",
         control: true, alt: false, shift: true, key: "7",
-        visible: context => context.list === undefined && context.atom === undefined,
-        active: context => context.list === undefined && context.atom === undefined && context.blocks !== undefined,
+        visible: context => context.blocks !== undefined && context.list === undefined,
+        active: context => context.blocks !== undefined && context.list === undefined,
         handler: context => rootWithNode(context, context.blocks, context.blocks?.withParagraphsAsLists(context.range, false))
     },
     {
@@ -819,8 +819,8 @@ export const commands: Command[] = [
         description: "convert paragraph to numbered list item",
         category: "list",
         control: true, alt: false, shift: true, key: "8",
-        visible: context => context.list === undefined && context.atom === undefined,
-        active: context => context.list === undefined && context.atom === undefined && context.blocks !== undefined,
+        visible: context => context.blocks !== undefined && context.list === undefined,
+        active: context => context.blocks !== undefined && context.list === undefined,
         handler: context => rootWithNode(context, context.blocks, context.blocks?.withParagraphsAsLists(context.range, true))
     },
     {
@@ -829,7 +829,7 @@ export const commands: Command[] = [
         description: "convert numbered list item to bulleted",
         category: "list",
         control: true, alt: false, shift: true, key: "7",
-        visible: context => context.blocks !== undefined && context.list !== undefined && context.list.isNumbered(),
+        visible: context => context.list !== undefined && context.list.isNumbered(),
         active: context => context.list !== undefined && context.list.isNumbered(),
         handler: context => context.list ? rootWithNode(context, context.blocks, context.blocks?.withListAsStyle(context.list, false)) : undefined
     },
@@ -839,7 +839,7 @@ export const commands: Command[] = [
         description: "convert bulleted list item to numbered",
         category: "list",
         control: true, alt: false, shift: true, key: "8",
-        visible: context => context.blocks !== undefined && context.list !== undefined && !context.list.isNumbered(),
+        visible: context => context.list !== undefined && !context.list.isNumbered(),
         active: context => context.list !== undefined && !context.list.isNumbered(),
         handler: context => context.list ? rootWithNode(context, context.blocks, context.blocks?.withListAsStyle(context.list, true)) : undefined
     },
@@ -849,8 +849,8 @@ export const commands: Command[] = [
         description: "convert bulleted list item to paragraph",
         category: "list",
         control: true, alt: false, shift: true, key: ["7", "8"],
-        visible: context => context.includesList,
-        active: context => context.includesList,
+        visible: context => context.list !== undefined,
+        active: context => context.list !== undefined,
         handler: context => rootWithNode(context, context.blocks, context.blocks?.withListsAsParagraphs(context.range))
     },
     {
@@ -859,7 +859,7 @@ export const commands: Command[] = [
         description: "undo the last command",
         category: "history",
         control: true, alt: false, shift: false, key: ["z"],
-        visible: context => true,
+        visible: true,
         active: context => context.undoStack.length > 0 && context.undoPosition < context.undoStack.length - 1,
         handler: context => context.undo()
     },
@@ -869,7 +869,7 @@ export const commands: Command[] = [
         description: "redo the most recently undone command",
         category: "history",
         control: true, alt: false, shift: true, key: ["z"],
-        visible: context => true,
+        visible: true,
         active: context => context.undoPosition > 0,
         handler: context => context.redo()
     },
@@ -878,7 +878,7 @@ export const commands: Command[] = [
         description: "delete the selected content and copy it to the clipboard",
         category: "clipboard",
         control: true, alt: false, shift: false, key: ["x"],
-        visible: context => true,
+        visible: true,
         active: context => context.root !== undefined && context.isSelection,
         handler: context => { 
             if(context.root === undefined) return;
@@ -897,8 +897,8 @@ export const commands: Command[] = [
         description: "copy the selected content to the clipboard",
         category: "clipboard",
         control: true, alt: false, shift: false, key: ["c"],
-        visible: context => true,
-        active: context => context.root !== undefined && context.isSelection,
+        visible: true,
+        active: context => context.isSelection,
         handler: context => { 
             if(context.root === undefined) return;        
             // Save the copied content to the clipboard
@@ -914,8 +914,8 @@ export const commands: Command[] = [
         description: "paste the content from the clipboard",
         category: "clipboard",
         control: true, alt: false, shift: false, key: ["v"],
-        visible: context => true,
-        active: context => context.root !== undefined && context.clipboard !== undefined, 
+        visible: true,
+        active: context => context.clipboard !== undefined, 
         handler: context => { 
             if(context.clipboard === undefined || context.root === undefined) return;
 
@@ -960,7 +960,7 @@ export const commands: Command[] = [
         description: "insert character",
         category: "text",
         control: false, alt: false, shift: undefined, key: undefined,
-        visible: context => false,
+        visible: false,
         active: (context, key) => key !== undefined && key.length === 1,
         handler: (context, utilities, key) => {
             const range = context.range;

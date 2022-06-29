@@ -96,7 +96,7 @@ button:hover:enabled {
 
 button:disabled {
     opacity: 0.3;
-    border: none;
+    border: 1px transparent;
     cursor: auto;
 }
 

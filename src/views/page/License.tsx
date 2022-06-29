@@ -20,6 +20,7 @@ const License = (props: { book: Book }) => {
 				<BookishEditor<FormatNode> 
 					ast={formatNode} 
 					save={(node: FormatNode) => book.setLicense(node.toBookdown())}
+					chapter={false}
 				/>
 			</>
 			:

@@ -297,6 +297,7 @@ const Chapter = (props: { chapter: ChapterModel, book: Book, print?: boolean }) 
 								<BookishEditor<ChapterNode>
 									ast={chapterAST} 
 									save={ (node: ChapterNode) => chapter.setAST(node) }
+									chapter={true}
 								/> : 
 								renderNode(chapterAST)
 						) :

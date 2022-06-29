@@ -93,11 +93,11 @@ export default class Parser {
     }
 
     static parseChapter(book: Book | undefined, text: string) {
-        return (new Parser(book, book ? Parser.preprocessSymbols(book, text) : text)).parseChapter();
+        return (new Parser(book, book === undefined ? text : Parser.preprocessSymbols(book, text))).parseChapter();
     }
 
-    static parseFormat(book: Book, text: string) {
-        return (new Parser(book, Parser.preprocessSymbols(book, text))).parseFormat();
+    static parseFormat(book: Book | undefined, text: string) {
+        return (new Parser(book, book === undefined ? text : Parser.preprocessSymbols(book, text))).parseFormat();
     }
 
     static parseEmbed(book: Book, text: string) {

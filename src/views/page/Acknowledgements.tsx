@@ -23,6 +23,7 @@ const Acknowledgements = (props: { book: Book }) => {
 					<BookishEditor<ChapterNode> 
 						ast={acksNode} 
 						save={(node: ChapterNode) => book.setAcknowledgements(node.toBookdown())}
+						chapter={false}
 					/>
 				</>
 				:
