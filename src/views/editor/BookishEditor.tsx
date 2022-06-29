@@ -723,7 +723,7 @@ const BookishEditor = <RootType extends RootNode>(props: {
                 onBlur={handleUnfocus}
                 tabIndex={0} // Makes the editor focusable.
                 >
-                { context && caretCoordinate ? <Toolbar context={context} executor={executeCommand} saving={saving}></Toolbar> : null }
+                { context && caretCoordinate ? <Toolbar context={context} executor={executeCommand} saving={saving} visible={editorFocused}></Toolbar> : null }
                 {
                     // Draw a caret. We draw our own since this view isn't contentEditable and we can't show a caret.
                     // Customize the rendering based on the formatting applied to the text node.

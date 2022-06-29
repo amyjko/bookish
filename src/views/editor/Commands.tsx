@@ -588,7 +588,7 @@ export const commands: Command[] = [
     {
         label: "link ⚭",
         icon: Link,
-        description: "link",
+        description: "toggle link",
         category: "annotation",
         control: true, alt: false, shift: false, key: "k",
         visible: context => (context.atom === undefined && context.meta === undefined) || context.meta instanceof LinkNode,
@@ -602,8 +602,8 @@ export const commands: Command[] = [
         description: "toggle definition",
         category: "annotation",
         control: true, alt: false, shift: false, key: "d",
-        visible: context => (context.atom === undefined && context.meta === undefined) || context.meta instanceof DefinitionNode,
-        active: context => context.startIsText && context.endIsText,
+        visible: context => (context.root instanceof ChapterNode && context.atom === undefined && context.meta === undefined) || context.meta instanceof DefinitionNode,
+        active: context => context.root instanceof ChapterNode && context.startIsText && context.endIsText,
         handler: context => context.meta instanceof DefinitionNode ? 
             rootWithNode(context, context.format, context.format?.withSegmentReplaced(context.meta, context.meta.getText())) : 
             context.root.withSegmentAtSelection(context.range, text => new DefinitionNode(new TextNode(text)))
@@ -613,27 +613,27 @@ export const commands: Command[] = [
         description: "insert footnote",
         category: "annotation",
         control: true, alt: false, shift: false, key: "f",
-        visible: context => context.atom === undefined && context.meta === undefined,
-        active: context => context.startIsText && context.endIsText,
-        handler: context => context.root?.withSegmentAtSelection(context.range, text => new FootnoteNode(new FormatNode("", [ new TextNode(text) ])))
+        visible: context => context.root instanceof ChapterNode && context.atom === undefined && context.meta === undefined,
+        active: context => context.root instanceof ChapterNode && context.startIsText && context.endIsText,
+        handler: context => context.root.withSegmentAtSelection(context.range, text => new FootnoteNode(new FormatNode("", [ new TextNode(text) ])))
     },
     {
         label: "cite",
         description: "insert citations",
         category: "annotation",
         control: true, alt: false, shift: false, key: "t",
-        visible: context => (context.atom === undefined && context.meta === undefined),
-        active: context => context.root !== undefined && context.startIsText && context.endIsText,
-        handler: context => context.root?.withSegmentAtSelection(context.range, text => new CitationsNode([]))
+        visible: context => context.root instanceof ChapterNode && context.atom === undefined && context.meta === undefined,
+        active: context => context.root instanceof ChapterNode && context.startIsText && context.endIsText,
+        handler: context => context.root.withSegmentAtSelection(context.range, text => new CitationsNode([]))
     },
     {
         label: "label",
         description: "insert label",
         category: "annotation",
         control: true, alt: false, shift: false, key: "l",
-        visible: context => (context.atom === undefined && context.meta === undefined),
-        active: context => context.root !== undefined && context.startIsText && context.endIsText,
-        handler: context => context.root?.withSegmentAtSelection(context.range, text => new LabelNode(""))
+        visible: context => context.root instanceof ChapterNode && context.atom === undefined && context.meta === undefined,
+        active: context => context.root instanceof ChapterNode && context.startIsText && context.endIsText,
+        handler: context => context.root.withSegmentAtSelection(context.range, text => new LabelNode(""))
     },
     {
         label: "comment",
@@ -641,9 +641,9 @@ export const commands: Command[] = [
         description: "insert comment",
         category: "annotation",
         control: true, alt: false, shift: false, key: "'",
-        visible: context => (context.atom === undefined && context.meta === undefined),
-        active: context => context.root !== undefined && context.atom === undefined && context.startIsText && context.endIsText,
-        handler: context => context.root?.withSegmentAtSelection(context.range, text => new CommentNode(new FormatNode("", [ new TextNode(text) ])))
+        visible: context => context.root instanceof ChapterNode && context.atom === undefined && context.meta === undefined,
+        active: context => context.root instanceof ChapterNode && context.root !== undefined && context.atom === undefined && context.startIsText && context.endIsText,
+        handler: context => context.root.withSegmentAtSelection(context.range, text => new CommentNode(new FormatNode("", [ new TextNode(text) ])))
     },
     {
         label: "paragraph",

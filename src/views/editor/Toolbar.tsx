@@ -73,7 +73,8 @@ const categoryIcons: {[key:string]: Function} = {
 const Toolbar = (props: { 
     context?: CaretState, 
     executor?: (command: Command, key: string) => void,
-    saving?: undefined | string
+    saving?: undefined | string,
+    visible: boolean
     },
 ) => {
 
@@ -147,7 +148,7 @@ const Toolbar = (props: {
     }
 
     // Render command categories.
-    return <div className="bookish-chapter-editor-toolbar" onKeyDown={handleKeyDown}>
+    return <div className="bookish-chapter-editor-toolbar" onKeyDown={handleKeyDown} style={{visibility: props.visible ? "visible" : "hidden"}}>
         <Header/>
         {
         context && categories && props.executor ?
