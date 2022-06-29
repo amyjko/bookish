@@ -55,6 +55,49 @@ export abstract class Node {
         return nodes;
     }
 
+    // Swap them order if this is two text nodes that are reversed.
+    sortRange(range: CaretRange): CaretRange {
+
+        const start = range.start.node;
+        const end = range.end.node;
+
+        // Find the common ancestor of the two nodes.
+        const ancestor = start.getCommonAncestor(this, end);
+
+        if(ancestor === undefined)
+            return range;
+
+        // Where do these text nodes appear in the ancestor's node sequence?
+        let startIndex = ancestor.getNodes().indexOf(start);
+        let endIndex = ancestor.getNodes().indexOf(end);
+
+        // Defensively verify that we could find the given nodes in the document.
+        // If we can't, something is wrong upstream.
+        if(startIndex < 0 || endIndex < 0)
+            throw Error(`Couldn't find caret range node(s) in this tree.`);
+
+        // If we didn't find them, or the start is before the end, return the given range.
+        return startIndex === undefined || endIndex === undefined || startIndex < endIndex ? 
+                range :
+            // If they're the same node, order the index.
+            startIndex === endIndex ? 
+                { 
+                    start: { 
+                        node: range.start.node, 
+                        index: Math.min(range.start.index, range.end.index)
+                    }, 
+                    end: {
+                        node: range.end.node, 
+                        index: Math.max(range.start.index, range.end.index)
+                    }
+                } :
+            // Otherwise, swap the caret positions
+            { start: range.end, end: range.start };
+
+    }
+
+    getNode(id: number) { return this.getNodes().find(n => n.getID() === id); }
+    
     // An index of the given node in the depth-first traversal of the nodes.
     getIndexOf(node: Node): number | undefined {
         const index = this.getNodes().indexOf(node);
@@ -182,5 +225,13 @@ export abstract class Node {
     // By default, a node doesn't know how to insert anything into itself. Subclasses
     // are responsible for overriding this if they want to support specific insertions.
     withNodeInserted(caret: Caret, node: Node): Edit { return undefined; }
+
+    copyRange(range: CaretRange): Node | undefined {
+        const sortedRange = this.sortRange(range);
+        // Find the common ancestor of the range, then ask it to copy the portion of it selected and produce a node.
+        const commonAncestor = sortedRange.start.node.getCommonAncestor(this, sortedRange.end.node);
+        if(commonAncestor === undefined) return;
+        return commonAncestor.withContentInRange(sortedRange);
+    }
 
 }

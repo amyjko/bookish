@@ -4,7 +4,7 @@ import Code from './Code'
 import Python from './Python'
 import { CodeNode } from "../../models/CodeNode"
 import { EditorContext } from '../page/Book'
-import { CaretContext } from '../editor/ChapterEditor'
+import { CaretContext } from '../editor/BookishEditor'
 import { Position } from "../../models/Position"
 import PositionEditor from '../editor/PositionEditor'
 

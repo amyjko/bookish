@@ -1,6 +1,6 @@
 import React, { useContext, useRef } from 'react'
 import { TextNode } from "../../models/TextNode";
-import { CaretContext } from '../editor/ChapterEditor';
+import { CaretContext } from '../editor/BookishEditor';
 import { ChapterContext } from './Chapter';
 
 function replaceMultipleSpacesWithNonBreakingSpaces(original: string) {

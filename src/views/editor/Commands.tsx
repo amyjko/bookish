@@ -19,7 +19,7 @@ import { TextNode } from "../../models/TextNode";
 import { Edit } from "../../models/Edit";
 import { Node } from "../../models/Node";
 
-import { CaretState, CaretUtilities } from "./ChapterEditor";
+import { CaretState, CaretUtilities } from "./BookishEditor";
 
 // From: https://thenounproject.com/browse/collection-icon/minio-text-editor-bold-13520/?p=1
 import Clear from "../svg/clear.svg";
@@ -64,7 +64,7 @@ export type Command = {
 function insertTableRowColumn(context: CaretState, table: TableNode, format: FormatNode, row: boolean, before: boolean): Edit {
     const location = table.locate(format);
     if(location === undefined) return;
-    return chapterWithNode(
+    return rootWithNode(
         context, 
         table, 
         row ? table.withNewRow(location.row + (before ? 0 : 1)): table.withNewColumn(location.column + (before ? 0 : 1)),
@@ -75,7 +75,7 @@ function insertTableRowColumn(context: CaretState, table: TableNode, format: For
 function deleteTableRowColumn(context: CaretState, table: TableNode, format: FormatNode, row: boolean): Edit {
     const location = table.locate(format);
     if(location === undefined) return;
-    return chapterWithNode(
+    return rootWithNode(
         context,
         table,
         row ? table.withoutRow(location.row) : table.withoutColumn(location.column),
@@ -88,12 +88,12 @@ function deleteTableRowColumn(context: CaretState, table: TableNode, format: For
 }
 
 // A helper function that encapsulates boilerplate for replacing a node in a root and updating a caret.
-function chapterWithNode(context: CaretState, original: Node | undefined, replacement: Node | undefined, caret?: (node: Node) => Caret | undefined): Edit | undefined {
+function rootWithNode(context: CaretState, original: Node | undefined, replacement: Node | undefined, caret?: (node: Node) => Caret | undefined): Edit | undefined {
 
     // If there was no original or replacement, do nothing. Saves commands from having to check.
     if(original === undefined || replacement === undefined) return;
     // Make the new root. Bail on fail.
-    const newRoot = context.chapter.withNodeReplaced(original, replacement);
+    const newRoot = context.root.withNodeReplaced(original, replacement);
     if(newRoot === undefined) return;
     // Generate a new caret based on the replacement, if there's a generator. Bail on fail.
     const newCaret = caret?.call(undefined, replacement);
@@ -167,9 +167,9 @@ export const commands: Command[] = [
         active: context => context.endIsTextOrAtom,
         handler: context => {
             if(context.end.node instanceof TextNode || context.end.node instanceof AtomNode) {
-                const nextCaret = context.chapter.getAdjacentCaret(context.end, false);
-                const sortedRange = context.chapter.sortRange(context.range);
-                return { root: context.chapter, range: nextCaret === undefined ? { start: sortedRange.start, end: sortedRange.start } : { start: nextCaret, end: nextCaret }};
+                const nextCaret = context.root.getAdjacentCaret(context.end, false);
+                const sortedRange = context.root.sortRange(context.range);
+                return { root: context.root, range: nextCaret === undefined ? { start: sortedRange.start, end: sortedRange.start } : { start: nextCaret, end: nextCaret }};
             }
         }
     },
@@ -181,8 +181,8 @@ export const commands: Command[] = [
         active: context => context.endIsTextOrAtom,
         handler: context => {
             if(context.end.node instanceof TextNode || context.end.node instanceof AtomNode) {
-                const previous = context.end.node.previousWord(context.chapter, context.end.index);
-                return { root: context.chapter, range: { start: previous, end: previous } };
+                const previous = context.end.node.previousWord(context.root, context.end.index);
+                return { root: context.root, range: { start: previous, end: previous } };
             }
         }
     },
@@ -195,7 +195,7 @@ export const commands: Command[] = [
         handler: context => {
             if(context.format !== undefined) {
                 const first = context.format.getFirstTextNode();
-                return { root: context.chapter, range: { start: { node: first, index: 0 }, end: { node: first, index: 0 }}}
+                return { root: context.root, range: { start: { node: first, index: 0 }, end: { node: first, index: 0 }}}
             }
         }
     },
@@ -207,9 +207,9 @@ export const commands: Command[] = [
         active: context => context.endIsTextOrAtom,
         handler: context => {
             if(context.end.node instanceof TextNode || context.end.node instanceof AtomNode) {
-                const previous = context.chapter.getAdjacentCaret(context.end, false);
+                const previous = context.root.getAdjacentCaret(context.end, false);
                 if(previous === undefined) return;
-                return { root: context.chapter, range: { start: context.start, end: previous } };
+                return { root: context.root, range: { start: context.start, end: previous } };
             }
         }
     },
@@ -221,8 +221,8 @@ export const commands: Command[] = [
         active: context => context.endIsTextOrAtom,
         handler: context => {
             if(context.end.node instanceof TextNode || context.end.node instanceof AtomNode) {
-                const previous = context.end.node.previousWord(context.chapter, context.end.index);
-                return { root: context.chapter, range: { start: context.start, end: previous } };
+                const previous = context.end.node.previousWord(context.root, context.end.index);
+                return { root: context.root, range: { start: context.start, end: previous } };
             }
         }
     },
@@ -235,7 +235,7 @@ export const commands: Command[] = [
         handler: context => {
             if(context.format !== undefined) {
                 const first = context.format.getFirstTextNode();
-                return { root: context.chapter, range: { start: context.start, end: { node: first, index: 0 } } };
+                return { root: context.root, range: { start: context.start, end: { node: first, index: 0 } } };
             }
         }
     },
@@ -247,10 +247,10 @@ export const commands: Command[] = [
         active: context => context.endIsTextOrAtom,
         handler: context => {
             if(context.end.node instanceof TextNode || context.end.node instanceof AtomNode) {
-                const nextCaret = context.blocks?.getAdjacentCaret(context.end, true);
-                const sortedRange = context.chapter.sortRange(context.range);
+                const nextCaret = context.root.getAdjacentCaret(context.end, true);
+                const sortedRange = context.root.sortRange(context.range);
                 // If there is no next caret, move the caret to the largest of the current start and end.
-                return { root: context.chapter, range: nextCaret === undefined ? { start: sortedRange.end, end: sortedRange.end } : { start: nextCaret, end: nextCaret }};
+                return { root: context.root, range: nextCaret === undefined ? { start: sortedRange.end, end: sortedRange.end } : { start: nextCaret, end: nextCaret }};
             }
         }
     },
@@ -262,8 +262,8 @@ export const commands: Command[] = [
         active: context => context.endIsTextOrAtom,
         handler: context => {
             if(context.end.node instanceof TextNode || context.end.node instanceof AtomNode) {
-                const next = context.end.node.nextWord(context.chapter, context.end.index);
-                return { root: context.chapter, range: { start: next, end: next } }
+                const next = context.end.node.nextWord(context.root, context.end.index);
+                return { root: context.root, range: { start: next, end: next } }
             }
         }
     },
@@ -277,7 +277,7 @@ export const commands: Command[] = [
             if(context.format !== undefined) {
                 const last = context.format.getLastTextNode();
                 const caret = { node: last, index: last.getLength() };
-                return { root: context.chapter, range: { start: caret, end: caret} };
+                return { root: context.root, range: { start: caret, end: caret} };
             }
         }
     },
@@ -289,9 +289,9 @@ export const commands: Command[] = [
         active: context => context.endIsTextOrAtom,
         handler: context => {
             if(context.end.node instanceof TextNode || context.end.node instanceof AtomNode) {
-                const next = context.chapter.getAdjacentCaret(context.end, true);
+                const next = context.root.getAdjacentCaret(context.end, true);
                 if(next === undefined) return;
-                return { root: context.chapter, range: { start: context.start, end: next } };
+                return { root: context.root, range: { start: context.start, end: next } };
             }
         }
     },
@@ -303,8 +303,8 @@ export const commands: Command[] = [
         active: context => context.endIsTextOrAtom,
         handler: context => {
             if(context.end.node instanceof TextNode || context.end.node instanceof AtomNode) {
-                const previous = context.end.node.nextWord(context.chapter, context.end.index);
-                return { root: context.chapter, range: { start: context.start, end: previous } };
+                const previous = context.end.node.nextWord(context.root, context.end.index);
+                return { root: context.root, range: { start: context.start, end: previous } };
             }
         }
     },
@@ -317,7 +317,7 @@ export const commands: Command[] = [
         handler: context => {
             if(context.format !== undefined) {
                 const last = context.format.getLastTextNode();
-                return { root: context.chapter, range: { start: context.start, end: { node: last, index: last.getLength() } } };
+                return { root: context.root, range: { start: context.start, end: { node: last, index: last.getLength() } } };
             }
         }
     },
@@ -331,14 +331,14 @@ export const commands: Command[] = [
             // If in a footnote, expand to the footnote.
             if(context.atom) {
                 const format = context.atom.getMeta();
-                return { root: context.chapter, range: { start: format.getFirstCaret(), end: format.getLastCaret() } };
+                return { root: context.root, range: { start: format.getFirstCaret(), end: format.getLastCaret() } };
             }
             else {
                 // Find the first and last caret of the entire chapter.
-                const text = context.chapter?.getTextNodes();
+                const text = context.root?.getTextNodes();
                 if(text && text.length > 0) {
                     return { 
-                        root: context.chapter, 
+                        root: context.root, 
                         range: {
                             start: { node: text[0], index: 0 },
                             end: { node: text[text.length - 1], index: text[text.length - 1].getLength() }
@@ -357,7 +357,7 @@ export const commands: Command[] = [
         active: context => context.startIsTextOrAtom,
         handler: (context, utilities) => {
             const above = utilities.getCaretOnLine(context.start, false);
-            return { root: context.chapter, range: { start: above, end: above } };
+            return { root: context.root, range: { start: above, end: above } };
         }
     },
     {
@@ -368,7 +368,7 @@ export const commands: Command[] = [
         active: context => context.startIsTextOrAtom,
         handler: (context, utilities) => {
             const above = utilities.getCaretOnLine(context.end, false);
-            return { root: context.chapter, range: { start: context.start, end: above } };
+            return { root: context.root, range: { start: context.start, end: above } };
         }
     },
     {
@@ -379,7 +379,7 @@ export const commands: Command[] = [
         active: context => context.startIsTextOrAtom,
         handler: (context, utilities) => {
             const below = utilities.getCaretOnLine(context.start, true);
-            return { root: context.chapter, range: { start: below, end: below } };
+            return { root: context.root, range: { start: below, end: below } };
         }
     },
     {
@@ -390,7 +390,7 @@ export const commands: Command[] = [
         active: context => context.startIsTextOrAtom,
         handler: (context, utilities) => {
             const below = utilities.getCaretOnLine(context.end, true);
-            return { root: context.chapter, range: { start: context.start, end: below } };
+            return { root: context.root, range: { start: context.start, end: below } };
         }
     },
     {
@@ -398,18 +398,18 @@ export const commands: Command[] = [
         category: "text",
         control: false, alt: false, shift: false, key: "Backspace",
         visible: context => false,
-        active: context => context.chapter !== undefined,
+        active: context => context.root !== undefined,
         handler: context => {
-            if(context.blocks === undefined) return;
+            if(context.root === undefined) return;
             if(context.isSelection) {
-                const edit = context.blocks.withoutRange(context.range);
+                const edit = context.root.withRangeFormatted(context.range, undefined);
                 if(edit === undefined) return;
-                return chapterWithNode(context, context.blocks, edit.root, () => edit.range.start)
+                return rootWithNode(context, context.root, edit.root, () => edit.range.start)
             }
             else {
-                const edit = context.blocks?.withoutAdjacentContent(context.start, false);
+                const edit = context.root.withoutAdjacentContent(context.start, false);
                 if(edit === undefined) return;
-                return chapterWithNode(context, context.blocks, edit.root, () => edit.range.start)
+                return rootWithNode(context, context.root, edit.root, () => edit.range.start)
             }
         }
     },
@@ -418,18 +418,18 @@ export const commands: Command[] = [
         category: "text",
         control: false, alt: false, shift: false, key: "Delete",
         visible: context => false,
-        active: context => context.chapter !== undefined,
+        active: context => context.root !== undefined,
         handler: context => {
-            if(context.blocks === undefined) return;
+            if(context.root === undefined) return;
             if(context.isSelection) {
-                const edit = context.blocks.withoutRange(context.range);
+                const edit = context.root.withRangeFormatted(context.range, undefined);
                 if(edit === undefined) return;
-                return chapterWithNode(context, context.blocks, edit.root, () => edit.range.start)
+                return rootWithNode(context, context.root, edit.root, () => edit.range.start)
             }
             else {
-                const edit = context.blocks?.withoutAdjacentContent(context.start, true);
+                const edit = context.root.withoutAdjacentContent(context.start, true);
                 if(edit === undefined) return;
-                return chapterWithNode(context, context.blocks, edit.root, () => edit.range.start)
+                return rootWithNode(context, context.root, edit.root, () => edit.range.start)
             }
         }
     },
@@ -438,12 +438,12 @@ export const commands: Command[] = [
         category: "text",
         control: false, alt: false, shift: false, key: "Enter",
         visible: context => false,
-        active: context => context.start.node.isInside(context.chapter, CodeNode),
+        active: context => context.start.node.isInside(context.root, CodeNode),
         handler: context => {
             if(!(context.start.node instanceof TextNode)) return;
             const newText = context.start.node.withCharacterAt("\n", context.start.index);
             if(newText === undefined) return;
-            return chapterWithNode(
+            return rootWithNode(
                 context, 
                 context.start.node, 
                 newText,
@@ -464,7 +464,7 @@ export const commands: Command[] = [
             const lastCaret = lastItem?.getLastCaret();
             // If we're at the last item in the list and it's empty, then add a
             if(lastItem !== undefined && lastCaret !== undefined && lastCaret.node instanceof TextNode && lastCaret.node.getLength() === 0 && lastCaret.node === context.end.node && lastCaret.index === context.end.index) {
-                const listParent = context.list.getParent(context.chapter);
+                const listParent = context.list.getParent(context.root);
                 if(listParent instanceof ListNode) {
                     const newSublist = context.list.withoutItem(lastItem);
                     if(newSublist === undefined) return;
@@ -472,18 +472,18 @@ export const commands: Command[] = [
                     if(newListWithoutSublistItem === undefined) return;
                     const newListWithSublistItem = newListWithoutSublistItem.withItemAfter(lastItem, newSublist);
                     if(newListWithSublistItem === undefined) return;                    
-                    return chapterWithNode(context, listParent, newListWithSublistItem, n => lastCaret)
+                    return rootWithNode(context, listParent, newListWithSublistItem, n => lastCaret)
                 }
                 else if(listParent instanceof BlocksNode) {
                     const listWithoutItem = context.list.withoutItem(lastItem);
                     if(listWithoutItem === undefined) return;
                     const newBlocks = listParent.withChildReplaced(context.list, listWithoutItem)?.withBlockInsertedAfter(listWithoutItem, new ParagraphNode(0, lastItem));
                     if(newBlocks === undefined) return;
-                    return chapterWithNode(context, listParent, newBlocks, n => lastCaret );
+                    return rootWithNode(context, listParent, newBlocks, n => lastCaret );
                 }
             }
             else
-                return chapterWithNode(context, context.list, context.list?.withItemSplit(context.range.start), newList => {
+                return rootWithNode(context, context.list, context.list?.withItemSplit(context.range.start), newList => {
                     const index = context.list?.getItemContaining(context.range.start);
                     if(index === undefined) return;
                     const item = (newList as ListNode).getItem(index + 1);
@@ -501,7 +501,7 @@ export const commands: Command[] = [
         handler: context => {
             const edit = context.blocks?.withSelectionSplit(context.range);
             if(edit === undefined) return;
-            return chapterWithNode(context, context.blocks, edit.root, () => edit.range.start)
+            return rootWithNode(context, context.blocks, edit.root, () => edit.range.start)
         }
     },
     {
@@ -512,7 +512,7 @@ export const commands: Command[] = [
         control: false, alt: false, shift: false, key: "Tab",
         visible: context => context.list !== undefined,
         active: context => context.list !== undefined,
-        handler: context => chapterWithNode(context, context.blocks, context.blocks?.withListsIndented(context.range, true))
+        handler: context => rootWithNode(context, context.blocks, context.blocks?.withListsIndented(context.range, true))
     },        
     {
         label: "unindent",
@@ -521,8 +521,8 @@ export const commands: Command[] = [
         category: "list",
         control: false, alt: false, shift: true, key: "Tab",
         visible: context => context.list !== undefined,
-        active: context => context.list !== undefined && context.list.isInside(context.chapter, ListNode),
-        handler: context => chapterWithNode(context, context.blocks, context.blocks?.withListsIndented(context.range, false))
+        active: context => context.list !== undefined && context.list.isInside(context.root, ListNode),
+        handler: context => rootWithNode(context, context.blocks, context.blocks?.withListsIndented(context.range, false))
     },
     {
         label: "plain",
@@ -531,8 +531,8 @@ export const commands: Command[] = [
         category: "text",
         control: true, alt: false, shift: false, key: "0",
         visible: context => true,
-        active: context => context.chapter !== undefined && context.startIsText && context.endIsText,
-        handler: context => context.chapter.withRangeFormatted(context.range, "")
+        active: context => context.root !== undefined && context.startIsText && context.endIsText,
+        handler: context => context.root.withRangeFormatted(context.range, "")
     },
     {
         label: "bold",
@@ -541,8 +541,8 @@ export const commands: Command[] = [
         category: "text",
         visible: context => true,
         control: true, alt: false, shift: false, key: "b",
-        active: context => context.chapter !== undefined && context.startIsText && context.endIsText,
-        handler: context => context.chapter.withRangeFormatted(context.range, "*")
+        active: context => context.root !== undefined && context.startIsText && context.endIsText,
+        handler: context => context.root.withRangeFormatted(context.range, "*")
     },
     {
         description: "italic",
@@ -550,8 +550,8 @@ export const commands: Command[] = [
         category: "text",
         control: true, alt: false, shift: false, key: "i",
         visible: context => true,
-        active: context => context.chapter !== undefined && context.startIsText && context.endIsText,
-        handler: context => context.chapter.withRangeFormatted(context.range, "_")
+        active: context => context.root !== undefined && context.startIsText && context.endIsText,
+        handler: context => context.root.withRangeFormatted(context.range, "_")
     },
     {
         label: "sub\u2099",
@@ -560,8 +560,8 @@ export const commands: Command[] = [
         category: "text",
         control: true, alt: false, shift: false, key: ",",
         visible: context => true,
-        active: context => context.chapter !== undefined && context.startIsText && context.endIsText,
-        handler: context => context.chapter.withRangeFormatted(context.range, "v")
+        active: context => context.root !== undefined && context.startIsText && context.endIsText,
+        handler: context => context.root.withRangeFormatted(context.range, "v")
     },
     {
         label: "super\u207F",
@@ -570,8 +570,8 @@ export const commands: Command[] = [
         category: "text",
         control: true, alt: false, shift: false, key: ".",
         visible: context => true,
-        active: context => context.chapter !== undefined && context.startIsText && context.endIsText,
-        handler: context => context.chapter.withRangeFormatted(context.range, "^")
+        active: context => context.root !== undefined && context.startIsText && context.endIsText,
+        handler: context => context.root.withRangeFormatted(context.range, "^")
     },
     {
         label: "<code>",
@@ -580,10 +580,10 @@ export const commands: Command[] = [
         category: "text",
         control: true, alt: false, shift: false, key: "j",
         visible: context => (context.atom === undefined && context.meta === undefined) || context.meta instanceof InlineCodeNode,
-        active: context => context.chapter !== undefined && context.startIsText && context.endIsText,
+        active: context => context.root !== undefined && context.startIsText && context.endIsText,
         handler: context => context.meta instanceof InlineCodeNode ? 
-            chapterWithNode(context, context.format, context.format?.withSegmentReplaced(context.meta, context.meta.getText())) : 
-            context.chapter.withSegmentAtSelection(context.range, text => new InlineCodeNode(new TextNode(text)))
+            rootWithNode(context, context.format, context.format?.withSegmentReplaced(context.meta, context.meta.getText())) : 
+            context.root.withSegmentAtSelection(context.range, text => new InlineCodeNode(new TextNode(text)))
     },
     {
         label: "link ⚭",
@@ -592,10 +592,10 @@ export const commands: Command[] = [
         category: "annotation",
         control: true, alt: false, shift: false, key: "k",
         visible: context => (context.atom === undefined && context.meta === undefined) || context.meta instanceof LinkNode,
-        active: context => context.chapter !== undefined && context.startIsText && context.endIsText,
+        active: context => context.root !== undefined && context.startIsText && context.endIsText,
         handler: context => context.meta instanceof LinkNode ? 
-            chapterWithNode(context, context.format, context.format?.withSegmentReplaced(context.meta, context.meta.getText())) : 
-            context.chapter.withSegmentAtSelection(context.range, text => new LinkNode(new TextNode(text)))
+            rootWithNode(context, context.format, context.format?.withSegmentReplaced(context.meta, context.meta.getText())) : 
+            context.root.withSegmentAtSelection(context.range, text => new LinkNode(new TextNode(text)))
     },
     {
         label: "glossary",
@@ -605,8 +605,8 @@ export const commands: Command[] = [
         visible: context => (context.atom === undefined && context.meta === undefined) || context.meta instanceof DefinitionNode,
         active: context => context.startIsText && context.endIsText,
         handler: context => context.meta instanceof DefinitionNode ? 
-            chapterWithNode(context, context.format, context.format?.withSegmentReplaced(context.meta, context.meta.getText())) : 
-            context.chapter.withSegmentAtSelection(context.range, text => new DefinitionNode(new TextNode(text)))
+            rootWithNode(context, context.format, context.format?.withSegmentReplaced(context.meta, context.meta.getText())) : 
+            context.root.withSegmentAtSelection(context.range, text => new DefinitionNode(new TextNode(text)))
     },
     {
         label: "footnote",
@@ -615,7 +615,7 @@ export const commands: Command[] = [
         control: true, alt: false, shift: false, key: "f",
         visible: context => context.atom === undefined && context.meta === undefined,
         active: context => context.startIsText && context.endIsText,
-        handler: context => context.chapter?.withSegmentAtSelection(context.range, text => new FootnoteNode(new FormatNode("", [ new TextNode(text) ])))
+        handler: context => context.root?.withSegmentAtSelection(context.range, text => new FootnoteNode(new FormatNode("", [ new TextNode(text) ])))
     },
     {
         label: "cite",
@@ -623,8 +623,8 @@ export const commands: Command[] = [
         category: "annotation",
         control: true, alt: false, shift: false, key: "t",
         visible: context => (context.atom === undefined && context.meta === undefined),
-        active: context => context.chapter !== undefined && context.startIsText && context.endIsText,
-        handler: context => context.chapter?.withSegmentAtSelection(context.range, text => new CitationsNode([]))
+        active: context => context.root !== undefined && context.startIsText && context.endIsText,
+        handler: context => context.root?.withSegmentAtSelection(context.range, text => new CitationsNode([]))
     },
     {
         label: "label",
@@ -632,8 +632,8 @@ export const commands: Command[] = [
         category: "annotation",
         control: true, alt: false, shift: false, key: "l",
         visible: context => (context.atom === undefined && context.meta === undefined),
-        active: context => context.chapter !== undefined && context.startIsText && context.endIsText,
-        handler: context => context.chapter?.withSegmentAtSelection(context.range, text => new LabelNode(""))
+        active: context => context.root !== undefined && context.startIsText && context.endIsText,
+        handler: context => context.root?.withSegmentAtSelection(context.range, text => new LabelNode(""))
     },
     {
         label: "comment",
@@ -642,8 +642,8 @@ export const commands: Command[] = [
         category: "annotation",
         control: true, alt: false, shift: false, key: "'",
         visible: context => (context.atom === undefined && context.meta === undefined),
-        active: context => context.chapter !== undefined && context.atom === undefined && context.startIsText && context.endIsText,
-        handler: context => context.chapter?.withSegmentAtSelection(context.range, text => new CommentNode(new FormatNode("", [ new TextNode(text) ])))
+        active: context => context.root !== undefined && context.atom === undefined && context.startIsText && context.endIsText,
+        handler: context => context.root?.withSegmentAtSelection(context.range, text => new CommentNode(new FormatNode("", [ new TextNode(text) ])))
     },
     {
         label: "paragraph",
@@ -651,11 +651,11 @@ export const commands: Command[] = [
         description: "format as paragraph",
         category: "level",
         control: true, alt: true, shift: false, code: "Digit0",
-        visible: context => context.chapter !== undefined && context.atom === undefined,
+        visible: context => context.root !== undefined && context.atom === undefined,
         active: context => context.paragraph !== undefined && context.paragraph.getLevel() !== 0,
         handler: context => {
             if(context.paragraph === undefined) return;
-            return chapterWithNode(context, context.paragraph, context.paragraph.withLevel(0));
+            return rootWithNode(context, context.paragraph, context.paragraph.withLevel(0));
         }
     },
     {
@@ -663,27 +663,27 @@ export const commands: Command[] = [
         description: "format as 1st level header",
         category: "level",
         control: true, alt: true, shift: false, code: "Digit1",
-        visible: context => context.chapter !== undefined && context.atom === undefined,
+        visible: context => context.root !== undefined && context.atom === undefined,
         active: context => context.paragraph !== undefined && context.paragraph.getLevel() !== 1,
-        handler: context => chapterWithNode(context, context.paragraph, context.paragraph?.withLevel(1))
+        handler: context => rootWithNode(context, context.paragraph, context.paragraph?.withLevel(1))
     },
     {
         label: "h2",
         description: "format as 2nd level header",
         category: "level",
         control: true, alt: true, shift: false, code: "Digit2",
-        visible: context => context.chapter !== undefined && context.atom === undefined,
+        visible: context => context.root !== undefined && context.atom === undefined,
         active: context => context.paragraph !== undefined && context.paragraph.getLevel() !== 2,
-        handler: context => chapterWithNode(context, context.paragraph, context.paragraph?.withLevel(2))
+        handler: context => rootWithNode(context, context.paragraph, context.paragraph?.withLevel(2))
     },
     {
         label: "h3",
         description: "format as 3rd level header",
         category: "level",
         control: true, alt: true, shift: false, code: "Digit3",
-        visible: context => context.chapter !== undefined && context.atom === undefined,
+        visible: context => context.root !== undefined && context.atom === undefined,
         active: context => context.paragraph !== undefined && context.paragraph.getLevel() !== 3,
-        handler: context => chapterWithNode(context, context.paragraph, context.paragraph?.withLevel(3))
+        handler: context => rootWithNode(context, context.paragraph, context.paragraph?.withLevel(3))
     },
     {
         label: "\u2014",
@@ -692,7 +692,7 @@ export const commands: Command[] = [
         control: true, alt: false, shift: true, key: "h",
         visible: context => context.blocks !== undefined && context.atParagraphStart,
         active: context => context.blocks !== undefined && context.atParagraphStart,
-        handler: context => context.paragraph ? chapterWithNode(context, context.blocks, context.blocks?.withBlockInsertedBefore(context.paragraph, new RuleNode())) : undefined
+        handler: context => context.paragraph ? rootWithNode(context, context.blocks, context.blocks?.withBlockInsertedBefore(context.paragraph, new RuleNode())) : undefined
     },
     {
         label: "callout",
@@ -706,7 +706,7 @@ export const commands: Command[] = [
             if(context.blocks && context.paragraph) {
                 // Make a new callout node with an empty paragraph, insert it before the paragraph the caret is in, and place the caret inside the empty paragraph.
                 const newParagraph = new ParagraphNode();
-                return chapterWithNode(
+                return rootWithNode(
                     context, 
                     context.blocks, 
                     context.blocks.withBlockInsertedBefore(context.paragraph, new CalloutNode([ newParagraph ])), 
@@ -727,7 +727,7 @@ export const commands: Command[] = [
             if(context.blocks && context.paragraph) {
                 // Make a new quote and place the caret inside the quote's first empty paragraph.
                 const newParagraph = new ParagraphNode();
-                return chapterWithNode(
+                return rootWithNode(
                     context, 
                     context.blocks, 
                     context.blocks.withBlockInsertedBefore(context.paragraph, new QuoteNode([ newParagraph ])),
@@ -747,7 +747,7 @@ export const commands: Command[] = [
         handler: context => {
             if(context.blocks && context.paragraph) {
                 const newCode = new CodeNode(new TextNode(), "plaintext", "|");
-                return chapterWithNode(
+                return rootWithNode(
                     context, 
                     context.blocks, 
                     context.blocks.withBlockInsertedBefore(context.paragraph, newCode), 
@@ -768,7 +768,7 @@ export const commands: Command[] = [
             if(context.blocks && context.paragraph) {
                 // Place the caret inside the code's code node.
                 const newEmbed = new EmbedNode("", "");
-                return chapterWithNode(
+                return rootWithNode(
                     context, 
                     context.blocks, 
                     context.blocks.withBlockInsertedBefore(context.paragraph, newEmbed), 
@@ -794,7 +794,7 @@ export const commands: Command[] = [
                         newRows[r].push(new FormatNode("", [ new TextNode()]));
                 }
                 const newTable = new TableNode(newRows, "|", new FormatNode("", [ new TextNode()]));
-                return chapterWithNode(
+                return rootWithNode(
                     context, 
                     context.blocks, 
                     context.blocks.withBlockInsertedBefore(context.paragraph, newTable), 
@@ -811,7 +811,7 @@ export const commands: Command[] = [
         control: true, alt: false, shift: true, key: "7",
         visible: context => context.list === undefined && context.atom === undefined,
         active: context => context.list === undefined && context.atom === undefined && context.blocks !== undefined,
-        handler: context => chapterWithNode(context, context.blocks, context.blocks?.withParagraphsAsLists(context.range, false))
+        handler: context => rootWithNode(context, context.blocks, context.blocks?.withParagraphsAsLists(context.range, false))
     },
     {
         label: "numbered",
@@ -821,7 +821,7 @@ export const commands: Command[] = [
         control: true, alt: false, shift: true, key: "8",
         visible: context => context.list === undefined && context.atom === undefined,
         active: context => context.list === undefined && context.atom === undefined && context.blocks !== undefined,
-        handler: context => chapterWithNode(context, context.blocks, context.blocks?.withParagraphsAsLists(context.range, true))
+        handler: context => rootWithNode(context, context.blocks, context.blocks?.withParagraphsAsLists(context.range, true))
     },
     {
         label: "bulleted",
@@ -831,7 +831,7 @@ export const commands: Command[] = [
         control: true, alt: false, shift: true, key: "7",
         visible: context => context.blocks !== undefined && context.list !== undefined && context.list.isNumbered(),
         active: context => context.list !== undefined && context.list.isNumbered(),
-        handler: context => context.list ? chapterWithNode(context, context.blocks, context.blocks?.withListAsStyle(context.list, false)) : undefined
+        handler: context => context.list ? rootWithNode(context, context.blocks, context.blocks?.withListAsStyle(context.list, false)) : undefined
     },
     {
         label: "numbered",
@@ -841,7 +841,7 @@ export const commands: Command[] = [
         control: true, alt: false, shift: true, key: "8",
         visible: context => context.blocks !== undefined && context.list !== undefined && !context.list.isNumbered(),
         active: context => context.list !== undefined && !context.list.isNumbered(),
-        handler: context => context.list ? chapterWithNode(context, context.blocks, context.blocks?.withListAsStyle(context.list, true)) : undefined
+        handler: context => context.list ? rootWithNode(context, context.blocks, context.blocks?.withListAsStyle(context.list, true)) : undefined
     },
     {
         label: "paragraph",
@@ -851,7 +851,7 @@ export const commands: Command[] = [
         control: true, alt: false, shift: true, key: ["7", "8"],
         visible: context => context.includesList,
         active: context => context.includesList,
-        handler: context => chapterWithNode(context, context.blocks, context.blocks?.withListsAsParagraphs(context.range))
+        handler: context => rootWithNode(context, context.blocks, context.blocks?.withListsAsParagraphs(context.range))
     },
     {
         label: "undo",
@@ -879,17 +879,17 @@ export const commands: Command[] = [
         category: "clipboard",
         control: true, alt: false, shift: false, key: ["x"],
         visible: context => true,
-        active: context => context.blocks !== undefined && context.isSelection,
+        active: context => context.root !== undefined && context.isSelection,
         handler: context => { 
-            if(context.blocks === undefined) return;
+            if(context.root === undefined) return;
             // Save the copied content to the clipboard
-            const copy = context.chapter.copyRange(context.range);
-            const edit = context.chapter.withoutRange(context.range);
+            const copy = context.root.copyRange(context.range);
+            const edit = context.root.withRangeFormatted(context.range, undefined);
             if(edit === undefined) return;
 
             context.setClipboard(copy);
 
-            return chapterWithNode(context, context.blocks, edit.root, () => edit.range.start);
+            return rootWithNode(context, context.root, edit.root, () => edit.range.start);
         }
     },
     {
@@ -898,11 +898,11 @@ export const commands: Command[] = [
         category: "clipboard",
         control: true, alt: false, shift: false, key: ["c"],
         visible: context => true,
-        active: context => context.blocks !== undefined && context.isSelection,
+        active: context => context.root !== undefined && context.isSelection,
         handler: context => { 
-            if(context.blocks === undefined) return;        
+            if(context.root === undefined) return;        
             // Save the copied content to the clipboard
-            const copy = context.chapter.copyRange(context.range);
+            const copy = context.root.copyRange(context.range);
             if(copy !== undefined)
                 context.setClipboard(copy);
             return undefined;
@@ -915,24 +915,24 @@ export const commands: Command[] = [
         category: "clipboard",
         control: true, alt: false, shift: false, key: ["v"],
         visible: context => true,
-        active: context => context.clipboard !== undefined, 
+        active: context => context.root !== undefined && context.clipboard !== undefined, 
         handler: context => { 
-            if(context.clipboard === undefined || context.chapter === undefined) return;
+            if(context.clipboard === undefined || context.root === undefined) return;
 
             // Track revisions in these two variables.
-            let newChapter = context.chapter;
+            let newRoot = context.root;
             let newCaret = context.start;
 
             // Is there any text to remove? Remove it first.
             if(context.isSelection) {
-                const edit = newChapter.withoutRange(context.range);
+                const edit = newRoot.withRangeFormatted(context.range, undefined);
                 if(edit === undefined || !(edit.root instanceof ChapterNode)) return;
-                newChapter = edit.root;
+                newRoot = edit.root;
                 newCaret = edit.range.start;
             }
 
             // Find the parents of the caret node, from nearest to furthest
-            const parents = context.chapter.getParentsOf(newCaret.node);
+            const parents = context.root.getParentsOf(newCaret.node);
             if(parents === undefined) return;
 
             // Pop parents, nearest to farthest, searching for one that handles an insertion.
@@ -948,7 +948,7 @@ export const commands: Command[] = [
 
             // Insert the node at the caret.
             if(parent !== undefined && edit !== undefined) {
-                const newChapter = context.chapter.withNodeReplaced(parent, edit.root);
+                const newChapter = context.root.withNodeReplaced(parent, edit.root);
                 if(newChapter === undefined) return;
                 return { root: newChapter, range: edit.range};
             }
@@ -971,13 +971,13 @@ export const commands: Command[] = [
                 let originalNode: Node = context.format;
 
                 // If there's a selection, remove it before inserting, and insert at the caret returned.
-                if(context.isSelection && context.blocks !== undefined) {
+                if(context.isSelection && context.root !== undefined) {
                     // Try to remove the range.
-                    let edit = context.blocks.withoutRange(range);
+                    let edit = context.root.withRangeFormatted(range, undefined);
                     // If we fail, fail to insert at the selection.
                     if(edit === undefined || !(edit.root instanceof BlocksNode)) return;
                     newNode = edit.root;
-                    originalNode = context.blocks;
+                    originalNode = context.root;
                     insertionPoint = edit.range.start;
                 }
         
@@ -993,7 +993,7 @@ export const commands: Command[] = [
                 if(newNode === undefined) return;
 
                 // Update the chapter
-                return chapterWithNode(context, originalNode, newNode, () => { return { node: newText, index: insertionPoint.index + 1 }});
+                return rootWithNode(context, originalNode, newNode, () => { return { node: newText, index: insertionPoint.index + 1 }});
     
             }
         }

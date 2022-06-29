@@ -3,7 +3,7 @@ import { Position } from '../../models/Position';
 import PositionEditor from "./PositionEditor";
 import { EmbedNode } from '../../models/EmbedNode';
 import URLEditor from './URLEditor';
-import { CaretContext, CaretContextType } from './ChapterEditor';
+import { CaretContext, CaretContextType } from './BookishEditor';
 
 const EmbedEditor = (props: {
     embed: EmbedNode

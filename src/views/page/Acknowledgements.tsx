@@ -1,8 +1,9 @@
 import React, { useContext } from "react"
 import Book from "../../models/Book"
+import { ChapterNode } from "../../models/ChapterNode"
 import Parser from "../../models/Parser"
 import { renderNode } from "../chapter/Renderer"
-import TextEditor from "../editor/TextEditor"
+import BookishEditor from "../editor/BookishEditor"
 import { EditorContext } from "./Book"
 
 const Acknowledgements = (props: { book: Book }) => {
@@ -11,6 +12,7 @@ const Acknowledgements = (props: { book: Book }) => {
 
 	const acknowledgementsHeader = <h2 className="bookish-header" id="acknowledgements">Acknowledgements</h2>
 	const book = props.book
+	const acksNode = Parser.parseChapter(book, book.getAcknowledgements());
 
 	return <>
 		{/* If editable, show acknowledgements even if they're empty, otherwise hide */}
@@ -18,23 +20,16 @@ const Acknowledgements = (props: { book: Book }) => {
 			editable ? 
 				<>
 					{ acknowledgementsHeader }
-					<TextEditor 
-						label="Acknowledgements"
-						text={book.getAcknowledgements()}
-						multiline
-						save={text => book.setAcknowledgements(text)}
-					>
-						{ book.getAcknowledgements() ? 
-							renderNode(Parser.parseChapter(book, book.getAcknowledgements())) :
-							<em>Click to write acknowledgements.</em>
-						}
-					</TextEditor>
+					<BookishEditor<ChapterNode> 
+						ast={acksNode} 
+						save={(node: ChapterNode) => book.setAcknowledgements(node.toBookdown())}
+					/>
 				</>
 				:
 				book.getAcknowledgements() ?
 					<>
 						{ acknowledgementsHeader }
-						{ renderNode(Parser.parseChapter(book, book.getAcknowledgements())) }
+						{ renderNode(acksNode) }
 					</>
 					: null
 		}

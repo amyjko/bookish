@@ -1,6 +1,6 @@
 import React, { useContext } from 'react';
 import { EmbedNode } from "../../models/EmbedNode";
-import { CaretContext } from '../editor/ChapterEditor';
+import { CaretContext } from '../editor/BookishEditor';
 import { EditorContext } from '../page/Book';
 import { renderNode, renderPosition } from './Renderer';
 

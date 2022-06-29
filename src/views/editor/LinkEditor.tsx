@@ -4,7 +4,7 @@ import { ChapterContext } from "../chapter/Chapter";
 import URLEditor from "./URLEditor";
 
 import Unlink from "../svg/unlink.svg";
-import { CaretContext } from "./ChapterEditor";
+import { CaretContext } from "./BookishEditor";
 
 const LinkEditor = (props: {
     link: LinkNode

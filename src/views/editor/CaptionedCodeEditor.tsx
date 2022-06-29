@@ -1,7 +1,7 @@
 import React, { useContext } from "react";
 import { CodeNode } from "../../models/CodeNode";
 import { Position } from "../../models/Position";
-import { CaretContext, CaretContextType } from "./ChapterEditor";
+import { CaretContext, CaretContextType } from "./BookishEditor";
 import LanguageEditor from "./LanguageEditor";
 import PositionEditor from "./PositionEditor";
 import Switch from "./Switch";

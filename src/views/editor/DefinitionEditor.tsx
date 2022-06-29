@@ -1,7 +1,7 @@
 import React, { ChangeEvent, useContext, useRef, useState } from "react";
 import { DefinitionNode } from "../../models/DefinitionNode";
 import { ChapterContext, ChapterContextType } from "../chapter/Chapter";
-import { CaretContext } from "./ChapterEditor";
+import { CaretContext } from "./BookishEditor";
 
 const DefinitionEditor = (props: {
     definition: DefinitionNode

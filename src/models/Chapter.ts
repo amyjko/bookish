@@ -126,12 +126,15 @@ class Chapter {
 
 		this.ast = node;
 		const newText = this.ast.toBookdown();
+		// Don't save if its the same.
 		if(this.text === newText) return;
 		this.text = newText;
 		this.wordCount = this.ast.toText().split(/\s+/).length;
 		this.index = this.computeIndex();
 		this.dirty++;
 		this.book.notifyListeners();
+
+		return this.update();
 
 	}
 

@@ -4,7 +4,7 @@ import Marginal  from './Marginal'
 import { renderNode } from './Renderer'
 import { FootnoteNode } from "../../models/FootnoteNode"
 import Atom from '../editor/Atom'
-import { CaretContext } from '../editor/ChapterEditor'
+import { CaretContext } from '../editor/BookishEditor'
 
 const Footnote = (props: { node: FootnoteNode }) => {
 

@@ -1,6 +1,6 @@
 import React, { ReactNode } from "react";
 import { ChapterNode } from "../../models/ChapterNode";
-import { CaretState } from "./ChapterEditor";
+import { CaretState } from "./BookishEditor";
 import { Command, commands } from "./Commands";
 
 import Text from "../svg/text.svg";
@@ -92,7 +92,7 @@ const Toolbar = (props: {
 
     const context = props.context;
     const executor = props.executor;
-    const chapter = props.context?.chapter;
+    const chapter = props.context?.root;
 
     if(chapter === undefined) return <></>;
 

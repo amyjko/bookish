@@ -7,7 +7,7 @@ import Marginal from './Marginal';
 
 import CommentIcon from "../svg/comment.svg";
 import { renderNode } from './Renderer';
-import { CaretContext } from '../editor/ChapterEditor';
+import { CaretContext } from '../editor/BookishEditor';
 
 const Comment = (props: { node: CommentNode }) => {
 

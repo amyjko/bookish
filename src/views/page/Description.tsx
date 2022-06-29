@@ -1,32 +1,28 @@
 import React, { useContext } from "react"
 import Book from "../../models/Book"
+import { ChapterNode } from "../../models/ChapterNode"
+import { FormatNode } from "../../models/FormatNode"
 import Parser from "../../models/Parser"
 import { renderNode } from "../chapter/Renderer"
-import TextEditor from "../editor/TextEditor"
+import BookishEditor from "../editor/BookishEditor"
 import { EditorContext } from "./Book"
 
 const Description = (props: { book: Book }) => {
 
 	const { editable } = useContext(EditorContext)
 	const book = props.book
-	const description = renderNode(Parser.parseChapter(book, book.getDescription()))
+	const descriptionNode = Parser.parseChapter(book, book.getDescription());
 
 	return <>
 		<div className="bookish-description">
 		{
 			editable ? 
-				<>
-					<TextEditor 
-						label="Book description"
-						text={book.getDescription()}
-						multiline
-						save={text => book.setDescription(text)}
-					>
-					{ description }
-					</TextEditor>
-				</>
+				<BookishEditor 
+					ast={descriptionNode} 
+					save={(node: ChapterNode | FormatNode) => book.setDescription(node.toBookdown())}
+				/>
 				:
-				description
+				renderNode(descriptionNode)
 		}
 		</div>
 	</>

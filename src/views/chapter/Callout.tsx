@@ -1,7 +1,7 @@
 import React, { useContext } from 'react'
 import { CalloutNode } from "../../models/CalloutNode"
 import { Position } from "../../models/Position";
-import { CaretContext } from '../editor/ChapterEditor';
+import { CaretContext } from '../editor/BookishEditor';
 import PositionEditor from '../editor/PositionEditor';
 import { EditorContext } from '../page/Book';
 import { renderNode, renderPosition } from './Renderer'

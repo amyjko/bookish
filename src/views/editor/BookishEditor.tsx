@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react"
+import React, { useContext, useEffect, useRef, useState } from "react"
 import { ChapterNode } from "../../models/ChapterNode";
 import { Caret, CaretRange, TextRange } from "../../models/Caret";
 import { LinkNode } from "../../models/LinkNode";
@@ -11,12 +11,14 @@ import { BlocksNode } from "../../models/BlocksNode";
 import { ListNode } from "../../models/ListNode";
 import { TableNode } from "../../models/TableNode";
 import { Node as BookishNode } from "../../models/Node";
-import Chapter from "../../models/Chapter";
 import { MetadataNode } from "../../models/MetadataNode";
+import { RootNode } from "../../models/RootNode";
 import { Edit } from "../../models/Edit";
 
 import { Command, commands } from "./Commands";
 import Toolbar from "./Toolbar";
+import Parser from "../../models/Parser";
+import { ChapterContext, ChapterContextType } from "../chapter/Chapter";
 
 export type CaretContextType = { 
     range: CaretRange | undefined, 
@@ -25,7 +27,7 @@ export type CaretContextType = {
     forceUpdate: Function,
     context: CaretState | undefined,
     edit: (previous: BookishNode, edited: BookishNode) => void,
-    root: ChapterNode,
+    root: RootNode,
     focused: boolean
 } | undefined;
 
@@ -36,7 +38,7 @@ export type CaretState = {
     start: Caret,
     end: Caret,
     isSelection: boolean,
-    chapter: ChapterNode, 
+    root: RootNode, 
     blocks: BlocksNode | undefined,
     paragraph: ParagraphNode | undefined,
     includesList: boolean,
@@ -72,10 +74,11 @@ export type CaretUtilities = {
 
 const IDLE_TIME = 500;
 
-const ChapterEditor = (props: { chapter: Chapter }) => {
+const BookishEditor = <RootType extends RootNode>(props: { 
+    ast: RootType,
+    save: (node: RootType) => Promise<void> | undefined
+}) => {
 
-    const { chapter } = props;
-    const parse = chapter.getAST();
     const editorRef = useRef<HTMLDivElement>(null);
 
     const [ caretRange, setCaretRange ] = useState<CaretRange>();
@@ -87,16 +90,15 @@ const ChapterEditor = (props: { chapter: Chapter }) => {
     const [ undoPosition, setUndoPosition ] = useState<number>(-1);
     const [ clipboard, setClipboard ] = useState<Clipboard>(undefined);
     const [ saving, setSaving ] = useState<undefined | string>(undefined);
+    const [ editedNode, setEditedNode ] = useState<RootType>(props.ast);
 
-    if(parse === undefined)
-        return <></>;
-    const ast = parse;
+    const chapterContext = useContext<ChapterContextType>(ChapterContext);
 
     useEffect(() => {
     
         // Focus the editor on load.
         if(editorRef.current) {
-            const text = ast.getTextNodes();
+            const text = editedNode.getTextNodes();
             if(text.length > 0) {
                 const caret = { node: text[0], index: 0 };
                 setCaretRange({ start: caret, end: caret });
@@ -122,7 +124,7 @@ const ChapterEditor = (props: { chapter: Chapter }) => {
             const isIdle = Date.now() - lastInputTime > IDLE_TIME;
             if(isIdle) {
                 setKeyboardIdle(true);
-                const promise = chapter.update();
+                const promise = props.save(editedNode);
                 if(promise) {
                     setSaving("Saving...")
                     promise.then(() => {
@@ -263,11 +265,6 @@ const ChapterEditor = (props: { chapter: Chapter }) => {
 
     function rangeToCaret(domNode: Node, rangeIndex: number) {
 
-        const chapterNode = chapter.getAST();
-
-        if(chapterNode === undefined)
-            return;
-
         // If it's a text node, find the closest TextNode parent
         if(domNode.nodeType === Node.TEXT_NODE) {
             let parent = domNode.parentNode;
@@ -275,7 +272,7 @@ const ChapterEditor = (props: { chapter: Chapter }) => {
             while(parent && !(parent instanceof HTMLElement && parent.classList.contains("bookish-text")))
                 parent = parent.parentNode;
             if(parent && parent.dataset.nodeid) {
-                const node = chapterNode.getNode(parseInt(parent.dataset.nodeid));
+                const node = editedNode.getNode(parseInt(parent.dataset.nodeid));
                 if(node instanceof TextNode)
                     // Account for the zero-width spaces that we insert in order to make selections possible on empty text nodes.
                     return { node: node, index: Math.min(rangeIndex, node.getLength()) };
@@ -283,7 +280,7 @@ const ChapterEditor = (props: { chapter: Chapter }) => {
         }
         // If it's an element, see if it has a nodeID and handle it accordingly.
         else if(domNode.nodeType === Node.ELEMENT_NODE && domNode instanceof HTMLElement && domNode.dataset.nodeid) {
-            const node = chapterNode.getNode(parseInt(domNode.dataset.nodeid));
+            const node = editedNode.getNode(parseInt(domNode.dataset.nodeid));
             // These assume that triple clicks on paragraphs in the browser choose text nodes for the selection start
             // and spans or paragraph nodes for the end.
             if(node instanceof ParagraphNode) {
@@ -343,7 +340,7 @@ const ChapterEditor = (props: { chapter: Chapter }) => {
         if(caret.node instanceof TextNode || caret.node instanceof AtomNode) {
             // Find the position of the current start node.
             const startCoordinate = getCaretCoordinate(caret);
-            let candidate = ast.getAdjacentCaret(caret, below);
+            let candidate = editedNode.getAdjacentCaret(caret, below);
             if(candidate === undefined) return caret;
             let previousCandidate = undefined;
             let previousCoordinate = undefined;
@@ -375,7 +372,7 @@ const ChapterEditor = (props: { chapter: Chapter }) => {
                     }
 
                     // Get the next candidate to consider.
-                    const nextCandidate = ast.getAdjacentCaret(candidate, below);
+                    const nextCandidate: Caret | undefined = editedNode.getAdjacentCaret(candidate, below);
                     if(nextCandidate === undefined) break;
 
                     // If the caret didn't move, we stop searching, something is wrong.
@@ -387,6 +384,8 @@ const ChapterEditor = (props: { chapter: Chapter }) => {
                     previousCandidate = candidate;
                     previousCoordinate = candidateCoordinate;
                     candidate = nextCandidate;
+
+                    if(candidate === undefined) return caret;
 
                 }
                 return candidate;
@@ -405,7 +404,7 @@ const ChapterEditor = (props: { chapter: Chapter }) => {
             !(caretRange.start.node instanceof TextNode))
             return false;
 
-        const firstCaret = caretRange.start.node.getFormatRoot(ast)?.getFirstCaret();
+        const firstCaret = caretRange.start.node.getFormatRoot(editedNode)?.getFirstCaret();
         return firstCaret !== undefined && firstCaret.node === caretRange.start.node && firstCaret.index === caretRange.start.index;
     }
 
@@ -415,8 +414,8 @@ const ChapterEditor = (props: { chapter: Chapter }) => {
         let undoState = undoStack[undoPosition + 1];
 
         // Restore the content of the chapter.
-        chapter.setText(undoState.chapter);
-        let node = chapter.getAST() as ChapterNode;
+        let node = Parser.parseChapter(chapterContext.book, undoState.chapter);
+        setEditedNode(node as RootType);
 
         // Move the undo state down a position.
         if(undoPosition < undoStack.length)
@@ -435,8 +434,8 @@ const ChapterEditor = (props: { chapter: Chapter }) => {
         let undoState = undoStack[undoPosition - 1];
 
         // Restore the content of the chapter.
-        chapter.setText(undoState.chapter);
-        let node = chapter.getAST() as ChapterNode;
+        let node = Parser.parseChapter(chapterContext.book, undoState.chapter);
+        setEditedNode(node as RootType);
 
         // Move the undo state down a position.
         if(undoPosition > 0)
@@ -454,16 +453,16 @@ const ChapterEditor = (props: { chapter: Chapter }) => {
             return undefined;
 
         // Determine whether the range contains a list
-        const nodes = ast.getNodes();
+        const nodes = editedNode.getNodes();
         let inside = false;
         let includesList = false;
         nodes.forEach(n => {
             if(n === caretRange.start.node) inside = true;
-            if(inside && n.getClosestParentMatching(ast, p => p instanceof ListNode) !== undefined) includesList = true;
+            if(inside && n.getClosestParentMatching(editedNode, p => p instanceof ListNode) !== undefined) includesList = true;
             if(n === caretRange.end.node) inside = false;
         });
 
-        const parents = ast.getParentsOf(caretRange.start.node)?.reverse();
+        const parents = editedNode.getParentsOf(caretRange.start.node)?.reverse();
 
         return { 
             // We make a new range so that setCaretRange always causes a re-render
@@ -471,7 +470,7 @@ const ChapterEditor = (props: { chapter: Chapter }) => {
             start: caretRange.start,
             end: caretRange.end,
             isSelection: caretRange.start.node !== caretRange.end.node || caretRange.start.index !== caretRange.end.index,
-            chapter: ast,
+            root: editedNode,
             blocks: parents?.find(n => n instanceof BlocksNode) as BlocksNode,
             paragraph: parents?.find(n => n instanceof ParagraphNode) as ParagraphNode,
             list: parents?.find(n => n instanceof ListNode) as ListNode,
@@ -479,7 +478,7 @@ const ChapterEditor = (props: { chapter: Chapter }) => {
             meta: parents?.find(n => n instanceof MetadataNode) as MetadataNode<FormatNode>,
             includesList: includesList,
             table: parents?.find(n => n instanceof TableNode) as TableNode,
-            format: (caretRange.end.node instanceof TextNode || caretRange.end.node instanceof AtomNode) ? caretRange.end.node.getFormatRoot(ast) : undefined,
+            format: (caretRange.end.node instanceof TextNode || caretRange.end.node instanceof AtomNode) ? caretRange.end.node.getFormatRoot(editedNode) : undefined,
             startIsText: caretRange.start.node instanceof TextNode,
             endIsText: caretRange.end.node instanceof TextNode,
             startIsTextOrAtom: caretRange.start.node instanceof TextNode || caretRange.start.node instanceof AtomNode,
@@ -555,8 +554,8 @@ const ChapterEditor = (props: { chapter: Chapter }) => {
                     setCaretRange({ start: firstCaret, end: firstCaret });
                     return true;
                 }
-                else if(caretRange.start.node.isInside(ast, AtomNode)) {
-                    const atom = caretRange.start.node.getClosestParentMatching(ast, p => p instanceof AtomNode);
+                else if(caretRange.start.node.isInside(editedNode, AtomNode)) {
+                    const atom = caretRange.start.node.getClosestParentMatching(editedNode, p => p instanceof AtomNode);
                     if(atom) {
                         const atomCaret = { node: atom, index: 0 };
                         setCaretRange({ start: atomCaret, end: atomCaret });
@@ -593,11 +592,11 @@ const ChapterEditor = (props: { chapter: Chapter }) => {
             );
 
             // If the command invoked produced a new range
-            if(results !== undefined && results.root instanceof ChapterNode) {
+            if(results !== undefined && (results.root instanceof ChapterNode || results.root instanceof FormatNode)) {
                 const { root, range } = results;
                 const newRange = { start: range.start, end: range.end };
 
-                if(root === ast && command.category !== "navigation" && command.category !== "selection")
+                if(root === editedNode && command.category !== "navigation" && command.category !== "selection")
                     console.error(`Warning: immutability violation on ${command.description}`);
         
                 // Set the range to force a rerender, assuming something in the document changed.
@@ -605,32 +604,40 @@ const ChapterEditor = (props: { chapter: Chapter }) => {
         
                 // Save the copy in the undo stack if this isn't a navigation or selection state.
                 if(command.category !== "navigation" && command.category !== "selection" && command.category !== "history")
-                    saveEdit(root, newRange, command);
+                    saveEdit(root as RootType, newRange, command);
             
             }
             // TODO If there was no result, shake or something.
         }
     }
 
-    function saveEdit(newChapter: ChapterNode, newRange: CaretRange, command?: Command) {
+    function saveEdit(newRoot: RootType, newRange: CaretRange, command?: Command) {
         
         // Change the chapter's AST.
-        chapter.setAST(newChapter);
+        setEditedNode(newRoot);
 
         // If the history is empty, record the current state.
-        const newStack: UndoState[] = undoStack.length > 0 ? undoStack : caretRange === undefined ? [] : [{ 
-            chapter: ast.toBookdown(), 
-            command: undefined,
-            range: ast.caretRangeToTextRange(caretRange)
-        }];
+        let newStack: UndoState[] = undoStack.length > 0 ? undoStack : [];  
+        
+        if(undoStack.length === 0 && caretRange !== undefined) {
+            const currentRange = newRoot.caretRangeToTextRange(caretRange);
+            if(currentRange !== undefined)
+                newStack = [{ 
+                    chapter: newRoot.toBookdown(), 
+                    command: undefined,
+                    range: currentRange
+                }];
+        }
 
         // Set the new undo stack, pre-pending the new command to the front.
-        setUndoStack([{ 
-            chapter: newChapter.toBookdown(),
-            command: command,
-            range: newChapter.caretRangeToTextRange(newRange)
-            // If the undo position is beyond the front, clear everything before it, because we're changing history.
-        }, ...(undoPosition > 0 ? newStack.slice(undoPosition) : newStack)]);
+        const newTextRange = newRoot.caretRangeToTextRange(newRange);
+        if(newTextRange !== undefined)
+            setUndoStack([{ 
+                chapter: newRoot.toBookdown(),
+                command: command,
+                range: newTextRange
+                // If the undo position is beyond the front, clear everything before it, because we're changing history.
+            }, ...(undoPosition > 0 ? newStack.slice(undoPosition) : newStack)]);
 
         // Set the undo position to the last index.
         setUndoPosition(0);
@@ -639,9 +646,9 @@ const ChapterEditor = (props: { chapter: Chapter }) => {
 
     function editNode(previous: BookishNode, edited: BookishNode) {
         if(caretRange) {
-            const newRoot = ast.withNodeReplaced(previous, edited);
+            const newRoot = editedNode.withNodeReplaced(previous, edited);
             if(newRoot === undefined) return;
-            saveEdit(newRoot, { start: caretRange.start, end: caretRange.end });
+            saveEdit(newRoot as RootType, { start: caretRange.start, end: caretRange.end });
 
             // Update the range if the current range contains the previous node. This will generally
             // be true any time a selected atom node is edited.
@@ -651,7 +658,7 @@ const ChapterEditor = (props: { chapter: Chapter }) => {
         }
     }
 
-    function handleMouseDown(event: React.MouseEvent) {
+    function handleMouseDown() {
         
         if(!editorRef.current)
             return;
@@ -687,11 +694,11 @@ const ChapterEditor = (props: { chapter: Chapter }) => {
     }
 
     const isAtom = caretRange && caretRange.start.node instanceof AtomNode;
-    const inAtom = caretRange && caretRange.start.node.isInside(ast, AtomNode);
+    const inAtom = caretRange && caretRange.start.node.isInside(editedNode, AtomNode);
     const isSelection = caretRange && (caretRange.start.node !== caretRange.end.node || caretRange.start.index !== caretRange.end.index);
-    const isItalic = caretRange && !isSelection && caretRange.start.node instanceof TextNode && caretRange.start.node.isItalic(ast);
-    const isBold = caretRange && !isSelection && caretRange.start.node instanceof TextNode && caretRange.start.node.isBold(ast);
-    const isLink = caretRange && !isSelection && caretRange.start.node.getClosestParentMatching(ast, p => p instanceof LinkNode) !== undefined;
+    const isItalic = caretRange && !isSelection && caretRange.start.node instanceof TextNode && caretRange.start.node.isItalic(editedNode);
+    const isBold = caretRange && !isSelection && caretRange.start.node instanceof TextNode && caretRange.start.node.isBold(editedNode);
+    const isLink = caretRange && !isSelection && caretRange.start.node.getClosestParentMatching(editedNode, p => p instanceof LinkNode) !== undefined;
     const focused = document.activeElement === editorRef.current && document.hasFocus();
 
     const context = getCaretContext();
@@ -703,7 +710,7 @@ const ChapterEditor = (props: { chapter: Chapter }) => {
         forceUpdate: forceUpdate,
         edit: editNode,
         context: context,
-        root: ast,
+        root: editedNode,
         focused: focused
     }}>
             <div 
@@ -730,10 +737,10 @@ const ChapterEditor = (props: { chapter: Chapter }) => {
                             }}>
                         </div> : null
                 }
-                { renderNode(ast) }                
+                { renderNode(editedNode) }
             </div>
         </CaretContext.Provider>
     ;
 }
 
-export default ChapterEditor;
+export default BookishEditor;

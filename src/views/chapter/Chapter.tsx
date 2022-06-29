@@ -16,7 +16,9 @@ import Book from '../../models/Book'
 import ChapterModel from '../../models/Chapter'
 import { EditorContext } from '../page/Book';
 import TextEditor from '../editor/TextEditor';
-import ChapterEditor from '../editor/ChapterEditor';
+import BookishEditor from '../editor/BookishEditor';
+import { FormatNode } from '../../models/FormatNode';
+import { RootNode } from '../../models/RootNode';
 
 export type ChapterContextType = {
 	book?: Book, 
@@ -290,7 +292,14 @@ const Chapter = (props: { chapter: ChapterModel, book: Book, print?: boolean }) 
 				>
 				{
 					chapterAST ?
-						(editable ? <ChapterEditor chapter={chapter} /> : renderNode(chapterAST)) :
+						(
+							editable ? 
+								<BookishEditor<ChapterNode>
+									ast={chapterAST} 
+									save={ (node: ChapterNode) => chapter.setAST(node) }
+								/> : 
+								renderNode(chapterAST)
+						) :
 						null
 				}
 				</ChapterContext.Provider>

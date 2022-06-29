@@ -123,29 +123,6 @@ export abstract class BlocksNode extends BlockNode {
         return text.length === 0 ? undefined : { node: text[text.length - 1], index: text[text.length - 1].getLength() };
     }
 
-    getSelectedText(range: CaretRange): string | undefined {
-
-        if(!(range.start.node instanceof TextNode) || !(range.end.node instanceof TextNode))
-            return undefined;
-
-        const start = this.getIndexOfTextNode(range.start.node);
-        const end = this.getIndexOfTextNode(range.end.node);
-
-        if(start === undefined || end === undefined)
-            return undefined;
-
-        return this.getTextNodes().map((current, index) => {
-            return current === range.start.node ? (
-                    current === range.end.node ? 
-                        current.getText().substring(range.start.index, range.end.index) : 
-                        current.getText().substring(range.start.index)) :
-                index > start && index < end ? current.getText() :
-                current === range.end.node ? current.getText().substring(0, range.end.index) :
-                "";
-        }).join("");
-        
-    }
-
     getTextAndAtomsAsTaggedText(nodeID: number) {
         return this.getTextAndAtomNodes().map(node => node.toBookdown(nodeID)).join("");
     }
@@ -228,48 +205,6 @@ export abstract class BlocksNode extends BlockNode {
         const endCaret = formatIndex === endIndex ? range.end : format.getLastCaret();
         if(startCaret === undefined || endCaret === undefined) return;
         return { start: startCaret, end: endCaret }
-
-    }
-
-    // Swap them order if this is two text nodes that are reversed.
-    // TODO this should really be encapsulated with a caret range object of some sort, rather than here.
-    sortRange(range: CaretRange): CaretRange {
-
-        const start = range.start.node;
-        const end = range.end.node;
-
-        // Find the common ancestor of the two nodes.
-        const ancestor = start.getCommonAncestor(this, end);
-
-        if(ancestor === undefined)
-            return range;
-
-        // Where do these text nodes appear in the ancestor's node sequence?
-        let startIndex = ancestor.getNodes().indexOf(start);
-        let endIndex = ancestor.getNodes().indexOf(end);
-
-        // Defensively verify that we could find the given nodes in the document.
-        // If we can't, something is wrong upstream.
-        if(startIndex < 0 || endIndex < 0)
-            throw Error(`Couldn't find caret range node(s) in this tree.`);
-
-        // If we didn't find them, or the start is before the end, return the given range.
-        return startIndex === undefined || endIndex === undefined || startIndex < endIndex ? 
-                range :
-            // If they're the same node, order the index.
-            startIndex === endIndex ? 
-                { 
-                    start: { 
-                        node: range.start.node, 
-                        index: Math.min(range.start.index, range.end.index)
-                    }, 
-                    end: {
-                        node: range.end.node, 
-                        index: Math.max(range.start.index, range.end.index)
-                    }
-                } :
-            // Otherwise, swap the caret positions
-            { start: range.end, end: range.start };
 
     }
  
@@ -518,6 +453,8 @@ export abstract class BlocksNode extends BlockNode {
             const updatedRoot = newBlocksRoot.withNodeReplaced(block, newBlock);
             if(updatedRoot === undefined) return;
             newBlocksRoot = updatedRoot;
+            if(newBlocksRoot === undefined) return;
+
         }
 
         // If deleting...
@@ -567,43 +504,16 @@ export abstract class BlocksNode extends BlockNode {
         // Only works at a text node.
         if(!(caret.node instanceof TextNode)) return;
 
-        // Get the nearest FormatNode parent of the selected text.
+        // Get the nearest FormatNode parent of the selected text. Bail on fail.
         const formatted = caret.node.getClosestParentOfType<FormatNode>(blocks, FormatNode);
-
-        // Can't do anything if it's not in a formatted node.
         if(formatted === undefined) return;
-    
-        // If there's a selection, grab it's text and then remove the text and update the root and text being edited.
-        let selectedText = blocks.getSelectedText(range);
-        if (range.start.node !== range.end.node || range.start.index !== range.end.index) {
-            // Try to remove the selected text. Bail on fail.
-            const edit = blocks.withoutRange(range);
-            if(edit === undefined || !(edit.root instanceof BlocksNode)) return;
-            // Update the tree we're manipulating.
-            blocks = edit.root;
-            caret = edit.range.start;
-        }
-
-        // Get the nearest FormatNode parent of the revised text.
-        const newFormatted = caret.node.getClosestParentOfType<FormatNode>(blocks, FormatNode);
-        if(newFormatted === undefined) return;
-
-        // Create and insert the into the formatted node.
-        const newNode = nodeCreator.call(undefined, selectedText ? selectedText : "");
-        const revisedFormat = newFormatted.withSegmentAt(newNode, caret);
-        if(revisedFormat === undefined) return;
-        const newCaret = 
-            newNode instanceof AtomNode ? newNode.getDefaultCaret() :
-            newNode instanceof FormatNode ? newNode.getFirstCaret() :
-            newNode instanceof MetadataNode ? { node: newNode.getText(), index: 0 } :
-            { node: newNode, index: 0 };
-
-        const newBlocks = blocks.withNodeReplaced(newFormatted, revisedFormat);
+        
+        // Update the format and replace it in the blocks.
+        const edit = formatted.withSegmentAtSelection(range, nodeCreator);
+        if(edit === undefined || !(edit.root instanceof FormatNode)) return;
+        const newBlocks = blocks.withNodeReplaced(formatted, edit.root);
         if(newBlocks === undefined) return;
-
-        // Return the edited tree.
-        if(newCaret === undefined) return;
-        return { root: newBlocks, range: { start: newCaret, end: newCaret } };
+        return { root: newBlocks, range: edit.range };
 
     }
 

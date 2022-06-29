@@ -1,7 +1,7 @@
 import React, { useContext } from 'react';
 import { CalloutNode } from "../../models/CalloutNode"
 import { Position } from '../../models/Position';
-import { CaretContext, CaretContextType } from './ChapterEditor';
+import { CaretContext, CaretContextType } from './BookishEditor';
 import PositionEditor from "./PositionEditor";
 
 const CalloutEditor = (props: {

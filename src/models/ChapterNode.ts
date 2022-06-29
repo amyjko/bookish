@@ -34,7 +34,6 @@ export class ChapterNode extends BlocksNode {
         return new ChapterNode(blocks, this.#metadata);
     }
 
-    getNode(id: number) { return this.getNodes().find(n => n.getID() === id); }
     getErrors(): ErrorNode[] { return this.getNodes().filter(n => n instanceof ErrorNode) as ErrorNode[]; }
     getCitations(): Set<string> { 
         const citations = new Set<string>();
@@ -120,14 +119,6 @@ export class ChapterNode extends BlocksNode {
 
     copy() {
         return new ChapterNode(this.getBlocks().map(b => b.copy()), this.#metadata) as this;
-    }
-
-    copyRange(range: CaretRange): Node | undefined {
-        const sortedRange = this.sortRange(range);
-        // Find the common ancestor of the range, then ask it to copy the portion of it selected and produce a node.
-        const commonAncestor = sortedRange.start.node.getCommonAncestor(this, sortedRange.end.node);
-        if(commonAncestor === undefined) return;
-        return commonAncestor.withContentInRange(sortedRange);
     }
     
 }

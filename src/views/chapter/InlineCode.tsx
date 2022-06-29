@@ -1,7 +1,7 @@
 import React, { useContext, useEffect, useRef } from 'react'
 import Code from './Code'
 import { InlineCodeNode } from "../../models/InlineCodeNode"
-import { CaretContext } from '../editor/ChapterEditor'
+import { CaretContext } from '../editor/BookishEditor'
 import { renderNode } from './Renderer'
 import { EditorContext } from '../page/Book'
 
