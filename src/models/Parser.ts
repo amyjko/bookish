@@ -286,11 +286,8 @@ export default class Parser {
 
         let blocks: BlockNode[] = [];
 
-        // Make the chapter node so we can pass it around.
-        const chapter = new ChapterNode(blocks, this.metadata);
-
         // Read any symbols declared for this chapter.
-        this.parseSymbols(chapter);
+        this.parseSymbols();
 
         // Get the remaining text.
         let declarations = this.text.substring(0, this.index);
@@ -326,11 +323,12 @@ export default class Parser {
         if(blocks.length === 0 || trailingNewlines > 1)
             blocks.push(new ParagraphNode());
 
-        return chapter;
+        // Make the chapter node so we can pass it around.
+        return new ChapterNode(blocks, this.metadata);
 
     }
 
-    parseSymbols(parent: ChapterNode) {
+    parseSymbols() {
 
         // Read whitespace before the symbols
         this.readWhitespace();

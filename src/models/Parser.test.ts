@@ -1,11 +1,11 @@
 import Parser from "./Parser"
 
 test("Empty chapter", () => {
-    expect(Parser.parseChapter(undefined, "").toText()).toBe("")
+    expect(Parser.parseChapter(undefined, "").toBookdown()).toBe("")
 })
 
 test("Single paragraph", () => {
-    expect(Parser.parseChapter(undefined, "hello").toText()).toBe("hello")
+    expect(Parser.parseChapter(undefined, "hello").toBookdown()).toBe("hello")
 })
 
 test("Peek", () => {

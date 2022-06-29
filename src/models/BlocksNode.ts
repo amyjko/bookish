@@ -6,7 +6,6 @@ import { ParagraphNode } from "./ParagraphNode";
 import { Format, FormatNode, FormatNodeSegmentType } from "./FormatNode";
 import { TextNode } from "./TextNode";
 import { AtomNode } from "./AtomNode";
-import { MetadataNode } from "./MetadataNode";
 import { Edit } from "./Edit";
 import { CodeNode } from "./CodeNode";
 
@@ -16,7 +15,9 @@ export abstract class BlocksNode extends BlockNode {
 
     constructor(elements: BlockNode[]) {
         super();
-        this.#blocks = elements;
+        // Always ensure there's an empty paragraph at the end if the last node isn't a paragraph, so that people can enter text after it.
+        this.#blocks = elements.length === 0 || !(elements[elements.length - 1] instanceof ParagraphNode) ?
+            [ ...elements, new ParagraphNode() ] : elements;
     }
 
     getBlocks() { return this.#blocks; }
