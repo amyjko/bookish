@@ -64,7 +64,7 @@ export type Clipboard = undefined | BookishNode;
 
 export type UndoState = {
     command: Command | undefined,
-    chapter: string,
+    bookdown: string,
     range: TextRange
 }
 
@@ -414,7 +414,7 @@ const BookishEditor = <RootType extends RootNode>(props: {
         let undoState = undoStack[undoPosition + 1];
 
         // Restore the content of the chapter.
-        let node = Parser.parseChapter(chapterContext.book, undoState.chapter);
+        let node = Parser.parseChapter(chapterContext.book, undoState.bookdown);
         setEditedNode(node as RootType);
 
         // Move the undo state down a position.
@@ -434,7 +434,7 @@ const BookishEditor = <RootType extends RootNode>(props: {
         let undoState = undoStack[undoPosition - 1];
 
         // Restore the content of the chapter.
-        let node = Parser.parseChapter(chapterContext.book, undoState.chapter);
+        let node = Parser.parseChapter(chapterContext.book, undoState.bookdown);
         setEditedNode(node as RootType);
 
         // Move the undo state down a position.
@@ -623,7 +623,7 @@ const BookishEditor = <RootType extends RootNode>(props: {
             const currentRange = newRoot.caretRangeToTextRange(caretRange);
             if(currentRange !== undefined)
                 newStack = [{ 
-                    chapter: newRoot.toBookdown(), 
+                    bookdown: newRoot.toBookdown(), 
                     command: undefined,
                     range: currentRange
                 }];
@@ -633,7 +633,7 @@ const BookishEditor = <RootType extends RootNode>(props: {
         const newTextRange = newRoot.caretRangeToTextRange(newRange);
         if(newTextRange !== undefined)
             setUndoStack([{ 
-                chapter: newRoot.toBookdown(),
+                bookdown: newRoot.toBookdown(),
                 command: command,
                 range: newTextRange
                 // If the undo position is beyond the front, clear everything before it, because we're changing history.
