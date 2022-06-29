@@ -606,12 +606,13 @@ export class FormatNode extends Node {
         // If there's a selection, grab it's text and then remove the text and update the root and text being edited.
         let selectedText = this.getSelectedText(range);
         let newFormat: FormatNode | undefined = this;
-        let caret = range.start;
-        if (range.start.node !== range.end.node || range.start.index !== range.end.index) {
+        const sortedRange = this.sortRange(range);
+        let caret = sortedRange.start;
+        if (sortedRange.start.node !== sortedRange.end.node || sortedRange.start.index !== sortedRange.end.index) {
             // Try to remove the selected text. Bail on fail.
-            const textIndex = this.caretToTextIndex(range.start);
+            const textIndex = this.caretToTextIndex(sortedRange.start);
             if(textIndex === undefined) return;
-            newFormat = this.withoutRange(range);
+            newFormat = this.withoutRange(sortedRange);
             if(newFormat === undefined) return;
             const newCaret = newFormat.textIndexToCaret(textIndex);
             if(newCaret === undefined) return;
