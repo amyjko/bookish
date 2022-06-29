@@ -980,12 +980,15 @@ export const commands: Command[] = [
                         if(context.code.getCodeNode() === sortedRange.start.node) {
                             const newText = insertionPoint.node.withoutRange(sortedRange);
                             if(newText === undefined) return;
+                            const edit = newRoot.withNodeReplaced(insertionPoint.node, newText);
+                            if(edit === undefined) return;
+                            newRoot = edit;
                             insertionPoint = { node: newText, index: sortedRange.start.index };
                         }
                     }
                     else {
                         // Try to remove the range.
-                        let edit = context.root.withRangeFormatted(sortedRange, undefined);
+                        let edit = newRoot.withRangeFormatted(sortedRange, undefined);
                         // If we fail, fail to insert at the selection.
                         if(edit === undefined) return;
                         newRoot = edit.root as RootNode;
@@ -1001,7 +1004,7 @@ export const commands: Command[] = [
                 if(newText === undefined) return;
 
                 // Replace the text.
-                newRoot = newRoot.withNodeReplaced(sortedRange.start.node, newText);
+                newRoot = newRoot.withNodeReplaced(insertionPoint.node, newText);
                 if(newRoot === undefined) return;
 
                 // Update the chapter

@@ -61,6 +61,11 @@ export abstract class Node {
         const start = range.start.node;
         const end = range.end.node;
 
+        if(start === end) return { 
+            start: { node: start, index: Math.min(range.start.index, range.end.index) }, 
+            end: { node: end, index: Math.max(range.start.index, range.end.index) }
+        };
+
         // Find the common ancestor of the two nodes.
         const ancestor = start.getCommonAncestor(this, end);
 
