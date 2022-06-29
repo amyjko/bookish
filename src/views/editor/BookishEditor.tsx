@@ -86,6 +86,7 @@ const BookishEditor = <RootType extends RootNode>(props: {
     const [ caretRange, setCaretRange ] = useState<CaretRange>();
     const [ caretCoordinate, setCaretCoordinate ] = useState<{ x: number, y: number, height: number}>();
     const [ lastInputTime, setLastInputTime ] = useState<number>(0);
+    const [ unsavedEdits, setUnsavedEdits ] = useState<number>(0);
     const [ keyboardIdle, setKeyboardIdle ] = useState<boolean>(true);
     const [ editorFocused, setEditorFocused ] = useState<boolean>(true);
     const [ undoStack, setUndoStack ] = useState<UndoState[]>([]);
@@ -95,6 +96,12 @@ const BookishEditor = <RootType extends RootNode>(props: {
     const [ editedNode, setEditedNode ] = useState<RootType>(props.ast);
 
     const chapterContext = useContext<ChapterContextType>(ChapterContext);
+
+    const editedNodeRef = useRef<RootType>(editedNode);
+
+    useEffect(() => {
+        editedNodeRef.current = editedNode;
+    }, [editedNode]);
 
     useEffect(() => {
     
@@ -120,21 +127,20 @@ const BookishEditor = <RootType extends RootNode>(props: {
 
     useEffect(() => {
         // When input happens, set a timer and then see if idle time has elapsed. If it ihas, Track time since last keystroke to control caret blinking behavior.
-        setSaving("Editing...")
         const keystrokeTimer = setTimeout(() => { 
             // Remember that we're idle so we can render things accordingly.
             const isIdle = Date.now() - lastInputTime > IDLE_TIME;
             if(isIdle) {
                 setKeyboardIdle(true);
-                const promise = props.save(editedNode);
-                if(promise) {
-                    setSaving("Saving...")
-                    promise.then(() => {
-                        setSaving("Saved.")
-                    })
-                    .catch((message: Error) => {
-                        setSaving("Unable to save :(")
-                    })
+                if(unsavedEdits > 0) {
+                    const promise = props.save(editedNode);
+                    if(promise) {
+                        setSaving("Saving...")
+                        promise
+                            .then(() => setSaving("Saved."))
+                            .catch((message: Error) => setSaving("Unable to save :("))
+                            .finally(() => setUnsavedEdits(0))
+                    }
                 }
             }
             // Save
@@ -143,7 +149,7 @@ const BookishEditor = <RootType extends RootNode>(props: {
             // Clear the timer if we're unmounting or re-rendering.
             clearTimeout(keystrokeTimer);
         }
-    }, [lastInputTime])
+    }, [lastInputTime, unsavedEdits])
 
     // When the selection changes, set the browser's selection to correspond. This helps with two things:
     // 1) we can rely on the browser to render selections rather than rendering it ourselves.
@@ -267,6 +273,8 @@ const BookishEditor = <RootType extends RootNode>(props: {
 
     function rangeToCaret(domNode: Node, rangeIndex: number) {
 
+        const currentNode = editedNodeRef.current;
+
         // If it's a text node, find the closest TextNode parent
         if(domNode.nodeType === Node.TEXT_NODE) {
             let parent = domNode.parentNode;
@@ -274,7 +282,7 @@ const BookishEditor = <RootType extends RootNode>(props: {
             while(parent && !(parent instanceof HTMLElement && parent.classList.contains("bookish-text")))
                 parent = parent.parentNode;
             if(parent && parent.dataset.nodeid) {
-                const node = editedNode.getNode(parseInt(parent.dataset.nodeid));
+                const node = currentNode.getNode(parseInt(parent.dataset.nodeid));
                 if(node instanceof TextNode)
                     // Account for the zero-width spaces that we insert in order to make selections possible on empty text nodes.
                     return { node: node, index: Math.min(rangeIndex, node.getLength()) };
@@ -282,7 +290,7 @@ const BookishEditor = <RootType extends RootNode>(props: {
         }
         // If it's an element, see if it has a nodeID and handle it accordingly.
         else if(domNode.nodeType === Node.ELEMENT_NODE && domNode instanceof HTMLElement && domNode.dataset.nodeid) {
-            const node = editedNode.getNode(parseInt(domNode.dataset.nodeid));
+            const node = currentNode.getNode(parseInt(domNode.dataset.nodeid));
             // These assume that triple clicks on paragraphs in the browser choose text nodes for the selection start
             // and spans or paragraph nodes for the end.
             if(node instanceof ParagraphNode) {
@@ -610,8 +618,13 @@ const BookishEditor = <RootType extends RootNode>(props: {
                 setCaretRange(newRange);
         
                 // Save the copy in the undo stack if this isn't a navigation or selection state.
-                if(command.category !== "navigation" && command.category !== "selection" && command.category !== "history")
+                if(command.category !== "navigation" && command.category !== "selection" && command.category !== "history") {
                     saveEdit(root as RootType, newRange, command);
+                }
+
+                // Remember the last edit time so we can remember to save.
+                if(command.category !== "navigation" && command.category !== "selection")
+                    setUnsavedEdits(unsavedEdits + 1);
             
             }
             // TODO If there was no result, shake or something.
