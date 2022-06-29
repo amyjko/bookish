@@ -209,16 +209,16 @@ input[type="text"].bookish-app-editable-error {
     cursor: pointer;
 }
 
-.bookish-chapter-editor:focus {
+.bookish-editor:focus {
     outline: 2px solid var(--bookish-highlight-color);
     outline-offset: var(--bookish-app-chrome-padding);
 }
 
-.bookish-chapter-editor.bookish-chapter-editor-atom-focused:focus {
+.bookish-editor.bookish-editor-atom-focused:focus {
     outline: none;
 }
 
-.bookish-chapter-editor-caret {
+.bookish-editor-caret {
     left: 0;
     top: 0;
     width: 0px;
@@ -230,29 +230,29 @@ input[type="text"].bookish-app-editable-error {
     z-index: 1;
 }
 
-@keyframes bookish-chapter-editor-caret-blink {
+@keyframes bookish-editor-caret-blink {
     100% {
         outline: none;
     }
 }
 
-.bookish-chapter-editor-caret-disabled {
+.bookish-editor-caret-disabled {
     outline-color: var(--bookish-app-chrome-muted);
 }
 
-.bookish-chapter-editor-caret-blink {
-    animation: bookish-chapter-editor-caret-blink 1s steps(2) infinite;
+.bookish-editor-caret-blink {
+    animation: bookish-editor-caret-blink 1s steps(2) infinite;
 }
 
-.bookish-chapter-editor-caret-italic {
+.bookish-editor-caret-italic {
     transform: skew(-10deg);
 }
 
-.bookish-chapter-editor-caret-bold {
+.bookish-editor-caret-bold {
     outline-width: 2px;
 }
 
-.bookish-chapter-editor-caret-linked {
+.bookish-editor-caret-linked {
     outline-width: 1px;
     outline-color: var(--bookish-link-color);
 }
@@ -356,11 +356,11 @@ input[type=text].bookish-editor-text-invalid {
     background-color: var(--bookish-app-chrome-hover-background);
 }
 
-.bookish-chapter-editor .bookish-table table td {
+.bookish-editor .bookish-table table td {
     border: 1px dashed var(--bookish-app-chrome-border-color);
 }
 
-.bookish-chapter-editor-toolbar {
+.bookish-editor-toolbar {
     position: fixed;
     top: 0;
     left: 0;
@@ -373,51 +373,51 @@ input[type=text].bookish-editor-text-invalid {
     z-index: 2;
 }
 
-.bookish-chapter-editor-toolbar svg {
+.bookish-editor-toolbar svg {
     width: 1em;
     height: 1em;
 }
 
-.bookish-chapter-editor-toolbar-shortcut {
+.bookish-editor-toolbar-shortcut {
     color: var(--bookish-app-chrome-muted);
     font-size: 80%;
 }
 
-.bookish-chapter-editor-toolbar-group button:first-of-type {
+.bookish-editor-toolbar-group button:first-of-type {
     border-top-right-radius: 0;
 }
 
-.bookish-chapter-editor-toolbar-group button:last-child {
+.bookish-editor-toolbar-group button:last-child {
     border-bottom-left-radius: 0;
 }
 
-.bookish-chapter-editor-toolbar-group button:not(:first-of-type):not(:last-child) {
+.bookish-editor-toolbar-group button:not(:first-of-type):not(:last-child) {
     border-radius: 0;
 }
 
-.bookish-chapter-editor-toolbar input[type="text"] {
+.bookish-editor-toolbar input[type="text"] {
     width: 10em;
 }
 
-.bookish-chapter-editor-toolbar hr {
+.bookish-editor-toolbar hr {
     margin-top: var(--bookish-app-chrome-padding);
     margin-bottom: var(--bookish-app-chrome-padding);
     line-height: 1em;
 }
 
-.bookish-chapter-editor-toolbar-icon {
+.bookish-editor-toolbar-icon {
     display: inline-block;
     margin-right: var(--bookish-app-chrome-padding);
 }
 
-.bookish-chapter-editor-toolbar-group {
+.bookish-editor-toolbar-group {
     display: inline-block;
     margin-right: calc(2 * var(--bookish-app-chrome-padding));
     margin-bottom: var(--bookish-app-chrome-padding);
 }
 
-.bookish-chapter-editor-toolbar-group input, 
-.bookish-chapter-editor-toolbar-group select {
+.bookish-editor-toolbar-group input, 
+.bookish-editor-toolbar-group select {
     margin-left: var(--bookish-app-chrome-padding);
     margin-right: var(--bookish-app-chrome-padding);
 }

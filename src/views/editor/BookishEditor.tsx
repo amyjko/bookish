@@ -256,7 +256,7 @@ const BookishEditor = <RootType extends RootNode>(props: {
             const caretTop = newCaretPosition.y;
             const caretBottom = caretTop + newCaretPosition.height;
             const windowHeight = window.innerHeight;
-            const toolbar = document.querySelector(".bookish-chapter-editor-toolbar");
+            const toolbar = document.querySelector(".bookish-editor-toolbar");
             const toolbarHeight = toolbar ? toolbar.clientHeight : 0;
 
             const buffer = newCaretPosition.height * 5;
@@ -578,15 +578,17 @@ const BookishEditor = <RootType extends RootNode>(props: {
                     }
                 }
 
-                const controls = [
-                    document.querySelector(".bookish-chapter-editor-toolbar input"),
-                    document.querySelector(".bookish-chapter-editor-toolbar select"),
-                    document.querySelector(".bookish-chapter-editor-toolbar button")
-                ];
-                const match = controls.find(control => control && control instanceof HTMLElement);
-                if(match && match instanceof HTMLElement) {
-                    match.focus();
-                    return true;
+                if(editorRef.current) {
+                    const controls = [
+                        editorRef.current.querySelector(".bookish-editor-toolbar input"),
+                        editorRef.current.querySelector(".bookish-editor-toolbar select"),
+                        editorRef.current.querySelector(".bookish-editor-toolbar button")
+                    ];
+                    const match = controls.find(control => control && control instanceof HTMLElement);
+                    if(match && match instanceof HTMLElement) {
+                        match.focus();
+                        return true;
+                    }
                 }
             }
 
@@ -710,7 +712,8 @@ const BookishEditor = <RootType extends RootNode>(props: {
     }
 
     function handleUnfocus() {
-        setEditorFocused(false);
+        if(document.activeElement !== null && editorRef.current !== null && !editorRef.current.contains(document.activeElement))
+            setEditorFocused(false);
     }
 
     const isAtom = caretRange && caretRange.start.node instanceof AtomNode;
@@ -734,7 +737,7 @@ const BookishEditor = <RootType extends RootNode>(props: {
         focused: focused
     }}>
             <div 
-                className={`bookish-chapter-editor ${inAtom ? "bookish-chapter-editor-atom-focused" : ""}`}
+                className={`bookish-editor ${inAtom ? "bookish-editor-atom-focused" : ""}`}
                 ref={editorRef}
                 onKeyDown={handleKeyDown}
                 onKeyUp={handleKeyUp}
@@ -749,7 +752,7 @@ const BookishEditor = <RootType extends RootNode>(props: {
                     // Customize the rendering based on the formatting applied to the text node.
                     caretCoordinate && caretRange && !isAtom && !isSelection ? 
                         <div 
-                            className={`bookish-chapter-editor-caret ${isLink ? "bookish-chapter-editor-caret-linked" : isItalic ? "bookish-chapter-editor-caret-italic" :""} ${isBold ? "bookish-chapter-editor-caret-bold" : ""} ${focused && keyboardIdle ? "bookish-chapter-editor-caret-blink" : ""} ${!focused ? "bookish-chapter-editor-caret-disabled" : ""}`}
+                            className={`bookish-editor-caret ${isLink ? "bookish-editor-caret-linked" : isItalic ? "bookish-editor-caret-italic" :""} ${isBold ? "bookish-editor-caret-bold" : ""} ${focused && keyboardIdle ? "bookish-editor-caret-blink" : ""} ${!focused ? "bookish-editor-caret-disabled" : ""}`}
                             style={{
                                 left: caretCoordinate.x,
                                 top: caretCoordinate.y,

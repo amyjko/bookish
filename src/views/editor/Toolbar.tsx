@@ -1,4 +1,4 @@
-import React, { ReactNode } from "react";
+import React, { ReactNode, useRef } from "react";
 import { ChapterNode } from "../../models/ChapterNode";
 import { CaretState } from "./BookishEditor";
 import { Command, commands } from "./Commands";
@@ -79,6 +79,8 @@ const Toolbar = (props: {
     },
 ) => {
 
+    const toolbarRef = useRef<HTMLDivElement>(null);
+
     function getShortcutDescription(command: Command) {
         const macOS = navigator.platform.indexOf('Mac') > -1;
         const controlSymbol = macOS ? "\u2318" : "Ctrl+";
@@ -89,7 +91,7 @@ const Toolbar = (props: {
     }
 
     function wrapIcon(icon: Function | string) {
-        return <span className='bookish-chapter-editor-toolbar-icon'>{icon instanceof Function ? icon.call(undefined) : icon}</span>;
+        return <span className='bookish-editor-toolbar-icon'>{icon instanceof Function ? icon.call(undefined) : icon}</span>;
     }
 
     const context = props.context;
@@ -138,8 +140,8 @@ const Toolbar = (props: {
 
     function handleKeyDown(event: React.KeyboardEvent) {
         // Return focus to the editor if someone presses an unhandled enter
-        if(event.key === "Enter") {
-            const editor = document.querySelector(".bookish-chapter-editor");
+        if(event.key === "Enter" && toolbarRef.current) {
+            const editor = toolbarRef.current.closest(".bookish-editor");
             if(editor instanceof HTMLElement) {
                 event.stopPropagation();
                 editor.focus();
@@ -148,8 +150,21 @@ const Toolbar = (props: {
         }
     }
 
+    function handleMouseDown() {
+        if(toolbarRef.current)
+            toolbarRef.current.focus();
+        console.log("Handled click");
+    }
+
     // Render command categories.
-    return <div className="bookish-chapter-editor-toolbar" onKeyDown={handleKeyDown} style={{visibility: props.visible === true || props.visible === undefined ? "visible" : "hidden"}}>
+    return <div 
+        className="bookish-editor-toolbar" 
+        onKeyDown={handleKeyDown} 
+        onMouseDown={handleMouseDown}
+        style={{visibility: props.visible === true || props.visible === undefined ? "visible" : "hidden"}} 
+        tabIndex={0}
+        ref={toolbarRef}
+        >
         <Header/>
         {
         context && categories && props.executor ?
@@ -165,6 +180,7 @@ const Toolbar = (props: {
                                         key={index}
                                         disabled={command.active === false || (command.active instanceof Function && command.active.call(undefined, context) === false)}
                                         title={command.description + " " + getShortcutDescription(command)}
+                                        tabIndex={0}
                                         onClick={() => executor?.call(undefined, command, "")}
                                     >
                                         { command.icon ? command.icon.call(undefined) : command.label ? command.label : command.description }
@@ -196,8 +212,8 @@ const ToolbarGroup = (props: {
 }) => {
 
     return <>
-        <span className="bookish-chapter-editor-toolbar-group">
-            <span className="bookish-chapter-editor-toolbar-icon">{props.icon}</span>
+        <span className="bookish-editor-toolbar-group">
+            <span className="bookish-editor-toolbar-icon">{props.icon}</span>
             { props.children }
         </span>
     </>
