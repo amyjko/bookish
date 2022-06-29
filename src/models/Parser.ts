@@ -705,7 +705,8 @@ export default class Parser {
                 this.readWhitespace();
 
                 // Read content until reaching another | or the end of the line.
-                row.push(this.parseFormat("|"));
+                const format = this.parseFormat("|");
+                row.push(format.isEmpty() ? format.withSegmentAppended(new TextNode()) : format);
 
             }
 
@@ -725,7 +726,7 @@ export default class Parser {
         const caption = this.parseFormat();
 
         // Return the new table.
-        return new TableNode(rows, position, caption);
+        return new TableNode(rows, position, caption.isEmpty() ? caption.withSegmentAppended(new TextNode()) : caption);
 
     }
 

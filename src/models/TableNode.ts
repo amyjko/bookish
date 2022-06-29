@@ -30,7 +30,7 @@ export class TableNode extends BlockNode {
     getFormats() { 
         const formats: FormatNode[] = [];
         this.#rows.forEach(row => row.forEach(cell => { formats.push(cell); }))
-        return this.#caption ? [ this.#caption, ...formats ] : formats;
+        return [ ...formats, this.#caption ];
     }
 
     toText() {
@@ -45,8 +45,7 @@ export class TableNode extends BlockNode {
     getChildren() {
         const children = [];
         this.#rows.forEach(row => row.forEach(cell => children.push(cell)));
-        if(this.#caption !== undefined)
-            children.push(this.#caption);
+        children.push(this.#caption);
         return children;
     }
 
@@ -81,6 +80,7 @@ export class TableNode extends BlockNode {
                     return parent;
             }
         }
+        return node === this.#caption ? this: this.#caption.getParentOf(node);
     }
 
     copy() {
