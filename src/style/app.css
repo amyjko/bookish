@@ -96,7 +96,7 @@ button:hover:enabled {
 
 button:disabled {
     opacity: 0.3;
-    border: 1px transparent;
+    border-color: var(--bookish-app-chrome-muted);
     cursor: auto;
 }
 
