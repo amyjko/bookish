@@ -967,17 +967,17 @@ export const commands: Command[] = [
             if(key.length === 1 && context.format !== undefined) {
                 // Insert at the start.
                 let insertionPoint = range.start;
-                let newNode: Node | undefined = context.format;
-                let originalNode: Node = context.format;
+                let newRoot: Node | undefined = context.format;
+                let originalRoot: Node = context.format;
 
                 // If there's a selection, remove it before inserting, and insert at the caret returned.
-                if(context.isSelection && context.root !== undefined) {
+                if(context.isSelection) {
                     // Try to remove the range.
                     let edit = context.root.withRangeFormatted(range, undefined);
                     // If we fail, fail to insert at the selection.
-                    if(edit === undefined || !(edit.root instanceof BlocksNode)) return;
-                    newNode = edit.root;
-                    originalNode = context.root;
+                    if(edit === undefined) return;
+                    newRoot = edit.root;
+                    originalRoot = context.root;
                     insertionPoint = edit.range.start;
                 }
         
@@ -989,11 +989,11 @@ export const commands: Command[] = [
                 if(newText === undefined) return;
 
                 // Replace the text.
-                newNode = newNode.withNodeReplaced(insertionPoint.node, newText);
-                if(newNode === undefined) return;
+                newRoot = newRoot.withNodeReplaced(insertionPoint.node, newText);
+                if(newRoot === undefined) return;
 
                 // Update the chapter
-                return rootWithNode(context, originalNode, newNode, () => { return { node: newText, index: insertionPoint.index + 1 }});
+                return rootWithNode(context, originalRoot, newRoot, () => { return { node: newText, index: insertionPoint.index + 1 }});
     
             }
         }
