@@ -14,7 +14,6 @@ const License = (props: { book: Book }) => {
 
 	return <>
 		<h2 className="bookish-header" id="license">License</h2>
-		<p>
 		{
 			editable ?
 			<>
@@ -24,9 +23,8 @@ const License = (props: { book: Book }) => {
 				/>
 			</>
 			:
-			renderNode(formatNode)
+			<p>{ renderNode(formatNode) }</p>
 		}
-		</p>
 	</>
 
 }
