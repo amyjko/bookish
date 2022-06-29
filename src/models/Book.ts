@@ -83,14 +83,14 @@ export default class Book {
 
         // Copy all of the specification metadata to fields.
         // Choose suitable defaults if the spec is empty.
-        this.title = specification && specification.title ? specification.title : "Untitled"
+        this.title = specification ? specification.title : "Untitled"
         this.symbols = specification && specification.symbols ? specification.symbols : {}
         this.tags = specification && specification.tags ? specification.tags : []
-        this.license = specification && specification.license ? specification.license : "All rights reserved.",
+        this.license = specification ? specification.license : "All rights reserved.",
         this.references = specification && specification.references ? specification.references : {}
         this.glossary = specification && specification.glossary ? specification.glossary : {}
         this.authors = specification && specification.authors ? specification.authors : []
-        this.description = specification && specification.description ? specification.description : "What's your book about?"
+        this.description = specification ? specification.description : "What's your book about?"
         this.acknowledgements = specification && specification.acknowledgements ? specification.acknowledgements : ""
         this.revisions = specification && specification.revisions ? specification.revisions : []
         this.images = specification && specification.images ? specification.images : {}

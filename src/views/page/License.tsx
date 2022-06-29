@@ -10,7 +10,7 @@ const License = (props: { book: Book }) => {
 
 	const { editable } = useContext(EditorContext)
 	const book = props.book
-	const formatNode = Parser.parseFormat(book, book.getLicense());
+	const formatNode = Parser.parseFormat(book, book.getLicense()).withTextIfEmpty();
 
 	return <>
 		<h2 className="bookish-header" id="license">License</h2>
