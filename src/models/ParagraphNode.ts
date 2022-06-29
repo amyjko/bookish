@@ -12,7 +12,7 @@ export class ParagraphNode extends BlockNode {
     constructor(level: number = 0, format?: FormatNode) {
         super();
 
-        this.#format = format === undefined ? new FormatNode("", [ new TextNode() ]) : format;
+        this.#format = format === undefined ? new FormatNode("", [ new TextNode() ]) : format.withTextIfEmpty();
         this.#level = level;
 
     }

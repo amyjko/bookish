@@ -15,9 +15,9 @@ export class TableNode extends BlockNode {
 
     constructor(rows: FormatNode[][], position?: Position, caption?: FormatNode) {
         super();
-        this.#rows = rows;
+        this.#rows = rows.map(r => r.map(c => c.withTextIfEmpty()));
         this.#position = position ? position : "|";
-        this.#caption = caption === undefined ? new FormatNode("", [ new TextNode() ]) : caption;
+        this.#caption = caption === undefined ? new FormatNode("", [ new TextNode() ]) : caption.withTextIfEmpty();
     }
 
     getType() { return "table"; }

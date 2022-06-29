@@ -19,8 +19,8 @@ export class EmbedNode extends BlockNode {
 
         this.#url = url;
         this.#description = description;
-        this.#caption = caption === undefined ? new FormatNode("", [ new TextNode() ]) : caption;
-        this.#credit = credit == undefined ? new FormatNode("", [ new TextNode() ]) : credit;
+        this.#caption = caption === undefined ? new FormatNode("", [ new TextNode() ]) : caption.withTextIfEmpty();
+        this.#credit = credit == undefined ? new FormatNode("", [ new TextNode() ]) : credit.withTextIfEmpty();
         this.#position = position;
 
     }

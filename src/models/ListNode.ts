@@ -16,7 +16,7 @@ export class ListNode extends BlockNode {
     constructor(items: Array<FormatNode | ListNode>, numbered: boolean) {
         super();
         this.#numbered = numbered;
-        this.#items = items;
+        this.#items = items.map(i => i instanceof FormatNode ? i.withTextIfEmpty() : i);
 
     }
 

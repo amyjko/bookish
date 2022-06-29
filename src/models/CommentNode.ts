@@ -6,7 +6,8 @@ import { Node } from "./Node";
 export class CommentNode extends AtomNode<FormatNode> {
 
     constructor(comment: FormatNode) {
-        super(comment);
+        super(comment.withTextIfEmpty());
+
     }
 
     getType() { return "comment"; }

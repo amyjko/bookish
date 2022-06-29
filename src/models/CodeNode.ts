@@ -22,7 +22,7 @@ export class CodeNode extends BlockNode {
         this.#position = position;
         this.#language = executable ? language.slice(0, -1) : language;
         this.#executable = executable;
-        this.#caption = caption === undefined ? new FormatNode("", [ new TextNode()]) : caption;
+        this.#caption = caption === undefined ? new FormatNode("", [ new TextNode()]) : caption.withTextIfEmpty();
 
     }
 

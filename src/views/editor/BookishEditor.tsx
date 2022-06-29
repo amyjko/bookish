@@ -623,10 +623,6 @@ const BookishEditor = <RootType extends RootNode>(props: {
                 if(command.category !== "navigation" && command.category !== "selection" && command.category !== "history") {
                     saveEdit(root as RootType, newRange, command);
                 }
-
-                // Remember the last edit time so we can remember to save.
-                if(command.category !== "navigation" && command.category !== "selection")
-                    setUnsavedEdits(unsavedEdits + 1);
             
             }
             // TODO If there was no result, shake or something.
@@ -634,7 +630,11 @@ const BookishEditor = <RootType extends RootNode>(props: {
     }
 
     function saveEdit(newRoot: RootType, newRange: CaretRange, command?: Command) {
-        
+
+        // Remember the last edit time so we can remember to save.
+        if(command && command.category !== "navigation" && command.category !== "selection")
+            setUnsavedEdits(unsavedEdits + 1);
+    
         // Change the chapter's AST.
         setEditedNode(newRoot);
 

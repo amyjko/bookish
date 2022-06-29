@@ -503,7 +503,8 @@ export default class Parser {
                 // Read the whitespace after the bullet.
                 this.readWhitespace();
                 // Parse content after the bullet.
-                items.push(this.parseFormat());
+                const format = this.parseFormat();
+                items.push(format.isEmpty() ? format.withSegmentAppended(new TextNode()) : format);
             }
             // Otherwise, unread the stars, then either stop parsing or parse nested list.
             else {
@@ -705,8 +706,7 @@ export default class Parser {
                 this.readWhitespace();
 
                 // Read content until reaching another | or the end of the line.
-                const format = this.parseFormat("|");
-                row.push(format.isEmpty() ? format.withSegmentAppended(new TextNode()) : format);
+                row.push(this.parseFormat("|"));
 
             }
 
@@ -726,7 +726,7 @@ export default class Parser {
         const caption = this.parseFormat();
 
         // Return the new table.
-        return new TableNode(rows, position, caption.isEmpty() ? caption.withSegmentAppended(new TextNode()) : caption);
+        return new TableNode(rows, position, caption);
 
     }
 

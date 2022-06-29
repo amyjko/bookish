@@ -212,6 +212,8 @@ export class FormatNode extends Node {
         
     }
 
+    withTextIfEmpty() { return this.isEmpty() ? this.withSegmentAppended(new TextNode()) : this }
+
     withSegmentPrepended(segment: FormatNodeSegmentType): FormatNode {
         return new FormatNode(this.#format, [ segment, ...this.#segments ]);
     }

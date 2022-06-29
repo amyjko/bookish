@@ -2,11 +2,12 @@ import { FormatNode } from "./FormatNode";
 import { AtomNode } from "./AtomNode";
 import { Node } from "./Node";
 import { Caret, CaretRange } from "./Caret";
+import { TextNode } from "./TextNode";
 
 export class FootnoteNode extends AtomNode<FormatNode> {
 
     constructor(content?: FormatNode) {
-        super(content ? content : new FormatNode("", []));
+        super(content === undefined ? new FormatNode("", [ new TextNode() ]) : content.withTextIfEmpty());
     }
 
     getType() { return "footnote"; }
