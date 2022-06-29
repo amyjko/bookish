@@ -690,7 +690,7 @@ export const commands: Command[] = [
         description: "insert horizontal rule",
         category: "block",
         control: true, alt: false, shift: true, key: "h",
-        visible: context => context.blocks !== undefined && context.atParagraphStart,
+        visible: context => context.blocks !== undefined,
         active: context => context.blocks !== undefined && context.atParagraphStart,
         handler: context => context.paragraph ? rootWithNode(context, context.blocks, context.blocks?.withBlockInsertedBefore(context.paragraph, new RuleNode())) : undefined
     },
@@ -699,7 +699,7 @@ export const commands: Command[] = [
         description: "insert callout",
         category: "block",
         control: true, alt: false, shift: true, key: "e",
-        visible: context => context.blocks !== undefined && context.atParagraphStart,
+        visible: context => context.blocks !== undefined,
         active: context => context.blocks !== undefined && context.atParagraphStart,
         handler: context => {
             // If the caret is in a paragraph in a blocks node, insert a callout before the current paragraph.
@@ -721,7 +721,7 @@ export const commands: Command[] = [
         description: "insert quote",
         category: "block",
         control: true, alt: false, shift: true, key: "u",
-        visible: context => context.blocks !== undefined && context.atParagraphStart,
+        visible: context => context.blocks !== undefined,
         active: context => context.blocks !== undefined && context.atParagraphStart,
         handler: context => {
             if(context.blocks && context.paragraph) {
@@ -742,7 +742,7 @@ export const commands: Command[] = [
         description: "insert code",
         category: "block",
         control: true, alt: false, shift: true, key: "s",
-        visible: context => context.blocks !== undefined && context.atParagraphStart,
+        visible: context => context.blocks !== undefined,
         active: context => context.blocks !== undefined && context.atParagraphStart,
         handler: context => {
             if(context.blocks && context.paragraph) {
@@ -762,7 +762,7 @@ export const commands: Command[] = [
         description: "insert image or video",
         category: "block",
         control: true, alt: false, shift: true, key: "p",
-        visible: context => context.blocks !== undefined && context.atParagraphStart,
+        visible: context => context.blocks !== undefined,
         active: context => context.blocks !== undefined && context.atParagraphStart,
         handler: context => {
             if(context.blocks && context.paragraph) {
@@ -782,7 +782,7 @@ export const commands: Command[] = [
         description: "insert table",
         category: "block",
         control: true, alt: false, shift: true, key: "\\",
-        visible: context => context.blocks !== undefined && context.atParagraphStart,
+        visible: context => context.blocks !== undefined,
         active: context => context.blocks !== undefined && context.atParagraphStart,
         handler: context => {
             if(context.blocks && context.paragraph) {
