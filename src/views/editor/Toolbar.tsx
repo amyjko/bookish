@@ -150,18 +150,24 @@ const Toolbar = (props: {
         }
     }
 
-    function handleMouseDown() {
-        if(toolbarRef.current)
-            toolbarRef.current.focus();
-        console.log("Handled click");
+    function handleMouse(event: React.MouseEvent) {
+        // This prevents the body from taking focus.
+        if(toolbarRef.current && props.visible === true) {
+            event.stopPropagation();
+            return false;
+        }
     }
+
+    const containsFocus = toolbarRef.current && toolbarRef.current.contains(document.activeElement);
+    const isVisible = props.visible === true || props.visible === undefined || containsFocus;
 
     // Render command categories.
     return <div 
         className="bookish-editor-toolbar" 
         onKeyDown={handleKeyDown} 
-        onMouseDown={handleMouseDown}
-        style={{visibility: props.visible === true || props.visible === undefined ? "visible" : "hidden"}} 
+        onMouseDown={handleMouse}
+        onClick={handleMouse}
+        style={{margin: isVisible ? "0" : "-10em"}} 
         tabIndex={0}
         ref={toolbarRef}
         >

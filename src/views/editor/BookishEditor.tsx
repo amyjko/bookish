@@ -256,7 +256,7 @@ const BookishEditor = <RootType extends RootNode>(props: {
             const caretTop = newCaretPosition.y;
             const caretBottom = caretTop + newCaretPosition.height;
             const windowHeight = window.innerHeight;
-            const toolbar = document.querySelector(".bookish-editor-toolbar");
+            const toolbar = editorRef.current?.querySelector(".bookish-editor-toolbar");
             const toolbarHeight = toolbar ? toolbar.clientHeight : 0;
 
             const buffer = newCaretPosition.height * 5;
