@@ -439,9 +439,9 @@ export const commands: Command[] = [
         category: "text",
         control: false, alt: false, shift: false, key: "Enter",
         visible: false,
-        active: context => context.start.node.isInside(context.root, CodeNode),
+        active: context => context.code !== undefined,
         handler: context => {
-            if(!(context.start.node instanceof TextNode)) return;
+            if(context.code?.getCodeNode() !== context.start.node) return;
             const newText = context.start.node.withCharacterAt("\n", context.start.index);
             if(newText === undefined) return;
             return rootWithNode(
