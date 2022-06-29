@@ -554,7 +554,7 @@ export class FormatNode extends Node {
         const newFormat = this.withFormat(range, format);
         if(newFormat === undefined) return;
         const newStart = newFormat.textIndexToCaret(text.start);
-        const newEnd = newFormat.textIndexToCaret(text.end);
+        const newEnd = format === undefined ? newStart : newFormat.textIndexToCaret(text.end);
         if(newStart === undefined || newEnd === undefined) return;
         return { root: newFormat, range: { start: newStart, end: newEnd } }
 
