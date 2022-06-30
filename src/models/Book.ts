@@ -3,6 +3,7 @@ import { EmbedNode } from "./EmbedNode";
 import Chapter from './Chapter.js';
 import { addChapter, removeChapter, updateBook } from "./Firestore";
 import { DocumentReference } from "firebase/firestore";
+import { ReferenceNode } from "./ReferenceNode";
 
 export type ChapterSpecification = {
     ref: DocumentReference | undefined;
@@ -264,9 +265,16 @@ export default class Book {
     }
 
     getSymbols() { return this.symbols }
+
     hasReferences() { return this.references && Object.keys(this.references).length > 0; }
 	getReferences() { return this.references; }
     getReference(citationID: string) { return this.references[citationID]; }
+    addReferences(references: ReferenceNode[]) {
+        // Generate a unique ID for the reference.
+        references.forEach(ref => this.references[ref.getUniqueID(Object.keys(this.references))] = ref.toList());
+        return this.update();
+    }
+
     hasGlossary() { return this.glossary && Object.keys(this.glossary).length > 0 }
 	getGlossary() { return this.glossary }
 	getTags() { return this.tags }

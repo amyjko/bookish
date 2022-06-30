@@ -11,7 +11,7 @@ import { renderNode } from '../chapter/Renderer'
 import { EditorContext } from './Book';
 import { ReferenceNode } from '../../models/ReferenceNode';
 
-function mineReference(text: string) {
+function mineReference(text: string): ReferenceNode {
 
 
 	// First find the year, since it's the most easily detected. Optional parens.
@@ -20,7 +20,7 @@ function mineReference(text: string) {
 	if(year && yearMatches) text = text.replace(yearMatches[1], "");
 	
 	// Split the remaining text by period-space sequences, assuming chunks of information are segmented by sentences.
-	let chunks = text.split(/[^A-Z]\. /);
+	let chunks = text.split(/(?<![A-Z])[?.]\s/);
 
 	// First find the URL. If we find it, remove it from the chunks.
 	let url = chunks.find(t => t.indexOf("http") >= 0);
@@ -37,19 +37,27 @@ function mineReference(text: string) {
 	}
 
 	// Titles are usually lists of roman characters and spaces and maybe a colon.
-	let title = chunks.find(t => /[a-zA-Z:!#]+/.test(t));
+	let title = chunks.find(t => /[a-zA-Z0-9:!#?]+/.test(t));
 	if(title) {
 		chunks = chunks.filter(t => t !== title);
+		if(text.charAt(text.indexOf(title) + title.length) === "?")
+			title = title + "?";
 	}
 
 	// Source is whatever is left.
 	let source = chunks.length > 0 ? chunks[0] : undefined;
+	if(source) {
+		chunks = chunks.filter(t => t !== source);
+	}
 
-	return new ReferenceNode(authors || "", year || "", title || "", source || "", url || "", "", false);
+	// If there's anything left, fall back to just a string.
+	return chunks.length > 0 ? 
+		new ReferenceNode(text, "", "", "", "") : 
+		new ReferenceNode(authors || "", year || "", title || "", source || "", url || "", "", false);
 
 }
 
-const BulkReferenceEditor = () => {
+const BulkReferenceEditor = (props: { book: Book }) => {
 
 	const textRef = useRef<HTMLTextAreaElement>(null);
 
@@ -60,9 +68,9 @@ const BulkReferenceEditor = () => {
 		const text = textRef.current.value;
 
 		// Split by lines, skipping empty lines.
-		const references = text.split("\n").filter(t => t !== "\n").map(line => mineReference(line));
+		const references = text.split(/\n+/).map(line => mineReference(line));
 
-		console.log(references);		
+		props.book.addReferences(references);
 
 	}
 
@@ -129,12 +137,12 @@ const References = (props: { book: Book }) => {
 			/>
 
 			{
+				editable ? <BulkReferenceEditor book={book}/> : null
+			}
+			{
 				book.hasReferences() ?
 					renderedReferences :
 					<p>This book has no references.</p>
-			}
-			{
-				editable ? <BulkReferenceEditor/> : null
 			}
 		</Page>
 	);
