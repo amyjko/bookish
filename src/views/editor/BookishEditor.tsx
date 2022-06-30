@@ -321,7 +321,6 @@ const BookishEditor = <RootType extends RootNode>(props: {
         if(selection && selection.anchorNode && selection.anchorOffset && selection.focusNode && selection.focusOffset) {
             const start = rangeToCaret(selection.anchorNode, selection.anchorOffset);
             const end = rangeToCaret(selection.focusNode, selection.focusOffset);
-            console.log(`Changed selection`);
             // If we found to text nodes, set the selection
             if(start && end) {
                 setCaretRange({ start: start, end: end });

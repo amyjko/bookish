@@ -250,7 +250,7 @@ const TableOfContents = (props: { book: Book }) => {
 						})
 					}
 					{
-						book.hasReferences() ? 
+						book.hasReferences() || editable ? 
 							<TableOfContentsRow
 								image={getImage(book.getImage(Book.ReferencesID))}
 								chapterID="references"
