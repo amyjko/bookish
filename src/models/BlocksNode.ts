@@ -18,6 +18,18 @@ export abstract class BlocksNode extends BlockNode {
         // Always ensure there's an empty paragraph at the end if the last node isn't a paragraph, so that people can enter text after it.
         this.#blocks = elements.length === 0 || !(elements[elements.length - 1] instanceof ParagraphNode) ?
             [ ...elements, new ParagraphNode() ] : elements;
+
+        // Always ensure the last paragraph has an empty space at the end if it ends with an atom node.
+        if(this.#blocks.length > 0) {
+            const last = this.#blocks[this.#blocks.length - 1];
+            if(last instanceof ParagraphNode) {
+                const format = last.getFormat();
+                const segments = format.getSegments();
+                if(segments.length > 0 && segments[segments.length - 1] instanceof AtomNode) {
+                    this.#blocks[this.#blocks.length - 1] = last.withContent(format.withSegmentAppended(new TextNode()));
+                }
+            }
+        }
     }
 
     getBlocks() { return this.#blocks; }
