@@ -1,5 +1,6 @@
 import React, { useState, useEffect }  from 'react';
 import { Route, Routes, useNavigate, useLocation } from 'react-router-dom';
+import { BookSaveStatus } from '../../models/Book';
 import Chapter from "../chapter/Chapter";
 import TableOfContents from "./TableOfContents";
 import References from "./References";
@@ -112,11 +113,38 @@ const Book = (props: { book: BookModel, base?: string, editable?: boolean }) => 
 				<Route path="print" element={<Print book={book} />} />
 				<Route path="*" element={<Unknown message="This page doesn't exist." book={book} />}/>
 			</Routes>
+			<BookStatus book={book}/>
 		</EditorContext.Provider>
 		</BaseContext.Provider>
 		</DarkModeContext.Provider>
 	</div>
 	
+}
+
+const BookStatus = (props: { book: BookModel }) => {
+
+	const [ status, setStatus ] = useState<BookSaveStatus>(BookSaveStatus.Saved);
+
+	function handleBookChange(status: BookSaveStatus) {
+		setStatus(status);
+	}
+
+	// Listen to book changes.
+	useEffect(() => {
+		props.book.addListener((status) => handleBookChange(status));
+		return () => { props.book.removeListener(handleBookChange); }
+	}, []);
+
+	return <div className={`bookish-editor-status ${status === BookSaveStatus.Saving ? "bookish-editor-status-saving" : status === BookSaveStatus.Error ? "bookish-editor-status-error" : ""}`}>
+		{
+			status === BookSaveStatus.Changed ? "\u2026" :
+			status === BookSaveStatus.Saving ? "\u2026" :
+			status === BookSaveStatus.Saved ? "\u2713" :
+			status === BookSaveStatus.Error ? "\u2715" :
+			""
+		}
+	</div>
+
 }
 
 export default Book

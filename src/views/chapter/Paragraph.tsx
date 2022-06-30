@@ -9,8 +9,9 @@ const Paragraph = (props: { node: ParagraphNode}) => {
     const content = node.getFormat();
     const level = node.getLevel();
     const context = useContext(ChapterContext)
+    const chapter = context.chapter?.getAST();
 
-    const id = node.getLevel() === 0 ? undefined : "header-" + (context.chapter ? context.chapter.getHeaders().indexOf(node) : "")
+    const id = node.getLevel() === 0 ? undefined : "header-" + (chapter ? chapter.getHeaders().indexOf(node) : "")
     const classes = node.getLevel() === 0 ? undefined: "bookish-header" + (context.highlightedID === id ? " bookish-content-highlight" : "")
 
     return  content === undefined ? <></> :

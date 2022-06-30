@@ -45,6 +45,13 @@ export type BookSpecification = {
     uids?: Array<string>;
 }
 
+export enum BookSaveStatus {
+    Changed,
+    Saving,
+    Saved,
+    Error
+}
+
 export default class Book {
 
     static TableOfContentsID = "";
@@ -72,6 +79,14 @@ export default class Book {
     chaptersByID: Record<string, Chapter | undefined>;
 
     listeners: Set<Function>;
+
+    // A list of requested edits, stored as promises, resolved
+    // when the book is ready to save.
+    edits: { resolve: Function, reject: Function }[] = [];
+
+    // The timer that checks for inactivity.
+    timerID: NodeJS.Timer | undefined;
+    lastEdit: number = 0;
 
     // Given an object with a valid specification and an object mapping chapter IDs to chapter text,
     // construct an object representing a book.
@@ -116,14 +131,51 @@ export default class Book {
             })
         }
 
+        // Periodically check for inactivity, and then update the book.
+        this.timerID = setInterval(() => {
+            // If it's been more than a second since our last edit and there
+            // are edits that haven't been saved, try updating the book, 
+            // and if we succeed, resolve all of the edits, and if we fail,
+            // then reject them.
+            if(Date.now() - this.lastEdit > 1000 && this.edits.length > 0) {
+                // Tell listeners that this book model changed.
+                this.notifyListeners(BookSaveStatus.Saving);
+                updateBook(this)
+                    .then(() => {
+                        // Approve the edits.
+                        this.edits.forEach(edit => edit.resolve());
+                        this.notifyListeners(BookSaveStatus.Saved);
+                    })
+                    .catch(() => {
+                        // Reject the edits.
+                        this.edits.forEach(edit => edit.reject());
+                        this.notifyListeners(BookSaveStatus.Error);
+                    })
+                    .finally(() => {
+                        // Reset the edit queue.
+                        this.edits = [];
+                    })
+            }
+        }, 500);
+
     }
 
-    addListener(listener: Function) { this.listeners.add(listener); }
+    addListener(listener: (status: BookSaveStatus) => void) { this.listeners.add(listener); }
     removeListener(listener: Function) { this.listeners.delete(listener); }
-    notifyListeners() { this.listeners.forEach(listener => listener.call(undefined)); }
-    update() {
-        this.notifyListeners()
-        return updateBook(this)
+    notifyListeners(status: BookSaveStatus) { this.listeners.forEach(listener => listener.call(undefined, status)); }
+
+    // Adds a save request to the queue, to be resolved later after a period of
+    // inactivity. Returns a promise that will eventually be resolved.
+    requestSave() {
+        // Tell listeners that this book model changed.
+        this.notifyListeners(BookSaveStatus.Changed);
+
+        // Return a promise that will resolve or reject later after this model saves the edits to the database.
+        this.lastEdit = Date.now();
+        const promise = new Promise<void>((resolve, reject) => {
+            this.edits.push({ resolve: resolve, reject: reject })
+        });
+        return promise;
     }
 
     // Convert the book back into JSON for storage. Deep copies arrays and objects to avoid other code mutating this object.
@@ -151,16 +203,14 @@ export default class Book {
     getRef() { return this.ref }
 
     addUserID(uid: string) {
-
         this.uids.push(uid);
-
     }
 
     getTitle() { return this.title; }
     setTitle(title: string): Promise<void> { 
         // Update locally, then update on the server.
         this.title = title;
-        return this.update();
+        return this.requestSave();
 
     }
 
@@ -168,21 +218,21 @@ export default class Book {
     setDescription(text: string) { 
         // Update locally, then update on the server.
         this.description = text;
-        return this.update();
+        return this.requestSave();
     }
 
 	getAcknowledgements() { return this.acknowledgements; }
     setAcknowledgements(text: string) { 
         // Update locally, then update on the server.
         this.acknowledgements = text;
-        return this.update();
+        return this.requestSave();
     }
 
     getLicense() { return this.license; }
     setLicense(text: string) { 
         // Update locally, then update on the server.
         this.license = text;
-        return this.update();
+        return this.requestSave();
     }
 
     getChapters() { return this.chapters }
@@ -226,7 +276,7 @@ export default class Book {
         this.chaptersByID[emptyChapter.id] = chap
 
         // Ask the database to create the chapter, returning the promise
-        return this.update();
+        return this.requestSave();
 
     }
 
@@ -246,7 +296,7 @@ export default class Book {
         this.chapters[index] = temp
 
         // Ask the database to update with this new order.
-        return this.update();
+        return this.requestSave();
 
     }
 
@@ -260,7 +310,7 @@ export default class Book {
         this.chapters.splice(index, 1);
 
         // Ask the database to update the new book metadata then delete the chapter.
-        return this.update().then(() => removeChapter(chapter));
+        return this.requestSave().then(() => removeChapter(chapter));
 
     }
 
@@ -272,23 +322,23 @@ export default class Book {
     addReferences(references: ReferenceNode[]) {
         // Generate a unique ID for the reference.
         references.forEach(ref => this.references[ref.citationID] = ref.toList());
-        return this.update();
+        return this.requestSave();
     }
     editReference(ref: ReferenceNode) {
         if(!(ref.citationID in this.references)) return;
         this.references[ref.citationID] = ref.toList();
-        return this.update(); 
+        return this.requestSave(); 
     }
     editReferenceID(newCitationID: string, ref: ReferenceNode) {
         if(!(ref.citationID in this.references)) return;
         delete this.references[ref.citationID];
         this.references[newCitationID] = ref.withCitationID(newCitationID).toList();
-        return this.update(); 
+        return this.requestSave(); 
     }
     removeReference(citationID: string) {
         if(!(citationID in this.references)) return;
         delete this.references[citationID];
-        return this.update();
+        return this.requestSave();
     }
 
     hasGlossary() { return this.glossary && Object.keys(this.glossary).length > 0 }
@@ -299,21 +349,21 @@ export default class Book {
 
     addAuthor(name: string) {
         this.authors.push(name)
-        return this.update();
+        return this.requestSave();
     }
 
     setAuthor(index: number, name: string) {
         if(index >= 0 && index < this.authors.length)
             this.authors[index] = name;
 
-            return this.update();
+            return this.requestSave();
     }
 
     removeAuthor(index: number) {
         if(index >= 0 && index < this.authors.length)
             this.authors.splice(index, 1);
 
-        return this.update();
+        return this.requestSave();
     }
 
 	getRevisions() { return this.revisions; }

@@ -7,7 +7,7 @@ import { renderNode } from './Renderer';
 const Authors = (
     props: { authors: string[], 
     add: () => Promise<void>,
-    edit: (index: number, text: string) => Promise<void> }
+    edit: (index: number, text: string) => Promise<void> | undefined }
 ) => {
 
     const { authors } = props

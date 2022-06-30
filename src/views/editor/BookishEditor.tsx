@@ -88,13 +88,11 @@ const BookishEditor = <RootType extends RootNode>(props: {
     const [ caretRange, setCaretRange ] = useState<CaretRange>();
     const [ caretCoordinate, setCaretCoordinate ] = useState<{ x: number, y: number, height: number}>();
     const [ lastInputTime, setLastInputTime ] = useState<number>(0);
-    const [ unsavedEdits, setUnsavedEdits ] = useState<number>(0);
     const [ keyboardIdle, setKeyboardIdle ] = useState<boolean>(true);
     const [ editorFocused, setEditorFocused ] = useState<boolean>(true);
     const [ undoStack, setUndoStack ] = useState<UndoState[]>([]);
     const [ undoPosition, setUndoPosition ] = useState<number>(-1);
     const [ clipboard, setClipboard ] = useState<Clipboard>(undefined);
-    const [ saving, setSaving ] = useState<undefined | string>(undefined);
     const [ editedNode, setEditedNode ] = useState<RootType>(props.ast);
 
     const chapterContext = useContext<ChapterContextType>(ChapterContext);
@@ -134,24 +132,13 @@ const BookishEditor = <RootType extends RootNode>(props: {
             const isIdle = Date.now() - lastInputTime > IDLE_TIME;
             if(isIdle) {
                 setKeyboardIdle(true);
-                if(unsavedEdits > 0) {
-                    const promise = props.save(editedNode);
-                    if(promise) {
-                        setSaving("Saving...")
-                        promise
-                            .then(() => setSaving("Saved."))
-                            .catch((message: Error) => setSaving("Unable to save :("))
-                            .finally(() => setUnsavedEdits(0))
-                    }
-                }
             }
-            // Save
         }, IDLE_TIME);
         return () => {
             // Clear the timer if we're unmounting or re-rendering.
             clearTimeout(keystrokeTimer);
         }
-    }, [lastInputTime, unsavedEdits])
+    }, [lastInputTime])
 
     // When the selection changes, set the browser's selection to correspond. This helps with two things:
     // 1) we can rely on the browser to render selections rather than rendering it ourselves.
@@ -634,10 +621,9 @@ const BookishEditor = <RootType extends RootNode>(props: {
 
     function saveEdit(newRoot: RootType, newRange: CaretRange, command?: Command) {
 
-        // Remember the last edit time so we can remember to save.
-        if(command && command.category !== "navigation" && command.category !== "selection")
-            setUnsavedEdits(unsavedEdits + 1);
-    
+        // Call the save callback.
+        props.save(newRoot);
+
         // Change the chapter's AST.
         setEditedNode(newRoot);
 
@@ -749,7 +735,7 @@ const BookishEditor = <RootType extends RootNode>(props: {
                 onBlur={handleUnfocus}
                 tabIndex={0} // Makes the editor focusable.
                 >
-                { context && caretCoordinate ? <Toolbar context={context} executor={executeCommand} saving={saving} visible={editorFocused}></Toolbar> : null }
+                { context && caretCoordinate ? <Toolbar context={context} executor={executeCommand} visible={editorFocused}></Toolbar> : null }
                 {
                     // Draw a caret. We draw our own since this view isn't contentEditable and we can't show a caret.
                     // Customize the rendering based on the formatting applied to the text node.

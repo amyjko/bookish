@@ -17,7 +17,7 @@ type HeaderProps = {
 	tags?: string[];
 	image: string | undefined;
 	outline: React.ReactNode;
-	save?: (text: string) => Promise<void>;
+	save?: (text: string) => Promise<void> | undefined;
 }
 
 const Header = (props: HeaderProps) => {

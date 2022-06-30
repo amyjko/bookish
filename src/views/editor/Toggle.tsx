@@ -9,7 +9,7 @@ enum Status {
 const Toggle = (props: { 
     on: boolean,
     children : React.ReactNode[] | React.ReactNode,
-    save: (set: boolean) => Promise<void>
+    save: (set: boolean) => Promise<void> | undefined
 }) => {
 
     const [ saving, setSaving ] = useState(Status.Viewing)
@@ -18,7 +18,14 @@ const Toggle = (props: {
 
         setSaving(Status.Saving)
 
-        props.save.call(undefined, !props.on)
+        const promise = props.save.call(undefined, !props.on);
+
+        if(promise === undefined) {
+            setSaving(Status.Viewing);
+            return;
+        }
+
+        promise
             .then(() => setSaving(Status.Viewing))
             .catch(() => setSaving(Status.Error))
 

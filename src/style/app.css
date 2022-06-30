@@ -442,3 +442,20 @@ input[type=text].bookish-editor-text-invalid {
     max-width: 20em;
     margin-right: var(--bookish-app-chrome-padding);
 }
+
+.bookish-editor-status {
+    position: fixed;
+    top: 1em;
+    right: 1em;
+    z-index: 3;
+    color: var(--bookish-app-chrome-muted);
+}
+
+.bookish-editor-status-error {
+    color: var(--bookish-app-error-color);
+    animation: failure 100ms infinite;
+}
+
+.bookish-editor-status-saving {
+    animation: waiting 100ms infinite;
+}

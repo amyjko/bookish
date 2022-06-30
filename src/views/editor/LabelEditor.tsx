@@ -1,4 +1,4 @@
-import React, { ChangeEvent, useContext, useEffect, useRef, useState } from "react";
+import React, { ChangeEvent, useContext, useState } from "react";
 import { LabelNode } from "../../models/LabelNode";
 import { ChapterContext } from "../chapter/Chapter";
 import { CaretContext, CaretContextType } from "./BookishEditor";
@@ -11,7 +11,10 @@ const LabelEditor = (props: {
     const context = useContext(ChapterContext);
     const caret = useContext<CaretContextType>(CaretContext);
     const [ labelID, setLabelID ] = useState<string>(label.getMeta());
-     
+    const chapter = context.chapter?.getAST();
+    
+    if(chapter === undefined) return null;
+    
     function handleChange(e: ChangeEvent<HTMLInputElement>) {
         setLabelID(e.target.value);
     }
@@ -22,7 +25,7 @@ const LabelEditor = (props: {
 
     function isValid() { 
         // At least one character and only appears once in the chapter's labels.
-        return label.getMeta().length > 0 && context.chapter && context.chapter.getLabels().filter(l => l.getMeta() === label.getMeta()).length === 1;
+        return label.getMeta().length > 0 && chapter?.getLabels().filter(l => l.getMeta() === label.getMeta()).length === 1;
     }
 
     return <span>

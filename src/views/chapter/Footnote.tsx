@@ -12,16 +12,17 @@ const Footnote = (props: { node: FootnoteNode }) => {
     const content = footnote.getMeta();
     const context = useContext(ChapterContext);
     const caret = useContext(CaretContext);
+    const chapter = context.chapter?.getAST();
 
     // If no chapter was provided, then don't render the footnote, since there's no context in which to render it.
-    if(!context || !context.chapter || !context.book)
+    if(chapter === undefined || !context.book)
         return <></>;
 
     // What footnote number is this?
-    let number = context.chapter.getFootnotes().indexOf(footnote);
+    let number = chapter.getFootnotes().indexOf(footnote);
     let letter = context.book.getFootnoteSymbol(number);
 
-    const focused = caret && caret.range && caret.range.start.node.hasAncestor(context.chapter, footnote);
+    const focused = caret && caret.range && caret.range.start.node.hasAncestor(chapter, footnote);
 
     // Position the marginals on every render.
     useEffect(() => {

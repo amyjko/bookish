@@ -51,7 +51,7 @@ const LinkEditor = (props: {
             return false;
 
         // The chapter ID is optional; if it's missing, it refers to this chapter.
-        const correspondingChapter = chapterID === "" ? chapter.chapter : chapter.book.getChapter(chapterID)?.getAST();
+        const correspondingChapter = chapterID === "" ? chapter.chapter?.getAST() : chapter.book.getChapter(chapterID)?.getAST();
         if(!correspondingChapter)
             return false;
         return correspondingChapter.hasLabel(labelID);

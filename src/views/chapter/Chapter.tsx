@@ -20,7 +20,7 @@ import BookishEditor from '../editor/BookishEditor';
 
 export type ChapterContextType = {
 	book?: Book, 
-	chapter?: ChapterNode, 
+	chapter?: ChapterModel, 
 	highlightedWord?: string,
 	highlightedID?: string,
 	marginalID?: string,
@@ -47,7 +47,10 @@ const Chapter = (props: { chapter: ChapterModel, book: Book, print?: boolean }) 
 
 	const { editable } = useContext(EditorContext);
 	const navigate = useNavigate();
-	
+
+	const [, updateState] = React.useState<{}>();
+	const forceUpdate = React.useCallback(() => updateState({}), []);
+
 	// When this component is mounted...
 	// 1) Subscribe and unsubscribe to window listeners
 	// 2) Do initial layout of marginals
@@ -118,6 +121,9 @@ const Chapter = (props: { chapter: ChapterModel, book: Book, print?: boolean }) 
 		// Position the marginals, since there's new content.
 		layoutMarginals();
 
+		// Listen to changes on the book.
+		book.addListener(handleBookChange);
+
 		// On cleanup, unsubscribe from everything above.
 		return () => {
 
@@ -139,6 +145,8 @@ const Chapter = (props: { chapter: ChapterModel, book: Book, print?: boolean }) 
 
 			// Stop observing everything on unmount
 			observer.disconnect()
+
+			book.removeListener(handleBookChange)
 		}
 
 	}, [])
@@ -189,6 +197,10 @@ const Chapter = (props: { chapter: ChapterModel, book: Book, print?: boolean }) 
 
 	}
 
+	function handleBookChange() {
+		forceUpdate();
+	}
+
 	// Prepare to render the chapter by getting some data from the chapter and book.
 	const book = props.book;
 	const chapter = props.chapter;
@@ -237,7 +249,7 @@ const Chapter = (props: { chapter: ChapterModel, book: Book, print?: boolean }) 
 									<TextEditor 
 										text={props.chapter.getChapterID()} 
 										label="Chapter URL ID editor"
-										save={ id => props.chapter.setChapterID(id).then(() => navigate(`/write/${props.book.getRef()}/${id}`)) }
+										save={ id => props.chapter.setChapterID(id)?.then(() => navigate(`/write/${props.book.getRef()}/${id}`)) }
 										validationError={(newChapterID) => 
 											!/^[a-zA-Z0-9]+$/.test(newChapterID) ? "Chapter IDs must be one or more letters or numbers" :
 											props.chapter.getChapterID() !== newChapterID && props.book.hasChapter(newChapterID) ? "There's already a chapter that has this ID." :
@@ -280,7 +292,7 @@ const Chapter = (props: { chapter: ChapterModel, book: Book, print?: boolean }) 
 				<ChapterContext.Provider 
 					value={{
 							book: book, 
-							chapter: chapter.getAST(), 
+							chapter: chapter, 
 							highlightedWord: word,
 							highlightedID: highlightedID,
 							marginalID: marginal,
@@ -293,7 +305,7 @@ const Chapter = (props: { chapter: ChapterModel, book: Book, print?: boolean }) 
 						(
 							editable ? 
 								<BookishEditor<ChapterNode>
-									ast={chapterAST} 
+									ast={chapterAST}
 									save={ (node: ChapterNode) => chapter.setAST(node) }
 									chapter={true}
 								/> : 

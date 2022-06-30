@@ -12,14 +12,14 @@ const Citations = (props: {node: CitationsNode}) => {
 
     const context = useContext<ChapterContextType>(ChapterContext);
 
-    let segments: React.ReactNode[] = [];
+    const segments: React.ReactNode[] = [];
+
+    const chapter = context.chapter?.getAST();
+    const book = context.book;
 
     // If there's no context or chapter, then render nothing.
-    if(!context || !context.chapter)
+    if(book === undefined || chapter === undefined)
         return <></>;
-
-    const chapter = context.chapter;
-    const book = context.book;
 
     // Sort citations numerically, however they're numbered.
     let citations = node.getMeta().sort((a, b) => {
@@ -36,27 +36,26 @@ const Citations = (props: {node: CitationsNode}) => {
     });
 
     // Convert each citation ID until a link.
-    if(book)
-        citations.forEach(
-            (citationID, index) => {
-                // Find the citation number. There should always be one,
-                let citationNumber = chapter.getCitationNumber(citationID)
-                if(citationNumber !== null && citationID in book.getReferences()) {
-                    // Add a citation.
-                    segments.push(
-                        <sup key={index} className="bookish-citation-symbol">{citationNumber}</sup>
-                    );
-                }
-                // If it's not a valid citation number, add an error.
-                else {
-                    segments.push(<span className="bookish-error" key={"citation-error-" + index}>Unknown reference: <code>{citationID}</code></span>)
-                }
-
-                // If there's more than one citation and this isn't the last, add a comma.
-                if(citations.length > 1 && index < citations.length - 1)
-                    segments.push(<sup key={"citation-comma-" + index}>,</sup>);
+    citations.forEach(
+        (citationID, index) => {
+            // Find the citation number. There should always be one,
+            let citationNumber = chapter.getCitationNumber(citationID)
+            if(citationNumber !== null && citationID in book.getReferences()) {
+                // Add a citation.
+                segments.push(
+                    <sup key={index} className="bookish-citation-symbol">{citationNumber}</sup>
+                );
             }
-        );
+            // If it's not a valid citation number, add an error.
+            else {
+                segments.push(<span className="bookish-error" key={"citation-error-" + index}>Unknown reference: <code>{citationID}</code></span>)
+            }
+
+            // If there's more than one citation and this isn't the last, add a comma.
+            if(citations.length > 1 && index < citations.length - 1)
+                segments.push(<sup key={"citation-comma-" + index}>,</sup>);
+        }
+    );
 
     // Render empty citation list as an m-dash.
     if(citations.length === 0)

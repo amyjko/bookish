@@ -15,6 +15,7 @@ const Comment = (props: { node: CommentNode }) => {
     const { chapter } = useContext(ChapterContext);
     const { editable } = useContext(EditorContext);
     const context = useContext(ChapterContext);
+    const chapterNode = chapter?.getAST();
 
     const caret = useContext(CaretContext);
 
@@ -24,14 +25,14 @@ const Comment = (props: { node: CommentNode }) => {
         }
     });
 
-    const focused = caret && caret.range && chapter && caret.range.start.node.hasAncestor(chapter, comment);
+    const focused = caret && caret.range && chapter && comment.contains(caret.range.start.node);
 
     return <Atom
         node={comment}
         textView={
             editable ?
             <Marginal 
-                id={"comment-" + chapter?.getComments().indexOf(comment)}
+                id={"comment-" + (chapterNode === undefined ? "?" : chapterNode.getComments().indexOf(comment))}
                 interactor={<span className="bookish-comment-symbol"><CommentIcon/></span>}
                 content={<span className={`bookish-app-comment ${focused ? "bookish-app-comment-focused" : ""}`}>{renderNode(comment.getMeta())}</span>}
             />
