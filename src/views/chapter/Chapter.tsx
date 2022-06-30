@@ -280,7 +280,8 @@ const Chapter = (props: { chapter: ChapterModel, book: Book, print?: boolean }) 
 					/* If there are chapter authors, map them to authors declared in the book title, otherwise use all the authors of the book */
 					after={
 						<Authors 
-							authors={ chapter.getAuthors() && chapter.getAuthors().length > 0 ? chapter.getAuthors() : book.getAuthors() }
+							authors={ chapter.getAuthors() }
+							inheritedAuthors={ book.getAuthors() }
 							add={ () => chapter.addAuthor("Author") }
 							edit={(index, text) => text.length === 0 ? chapter.removeAuthor(index) : chapter.setAuthor(index, text) }
 						/>

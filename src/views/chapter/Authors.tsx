@@ -4,13 +4,14 @@ import TextEditor from '../editor/TextEditor';
 import { EditorContext } from '../page/Book';
 import { renderNode } from './Renderer';
 
-const Authors = (
-    props: { authors: string[], 
+const Authors = (props: { 
+    authors: string[], 
+    inheritedAuthors?: string[],
     add: () => Promise<void>,
-    edit: (index: number, text: string) => Promise<void> | undefined }
-) => {
+    edit: (index: number, text: string) => Promise<void> | undefined 
+}) => {
 
-    const { authors } = props
+    const { authors, inheritedAuthors } = props
     const { editable, book } = useContext(EditorContext)
 
     function addAuthor() {
@@ -19,17 +20,19 @@ const Authors = (
 
     }
 
+    const showInherited = authors.length === 0 && inheritedAuthors;
+
     return <div className="bookish-authors">
         {
-            authors.length === 0 ? 
+            authors.length === 0 && (inheritedAuthors === undefined || inheritedAuthors.length === 0)  ? 
                 "No authors" : 
                 <em>by </em> 
         }
         {
-            authors.map( 
+            (showInherited ? inheritedAuthors : authors).map( 
                 (author, index) => [
                     book ?
-                        editable ? 
+                        editable && !showInherited ? 
                             <TextEditor
                                 key={"author" + index}
                                 text={author} 
@@ -45,6 +48,11 @@ const Authors = (
                     index < authors.length - 1 ? (", ") : null
                 ]
             )
+        }
+        {
+            editable && showInherited ?
+                <span className="bookish-editor-note">&nbsp;(inherited from book authors)&nbsp;</span> : 
+                null
         }
         &nbsp;
         {
