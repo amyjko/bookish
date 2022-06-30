@@ -28,6 +28,8 @@ export type BookPreview = {
     description: string;
 }
 
+export type Definition = { phrase: string, definition: string, synonyms?: string[]}
+
 export type BookSpecification = {
     title: string;
     authors: string[];
@@ -41,7 +43,7 @@ export type BookSpecification = {
     sources?: Record<string, string>;
     references?: Record<string, string | string[]>;
     symbols?: Record<string, string>;
-    glossary?: Record<string, { phrase: string, definition: string, synonyms?: string[]}>;
+    glossary?: Record<string, Definition>;
     uids?: Array<string>;
 }
 

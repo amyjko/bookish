@@ -8,6 +8,34 @@ import { renderNode } from '../chapter/Renderer'
 import Book from '../../models/Book.js'
 import Parser from '../../models/Parser'
 import { EditorContext } from './Book'
+import { Definition } from '../../models/Book.js'
+
+const Definition = (props: { id: string, definition: Definition }) => {
+
+	const { id, definition } = props;
+	const { editable } = useContext(EditorContext);
+
+	return <tr>
+		<td>
+			<strong>{definition.phrase || <em>Phrase</em>}</strong>
+			{ editable ? <><br/><span className="bookish-editor-note">{id}</span></> : null }
+		</td>
+		<td>
+			{ 
+				definition.definition === "" ? 
+					<em>Definition</em> :
+					renderNode(Parser.parseFormat(undefined, definition.definition)) 
+			}
+			<br/><br/>
+			{
+				definition.synonyms === undefined || definition.synonyms.length === 0 ?
+					(editable ? <em>Synonyms</em> : null) :
+					<span><em>{definition.synonyms.join(", ")}</em></span> 
+			}
+		</td>
+	</tr>
+
+}
 
 const Glossary = (props: { book: Book }) => {
 
@@ -49,33 +77,26 @@ const Glossary = (props: { book: Book }) => {
 					/>
 				}
 			/>
-
+			{
+				editable ?
+				<>
+					<p>Add definitions and then link to them in a chapter's text.</p>
+					<p><button onClick={addEmptyDefinition}>+</button></p>
+				</> : null
+			}
 			{
 				keys === null ? 
-					editable ? 
-						<>
-							<p>Add definitions and then link to them in a chapter's text.</p>
-							<p><button onClick={addEmptyDefinition}>+</button></p>
-						</> :
-						<p>This book has no glossary.</p> :
-				<div>
-					<br/>
-					<div className="bookish-table">
-						<table>
-							<tbody>
-							{ keys.map((key, index) => 
-								<tr key={"definition" + index}>
-									<td><strong>{glossary[key].phrase}</strong></td>
-									<td>
-										{ renderNode(Parser.parseFormat(book, glossary[key].definition)) }
-										{ <span><br/><br/><em>{glossary[key].synonyms?.join(", ")}</em></span> ?? null }
-									</td>
-								</tr>
-							)}
-							</tbody>
-						</table>
+					<p>This book has no glossary.</p> :
+					<div>
+						<br/>
+						<div className="bookish-table">
+							<table>
+								<tbody>
+								{ keys.map((id, index) => <Definition key={index} id={id} definition={glossary[id]} />) }
+								</tbody>
+							</table>
+						</div>
 					</div>
-				</div>
 			}
 		</Page>
 	);
