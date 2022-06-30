@@ -12,7 +12,7 @@ const TextEditor = (props: {
     label: string,
     multiline?: boolean,
     validationError?: (text: string) => string | undefined,
-    save: (text: string) => Promise<void>,
+    save: (text: string) => Promise<void> | undefined,
     children: React.ReactNode | React.ReactNode[]
  }) => {
 
@@ -70,6 +70,7 @@ const TextEditor = (props: {
 
         // Return to viewing
         setStatus(Status.Viewing);
+        setError(undefined);
         
     }
 
@@ -84,6 +85,14 @@ const TextEditor = (props: {
 
             const editor = getEditor()
 
+            const promise = props.save.call(undefined, text);
+
+            if(promise === undefined) {
+                setStatus(Status.Editing);
+                setError("Unable to save.")
+                return;
+            }
+
             // Disable the input temporarily
             if(editor)
                 editor.disabled = true
@@ -93,7 +102,7 @@ const TextEditor = (props: {
             setStatus(Status.Saving)
 
             // Attempt to save
-            props.save.call(undefined, text)
+            promise
                 .then(() => {
                     if(isMounted.current) {
                         // Success! Lose focus...

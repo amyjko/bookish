@@ -1,7 +1,7 @@
 import React, { useContext, useEffect, useRef, useState } from "react"
 import { EditorContext } from "../page/Book"
 
-const ConfirmButton = (props: { commandLabel: string, confirmLabel: string, command: () => Promise<void> }) => {
+const ConfirmButton = (props: { commandLabel: string, confirmLabel: string, command: () => Promise<void> | undefined }) => {
 
     const [ confirming, setConfirming ] = useState(false)
     const [ executing, setExecuting ] = useState(false)
@@ -20,7 +20,7 @@ const ConfirmButton = (props: { commandLabel: string, confirmLabel: string, comm
             setTimeoutID(setTimeout(() => isMounted.current ? setConfirming(false) : undefined, 2000))
         } else if(confirming) {
             props.command.call(undefined)
-                .finally(() => {
+                ?.finally(() => {
                     if(isMounted.current) {
                         if(timeoutID) clearTimeout(timeoutID)
                         setConfirming(false)

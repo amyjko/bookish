@@ -271,7 +271,23 @@ export default class Book {
     getReference(citationID: string) { return this.references[citationID]; }
     addReferences(references: ReferenceNode[]) {
         // Generate a unique ID for the reference.
-        references.forEach(ref => this.references[ref.getUniqueID(Object.keys(this.references))] = ref.toList());
+        references.forEach(ref => this.references[ref.citationID] = ref.toList());
+        return this.update();
+    }
+    editReference(ref: ReferenceNode) {
+        if(!(ref.citationID in this.references)) return;
+        this.references[ref.citationID] = ref.toList();
+        return this.update(); 
+    }
+    editReferenceID(newCitationID: string, ref: ReferenceNode) {
+        if(!(ref.citationID in this.references)) return;
+        delete this.references[ref.citationID];
+        this.references[newCitationID] = ref.withCitationID(newCitationID).toList();
+        return this.update(); 
+    }
+    removeReference(citationID: string) {
+        if(!(citationID in this.references)) return;
+        delete this.references[citationID];
         return this.update();
     }
 
@@ -422,7 +438,7 @@ export default class Book {
         switch(chapterID) {
 
             // Handle back matter chapters.
-            case Book.ReferencesID: return this.chapters[this.chapters.length - 1].chapterID; // Last chapter of the book
+            case Book.ReferencesID: return this.chapters.length > 0 ? this.chapters[this.chapters.length - 1].chapterID : null; // Last chapter of the book
             case Book.GlossaryID: return this.hasReferences() ? Book.ReferencesID : this.chapters.length > 0 ? this.chapters[this.chapters.length - 1].chapterID : Book.TableOfContentsID;
             case Book.IndexID: return this.hasGlossary() ? Book.GlossaryID : this.hasReferences() ? Book.ReferencesID : this.chapters.length > 0 ? this.chapters[this.chapters.length - 1].chapterID : Book.TableOfContentsID;
             case Book.SearchID: return Book.IndexID;

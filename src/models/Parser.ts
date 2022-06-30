@@ -104,7 +104,7 @@ export default class Parser {
         return (new Parser(book, Parser.preprocessSymbols(book, text))).parseEmbed();
     }
 
-    static parseReference(ref: string | Array<string>, book: Book, short=false) {
+    static parseReference(citationID: string, ref: string | Array<string>, book: Book, short=false) {
 
         if(typeof ref === "string")
             return Parser.parseFormat(book, ref);
@@ -115,8 +115,8 @@ export default class Parser {
                 let year = ref[1];
                 let title = ref[2];
                 let source = ref[3];
-                let url = ref.length === 5 ? ref[4] : null;
-                let summary = ref.length === 6 ? ref[5] : null;
+                let url = ref.length === 5 ? ref[4] : "";
+                let summary = ref.length === 6 ? ref[5] : "";
 
                 if(source.charAt(0) === "#") {
                     let src = book.getSource(source)
@@ -126,7 +126,7 @@ export default class Parser {
                         source = src
                 }
 
-                return new ReferenceNode(authors, year, title, source, url, summary, short)
+                return new ReferenceNode(citationID, authors, year, title, source, url, summary, short)
             }
             else
                 return new ErrorNode(undefined, "Expected at least 4 items in the reference array, but found " + ref.length + ": " + ref.toString())

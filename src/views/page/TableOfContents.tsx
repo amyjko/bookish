@@ -66,7 +66,7 @@ const TableOfContentsRow = (props: {
 							<button disabled={chapter.getPosition() === chapter.getBook().getChapterCount() - 1} onClick={moveDown}>{"▼"}</button>
 							&nbsp;
 							<ConfirmButton
-								commandLabel="Delete"
+								commandLabel="x"
 								confirmLabel="Confirm"
 								command={() => chapter.delete()}
 							/>

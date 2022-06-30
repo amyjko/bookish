@@ -3,16 +3,19 @@ import { Node } from "./Node";
 
 export class ReferenceNode extends Node {
 
-    authors: string;
-    year: string;
-    title: string;
-    source: string;
-    url: string | null;
-    summary: string | null;
-    short: boolean;
+    readonly citationID: string;
+    readonly authors: string;
+    readonly year: string;
+    readonly title: string;
+    readonly source: string;
+    readonly url: string;
+    readonly summary: string;
+    readonly short: boolean;
 
-    constructor(authors: string, year: string, title: string, source: string, url: string | null, summary: string | null, short: boolean) {
+    constructor(citationID: string, authors: string="", year: string="", title: string="", source: string="", url: string="", summary: string="", short: boolean=false) {
         super();
+
+        this.citationID = citationID;
         this.authors = authors;
         this.year = year;
         this.title = title;
@@ -20,6 +23,7 @@ export class ReferenceNode extends Node {
         this.url = url;
         this.summary = summary;
         this.short = short;
+
     }
 
     getType() { return "reference"; }
@@ -27,21 +31,6 @@ export class ReferenceNode extends Node {
     getChildren() { return [] }
  
     getParentOf(node: Node): Node | undefined { return undefined; }
-
-    getUniqueID(ids: string[]): string {
-        // Split the authors, combine the first initials of each, then append the year.
-        const semicolons = this.authors.includes(";");
-        const authors = this.authors.split(semicolons ? /;\s+/ : /,\s+/).map(t => t.trim());
-        const initials = authors.map(a => a.charAt(0).toLocaleLowerCase());
-        const id = initials.join("") + this.year;
-        let revisedID = id;
-        let letters = "abcdefghijklmnopqrstuv".split("");
-        while(ids.includes(revisedID)) {
-            const letter = letters.shift();
-            revisedID = id + (letter !== undefined ? letter : Math.floor(Math.random() * 10));
-        }
-        return revisedID;
-    }
     
     toText() { return this.authors + " "  + this.year + " " + this.title + " " + this.source + (this.summary ? this.summary : ""); }
     toBookdown(debug?: number): string { return ""; }
@@ -53,11 +42,19 @@ export class ReferenceNode extends Node {
     }
 
     copy() {
-        return new ReferenceNode(this.authors, this.year, this.title, this.source, this.url, this.summary, this.short) as this;
+        return new ReferenceNode(this.citationID, this.authors, this.year, this.title, this.source, this.url, this.summary, this.short) as this;
     }
 
     withChildReplaced(node: Node, replacement: Node | undefined) { return undefined; }
 
     withContentInRange(range: CaretRange): this | undefined { return this.copy(); }
+
+    withCitationID(id: string) { return new ReferenceNode(id, this.authors, this.year, this.title, this.source, this.url, this.summary, this.short); }
+    withAuthors(authors: string) { return new ReferenceNode(this.citationID, authors, this.year, this.title, this.source, this.url, this.summary, this.short); }
+    withYear(year: string) { return new ReferenceNode(this.citationID, this.authors, year, this.title, this.source, this.url, this.summary, this.short); }
+    withTitle(title: string) { return new ReferenceNode(this.citationID, this.authors, this.year, title, this.source, this.url, this.summary, this.short); }
+    withSource(source: string) { return new ReferenceNode(this.citationID, this.authors, this.year, this.title, source, this.url, this.summary, this.short); }
+    withURL(url: string) { return new ReferenceNode(this.citationID, this.authors, this.year, this.title, this.source, url, this.summary, this.short); }
+    withSummary(summary: string) { return new ReferenceNode(this.citationID, this.authors, this.year, this.title, this.source, this.url, summary, this.short); }
 
 }

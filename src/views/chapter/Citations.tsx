@@ -88,7 +88,7 @@ const Citations = (props: {node: CitationsNode}) => {
                                                 key={index} 
                                                 className="bookish-reference">
                                                     <sup className="bookish-citation-symbol">{citationNumber}</sup>
-                                                    { renderNode(Parser.parseReference(ref, book, true)) }
+                                                    { renderNode(Parser.parseReference(citationID, ref, book, true)) }
                                             </span> :
                                             null
                                     }) :

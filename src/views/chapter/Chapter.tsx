@@ -17,8 +17,6 @@ import ChapterModel from '../../models/Chapter'
 import { EditorContext } from '../page/Book';
 import TextEditor from '../editor/TextEditor';
 import BookishEditor from '../editor/BookishEditor';
-import { FormatNode } from '../../models/FormatNode';
-import { RootNode } from '../../models/RootNode';
 
 export type ChapterContextType = {
 	book?: Book, 
@@ -316,7 +314,7 @@ const Chapter = (props: { chapter: ChapterModel, book: Book, print?: boolean }) 
 								if(citationID in refs) {
 									let ref = refs[citationID];
 									return <li key={"citation-" + citationID} className={"bookish-reference"} id={"ref-" + citationID}>
-										{ renderNode(Parser.parseReference(ref, book)) }
+										{ renderNode(Parser.parseReference(citationID, ref, book)) }
 									</li>
 
 								}
