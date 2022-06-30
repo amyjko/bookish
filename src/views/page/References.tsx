@@ -118,7 +118,7 @@ const BulkReferenceEditor = (props: { book: Book }) => {
 	function handleChange() { setText(textRef.current ? textRef.current.value : ""); }
 
 	return <>
-		<p className="bookish-">
+		<p>
 			<em>
 				Paste some references, one per line, and we'll do our best to pull out the relevant parts,
 				looking for things that look like author lists, years, sources, and URLs.

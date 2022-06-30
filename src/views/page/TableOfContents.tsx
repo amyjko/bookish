@@ -260,7 +260,7 @@ const TableOfContents = (props: { book: Book }) => {
 							: null
 					}
 					{
-						book.getGlossary() && Object.keys(book.getGlossary()).length > 0 ?
+						book.getGlossary() && Object.keys(book.getGlossary()).length > 0 || editable ?
 							<TableOfContentsRow
 								image={getImage(book.getImage(Book.GlossaryID))}
 								chapterID="glossary"

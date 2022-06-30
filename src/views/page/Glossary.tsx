@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react'
+import React, { useContext, useEffect } from 'react'
 
 import Header from "./Header"
 import Outline from './Outline'
@@ -7,8 +7,11 @@ import { renderNode } from '../chapter/Renderer'
 
 import Book from '../../models/Book.js'
 import Parser from '../../models/Parser'
+import { EditorContext } from './Book'
 
 const Glossary = (props: { book: Book }) => {
+
+	const { editable } = useContext(EditorContext);
 
 	useEffect(() => {
 	    // Always start at the top of the page.
@@ -18,7 +21,18 @@ const Glossary = (props: { book: Book }) => {
 	let book = props.book;
 	let glossary = book.getGlossary();
 	// Sort by canonical phrases
-	let keys = glossary === undefined ? null : Object.keys(glossary).sort((a, b) => glossary[a].phrase.localeCompare(glossary[b].phrase));
+	let keys = glossary === undefined || Object.keys(glossary).length === 0 ? null : Object.keys(glossary).sort((a, b) => glossary[a].phrase.localeCompare(glossary[b].phrase));
+
+	function addEmptyDefinition() {
+
+		// Generate an ID.
+		const letters = "abcdefghijklmnopqrstuvwxyz".split("");
+		let id = "";
+		while(id.length < 4 || book.hasDefinition(id))
+			id = id + letters[Math.round(Math.random() * 26)];
+		book.addDefinition(id, "", "", []);
+
+	}
 
 	return (
 		<Page>
@@ -38,7 +52,12 @@ const Glossary = (props: { book: Book }) => {
 
 			{
 				keys === null ? 
-					<p>This book has no glossary.</p> :
+					editable ? 
+						<>
+							<p>Add definitions and then link to them in a chapter's text.</p>
+							<p><button onClick={addEmptyDefinition}>+</button></p>
+						</> :
+						<p>This book has no glossary.</p> :
 				<div>
 					<br/>
 					<div className="bookish-table">

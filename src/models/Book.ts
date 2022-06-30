@@ -343,6 +343,16 @@ export default class Book {
 
     hasGlossary() { return this.glossary && Object.keys(this.glossary).length > 0 }
 	getGlossary() { return this.glossary }
+    hasDefinition(id: string) { return id in this.glossary; }
+    addDefinition(id: string, phrase: string, definition: string, synonyms: string[]) {
+        this.glossary[id] = {
+            phrase: phrase,
+            definition: definition,
+            synonyms: synonyms
+        }
+        return this.requestSave();
+    }
+
 	getTags() { return this.tags }
 
 	getAuthors() { return this.authors; }
