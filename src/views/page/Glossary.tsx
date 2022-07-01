@@ -9,16 +9,29 @@ import Book from '../../models/Book.js'
 import Parser from '../../models/Parser'
 import { EditorContext } from './Book'
 import { Definition } from '../../models/Book.js'
+import ConfirmButton from '../editor/ConfirmButton'
 
 const Definition = (props: { id: string, definition: Definition }) => {
 
 	const { id, definition } = props;
-	const { editable } = useContext(EditorContext);
+	const { editable, book } = useContext(EditorContext);
 
 	return <tr>
 		<td>
 			<strong>{definition.phrase || <em>Phrase</em>}</strong>
 			{ editable ? <><br/><span className="bookish-editor-note">{id}</span></> : null }
+			{
+				editable && book ?
+				<>
+					<br/>
+					<ConfirmButton
+						commandLabel="x"
+						confirmLabel="Confirm"
+						command={() => book.removeDefinition(id)}
+					/>
+				</> : null
+				
+			}
 		</td>
 		<td>
 			{ 
@@ -91,6 +104,10 @@ const Glossary = (props: { book: Book }) => {
 						<br/>
 						<div className="bookish-table">
 							<table>
+								<colgroup>
+									<col style={{width: "40%" }} />
+									<col style={{width: "60%" }} />
+								</colgroup>
 								<tbody>
 								{ keys.map((id, index) => <Definition key={index} id={id} definition={glossary[id]} />) }
 								</tbody>

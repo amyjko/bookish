@@ -354,6 +354,10 @@ export default class Book {
         }
         return this.requestSave();
     }
+    removeDefinition(id: string) {
+        delete this.glossary[id];
+        return this.requestSave();
+    }
 
 	getTags() { return this.tags }
 
