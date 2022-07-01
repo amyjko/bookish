@@ -358,6 +358,17 @@ export default class Book {
         delete this.glossary[id];
         return this.requestSave();
     }
+    editDefinition(id: string, definition: Definition) {
+        this.glossary[id] = definition;
+        return this.requestSave();
+    }
+    editDefinitionID(id: string, newID: string) {
+        if(!(id in this.glossary)) return;
+        const definition = this.glossary[id];
+        delete this.glossary[id];
+        this.glossary[newID] = definition;
+        return this.requestSave();
+    }
 
 	getTags() { return this.tags }
 

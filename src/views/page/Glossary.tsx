@@ -10,41 +10,131 @@ import Parser from '../../models/Parser'
 import { EditorContext } from './Book'
 import { Definition } from '../../models/Book.js'
 import ConfirmButton from '../editor/ConfirmButton'
+import TextEditor from '../editor/TextEditor'
+import BookishEditor from '../editor/BookishEditor'
+import { FormatNode } from '../../models/FormatNode'
 
 const Definition = (props: { id: string, definition: Definition }) => {
 
 	const { id, definition } = props;
 	const { editable, book } = useContext(EditorContext);
 
+	const phraseRender = <strong>{definition.phrase || <em>Phrase</em>}</strong>;
+	const phrase =
+		editable && book ?
+			<TextEditor
+				text={definition.phrase} 
+				label={'Glossary phrase editor.'} 
+				save={text => book.editDefinition(id, { 
+					phrase: text, 
+					definition: definition.definition, 
+					synonyms: definition.synonyms
+				})}
+			>
+				{phraseRender}
+			</TextEditor>
+			:
+			{ phraseRender}
+
+	const idRender = <span className="bookish-editor-note">{id}</span>;
+	const idEditor =
+		editable && book ?
+			<TextEditor
+				text={id} 
+				label={'Definition ID editor.'} 
+				save={text => book.editDefinitionID(id, text)}
+			>
+				{idRender}
+			</TextEditor>
+			:
+			null
+
+	const deleteButton = editable && book ?
+		<>
+			<br/>
+			<ConfirmButton
+				commandLabel="x"
+				confirmLabel="Confirm"
+				command={() => book.removeDefinition(id)}
+			/>
+		</> : null;
+
+	const format = Parser.parseFormat(undefined, definition.definition).withTextIfEmpty();
+	const definitionEditor = 
+		editable && book ?
+			<BookishEditor<FormatNode> 
+			ast={format} 
+			save={(node: FormatNode) => book.editDefinition(id, { 
+				phrase: definition.phrase, 
+				definition: node.toBookdown(), 
+				synonyms: definition.synonyms
+			})}
+			chapter={false}
+		/> :
+		definition.definition === "" ? 
+			<em>Definition</em> : 
+			renderNode(format) 
+
+	function addSynonym() {
+		if(book && definition.synonyms)
+			book.editDefinition(id, { 
+				phrase: definition.phrase, 
+				definition: definition.definition, 
+				synonyms: [ ...definition.synonyms, "synonym" ]
+			})
+	}
+
+	const syns = definition.synonyms || [];
+	const synonymsEditor =
+		<span>
+			<button onClick={addSynonym}>+</button>&nbsp;
+			{
+				syns.length === 0 ?
+					<em>No synonyms</em> :
+					syns.map((syn, index) => 			
+						[
+							<TextEditor
+								text={syn} 
+								label={'Synonym editor.'} 
+								save={text => {
+									const newSyns = [ ...syns ];
+									if(text.length === 0)
+										newSyns.splice(index, 1);
+									else
+										newSyns[index] = text;
+									return book?.editDefinition(id, { 
+										phrase: definition.phrase, 
+										definition: definition.definition, 
+										synonyms: newSyns
+									})
+								}}
+							>
+								<span className="bookish-editor-note">{syn}</span>
+							</TextEditor>,
+							syns.length > 1 && index < syns.length - 1 ? ", " : ""
+						]
+					)
+			}
+		</span> 
+
+	// If viewing, don't show any if empty. If editing, show editor if empty.
+	const synonyms =
+		book && editable ? 
+			synonymsEditor :
+			definition.synonyms === undefined || definition.synonyms.length === 0 ?
+				null :
+				<span className="bookish-editor-note"><em>{definition.synonyms.join(", ")}</em></span>
+
 	return <tr>
 		<td>
-			<strong>{definition.phrase || <em>Phrase</em>}</strong>
-			{ editable ? <><br/><span className="bookish-editor-note">{id}</span></> : null }
-			{
-				editable && book ?
-				<>
-					<br/>
-					<ConfirmButton
-						commandLabel="x"
-						confirmLabel="Confirm"
-						command={() => book.removeDefinition(id)}
-					/>
-				</> : null
-				
-			}
+			{ phrase }
+			<br/>{ idEditor }
+			{ deleteButton }
 		</td>
 		<td>
-			{ 
-				definition.definition === "" ? 
-					<em>Definition</em> :
-					renderNode(Parser.parseFormat(undefined, definition.definition)) 
-			}
-			<br/><br/>
-			{
-				definition.synonyms === undefined || definition.synonyms.length === 0 ?
-					(editable ? <em>Synonyms</em> : null) :
-					<span><em>{definition.synonyms.join(", ")}</em></span> 
-			}
+			{ definitionEditor }
+			<br/>
+			{ synonyms }
 		</td>
 	</tr>
 
