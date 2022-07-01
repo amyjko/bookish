@@ -94,6 +94,7 @@ const Definition = (props: { id: string, definition: Definition }) => {
 					syns.map((syn, index) => 			
 						[
 							<TextEditor
+								key={`syn-${index}`}
 								text={syn} 
 								label={'Synonym editor.'} 
 								save={text => {
