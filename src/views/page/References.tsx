@@ -179,7 +179,8 @@ const References = (props: { book: Book }) => {
 			<Header 
 				book={book}
 				label="References title"
-				image={book.getImage(Book.ReferencesID)} 
+				getImage={() => book.getImage(Book.ReferencesID)}
+				setImage={(embed) => book.setImage(Book.ReferencesID, embed)}
 				header="References"
 				tags={book.getTags()}
 				outline={

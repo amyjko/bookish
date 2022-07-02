@@ -1,6 +1,6 @@
 import { Node } from "./Node";
-import { FormatNode } from "./FormatNode";
 import { BlockNode } from "./BlockNode";
+import { FormatNode } from "./FormatNode";
 import { TextNode } from "./TextNode";
 import { Caret, CaretRange } from "./Caret";
 

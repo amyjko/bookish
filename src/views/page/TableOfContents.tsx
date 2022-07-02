@@ -163,7 +163,8 @@ const TableOfContents = (props: { book: Book }) => {
 		<Header 
 			book={book}
 			label="Book title"
-			image={book.getImage("cover")} 
+			getImage={() => book.getImage("cover")}
+			setImage={(embed) => book.setImage("cover", embed)}
 			header={title}
 			subtitle={subtitle}
 			tags={book.getTags()}

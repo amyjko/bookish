@@ -100,8 +100,8 @@ export default class Parser {
         return (new Parser(book, book === undefined ? text : Parser.preprocessSymbols(book, text))).parseFormat();
     }
 
-    static parseEmbed(book: Book, text: string) {
-        return (new Parser(book, Parser.preprocessSymbols(book, text))).parseEmbed();
+    static parseEmbed(book: Book | undefined, text: string) {
+        return (new Parser(book, book === undefined ? text : Parser.preprocessSymbols(book, text))).parseEmbed();
     }
 
     static parseReference(citationID: string, ref: string | Array<string>, book: Book, short=false) {

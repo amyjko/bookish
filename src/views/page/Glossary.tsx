@@ -171,7 +171,8 @@ const Glossary = (props: { book: Book }) => {
 			<Header 
 				book={book}
 				label="Glossary title"
-				image={book.getImage(Book.GlossaryID)} 
+				getImage={() => book.getImage(Book.GlossaryID)}
+				setImage={(embed) => book.setImage(Book.GlossaryID, embed)}
 				header="Glossary"
 				tags={book.getTags()}
 				outline={

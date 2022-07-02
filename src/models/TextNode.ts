@@ -1,14 +1,9 @@
-import { MetadataNode } from "./MetadataNode";
 import { Caret, CaretRange } from "./Caret";
 import { FormatNode } from "./FormatNode";
 import { Node } from "./Node";
-import { ParagraphNode } from "./ParagraphNode";
 import { AtomNode } from "./AtomNode";
-import { CodeNode } from "./CodeNode";
 import { BlocksNode } from "./BlocksNode";
 import { RootNode } from "./RootNode";
-
-export type TextNodeParent = FormatNode | MetadataNode<any> | CodeNode;
 
 export class TextNode extends Node {
 
@@ -62,10 +57,6 @@ export class TextNode extends Node {
     
     isEmpty() { return this.getLength() === 0; }
 
-    getParagraph(root: Node): ParagraphNode | undefined {
-        return this.getClosestParentOfType<ParagraphNode>(root, ParagraphNode);
-    }
-
     getFormat(root: Node): FormatNode | undefined {
         return this.getClosestParentOfType<FormatNode>(root, FormatNode);
     }
@@ -111,13 +102,13 @@ export class TextNode extends Node {
             return { node: this, index: i };
 
         // Otherwise, find the next text node's next word boundary.
-        const paragraph = this.getParagraph(root);
-        const paragraphText = paragraph ? paragraph.getTextNodes() : undefined;
+        const format = this.getFormatRoot(root);
+        const formatTextNodes = format ? format.getTextNodes() : undefined;
         const nextNode = root.getNextTextOrAtom(this);
         const nextWord = nextNode?.nextWord(root);
 
         // If there isn't one, just go to the end of this.
-        if(paragraphText && nextNode && this === paragraphText[paragraphText.length - 1])
+        if(formatTextNodes && nextNode && this === formatTextNodes[formatTextNodes.length - 1])
             return { node: nextNode, index: 0 };
         else if(nextWord === undefined)
             return { node: this, index: this.#text.length };
@@ -141,13 +132,13 @@ export class TextNode extends Node {
             return { node: this, index: i };
 
         // Otherwise, find the next text node's next word boundary.
-        const paragraph = this.getParagraph(root);
-        const paragraphText = paragraph ? paragraph.getTextNodes() : undefined;
+        const format = this.getFormatRoot(root);
+        const formatTextNodes = format ? format.getTextNodes() : undefined;
         const previousNode = root.getPreviousTextOrAtom(this);
         const previousWord = previousNode?.previousWord(root);
 
         // If there isn't one, just go to the end of this.
-        if(paragraphText && previousNode && this === paragraphText[0])
+        if(formatTextNodes && previousNode && this === formatTextNodes[0])
             return { node: previousNode, index: previousNode instanceof TextNode ? previousNode.getLength() : 0 };
         else if(previousWord === undefined)
             return { node: this, index: 0 };

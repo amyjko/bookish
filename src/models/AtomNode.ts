@@ -1,7 +1,6 @@
 import { Caret } from "./Caret";
 import { FormatNode } from "./FormatNode";
 import { Node } from "./Node";
-import { ParagraphNode } from "./ParagraphNode";
 import { TextNode } from "./TextNode";
 import { RootNode } from "./RootNode";
 

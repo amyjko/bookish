@@ -163,6 +163,12 @@ class Chapter {
 	delete() { return this.book.deleteChapter(this.getChapterID()) }
 
 	getImage() { return this.image; }
+	setImage(embed: string | undefined) { 
+		if(this.image === embed) return;
+		this.image = embed;
+		return this.book.requestSave();
+	}
+
     getIndex() { return this.index; }
     getAST() { return this.ast; }
 

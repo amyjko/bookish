@@ -87,7 +87,7 @@ const Reference = (props: { node: ReferenceNode }) => {
                     {sourceRender}
                 </TextEditor>
                 :
-                { sourceRender}
+                sourceRender
 
         const summary =
             editable && book ?

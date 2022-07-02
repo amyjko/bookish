@@ -1,5 +1,4 @@
 import React, { ReactNode, useRef } from "react";
-import { ChapterNode } from "../../models/ChapterNode";
 import { CaretState } from "./BookishEditor";
 import { Command, commands } from "./Commands";
 

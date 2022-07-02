@@ -21,7 +21,8 @@ export default function Media(props: { book: Book }) {
 			<Header 
 				book={book}
 				label="Media title"
-				image={book.getImage(Book.MediaID)} 
+				getImage={() => book.getImage(Book.MediaID)}
+				setImage={(embed) => book.setImage(Book.MediaID, embed)}
 				header="Media"
 				tags={book.getTags()}
 				outline={

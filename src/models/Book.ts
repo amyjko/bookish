@@ -33,7 +33,7 @@ export type Definition = { phrase: string, definition: string, synonyms?: string
 export type BookSpecification = {
     title: string;
     authors: string[];
-    images: Record<string, string>;
+    images: Record<string, string | null>;
     description: string;
     chapters: ChapterSpecification[];
     license: string;
@@ -74,7 +74,7 @@ export default class Book {
     description: string;
     acknowledgements: string;
     revisions: Array<[string, string]>;
-    images: Record<string, string>;
+    images: Record<string, string | null>;
     sources: Record<string, string>;
     uids: string[];
     chapters: Chapter[];
@@ -389,14 +389,18 @@ export default class Book {
     removeAuthor(index: number) {
         if(index >= 0 && index < this.authors.length)
             this.authors.splice(index, 1);
-
         return this.requestSave();
     }
 
 	getRevisions() { return this.revisions; }
 
-    hasImage(id: string) { return id in this.images; }
-    getImage(id: string) { return this.hasImage(id) ? this.images[id] : undefined; }
+    hasImage(id: string) { return id in this.images && this.images[id] !== null; }
+    getImage(id: string) { return this.images[id] ?? undefined; }
+    setImage(id: string, embed: string | undefined) {
+        if(this.images[id] === embed) return;
+        this.images[id] = embed ?? null;
+        return this.requestSave();
+    }
 	
 	getBookReadingTime() {
 		return this.chapters

@@ -1,8 +1,11 @@
 import React, { useEffect, useRef, useContext } from 'react';
 import Book from '../../models/Book';
+import { EmbedNode } from '../../models/EmbedNode';
 
 import Parser from "../../models/Parser";
 import { renderNode } from '../chapter/Renderer'
+import BookishEditor from '../editor/BookishEditor';
+import Switch from '../editor/Switch';
 import TextEditor from '../editor/TextEditor';
 import { EditorContext } from './Book';
 
@@ -15,7 +18,8 @@ type HeaderProps = {
 	after?: React.ReactNode;
 	print?: boolean;
 	tags?: string[];
-	image: string | undefined;
+	getImage: () => string | undefined;
+	setImage: (embed: string | undefined) => Promise<void> | undefined
 	outline: React.ReactNode;
 	save?: (text: string) => Promise<void> | undefined;
 }
@@ -24,7 +28,7 @@ const Header = (props: HeaderProps) => {
 
 	const title = useRef<HTMLHeadingElement | null>(null)
 	const reminder = useRef<HTMLDivElement>(null)
-	const { editable } = useContext(EditorContext)
+	const { book, editable } = useContext(EditorContext)
 
 	function updateScrollReminder() {
 		if(title.current && reminder.current) {
@@ -55,16 +59,36 @@ const Header = (props: HeaderProps) => {
 		{ props.subtitle ? <div className="bookish-subtitle">{props.subtitle}</div> : null }
 	</>
 
+	const embed = props.getImage();
+	const embedNode = embed ? Parser.parseEmbed(props.book, embed) : undefined;
+
 	return (
 		<div className="bookish-chapter-header">
 			{
-				props.image ?
+				embedNode ?
 					<div className="bookish-figure-full">
-						{ renderNode(Parser.parseEmbed(props.book, props.image)) }
+						{
+							book && editable && embedNode instanceof EmbedNode ?
+								<BookishEditor 
+									ast={embedNode} 
+									save={(node: EmbedNode) => props.setImage(node.toBookdown())}
+									chapter={false} 
+								/> :
+								renderNode(embedNode)
+						}
 						{ props.print ? null : <div ref={reminder} className="bookish-scroll-reminder"></div> }
 					</div> :
 					// Add a bit of space to account for the lack of an image.
 					<p>&nbsp;</p>
+			}
+			{
+				editable ?
+					<Switch 
+						options={["\u25A1", "x"]} 
+						value={ embed === undefined ? "x" : "\u25A1"} 
+						edit={ newValue => newValue === "\u25A1" ? props.setImage("|||||") : props.setImage(undefined)} 
+					/> :
+					null
 			}
 			{ props.outline }
 			<div className="bookish-chapter-header-text">

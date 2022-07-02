@@ -217,7 +217,8 @@ const Chapter = (props: { chapter: ChapterModel, book: Book, print?: boolean }) 
 				<Header 
 					book={book}
 					label="Chapter title"
-					image={chapter.getImage()}
+					getImage={() => chapter.getImage()}
+					setImage={(embed) => chapter.setImage(embed)}
 					print={props.print}
 					outline=
 					{

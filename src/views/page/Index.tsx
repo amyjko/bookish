@@ -80,7 +80,8 @@ const Index = (props: { book: Book }) => {
         <Header 
             book={book}
             label="Index title"
-            image={book.getImage(Book.IndexID)} 
+			getImage={() => book.getImage(Book.IndexID)}
+			setImage={(embed) => book.setImage(Book.IndexID, embed)}
             header="Index"
             tags={book.getTags()}
             outline={

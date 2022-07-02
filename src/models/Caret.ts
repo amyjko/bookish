@@ -1,5 +1,4 @@
 import { AtomNode } from "./AtomNode";
-import { Node } from "./Node";
 import { TextNode } from "./TextNode";
 
 export type Caret = { node: TextNode | AtomNode<any>; index: number; };

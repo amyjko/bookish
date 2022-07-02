@@ -1,19 +1,13 @@
 import { Node } from "./Node";
 import { ErrorNode } from "./ErrorNode";
 import { TextNode } from "./TextNode";
-import { BlockNode } from "./BlockNode";
-import { FootnoteNode } from "./FootnoteNode";
-import { EmbedNode } from "./EmbedNode";
 import { Caret, CaretRange, TextRange } from "./Caret";
 import { MetadataNode } from "./MetadataNode";
 import { AtomNode } from "./AtomNode";
-import { ListNode } from "./ListNode";
-import { TableNode } from "./TableNode";
 import { Edit } from "./Edit";
 
 export type Format = "" | "*" | "_" | "^" | "v";
 export type FormatNodeSegmentType = FormatNode | TextNode | ErrorNode | MetadataNode<any> | AtomNode<any>;
-export type FormatNodeParent = BlockNode | FormatNode | FootnoteNode | EmbedNode | ListNode | TableNode | undefined;
 
 export class FormatNode extends Node {
     
@@ -51,7 +45,7 @@ export class FormatNode extends Node {
     }
 
     toBookdown(debug?: number): string {
-        return (this.#format === "v" ? "^v" : this.#format) + this.#segments.map(s => s instanceof AtomNode ? s.toBookdown(debug, this) : s.toBookdown(debug)).join("") + this.#format;
+        return (this.#format === "v" ? "^v" : this.#format) + this.#segments.map(s => s instanceof AtomNode ? s.toBookdown(debug, this) : s.toBookdown(debug)).join("") + (this.#format === "v" ? "^" : this.#format);
     }
 
     getChildren() { return this.#segments; }
@@ -135,6 +129,10 @@ export class FormatNode extends Node {
         }
         return undefined;
 
+    }
+
+    getTextLength() {
+        return this.getTextAndAtomNodes().reduce((previous, current) => previous + current.getLength(), 0);
     }
 
     textIndexToCaret(index: number): Caret | undefined {
@@ -571,12 +569,12 @@ export class FormatNode extends Node {
 
     getFormats(root: Node): Format[] {
 
-        let format: FormatNodeParent | undefined = this;
+        let format: Node | undefined = this;
         const formats: Format[] = [];
         while(format instanceof FormatNode) {
             if(format.#format !== "")
                 formats.push(format.#format);
-            format = format.getParent(root) as FormatNodeParent;
+            format = format.getParent(root);
         }
         return formats;
 

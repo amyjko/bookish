@@ -344,15 +344,15 @@ test("Copy/paste", () => {
     expect(partialImageCredit?.toBookdown())
         .toBe(`y`)
     expect(imageCaptionAndCredit?.toBookdown())
-        .toBe(`|nope|nothing|image|A|`)
+        .toBe(`|nope|nothing|no |my|`)
     expect(paragraphAndImage?.toBookdown())
-        .toBe(`last.\n\n|nope|nothing|no||\n\n`)
+        .toBe(`last.\n\n|nope|nothing|no|Amy|\n\n`)
 
     const imageAndCode = chapter.copyRange({ start: { node: imageCredit, index: 0}, end: { node: js, index: 3 }})
     
     // Code
     expect(imageAndCode?.toBookdown())
-        .toBe(`|nope|nothing||Amy|\n\n\`js\nlet\n\`\n\n`)
+        .toBe(`|nope|nothing|no image|Amy|\n\n\`js\nlet\n\`\n\n`)
 
     const partialList = chapter.copyRange({ start: { node: item1a, index: 4}, end: { node: item2, index: 1 }})
     const partialListAndParagraph = chapter.copyRange({ start: { node: item2, index: 0}, end: { node: afterList, index: 4 }})

@@ -20,6 +20,8 @@ import Toolbar from "./Toolbar";
 import Parser from "../../models/Parser";
 import { ChapterContext, ChapterContextType } from "../chapter/Chapter";
 import { CodeNode } from "../../models/CodeNode";
+import { BlockNode } from "../../models/BlockNode";
+import { EmbedNode } from "../../models/EmbedNode";
 
 export type CaretContextType = { 
     range: CaretRange | undefined, 
@@ -43,6 +45,7 @@ export type CaretState = {
     root: RootNode, 
     blocks: BlocksNode | undefined,
     paragraph: ParagraphNode | undefined,
+    block: BlockNode | undefined,
     includesList: boolean,
     code: CodeNode | undefined,
     list: ListNode | undefined,
@@ -107,9 +110,8 @@ const BookishEditor = <RootType extends RootNode>(props: {
     
         // Focus the editor on load.
         if(editorRef.current) {
-            const text = editedNode.getTextNodes();
-            if(text.length > 0) {
-                const caret = { node: text[0], index: 0 };
+            const caret = editedNode.getFirstCaret();
+            if(caret) {
                 setCaretRange({ start: caret, end: caret });
                 editorRef.current.focus();
             }
@@ -218,12 +220,25 @@ const BookishEditor = <RootType extends RootNode>(props: {
                         const pageRect = document.querySelector(".bookish-page")?.getBoundingClientRect();
                         const lineHeightString = window.getComputedStyle(startNode).getPropertyValue("line-height");
                         const lineHeight = lineHeightString.endsWith("px") ? parseInt(lineHeightString.substring(0, lineHeightString.length - 2)) : undefined;
+
+                        // Is the caret in relatively positioned ancestors? Undo their offsets.
+                        let caretAncestor = startNode.parentElement;
+                        let relativeX = 0;
+                        let relativeY = 0;
+                        while(caretAncestor != null) {
+                            if(window.getComputedStyle(caretAncestor).position === "relative") {
+                                relativeX += caretAncestor.offsetLeft;
+                                relativeY += caretAncestor.offsetTop;
+                            }
+                            caretAncestor = caretAncestor.parentElement;
+                        }
+
                         // If we're after a new line, calculate the correct position, since selections don't actually render to the next line.
                         const left = afterNewLine ? textRect.left : rangeRect.left;
                         const top = afterNewLine && lineHeight ? rangeRect.top + lineHeight : rangeRect.top;
                         const position = {
-                            x: left + window.scrollX - (pageRect ? pageRect.left + window.scrollX : 0),
-                            y: top + window.scrollY - (pageRect ? pageRect.top + window.scrollY : 0),
+                            x: left + window.scrollX - relativeX,
+                            y: top + window.scrollY - relativeY,
                             height: rangeRect.height
                         };
                         newCaretPosition = position;
@@ -413,9 +428,15 @@ const BookishEditor = <RootType extends RootNode>(props: {
         let undoState = undoStack[undoPosition + 1];
 
         // Restore the content of the chapter.
-        let node = props.ast instanceof ChapterNode ? 
-            Parser.parseChapter(chapterContext.book, undoState.bookdown) : 
-            Parser.parseFormat(chapterContext.book, undoState.bookdown)
+        let node = 
+            props.ast instanceof ChapterNode ? Parser.parseChapter(chapterContext.book, undoState.bookdown) : 
+            props.ast instanceof FormatNode ? Parser.parseFormat(chapterContext.book, undoState.bookdown) :
+            props.ast instanceof EmbedNode ? Parser.parseEmbed(chapterContext.book, undoState.bookdown) :
+            undefined;
+
+        if(node === undefined)
+            return;
+        
         setEditedNode(node as RootType);
 
         // Move the undo state down a position.
@@ -435,9 +456,15 @@ const BookishEditor = <RootType extends RootNode>(props: {
         let undoState = undoStack[undoPosition - 1];
 
         // Restore the content of the chapter.
-        let node = props.ast instanceof ChapterNode ? 
-            Parser.parseChapter(chapterContext.book, undoState.bookdown) : 
-            Parser.parseFormat(chapterContext.book, undoState.bookdown)
+        let node = 
+            props.ast instanceof ChapterNode ? Parser.parseChapter(chapterContext.book, undoState.bookdown) : 
+            props.ast instanceof FormatNode ? Parser.parseFormat(chapterContext.book, undoState.bookdown) :
+            props.ast instanceof EmbedNode ? Parser.parseEmbed(chapterContext.book, undoState.bookdown) :
+            undefined;
+
+        if(node === undefined)
+            return;
+
         setEditedNode(node as RootType);
 
         // Move the undo state down a position.
@@ -477,6 +504,7 @@ const BookishEditor = <RootType extends RootNode>(props: {
             root: editedNode,
             blocks: parents?.find(n => n instanceof BlocksNode) as BlocksNode,
             paragraph: parents?.find(n => n instanceof ParagraphNode) as ParagraphNode,
+            block: parents?.find(n => n instanceof BlockNode) as BlockNode,
             code: parents?.find(n => n instanceof CodeNode) as CodeNode,
             list: parents?.find(n => n instanceof ListNode) as ListNode,
             atom: parents?.find(n => n instanceof AtomNode) as AtomNode<any>,
@@ -599,7 +627,7 @@ const BookishEditor = <RootType extends RootNode>(props: {
             );
 
             // If the command invoked produced a new range
-            if(results !== undefined && (results.root instanceof ChapterNode || results.root instanceof FormatNode)) {
+            if(results !== undefined) {
                 const { root, range } = results;
                 const newRange = { start: range.start, end: range.end };
 
@@ -624,21 +652,22 @@ const BookishEditor = <RootType extends RootNode>(props: {
         // Call the save callback.
         props.save(newRoot);
 
-        // Change the chapter's AST.
-        setEditedNode(newRoot);
-
         // If the history is empty, record the current state.
         let newStack: UndoState[] = undoStack.length > 0 ? undoStack : [];  
         
+        // If there's nothing on the stack, save the current state before we add something to the stack.
         if(undoStack.length === 0 && caretRange !== undefined) {
             const currentRange = newRoot.caretRangeToTextRange(caretRange);
             if(currentRange !== undefined)
                 newStack = [{ 
-                    bookdown: newRoot.toBookdown(), 
+                    bookdown: editedNode.toBookdown(), 
                     command: undefined,
                     range: currentRange
                 }];
         }
+
+        // Change the chapter's AST.
+        setEditedNode(newRoot);
 
         // Set the new undo stack, pre-pending the new command to the front.
         const newTextRange = newRoot.caretRangeToTextRange(newRange);

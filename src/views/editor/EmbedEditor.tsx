@@ -27,8 +27,13 @@ const EmbedEditor = (props: {
         caret?.edit(embed, embed.withDescription(e.target.value));
     }
 
+    const positionEditor = 
+        caret?.root instanceof EmbedNode ? 
+            null : 
+            <>Position <PositionEditor value={embed.getPosition()} edit={(position: string) => caret?.edit(embed, embed.withPosition(position as Position)) } /></>
+
     return <>
-        Position <PositionEditor value={embed.getPosition()} edit={(position: string) => caret?.edit(embed, embed.withPosition(position as Position)) } />
+        { positionEditor } 
         URL <URLEditor url={embed.getURL()} valid={isValidURL(embed.getURL())} edit={(url: string) => caret?.edit(embed, embed.withURL(url))} />
         Description <input
             type="text"

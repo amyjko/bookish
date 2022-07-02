@@ -1,9 +1,10 @@
 import { Node } from "./Node";
 import { Position } from "./Position";
-import { FormatNode } from "./FormatNode";
+import { Format, FormatNode } from "./FormatNode";
 import { TextNode } from "./TextNode";
 import { BlockNode } from "./BlockNode";
 import { CaretRange } from "./Caret";
+import { Edit } from "./Edit";
 
 export class EmbedNode extends BlockNode {
 
@@ -26,20 +27,25 @@ export class EmbedNode extends BlockNode {
     }
 
     getType() { return "embed"; }
-
     getURL() { return this.#url; }
     getDescription() { return this.#description; }
     getCaption() { return this.#caption; }
     getCredit() { return this.#credit; }
     getPosition() { return this.#position; }
-    getFormats() { return [ this.#caption, this.#credit ]; }
-
+    getFormats() { return [ this.#credit, this.#caption ]; }
+    getChildren() { return [ this.#credit, this.#caption ]; }
+    getParentOf(node: Node): Node | undefined {
+        if(node === this.#caption || node === this.#credit) return this;
+        const captionParent = this.#caption.getParentOf(node);
+        if(captionParent) return captionParent;
+        const creditParent = this.#credit.getParentOf(node);
+        if(creditParent) return creditParent;
+    }
+    
     toText(): string { return this.#caption.toText(); }
-
     toBookdown(debug?: number): string {
         return `|${this.#url}|${this.#description}|${this.#caption.toBookdown(debug)}|${this.#credit.toBookdown(debug)}|`;
     }
-
     toJSON() {
         return {
             url: this.#url,
@@ -47,18 +53,6 @@ export class EmbedNode extends BlockNode {
             caption: this.#caption.toText(),
             credit: this.#credit.toText()
         };
-    }
-
-    getChildren() { return [ this.#caption, this.#credit ]; }
-
-    getParentOf(node: Node): Node | undefined {
-
-        if(node === this.#caption || node === this.#credit) return this;
-        const captionParent = this.#caption.getParentOf(node);
-        if(captionParent) return captionParent;
-        const creditParent = this.#credit.getParentOf(node);
-        if(creditParent) return creditParent;
-
     }
 
     copy() {
@@ -88,8 +82,8 @@ export class EmbedNode extends BlockNode {
     withContentInRange(range: CaretRange): this | undefined {
 
         if(!this.contains(range.start.node) && !this.contains(range.end.node)) return this.copy();
-        const newCaption = this.#credit.contains(range.start.node) ? new FormatNode("", [ new TextNode() ] ) : this.#caption.withContentInRange(range);
-        const newCredit = this.#caption.contains(range.end.node) ? new FormatNode("", [ new TextNode() ] ) : this.#credit.withContentInRange(range);
+        const newCredit = this.#caption.contains(range.start.node) ? new FormatNode("", [ new TextNode() ] ) : this.#credit.withContentInRange(range);
+        const newCaption = this.#credit.contains(range.end.node) ? new FormatNode("", [ new TextNode() ] ) : this.#caption.withContentInRange(range);
         if(newCaption === undefined || newCredit === undefined) return;
 
         return new EmbedNode(this.#url, this.#description, newCaption, newCredit, this.#position) as this;
