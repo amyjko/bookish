@@ -107,7 +107,7 @@ function rootWithNode<NodeType extends Node>(context: CaretState, original: Node
 // An ordered list of command specifications for keyboard and mouse input.
 export const commands: Command[] = [
     {
-        label: "row ↑",
+        label: "—↑",
         description: "insert row above",
         category: "table",
         control: false, alt: true, shift: false, key: "ArrowUp",
@@ -116,7 +116,7 @@ export const commands: Command[] = [
         handler: context => context.table !== undefined && context.format !== undefined ? insertTableRowColumn(context, context.table, context.format, true, true) : undefined
     },
     {
-        label: "row ↓",
+        label: "—↓",
         description: "insert row below",
         category: "table",
         control: false, alt: true, shift: false, key: "ArrowDown",
@@ -125,7 +125,7 @@ export const commands: Command[] = [
         handler: context => context.table !== undefined && context.format !== undefined ? insertTableRowColumn(context, context.table, context.format, true, false) : undefined
     },
     {
-        label: "col →",
+        label: "→|",
         description: "insert column after",
         category: "table",
         control: false, alt: true, shift: false, key: "ArrowRight",
@@ -134,7 +134,7 @@ export const commands: Command[] = [
         handler: context => context.table !== undefined && context.format !== undefined ? insertTableRowColumn(context, context.table, context.format, false, false) : undefined
     },
     {
-        label: "col ←",
+        label: "|←",
         description: "insert column before",
         category: "table",
         control: false, alt: true, shift: false, key: "ArrowLeft",
@@ -143,7 +143,7 @@ export const commands: Command[] = [
         handler: context => context.table !== undefined && context.format !== undefined ? insertTableRowColumn(context, context.table, context.format, false, true) : undefined
     },
     {
-        label: "\u232B row",
+        label: "\u232B—",
         description: "delete row",
         category: "table",
         control: false, alt: true, shift: false, key: "Backspace",
@@ -152,7 +152,7 @@ export const commands: Command[] = [
         handler: context => context.format !== undefined && context.table !== undefined ? deleteTableRowColumn(context, context.table, context.format, true) : undefined
     },
     {
-        label: "\u232B col",
+        label: "\u232B|",
         description: "delete column",
         category: "table",
         control: false, alt: true, shift: true, key: "Backspace",
