@@ -15,21 +15,28 @@ export abstract class BlocksNode extends BlockNode {
 
     constructor(elements: BlockNode[]) {
         super();
-        // Always ensure there's an empty paragraph at the end if the last node isn't a paragraph, so that people can enter text after it.
-        this.#blocks = elements.length === 0 || !(elements[elements.length - 1] instanceof ParagraphNode) ?
-            [ ...elements, new ParagraphNode() ] : elements;
-
-        // Always ensure the last paragraph has an empty space at the end if it ends with an atom node.
-        if(this.#blocks.length > 0) {
-            const last = this.#blocks[this.#blocks.length - 1];
-            if(last instanceof ParagraphNode) {
-                const format = last.getFormat();
-                const segments = format.getSegments();
-                if(segments.length > 0 && segments[segments.length - 1] instanceof AtomNode) {
-                    this.#blocks[this.#blocks.length - 1] = last.withContent(format.withSegmentAppended(new TextNode()));
-                }
+        // Always ensure there's an empty paragraph before and after non-paragraph nodes to allow for insertions.
+        const adjustedElements = [];
+        for(let i = 0; i < elements.length; i++) {
+            const block = elements[i];
+            const previousBlock = i === 0 ? undefined : elements[i - 1];
+            // If this block and the previous one are lists of the same kind, merge them.
+            if(block instanceof ListNode && previousBlock instanceof ListNode && block.isNumbered() === previousBlock.isNumbered()) {
+                adjustedElements[adjustedElements.length - 1] = previousBlock.withListAppended(block);
+            }
+            // If the block isn't a paragraph and the last one isn't either or this is the first one., put a paragraph between them to allow for insertion.
+            else {
+                if(!(block instanceof ParagraphNode) && (i === 0 || !(previousBlock instanceof ParagraphNode)))
+                    adjustedElements.push(new ParagraphNode());
+                adjustedElements.push(block);
             }
         }
+        // Check the last one.
+        if(!(adjustedElements[adjustedElements.length - 1] instanceof ParagraphNode))
+            adjustedElements.push(new ParagraphNode());
+
+        this.#blocks = adjustedElements;
+
     }
 
     getBlocks() { return this.#blocks; }
@@ -295,22 +302,6 @@ export abstract class BlocksNode extends BlockNode {
 
     withBlockInsertedAfter(anchor: BlockNode, block: BlockNode) {
         return this.withBlockInserted(anchor, block, false);
-    }
-
-    withAdjacentListsMerged(): BlocksNode {
-
-        const newBlocks: BlockNode[] = [];
-        this.#blocks.forEach(block => {
-            const previousBlock = newBlocks[newBlocks.length - 1];
-            // Are these two adjacent lists of the same style? Put all of the current block's list items in the previous block.
-            if(previousBlock instanceof ListNode && block instanceof ListNode && previousBlock.isNumbered() === block.isNumbered())
-                newBlocks[newBlocks.length - 1] = previousBlock.withListAppended(block) as BlockNode;
-            else
-                newBlocks.push(block);
-        });
-    
-        return this.create(newBlocks);
-    
     }
 
     withSelectionSplit(range: CaretRange): Edit {
@@ -667,7 +658,7 @@ export abstract class BlocksNode extends BlockNode {
 
     // This accounts for adjascent lists that end up with the same style.
     withListAsStyle(list: ListNode, numbered: boolean): BlocksNode | undefined {
-        return this.withNodeReplaced(list, list.withStyle(numbered))?.withAdjacentListsMerged();
+        return this.withNodeReplaced(list, list.withStyle(numbered));
     }
 
     // Removes the character before or after the current caret

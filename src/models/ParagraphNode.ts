@@ -3,6 +3,7 @@ import { BlockNode } from "./BlockNode";
 import { FormatNode } from "./FormatNode";
 import { TextNode } from "./TextNode";
 import { Caret, CaretRange } from "./Caret";
+import { AtomNode } from "./AtomNode";
 
 export class ParagraphNode extends BlockNode {
 
@@ -12,7 +13,15 @@ export class ParagraphNode extends BlockNode {
     constructor(level: number = 0, format?: FormatNode) {
         super();
 
-        this.#format = format === undefined ? new FormatNode("", [ new TextNode() ]) : format.withTextIfEmpty();
+        // Always ensure the paragraphs have an empty space at the begining and end for insertion.
+        let adjustedFormat = format ?? new FormatNode("", [ new TextNode() ]);
+        if(adjustedFormat.getLength() > 0 && adjustedFormat.getSegments()[0] instanceof AtomNode)
+            adjustedFormat = adjustedFormat.withSegmentPrepended(new TextNode());
+        if(adjustedFormat.getLength() > 0 && adjustedFormat.getSegments()[adjustedFormat.getLength() - 1] instanceof AtomNode)
+            adjustedFormat = adjustedFormat.withSegmentAppended(new TextNode());
+        adjustedFormat = adjustedFormat.withTextIfEmpty();
+
+        this.#format = adjustedFormat;
         this.#level = level;
 
     }
