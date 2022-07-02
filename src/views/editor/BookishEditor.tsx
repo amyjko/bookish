@@ -217,12 +217,11 @@ const BookishEditor = <RootType extends RootNode>(props: {
                     if(currentRange) {
                         const rangeRect = currentRange.getBoundingClientRect();
                         const textRect = startNode.getBoundingClientRect();
-                        const pageRect = document.querySelector(".bookish-page")?.getBoundingClientRect();
                         const lineHeightString = window.getComputedStyle(startNode).getPropertyValue("line-height");
                         const lineHeight = lineHeightString.endsWith("px") ? parseInt(lineHeightString.substring(0, lineHeightString.length - 2)) : undefined;
 
-                        // Is the caret in relatively positioned ancestors? Undo their offsets.
-                        let caretAncestor = startNode.parentElement;
+                        // Is the caret in relatively positioned ancestors above the editor? Undo their offsets.
+                        let caretAncestor: HTMLElement | null = startNode.closest(".bookish-editor");
                         let relativeX = 0;
                         let relativeY = 0;
                         while(caretAncestor != null) {
