@@ -939,7 +939,6 @@ a .bookish-outline-header-active {
 	.bookish-marginal {
 		background-color: var(--bookish-background-color);
 		padding: 0.75em;
-		border: 1px solid var(--bookish-border-color-light);
 		position: fixed;
 		width: auto;
 		height: auto;

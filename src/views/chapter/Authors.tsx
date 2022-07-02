@@ -51,7 +51,7 @@ const Authors = (props: {
         }
         {
             editable && showInherited ?
-                <span className="bookish-editor-note">&nbsp;(inherited from book authors)&nbsp;</span> : 
+                <span className="bookish-editor-note">&nbsp;(book authors)&nbsp;</span> : 
                 null
         }
         &nbsp;
