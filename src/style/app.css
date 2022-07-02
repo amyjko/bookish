@@ -459,3 +459,18 @@ input[type=text].bookish-editor-text-invalid {
 .bookish-editor-status-saving {
     animation: waiting 100ms infinite;
 }
+
+.bookish-theme-preview {
+    padding: 1em;
+    border: 1px solid black;
+    transform: translate(-25%, -25%) scale(0.5);
+    position: sticky;
+    margin-top: 2em;
+    top: 2em;
+    z-index: 3;
+    margin-bottom: -15em;
+}
+
+.bookish-dark .bookish-theme-preview {
+    border-color: white;
+}

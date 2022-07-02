@@ -288,6 +288,15 @@ const TableOfContents = (props: { book: Book }) => {
 						title="Media"
 						annotation="Images and video in the book"
 					/>
+					{
+						editable ?
+							<TableOfContentsRow
+							image={undefined}
+							chapterID="theme"
+							title="Theme"
+							annotation="Style the book"
+						/> : null
+					}
 				</tbody>
 			</table>
 		</div>

@@ -1,6 +1,6 @@
 import React, { useState, useEffect }  from 'react';
 import { Route, Routes, useNavigate, useLocation } from 'react-router-dom';
-import { BookSaveStatus } from '../../models/Book';
+import { BookSaveStatus, defaultTheme, ThemeColors } from '../../models/Book';
 import Chapter from "../chapter/Chapter";
 import TableOfContents from "./TableOfContents";
 import References from "./References";
@@ -10,9 +10,11 @@ import Search from "./Search";
 import Media from "./Media";
 import Unknown from "./Unknown";
 import Print from "./Print"
+import { Theme as ThemeType } from "../../models/Book"
 import BookModel from "../../models/Book"
 
 import smoothscroll from 'smoothscroll-polyfill';
+import Theme from './Theme';
 
 // Poly fill smooth scrolling for Safari.
 smoothscroll.polyfill();
@@ -79,6 +81,9 @@ const Book = (props: { book: BookModel, base?: string, editable?: boolean }) => 
 	// When dark mode changes, update dark mode.
 	useEffect(updateDarkMode, [ darkMode ])
 
+	// Set the theme, whatever it is.
+	setTheme(book.getTheme());
+
 	// Render the book
 	return <div className={"bookish"  + (darkMode ? " bookish-dark" : "")}>
 		<DarkModeContext.Provider value={{ darkMode, setDarkMode}}>
@@ -110,6 +115,7 @@ const Book = (props: { book: BookModel, base?: string, editable?: boolean }) => 
 				<Route path="index/:letter" element={<Index book={book} />} />
 				<Route path="search" element={<Search book={book} />} />
 				<Route path="media" element={<Media book={book} />} />
+				<Route path="theme" element={<Theme book={book} />} />
 				<Route path="print" element={<Print book={book} />} />
 				<Route path="*" element={<Unknown message="This page doesn't exist." book={book} />}/>
 			</Routes>
@@ -145,6 +151,41 @@ const BookStatus = (props: { book: BookModel }) => {
 		}
 	</div>
 
+}
+
+function setTheme(theme: ThemeType | null) {
+
+	// Remove any existing theme.
+	document.getElementById("bookish-theme")?.remove();
+
+	// If the theme is being unset, make sure we've removed any overrding style declaration.
+	// This let's the default theme kick in.
+	if(theme === null)
+		return;
+
+	// If it's being set, create a new style tag.
+	const themeTag = document.createElement("style");
+	themeTag.setAttribute("id", "bookish-theme");
+	const css = `:root {
+		${toRules(theme.light)}
+		${toRules(theme.fonts)}
+		${toRules(theme.sizes)}
+		${toRules(theme.weights)}
+		${toRules(theme.spacing)}
+	}
+	.bookish-dark {
+		${toRules(theme.dark)}
+	}`;
+	themeTag.appendChild(document.createTextNode(css));
+	document.head.appendChild(themeTag);
+
+}
+
+function toRules(set: Record<string, string>) {
+	return Object.keys(set).map(name => {
+		const cssVariable = "--bookish-" + name.replace(/([a-z])([A-Z])/g, "$1 $2").split(" ").map(s => s.toLowerCase()).join("-");
+		return `${cssVariable}: ${set[name]};`
+	}).join("\n\t\t");
 }
 
 export default Book
