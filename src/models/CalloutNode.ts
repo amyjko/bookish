@@ -25,8 +25,6 @@ export class CalloutNode extends BlocksNode {
 
     getChildren() { return this.getBlocks(); }
 
-    getFormats() { return []; }
-
     copy() {
         return new CalloutNode(this.getBlocks().map(e => e.copy()), this.#position) as this;
     }

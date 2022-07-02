@@ -9,6 +9,7 @@ export abstract class BlockNode extends Node {
 
     abstract getFormats(): FormatNode[];
 
+    isEmpty() { return this.getFormats().every(f => f.isEmptyText()); }
     getTextNodes(): TextNode[] { return this.getNodes().filter(n => n instanceof TextNode) as TextNode[]; }
     getFirstCaret() { return this.getFormats()[0].getFirstCaret(); }
 

@@ -33,6 +33,7 @@ export abstract class BlocksNode extends BlockNode {
     }
 
     getBlocks() { return this.#blocks; }
+    getFormats() { return this.getBlocks().reduce((prev: FormatNode[], current) => prev.concat(current.getFormats()), []); }
 
     getIndexOf(block: BlockNode): number | undefined {
         const index = this.#blocks.indexOf(block);
@@ -470,13 +471,9 @@ export abstract class BlocksNode extends BlockNode {
                 newBlock = newList;
             }
             
-            // If we're deleting, and this block is an empty a paragraph or list that's not the first or last block, remove the block.
-            if(format === undefined) {
-                if(newBlock instanceof ParagraphNode && i > 0 && i < blocksToEdit.length - 1 && newBlock.getFormat().isEmptyText())
-                   newBlock = undefined;
-                else if(newBlock instanceof ListNode && newBlock.isEmpty())
-                    newBlock = undefined;
-            }
+            // If we're deleting, and this block is now fully empty, remove it from this blocks node.
+            if(format === undefined && newBlock.isEmpty())
+                newBlock = undefined;
 
             // Remember the new block we made.
             if(newBlock !== undefined)
