@@ -460,7 +460,6 @@ export default class Parser {
         let numbered = this.nextMatches(numberedRE);
 
         const items: (FormatNode | ListNode)[] = [];
-        const list = new ListNode(items, numbered);
         let lastLevel = undefined;
         let currentLevel = undefined;
 
@@ -545,7 +544,7 @@ export default class Parser {
             }
 
         }
-        return list;
+        return new ListNode(items, numbered);
 
     }
 
@@ -896,8 +895,6 @@ export default class Parser {
         if(delimeter === null)
             return new ErrorNode(undefined, "Somehow parsing formatted text at end of file.");
 
-        const node = new FormatNode(delimeter as Format, segments)
-
         // Read some content until reaching the delimiter or the end of the line
         while(this.more() && this.peek() !== delimeter && !this.nextIs("\n")) {
             // If this is more formatted text, make a text node with whatever we've accumulated so far, 
@@ -928,7 +925,7 @@ export default class Parser {
         else
             segments.push(new ErrorNode(undefined, "Unclosed " + delimeter));
         
-        return node;
+        return new FormatNode(delimeter as Format, segments);
 
     }
 
@@ -1001,12 +998,10 @@ export default class Parser {
             superscript = false;
         }
 
-        const node = new FormatNode(superscript ? "^" : "v", [ this.parseFormat("^") ]);
-
         // Read the closing ^
         this.read();
 
-        return node;
+        return new FormatNode(superscript ? "^" : "v", [ this.parseFormat("^") ]);
 
     }
 
