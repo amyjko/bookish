@@ -815,8 +815,8 @@ export const commands: Command[] = [
         description: "convert paragraph to bulleted list item",
         category: "list",
         control: true, alt: false, shift: true, key: "7",
-        visible: context => context.blocks !== undefined && context.list === undefined,
-        active: context => context.blocks !== undefined && context.list === undefined,
+        visible: context => context.paragraph !== undefined && context.list === undefined,
+        active: context => context.paragraph !== undefined && context.list === undefined,
         handler: context => rootWithNode(context, context.blocks, context.blocks?.withParagraphsAsLists(context.range, false))
     },
     {
@@ -825,8 +825,8 @@ export const commands: Command[] = [
         description: "convert paragraph to numbered list item",
         category: "list",
         control: true, alt: false, shift: true, key: "8",
-        visible: context => context.blocks !== undefined && context.list === undefined,
-        active: context => context.blocks !== undefined && context.list === undefined,
+        visible: context => context.paragraph !== undefined && context.list === undefined,
+        active: context => context.paragraph !== undefined && context.list === undefined,
         handler: context => rootWithNode(context, context.blocks, context.blocks?.withParagraphsAsLists(context.range, true))
     },
     {
