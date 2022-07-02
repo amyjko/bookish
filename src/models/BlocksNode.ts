@@ -715,8 +715,8 @@ export abstract class BlocksNode extends BlockNode {
             else if(parent instanceof ParagraphNode) {
                 const firstCaret = next ? parent.getLastCaret() : parent.getFirstCaret();
                 if(firstCaret === undefined) return;
-                const adjacentBlock = next ? this.getBlockAfter(parent) : this.getBlockBefore(parent);
                 const blocks = parents[parents.length - 1] as BlocksNode;
+                const adjacentBlock = next ? blocks.getBlockAfter(parent) : blocks.getBlockBefore(parent);
                 // Is this the first/last caret of the paragraph and there's an adjascent block? Try deleting something.
                 if(firstCaret.node === caret.node && firstCaret.index === caret.index && adjacentBlock !== undefined) {
                     // If the block adjacent this paragraph is a paragraph, merge the paragraph into the adjacent paragraph.
