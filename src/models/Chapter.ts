@@ -38,7 +38,7 @@ class Chapter {
 		this.forthcoming = spec.forthcoming === true;
 
 		// If the chapter has text, then parse it, count searchable words, and compute an index.
-		if(spec.text)
+		if(spec.text !== undefined)
 			this.setText(spec.text)
 		else if(this.ref)
 			getChapterText(this.ref).then(text => this.setText(text.text))
@@ -60,13 +60,13 @@ class Chapter {
 			authors: [...this.authors]
 		} as ChapterSpecification
 
-		if(this.image) payload.image = this.image;
+		if(this.image !== undefined) payload.image = this.image;
 		payload.numbered = this.numbered ? true : false;
-		if(this.section) payload.section = this.section;
+		if(this.section !== undefined) payload.section = this.section;
 		if(this.forthcoming) payload.forthcoming = this.forthcoming;
-		if(this.text) payload.text = this.text;
+		if(this.text !== undefined) payload.text = this.text;
 
-		return payload
+		return payload;
 
 	}
 
@@ -108,7 +108,7 @@ class Chapter {
 
 	getText() { return this.text; }
 	setText(text: string) {
-		if(this.text !== text) {
+		if(this.text !== text || this.ast === undefined) {
 			this.text = text;
 			this.setAST(Parser.parseChapter(this.book, this.text));
 		}
