@@ -92,10 +92,10 @@ const TextEditor = (props: {
         />
         {
             error ? 
-                <div
+                <span
                     aria-live="polite"
                     className="bookish-text-editor-error">{error}
-                </div> : 
+                </span> : 
             null 
         }
     </span>

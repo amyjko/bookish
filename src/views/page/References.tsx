@@ -169,7 +169,7 @@ const References = (props: { book: Book }) => {
 				command={() => book.removeReference(citationID)}
 			/>
 	
-			renderedReferences.push(<p key={citationID}>{renderNode(ref)}{editable ? <>{deleteButton}</> : null}</p>);
+			renderedReferences.push(<p key={citationID}>{renderNode(ref)} {editable ? <>{deleteButton}</> : null}</p>);
 		})
 
 	}
