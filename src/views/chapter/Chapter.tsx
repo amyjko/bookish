@@ -250,13 +250,21 @@ const Chapter = (props: { chapter: ChapterModel, book: Book, print?: boolean }) 
 									<TextEditor 
 										text={props.chapter.getChapterID()} 
 										label="Chapter URL ID editor"
-										save={ id => props.chapter.setChapterID(id)?.then(() => navigate(`/write/${props.book.getRef()}/${id}`)) }
+										save={ 
+											// After the ID is edited, reload the page with the new URL.
+											id => props.chapter.setChapterID(id)?.then(() => {
+												const ref = props.book.getRef();
+												if(ref?.id)
+													navigate(`/write/${ref?.id}/${id}`)
+											})
+										}
 										placeholder="chapter ID"
 										valid={(newChapterID) => 
 											!/^[a-zA-Z0-9]+$/.test(newChapterID) ? "Chapter IDs must be one or more letters or numbers" :
 											props.chapter.getChapterID() !== newChapterID && props.book.hasChapter(newChapterID) ? "There's already a chapter that has this ID." :
 											undefined
 										}
+										saveOnExit={true}
 									/>
 									<br/>
 								</span>

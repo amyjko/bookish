@@ -10,7 +10,8 @@ const TextEditor = (props: {
     label: string,
     placeholder: string,
     valid: (text: string) => string | undefined,
-    save: (text: string) => Promise<void> | undefined
+    save: (text: string) => Promise<void> | undefined,
+    saveOnExit?: boolean
  }) => {
 
     const [ status, setStatus ] = useState(Status.Viewing)
@@ -53,13 +54,15 @@ const TextEditor = (props: {
 
     function stopEditing() {
         setStatus(Status.Viewing);
+        if(props.saveOnExit === true)
+            props.save.call(undefined, text);
     }
 
     function edit() {
         if(textField?.current) {
             const newValue = textField?.current.value;
             setText(newValue)
-            if(validate(newValue) === undefined)
+            if(validate(newValue) === undefined && props.saveOnExit !== true)
                 props.save.call(undefined, newValue);
         }
     }
