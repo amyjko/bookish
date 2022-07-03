@@ -1,4 +1,4 @@
-import React, { useContext, useEffect } from 'react'
+import React, { useContext, useEffect, useRef, useState } from 'react'
 
 import Header from "./Header"
 import Outline from './Outline'
@@ -18,6 +18,22 @@ const Definition = (props: { id: string, definition: Definition }) => {
 
 	const { id, definition } = props;
 	const { editable, book } = useContext(EditorContext);
+	const [ newSynonym, setNewSynonym ] = useState<boolean>(false);
+	const synonymsRef = useRef<HTMLSpanElement>(null);
+
+	// Focus after adding a new synonym.
+	useEffect(() => {	
+		if(newSynonym && synonymsRef.current) {
+			const editors = synonymsRef.current.querySelectorAll(".bookish-editor-synonym input");
+			if(editors.length > 0) {
+				const last = editors[editors.length - 1];
+				if(last instanceof HTMLElement)
+					last.focus();
+			}
+		}
+		setNewSynonym(false);
+
+	}, [newSynonym])
 
 	const phrase =
 		editable && book ?
@@ -48,7 +64,6 @@ const Definition = (props: { id: string, definition: Definition }) => {
 					placeholder="ID"
 					valid={ text => {
 						if(text.length === 0) return "ID can't be empty";
-						if(text in book.getGlossary()) return "Another phrase has this ID.";
 					}}
 					save={text => book.editDefinitionID(id, text)}
 				/>
@@ -83,30 +98,31 @@ const Definition = (props: { id: string, definition: Definition }) => {
 			renderNode(format) 
 
 	function addSynonym() {
-		if(book && definition.synonyms)
+		if(book && definition.synonyms) {
 			book.editDefinition(id, { 
 				phrase: definition.phrase, 
 				definition: definition.definition, 
-				synonyms: [ ...definition.synonyms, "synonym" ]
+				synonyms: [ ...definition.synonyms, "" ]
 			})
+			setNewSynonym(true);
+		}
 	}
 
 	const syns = definition.synonyms || [];
 	const synonymsEditor =
-		<span>
+		<span ref={synonymsRef}>
 			<button onClick={addSynonym}>+</button>&nbsp;
 			{
 				syns.length === 0 ?
 					<em>No synonyms</em> :
 					syns.map((syn, index) => 			
 						[
-							<span className="bookish-editor-note">
+							<span key={`syn-${index}`} className="bookish-editor-synonym bookish-editor-note">
 								<TextEditor
-									key={`syn-${index}`}
 									text={syn} 
 									label={'Synonym editor.'}
 									placeholder="Synonym"
-									valid={ text => { if(text.length === 0) return "Can't be empty." }}
+									valid={ text => undefined }
 									save={text => {
 										const newSyns = [ ...syns ];
 										if(text.length === 0)
