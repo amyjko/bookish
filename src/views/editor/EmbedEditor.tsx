@@ -33,23 +33,27 @@ const EmbedEditor = (props: {
     return <>
         { positionEditor }
         { positionEditor !== null ? <Spacer/> : null }
-        <URLEditor 
-            url={embed.getURL()} 
-            validator={isValidURL} 
-            edit={(url: string) => caret?.edit(embed, embed.withURL(url))} 
-        />
+        <code>
+            <URLEditor 
+                url={embed.getURL()} 
+                validator={isValidURL} 
+                edit={(url: string) => caret?.edit(embed, embed.withURL(url))} 
+            />
+        </code>
         <Spacer/>
-        <TextEditor
-            text={description} 
-            label={'Image description'} 
-            placeholder={'description'} 
-            valid={ alt => {
-                if(alt.length === 0) return "Image description required";
-            }}
-            save={ alt => { caret?.edit(embed, embed.withDescription(alt)); } }
-            width={20}
-            clip={true}
-        />
+        <code>
+            <TextEditor
+                text={description} 
+                label={'Image description'} 
+                placeholder={'description'} 
+                valid={ alt => {
+                    if(alt.length === 0) return "Image description required";
+                }}
+                save={ alt => { caret?.edit(embed, embed.withDescription(alt)); } }
+                width={20}
+                clip={true}
+            />
+        </code>
     </>
 
 }
