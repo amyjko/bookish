@@ -143,10 +143,10 @@ const BookStatus = (props: { book: BookModel }) => {
 
 	return <div className={`bookish-editor-status ${status === BookSaveStatus.Saving ? "bookish-editor-status-saving" : status === BookSaveStatus.Error ? "bookish-editor-status-error" : ""}`}>
 		{
-			status === BookSaveStatus.Changed ? "\u2026" :
-			status === BookSaveStatus.Saving ? "\u2026" :
-			status === BookSaveStatus.Saved ? "\u2713" :
-			status === BookSaveStatus.Error ? "\u2715" :
+			status === BookSaveStatus.Changed ? "\u270E Editing" :
+			status === BookSaveStatus.Saving ? "\u2026 Saving" :
+			status === BookSaveStatus.Saved ? "\u2713 Saved" :
+			status === BookSaveStatus.Error ? "\u2715 Couldn't save." :
 			""
 		}
 	</div>

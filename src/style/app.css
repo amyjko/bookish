@@ -440,8 +440,8 @@ input[type=text].bookish-editor-text-invalid {
 
 .bookish-editor-status {
     position: fixed;
-    top: 1em;
-    right: 1em;
+    top: 0.5em;
+    right: 0.5em;
     z-index: 3;
     color: var(--bookish-app-chrome-muted);
 }
