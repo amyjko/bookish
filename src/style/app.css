@@ -178,7 +178,7 @@ button:disabled {
     opacity: 0;
 }
 
-.bookish-text-editor input:focus, button:focus, select:focus {
+input:focus, button:focus, select:focus {
     outline: 2px solid var(--bookish-highlight-color);
     z-index: 2;
 }
