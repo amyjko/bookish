@@ -10,6 +10,7 @@ import List from "../svg/list.svg";
 import LinkIcon from "../svg/link.svg";
 import Code from "../svg/code.svg";
 import Scissors from "../svg/scissors.svg";
+import Media from "../svg/media.svg";
 
 import { TextNode } from "../../models/TextNode";
 import { AtomNode } from "../../models/AtomNode";
@@ -203,7 +204,7 @@ const Toolbar = (props: {
         { metaNode instanceof CodeNode && context ? <ToolbarGroup icon={wrapIcon(Code)}><CaptionedCodeEditor code={context.start.node.getParent(chapter) as CodeNode}/></ToolbarGroup> : null }
         { calloutNode ? <ToolbarGroup icon="Callout"><CalloutEditor callout={calloutNode} /></ToolbarGroup> : null }
         { quoteNode ? <ToolbarGroup icon="Quote"><QuoteEditor quote={quoteNode} /></ToolbarGroup> : null }
-        { embedNode ? <ToolbarGroup icon="Image/Video"><EmbedEditor embed={embedNode} /></ToolbarGroup> : null }
+        { embedNode ? <ToolbarGroup icon={wrapIcon(Media)}><EmbedEditor embed={embedNode} /></ToolbarGroup> : null }
     </div>
 
 }
