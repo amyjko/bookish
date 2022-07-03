@@ -1112,7 +1112,7 @@ a .bookish-outline-header-active {
 	}
 
 	/* When the outline is fixed to title, it's positioned absolutely relative to the book container. */
-	/* We set a margin appropriate for it's width above. This class is set by outline.js. */
+	/* We set a margin appropriate for it's width above. This class is set in Outline.tsx. */
 	.bookish-outline.bookish-outline-title-left {
 		position: absolute;
 		margin-left: var(--bookish-outline-offset);
