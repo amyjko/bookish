@@ -24,11 +24,6 @@ const TextEditor = (props: {
     }, [text, status]);
 
     useEffect(() => {
-        validate();
-        props.save.call(undefined, text);
-    }, [text])
-
-    useEffect(() => {
         if(status === Status.Editing)
             textField?.current?.focus();
         else
@@ -57,12 +52,17 @@ const TextEditor = (props: {
 
     function edit() {
         if(textField?.current) {
-            setText(textField?.current.value)
+            const newValue = textField?.current.value;
+            setText(newValue)
+            if(validate(newValue))
+                props.save.call(undefined, newValue);
         }
     }
 
-    function validate() {
-        setError(props.valid?.call(undefined, text));
+    function validate(value: string): boolean {
+        const error = props.valid?.call(undefined, value);
+        setError(error);
+        return error === undefined;
     }
 
     function handleKeyPress(event: KeyboardEvent) {
