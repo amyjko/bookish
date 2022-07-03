@@ -12,6 +12,10 @@ export abstract class BlockNode extends Node {
     isEmpty() { return this.getFormats().every(f => f.isEmptyText()); }
     getTextNodes(): TextNode[] { return this.getNodes().filter(n => n instanceof TextNode) as TextNode[]; }
     getFirstCaret() { return this.getFormats()[0].getFirstCaret(); }
+    getLastCaret() { 
+        const formats = this.getFormats();
+        return formats.length === 0 ? undefined : formats[formats.length - 1].getLastCaret(); 
+    }
 
     getAdjacentCaret(caret: Caret, next: boolean): Caret | undefined {
         const formats = next ? this.getFormats() : this.getFormats().reverse();
@@ -124,30 +128,35 @@ export abstract class BlockNode extends Node {
     }
 
     withRangeFormatted(range: CaretRange, format: Format | undefined): Edit {
+        const sortedRange = this.sortRange(range);
         const formats = this.getFormats();
         let newRoot: this | undefined = this;
         let newStart: Caret | undefined;
         let newEnd: Caret | undefined;
         let inRange = false;
+
         // Find all of the formats contained in the range and format then.
         for(let i = 0; i < formats.length; i++) {
             const f = formats[i];
-            const containsStart = f.contains(range.start.node);
-            const containsEnd = f.contains(range.end.node);
-            if(containsStart)
+            const containsStart = f.contains(sortedRange.start.node);
+            const containsEnd = f.contains(sortedRange.end.node);
+            if(containsStart || containsEnd)
                 inRange = true;
             if(inRange) {
                 // Revise the entire format.
-                const first = containsStart ? range.start : f.getFirstCaret();
-                const last = containsEnd ? range.end : f.getLastCaret();
+                const first = containsStart ? sortedRange.start : f.getFirstCaret();
+                const last = containsEnd ? sortedRange.end : f.getLastCaret();
                 if(first && last) {
                     const edit = f.withRangeFormatted({ start: first, end: last }, format);
                     if(edit === undefined) return;
-                    newRoot = newRoot.withChildReplaced(f, edit.root);
+                    const newFormat = edit.root as FormatNode;
+                    const deleteChild = newFormat.isEmptyText();
+                    // Delete the format if it's empty.
+                    newRoot = newRoot.withNodeReplaced(f, deleteChild ? undefined : newFormat);
                     if(newRoot === undefined) return;
-                    if(containsStart)
+                    if(containsStart && !deleteChild)
                         newStart = edit.range.start;
-                    if(containsEnd)
+                    if(containsEnd && !deleteChild)
                         newEnd = edit.range.end;
                 }
             }
@@ -155,8 +164,12 @@ export abstract class BlockNode extends Node {
                 inRange = false;
         }
 
-        if(newRoot && newStart && newEnd)
-            return { root: newRoot, range: { start: newStart, end: newEnd } };
+        if(newRoot) {
+            if(newStart === undefined) newStart = newRoot.getFirstCaret();
+            if(newEnd === undefined) newEnd = newRoot.getLastCaret();
+            if(newStart && newEnd)
+                return { root: newRoot, range: { start: newStart, end: newEnd } };
+        }
     }
 
 }

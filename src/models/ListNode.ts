@@ -1,9 +1,10 @@
 import { Node } from "./Node";
-import { FormatNode } from "./FormatNode";
+import { Format, FormatNode } from "./FormatNode";
 import { Caret, CaretRange } from "./Caret";
 import { BlocksNode } from "./BlocksNode";
 import { BlockNode } from "./BlockNode";
 import { Edit } from "./Edit";
+import { TextNode } from "./TextNode";
 
 export type ListParentType =  BlocksNode | ListNode;
 export type ListNodeType = FormatNode | ListNode;
@@ -16,7 +17,14 @@ export class ListNode extends BlockNode {
     constructor(items: Array<FormatNode | ListNode>, numbered: boolean) {
         super();
         this.#numbered = numbered;
-        this.#items = items.map(i => i instanceof FormatNode ? i.withTextIfEmpty() : i);
+
+        let adjustedItems = items
+            // Make sure all format nodes have an empty text.
+            .map(i => i instanceof FormatNode ? i.withTextIfEmpty() : i)
+            // Strip all empty sublists.
+            .filter(i => !i.isEmpty())
+
+        this.#items = adjustedItems;
 
     }
 
@@ -30,7 +38,9 @@ export class ListNode extends BlockNode {
     getLastItem(): FormatNode | undefined { return this.getFirstLastItem(false); }
     getFirstItem(): FormatNode | undefined { return this.getFirstLastItem(true); }
     getFormats(): FormatNode[] { 
-        return this.#items.reduce((previous: FormatNode[], current: ListNodeType) => previous.concat(current instanceof FormatNode ? [ current ] : current.getFormats()), []) as FormatNode[];
+        return this.#items.reduce(
+            (previous: FormatNode[], current: ListNodeType) => 
+                previous.concat(current instanceof FormatNode ? [ current ] : current.getFormats()), []) as FormatNode[];
     }
     getFirstLastItem(first: boolean): FormatNode | undefined {
 
@@ -163,10 +173,29 @@ export class ListNode extends BlockNode {
         const deletedItem = this.#items[index];
         let previousItem = this.#items[index - 1];
 
-        if(!(deletedItem instanceof FormatNode)) return;
-
+        // If we're merging a sublist back into this list, move its
+        // remaining format into the previous item.
+        if(deletedItem instanceof ListNode) {
+            if(previousItem instanceof ListNode) return;
+            const itemToMerge = deletedItem.getFirstItem();
+            if(itemToMerge === undefined) return;
+            const newSubList = deletedItem.withChildReplaced(itemToMerge, undefined);
+            if(newSubList === undefined) return;
+            const listWithRevisedSublist = this.withChildReplaced(deletedItem, newSubList);
+            if(listWithRevisedSublist === undefined) return;
+            const lastCaret = previousItem.getLastCaret();
+            if(lastCaret === undefined) return;
+            const textIndex = previousItem.caretToTextIndex(lastCaret);
+            if(textIndex === undefined) return;
+            const mergedItem = previousItem.withSegmentsAppended(itemToMerge);
+            const listWithMergedItem = listWithRevisedSublist.withChildReplaced(previousItem, mergedItem);
+            if(listWithMergedItem === undefined) return;
+            const newCaret = mergedItem.textIndexToCaret(textIndex);
+            if(newCaret === undefined) return;
+            return [ listWithMergedItem, newCaret ]
+        }
         // If the previous item is a list, find it's last item.
-        if(previousItem instanceof ListNode) {
+        else if(previousItem instanceof ListNode) {
             const lastItem = previousItem.getLastItem();
             if(lastItem === undefined) return;
             const lastCaret = lastItem.getLastCaret();
@@ -335,6 +364,25 @@ export class ListNode extends BlockNode {
         if(newCaret === undefined) return;
 
         return { root: newList, range: { start: newCaret, end: newCaret }}
+
+    }
+
+    withRangeFormatted(range: CaretRange, format: Format | undefined): Edit {
+
+        const sortedRange = this.sortRange(range);
+        const itemStart = this.getItemContaining(sortedRange.start);
+        const itemEnd = this.getItemContaining(sortedRange.end);
+        const edit = super.withRangeFormatted(sortedRange, format);
+
+        // If we were deleting and two list items were involved, merge them.
+        if(edit && format === undefined && itemStart !== undefined && itemEnd !== undefined && (edit.root as ListNode).getLength() > 1) {
+            const newList = edit.root as ListNode;
+            // Merge the items, accounting for the new index of the last item.
+            const mergedEdit = newList.withItemMergedBackwards(itemEnd - (this.#items.length - newList.#items.length));
+            if(mergedEdit === undefined) return;
+            return { root: mergedEdit[0], range: { start: mergedEdit[1], end: mergedEdit[1] }};
+        }
+        else return edit;
 
     }
 

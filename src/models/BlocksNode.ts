@@ -407,113 +407,73 @@ export abstract class BlocksNode extends BlockNode {
         // Sort the range if it's out of order, since the algorithm below assumes that it's ordered.
         const sortedRange = this.sortRange(adjustedRange);
 
-        // Remember the start and end text index.
+        // Remember the start and end text index so we can map it back after editing.
         const startTextIndex = this.getTextIndexOfCaret(sortedRange.start);
         const endTextIndex = this.getTextIndexOfCaret(sortedRange.end);
 
-        const blocksToEdit = this.getBlocksInRange(sortedRange);
-        if(blocksToEdit === undefined) return;
+        // Ask all of the blocks to format themselves, replacing them as we do.
+        let newBlocks: this | undefined = this;
+        let formattedBlocks: BlockNode[] = [];
+        let inRange = false;
+        for(let i = 0; i < this.#blocks.length; i++) {
+            const block = this.#blocks[i];
+            const containsStart = block.contains(sortedRange.start.node);
+            const containsEnd = block.contains(sortedRange.end.node);
+            if(containsStart || containsEnd || inRange) {
+                inRange = true;
+                // Compute a proper range based on containment.
+                const blockStart = containsStart ? sortedRange.start : block.getFirstCaret();
+                const blockEnd = containsEnd ? sortedRange.end : block.getLastCaret();
+                if(blockStart === undefined || blockEnd === undefined) return;
 
-        // Edit each of the blocks as requested, accounting for the start and stop nodes, creating a new chapter as we go.
-        let newBlocksRoot: BlocksNode | undefined = this;
-        const newBlocks: BlockNode[] = [];
-        for(let i = 0; i < blocksToEdit.length; i++ ) {
-            const block = blocksToEdit[i];
-            const parent = block.getParent(newBlocksRoot);
-            if(parent === undefined) return;
-
-            let newBlock: BlockNode | undefined = block;
-            // Edit all of the formats in this block.
-            const formats = block.getFormats();
-            // We keep track of these so that we can merge formats in lests together after item deletion.
-            const editedFormats = [];
-
-            // Loop through and edit all of the formats in the selection.
-            for(let j = 0; j < formats.length; j++) {
-                const formatToEdit = formats[j];
-
-                // If the selection doesn't contain any part of this format (other formats in the node might be included), skip it.
-                const selectedFormatRange = this.getSelectedFormatRange(formatToEdit, sortedRange);
-                if(selectedFormatRange !== undefined) {
-                    // Format the range and replace it in this chapter! Bail on fail.
-                    const editedFormat = formatToEdit.withFormat(selectedFormatRange, format);
-                    if(editedFormat === undefined) return;
-
-                    // If this format is a list item and it's empty, then remove the list item.
-                    const removeFormat = block instanceof ListNode && editedFormat.isEmptyText();
-
-                    // Create a new chapter tree with the new format, or if the new format is empty, without the paragraph altogether. Bail on fail.
-                    newBlock = newBlock.withNodeReplaced(formatToEdit, removeFormat ? undefined : editedFormat);
-                    if(newBlock === undefined) return;
-
-                    // Ignore the removed formats, we just want to merge the ones that remain.
-                    if(!removeFormat)
-                        editedFormats.push(editedFormat);
+                // If we're just going to delete it, then don't bother formatting it.
+                if(!containsStart && !containsEnd && format === undefined) {
+                    newBlocks = newBlocks.withChildReplaced(block, undefined);
+                    if(newBlocks === undefined) return;
+                }
+                // Otherwise, format it.
+                else {
+                    const edit = block.withRangeFormatted({ start: blockStart, end: blockEnd }, format);
+                    // If we failed to format it, remove it.
+                    if(edit === undefined) return;
+                    // If we succeeded in formatting it, replace it, otherwise skip it.
+                    else {
+                        const newBlock = edit.root as BlockNode;
+                        // Remember non-empty revised blocks so we can merge things after.
+                        if(!newBlock.isEmpty())
+                            formattedBlocks.push(newBlock);
+                        // Replace the block, or delete it if it's empty.
+                        newBlocks = newBlocks.withChildReplaced(block, newBlock.isEmpty() ? undefined: newBlock);
+                        if(newBlocks === undefined) return;
+                    }
                 }
             }
+            if(block.contains(sortedRange.end.node))
+                inRange = false;
+        }
 
-            // If we're deleting and this is a list, merge edited list nodes
-            if(format === undefined && newBlock instanceof ListNode && editedFormats.length >= 2) {
-                const index = newBlock.getItems().indexOf(editedFormats[editedFormats.length - 1]);
-                if(index < 0) return;
-                const edit = newBlock.withItemMergedBackwards(index);
-                if(edit === undefined) return;
-                const [ newList, newCaret ] = edit;
-                newBlock = newList;
+        // If we're deleting and there are two non-empty paragraphs left, merge them.
+        if(format === undefined && formattedBlocks.length >= 2) {
+            const first = formattedBlocks[0];
+            const last = formattedBlocks[formattedBlocks.length - 1];
+            if(first instanceof ParagraphNode && last instanceof ParagraphNode) {
+                // Replace the first paragraph with the second merged.
+                newBlocks = newBlocks.withNodeReplaced(first, first.withContent(first.getFormat().withSegmentsAppended(last.getFormat())));
+                if(newBlocks === undefined) return;
+                // Remove the last paragraph.
+                newBlocks = newBlocks.withNodeReplaced(last, undefined);
+                if(newBlocks === undefined) return;
             }
-            
-            // If we're deleting, and this block is now fully empty, remove it from this blocks node.
-            if(format === undefined && newBlock.isEmpty())
-                newBlock = undefined;
-
-            // Remember the new block we made.
-            if(newBlock !== undefined)
-                newBlocks.push(newBlock);
-
-            // Replace the old block with the new block in the tree (or nothing). Bail on fail.
-            const updatedRoot = newBlocksRoot.withNodeReplaced(block, newBlock);
-            if(updatedRoot === undefined) return;
-            newBlocksRoot = updatedRoot;
-            if(newBlocksRoot === undefined) return;
-
         }
 
-        // If deleting...
-        if(format === undefined) {
-            // If there are two distinct non-empty paragraphs we edited, merge them.
-            if(newBlocks.length >= 2 && newBlocks) {
-                const first = newBlocks[0];
-                const last = newBlocks[newBlocks.length - 1];
-                if(first instanceof ParagraphNode && last instanceof ParagraphNode) {
-                    // Replace the first paragraph with the second merged.
-                    newBlocksRoot = newBlocksRoot.withNodeReplaced(first, first.withContent(first.getFormat().withSegmentsAppended(last.getFormat())));
-                    if(newBlocksRoot === undefined) return;
-                    // Remove the last paragraph.
-                    newBlocksRoot = newBlocksRoot.withNodeReplaced(last, undefined);
-                    if(newBlocksRoot === undefined) return;
-                }
-            }
-
-        }
-
-        // If we ended up with nothing, then create an empty paragraph.
-        if(newBlocksRoot.#blocks.length === 0) {
-            const newParagraph = new ParagraphNode();
-            newBlocksRoot = newBlocksRoot.withBlockAppended(newParagraph);
-            const newCaret = newParagraph.getFirstCaret();
-            if(newCaret === undefined) return;
-            return { root: newBlocksRoot, range: { start: newCaret, end: newCaret }}
-        }
-        
-        // Map the text indicies back to carets.
-        const startCaret = newBlocksRoot.getTextIndexAsCaret(startTextIndex);
+        const startCaret = newBlocks.getTextIndexAsCaret(startTextIndex);
         // If we deleted, then the end caret should be the same as the start.
-        const endCaret = format === undefined ? startCaret : newBlocksRoot.getTextIndexAsCaret(endTextIndex);
+        const endCaret = format === undefined ? startCaret : newBlocks.getTextIndexAsCaret(endTextIndex);
 
         if(startCaret === undefined || endCaret === undefined) return;
 
         // Return the new root and the start and end of the range.
-        return { root: newBlocksRoot, range: { start: startCaret, end: endCaret } };
+        return { root: newBlocks, range: { start: startCaret, end: endCaret } };
 
     }
 

@@ -98,9 +98,8 @@ export class ParagraphNode extends BlockNode {
     copy() { return new ParagraphNode(this.#level, this.#format.copy()) as this; }
 
     withChildReplaced(node: Node, replacement: Node | undefined) {
-        return node instanceof FormatNode && node === this.#format && replacement instanceof FormatNode ? 
-            new ParagraphNode(this.#level, replacement) as this : 
-            undefined;
+        return node === this.#format && (replacement instanceof FormatNode || replacement === undefined) ?
+            new ParagraphNode(this.#level, replacement) as this : undefined;
     }
 
     withContentInRange(range: CaretRange): this | undefined {
