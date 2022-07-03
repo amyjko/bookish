@@ -282,7 +282,7 @@ const Chapter = (props: { chapter: ChapterModel, book: Book, print?: boolean }) 
 						<Authors 
 							authors={ chapter.getAuthors() }
 							inheritedAuthors={ book.getAuthors() }
-							add={ () => chapter.addAuthor("Author") }
+							add={ () => chapter.addAuthor("") }
 							edit={(index, text) => text.length === 0 ? chapter.removeAuthor(index) : chapter.setAuthor(index, text) }
 						/>
 					}

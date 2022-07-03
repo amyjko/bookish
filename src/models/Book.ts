@@ -537,7 +537,8 @@ export default class Book {
         return this.requestSave();
     }
 
-	getAuthors() { return this.authors; }
+    // Don't let callers get their sneaky hands on this mutable array...
+	getAuthors() { return [...this.authors ]; }
     addAuthor(name: string) {
         this.authors.push(name)
         return this.requestSave();
@@ -554,7 +555,7 @@ export default class Book {
         return this.requestSave();
     }
 
-	getRevisions() { return this.revisions; }
+	getRevisions() { return [...this.revisions]; }
 
     hasImage(id: string) { return id in this.images && this.images[id] !== null; }
     getImage(id: string) { return this.images[id] ?? undefined; }

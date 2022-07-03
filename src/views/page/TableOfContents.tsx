@@ -170,7 +170,7 @@ const TableOfContents = (props: { book: Book }) => {
 			tags={book.getTags()}
 			after={<Authors 
 				authors={book.getAuthors()} 
-				add={ () => book.addAuthor("Author")}
+				add={ () => book.addAuthor("")}
 				edit={(index, text) => text.length === 0 ? book.removeAuthor(index) : book.setAuthor(index, text)} 
 			/>}
 			outline={

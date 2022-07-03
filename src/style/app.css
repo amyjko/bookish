@@ -132,7 +132,7 @@ button:disabled {
     position: absolute;
     left: 0;
     width: 100%;
-    min-width: 1em;
+    min-width: 0.5em;
 }
 
 /* Match the parent's styling as much as possible. */
