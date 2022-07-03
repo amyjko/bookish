@@ -1,191 +1,103 @@
-import React, { KeyboardEvent, useEffect, useRef, useState } from "react"
+import React, { ChangeEvent, KeyboardEvent, useEffect, useRef, useState } from "react"
 
 enum Status {
     Viewing,
-    Editing,
-    Saving,
-    Saved
+    Editing
 }
 
 const TextEditor = (props: {
     text: string, 
     label: string,
-    multiline?: boolean,
-    validationError?: (text: string) => string | undefined,
-    save: (text: string) => Promise<void> | undefined,
-    children: React.ReactNode | React.ReactNode[]
+    placeholder: string,
+    valid: (text: string) => string | undefined,
+    save: (text: string) => Promise<void> | undefined
  }) => {
 
-    const [ status, setStatus ] = useState<Status>(Status.Viewing)
+    const [ status, setStatus ] = useState(Status.Viewing)
     const [ text, setText ] = useState(props.text)
     const [ error, setError ] = useState<undefined | string>(undefined)
-    const inputEditor = useRef<HTMLInputElement>(null)
-    const textareaEditor = useRef<HTMLTextAreaElement>(null)
-    const isMounted = useRef(false)
+    const textField = useRef<HTMLInputElement>(null)
+    const sizer = useRef<HTMLSpanElement>(null);
 
-    // Track whether the component is mounted so that we don't set state after unmounting
-    // We need to do this because the save function might navigate away from this view.
-    // (e.g., when changing the ID of a chapter, we navigate away to the new chapter ID).
     useEffect(() => {
-      isMounted.current = true;
-      return () => { isMounted.current = false }
-    }, []);
+      grow();
+    }, [text, status]);
 
-    function measure() {
-        if(textareaEditor?.current) {
-            textareaEditor.current.style.height = "auto";
-            textareaEditor.current.style.height = (textareaEditor.current.scrollHeight) + "px";
-        }
+    useEffect(() => {
+        validate();
+        props.save.call(undefined, text);
+    }, [text])
+
+    useEffect(() => {
+        if(status === Status.Editing)
+            textField?.current?.focus();
+        else
+            textField?.current?.blur();
+    }, [status])
+
+    function showPlaceholder() {
+        return text === "" && status == Status.Viewing;
+    }
+
+    function grow() {
+        if(sizer.current)
+            // Set the invisible sizer to the text to set the container's width.
+            // The browser strips trailing spaces, causing jitter after a space, so we replace
+            // them with non-breaking spaces.
+            sizer.current.innerHTML = showPlaceholder() ? props.placeholder : text.replace(/\s/g, "\u00a0");
     }
 
     function startEditing() {
         setStatus(Status.Editing);
-        setText(props.text);
-        if(props.validationError)
-            setError(props.validationError.call(undefined, props.text))
     }
 
-    function getEditor() {
-
-        return inputEditor?.current ? inputEditor.current :
-            textareaEditor?.current ? textareaEditor.current :
-            null
-
+    function stopEditing() {
+        setStatus(Status.Viewing);
     }
 
     function edit() {
-
-        const editor = getEditor()
-
-        measure()
-
-        if(editor) {
-            setText(editor.value)
-            if(props.validationError)
-                setError(props.validationError.call(undefined, editor.value))
+        if(textField?.current) {
+            setText(textField?.current.value)
         }
     }
 
-    function cancel() {
-
-        // Return to viewing
-        setStatus(Status.Viewing);
-        setError(undefined);
-        
+    function validate() {
+        setError(props.valid?.call(undefined, text));
     }
 
-    function save() {
-
-        // If the text hasn't changed, just flip back to viewing.
-        if(text === props.text) {
-            cancel()
-        }
-        // If there's no validation error and the text changed, save
-        else if(!props.validationError || props.validationError.call(undefined, text) === undefined) {
-
-            const editor = getEditor()
-
-            const promise = props.save.call(undefined, text);
-
-            if(promise === undefined) {
-                setStatus(Status.Editing);
-                setError("Unable to save.")
-                return;
-            }
-
-            // Disable the input temporarily
-            if(editor)
-                editor.disabled = true
-
-            // Remove any error feedback and set to saving
-            setError(undefined)
-            setStatus(Status.Saving)
-
-            // Attempt to save
-            promise
-                .then(() => {
-                    if(isMounted.current) {
-                        // Success! Lose focus...
-                        editor?.blur();
-                        // Changed to saved status...
-                        setStatus(Status.Saved);
-                    }
-                })
-                .catch((message: Error) => {
-                    if(isMounted.current) {
-                        // Restore editing and show the error.
-                        if(editor)
-                            editor.disabled = false
-                        editor?.focus()
-                        setStatus(Status.Editing);
-                        setError(message.message)
-                    }
-                })
+    function handleKeyPress(event: KeyboardEvent) {
+        grow();
+        if(event.key === "Enter") {
+            setStatus(Status.Viewing);
+            event.preventDefault();
         }
     }
 
-    // Save when enter is pressed.
-    function handleKeystroke(event: KeyboardEvent) {
-
-        if(event.key === "Enter" && (!props.multiline || event.shiftKey)) {
-            save()
-            event.preventDefault()
-        }
-        else if(event.key === "Escape")
-            cancel()
-
-    }
-
-    // If editing changes to true, focus the input.
-    useEffect(() => {
-        measure()
-        if(status === Status.Editing)
-            getEditor()?.focus()
-    }, [status])
-
-    const statusClass = "bookish-app-editable-" + ["viewing", "editing", "saving", "saved"][status];
-
-    return status === Status.Viewing || status === Status.Saved ?
-        // If viewed or just saved, render the children passed in
-        <>
-            <span className={"bookish-app-editable " + statusClass} onClick={startEditing}>{ props.children }</span>
-        </>
-        :
-        // If it's multiline, render a text area
-        props.multiline ?
-        <textarea
-            className={"bookish-app-editable " + statusClass}
+    return <span className="bookish-text-editor">
+        <span className="bookish-text-editor-sizer" aria-hidden={true} ref={sizer}></span>
+        <input
+            className={`${text === "" ? "bookish-text-editor-placeholder" :""}`}
+            type="text" 
             required
-            aria-invalid={error ? true: false}
+            role="textbox"
+            aria-invalid={error !== undefined}
             aria-label={props.label}
-            ref={textareaEditor}
-            value={text}
+            ref={textField}
+            value={showPlaceholder() ? props.placeholder : text}
             onChange={edit}
-            onBlur={save}
-            onKeyDown={handleKeystroke}
+            onKeyPress={handleKeyPress}
+            onBlur={stopEditing}
+            onFocus={startEditing}
         />
-        :
-        // Otherwise, render a single line text input
-        <> 
-            <input
-                className={"bookish-app-editable " + statusClass + (error ? " bookish-app-editable-error" : "")}
-                type="text" 
-                required
-                aria-invalid={error ? true: false}
-                aria-label={props.label}
-                aria-errormessage="bookish-app-title-error"
-                ref={inputEditor}
-                value={text}
-                onChange={edit}
-                onKeyDown={handleKeystroke}
-                onBlur={save}
-            />
-            {error ? 
-                <span 
-                    id="bookish-app-title-error" 
+        {
+            error ? 
+                <div
                     aria-live="polite"
-                    className="bookish-app-editable-message bookish-app-editable-message-error">{error}</span> : null }
-        </>
+                    className="bookish-text-editor-error">{error}
+                </div> : 
+            null 
+        }
+    </span>
 
 }
 

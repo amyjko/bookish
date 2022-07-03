@@ -34,8 +34,8 @@ const Toggle = (props: {
     return <div 
         className={
             "bookish-app-interactive" + 
-                (saving === Status.Saving ? " bookish-app-editable-saving" : "") +
-                (saving === Status.Error ? " bookish-app-editable-error" : "")} onClick={toggle}>
+                (saving === Status.Saving ? " bookish-text-editor-saving" : "") +
+                (saving === Status.Error ? " bookish-text-editor-error" : "")} onClick={toggle}>
         {props.children}
     </div>
 

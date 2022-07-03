@@ -22,30 +22,38 @@ const Definition = (props: { id: string, definition: Definition }) => {
 	const phraseRender = <strong>{definition.phrase || <em>Phrase</em>}</strong>;
 	const phrase =
 		editable && book ?
-			<TextEditor
-				text={definition.phrase} 
-				label={'Glossary phrase editor.'} 
-				save={text => book.editDefinition(id, { 
-					phrase: text, 
-					definition: definition.definition, 
-					synonyms: definition.synonyms
-				})}
-			>
-				{phraseRender}
-			</TextEditor>
+			<strong>
+				<TextEditor
+					text={definition.phrase} 
+					label={'Glossary phrase editor.'} 
+					placeholder="Phrase"
+					valid={ text => {
+						if(text.length === 0) return "Phrase can't be empty";
+					}}
+					save={text => book.editDefinition(id, { 
+						phrase: text, 
+						definition: definition.definition, 
+						synonyms: definition.synonyms
+					})}
+				/>
+			</strong>
 			:
-			{ phraseRender}
+			<strong>{definition.phrase || <em>Phrase</em>}</strong>;
 
-	const idRender = <span className="bookish-editor-note">{id}</span>;
 	const idEditor =
 		editable && book ?
-			<TextEditor
-				text={id} 
-				label={'Definition ID editor.'} 
-				save={text => book.editDefinitionID(id, text)}
-			>
-				{idRender}
-			</TextEditor>
+			<span className="bookish-editor-note">
+				<TextEditor
+					text={id} 
+					label={'Definition ID editor.'} 
+					placeholder="ID"
+					valid={ text => {
+						if(text.length === 0) return "ID can't be empty";
+						if(text in book.getGlossary()) return "Another phrase has this ID.";
+					}}
+					save={text => book.editDefinitionID(id, text)}
+				/>
+			</span>
 			:
 			null
 
@@ -93,25 +101,27 @@ const Definition = (props: { id: string, definition: Definition }) => {
 					<em>No synonyms</em> :
 					syns.map((syn, index) => 			
 						[
-							<TextEditor
-								key={`syn-${index}`}
-								text={syn} 
-								label={'Synonym editor.'} 
-								save={text => {
-									const newSyns = [ ...syns ];
-									if(text.length === 0)
-										newSyns.splice(index, 1);
-									else
-										newSyns[index] = text;
-									return book?.editDefinition(id, { 
-										phrase: definition.phrase, 
-										definition: definition.definition, 
-										synonyms: newSyns
-									})
-								}}
-							>
-								<span className="bookish-editor-note">{syn}</span>
-							</TextEditor>,
+							<span className="bookish-editor-note">
+								<TextEditor
+									key={`syn-${index}`}
+									text={syn} 
+									label={'Synonym editor.'}
+									placeholder="Synonym"
+									valid={ text => { if(text.length === 0) return "Can't be empty." }}
+									save={text => {
+										const newSyns = [ ...syns ];
+										if(text.length === 0)
+											newSyns.splice(index, 1);
+										else
+											newSyns[index] = text;
+										return book?.editDefinition(id, { 
+											phrase: definition.phrase, 
+											definition: definition.definition, 
+											synonyms: newSyns
+										})
+									}}
+								/>
+							</span>,
 							syns.length > 1 && index < syns.length - 1 ? ", " : ""
 						]
 					)

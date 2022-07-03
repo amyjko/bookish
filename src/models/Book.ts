@@ -474,7 +474,7 @@ export default class Book {
 
     hasReferences() { return this.references && Object.keys(this.references).length > 0; }
 	getReferences() { return this.references; }
-    getReference(citationID: string) { return this.references[citationID]; }
+    getReference(citationID: string) { return citationID in this.references ? this.references[citationID] : undefined; }
     addReferences(references: ReferenceNode[]) {
         // Generate a unique ID for the reference.
         references.forEach(ref => this.references[ref.citationID] = ref.toList());

@@ -19,12 +19,32 @@
 
     --bookish-app-error-background: rgb(255, 231, 231);
     --bookish-app-error-color: rgb(191, 15, 15);
+    --bookish-app-error-font-weight: 400;
 
     --bookish-app-chrome-padding: 0.5em;
-    --bookish-app-chrome-roundedness: 5px;
+    --bookish-app-chrome-roundedness: 3px;
     --bookish-app-chrome-font-size: 11pt;
     --bookish-app-chrome-spacing: 0.5em;
 
+}
+
+@keyframes waiting {
+    from, to { transform: scale(1, 1); }
+    25% { transform: scale(1, 1.2); }
+    50% { transform: scale(1, 1.0); }
+    75% { transform: scale(1, 1.1); }
+}
+
+@keyframes failure {
+    0% {
+		transform: translate(-2px, 0px);
+	}
+	50% {
+		transform: translate(0px, 0px);
+	}
+	100% {
+		transform: translate(2px, 0px);
+	}
 }
 
 .bookish-app {
@@ -72,7 +92,6 @@ input, button {
 
 input[type="email"], input[type="text"], select {
     padding: var(--bookish-app-chrome-padding);
-    border-radius: var(--bookish-app-chrome-roundedness);
     font-size: var(--bookish-app-chrome-font-size);
     border: 1px solid var(--bookish-app-chrome-border-color);
     background-color: var(--bookish-app-chrome-background);
@@ -104,34 +123,21 @@ button:disabled {
     vertical-align: middle;
 }
 
-.bookish-app-editable {
+.bookish-text-editor {
     position: relative;
 }
 
-.bookish-app-editable.bookish-app-editable-viewing:hover:before {
-    color: var(--bookish-paragraph-color);
-}
-
-.bookish-app-editable:before {
-    font-family: var(----bookish-app-chrome-font-family);
-    font-size: var(--bookish-small-font-size);
-    color: var(--bookish-muted-color);
+.bookish-text-editor input[type="text"] {
+    cursor: pointer;
     position: absolute;
-    left: -2em;
-}
-
-/* Pencil! */
-.bookish-app-editable-viewing:before {
-    content: "\270E";
-}
-
-/* Check mark */
-.bookish-app-editable-saved:before {
-    content: "\2713";
+    left: 0;
+    width: 100%;
+    min-width: 1em;
 }
 
 /* Match the parent's styling as much as possible. */
-input[type="text"].bookish-app-editable, textarea.bookish-app-editable {
+.bookish-text-editor input[type="text"], .bookish-text-editor-sizer {
+    background-color: var(--bookish-background-color);
     font-family: inherit;
     font-size: inherit;
     font-weight: inherit;
@@ -143,66 +149,54 @@ input[type="text"].bookish-app-editable, textarea.bookish-app-editable {
     padding: 0;
     margin: 0;
     display: inline;
-    width: auto;
+    cursor: text;
 }
 
-textarea:focus, input:focus, button:focus, select:focus {
+/* This ensures the error message always appears below empty text editors */
+.bookish-text-editor-sizer {
+    min-height: 1em;
+}
+
+.bookish-text-editor-sizer:empty:before {
+    content: "\200b";
+  }
+
+/* Override the inherited color of the text is a placeholder */
+input[type="text"].bookish-text-editor-placeholder {
+    color: var(--bookish-app-chrome-muted);
+}
+
+.bookish-text-editor input:focus, button:focus, select:focus {
     outline: 2px solid var(--bookish-highlight-color);
-    position: relative;
     z-index: 2;
 }
 
-textarea.bookish-app-editable {
-    width: 100%;
-    resize: none;
+input[type="text"].bookish-text-editor-error {
+    outline-color: var(--bookish-app-error-color);
 }
 
-.bookish-app-editable-saving {
-    animation-name: waiting;
-    animation-duration: 0.5s;
-    animation-iteration-count: infinite;
-}
-
-@keyframes waiting {
-    from, to { transform: scale(1, 1); }
-    25% { transform: scale(1, 1.2); }
-    50% { transform: scale(1, 1.0); }
-    75% { transform: scale(1, 1.1); }
-}
-
-.bookish-app-editable-error {
-    animation: failure 100ms 10;
-}
-
-@keyframes failure {
-    0% {
-		transform: translate(-2px, 0px);
-	}
-	50% {
-		transform: translate(0px, 0px);
-	}
-	100% {
-		transform: translate(2px, 0px);
-	}
-}
-
-button.bookish-app-editable-confirm {
-    animation: failure 100ms infinite;
-}
-
-input[type="text"].bookish-app-editable-error {
-    background-color: var(--bookish-app-error-background);
-}
-
-.bookish-app-editable-message {
+.bookish-text-editor .bookish-text-editor-error {
+    position: absolute;
+    left: 0;
+    top: 100%;
+    width: max-content;
+    z-index: 3;
+    font-family: var(--bookish-app-chrome-font-family);
     font-size: var(--bookish-small-font-size);
-    float: right;
+    font-weight: normal;
+    font-style: normal;
+    color: var(--bookish-app-error-color);
+    background: var(--bookish-background-color);
     line-height: 1em;
-    margin-top: 1em;
+    animation: failure 100ms 10;
+    margin-top: -0.5em;
+    margin-left: -0.5em;
+    padding: 0.5em 0.5em;
+    backdrop-filter: blur(5px) opacity(50%);
 }
 
-.bookish-app-editable-message-error {
-    color: var(--bookish-app-error-color);
+button.bookish-editor-confirm {
+    animation: failure 100ms infinite;
 }
 
 .bookish-app-interactive {
@@ -212,6 +206,7 @@ input[type="text"].bookish-app-editable-error {
 .bookish-editor:focus {
     outline: 2px solid var(--bookish-highlight-color);
     outline-offset: var(--bookish-app-chrome-padding);
+    border-radius: var(--bookish-app-chrome-roundedness);
 }
 
 .bookish-editor.bookish-editor-atom-focused:focus {

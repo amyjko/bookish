@@ -251,14 +251,13 @@ const Chapter = (props: { chapter: ChapterModel, book: Book, print?: boolean }) 
 										text={props.chapter.getChapterID()} 
 										label="Chapter URL ID editor"
 										save={ id => props.chapter.setChapterID(id)?.then(() => navigate(`/write/${props.book.getRef()}/${id}`)) }
-										validationError={(newChapterID) => 
+										placeholder="chapter ID"
+										valid={(newChapterID) => 
 											!/^[a-zA-Z0-9]+$/.test(newChapterID) ? "Chapter IDs must be one or more letters or numbers" :
 											props.chapter.getChapterID() !== newChapterID && props.book.hasChapter(newChapterID) ? "There's already a chapter that has this ID." :
 											undefined
 										}
-									>
-										{props.chapter.getChapterID()}
-									</TextEditor>
+									/>
 									<br/>
 								</span>
 								:

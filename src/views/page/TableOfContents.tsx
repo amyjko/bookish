@@ -230,11 +230,10 @@ const TableOfContents = (props: { book: Book }) => {
 											<TextEditor
 												label={"Chapter section editor"}
 												text={section ? section : ""}
-												validationError={() => undefined }
+												placeholder="Section"
+												valid={ text => undefined }
 												save={text => chapter.setSection(text) }
-											>
-												{section ? section : "No section"}
-											</TextEditor>
+											/>
 											:
 											chapter.getSection()
 									}

@@ -34,7 +34,7 @@ const ConfirmButton = (props: { commandLabel: string, confirmLabel: string, comm
     return <button 
         disabled={executing} 
         onClick={execute} 
-        className={confirming ? "bookish-app-editable-confirm" : ""}>
+        className={confirming ? "bookish-editor-confirm" : ""}>
             { confirming ? props.confirmLabel : props.commandLabel }
     </button>
 

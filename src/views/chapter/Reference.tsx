@@ -27,77 +27,91 @@ const Reference = (props: { node: ReferenceNode }) => {
 
         const id =
             editable && book ?
-                <TextEditor
-                    text={node.citationID} 
-                    label={'Citation ID editor.'} 
-                    save={text => book.editReferenceID(text, node)}
-                >
-                    <span className="bookish-editor-note">{node.citationID}</span>
-                </TextEditor>
+                <span className="bookish-editor-note">
+                    <TextEditor
+                        text={node.citationID} 
+                        label={'Citation ID editor.'} 
+                        placeholder="ID"
+                        valid={ text => {
+                            if(text.length === 0) return "At least one character please.";
+                            if(book.getReference(text) !== undefined) return "Must be unique; another reference has this id.";
+                        }}
+                        save={text => book.editReferenceID(text, node)}
+                    />
+                </span>
                 :
                 null // Don't show the ID when not editing
 
-        const authorsRender = node.authors || <em>Authors</em>;
         const authors =
             editable && book ?
-                <TextEditor
-                    text={node.authors} 
-                    label={'Author list editor.'} 
-                    save={text => book.editReference(node.withAuthors(text))}
-                >
-                    { authorsRender }
-                </TextEditor>
+                <em>
+                    <TextEditor
+                        text={node.authors} 
+                        label={'Author list editor.'}
+                        placeholder="Authors"
+                        valid={ text => {
+                            if(text.length === 0) return "Authors can't be empty.";
+                        }}
+                        save={text => book.editReference(node.withAuthors(text))}
+                    />
+                </em>
                 :
-                authorsRender
+                node.authors || <em>Authors</em>;
 
-        const yearRender = node.year || <em>Year</em>;
         const year =
             editable && book ?
                 <TextEditor
                     text={node.year} 
                     label={'Year editor.'} 
+                    placeholder="Year"
+                    valid={ text => {
+                        if(text.length === 0) return "Year can't be empty";
+                        if(!/1?[0-9)[0-9]{2}/.test(text)) return "Not a valid year"
+                    }}
                     save={text => book.editReference(node.withYear(text))}
-                >
-                    {yearRender}
-                </TextEditor>
+                />
                 :
-                yearRender
+                node.year || <em>Year</em>
 
-        const titleRender = node.url === null ? node.title || <em>Title</em> : <a href={node.url} target={"_blank"}>{node.title || <em>Title</em>}</a>;
         const title =
             editable && book ?
                 <TextEditor
                     text={node.title} 
                     label={'Title editor.'} 
+                    placeholder="Title"
+                    valid={ text => {
+                        if(text.length === 0) return "Title can't be empty.";
+                    }}
                     save={text => book.editReference(node.withTitle(text))}
-                >
-                    {titleRender}
-                </TextEditor>
+                />
                 :
-                titleRender
+                node.url === null ? node.title || <em>Title</em> : <a href={node.url} target={"_blank"}>{node.title || <em>Title</em>}</a>
         
-        const sourceRender = <em>{node.source || "Source"}</em>
         const source =
             editable && book ?
-                <TextEditor
-                    text={node.source} 
-                    label={'Source editor.'} 
-                    save={text => book.editReference(node.withSource(text))}
-                >
-                    {sourceRender}
-                </TextEditor>
+                <em>
+                    <TextEditor
+                        text={node.source}
+                        label={'Source editor.'} 
+                        placeholder="Source"
+                        valid={ text => {
+                            if(text.length === 0) return "Source can't be empty";
+                        }}
+                        save={text => book.editReference(node.withSource(text))}
+                    />
+                </em>
                 :
-                sourceRender
+                <em>{node.source || "Source"}</em>
 
         const summary =
             editable && book ?
                 <TextEditor
                     text={node.summary} 
                     label={'Summary editor.'} 
+                    placeholder="Summary"
+                    valid={ text => undefined }
                     save={text => book.editReference(node.withSummary(text))}
-                >
-                    {node.summary}
-                </TextEditor>
+                />
                 :
                 node.summary ? <span className="bookish-reference-summary">{node.summary}</span> : null
     

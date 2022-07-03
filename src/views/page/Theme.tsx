@@ -29,6 +29,15 @@ const Preview = (props: { theme: Theme }) => {
 	</div>
 }
 
+const placeholders = {
+	light: "CSS color",
+	dark: "CSS color",
+	fonts: "CSS font name",
+	sizes: "CSS font size",
+	weights: "CSS font weights",
+	spacing: "CSS length"
+};
+
 const VariableEditor = ( props: { group: string, name: string, value: string }) => {
 
 	const { group, name, value } = props;
@@ -40,10 +49,11 @@ const VariableEditor = ( props: { group: string, name: string, value: string }) 
 		<td style={{ textAlign: "right"}}>
 			<TextEditor 
 				text={value} 
-				label={`${name} editor`} 
-				save={text => book.setThemeValue(group, name, text)}>
-				{ value }
-			</TextEditor>
+				label={`${name} editor`}
+				placeholder={group in placeholders ? (placeholders as Record<string,string>)[group] : "value"}
+				valid={ text => undefined }
+				save={text => book.setThemeValue(group, name, text)}
+			/>
 		</td>
 	</tr>
 

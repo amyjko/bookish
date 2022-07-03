@@ -99,11 +99,10 @@ const Header = (props: HeaderProps) => {
 						<TextEditor 
 							label={props.label}
 							text={props.header + (props.subtitle ? ": " + props.subtitle : "")}
-							validationError={text => text.length === 0 ? "Titles have to be at least one character long." : undefined }
+							placeholder="Title"
+							valid={text => text.length === 0 ? "Titles have to be at least one character long." : undefined }
 							save={props.save}
-						>
-							{titleView}
-						</TextEditor>
+						/>
 						: 
 						titleView
 				}
