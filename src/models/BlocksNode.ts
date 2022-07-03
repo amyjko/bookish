@@ -1,7 +1,7 @@
 import { Node } from "./Node";
 import { BlockNode } from "./BlockNode";
 import { ListNode } from "./ListNode";
-import { Caret, CaretRange } from "./Caret";
+import { Caret, CaretRange, TextRange } from "./Caret";
 import { ParagraphNode } from "./ParagraphNode";
 import { Format, FormatNode, FormatNodeSegmentType } from "./FormatNode";
 import { TextNode } from "./TextNode";
@@ -179,6 +179,18 @@ export abstract class BlocksNode extends BlockNode {
 
     }
 
+    // Convert text index to node by iterating through text nodes and finding the corresponding node.
+    getTextRangeAsCaretRange(range: TextRange): CaretRange | undefined {
+        const start = this.getTextIndexAsCaret(range.start);
+        const end = this.getTextIndexAsCaret(range.end);
+        if(start === undefined || end === undefined) return;
+        return { start: start, end: end }; 
+    }
+
+    getCaretRangeAsTextRange(range: CaretRange): TextRange {
+        return { start: this.getCaretAsTextIndex(range.start), end: this.getCaretAsTextIndex(range.end) };
+    }
+    
     getAdjacentCaret(caret: Caret, next: boolean): Caret | undefined {
     
         if(!this.contains(caret.node)) return;
