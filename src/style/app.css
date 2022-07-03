@@ -193,17 +193,20 @@ input[type="text"].bookish-text-editor-error {
     top: 0.15rem;
     width: max-content;
     z-index: 3;
+    line-height: 1em;
+    margin-top: -0.5em;
+    padding: 0.5em 0.5em;
+    backdrop-filter: blur(5px) opacity(50%);
+}
+
+.bookish-editor-error, .bookish-text-editor-error {
     font-family: var(--bookish-app-chrome-font-family);
     font-size: var(--bookish-small-font-size);
     font-weight: normal;
     font-style: normal;
     color: var(--bookish-app-error-color);
     background: var(--bookish-background-color);
-    line-height: 1em;
     animation: failure 100ms 10;
-    margin-top: -0.5em;
-    padding: 0.5em 0.5em;
-    backdrop-filter: blur(5px) opacity(50%);
 }
 
 .bookish-text-editor .bookish-text-editor-error.bookish-text-editor-error-focused {

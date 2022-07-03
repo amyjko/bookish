@@ -29,6 +29,9 @@ const DefinitionEditor = (props: {
     // Sort the glossary entries by phrase
     const entries = Object.keys(glossary).map(key => { return { glossaryID: key, phrase: glossary[key].phrase }; }).sort((a, b) => a.phrase.localeCompare(b.phrase));
     
+    const refID = book.getRef()?.id;
+    const glossaryLink = `/write/${refID}/glossary`;
+
     return <span>
         <select 
             ref={selectRef} 
@@ -42,7 +45,7 @@ const DefinitionEditor = (props: {
         {
             definition.getMeta() in glossary ?
                 null :
-                <span className="bookish-editor-note bookish-editor-note-error">Choose a glossary entry to link to this phrase.</span>
+                <span className="bookish-editor-error">Choose a <a href={glossaryLink}>glossary</a> entry.</span>
         }
     </span>;
 

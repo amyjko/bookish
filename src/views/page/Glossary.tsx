@@ -19,7 +19,6 @@ const Definition = (props: { id: string, definition: Definition }) => {
 	const { id, definition } = props;
 	const { editable, book } = useContext(EditorContext);
 
-	const phraseRender = <strong>{definition.phrase || <em>Phrase</em>}</strong>;
 	const phrase =
 		editable && book ?
 			<strong>
