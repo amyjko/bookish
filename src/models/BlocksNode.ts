@@ -613,6 +613,7 @@ export abstract class BlocksNode extends BlockNode {
             else if(parent instanceof ListNode) {
                 const index = parent.getItemContaining(caret);
                 if(index === undefined) break;
+                // Merge the item backwards.
                 if(parent.getLength() > 1) {
                     const edit = parent.withItemMergedBackwards(index);
                     if(edit === undefined) return;
@@ -621,22 +622,15 @@ export abstract class BlocksNode extends BlockNode {
                     if(newBlocks === undefined) return;
                     return { root: newBlocks, range: { start: newCaret, end: newCaret } }
                 }
-                // Delete the list!
-                else {
-                    if(parent instanceof ListNode) {
-                        const newFormat = new FormatNode("", [ new TextNode()]);
-                        const newBlocks = this.withNodeReplaced(parent, newFormat);
-                        const newCaret = newFormat.getFirstCaret();
-                        if(newBlocks === undefined || newCaret === undefined) return;
-                        return { root: newBlocks, range: { start: newCaret, end: newCaret } }
-                    }
-                    else {
-                        const newParagraph = new ParagraphNode();
-                        const newBlocks = this.withNodeReplaced(parent, newParagraph);
-                        const newCaret = newParagraph.getFirstCaret();
-                        if(newBlocks === undefined || newCaret === undefined) return;
-                        return { root: newBlocks, range: { start: newCaret, end: newCaret } }
-                    }
+                // Convert the remaining list item into a paragraph.
+                else if(parents.length > 0 && parents[parents.length - 1] instanceof BlocksNode) {
+                    const item = parent.getItem(0);
+                    if(!(item instanceof FormatNode)) return;
+                    const newParagraph = new ParagraphNode(0, item);
+                    const newBlocks = this.withNodeReplaced(parent, newParagraph);
+                    const newCaret = newParagraph.getFirstCaret();
+                    if(newBlocks === undefined || newCaret === undefined) return;
+                    return { root: newBlocks, range: { start: newCaret, end: newCaret } }
                 }
             }
             // If it's at the beginning of the paragraph, and there's a previous paragraph, merge with the previous paragraph.
