@@ -767,7 +767,7 @@ const BookishEditor = <RootType extends RootNode>(props: {
                 {
                     // Draw a caret. We draw our own since this view isn't contentEditable and we can't show a caret.
                     // Customize the rendering based on the formatting applied to the text node.
-                    caretCoordinate && caretRange && !isAtom && !isSelection ? 
+                    caretCoordinate && caretRange && !isAtom && !isSelection && focused ? 
                         <div 
                             className={`bookish-editor-caret ${isLink ? "bookish-editor-caret-linked" : isItalic ? "bookish-editor-caret-italic" :""} ${isBold ? "bookish-editor-caret-bold" : ""} ${focused && keyboardIdle ? "bookish-editor-caret-blink" : ""} ${!focused ? "bookish-editor-caret-disabled" : ""}`}
                             style={{
