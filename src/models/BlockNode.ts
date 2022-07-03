@@ -109,7 +109,7 @@ export abstract class BlockNode extends Node {
                     const edit = f.withRangeFormatted({ start: first, end: last }, format);
                     if(edit === undefined) return;
                     const newFormat = edit.root as FormatNode;
-                    const deleteChild = newFormat.isEmptyText();
+                    const deleteChild = newFormat.isEmptyText() && !containsStart && !containsEnd;
                     // Delete the format if it's empty.
                     newRoot = newRoot.withNodeReplaced(f, deleteChild ? undefined : newFormat);
                     if(newRoot === undefined) return;

@@ -375,14 +375,18 @@ export class ListNode extends BlockNode {
         const edit = super.withRangeFormatted(sortedRange, format);
 
         // If we were deleting and two list items were involved, merge them.
-        if(edit && format === undefined && itemStart !== undefined && itemEnd !== undefined && (edit.root as ListNode).getLength() > 1) {
+        if(edit && format === undefined && itemStart !== undefined && itemEnd !== undefined && itemStart !== itemEnd) {
             const newList = edit.root as ListNode;
-            // Merge the items, accounting for the new index of the last item.
-            const mergedEdit = newList.withItemMergedBackwards(itemEnd - (this.#items.length - newList.#items.length));
-            if(mergedEdit === undefined) return;
-            return { root: mergedEdit[0], range: { start: mergedEdit[1], end: mergedEdit[1] }};
+            const itemIndex = itemEnd - (this.#items.length - newList.#items.length);
+            if(itemIndex > 0 && newList.getLength() > 1) {
+                // Merge the items, accounting for the new index of the last item.
+                const mergedEdit = newList.withItemMergedBackwards(itemIndex);
+                if(mergedEdit === undefined) return;
+                return { root: mergedEdit[0], range: { start: mergedEdit[1], end: mergedEdit[1] }};
+            }
         }
-        else return edit;
+
+        return edit;
 
     }
 
