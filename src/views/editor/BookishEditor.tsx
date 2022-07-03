@@ -656,12 +656,12 @@ const BookishEditor = <RootType extends RootNode>(props: {
         // Call the save callback.
         props.save(newRoot);
 
-        // If the history is empty, record the current state.
+        // Initialize a new history if we don't have one.
         let newStack: UndoState[] = undoStack.length > 0 ? undoStack : [];  
         
-        // If there's nothing on the stack, save the current state before we add something to the stack.
+        // If there's nothing on the stack, save the initial state before we add something to the stack.
         if(undoStack.length === 0 && caretRange !== undefined) {
-            const currentRange = caretRangeToIndexRange(newRoot, caretRange);
+            const currentRange = caretRangeToIndexRange(editedNode, caretRange);
             if(currentRange !== undefined)
                 newStack = [{ 
                     bookdown: editedNode.toBookdown(), 
