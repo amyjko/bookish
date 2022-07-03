@@ -779,7 +779,6 @@ export default class Parser {
                     next = this.peek();
                 }
                 segments.push(new ErrorNode(undefined, "Couldn't find symbol @" + symbol));
-
             }
             // Parse a label
             else if(next === ":" && charAfterNext !== null && charAfterNext.match(/[a-z]/i)) {

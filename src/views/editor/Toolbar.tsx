@@ -201,7 +201,7 @@ const Toolbar = (props: {
             : null
         }
         { metaNode instanceof LinkNode ? <ToolbarGroup icon={wrapIcon(LinkIcon)}><LinkEditor link={metaNode}/></ToolbarGroup> : null }
-        { metaNode instanceof LabelNode ? <ToolbarGroup icon="Label"><LabelEditor label={metaNode}/></ToolbarGroup> : null }
+        { metaNode instanceof LabelNode ? <ToolbarGroup icon="•"><LabelEditor label={metaNode}/></ToolbarGroup> : null }
         { metaNode instanceof InlineCodeNode ? <ToolbarGroup icon={wrapIcon(Code)}><InlineCodeEditor code={metaNode}/></ToolbarGroup> : null }
         { metaNode instanceof CitationsNode ? <ToolbarGroup icon="Citations"><CitationsEditor citations={metaNode}/></ToolbarGroup> : null }
         { metaNode instanceof DefinitionNode ? <ToolbarGroup icon="Glossary"><DefinitionEditor definition={metaNode}/></ToolbarGroup> : null }

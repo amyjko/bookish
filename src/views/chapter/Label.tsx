@@ -10,12 +10,19 @@ const Label = (props: { node: LabelNode }) => {
     const context = useContext(ChapterContext);
     const { editable } = useContext(EditorContext)
 
+    const ast = context.chapter?.getAST();
+    const duplicate = 
+        ast === undefined ? 
+        false : 
+        ast.getLabels().filter(l => l.getMeta() === node.getMeta()).length > 1;
+
+
     const label = <span 
         className={"bookish-label" + (context.highlightedID === node.getMeta() ? " bookish-content-highlight" : "")} 
         id={node.getMeta()}
         data-nodeid={props.node.nodeID}
     >
-        {editable ? "•" : ""}
+        {editable ? <span className={`${duplicate ? "bookish-error" : ""}`}>•<code>{node.getMeta()}</code></span> : ""}
     </span>
 
     return <Atom

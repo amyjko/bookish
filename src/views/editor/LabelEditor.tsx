@@ -1,7 +1,8 @@
-import React, { ChangeEvent, useContext, useState } from "react";
+import React, { useContext } from "react";
 import { LabelNode } from "../../models/LabelNode";
 import { ChapterContext } from "../chapter/Chapter";
 import { CaretContext, CaretContextType } from "./BookishEditor";
+import TextEditor from "./TextEditor";
 
 const LabelEditor = (props: {
     label: LabelNode
@@ -10,41 +11,25 @@ const LabelEditor = (props: {
     const label = props.label;
     const context = useContext(ChapterContext);
     const caret = useContext<CaretContextType>(CaretContext);
-    const [ labelID, setLabelID ] = useState<string>(label.getMeta());
     const chapter = context.chapter?.getAST();
     
     if(chapter === undefined) return null;
     
-    function handleChange(e: ChangeEvent<HTMLInputElement>) {
-        setLabelID(e.target.value);
-    }
-
-    function handleBlur() {
-        caret?.edit(label, label.withMeta(labelID));
-    }
-
-    function isValid() { 
-        // At least one character and only appears once in the chapter's labels.
-        return label.getMeta().length > 0 && chapter?.getLabels().filter(l => l.getMeta() === label.getMeta()).length === 1;
-    }
-
-    return <span>
-        <input 
-            type="text"
-            tabIndex={0}
-            className={isValid() ? "" : "bookish-editor-text-invalid"}
-            value={labelID}
-            onChange={handleChange}
-            onBlur={handleBlur}
+    return <code>
+        <TextEditor 
+            text={label.getMeta()} 
+            label="Chapter label ID"
             placeholder="label ID"
+            valid={ id => {
+                if(id.length === 0) return "Can't be empty";
+                if(!/^[a-z]+$/.test(id)) return "Can only be a-z";
+                // If it's different than what it is and there's already one, then error.
+                if(chapter.getLabels().filter(l => l.getMeta() === id).length > (label.getMeta() === id ? 1 : 0)) return "Another label has this ID";
+            }}
+            save={labelID => caret?.edit(label, label.withMeta(labelID)) }
+            saveOnExit
         />
-        {
-            isValid() ?
-                <span className="bookish-editor-note">You can link to this label using this ID.</span> :
-                <span className="bookish-editor-note bookish-editor-note-error">Type a unique, non-empty ID for this label.</span>
-        }
-    </span>
-
+    </code>
 }
 
 export default LabelEditor;
