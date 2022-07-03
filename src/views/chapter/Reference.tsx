@@ -25,23 +25,6 @@ const Reference = (props: { node: ReferenceNode }) => {
     }
     else {
 
-        const id =
-            editable && book ?
-                <span className="bookish-editor-note">
-                    <TextEditor
-                        text={node.citationID} 
-                        label={'Citation ID editor.'} 
-                        placeholder="ID"
-                        valid={ text => {
-                            if(text.length === 0) return "At least one character please.";
-                            if(book.getReference(text) !== undefined) return "Must be unique; another reference has this id.";
-                        }}
-                        save={text => book.editReferenceID(text, node)}
-                    />
-                </span>
-                :
-                null // Don't show the ID when not editing
-
         const authors =
             editable && book ?
                 <em>
@@ -116,7 +99,7 @@ const Reference = (props: { node: ReferenceNode }) => {
                 node.summary ? <span className="bookish-reference-summary">{node.summary}</span> : null
     
         return <span data-nodeid={props.node.nodeID} className="bookish-reference-text">
-            {authors} ({year}). {title}. {source}. {summary} { id ? <><br/>{id}</> : null } 
+            {authors} ({year}). {title}. {source}. {summary}
         </span>
 
     }

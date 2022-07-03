@@ -1,4 +1,4 @@
-import React, { ChangeEvent, KeyboardEvent, useEffect, useRef, useState } from "react"
+import React, { KeyboardEvent, useEffect, useRef, useState } from "react"
 
 enum Status {
     Viewing,

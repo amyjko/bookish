@@ -8,6 +8,7 @@ import Parser from "../../models/Parser";
 import Book from '../../models/Book';
 
 import { renderNode } from '../chapter/Renderer'
+import Reference from '../chapter/Reference'
 import { EditorContext } from './Book';
 import { ReferenceNode } from '../../models/ReferenceNode';
 import ConfirmButton from '../editor/ConfirmButton';
@@ -154,7 +155,7 @@ const References = (props: { book: Book }) => {
 
 		const sorted = Object.keys(references).sort();
 		let letter: undefined | string = undefined;
-		sorted.forEach((citationID) => {
+		sorted.forEach((citationID, index) => {
 
 			const ref = Parser.parseReference(citationID, references[citationID], book);
 
@@ -169,7 +170,7 @@ const References = (props: { book: Book }) => {
 				command={() => book.removeReference(citationID)}
 			/>
 	
-			renderedReferences.push(<p key={citationID}>{renderNode(ref)} {editable ? <>{deleteButton}</> : null}</p>);
+			renderedReferences.push(<p key={`citation${citationID}`}>{renderNode(ref)} {editable ? <>{deleteButton}</> : null}</p>);
 		})
 
 	}
