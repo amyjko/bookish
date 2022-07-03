@@ -80,6 +80,7 @@ const TextEditor = (props: {
             type="text" 
             required
             role="textbox"
+            tabIndex={0}
             aria-invalid={error !== undefined}
             aria-label={props.label}
             ref={textField}
