@@ -61,7 +61,7 @@ export class CodeNode extends BlockNode {
 
     withChildReplaced(node: Node, replacement: Node | undefined) {
         const newCode = node === this.#code && replacement instanceof TextNode ? replacement : undefined;
-        const newCaption = node === this.#caption && replacement instanceof FormatNode ? replacement : undefined;
+        const newCaption = node === this.#caption && (replacement instanceof FormatNode || replacement === undefined) ? replacement : undefined;
         return newCode || newCaption ? new CodeNode(
             newCode ? newCode : this.#code, 
             this.#language, 

@@ -88,9 +88,11 @@ export abstract class BlockNode extends Node {
         const sortedRange = this.sortRange(range);
         const formats = this.getFormats();
         let newRoot: this | undefined = this;
-        let newStart: Caret | undefined;
-        let newEnd: Caret | undefined;
         let inRange = false;
+
+        const startIndex = caretToIndex(this, sortedRange.start);
+        const endIndex = caretToIndex(this, sortedRange.end);
+        if(startIndex === undefined || endIndex === undefined) return;
 
         // Find all of the formats contained in the range and format then.
         for(let i = 0; i < formats.length; i++) {
@@ -111,10 +113,6 @@ export abstract class BlockNode extends Node {
                     // Delete the format if it's empty.
                     newRoot = newRoot.withNodeReplaced(f, deleteChild ? undefined : newFormat);
                     if(newRoot === undefined) return;
-                    if(containsStart && !deleteChild)
-                        newStart = edit.range.start;
-                    if(containsEnd && !deleteChild)
-                        newEnd = edit.range.end;
                 }
             }
             if(containsEnd)
@@ -122,10 +120,10 @@ export abstract class BlockNode extends Node {
         }
 
         if(newRoot) {
-            if(newStart === undefined) newStart = newRoot.getFirstCaret();
-            if(newEnd === undefined) newEnd = newRoot.getLastCaret();
-            if(newStart && newEnd)
-                return { root: newRoot, range: { start: newStart, end: newEnd } };
+            const start = indexToCaret(newRoot, startIndex);
+            const end = format === undefined ? start : indexToCaret(newRoot, endIndex);
+            if(start === undefined || end === undefined) return;
+            return { root: newRoot, range: { start: start, end: end } };
         }
     }
 

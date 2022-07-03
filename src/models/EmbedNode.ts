@@ -60,14 +60,14 @@ export class EmbedNode extends BlockNode {
     }
 
     withChildReplaced(node: Node, replacement: Node | undefined) {
-        const newCaption = node === this.#caption && replacement instanceof FormatNode ? replacement : undefined;
-        const newCredit = node === this.#credit && replacement instanceof FormatNode ? replacement : undefined;
+        const newCaption = (node === this.#caption && (replacement === undefined || replacement instanceof FormatNode)) ? replacement : this.#caption;
+        const newCredit = (node === this.#credit && (replacement === undefined || replacement instanceof FormatNode)) ? replacement : this.#credit;
         return newCaption || newCredit ?
             new EmbedNode(
                 this.#url,
                 this.#description,
-                newCaption === undefined ? this.#caption : newCaption, 
-                newCredit === undefined ? this.#credit : newCredit, 
+                newCaption, 
+                newCredit, 
                 this.#position
             ) as this :
             undefined;    

@@ -50,7 +50,7 @@ export class QuoteNode extends BlocksNode {
     withChildReplaced(node: BlockNode | FormatNode, replacement: BlockNode | FormatNode | undefined) {
 
         // Replace the credit.
-        if(this.#credit === node && replacement instanceof FormatNode)
+        if(this.#credit === node && (replacement instanceof FormatNode || replacement === undefined))
             return new QuoteNode(this.getBlocks(), replacement, this.#position) as this;
     
         // Replace a block.

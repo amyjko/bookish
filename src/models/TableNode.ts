@@ -97,7 +97,7 @@ export class TableNode extends BlockNode {
     withChildReplaced(node: FormatNode, replacement: FormatNode | undefined) {
 
         // If it's just the caption, make a new node with the new credit.
-        if(node === this.#caption && replacement instanceof FormatNode)
+        if(node === this.#caption && (replacement instanceof FormatNode || replacement === undefined))
             return new TableNode(this.#rows, this.#position, replacement) as this;
 
         // If it's a cell, update the cell.
