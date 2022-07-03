@@ -34,8 +34,8 @@ const EmbedEditor = (props: {
 
     return <>
         { positionEditor } 
-        URL <URLEditor url={embed.getURL()} valid={isValidURL(embed.getURL())} edit={(url: string) => caret?.edit(embed, embed.withURL(url))} />
-        Description <input
+        url <URLEditor url={embed.getURL()} valid={isValidURL(embed.getURL())} edit={(url: string) => caret?.edit(embed, embed.withURL(url))} />
+        alt <input
             type="text"
             value={description}
             placeholder="Describe the image or video for people who can't see it"
