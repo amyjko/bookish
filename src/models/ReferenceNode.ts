@@ -33,7 +33,7 @@ export class ReferenceNode extends Node {
     getParentOf(node: Node): Node | undefined { return undefined; }
     
     toText() { return this.authors + " "  + this.year + " " + this.title + " " + this.source + (this.summary ? this.summary : ""); }
-    toBookdown(debug?: number): string { return ""; }
+    toBookdown(): string { return ""; }
     toList() { 
         const list = [ this.authors, this.year, this.title, this.source ];
         if(this.url) list.push(this.url);

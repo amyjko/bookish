@@ -10,7 +10,7 @@ export class CitationsNode extends AtomNode<string[]> {
     getType() { return "citations"; }
     getDefaultCaret(): Caret { return { node: this, index: 0 }; };
     toText(): string { return ""; }
-    toBookdown(debug?: number): string { return `${debug === this.nodeID ? "%debug%" : ""}<${this.getMeta().join(",")}>`; }
+    toBookdown(): string { return `<${this.getMeta().join(",")}>`; }
     getParentOf(node: Node): Node | undefined { return undefined; }
     
     copy() { return new CitationsNode([...this.getMeta()]) as this; } 

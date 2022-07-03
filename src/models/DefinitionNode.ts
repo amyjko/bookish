@@ -13,8 +13,8 @@ export class DefinitionNode extends MetadataNode<string> {
         return this.getText().toText();
     }
 
-    toBookdown(debug?: number): string {
-        return `~${this.getText().toBookdown(debug)}~${this.getMeta()}`; 
+    toBookdown(): string {
+        return `~${this.getText().toBookdown()}~${this.getMeta()}`; 
     }
 
     copy() {

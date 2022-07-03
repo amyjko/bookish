@@ -40,9 +40,9 @@ export abstract class AtomNode<MetadataType> extends Node {
         return this.getFarthestParentMatching(root, p => p instanceof FormatNode) as FormatNode;
     }
 
-    getLength() { return 1; }
+    getCaretPositionCount() { return 1; }
 
-    abstract toBookdown(debug?: number, format?: FormatNode): string;
+    abstract toBookdown(format?: FormatNode): string;
     abstract toText(): string;
     abstract withMeta(meta: MetadataType): AtomNode<MetadataType>;
 

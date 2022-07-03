@@ -19,7 +19,7 @@ export abstract class MetadataNode<MetaType> extends Node {
     abstract withMeta(meta: MetaType): MetadataNode<MetaType>;
     abstract withText(text: TextNode): MetadataNode<MetaType>;
     abstract toText(): string;
-    abstract toBookdown(debug?: number): string;
+    abstract toBookdown(): string;
 
     getChildren() { return [ this.#text ] }
     getParentOf(node: Node): Node | undefined { return this.#text === node ? this : undefined; }

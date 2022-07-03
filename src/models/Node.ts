@@ -17,7 +17,7 @@ export abstract class Node {
     abstract toText(): string;
     
     // Returns a syntactically valid Bookdown string representing the node.
-    abstract toBookdown(debug?: number): string;
+    abstract toBookdown(): string;
     
     // Returns a string represent the type of node this is.
     abstract getType(): string;

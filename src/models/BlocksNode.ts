@@ -1,7 +1,7 @@
 import { Node } from "./Node";
 import { BlockNode } from "./BlockNode";
 import { ListNode } from "./ListNode";
-import { Caret, CaretRange, TextRange } from "./Caret";
+import { Caret, CaretRange, caretToIndex, indexToCaret, IndexRange } from "./Caret";
 import { ParagraphNode } from "./ParagraphNode";
 import { Format, FormatNode, FormatNodeSegmentType } from "./FormatNode";
 import { TextNode } from "./TextNode";
@@ -143,52 +143,6 @@ export abstract class BlocksNode extends BlockNode {
     getLastCaret(): Caret | undefined {
         const text = this.getTextNodes();
         return text.length === 0 ? undefined : { node: text[text.length - 1], index: text[text.length - 1].getLength() };
-    }
-
-    getTextAndAtomsAsTaggedText(nodeID: number) {
-        return this.getTextAndAtomNodes().map(node => node.toBookdown(nodeID)).join("");
-    }
-
-    // Convert node and index into text index by converting to Bookdown and then finding the index of the node.
-    getCaretAsTextIndex(caret: Caret): number {
-        // Get a list of all text and atom nodes, map them to just text with a marker for the matching node,
-        // find the index of that marker, and add the caret's index.
-        return this.getTextAndAtomsAsTaggedText(caret.node.nodeID).indexOf("%debug%") + caret.index;
-    }
-
-    getTextIndexAsCaret(textIndex: number): Caret | undefined {
-
-        const nodes = this.getTextAndAtomNodes();
-
-        // Find the first node that contains the given text index.
-        const matches = nodes.filter(node => {
-            const index = this.getTextAndAtomsAsTaggedText(node.nodeID).indexOf("%debug%");
-            return textIndex >= index && textIndex <= index + node.getLength();
-        });
-
-        if(matches.length > 0) {
-            // If we found multiple matches, prefer the empty node.
-            const empty = matches.find(m => m instanceof TextNode && m.isEmpty());
-            const match = empty !== undefined ? empty : matches[0];
-
-            // If we found match, return a corresponding caret by converting this whole
-            // node to a bookdown string and then finding the index of the match in the string,
-            // then subtracting the match from the given text index in the string.
-            return { node: match, index: textIndex - nodes.map(node => node.toBookdown(match.nodeID)).join("").indexOf("%debug%") };
-        }
-
-    }
-
-    // Convert text index to node by iterating through text nodes and finding the corresponding node.
-    getTextRangeAsCaretRange(range: TextRange): CaretRange | undefined {
-        const start = this.getTextIndexAsCaret(range.start);
-        const end = this.getTextIndexAsCaret(range.end);
-        if(start === undefined || end === undefined) return;
-        return { start: start, end: end }; 
-    }
-
-    getCaretRangeAsTextRange(range: CaretRange): TextRange {
-        return { start: this.getCaretAsTextIndex(range.start), end: this.getCaretAsTextIndex(range.end) };
     }
     
     getAdjacentCaret(caret: Caret, next: boolean): Caret | undefined {
@@ -380,7 +334,7 @@ export abstract class BlocksNode extends BlockNode {
             format.withoutSegment(atom);
 
         // New caret is left, or right, or empty text.
-        const newCaret = { node: previous ? previous : next ? next : newText, index: previous ? previous.getLength() : 0 };
+        const newCaret = { node: previous ? previous : next ? next : newText, index: previous && previous instanceof TextNode ? previous.getLength() : 0 };
 
         // No format? Fail.
         if(newFormat === undefined) return;
@@ -420,8 +374,10 @@ export abstract class BlocksNode extends BlockNode {
         const sortedRange = this.sortRange(adjustedRange);
 
         // Remember the start and end text index so we can map it back after editing.
-        const startTextIndex = this.getCaretAsTextIndex(sortedRange.start);
-        const endTextIndex = this.getCaretAsTextIndex(sortedRange.end);
+        const startTextIndex = caretToIndex(this, sortedRange.start);
+        const endTextIndex = caretToIndex(this, sortedRange.end);
+
+        if(startTextIndex === undefined || endTextIndex === undefined) return;
 
         // Ask all of the blocks to format themselves, replacing them as we do.
         let newBlocks: this | undefined = this;
@@ -478,9 +434,9 @@ export abstract class BlocksNode extends BlockNode {
             }
         }
 
-        const startCaret = newBlocks.getTextIndexAsCaret(startTextIndex);
+        const startCaret = indexToCaret(newBlocks, startTextIndex);
         // If we deleted, then the end caret should be the same as the start.
-        const endCaret = format === undefined ? startCaret : newBlocks.getTextIndexAsCaret(endTextIndex);
+        const endCaret = format === undefined ? startCaret : indexToCaret(newBlocks, endTextIndex);
 
         if(startCaret === undefined || endCaret === undefined) return;
 
@@ -695,13 +651,13 @@ export abstract class BlocksNode extends BlockNode {
                     if(adjacentBlock instanceof ParagraphNode) {
                         const currentCaret = next ? parent.getLastCaret() : adjacentBlock.getLastCaret();
                         if(currentCaret === undefined) return;
-                        const textIndex = next ? parent.getFormat().getCaretAsTextIndex(currentCaret) : adjacentBlock.getFormat().getCaretAsTextIndex(currentCaret);
+                        const textIndex = next ? caretToIndex(parent.getFormat(), currentCaret) : caretToIndex(adjacentBlock.getFormat(), currentCaret);
                         if(textIndex === undefined) return;
                         const mergedParagraph = next ? adjacentBlock.withParagraphPrepended(parent) : adjacentBlock.withParagraphAppended(parent);
                         if(mergedParagraph === undefined) return;
                         const newBlocks = this.withNodeReplaced(blocks, blocks.withChildReplaced(adjacentBlock, mergedParagraph)?.withoutBlock(parent));
                         if(newBlocks === undefined) return;
-                        const newCaret = mergedParagraph.getFormat().getTextIndexAsCaret(textIndex);
+                        const newCaret = indexToCaret(mergedParagraph.getFormat(), textIndex);
                         if(newCaret === undefined) return;
                         return { root: newBlocks, range: { start: newCaret, end: newCaret }};
                     }

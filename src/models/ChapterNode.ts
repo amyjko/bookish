@@ -12,7 +12,7 @@ import { CitationsNode } from "./CitationsNode";
 import { LabelNode } from "./LabelNode";
 import { CommentNode } from "./CommentNode";
 import { BlocksNode } from "./BlocksNode";
-import { CaretRange, TextRange } from "./Caret";
+import { CaretRange, IndexRange } from "./Caret";
 
 export class ChapterNode extends BlocksNode {
 
@@ -62,10 +62,10 @@ export class ChapterNode extends BlocksNode {
         return this.getBlocks().map(block => block.toText()).join(" ");
     }
 
-    toBookdown(debug?: number): string {
+    toBookdown(): string {
         // Render the symbols then all the blocks
         return Object.keys(this.#metadata.symbols).sort().map(name => `@${name}: ${this.#metadata.symbols[name]}\n\n`).join("") +
-            this.getBlocks().map(b => b.toBookdown(debug)).join("\n\n");
+            this.getBlocks().map(b => b.toBookdown()).join("\n\n");
     }
 
     getNextTextOrAtom(node: TextNode | AtomNode<any>): TextNode | AtomNode<any> | undefined {

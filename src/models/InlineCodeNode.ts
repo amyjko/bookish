@@ -12,8 +12,8 @@ export class InlineCodeNode extends MetadataNode<string> {
         return this.getText().getText();
     }
 
-    toBookdown(debug?: number): string {
-        return "`" + this.getText().toBookdown(debug).replace(/`/g, '\\`') + "`" + (this.getMeta() === "plaintext" ? "" : this.getMeta());
+    toBookdown(): string {
+        return "`" + this.getText().toBookdown().replace(/`/g, '\\`') + "`" + (this.getMeta() === "plaintext" ? "" : this.getMeta());
     }
 
     copy() { return new InlineCodeNode(this.getText(), this.getMeta()) as this }

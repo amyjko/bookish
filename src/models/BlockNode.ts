@@ -1,5 +1,5 @@
 import { Node } from "./Node";
-import { Caret, CaretRange, TextRange } from "./Caret";
+import { Caret, CaretRange, IndexRange, indexToCaret, caretToIndex } from "./Caret";
 import { Edit } from "./Edit";
 import { Format, FormatNode, FormatNodeSegmentType } from "./FormatNode";
 import { TextNode } from "./TextNode";
@@ -37,49 +37,6 @@ export abstract class BlockNode extends Node {
     }
     getPreviousTextOrAtom(node: TextNode | AtomNode<any>): TextNode | AtomNode<any> | undefined {
         return this.getAdjacentCaret({ node: node, index: 0 }, true)?.node;
-    }
-
-    getCaretAsTextIndex(caret: Caret): number | undefined {
-        // Loop through all the formats in order and compute a text index.
-        const formats = this.getFormats();
-        let index = 0;
-        for(let i = 0; i < formats.length; i++) {
-            const format = formats[i];
-            const formatIndex = format.getCaretAsTextIndex(caret);
-            if(formatIndex === undefined)
-                index += format.getTextLength();
-            else {
-                return index + formatIndex;
-            }
-        }
-        return undefined;
-    }
-
-    getTextIndexAsCaret(index: number): Caret | undefined {
-        // Loop through all the formats and find format that contains the index and ask it for a caret.
-        const formats = this.getFormats();
-        let currentIndex = 0;
-        for(let i = 0; i < formats.length; i++) {
-            const format = formats[i];
-            const length = format.getTextLength();
-            if(index >= currentIndex && index <= currentIndex + length)
-                return format.getTextIndexAsCaret(index - currentIndex);
-            currentIndex += length;
-        }
-    }
-
-    getCaretRangeAsTextRange(range: CaretRange): TextRange | undefined {
-        const startIndex = this.getCaretAsTextIndex(range.start);
-        const endIndex = this.getCaretAsTextIndex(range.end);
-        if(startIndex === undefined || endIndex === undefined) return;
-        return { start: startIndex, end: endIndex };
-    }
-
-    getTextRangeAsCaretRange(range: TextRange): CaretRange | undefined {
-        const start = this.getTextIndexAsCaret(range.start);
-        const end = this.getTextIndexAsCaret(range.end);
-        if(start === undefined || end === undefined) return;
-        return { start: start, end: end }; 
     }
 
     withSegmentAtSelection(range: CaretRange, nodeCreator: (text: string) => FormatNodeSegmentType): Edit {

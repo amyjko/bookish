@@ -1,7 +1,7 @@
 import { Node } from "./Node";
 import { ErrorNode } from "./ErrorNode";
 import { TextNode } from "./TextNode";
-import { Caret, CaretRange, TextRange } from "./Caret";
+import { Caret, CaretRange, caretRangeToIndexRange, caretToIndex, indexToCaret, IndexRange } from "./Caret";
 import { MetadataNode } from "./MetadataNode";
 import { AtomNode } from "./AtomNode";
 import { Edit } from "./Edit";
@@ -44,8 +44,8 @@ export class FormatNode extends Node {
         return this.#segments.map(segment => segment.toText()).join(" ");
     }
 
-    toBookdown(debug?: number): string {
-        return (this.#format === "v" ? "^v" : this.#format) + this.#segments.map(s => s instanceof AtomNode ? s.toBookdown(debug, this) : s.toBookdown(debug)).join("") + (this.#format === "v" ? "^" : this.#format);
+    toBookdown(): string {
+        return (this.#format === "v" ? "^v" : this.#format) + this.#segments.map(s => s instanceof AtomNode ? s.toBookdown(this) : s.toBookdown()).join("") + (this.#format === "v" ? "^" : this.#format);
     }
 
     getChildren() { return this.#segments; }
@@ -114,53 +114,6 @@ export class FormatNode extends Node {
         }
         // Otherwise, there is no adjascent caret.
         return undefined;
-    }
-
-    getTextLength() {
-        return this.getTextAndAtomNodes().reduce((previous, current) => previous + current.getLength(), 0);
-    }
-
-    getCaretAsTextIndex(caret: Caret): number | undefined {
-
-        const nodes = this.getTextAndAtomNodes();
-        let index = 0;
-        for(let i = 0; i < nodes.length; i++) {
-            const t = nodes[i];
-            if(t !== caret.node)
-                index += t.getLength();
-            else
-                return index + caret.index;
-        }
-        return undefined;
-
-    }
-
-    getTextIndexAsCaret(index: number): Caret | undefined {
-
-        const text = this.getTextAndAtomNodes();
-        let currentIndex = 0;
-        for(let i = 0; i < text.length; i++) {
-            const t = text[i];
-            if(!(t instanceof AtomNode) && index >= currentIndex && index <= currentIndex + t.getLength())
-                return { node: t, index: index - currentIndex };
-            currentIndex += t.getLength();
-        }
-        return undefined;
-
-    }
-
-    getCaretRangeAsTextRange(range: CaretRange): TextRange | undefined {
-        const startIndex = this.getCaretAsTextIndex(range.start);
-        const endIndex = this.getCaretAsTextIndex(range.end);
-        if(startIndex === undefined || endIndex === undefined) return;
-        return { start: startIndex, end: endIndex };
-    }
-
-    getTextRangeAsCaretRange(range: TextRange): CaretRange | undefined {
-        const start = this.getTextIndexAsCaret(range.start);
-        const end = this.getTextIndexAsCaret(range.end);
-        if(start === undefined || end === undefined) return;
-        return { start: start, end: end }; 
     }
 
     getFirstCaret(): Caret | undefined {
@@ -286,9 +239,11 @@ export class FormatNode extends Node {
             !(this.contains(range.start.node) && this.contains(range.end.node)))
             return;
 
+        const sortedRange = this.sortRange(range);
+
         // Remember the text positions so we can return a new range in the new tree.
-        const selectionStartIndex = this.getCaretAsTextIndex(range.start);
-        const selectionEndIndex = this.getCaretAsTextIndex(range.end);
+        const selectionStartIndex = caretToIndex(this, sortedRange.start);
+        const selectionEndIndex = caretToIndex(this, sortedRange.end);
 
         if(selectionStartIndex === undefined || selectionEndIndex === undefined) return;
 
@@ -330,9 +285,9 @@ export class FormatNode extends Node {
                     // and this node's parent contains the formatting.
                     else {
                         const parentIsFormatted = parent.getFormats(this).includes(format);
-                        const selectionContainsNode = (selectionStartIndex > checkIndex && selectionStartIndex < checkIndex + node.getLength() - 1) || (selectionEndIndex > checkIndex && selectionEndIndex < checkIndex + node.getLength() - 1)
-                        const nodeContainsSelection = selectionStartIndex >= checkIndex && selectionEndIndex <= checkIndex + node.getLength();
-                        checkIndex += node.getLength();
+                        const selectionContainsNode = (selectionStartIndex > checkIndex && selectionStartIndex < checkIndex + node.getCaretPositionCount() - 1) || (selectionEndIndex > checkIndex && selectionEndIndex < checkIndex + node.getCaretPositionCount() - 1)
+                        const nodeContainsSelection = selectionStartIndex >= checkIndex && selectionEndIndex <= checkIndex + node.getCaretPositionCount();
+                        checkIndex += node.getCaretPositionCount();
                         if(nodeContainsSelection || selectionContainsNode) {
                             nodeCount++;
                             if(parentIsFormatted) nodesWithFormat++;
@@ -364,7 +319,7 @@ export class FormatNode extends Node {
         }
 
         function inRange() {
-            return textIndex >= Math.min(selectionStartIndex as number, selectionEndIndex as number) && textIndex < Math.max(selectionStartIndex as number, selectionEndIndex as number);
+            return selectionStartIndex !== undefined && selectionEndIndex !== undefined && textIndex >= selectionStartIndex && textIndex < selectionEndIndex;
         }
 
         function getFormats() {
@@ -387,13 +342,14 @@ export class FormatNode extends Node {
                 // account for it's length, but do nothing else.
                 const atomAncestor = node.getClosestParentOfType(this, AtomNode);
                 if(atomAncestor instanceof AtomNode && atomAncestor.getMeta() !== this && atomAncestor.getMeta() instanceof FormatNode) {
-                    textIndex += node.getLength();
+                    textIndex += node.getCaretPositionCount();
                 }
                 else if(parent instanceof FormatNode) {
                     // Remember we found an empty node so that we don't insert an extra one later.
                     if(node.getText().length === 0) {
                         if(textIndex === selectionStartIndex && zeroWidthSelection) {
                             formattingEmptyNode = true;
+                            textIndex++;
                         }
                     }
                     else {
@@ -474,6 +430,7 @@ export class FormatNode extends Node {
                             if(i < node.getLength()) {
                                 if(format !== undefined || !inRange())
                                     currentText += node.getText().charAt(i);
+                                // Increment the text index for this character.
                                 textIndex++;
                             }
                         }
@@ -556,12 +513,12 @@ export class FormatNode extends Node {
     withRangeFormatted(range: CaretRange, format: Format | undefined): Edit {
 
         // Convert the range to text indices.
-        const text = this.getCaretRangeAsTextRange(range);
+        const text = caretRangeToIndexRange(this, range);
         if(text === undefined) return;
         const newFormat = this.withFormat(range, format);
         if(newFormat === undefined) return;
-        const newStart = newFormat.getTextIndexAsCaret(text.start);
-        const newEnd = format === undefined ? newStart : newFormat.getTextIndexAsCaret(text.end);
+        const newStart = indexToCaret(newFormat, text.start);
+        const newEnd = format === undefined ? newStart : indexToCaret(newFormat, text.end);
         if(newStart === undefined || newEnd === undefined) return;
         return { root: newFormat, range: { start: newStart, end: newEnd } }
 
@@ -610,11 +567,11 @@ export class FormatNode extends Node {
         let caret = sortedRange.start;
         if (sortedRange.start.node !== sortedRange.end.node || sortedRange.start.index !== sortedRange.end.index) {
             // Try to remove the selected text. Bail on fail.
-            const textIndex = this.getCaretAsTextIndex(sortedRange.start);
+            const textIndex = caretToIndex(this, sortedRange.start);
             if(textIndex === undefined) return;
             newFormat = this.withoutRange(sortedRange);
             if(newFormat === undefined) return;
-            const newCaret = newFormat.getTextIndexAsCaret(textIndex);
+            const newCaret = indexToCaret(newFormat, textIndex);
             if(newCaret === undefined) return;
             caret = newCaret;
         }
@@ -665,13 +622,14 @@ export class FormatNode extends Node {
         const startCaret = containsStart ? range.start : this.getFirstCaret();
         const endCaret = containsEnd ? range.end : this.getLastCaret();
         if(startCaret === undefined || endCaret === undefined) return;
-        const startIndex = this.getCaretAsTextIndex(startCaret);
-        const endIndex = this.getCaretAsTextIndex(endCaret);
+        const startIndex = caretToIndex(this, startCaret);
+        const endIndex = caretToIndex(this, endCaret);
         if(startIndex === undefined || endIndex === undefined) return;
         const withoutBefore = this.withoutContentBefore(startCaret);
-        const revisedEndCaret = withoutBefore?.getTextIndexAsCaret(endIndex - startIndex);
+        if(withoutBefore === undefined) return;
+        const revisedEndCaret = indexToCaret(withoutBefore, (endIndex - startIndex));
         if(revisedEndCaret === undefined) return;
-        return withoutBefore?.withoutContentAfter(revisedEndCaret) as this;
+        return withoutBefore.withoutContentAfter(revisedEndCaret) as this;
     }
 
     withSegmentsAppended(format: FormatNode): FormatNode {
@@ -702,12 +660,13 @@ export class FormatNode extends Node {
         }
         else {
             // If next, keep the caret in place, otherwise go to the adjacent caret position.
-            const textIndex = this.getCaretAsTextIndex(next ? caret : adjacentCaret);
+            const textIndex = caretToIndex(this, next ? caret : adjacentCaret);
             if(textIndex === undefined) return;
             // If there is one, try removing everything between this and the adjascent caret.
             const newFormat = this.withoutRange({ start: caret, end: adjacentCaret });
-            const newCaret = newFormat?.getTextIndexAsCaret(textIndex);
-            if(newFormat === undefined || newCaret === undefined) return;
+            if(newFormat === undefined) return;
+            const newCaret = indexToCaret(newFormat, textIndex);
+            if(newCaret === undefined) return;
             return { root: newFormat, range: { start: newCaret, end: newCaret } };
         }
     }

@@ -47,8 +47,8 @@ export class ParagraphNode extends BlockNode {
         return this.#format.toText();
     }
 
-    toBookdown(debug?: number): string {
-        return (this.#level === 1 ? "# " : this.#level === 2 ? "## " : this.#level === 3 ? "### " : "") + this.#format.toBookdown(debug);
+    toBookdown(): string {
+        return (this.#level === 1 ? "# " : this.#level === 2 ? "## " : this.#level === 3 ? "### " : "") + this.#format.toBookdown();
     }
 
     withLevel(level: number): ParagraphNode { return new ParagraphNode(level, this.#format); }

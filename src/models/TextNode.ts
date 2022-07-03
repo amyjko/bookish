@@ -17,16 +17,17 @@ export class TextNode extends Node {
     getType() { return "text"; }
     getText() { return this.#text; }
     getLength() { return this.#text.length; }
+    getCaretPositionCount() { return this.#text.length; }
     getParentOf(node: Node): Node | undefined { return undefined; }
     getFirstCaret(): Caret { return { node: this, index: 0}; }
     getLastCaret(): Caret { return { node: this, index: this.#text.length }; }
 
     toText(): string { return this.#text; }
 
-    toBookdown(debug?: number): string {
+    toBookdown(): string {
 
         // Escape all characters with special meaning inside content nodes: _*`<^{~\[@% and :'s with no space after
-        let newString = new String(this.#text)
+        return this.#text
             .replace(/\\/g, '\\\\') // This has to go first! Otherwise it breaks all of the others below.
             .replace(/_/g, '\\_')
             .replace(/\*/g, '\\*')
@@ -39,12 +40,6 @@ export class TextNode extends Node {
             .replace(/\[/g, '\\[')
             .replace(/@/g, '\\@')
             .replace(/(:)([a-z])/g, '\\:$2');
-
-        // If we're trying to mark this node
-        if(debug === this.nodeID)
-            newString = "%debug%" + newString;
-
-        return newString;
 
     }
 

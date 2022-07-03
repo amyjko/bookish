@@ -14,7 +14,7 @@ export class FootnoteNode extends AtomNode<FormatNode> {
     getDefaultCaret(): Caret | undefined { return this.getMeta().getFirstCaret(); }
 
     toText(): string { return this.getMeta().toText(); }
-    toBookdown(debug?: number): string { return `${debug === this.nodeID ? "%debug%" : ""}{${this.getMeta().toBookdown(debug)}}`; }
+    toBookdown(): string { return `{${this.getMeta().toBookdown()}}`; }
 
     copy() { return new FootnoteNode(this.getMeta().copy()) as this; }
 

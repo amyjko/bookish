@@ -38,7 +38,7 @@ export class CodeNode extends BlockNode {
 
     toText() { return ""; }
 
-    toBookdown(debug?: number): string {
+    toBookdown(): string {
         // Remember to escape any back ticks.
         return "`" + 
                 (this.#language !== "plaintext" ? this.#language : "") + 
@@ -46,7 +46,7 @@ export class CodeNode extends BlockNode {
                 this.#code.getText().replace(/`/g, '\\`') + 
                 "\n`" + 
                 (this.#position !== "|" ? this.#position : "") + 
-                this.#caption.toBookdown(debug);
+                this.#caption.toBookdown();
     }
 
     getChildren() { return [ this.#code, this.#caption ] }

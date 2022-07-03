@@ -15,10 +15,10 @@ export class CommentNode extends AtomNode<FormatNode> {
 
     getDefaultCaret(): Caret | undefined { return this.getMeta().getFirstCaret(); }
 
-    toBookdown(debug?: number, format?: FormatNode): string { 
+    toBookdown(format?: FormatNode): string { 
         const previousText = format?.getPreviousTextOrAtom(this)?.toBookdown();
         // Insert a space before the % if there isn't one before this.
-        return `${previousText?.endsWith(" ") ? "" : " "}%${debug === this.nodeID ? "%debug%" : ""}${this.getMeta().toBookdown(debug)}%`; 
+        return `${previousText?.endsWith(" ") ? "" : " "}%${this.getMeta().toBookdown()}%`; 
     }
 
     copy() { return new CommentNode(this.getMeta().copy()) as this; }
