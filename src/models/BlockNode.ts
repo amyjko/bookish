@@ -39,13 +39,13 @@ export abstract class BlockNode extends Node {
         return this.getAdjacentCaret({ node: node, index: 0 }, true)?.node;
     }
 
-    caretToTextIndex(caret: Caret): number | undefined {
+    getCaretAsTextIndex(caret: Caret): number | undefined {
         // Loop through all the formats in order and compute a text index.
         const formats = this.getFormats();
         let index = 0;
         for(let i = 0; i < formats.length; i++) {
             const format = formats[i];
-            const formatIndex = format.caretToTextIndex(caret);
+            const formatIndex = format.getCaretAsTextIndex(caret);
             if(formatIndex === undefined)
                 index += format.getTextLength();
             else {
@@ -55,7 +55,7 @@ export abstract class BlockNode extends Node {
         return undefined;
     }
 
-    textIndexToCaret(index: number): Caret | undefined {
+    getTextIndexAsCaret(index: number): Caret | undefined {
         // Loop through all the formats and find format that contains the index and ask it for a caret.
         const formats = this.getFormats();
         let currentIndex = 0;
@@ -63,21 +63,21 @@ export abstract class BlockNode extends Node {
             const format = formats[i];
             const length = format.getTextLength();
             if(index >= currentIndex && index <= currentIndex + length)
-                return format.textIndexToCaret(index - currentIndex);
+                return format.getTextIndexAsCaret(index - currentIndex);
             currentIndex += length;
         }
     }
 
-    caretRangeToTextRange(range: CaretRange): TextRange | undefined {
-        const startIndex = this.caretToTextIndex(range.start);
-        const endIndex = this.caretToTextIndex(range.end);
+    getCaretRangeAsTextRange(range: CaretRange): TextRange | undefined {
+        const startIndex = this.getCaretAsTextIndex(range.start);
+        const endIndex = this.getCaretAsTextIndex(range.end);
         if(startIndex === undefined || endIndex === undefined) return;
         return { start: startIndex, end: endIndex };
     }
 
-    textRangeToCaret(range: TextRange): CaretRange | undefined {
-        const start = this.textIndexToCaret(range.start);
-        const end = this.textIndexToCaret(range.end);
+    getTextRangeAsCaretRange(range: TextRange): CaretRange | undefined {
+        const start = this.getTextIndexAsCaret(range.start);
+        const end = this.getTextIndexAsCaret(range.end);
         if(start === undefined || end === undefined) return;
         return { start: start, end: end }; 
     }

@@ -185,12 +185,12 @@ export class ListNode extends BlockNode {
             if(listWithRevisedSublist === undefined) return;
             const lastCaret = previousItem.getLastCaret();
             if(lastCaret === undefined) return;
-            const textIndex = previousItem.caretToTextIndex(lastCaret);
+            const textIndex = previousItem.getCaretAsTextIndex(lastCaret);
             if(textIndex === undefined) return;
             const mergedItem = previousItem.withSegmentsAppended(itemToMerge);
             const listWithMergedItem = listWithRevisedSublist.withChildReplaced(previousItem, mergedItem);
             if(listWithMergedItem === undefined) return;
-            const newCaret = mergedItem.textIndexToCaret(textIndex);
+            const newCaret = mergedItem.getTextIndexAsCaret(textIndex);
             if(newCaret === undefined) return;
             return [ listWithMergedItem, newCaret ]
         }
@@ -200,25 +200,25 @@ export class ListNode extends BlockNode {
             if(lastItem === undefined) return;
             const lastCaret = lastItem.getLastCaret();
             if(lastCaret === undefined) return;
-            const newCaretIndex = lastItem.caretToTextIndex(lastCaret);
+            const newCaretIndex = lastItem.getCaretAsTextIndex(lastCaret);
             if(newCaretIndex === undefined) return;
             const mergedItem = lastItem.withSegmentsAppended(deletedItem);
             const newSublist = previousItem.withChildReplaced(lastItem, mergedItem);
             if(newSublist === undefined) return;
             const newList = this.withChildReplaced(previousItem, newSublist)?.withoutItemAt(index);
             if(newList === undefined) return;
-            const newCaret = mergedItem.textIndexToCaret(newCaretIndex);
+            const newCaret = mergedItem.getTextIndexAsCaret(newCaretIndex);
             if(newCaret === undefined) return;
             return [ newList, newCaret ];
         } else {
             const lastCaret = previousItem.getLastCaret();
             if(lastCaret === undefined) return;
-            const newCaretIndex = previousItem.caretToTextIndex(lastCaret);
+            const newCaretIndex = previousItem.getCaretAsTextIndex(lastCaret);
             if(newCaretIndex === undefined) return;
             const mergedItem = previousItem.withSegmentsAppended(deletedItem);
             const newList = this.withItemReplaced(index - 1, mergedItem)?.withoutItemAt(index);
             if(newList === undefined) return;
-            const newCaret = mergedItem.textIndexToCaret(newCaretIndex);
+            const newCaret = mergedItem.getTextIndexAsCaret(newCaretIndex);
             if(newCaret === undefined) return;
             return [ newList, newCaret ];
         }

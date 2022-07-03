@@ -443,7 +443,7 @@ const BookishEditor = <RootType extends RootNode>(props: {
             setUndoPosition(undoPosition + 1);
 
         // Return the original caret.
-        const range = node.textRangeToCaret(undoState.range);
+        const range = node.getTextRangeAsCaretRange(undoState.range);
         if(range === undefined) return;
         return { root: node, range: range };
 
@@ -471,7 +471,7 @@ const BookishEditor = <RootType extends RootNode>(props: {
             setUndoPosition(undoPosition - 1);
 
         // Return the original caret.
-        const range = node.textRangeToCaret(undoState.range);
+        const range = node.getTextRangeAsCaretRange(undoState.range);
         if(range === undefined) return;
         return { root: node, range: range };
 
@@ -656,7 +656,7 @@ const BookishEditor = <RootType extends RootNode>(props: {
         
         // If there's nothing on the stack, save the current state before we add something to the stack.
         if(undoStack.length === 0 && caretRange !== undefined) {
-            const currentRange = newRoot.caretRangeToTextRange(caretRange);
+            const currentRange = newRoot.getCaretRangeAsTextRange(caretRange);
             if(currentRange !== undefined)
                 newStack = [{ 
                     bookdown: editedNode.toBookdown(), 
@@ -669,7 +669,7 @@ const BookishEditor = <RootType extends RootNode>(props: {
         setEditedNode(newRoot);
 
         // Set the new undo stack, pre-pending the new command to the front.
-        const newTextRange = newRoot.caretRangeToTextRange(newRange);
+        const newTextRange = newRoot.getCaretRangeAsTextRange(newRange);
         if(newTextRange !== undefined)
             setUndoStack([{ 
                 bookdown: newRoot.toBookdown(),
