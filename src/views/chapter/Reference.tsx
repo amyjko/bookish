@@ -98,9 +98,17 @@ const Reference = (props: { node: ReferenceNode }) => {
                 :
                 node.summary ? <span className="bookish-reference-summary">{node.summary}</span> : null
     
-        return <span data-nodeid={props.node.nodeID} className="bookish-reference-text">
-            {authors} ({year}). {title}. {source}. {summary}
-        </span>
+        return editable ?
+            // If editable, place in rows to make room for text editors to not have to wrap.
+            <span data-nodeid={props.node.nodeID} className="bookish-reference-text">
+                {authors} ({year})
+                <br/>{title}
+                <br/>{source}
+                <br/>{summary}
+            </span> :
+            <span data-nodeid={props.node.nodeID} className="bookish-reference-text">
+                {authors} ({year}). {title}. {source}. {summary}
+            </span>
 
     }
     

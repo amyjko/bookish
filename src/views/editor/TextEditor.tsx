@@ -35,11 +35,16 @@ const TextEditor = (props: {
     }
 
     function grow() {
-        if(sizer.current)
+        if(sizer.current) {
             // Set the invisible sizer to the text to set the container's width.
             // The browser strips trailing spaces, causing jitter after a space, so we replace
             // them with non-breaking spaces.
-            sizer.current.innerHTML = showPlaceholder() ? props.placeholder : text.replace(/\s/g, "\u00a0");
+            const sizedText = showPlaceholder() ? props.placeholder : text.replace(/\s/g, "\u00a0");
+            // Clip the text to prevent this editor from getting too long. If it goes past one line,
+            // the measurements and layout are way off.
+            const trimmedText = status === Status.Viewing ? sizedText : sizedText.substring(0, 60);
+            sizer.current.innerHTML = trimmedText;
+        }
     }
 
     function startEditing() {
@@ -73,10 +78,9 @@ const TextEditor = (props: {
         }
     }
 
-    return <span className="bookish-text-editor">
-        <span className="bookish-text-editor-sizer" aria-hidden={true} ref={sizer}></span>
+    return <span className={`bookish-text-editor ${showPlaceholder() ? "bookish-text-editor-placeholder" : ""} ${status === Status.Viewing ? "bookish-text-editor-viewing" : ""}`}>
+        <span className="bookish-text-editor-sizer" aria-hidden={true} ref={sizer} onClick={startEditing}></span>
         <input
-            className={`${text === "" ? "bookish-text-editor-placeholder" :""}`}
             type="text" 
             required
             role="textbox"
