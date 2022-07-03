@@ -148,11 +148,6 @@ const BookishEditor = <RootType extends RootNode>(props: {
     // 2) We can measure the caret position, so we can render our own fancy one rather than relying on inconsistent cross browser behavior.
     useEffect(() => {
 
-        // Grab the focus if we're focused on a text node.
-        if(caretRange && editorRef.current) {
-            editorRef.current.focus();
-        }
-
         // Measure the location of the selection using the browser's selection.
         let docSelection = document.getSelection();
         let newCaretPosition = undefined;
