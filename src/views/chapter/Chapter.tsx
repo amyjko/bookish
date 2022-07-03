@@ -17,6 +17,7 @@ import ChapterModel from '../../models/Chapter'
 import { EditorContext } from '../page/Book';
 import TextEditor from '../editor/TextEditor';
 import BookishEditor from '../editor/BookishEditor';
+import Toggle from '../editor/Toggle';
 
 export type ChapterContextType = {
 	book?: Book, 
@@ -272,6 +273,11 @@ const Chapter = (props: { chapter: ChapterModel, book: Book, print?: boolean }) 
 								null
 						}
 						{
+							editable ?
+								<Toggle on={props.chapter.isNumbered()} save={ on => chapter.setNumbered(on) }>
+									{ chapterNumber !== undefined ? <span className="bookish-chapter-number">Chapter {chapterNumber}</span> : <span className="bookish-muted">Unnumbered</span> }
+								</Toggle>
+							:
 							chapterNumber === undefined ? 
 								null : 
 								<span className="bookish-chapter-number">Chapter {chapterNumber}</span> 
