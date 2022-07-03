@@ -27,6 +27,7 @@ const CitationsEditor = (props: {
         <Select 
             isMulti 
             className="bookish-editor-select"
+            classNamePrefix="bookish-editor-select"
             placeholder="Choose one or more citations."
             value={ citations.getMeta().map(val => { return { value: val, label: val }; }) }
             options={Object.keys(book.getReferences()).sort().map(citationID => { return {value: citationID, label: citationID }; })} 

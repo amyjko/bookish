@@ -183,6 +183,12 @@ input:focus, button:focus, select:focus {
     z-index: 2;
 }
 
+.bookish-editor-select .bookish-editor-select__control.bookish-editor-select__control--is-focused {
+    border: none !important;
+    outline: 2px solid var(--bookish-highlight-color) !important;
+    box-shadow: none !important;
+}
+
 input[type="text"].bookish-text-editor-error {
     outline-color: var(--bookish-app-error-color);
 }
@@ -450,7 +456,11 @@ input[type=text].bookish-editor-text-invalid {
 .bookish-editor-select {
     display: inline-block;
     max-width: 20em;
-    margin-right: var(--bookish-app-chrome-padding);
+}
+
+.bookish-editor-select .bookish-editor-select__multi-value__label, .bookish-editor-select .bookish-editor-select__value-container {
+    padding-top: 0 !important;
+    padding-bottom: 0 !important;
 }
 
 .bookish-editor-status {
