@@ -12,6 +12,7 @@ const LinkEditor = (props: {
 
     const chapter = useContext(ChapterContext);
     const caret = useContext(CaretContext);
+    const [ selectedOption, setSelectedOption ] = useState<string>("");
 
     const link = props.link;
     const url = link.getMeta();
@@ -22,6 +23,7 @@ const LinkEditor = (props: {
 
     function handleChapterChange(e: ChangeEvent<HTMLSelectElement>) {
         saveEdit(e.target.value);
+        setSelectedOption(e.target.value);
     }
 
     function isValidURL(url: string) {
@@ -31,9 +33,13 @@ const LinkEditor = (props: {
             if(test.protocol === "http:" || test.protocol === "https:")
                 return true;
         } catch (_) {}
+        return false;
     }
 
-    function isValid(urlOrChapter: string): string | undefined {
+    function getURLError(urlOrChapter: string): string | undefined {
+
+        if(urlOrChapter.length === 0) 
+            return "Can't be empty.";
 
         if(isValidURL(urlOrChapter))
             return;
@@ -48,15 +54,15 @@ const LinkEditor = (props: {
         // If not, is it a valid chapterID:label?
         const [ chapterID, labelID ] = urlOrChapter.split(":");
         if(chapterID === undefined || labelID === undefined)
-            return "Not a valid chapter label ID.";
+            return;
 
         // The chapter ID is optional; if it's missing, it refers to this chapter.
         const correspondingChapter = chapterID === "" ? chapter.chapter?.getAST() : chapter.book.getChapter(chapterID)?.getAST();
-        if(!correspondingChapter)
-            return "Not a valid chapter ID.";
+        if(correspondingChapter === undefined)
+            return "Not a valid URL or chapter.";
         
         if(!correspondingChapter.hasLabel(labelID))
-            return "This chapter doesn't have this label."
+            return "Not a valid chapter label."
 
     }
 
@@ -85,16 +91,9 @@ const LinkEditor = (props: {
             <option value="">URL</option>
             { options.map((option, index) => <option key={index} value={option.value}>{option.label}</option>) }
         </select>
-        <URLEditor url={url} validator={isValid} edit={ url => { saveEdit(url); } } />
-        {
-            isValid(url) ?
-                (
-                    isValidURL(url) ? <span className="bookish-editor-note">This link will navigate to this URL.</span> :
-                    url.indexOf(":") >= 0 ? <span className="bookish-editor-note">This link will navigate to this chapter label.</span> :
-                    <span className="bookish-editor-note">This link will navigate to this chapter.</span>
-                ) :
-                <span className="bookish-editor-note bookish-editor-note-error">Choose a valid URL, chapter ID, or chapterID:labelID.</span>
-        }
+        <code>
+            <URLEditor key={selectedOption} url={url} validator={getURLError} edit={ url => { saveEdit(url); } } />
+        </code>
     </span>
 
 }
