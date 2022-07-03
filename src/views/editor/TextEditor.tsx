@@ -15,7 +15,7 @@ const TextEditor = (props: {
 
     const [ status, setStatus ] = useState(Status.Viewing)
     const [ text, setText ] = useState(props.text)
-    const [ error, setError ] = useState<undefined | string>(undefined)
+    const [ error, setError ] = useState<undefined | string>(props.valid.call(undefined, props.text))
     const textField = useRef<HTMLInputElement>(null)
     const sizer = useRef<HTMLSpanElement>(null);
 
@@ -54,15 +54,15 @@ const TextEditor = (props: {
         if(textField?.current) {
             const newValue = textField?.current.value;
             setText(newValue)
-            if(validate(newValue))
+            if(validate(newValue) === undefined)
                 props.save.call(undefined, newValue);
         }
     }
 
-    function validate(value: string): boolean {
-        const error = props.valid?.call(undefined, value);
+    function validate(value: string): string | undefined {
+        const error = props.valid.call(undefined, value);
         setError(error);
-        return error === undefined;
+        return error;
     }
 
     function handleKeyPress(event: KeyboardEvent) {
@@ -94,7 +94,9 @@ const TextEditor = (props: {
             error ? 
                 <span
                     aria-live="polite"
-                    className="bookish-text-editor-error">{error}
+                    className={`bookish-text-editor-error ${status === Status.Editing ? "bookish-text-editor-error-focused" : ""}`}
+                >
+                        {status === Status.Viewing ? "\u2715" : error}
                 </span> : 
             null 
         }

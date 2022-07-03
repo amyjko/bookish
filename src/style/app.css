@@ -195,6 +195,11 @@ input[type="text"].bookish-text-editor-error {
     backdrop-filter: blur(5px) opacity(50%);
 }
 
+.bookish-text-editor .bookish-text-editor-error.bookish-text-editor-error-focused {
+    /* Put this above other errors nearby. */
+    z-index: 4;
+}
+
 button.bookish-editor-confirm {
     animation: failure 100ms infinite;
 }
