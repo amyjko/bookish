@@ -138,7 +138,7 @@ button:disabled {
 
 /* Match the parent's styling as much as possible. */
 .bookish-text-editor input[type="text"], .bookish-text-editor-sizer {
-    background-color: var(--bookish-background-color);
+    background-color: inherit;
     font-family: inherit;
     font-size: inherit;
     font-weight: inherit;

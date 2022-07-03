@@ -40,6 +40,9 @@ const Header = (props: HeaderProps) => {
 		}
 	}
 
+	function addCover() { props.setImage("|||||"); }
+	function removeCover() { props.setImage(undefined); }
+
     useEffect(() => {
 
 		// When the title becomes visible or hidden, update the scroll reminder.
@@ -81,16 +84,14 @@ const Header = (props: HeaderProps) => {
 					// Add a bit of space to account for the lack of an image.
 					<p>&nbsp;</p>
 			}
+			{ props.outline }
 			{
 				editable ?
-					<Switch 
-						options={["\u25A1", "x"]} 
-						value={ embed === undefined ? "x" : "\u25A1"} 
-						edit={ newValue => newValue === "\u25A1" ? props.setImage("|||||") : props.setImage(undefined)} 
-					/> :
+					embedNode === undefined ?
+						<button onClick={addCover}>+ cover image</button> :
+						<button onClick={removeCover}>x cover image</button> :
 					null
 			}
-			{ props.outline }
 			<div className="bookish-chapter-header-text">
 				{ props.before }
 				<h1 ref={title} className="bookish-title">
