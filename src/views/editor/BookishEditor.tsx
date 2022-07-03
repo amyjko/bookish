@@ -22,6 +22,7 @@ import { ChapterContext, ChapterContextType } from "../chapter/Chapter";
 import { CodeNode } from "../../models/CodeNode";
 import { BlockNode } from "../../models/BlockNode";
 import { EmbedNode } from "../../models/EmbedNode";
+import { ErrorNode } from "../../models/ErrorNode";
 
 export type CaretContextType = { 
     range: CaretRange | undefined, 
@@ -433,10 +434,14 @@ const BookishEditor = <RootType extends RootNode>(props: {
             props.ast instanceof EmbedNode ? Parser.parseEmbed(chapterContext.book, undoState.bookdown) :
             undefined;
 
-        if(node === undefined)
+        if(node === undefined || node instanceof ErrorNode)
             return;
-        
+
+        // Restore the view
         setEditedNode(node as RootType);
+
+        // Save the undo.
+        props.save(node as RootType);
 
         // Move the undo state down a position.
         if(undoPosition < undoStack.length)
