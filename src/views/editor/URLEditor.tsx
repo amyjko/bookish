@@ -1,22 +1,20 @@
-import React, { ChangeEvent, useRef, useState } from "react";
+import React, { ChangeEvent } from "react";
+import TextEditor from "./TextEditor";
 
 const URLEditor = (props: {
     url: string,
-    valid: boolean,
+    validator: (text: string) => undefined | string,
     edit: (newURL: string) => void
 }) => {
 
-    function handleURLChange(e: ChangeEvent<HTMLInputElement>) {
-        props.edit.call(undefined, e.target.value);    
-    }
-
-    return <input 
-        type="text"
-        tabIndex={0}
-        className={props.valid ? "" : "bookish-editor-text-invalid"}
-        value={props.url}
-        onChange={handleURLChange}
-        placeholder="e.g., https://bookish.press" 
+    return <TextEditor
+        placeholder="url" 
+        text={props.url} 
+        label="URL editor"
+        valid={ url => props.validator.call(undefined, url) }
+        save={ url => props.edit.call(undefined, url) }
+        width={20}
+        clip={true}
     />;
 
 }

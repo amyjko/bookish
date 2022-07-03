@@ -10,8 +10,10 @@ const TextEditor = (props: {
     label: string,
     placeholder: string,
     valid: (text: string) => string | undefined,
-    save: (text: string) => Promise<void> | undefined,
-    saveOnExit?: boolean
+    save: (text: string) => Promise<void> | undefined | void,
+    saveOnExit?: boolean,
+    width?: number,
+    clip?: boolean
  }) => {
 
     const [ status, setStatus ] = useState(Status.Viewing)
@@ -41,9 +43,9 @@ const TextEditor = (props: {
             // The browser strips trailing spaces, causing jitter after a space, so we replace
             // them with non-breaking spaces.
             const sizedText = showPlaceholder() ? props.placeholder : text.replace(/\s/g, "\u00a0");
-            // Clip the text to prevent this editor from getting too long. If it goes past one line,
+            // Clip the text to prevent this editor from getting too long when editing or when asked to.. If it goes past one line,
             // the measurements and layout are way off.
-            const trimmedText = status === Status.Viewing ? sizedText : sizedText.substring(0, 60);
+            const trimmedText = props.width !== undefined && (props.clip === true || status === Status.Editing) ? sizedText.substring(0, props.width) + "…" : sizedText;
             sizer.current.innerHTML = trimmedText;
         }
     }

@@ -71,6 +71,10 @@ const categoryIcons: {[key:string]: Function | string} = {
     "history": "\u2026"
 }
 
+export const Spacer = (props: {}) => {
+    return <span style={{ display: "inline-block", width: "1em"}}></span>
+}
+
 const Toolbar = (props: { 
     context?: CaretState, 
     executor?: (command: Command, key: string) => void,
@@ -176,7 +180,7 @@ const Toolbar = (props: {
             categories.map(cat => 
                 commandsByCategory[cat].length === 0 ?
                     null :
-                    <ToolbarGroup key={cat} icon={ cat in categoryIcons ? wrapIcon(categoryIcons[cat]) : cat.charAt(0).toUpperCase() + cat.slice(1) }>
+                    <ToolbarGroup key={cat} break={false} icon={ cat in categoryIcons ? wrapIcon(categoryIcons[cat]) : cat.charAt(0).toUpperCase() + cat.slice(1) }>
                         {
                             commandsByCategory[cat]
                                 // Convert commands into buttons
@@ -204,17 +208,19 @@ const Toolbar = (props: {
         { metaNode instanceof CodeNode && context ? <ToolbarGroup icon={wrapIcon(Code)}><CaptionedCodeEditor code={context.start.node.getParent(chapter) as CodeNode}/></ToolbarGroup> : null }
         { calloutNode ? <ToolbarGroup icon="Callout"><CalloutEditor callout={calloutNode} /></ToolbarGroup> : null }
         { quoteNode ? <ToolbarGroup icon="Quote"><QuoteEditor quote={quoteNode} /></ToolbarGroup> : null }
-        { embedNode ? <ToolbarGroup icon={wrapIcon(Media)}><EmbedEditor embed={embedNode} /></ToolbarGroup> : null }
+        { embedNode ? <ToolbarGroup break={true} icon={wrapIcon(Media)}><EmbedEditor embed={embedNode} /></ToolbarGroup> : null }
     </div>
 
 }
 
 const ToolbarGroup = (props: {
     icon: ReactNode,
+    break?: boolean,
     children: React.ReactNode
 }) => {
 
     return <>
+        { props.break !== false ? <br/> : null }
         <span className="bookish-editor-toolbar-group">
             <span className="bookish-editor-toolbar-icon">{props.icon}</span>
             { props.children }

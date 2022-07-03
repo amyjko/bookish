@@ -36,6 +36,7 @@ const Reference = (props: { node: ReferenceNode }) => {
                             if(text.length === 0) return "Authors can't be empty.";
                         }}
                         save={text => book.editReference(node.withAuthors(text))}
+                        width={60}
                     />
                 </em>
                 :
@@ -66,6 +67,7 @@ const Reference = (props: { node: ReferenceNode }) => {
                         if(text.length === 0) return "Title can't be empty.";
                     }}
                     save={text => book.editReference(node.withTitle(text))}
+                    width={60}
                 />
                 :
                 node.url === null ? node.title || <em>Title</em> : <a href={node.url} target={"_blank"}>{node.title || <em>Title</em>}</a>
@@ -81,6 +83,7 @@ const Reference = (props: { node: ReferenceNode }) => {
                             if(text.length === 0) return "Source can't be empty";
                         }}
                         save={text => book.editReference(node.withSource(text))}
+                        width={60}
                     />
                 </em>
                 :
@@ -94,6 +97,7 @@ const Reference = (props: { node: ReferenceNode }) => {
                     placeholder="Summary"
                     valid={ text => undefined }
                     save={text => book.editReference(node.withSummary(text))}
+                    width={60}
                 />
                 :
                 node.summary ? <span className="bookish-reference-summary">{node.summary}</span> : null

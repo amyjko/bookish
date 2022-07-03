@@ -4,6 +4,8 @@ import PositionEditor from "./PositionEditor";
 import { EmbedNode } from '../../models/EmbedNode';
 import URLEditor from './URLEditor';
 import { CaretContext, CaretContextType } from './BookishEditor';
+import TextEditor from './TextEditor';
+import { Spacer } from './Toolbar';
 
 const EmbedEditor = (props: {
     embed: EmbedNode
@@ -13,18 +15,14 @@ const EmbedEditor = (props: {
     const description = embed.getDescription();
     const caret = useContext<CaretContextType>(CaretContext);
 
-    function isValidURL(url: string): boolean {
+    function isValidURL(url: string): string | undefined {
         // Is it a valid URL?
         try {
             let test = new URL(url);
             if(test.protocol === "http:" || test.protocol === "https:")
-                return true;
+                return;
         } catch (_) {}
-        return false;
-    }
-
-    function handleDescriptionChange(e: ChangeEvent<HTMLInputElement>) {
-        caret?.edit(embed, embed.withDescription(e.target.value));
+        return "URL doesn't seem valid";
     }
 
     const positionEditor = 
@@ -33,13 +31,24 @@ const EmbedEditor = (props: {
             <>Position <PositionEditor value={embed.getPosition()} edit={(position: string) => caret?.edit(embed, embed.withPosition(position as Position)) } /></>
 
     return <>
-        { positionEditor } 
-        url <URLEditor url={embed.getURL()} valid={isValidURL(embed.getURL())} edit={(url: string) => caret?.edit(embed, embed.withURL(url))} />
-        alt <input
-            type="text"
-            value={description}
-            placeholder="Describe the image or video for people who can't see it"
-            onChange={handleDescriptionChange}
+        { positionEditor }
+        { positionEditor !== null ? <Spacer/> : null }
+        <URLEditor 
+            url={embed.getURL()} 
+            validator={isValidURL} 
+            edit={(url: string) => caret?.edit(embed, embed.withURL(url))} 
+        />
+        <Spacer/>
+        <TextEditor
+            text={description} 
+            label={'Image description'} 
+            placeholder={'description'} 
+            valid={ alt => {
+                if(alt.length === 0) return "Image description required";
+            }}
+            save={ alt => { caret?.edit(embed, embed.withDescription(alt)); } }
+            width={20}
+            clip={true}
         />
     </>
 

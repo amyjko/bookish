@@ -33,28 +33,30 @@ const LinkEditor = (props: {
         } catch (_) {}
     }
 
-    function isValid(urlOrChapter: string) {
+    function isValid(urlOrChapter: string): string | undefined {
 
         if(isValidURL(urlOrChapter))
-            return true;
+            return;
 
         if(!chapter || !chapter.book)
-            return false;
+            return;
 
         // If not, is it a valid chapterID?
         if(chapter.book.hasChapter(urlOrChapter))
-            return true;
+            return;
 
         // If not, is it a valid chapterID:label?
         const [ chapterID, labelID ] = urlOrChapter.split(":");
         if(chapterID === undefined || labelID === undefined)
-            return false;
+            return "Not a valid chapter label ID.";
 
         // The chapter ID is optional; if it's missing, it refers to this chapter.
         const correspondingChapter = chapterID === "" ? chapter.chapter?.getAST() : chapter.book.getChapter(chapterID)?.getAST();
         if(!correspondingChapter)
-            return false;
-        return correspondingChapter.hasLabel(labelID);
+            return "Not a valid chapter ID.";
+        
+        if(!correspondingChapter.hasLabel(labelID))
+            return "This chapter doesn't have this label."
 
     }
 
@@ -83,7 +85,7 @@ const LinkEditor = (props: {
             <option value="">URL</option>
             { options.map((option, index) => <option key={index} value={option.value}>{option.label}</option>) }
         </select>
-        <URLEditor url={url} valid={isValid(url)} edit={ url => { saveEdit(url); } } />
+        <URLEditor url={url} validator={isValid} edit={ url => { saveEdit(url); } } />
         {
             isValid(url) ?
                 (
