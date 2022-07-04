@@ -5,7 +5,6 @@ import { EmbedNode } from '../../models/EmbedNode';
 import Parser from "../../models/Parser";
 import { renderNode } from '../chapter/Renderer'
 import BookishEditor from '../editor/BookishEditor';
-import Switch from '../editor/Switch';
 import TextEditor from '../editor/TextEditor';
 import { EditorContext } from './Book';
 
