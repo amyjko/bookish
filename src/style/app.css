@@ -398,6 +398,11 @@ input[type=text].bookish-editor-text-invalid {
     height: 1em;
 }
 
+.bookish-editor-toolbar-group button {
+    vertical-align: middle;
+    height: 2.25em;
+}
+
 .bookish-editor-toolbar-shortcut {
     color: var(--bookish-app-chrome-muted);
     font-size: 80%;

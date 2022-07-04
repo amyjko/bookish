@@ -11,6 +11,7 @@ import LinkIcon from "../svg/link.svg";
 import Code from "../svg/code.svg";
 import Scissors from "../svg/scissors.svg";
 import Media from "../svg/media.svg";
+import Quote from "../svg/quote.svg";
 
 import { TextNode } from "../../models/TextNode";
 import { AtomNode } from "../../models/AtomNode";
@@ -68,6 +69,7 @@ const categoryIcons: {[key:string]: Function | string} = {
     "level": Level,
     "block": Block,
     "list": List,
+    "table": "▦",
     "history": "\u2026"
 }
 
@@ -203,11 +205,11 @@ const Toolbar = (props: {
         { metaNode instanceof LinkNode ? <ToolbarGroup icon={wrapIcon(LinkIcon)}><LinkEditor link={metaNode}/></ToolbarGroup> : null }
         { metaNode instanceof LabelNode ? <ToolbarGroup icon="•"><LabelEditor label={metaNode}/></ToolbarGroup> : null }
         { metaNode instanceof InlineCodeNode ? <ToolbarGroup icon={wrapIcon(Code)}><InlineCodeEditor code={metaNode}/></ToolbarGroup> : null }
-        { metaNode instanceof CitationsNode ? <ToolbarGroup icon="Citations"><CitationsEditor citations={metaNode}/></ToolbarGroup> : null }
-        { metaNode instanceof DefinitionNode ? <ToolbarGroup icon="Glossary"><DefinitionEditor definition={metaNode}/></ToolbarGroup> : null }
+        { metaNode instanceof CitationsNode ? <ToolbarGroup icon="a\u00b9"><CitationsEditor citations={metaNode}/></ToolbarGroup> : null }
+        { metaNode instanceof DefinitionNode ? <ToolbarGroup icon="_"><DefinitionEditor definition={metaNode}/></ToolbarGroup> : null }
         { metaNode instanceof CodeNode && context ? <ToolbarGroup icon={wrapIcon(Code)}><CaptionedCodeEditor code={context.start.node.getParent(chapter) as CodeNode}/></ToolbarGroup> : null }
-        { calloutNode ? <ToolbarGroup icon="Callout"><CalloutEditor callout={calloutNode} /></ToolbarGroup> : null }
-        { quoteNode ? <ToolbarGroup icon="Quote"><QuoteEditor quote={quoteNode} /></ToolbarGroup> : null }
+        { calloutNode ? <ToolbarGroup icon="🄰"><CalloutEditor callout={calloutNode} /></ToolbarGroup> : null }
+        { quoteNode ? <ToolbarGroup icon={wrapIcon(Quote)}><QuoteEditor quote={quoteNode} /></ToolbarGroup> : null }
         { embedNode ? <ToolbarGroup break={true} icon={wrapIcon(Media)}><EmbedEditor embed={embedNode} /></ToolbarGroup> : null }
     </div>
 

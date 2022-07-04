@@ -604,7 +604,7 @@ export const commands: Command[] = [
             context.root.withSegmentAtSelection(context.range, text => new LinkNode(new TextNode(text)))
     },
     {
-        label: "glossary",
+        label: "_",
         description: "toggle definition",
         category: "annotation",
         control: true, alt: false, shift: false, key: "d",
@@ -615,7 +615,7 @@ export const commands: Command[] = [
             context.root.withSegmentAtSelection(context.range, text => new DefinitionNode(new TextNode(text)))
     },
     {
-        label: "footnote",
+        label: "a\u1D43",
         description: "insert footnote",
         category: "annotation",
         control: true, alt: false, shift: false, key: "f",
@@ -624,7 +624,7 @@ export const commands: Command[] = [
         handler: context => context.root.withSegmentAtSelection(context.range, text => new FootnoteNode(new FormatNode("", [ new TextNode(text) ])))
     },
     {
-        label: "cite",
+        label: "a\u00b9",
         description: "insert citations",
         category: "annotation",
         control: true, alt: false, shift: false, key: "t",
@@ -633,7 +633,7 @@ export const commands: Command[] = [
         handler: context => context.root.withSegmentAtSelection(context.range, text => new CitationsNode([]))
     },
     {
-        label: "label",
+        label: "•",
         description: "insert label",
         category: "annotation",
         control: true, alt: false, shift: false, key: "l",
@@ -701,7 +701,7 @@ export const commands: Command[] = [
         handler: context => context.paragraph ? rootWithNode(context, context.blocks, context.blocks?.withBlockInsertedBefore(context.paragraph, new RuleNode())) : undefined
     },
     {
-        label: "callout",
+        label: "🄰",
         description: "insert callout",
         category: "block",
         control: true, alt: false, shift: true, key: "e",
@@ -784,7 +784,7 @@ export const commands: Command[] = [
         } 
     },
     {
-        label: "table",
+        label: "▦",
         description: "insert table",
         category: "block",
         control: true, alt: false, shift: true, key: "\\",
@@ -880,7 +880,7 @@ export const commands: Command[] = [
         handler: context => context.redo()
     },
     {
-        label: "cut",
+        label: "✂",
         description: "delete the selected content and copy it to the clipboard",
         category: "clipboard",
         control: true, alt: false, shift: false, key: ["x"],
@@ -899,7 +899,7 @@ export const commands: Command[] = [
         }
     },
     {
-        label: "copy",
+        label: "🗎",
         description: "copy the selected content to the clipboard",
         category: "clipboard",
         control: true, alt: false, shift: false, key: ["c"],
@@ -916,7 +916,7 @@ export const commands: Command[] = [
         }
     },
     {
-        label: "paste",
+        label: "⎘",
         description: "paste the content from the clipboard",
         category: "clipboard",
         control: true, alt: false, shift: false, key: ["v"],
