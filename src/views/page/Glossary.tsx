@@ -55,31 +55,13 @@ const Definition = (props: { id: string, definition: Definition }) => {
 			:
 			<strong>{definition.phrase || <em>Phrase</em>}</strong>;
 
-	const idEditor =
-		editable && book ?
-			<span className="bookish-editor-note">
-				<TextEditor
-					text={id} 
-					label={'Definition ID editor.'} 
-					placeholder="ID"
-					valid={ text => {
-						if(text.length === 0) return "ID can't be empty";
-					}}
-					save={text => book.editDefinitionID(id, text)}
-				/>
-			</span>
-			:
-			null
-
 	const deleteButton = editable && book ?
-		<>
-			<br/>
-			<ConfirmButton
-				commandLabel="x"
-				confirmLabel="Confirm"
-				command={() => book.removeDefinition(id)}
-			/>
-		</> : null;
+		<ConfirmButton
+			commandLabel="x"
+			confirmLabel="Confirm"
+			command={() => book.removeDefinition(id)}
+		/>
+		: null;
 
 	const format = Parser.parseFormat(undefined, definition.definition).withTextIfEmpty();
 	const definitionEditor = 
@@ -155,9 +137,7 @@ const Definition = (props: { id: string, definition: Definition }) => {
 
 	return <tr>
 		<td>
-			{ phrase }
-			<br/>{ idEditor }
-			{ deleteButton }
+			{ deleteButton } { phrase }
 		</td>
 		<td>
 			{ definitionEditor }
