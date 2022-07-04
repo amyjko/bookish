@@ -739,19 +739,15 @@ export default class Parser {
             const next = this.peek();
             const charAfterNext = this.charAfterNext();
 
-            // Parse some formatted text
-            if(next === "_" || next === "*")
-                segments.push(this.parseBoldItalic(next));
+            // Parse some bold, italic, subscript, superscript
+            if(next === "_" || next === "*" || next === "^")
+                segments.push(this.parseStyle(next));
             // Parse unformatted text
-            else if(this.nextIs("`")) {
+            else if(this.nextIs("`"))
                 segments.push(this.parseInlineCode());
-            }
             // Parse a citation list
             else if(this.nextIs("<"))
                 segments.push(this.parseCitations());
-            // Parse sub/super scripts
-            else if(this.nextIs("^"))
-                segments.push(this.parseSubSuperscripts());
             // Parse a footnote
             else if(this.nextIs("{"))
                 segments.push(this.parseFootnote());
@@ -884,12 +880,19 @@ export default class Parser {
 
     }
 
-    parseBoldItalic(awaiting: string): FormatNode | ErrorNode {
+    parseStyle(awaiting: string): FormatNode | ErrorNode {
 
         // Remember what we're matching.
         const delimeter = this.read();
+        let subscript = false;
         const segments: Array<FormatNode | TextNode | ErrorNode> = [];
         let text = "";
+
+        // Special case subscript, which has an extra delimeter.
+        if(this.peek() === "v") {
+            this.read();
+            subscript = true;
+        }
 
         if(delimeter === null)
             return new ErrorNode(undefined, "Somehow parsing formatted text at end of file.");
@@ -924,7 +927,7 @@ export default class Parser {
         else
             segments.push(new ErrorNode(undefined, "Unclosed " + delimeter));
         
-        return new FormatNode(delimeter as Format, segments);
+        return new FormatNode(subscript ? "v" : delimeter as Format, segments);
 
     }
 
@@ -980,27 +983,6 @@ export default class Parser {
         const citationList = citations.split(",").map(citation => citation.trim()).filter(citationID => citationID.length > 0);
 
         return new CitationsNode(citationList);
-
-    }
-
-    parseSubSuperscripts(): FormatNode {
-        
-        // Read the ^
-        this.read();
-
-        // Default to superscript.
-        let superscript = true;
-
-        // Is there a 'v', indicating subscript?
-        if(this.peek() === "v") {
-            this.read();
-            superscript = false;
-        }
-
-        // Read the closing ^
-        this.read();
-
-        return new FormatNode(superscript ? "^" : "v", [ this.parseFormat("^") ]);
 
     }
 
