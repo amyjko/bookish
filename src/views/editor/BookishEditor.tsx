@@ -717,7 +717,9 @@ const BookishEditor = <RootType extends RootNode>(props: {
 
         // Grab focus.
         editorRef.current.focus();
-        setEditorFocused(true);
+        // Update the caret range to ensure it's positioned correctly, since it depends on relative positioned parents.
+        if(caretRange)
+            setCaretRange({ start: caretRange.start, end: caretRange.end });
 
         // If we've selected a non-TextNode, release it, so the browser is free to select a text node.
         if(caretRange && !(caretRange.start.node instanceof TextNode || caretRange.start.node instanceof AtomNode)) {
