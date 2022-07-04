@@ -4,15 +4,12 @@ import { ErrorNode } from "./ErrorNode";
 import { TextNode } from "./TextNode";
 import { FootnoteNode } from "./FootnoteNode";
 import { EmbedNode } from "./EmbedNode";
-import { Node } from "./Node";
 import { ParagraphNode } from "./ParagraphNode";
-import { FormatNode } from "./FormatNode";
 import { AtomNode } from "./AtomNode";
 import { CitationsNode } from "./CitationsNode";
 import { LabelNode } from "./LabelNode";
 import { CommentNode } from "./CommentNode";
 import { BlocksNode } from "./BlocksNode";
-import { CaretRange, IndexRange } from "./Caret";
 
 export class ChapterNode extends BlocksNode {
 
@@ -27,7 +24,6 @@ export class ChapterNode extends BlocksNode {
     }
 
     getType() { return "chapter"; }
-    getFormats(): FormatNode[] { return []; }
     getChapter() { return this; }
 
     create(blocks: BlockNode[]): BlocksNode {

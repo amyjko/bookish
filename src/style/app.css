@@ -209,6 +209,13 @@ input[type="text"].bookish-text-editor-error {
     backdrop-filter: blur(5px) opacity(50%);
 }
 
+.bookish-editor-placeholder {
+    color: var(--bookish-muted-color);
+    font-style: italic;
+    /* Rather than making the editor relative positioned, just translate late it up to the first line */
+    margin-top: calc(-1 * var(--bookish-paragraph-line-height));
+}
+
 .bookish-editor-error, .bookish-text-editor-error {
     font-family: var(--bookish-app-chrome-font-family);
     font-size: var(--bookish-small-font-size);

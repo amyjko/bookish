@@ -76,6 +76,7 @@ const Header = (props: HeaderProps) => {
 									ast={embedNode} 
 									save={(node: EmbedNode) => props.setImage(node.toBookdown())}
 									chapter={false}
+									placeholder="Set a URL and description in the toolbar."
 									autofocus={false}
 								/> :
 								renderNode(embedNode)

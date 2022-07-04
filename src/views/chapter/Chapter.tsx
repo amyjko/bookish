@@ -323,6 +323,7 @@ const Chapter = (props: { chapter: ChapterModel, book: Book, print?: boolean }) 
 									ast={chapterAST}
 									save={ (node: ChapterNode) => chapter.setAST(node) }
 									chapter={true}
+									placeholder="Ready to start this chapter?"
 									autofocus
 								/> : 
 								renderNode(chapterAST)

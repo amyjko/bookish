@@ -23,6 +23,7 @@ import { CodeNode } from "../../models/CodeNode";
 import { BlockNode } from "../../models/BlockNode";
 import { EmbedNode } from "../../models/EmbedNode";
 import { ErrorNode } from "../../models/ErrorNode";
+import Placeholder from "./Placeholder";
 
 export type CaretContextType = { 
     range: CaretRange | undefined, 
@@ -85,6 +86,7 @@ const BookishEditor = <RootType extends RootNode>(props: {
     ast: RootType,
     save: (node: RootType) => Promise<void> | undefined,
     chapter: boolean,
+    placeholder: string,
     autofocus: boolean
 }) => {
 
@@ -715,6 +717,7 @@ const BookishEditor = <RootType extends RootNode>(props: {
 
         // Grab focus.
         editorRef.current.focus();
+        setEditorFocused(true);
 
         // If we've selected a non-TextNode, release it, so the browser is free to select a text node.
         if(caretRange && !(caretRange.start.node instanceof TextNode || caretRange.start.node instanceof AtomNode)) {
@@ -789,6 +792,9 @@ const BookishEditor = <RootType extends RootNode>(props: {
                         </div> : null
                 }
                 { renderNode(editedNode) }
+                { (editedNode.isEmpty() || (editedNode instanceof FormatNode && editedNode.isEmptyText())) ? 
+                    <Placeholder text={props.placeholder} /> : 
+                    null }
             </div>
         </CaretContext.Provider>
     ;
