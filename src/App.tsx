@@ -14,7 +14,6 @@ import Footer from "./views/app/Footer"
 import Editor from "./views/app/Editor"
 import Reader from "./views/app/Reader"
 import About from "./views/app/About"
-import Toolbar from './views/editor/Toolbar';
 
 function App() {
 
@@ -33,7 +32,7 @@ function App() {
   return <div className="bookish-app">
       <AuthProvider>
         <Router>
-          <Toolbar/>
+          <Header/>
           <Routes>
             <Route path="/" element={<Home/>} />
             <Route path="/login" element={<Login/>} />

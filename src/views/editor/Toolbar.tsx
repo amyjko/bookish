@@ -35,7 +35,6 @@ import { QuoteNode } from "../../models/QuoteNode";
 import QuoteEditor from "./QuoteEditor";
 import { EmbedNode } from "../../models/EmbedNode";
 import EmbedEditor from "./EmbedEditor";
-import Header from "../app/Header";
 
 const keyLabels: {[key: string]: string} = {
     "Digit0": "0",
@@ -176,7 +175,6 @@ const Toolbar = (props: {
         tabIndex={0}
         ref={toolbarRef}
         >
-        <Header/>
         {
         context && categories && props.executor ?
             categories.map(cat => 

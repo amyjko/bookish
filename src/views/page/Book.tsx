@@ -1,6 +1,6 @@
 import React, { useState, useEffect }  from 'react';
 import { Route, Routes, useNavigate, useLocation } from 'react-router-dom';
-import { BookSaveStatus, defaultTheme, ThemeColors } from '../../models/Book';
+import { BookSaveStatus } from '../../models/Book';
 import Chapter from "../chapter/Chapter";
 import TableOfContents from "./TableOfContents";
 import References from "./References";
