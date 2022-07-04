@@ -276,6 +276,10 @@ button.bookish-editor-confirm {
     outline-width: 2px;
 }
 
+.bookish-editor-caret-ignored {
+    animation: failure 100ms 10;
+}
+
 .bookish-editor-caret-linked {
     outline-width: 1px;
     outline-color: var(--bookish-link-color);

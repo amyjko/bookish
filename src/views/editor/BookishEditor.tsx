@@ -99,6 +99,7 @@ const BookishEditor = <RootType extends RootNode>(props: {
     const [ undoPosition, setUndoPosition ] = useState<number>(-1);
     const [ clipboard, setClipboard ] = useState<Clipboard>(undefined);
     const [ editedNode, setEditedNode ] = useState<RootType>(props.ast);
+    const [ ignoredInput, setIgnoredInput ] = useState<boolean>(false);
 
     const chapterContext = useContext<ChapterContextType>(ChapterContext);
 
@@ -136,6 +137,7 @@ const BookishEditor = <RootType extends RootNode>(props: {
             const isIdle = Date.now() - lastInputTime > IDLE_TIME;
             if(isIdle) {
                 setKeyboardIdle(true);
+                setIgnoredInput(false);
             }
         }, IDLE_TIME);
         return () => {
@@ -578,13 +580,13 @@ const BookishEditor = <RootType extends RootNode>(props: {
         if(unmatched) {
             // Toolbar navigation
             if(event.key === "Tab") {
-                event.preventDefault();
-                event.stopPropagation();
 
                 // If we've selected a FootnoteNode or Comment, navigate to the footnote or comment text.
                 if(caretRange.start.node instanceof AtomNode && caretRange.start.node.getMeta() instanceof FormatNode) {
                     const firstCaret = caretRange.start.node.getMeta().getFirstCaret();
                     setCaretRange({ start: firstCaret, end: firstCaret });
+                    event.preventDefault();
+                    event.stopPropagation();
                     return true;
                 }
                 else if(caretRange.start.node.isInside(editedNode, AtomNode)) {
@@ -592,6 +594,8 @@ const BookishEditor = <RootType extends RootNode>(props: {
                     if(atom) {
                         const atomCaret = { node: atom, index: 0 };
                         setCaretRange({ start: atomCaret, end: atomCaret });
+                        event.preventDefault();
+                        event.stopPropagation();
                         return true;
                     }
                 }
@@ -605,6 +609,8 @@ const BookishEditor = <RootType extends RootNode>(props: {
                     const match = controls.find(control => control && control instanceof HTMLElement);
                     if(match && match instanceof HTMLElement) {
                         match.focus();
+                        event.preventDefault();
+                        event.stopPropagation();
                         return true;
                     }
                 }
@@ -615,6 +621,9 @@ const BookishEditor = <RootType extends RootNode>(props: {
     }
 
     function executeCommand(command: Command, key: string) {
+
+        // Assume we process it, then flip it if we don't.
+        setIgnoredInput(false);
 
         const context = getCaretContext();
         if(context && caretRange) {
@@ -641,9 +650,10 @@ const BookishEditor = <RootType extends RootNode>(props: {
                 if(command.category !== "navigation" && command.category !== "selection" && command.category !== "history") {
                     saveEdit(root as RootType, newRange, command);
                 }
-            
             }
-            // TODO If there was no result, shake or something.
+            else
+                setIgnoredInput(true);
+
         }
     }
 
@@ -770,7 +780,7 @@ const BookishEditor = <RootType extends RootNode>(props: {
                     // Customize the rendering based on the formatting applied to the text node.
                     caretCoordinate && caretRange && !isAtom && !isSelection && focused ? 
                         <div 
-                            className={`bookish-editor-caret ${isLink ? "bookish-editor-caret-linked" : isItalic ? "bookish-editor-caret-italic" :""} ${isBold ? "bookish-editor-caret-bold" : ""} ${focused && keyboardIdle ? "bookish-editor-caret-blink" : ""} ${!focused ? "bookish-editor-caret-disabled" : ""}`}
+                            className={`bookish-editor-caret ${isLink ? "bookish-editor-caret-linked" : isItalic ? "bookish-editor-caret-italic" :""} ${isBold ? "bookish-editor-caret-bold" : ""} ${focused && keyboardIdle ? "bookish-editor-caret-blink" : ""} ${!focused ? "bookish-editor-caret-disabled" : ""} ${ignoredInput ? "bookish-editor-caret-ignored" : ""}`}
                             style={{
                                 left: caretCoordinate.x,
                                 top: caretCoordinate.y,
