@@ -108,7 +108,7 @@ button {
     border-top-left-radius: 0;
     border-bottom-right-radius: 0;
     border-bottom-left-radius: var(--bookish-app-chrome-roundedness);
-    border: 1px solid var(--bookish-app-chrome-border-color);
+    border: none;
 }
 
 button:hover:enabled {
