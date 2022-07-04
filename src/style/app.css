@@ -479,6 +479,7 @@ input[type=text].bookish-editor-text-invalid {
     z-index: 3;
     color: var(--bookish-muted-color);
     font-family: var(--bookish-header-font-family);
+    font-size: var(--bookish-small-font-size);
 }
 
 .bookish-editor-status-error {
