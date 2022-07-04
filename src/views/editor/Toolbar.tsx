@@ -142,7 +142,7 @@ const Toolbar = (props: {
 
     }
 
-    function handleKeyDown(event: React.KeyboardEvent) {
+    function handleKeyPress(event: React.KeyboardEvent) {
         // Return focus to the editor if someone presses an unhandled enter
         if(event.key === "Enter" && toolbarRef.current) {
             const editor = toolbarRef.current.closest(".bookish-editor");
@@ -168,11 +168,10 @@ const Toolbar = (props: {
     // Render command categories.
     return <div 
         className="bookish-editor-toolbar" 
-        onKeyDown={handleKeyDown} 
+        onKeyPress={handleKeyPress} 
         onMouseDown={handleMouse}
         onClick={handleMouse}
-        style={{margin: isVisible ? "0" : "-10em"}} 
-        tabIndex={0}
+        style={{margin: isVisible ? "0" : "-20em"}} 
         ref={toolbarRef}
         >
         {
@@ -191,6 +190,7 @@ const Toolbar = (props: {
                                         title={command.description + " " + getShortcutDescription(command)}
                                         tabIndex={0}
                                         onClick={() => executor?.call(undefined, command, "")}
+                                        onKeyPress={(event) => event.key === " " || event.key === "Enter" ? executor?.call(undefined, command, "") : undefined }
                                     >
                                         { command.icon ? command.icon.call(undefined) : command.label ? command.label : command.description }
                                     </button>
