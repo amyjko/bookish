@@ -8,6 +8,7 @@ import { renderNode } from '../chapter/Renderer';
 import Switch from '../editor/Switch';
 import TextEditor from '../editor/TextEditor';
 import { DarkModeContext, EditorContext } from './Book';
+import ConfirmButton from '../editor/ConfirmButton';
 
 const Preview = (props: { theme: Theme }) => {
 
@@ -102,11 +103,15 @@ const Theme = (props: { book: Book }) => {
 			
 			<p>This is the theme editor. You can use it to choose from existing themes or create a custom theme for your book.</p>
 
-			<Switch 
-				options={["Default", "Custom"]} 
-				value={theme == undefined ? "Default" : "Custom"} 
-				edit={custom => book.setTheme(custom === "Default" ? null : defaultTheme)}
-			/>
+			{
+				theme === null ?
+					<button onClick={() => book.setTheme(defaultTheme)}>Customize</button> :
+					<ConfirmButton
+						commandLabel="Revert to default"
+						confirmLabel="Delete your theme?"
+						command={() => book.setTheme(null)}
+					/>
+			}
 			{
 				theme !== null ?
 					<>
