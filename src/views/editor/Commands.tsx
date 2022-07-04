@@ -604,7 +604,7 @@ export const commands: Command[] = [
             context.root.withSegmentAtSelection(context.range, text => new LinkNode(new TextNode(text)))
     },
     {
-        label: "_",
+        label: "Aa",
         description: "toggle definition",
         category: "annotation",
         control: true, alt: false, shift: false, key: "d",

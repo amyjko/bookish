@@ -204,7 +204,7 @@ const Toolbar = (props: {
         { metaNode instanceof LabelNode ? <ToolbarGroup icon="•"><LabelEditor label={metaNode}/></ToolbarGroup> : null }
         { metaNode instanceof InlineCodeNode ? <ToolbarGroup icon={wrapIcon(Code)}><InlineCodeEditor code={metaNode}/></ToolbarGroup> : null }
         { metaNode instanceof CitationsNode ? <ToolbarGroup icon="a\u00b9"><CitationsEditor citations={metaNode}/></ToolbarGroup> : null }
-        { metaNode instanceof DefinitionNode ? <ToolbarGroup icon="_"><DefinitionEditor definition={metaNode}/></ToolbarGroup> : null }
+        { metaNode instanceof DefinitionNode ? <ToolbarGroup icon="Aa"><DefinitionEditor definition={metaNode}/></ToolbarGroup> : null }
         { metaNode instanceof CodeNode && context ? <ToolbarGroup icon={wrapIcon(Code)}><CaptionedCodeEditor code={context.start.node.getParent(chapter) as CodeNode}/></ToolbarGroup> : null }
         { calloutNode ? <ToolbarGroup icon="🄰"><CalloutEditor callout={calloutNode} /></ToolbarGroup> : null }
         { quoteNode ? <ToolbarGroup icon={wrapIcon(Quote)}><QuoteEditor quote={quoteNode} /></ToolbarGroup> : null }
