@@ -4,6 +4,7 @@ import { FormatNode } from "./FormatNode";
 import { TextNode } from "./TextNode";
 import { Caret, CaretRange } from "./Caret";
 import { AtomNode } from "./AtomNode";
+import { MetadataNode } from "./MetadataNode";
 
 export class ParagraphNode extends BlockNode {
 
@@ -15,10 +16,15 @@ export class ParagraphNode extends BlockNode {
 
         // Always ensure the paragraphs have an empty space at the begining and end for insertion.
         let adjustedFormat = format ?? new FormatNode("", [ new TextNode() ]);
-        if(adjustedFormat.getLength() > 0 && adjustedFormat.getSegments()[0] instanceof AtomNode)
-            adjustedFormat = adjustedFormat.withSegmentPrepended(new TextNode());
-        if(adjustedFormat.getLength() > 0 && adjustedFormat.getSegments()[adjustedFormat.getLength() - 1] instanceof AtomNode)
-            adjustedFormat = adjustedFormat.withSegmentAppended(new TextNode());
+        if(adjustedFormat.getLength() > 0) {
+            const first = adjustedFormat.getSegments()[0];
+            const last = adjustedFormat.getSegments()[adjustedFormat.getLength() - 1];
+            if(first instanceof AtomNode || first instanceof MetadataNode)
+                adjustedFormat = adjustedFormat.withSegmentPrepended(new TextNode());
+            if(last instanceof AtomNode || last instanceof MetadataNode)
+                adjustedFormat = adjustedFormat.withSegmentAppended(new TextNode());
+        } 
+        // Always ensure a paragraph has at least an empty text node.
         adjustedFormat = adjustedFormat.withTextIfEmpty();
 
         this.#format = adjustedFormat;
