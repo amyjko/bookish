@@ -61,9 +61,9 @@ const TableOfContentsRow = (props: {
 				editable ?
 					chapter ?
 						<td>
-							<button disabled={chapter.getPosition() === 0} onClick={moveUp}>{"▲"}</button>
+							<button disabled={chapter.getPosition() === 0} onClick={moveUp}>{"↑"}</button>
 							&nbsp;
-							<button disabled={chapter.getPosition() === chapter.getBook().getChapterCount() - 1} onClick={moveDown}>{"▼"}</button>
+							<button disabled={chapter.getPosition() === chapter.getBook().getChapterCount() - 1} onClick={moveDown}>{"↓"}</button>
 							&nbsp;
 							<ConfirmButton
 								commandLabel="x"
