@@ -32,7 +32,7 @@ export type CaretContextType = {
     context: CaretState | undefined,
     edit: (previous: BookishNode, edited: BookishNode) => void,
     root: RootNode,
-    focused: boolean
+    focused: boolean,
 } | undefined;
 
 export const CaretContext = React.createContext<CaretContextType>(undefined);
@@ -84,7 +84,8 @@ const IDLE_TIME = 500;
 const BookishEditor = <RootType extends RootNode>(props: { 
     ast: RootType,
     save: (node: RootType) => Promise<void> | undefined,
-    chapter: boolean
+    chapter: boolean,
+    autofocus: boolean
 }) => {
 
     const editorRef = useRef<HTMLDivElement>(null);
@@ -108,14 +109,14 @@ const BookishEditor = <RootType extends RootNode>(props: {
     }, [editedNode]);
 
     useEffect(() => {
-    
+
+        const caret = editedNode.getFirstCaret();
+        if(caret) {
+            setCaretRange({ start: caret, end: caret });
+
         // Focus the editor on load.
-        if(editorRef.current) {
-            const caret = editedNode.getFirstCaret();
-            if(caret) {
-                setCaretRange({ start: caret, end: caret });
-                editorRef.current.focus();
-            }
+        if(editorRef.current && props.autofocus === true)
+            editorRef.current.focus();
         }
 
         // Listen to selection changes

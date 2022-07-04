@@ -92,6 +92,7 @@ const Definition = (props: { id: string, definition: Definition }) => {
 				synonyms: definition.synonyms
 			})}
 			chapter={false}
+			autofocus={false}
 		/> :
 		definition.definition === "" ? 
 			<em>Definition</em> : 

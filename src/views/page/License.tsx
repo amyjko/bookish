@@ -21,6 +21,7 @@ const License = (props: { book: Book }) => {
 					ast={formatNode} 
 					save={(node: FormatNode) => book.setLicense(node.toBookdown())}
 					chapter={false}
+					autofocus={false}
 				/>
 			</>
 			:

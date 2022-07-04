@@ -21,6 +21,7 @@ const Description = (props: { book: Book }) => {
 					ast={descriptionNode} 
 					save={(node: ChapterNode | FormatNode) => book.setDescription(node.toBookdown())}
 					chapter={false}
+					autofocus={false}
 				/>
 				:
 				renderNode(descriptionNode)

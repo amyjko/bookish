@@ -75,7 +75,8 @@ const Header = (props: HeaderProps) => {
 								<BookishEditor 
 									ast={embedNode} 
 									save={(node: EmbedNode) => props.setImage(node.toBookdown())}
-									chapter={false} 
+									chapter={false}
+									autofocus={false}
 								/> :
 								renderNode(embedNode)
 						}
