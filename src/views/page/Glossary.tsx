@@ -181,6 +181,7 @@ const Glossary = (props: { book: Book }) => {
 	let glossary = book.getGlossary();
 	// Sort by canonical phrases
 	let keys = glossary === undefined || Object.keys(glossary).length === 0 ? null : Object.keys(glossary).sort((a, b) => glossary[a].phrase.localeCompare(glossary[b].phrase));
+	
 
 	function addEmptyDefinition() {
 
@@ -228,7 +229,7 @@ const Glossary = (props: { book: Book }) => {
 									<col style={{width: "60%" }} />
 								</colgroup>
 								<tbody>
-								{ keys.map((id, index) => <Definition key={index} id={id} definition={glossary[id]} />) }
+								{ keys.map((id, index) => <Definition key={id} id={id} definition={glossary[id]} />) }
 								</tbody>
 							</table>
 						</div>
