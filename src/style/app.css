@@ -49,7 +49,10 @@
 
 .bookish-app {
     text-align: center;
-    font-family: var(--bookish-app-chrome-font-family);
+	font-weight: var(--bookish-paragraph-font-weight);
+	font-family: var(--bookish-paragraph-font-family);
+	font-size: var(--bookish-paragraph-font-size);
+	line-height: var(--bookish-paragraph-line-height);
 }
 
 .bookish-app-header {
@@ -68,8 +71,12 @@
     vertical-align: baseline;
 }
 
-.bookish-app-text {
+.bookish-app-text, .bookish-app-text p {
     text-align: left;
+    padding-left: 2rem;
+    padding-right: 2rem;
+    margin: auto;
+    max-width: 40rem;
 }
 
 .bookish-app-book-preview {
