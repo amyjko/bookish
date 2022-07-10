@@ -1,4 +1,4 @@
-import React, { ChangeEvent, useContext, useState } from "react";
+import React, { ChangeEvent, useContext } from "react";
 import { CaretContext } from "./BookishEditor";
 
 

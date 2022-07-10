@@ -5,10 +5,10 @@ import Header from "./Header";
 import Outline from './Outline';
 import Page from './Page';
 
-import Book from '../../models/Book';
+import Edition from '../../models/book/Edition';
 import { BaseContext } from './Book';
 
-const Index = (props: { book: Book }) => {
+const Index = (props: { book: Edition }) => {
 
     // What letter are we matching?
     const { letter } = useParams()
@@ -80,14 +80,14 @@ const Index = (props: { book: Book }) => {
         <Header 
             book={book}
             label="Index title"
-			getImage={() => book.getImage(Book.IndexID)}
-			setImage={(embed) => book.setImage(Book.IndexID, embed)}
+			getImage={() => book.getImage(Edition.IndexID)}
+			setImage={(embed) => book.setImage(Edition.IndexID, embed)}
             header="Index"
             tags={book.getTags()}
             outline={
                 <Outline
-                    previous={book.getPreviousChapterID(Book.IndexID)}
-                    next={book.getNextChapterID(Book.IndexID)}
+                    previous={book.getPreviousChapterID(Edition.IndexID)}
+                    next={book.getNextChapterID(Edition.IndexID)}
                 />
             }
         />

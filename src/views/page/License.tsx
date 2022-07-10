@@ -1,12 +1,12 @@
 import React, { useContext } from "react"
-import Book from "../../models/Book"
-import { FormatNode } from "../../models/FormatNode"
-import Parser from "../../models/Parser"
+import Edition from "../../models/book/Edition"
+import { FormatNode } from "../../models/chapter/FormatNode"
+import Parser from "../../models/chapter/Parser"
 import { renderNode } from "../chapter/Renderer"
 import BookishEditor from "../editor/BookishEditor"
 import { EditorContext } from "./Book"
 
-const License = (props: { book: Book }) => {
+const License = (props: { book: Edition }) => {
 
 	const { editable } = useContext(EditorContext)
 	const book = props.book

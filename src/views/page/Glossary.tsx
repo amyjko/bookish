@@ -5,14 +5,14 @@ import Outline from './Outline'
 import Page from './Page'
 import { renderNode } from '../chapter/Renderer'
 
-import Book from '../../models/Book.js'
-import Parser from '../../models/Parser'
+import Edition from '../../models/book/Edition.js'
+import Parser from '../../models/chapter/Parser'
 import { EditorContext } from './Book'
-import { Definition } from '../../models/Book.js'
+import { Definition } from '../../models/book/Definition.js'
 import ConfirmButton from '../editor/ConfirmButton'
 import TextEditor from '../editor/TextEditor'
 import BookishEditor from '../editor/BookishEditor'
-import { FormatNode } from '../../models/FormatNode'
+import { FormatNode } from '../../models/chapter/FormatNode'
 
 const Definition = (props: { id: string, definition: Definition }) => {
 
@@ -148,7 +148,7 @@ const Definition = (props: { id: string, definition: Definition }) => {
 
 }
 
-const Glossary = (props: { book: Book }) => {
+const Glossary = (props: { book: Edition }) => {
 
 	const { editable } = useContext(EditorContext);
 
@@ -179,14 +179,14 @@ const Glossary = (props: { book: Book }) => {
 			<Header 
 				book={book}
 				label="Glossary title"
-				getImage={() => book.getImage(Book.GlossaryID)}
-				setImage={(embed) => book.setImage(Book.GlossaryID, embed)}
+				getImage={() => book.getImage(Edition.GlossaryID)}
+				setImage={(embed) => book.setImage(Edition.GlossaryID, embed)}
 				header="Glossary"
 				tags={book.getTags()}
 				outline={
 					<Outline
-						previous={book.getPreviousChapterID(Book.GlossaryID)}
-						next={book.getNextChapterID(Book.GlossaryID)}
+						previous={book.getPreviousChapterID(Edition.GlossaryID)}
+						next={book.getNextChapterID(Edition.GlossaryID)}
 					/>
 				}
 			/>

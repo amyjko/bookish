@@ -1,5 +1,5 @@
 import React from 'react'
-import { ListNode } from "../../models/ListNode"
+import { ListNode } from "../../models/chapter/ListNode"
 import { renderNode } from './Renderer'
 
 const List = (props: { node: ListNode}) => {

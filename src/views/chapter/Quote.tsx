@@ -1,5 +1,5 @@
 import React from 'react'
-import { QuoteNode } from "../../models/QuoteNode"
+import { QuoteNode } from "../../models/chapter/QuoteNode"
 import { renderNode, renderPosition } from './Renderer'
 
 const Quote = (props: { node: QuoteNode}) => {

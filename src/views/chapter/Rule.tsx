@@ -1,5 +1,5 @@
 import React from 'react'
-import { RuleNode } from "../../models/RuleNode"
+import { RuleNode } from "../../models/chapter/RuleNode"
 
 const Rule = (props: {node: RuleNode}) => {
 

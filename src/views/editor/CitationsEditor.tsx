@@ -1,5 +1,5 @@
 import React, { useContext, useState } from "react";
-import { CitationsNode } from "../../models/CitationsNode";
+import { CitationsNode } from "../../models/chapter/CitationsNode";
 import { ChapterContext, ChapterContextType } from "../chapter/Chapter";
 import Select, { MultiValue } from 'react-select';
 import { CaretContext } from "./BookishEditor";

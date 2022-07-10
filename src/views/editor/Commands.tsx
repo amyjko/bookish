@@ -1,23 +1,27 @@
-import { CalloutNode } from "../../models/CalloutNode";
-import { Caret } from "../../models/Caret";
-import { CitationsNode } from "../../models/CitationsNode";
-import { CodeNode } from "../../models/CodeNode";
-import { CommentNode } from "../../models/CommentNode";
-import { DefinitionNode } from "../../models/DefinitionNode";
-import { EmbedNode } from "../../models/EmbedNode";
-import { FootnoteNode } from "../../models/FootnoteNode";
-import { FormatNode } from "../../models/FormatNode";
-import { InlineCodeNode } from "../../models/InlineCodeNode";
-import { LabelNode } from "../../models/LabelNode";
-import { LinkNode } from "../../models/LinkNode";
-import { ListNode } from "../../models/ListNode";
-import { ParagraphNode } from "../../models/ParagraphNode";
-import { QuoteNode } from "../../models/QuoteNode";
-import { RuleNode } from "../../models/RuleNode";
-import { TableNode } from "../../models/TableNode";
-import { TextNode } from "../../models/TextNode";
-import { Edit } from "../../models/Edit";
-import { Node } from "../../models/Node";
+import { CalloutNode } from "../../models/chapter/CalloutNode";
+import { Caret } from "../../models/chapter/Caret";
+import { CitationsNode } from "../../models/chapter/CitationsNode";
+import { CodeNode } from "../../models/chapter/CodeNode";
+import { CommentNode } from "../../models/chapter/CommentNode";
+import { DefinitionNode } from "../../models/chapter/DefinitionNode";
+import { EmbedNode } from "../../models/chapter/EmbedNode";
+import { FootnoteNode } from "../../models/chapter/FootnoteNode";
+import { FormatNode } from "../../models/chapter/FormatNode";
+import { InlineCodeNode } from "../../models/chapter/InlineCodeNode";
+import { LabelNode } from "../../models/chapter/LabelNode";
+import { LinkNode } from "../../models/chapter/LinkNode";
+import { ListNode } from "../../models/chapter/ListNode";
+import { ParagraphNode } from "../../models/chapter/ParagraphNode";
+import { QuoteNode } from "../../models/chapter/QuoteNode";
+import { RuleNode } from "../../models/chapter/RuleNode";
+import { TableNode } from "../../models/chapter/TableNode";
+import { TextNode } from "../../models/chapter/TextNode";
+import { AtomNode } from "../../models/chapter/AtomNode";
+import { BlocksNode } from "../../models/chapter/BlocksNode";
+import { ChapterNode } from "../../models/chapter/ChapterNode";
+import { RootNode } from "../../models/chapter/RootNode";
+import { Edit } from "../../models/chapter/Edit";
+import { Node } from "../../models/chapter/Node";
 
 import { CaretState, CaretUtilities } from "./BookishEditor";
 
@@ -39,10 +43,6 @@ import Quote from "../svg/quote.svg";
 import Code from "../svg/code.svg";
 import Undo from "../svg/undo.svg";
 import Redo from "../svg/redo.svg";
-import { AtomNode } from "../../models/AtomNode";
-import { BlocksNode } from "../../models/BlocksNode";
-import { ChapterNode } from "../../models/ChapterNode";
-import { RootNode } from "../../models/RootNode";
 
 export type Command = {
     label?: string,

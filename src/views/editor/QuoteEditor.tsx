@@ -1,6 +1,6 @@
 import React from 'react';
-import { QuoteNode } from "../../models/QuoteNode"
-import { Position } from '../../models/Position';
+import { QuoteNode } from "../../models/chapter/QuoteNode"
+import { Position } from '../../models/chapter/Position';
 import PositionEditor from "./PositionEditor";
 
 const QuoteEditor = (props: {

@@ -1,5 +1,4 @@
 import React, { useContext, useState } from 'react'
-import { EditorContext } from '../page/Book';
 
 enum Status {
     Viewing,

@@ -1,5 +1,5 @@
 import React, { useContext } from 'react'
-import { ReferenceNode } from "../../models/ReferenceNode";
+import { ReferenceNode } from "../../models/chapter/ReferenceNode";
 import TextEditor from '../editor/TextEditor';
 import { EditorContext } from '../page/Book';
 

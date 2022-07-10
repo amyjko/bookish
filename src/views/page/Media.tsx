@@ -3,11 +3,11 @@ import React, { useEffect } from 'react';
 import Header from "./Header";
 import Outline from './Outline';
 
-import Book from '../../models/Book';
+import Edition from '../../models/book/Edition';
 import Page from './Page'
 import { renderNode } from '../chapter/Renderer';
 
-export default function Media(props: { book: Book }) {
+export default function Media(props: { book: Edition }) {
 
     // Always start at the top of the page.
 	useEffect(() => {
@@ -21,14 +21,14 @@ export default function Media(props: { book: Book }) {
 			<Header 
 				book={book}
 				label="Media title"
-				getImage={() => book.getImage(Book.MediaID)}
-				setImage={(embed) => book.setImage(Book.MediaID, embed)}
+				getImage={() => book.getImage(Edition.MediaID)}
+				setImage={(embed) => book.setImage(Edition.MediaID, embed)}
 				header="Media"
 				tags={book.getTags()}
 				outline={
 					<Outline
-						previous={book.getPreviousChapterID(Book.MediaID)}
-						next={book.getNextChapterID(Book.MediaID)}
+						previous={book.getPreviousChapterID(Edition.MediaID)}
+						next={book.getNextChapterID(Edition.MediaID)}
 					/>
 				}
 			/>

@@ -1,5 +1,5 @@
 import React from 'react'
-import { FormatNode } from "../../models/FormatNode";
+import { FormatNode } from "../../models/chapter/FormatNode";
 
 import { renderNode } from './Renderer'
 

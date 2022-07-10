@@ -6,7 +6,7 @@ import { HashLink } from "../util/HashLink"
 import { renderNode } from './Renderer';
 import smoothlyScrollElementToEyeLevel from '../util/Scroll'
 import { BaseContext, EditorContext } from '../page/Book';
-import { LinkNode } from "../../models/LinkNode";
+import { LinkNode } from "../../models/chapter/LinkNode";
 import { ChapterContext } from './Chapter';
 
 const Link = (props: { node: LinkNode}) => {

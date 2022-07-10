@@ -1,8 +1,8 @@
 import React from 'react'
-import Book from '../../models/Book'
+import Edition from '../../models/book/Edition'
 import Chapter from "../chapter/Chapter"
 
-const Print = (props: { book: Book }) => {
+const Print = (props: { book: Edition }) => {
 
     return <>
         {

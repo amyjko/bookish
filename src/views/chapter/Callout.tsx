@@ -1,9 +1,5 @@
-import React, { useContext } from 'react'
-import { CalloutNode } from "../../models/CalloutNode"
-import { Position } from "../../models/Position";
-import { CaretContext } from '../editor/BookishEditor';
-import PositionEditor from '../editor/PositionEditor';
-import { EditorContext } from '../page/Book';
+import React from 'react'
+import { CalloutNode } from "../../models/chapter/CalloutNode"
 import { renderNode, renderPosition } from './Renderer'
 
 const Callout = (props: { node: CalloutNode }) => {

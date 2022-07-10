@@ -3,7 +3,7 @@ import { useAuth } from "./AuthContext"
 import { createBook, getUserBooks } from '../../models/Firestore'
 import BookPreview from './BookPreview'
 import { useNavigate } from "react-router-dom"
-import { BookPreview as Preview } from "../../models/Book"
+import { BookSpecification as Preview } from "../../models/book/Book"
 
 export default function Dashboard() {
 

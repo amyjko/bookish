@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useRef, useState } from 'react';
-import Parser from '../../models/Parser';
+import Parser from '../../models/chapter/Parser';
 import TextEditor from '../editor/TextEditor';
 import { EditorContext } from '../page/Book';
 import { renderNode } from './Renderer';

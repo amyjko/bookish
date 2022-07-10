@@ -4,7 +4,6 @@ import { Caret, CaretRange, caretToIndex, indexToCaret } from "./Caret";
 import { BlocksNode } from "./BlocksNode";
 import { BlockNode } from "./BlockNode";
 import { Edit } from "./Edit";
-import { TextNode } from "./TextNode";
 
 export type ListParentType =  BlocksNode | ListNode;
 export type ListNodeType = FormatNode | ListNode;

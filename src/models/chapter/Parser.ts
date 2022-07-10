@@ -1,4 +1,4 @@
-import Book from "./Book";
+import Edition from "../book/Edition";
 import { CalloutNode } from "./CalloutNode";
 import { ChapterNode } from "./ChapterNode";
 import { CitationsNode } from "./CitationsNode";
@@ -57,14 +57,14 @@ const bulletRE = /^\*+\s+/;
 
 export default class Parser {
 
-    book: Book | undefined;
+    book: Edition | undefined;
     text: string;
     index: number;
     openedDoubleQuote: boolean;
     // We pass this to all parsing functions to gather information strewn about the document.
     metadata: Bookkeeping;
 
-    constructor(book: Book | undefined, text: string) {
+    constructor(book: Edition | undefined, text: string) {
         if(typeof text !== "string")
             throw "Parser expected a string but received " + typeof text;
 
@@ -78,7 +78,7 @@ export default class Parser {
 
     }
 
-    static preprocessSymbols(book: Book, text: string) {
+    static preprocessSymbols(book: Edition, text: string) {
 
         // Replace any remaining symbols with any definitions given.
         if(book && book.getSymbols()) {
@@ -92,19 +92,19 @@ export default class Parser {
 
     }
 
-    static parseChapter(book: Book | undefined, text: string) {
+    static parseChapter(book: Edition | undefined, text: string) {
         return (new Parser(book, book === undefined ? text : Parser.preprocessSymbols(book, text))).parseChapter();
     }
 
-    static parseFormat(book: Book | undefined, text: string) {
+    static parseFormat(book: Edition | undefined, text: string) {
         return (new Parser(book, book === undefined ? text : Parser.preprocessSymbols(book, text))).parseFormat();
     }
 
-    static parseEmbed(book: Book | undefined, text: string) {
+    static parseEmbed(book: Edition | undefined, text: string) {
         return (new Parser(book, book === undefined ? text : Parser.preprocessSymbols(book, text))).parseEmbed();
     }
 
-    static parseReference(citationID: string, ref: string | Array<string>, book: Book, short=false) {
+    static parseReference(citationID: string, ref: string | Array<string>, book: Edition, short=false) {
 
         if(typeof ref === "string")
             return Parser.parseFormat(book, ref);

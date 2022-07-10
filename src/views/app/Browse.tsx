@@ -1,6 +1,6 @@
 import React from "react"
 import { useState, useEffect } from "react"
-import { BookPreview as Preview } from "../../models/Book"
+import { BookSpecification as Preview } from "../../models/book/Book"
 import { getPreviews } from '../../models/Firestore'
 import BookPreview from './BookPreview'
 

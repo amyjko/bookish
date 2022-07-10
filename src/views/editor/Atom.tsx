@@ -1,7 +1,7 @@
 import React, { ReactNode, useContext } from 'react'
 
 import { CaretContext } from './BookishEditor';
-import { AtomNode } from '../../models/AtomNode';
+import { AtomNode } from '../../models/chapter/AtomNode';
 
 const Atom = (props: { node: AtomNode<any>, textView: React.ReactElement }) => {
 

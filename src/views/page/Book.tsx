@@ -1,6 +1,6 @@
 import React, { useState, useEffect }  from 'react';
 import { Route, Routes, useNavigate, useLocation } from 'react-router-dom';
-import { BookSaveStatus } from '../../models/Book';
+import { BookSaveStatus } from '../../models/book/Edition';
 import Chapter from "../chapter/Chapter";
 import TableOfContents from "./TableOfContents";
 import References from "./References";
@@ -10,8 +10,8 @@ import Search from "./Search";
 import Media from "./Media";
 import Unknown from "./Unknown";
 import Print from "./Print"
-import { Theme as ThemeType } from "../../models/Book"
-import BookModel from "../../models/Book"
+import { Theme as ThemeType } from "../../models/book/Theme"
+import BookModel from "../../models/book/Edition"
 
 import smoothscroll from 'smoothscroll-polyfill';
 import Theme from './Theme';

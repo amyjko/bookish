@@ -1,5 +1,5 @@
 import React, { ChangeEvent, useContext, useRef, useState } from "react";
-import { DefinitionNode } from "../../models/DefinitionNode";
+import { DefinitionNode } from "../../models/chapter/DefinitionNode";
 import { ChapterContext, ChapterContextType } from "../chapter/Chapter";
 import { CaretContext } from "./BookishEditor";
 

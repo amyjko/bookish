@@ -3,7 +3,7 @@ import { Position } from "./Position";
 import { FormatNode } from "./FormatNode";
 import { TextNode } from "./TextNode";
 import { BlockNode } from "./BlockNode";
-import { Caret, CaretRange } from "./Caret";
+import { CaretRange } from "./Caret";
 
 export type Location = { row: number, column: number };
 

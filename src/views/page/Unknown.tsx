@@ -1,12 +1,11 @@
-import React, { useContext } from 'react';
+import React from 'react';
 
 import Header from "./Header";
 import Outline from './Outline';
 import Page from './Page';
-import Book from '../../models/Book'
-import { EditorContext } from './Book';
+import Edition from '../../models/book/Edition'
 
-const Unknown = (props: { book: Book, message: React.ReactNode }) => {
+const Unknown = (props: { book: Edition, message: React.ReactNode }) => {
 
 	return (
 		<Page>

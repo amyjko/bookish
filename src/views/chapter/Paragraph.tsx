@@ -1,5 +1,5 @@
 import React, { useContext } from 'react'
-import { ParagraphNode } from "../../models/ParagraphNode"
+import { ParagraphNode } from "../../models/chapter/ParagraphNode"
 import { ChapterContext } from './Chapter'
 import { renderNode } from './Renderer'
 

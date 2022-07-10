@@ -1,7 +1,7 @@
-import Parser from "./Parser";
-import { ChapterNode } from "./ChapterNode";
-import Book, { BookSaveStatus } from "./Book"
-import { getChapterText, updateChapter } from "./Firestore";
+import Parser from "../chapter/Parser";
+import { ChapterNode } from "../chapter/ChapterNode";
+import Edition, { BookSaveStatus } from "./Edition"
+import { getChapterText, updateChapter } from "../Firestore";
 import { DocumentReference } from "firebase/firestore";
 
 export type ChapterSpecification = {
@@ -27,7 +27,7 @@ export type Match = {
 }
 
 export default class Chapter {
-	book: Book;
+	edition: Edition;
 	ref: DocumentReference | undefined;
 	chapterID: string;
 	title: string;
@@ -51,9 +51,9 @@ export default class Chapter {
 	// A set of listeners that are notified when the chapter text changes.
 	listeners = new Set<(text: string) => void>();
 
-    constructor(book: Book, spec: ChapterSpecification) {
+    constructor(edition: Edition, spec: ChapterSpecification) {
 
-        this.book = book;
+        this.edition = edition;
 		this.ref = spec.ref;
 		this.chapterID = spec.id;
         this.title = spec.title;
@@ -78,24 +78,24 @@ export default class Chapter {
 		
         // Periodically check for inactivity, pooling edits until after an idle state.
 		this.timerID = setInterval(() => {
-			if(this.book.ref && this.ref && this.text) {
+			if(this.edition.ref && this.ref && this.text) {
 				// If it's been more than a second since our last edit and there
 				// are edits that haven't been saved, try updating the book, 
 				// and if we succeed, resolve all of the edits, and if we fail,
 				// then reject them.
 				if(Date.now() - this.lastEdit > 1000 && this.edits.length > 0) {
 					// Tell listeners that this book model changed.
-					this.book.notifyListeners(BookSaveStatus.Saving);
-					updateChapter(this.book.ref, this.ref, this.text)
+					this.edition.notifyListeners(BookSaveStatus.Saving);
+					updateChapter(this.edition.ref, this.ref, this.text)
 						.then(() => {
 							// Approve the edits.
 							this.edits.forEach(edit => edit.resolve());
-							this.book.notifyListeners(BookSaveStatus.Saved);
+							this.edition.notifyListeners(BookSaveStatus.Saved);
 						})
 						.catch(() => {
 							// Reject the edits.
 							this.edits.forEach(edit => edit.reject());
-							this.book.notifyListeners(BookSaveStatus.Error);
+							this.edition.notifyListeners(BookSaveStatus.Error);
 						})
 						.finally(() => {
 							// Reset the edit queue.
@@ -117,7 +117,7 @@ export default class Chapter {
     // inactivity. Returns a promise that will eventually be resolved.
     requestSave() {
         // Tell listeners that this book model changed.
-        this.book.notifyListeners(BookSaveStatus.Changed);
+        this.edition.notifyListeners(BookSaveStatus.Changed);
 
         // Return a promise that will resolve or reject later after this model saves the edits to the database.
         this.lastEdit = Date.now();
@@ -148,7 +148,7 @@ export default class Chapter {
 
 	}
 
-	getBook() { return this.book }
+	getBook() { return this.edition }
 
 	getRef() { return this.ref; }
 
@@ -156,7 +156,7 @@ export default class Chapter {
 	setChapterID(id: string) {
 		if(this.chapterID !== id) {
 			this.chapterID = id;
-			return this.book.requestSave();
+			return this.edition.requestSave();
 		}
 	}
 
@@ -164,7 +164,7 @@ export default class Chapter {
 	setSection(section: string) {
 		if(this.section !== section) {
 			this.section = section;
-			return this.book.requestSave();
+			return this.edition.requestSave();
 		}
 	}
 
@@ -172,7 +172,7 @@ export default class Chapter {
 	setForthcoming(forthcoming: boolean) {
 		if(this.forthcoming !== forthcoming) {
 			this.forthcoming = forthcoming;
-			return this.book.requestSave();
+			return this.edition.requestSave();
 		}
 	}
 
@@ -180,7 +180,7 @@ export default class Chapter {
 	setNumbered(numbered: boolean) {
 		if(numbered !== this.numbered) {
 			this.numbered = numbered;
-			return this.book.requestSave();
+			return this.edition.requestSave();
 		}
 	}
 
@@ -188,7 +188,7 @@ export default class Chapter {
 	setText(text: string) {
 		if(this.text !== text || this.ast === undefined) {
 			this.text = text;
-			this.setAST(Parser.parseChapter(this.book, this.text));
+			this.setAST(Parser.parseChapter(this.edition, this.text));
 			this.notifyListeners();
 		}
 	}
@@ -204,7 +204,7 @@ export default class Chapter {
 
 		// Don't save if its the same. This is just an optimization.
 		if(changed) {
-			if(this.book.ref && this.ref)
+			if(this.edition.ref && this.ref)
 				return this.requestSave();
 		}
 
@@ -212,21 +212,21 @@ export default class Chapter {
 
 	addAuthor(name: string) {
         this.authors.push(name);
-		return this.book.requestSave();
+		return this.edition.requestSave();
     }
 
 	getAuthors() { return this.authors; }
     setAuthor(index: number, name: string) {
         if(index >= 0 && index < this.authors.length) {
             this.authors[index] = name;
-			return this.book.requestSave();
+			return this.edition.requestSave();
 		}
 	}
 
     removeAuthor(index: number) {
         if(index >= 0 && index < this.authors.length) {
             this.authors.splice(index, 1)
-			return this.book.requestSave();
+			return this.edition.requestSave();
 		}
 	}
 
@@ -234,20 +234,20 @@ export default class Chapter {
 	setTitle(title: string) {
 		if(title !== this.title) {
 			this.title = title;
-			return this.book.requestSave();
+			return this.edition.requestSave();
 		}
 	}
 
-	getPosition() { return this.book.getChapterPosition(this.getChapterID()) }
-	move(increment: number) { return this.book.moveChapter(this.getChapterID(), increment); }
+	getPosition() { return this.edition.getChapterPosition(this.getChapterID()) }
+	move(increment: number) { return this.edition.moveChapter(this.getChapterID(), increment); }
 
-	delete() { return this.book.deleteChapter(this.getChapterID()) }
+	delete() { return this.edition.deleteChapter(this.getChapterID()) }
 
 	getImage() { return this.image; }
 	setImage(embed: string | undefined) { 
 		if(this.image === embed) return;
 		this.image = embed;
-		return this.book.requestSave();
+		return this.edition.requestSave();
 	}
 
     getIndex() { return this.index; }

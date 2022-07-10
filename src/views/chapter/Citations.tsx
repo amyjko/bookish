@@ -1,7 +1,7 @@
 import React, { useContext, useEffect } from 'react'
 import Marginal  from './Marginal'
-import Parser from '../../models/Parser'
-import { CitationsNode } from "../../models/CitationsNode"
+import Parser from '../../models/chapter/Parser'
+import { CitationsNode } from "../../models/chapter/CitationsNode"
 import { renderNode } from './Renderer'
 import { ChapterContext, ChapterContextType } from './Chapter'
 import Atom from '../editor/Atom'

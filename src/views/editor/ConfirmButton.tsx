@@ -1,5 +1,4 @@
-import React, { useContext, useEffect, useRef, useState } from "react"
-import { EditorContext } from "../page/Book"
+import React, { useEffect, useRef, useState } from "react"
 
 const ConfirmButton = (props: { commandLabel: string, confirmLabel: string, command: () => Promise<void> | undefined }) => {
 

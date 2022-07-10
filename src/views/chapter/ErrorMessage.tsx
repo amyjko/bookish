@@ -1,5 +1,5 @@
 import React from 'react'
-import { ErrorNode } from "../../models/ErrorNode"
+import { ErrorNode } from "../../models/chapter/ErrorNode"
 
 const ErrorMessage = (props: { node: ErrorNode }) => {
 

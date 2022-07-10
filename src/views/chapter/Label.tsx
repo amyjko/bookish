@@ -1,6 +1,6 @@
 import React, { useContext } from 'react'
 import { ChapterContext } from './Chapter'
-import { LabelNode } from "../../models/LabelNode"
+import { LabelNode } from "../../models/chapter/LabelNode"
 import Atom from '../editor/Atom';
 import { EditorContext } from '../page/Book';
 

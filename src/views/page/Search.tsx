@@ -5,11 +5,11 @@ import Outline from './Outline';
 import Page from './Page';
 
 import { Link } from 'react-router-dom';
-import Book from '../../models/Book';
-import Chapter, { Match } from '../../models/Chapter';
+import Edition from '../../models/book/Edition';
+import Chapter, { Match } from '../../models/book/Chapter';
 import { BaseContext } from "./Book"
 
-const Search = (props: { book: Book }) => {
+const Search = (props: { book: Edition }) => {
 
     let [ query, setQuery ] = useState("")
     let { base } = useContext(BaseContext)
@@ -84,14 +84,14 @@ const Search = (props: { book: Book }) => {
         <Header 
             book={book}
             label="Search title"
-			getImage={() => book.getImage(Book.SearchID)}
-			setImage={(embed) => book.setImage(Book.SearchID, embed)}
+			getImage={() => book.getImage(Edition.SearchID)}
+			setImage={(embed) => book.setImage(Edition.SearchID, embed)}
             header="Search"
             tags={book.getTags()}
             outline={
                 <Outline
-                    previous={book.getPreviousChapterID(Book.SearchID)}
-                    next={book.getNextChapterID(Book.SearchID)}
+                    previous={book.getPreviousChapterID(Edition.SearchID)}
+                    next={book.getNextChapterID(Edition.SearchID)}
                 />    
             }
         />

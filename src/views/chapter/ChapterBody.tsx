@@ -1,5 +1,5 @@
 import React from 'react'
-import { ChapterNode } from "../../models/ChapterNode"
+import { ChapterNode } from "../../models/chapter/ChapterNode"
 import { renderNode } from './Renderer'
 
 const ChapterBody = (props: { node: ChapterNode }) => {

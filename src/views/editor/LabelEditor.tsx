@@ -1,5 +1,5 @@
 import React, { useContext } from "react";
-import { LabelNode } from "../../models/LabelNode";
+import { LabelNode } from "../../models/chapter/LabelNode";
 import { ChapterContext } from "../chapter/Chapter";
 import { CaretContext, CaretContextType } from "./BookishEditor";
 import TextEditor from "./TextEditor";

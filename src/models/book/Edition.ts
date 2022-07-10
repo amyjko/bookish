@@ -1,89 +1,13 @@
-import Parser from "./Parser";
-import { EmbedNode } from "./EmbedNode";
 import Chapter, { ChapterSpecification } from './Chapter.js';
-import { addChapter, removeChapter, updateBook } from "./Firestore";
+import Parser from "../chapter/Parser";
+import { EmbedNode } from "../chapter/EmbedNode";
+import { ReferenceNode } from "../chapter/ReferenceNode";
+import { addChapter, removeChapter, updateBook } from "../Firestore";
 import { DocumentReference } from "firebase/firestore";
-import { ReferenceNode } from "./ReferenceNode";
+import { Theme } from './Theme.js';
+import { Definition } from './Definition.js';
 
-export type BookPreview = {
-    ref: DocumentReference;
-    title: string;
-    authors: string[];
-    description: string;
-}
-
-export type Edition = {
-    version: string;
-    changes: string;
-}
-
-export type Definition = { phrase: string, definition: string, synonyms?: string[]}
-
-export type ThemeColors = {
-    // Background colors;
-    backgroundColor: string;
-    blockBackgroundColor: string;
-    errorBackgroundColor: string;
-
-    // Border colors
-    borderColorLight: string;
-    borderColorBold: string;
-
-    // Foreground colors
-    paragraphColor: string;
-    mutedColor: string;
-    highlightColor: string;
-    commentColor: string;
-    errorColor: string;
-    linkColor: string;
-    bulletColor: string;
-}
-
-export type Theme = {
-    // Background colors
-    light: ThemeColors,
-    dark: ThemeColors,
-    // Fonts
-    fonts: {
-        paragraphFontFamily: string;
-        headerFontFamily: string;
-        codeFontFamily: string;
-        bulletFontFamily: string;
-    }
-    // Fonts
-    sizes: {
-        paragraphFontSize: string;
-        blockFontSize: string;
-        smallFontSize: string;
-        titleFontSize: string;
-        header1FontSize: string;
-        header2FontSize: string;
-        header3FontSize: string;
-        codeFontSize: string;
-    }
-    weights: {
-        headerFontWeight: string;
-        paragraphFontWeight: string;
-        boldFontWeight: string;
-        linkFontWeight: string;
-        codeFontWeight: string;
-        bulletFontWeight: string;
-    }
-    // Spacing
-    spacing: {
-        paragraphLineHeight: string;
-        paragraphLineHeightTight: string;
-        headerLineHeight: string;
-        paragraphSpacing: string;
-        headerSpacing: string;
-        indent: string;
-        inlinePadding: string;
-        blockPadding: string;
-        roundedness: string;
-    }
-}
-
-export type BookSpecification = {
+export type EditionSpecification = {
     title: string;
     authors: string[];
     images: Record<string, string | null>;
@@ -108,93 +32,7 @@ export enum BookSaveStatus {
     Error
 }
 
-export const defaultTheme = {
-    // Background colors
-    light: {
-		// Background colors;
-		backgroundColor: "#FFFFFF",
-		blockBackgroundColor: "#FCFAFA",
-		errorBackgroundColor: "#F8D7DA",
-	
-		// Border colors
-		borderColorLight: "#E0E0E0",
-		borderColorBold: "#000000",
-	
-		// Foreground colors
-		paragraphColor: "#000000",
-		mutedColor: "#9AA1A7",
-		highlightColor: "#E8AF22",
-		commentColor: "#257F31",
-		errorColor: "#721C24",
-		linkColor: "#1B499C",
-		bulletColor: "#EB2C27"
-    },
-    dark: {
-		// Background colors;
-		backgroundColor: "#1C1C1C",
-		blockBackgroundColor: "#333333",
-		errorBackgroundColor: "#721C24",
-	
-		// Border colors
-		borderColorLight: "#444444",
-		borderColorBold: "#DADADA",
-	
-		// Foreground colors
-		paragraphColor: "#DADADA",
-		mutedColor: "#666666",
-		highlightColor: "#c5a248",
-		commentColor: "#1c4722",
-		errorColor: "#F8D7DA",
-		linkColor: "#73a3fa",
-		bulletColor: "#721C24"
-	},
-    
-    // Fonts
-    fonts: {
-        paragraphFontFamily: '"Georgia", serif',
-        headerFontFamily: '"Verdana", serif',
-        codeFontFamily: '"Courier New", monospace',
-        bulletFontFamily: '"Verdana"'
-    },
-
-    // Font sizes
-    sizes: {
-        paragraphFontSize: "14pt",
-        blockFontSize: "11pt",
-        smallFontSize: "9pt",
-        titleFontSize: "2.4rem",
-        header1FontSize: "2rem",
-        header2FontSize: "1.5rem",
-        header3FontSize: "1rem",
-        codeFontSize: "11pt"
-    },
-
-    // Font weights
-    weights: {
-        headerFontWeight: "700",
-        paragraphFontWeight: "400",
-        boldFontWeight: "700",
-        linkFontWeight: "400",
-        codeFontWeight: "400",
-        bulletFontWeight: "500"
-    },
-
-    // Spacing
-    spacing: {
-        paragraphLineHeight: "1.8em",
-        paragraphLineHeightTight: "1.4em",
-        headerLineHeight: "1.4em",
-        paragraphSpacing: "1.8rem",
-        headerSpacing: "2rem",
-        indent: "10%",
-        inlinePadding: "0.25rem",
-        blockPadding: "1rem",
-        roundedness: "5px"
-    }
-
-}
-
-export default class Book {
+export default class Edition {
 
     static TableOfContentsID = "";
     static ReferencesID = "references";
@@ -233,7 +71,7 @@ export default class Book {
 
     // Given an object with a valid specification and an object mapping chapter IDs to chapter text,
     // construct an object representing a book.
-    constructor(ref: DocumentReference | undefined, specification?: BookSpecification) {
+    constructor(ref: DocumentReference | undefined, specification?: EditionSpecification) {
 
         if(typeof specification !== "object" && specification !== undefined)
             throw Error("Expected a book specification object, but received " + specification)
@@ -639,12 +477,12 @@ export default class Book {
 
         // Handle back matter chapters.
         switch(chapterID) {
-            case Book.ReferencesID: return this.hasGlossary() ? Book.GlossaryID : Book.IndexID;
-            case Book.GlossaryID: return Book.IndexID;
-            case Book.IndexID: return Book.SearchID;
-            case Book.SearchID: return Book.MediaID;
-            case Book.MediaID: return Book.TableOfContentsID;
-            case Book.TableOfContentsID: return this.chapters.length > 0 ? this.chapters[0].getChapterID() : null;
+            case Edition.ReferencesID: return this.hasGlossary() ? Edition.GlossaryID : Edition.IndexID;
+            case Edition.GlossaryID: return Edition.IndexID;
+            case Edition.IndexID: return Edition.SearchID;
+            case Edition.SearchID: return Edition.MediaID;
+            case Edition.MediaID: return Edition.TableOfContentsID;
+            case Edition.TableOfContentsID: return this.chapters.length > 0 ? this.chapters[0].getChapterID() : null;
             default:
                 let after = false;
                 for(let i = 0; i < this.chapters.length; i++) {
@@ -657,7 +495,7 @@ export default class Book {
                 }
                 // If the given ID was the last chapter, go to the next back matter chapter.
                 if(after)
-                    return this.hasReferences() ? Book.ReferencesID : this.hasGlossary() ? Book.GlossaryID : Book.IndexID;
+                    return this.hasReferences() ? Edition.ReferencesID : this.hasGlossary() ? Edition.GlossaryID : Edition.IndexID;
                 // Otherwise, it wasn't a valid ID
                 else
                     return null;
@@ -671,11 +509,11 @@ export default class Book {
         switch(chapterID) {
 
             // Handle back matter chapters.
-            case Book.ReferencesID: return this.chapters.length > 0 ? this.chapters[this.chapters.length - 1].chapterID : null; // Last chapter of the book
-            case Book.GlossaryID: return this.hasReferences() ? Book.ReferencesID : this.chapters.length > 0 ? this.chapters[this.chapters.length - 1].chapterID : Book.TableOfContentsID;
-            case Book.IndexID: return this.hasGlossary() ? Book.GlossaryID : this.hasReferences() ? Book.ReferencesID : this.chapters.length > 0 ? this.chapters[this.chapters.length - 1].chapterID : Book.TableOfContentsID;
-            case Book.SearchID: return Book.IndexID;
-            case Book.MediaID: return Book.SearchID;
+            case Edition.ReferencesID: return this.chapters.length > 0 ? this.chapters[this.chapters.length - 1].chapterID : null; // Last chapter of the book
+            case Edition.GlossaryID: return this.hasReferences() ? Edition.ReferencesID : this.chapters.length > 0 ? this.chapters[this.chapters.length - 1].chapterID : Edition.TableOfContentsID;
+            case Edition.IndexID: return this.hasGlossary() ? Edition.GlossaryID : this.hasReferences() ? Edition.ReferencesID : this.chapters.length > 0 ? this.chapters[this.chapters.length - 1].chapterID : Edition.TableOfContentsID;
+            case Edition.SearchID: return Edition.IndexID;
+            case Edition.MediaID: return Edition.SearchID;
             default:
                 let before = false;
                 for(let i = this.chapters.length - 1; i >= 0; i--) {
@@ -688,7 +526,7 @@ export default class Book {
                 }
                 // If the given ID was the last chapter, go to the next back matter chapter.
                 if(before)
-                    return Book.TableOfContentsID;
+                    return Edition.TableOfContentsID;
                 // Otherwise, it wasn't a valid ID
                 else
                     return null;

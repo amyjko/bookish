@@ -1,7 +1,7 @@
 import React from 'react'
 
-import { Position } from "../../models/Position"
-import { Node } from "../../models/Node"
+import { Position } from "../../models/chapter/Position"
+import { Node } from "../../models/chapter/Node"
 import ChapterBody from './ChapterBody'
 import Paragraph from './Paragraph'
 import Embed from './Embed'

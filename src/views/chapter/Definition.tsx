@@ -1,10 +1,9 @@
 import React, { useContext, useEffect } from 'react'
 import Marginal  from './Marginal'
 import { renderNode } from './Renderer'
-import Parser from '../../models/Parser'
-import { DefinitionNode } from "../../models/DefinitionNode"
+import Parser from '../../models/chapter/Parser'
+import { DefinitionNode } from "../../models/chapter/DefinitionNode"
 import { ChapterContext, ChapterContextType } from './Chapter'
-import { CaretContext } from '../editor/BookishEditor'
 
 const Definition = (props: { node: DefinitionNode}) => {
 

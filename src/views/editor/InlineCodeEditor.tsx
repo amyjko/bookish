@@ -1,5 +1,5 @@
 import React, { useContext } from "react";
-import { InlineCodeNode } from "../../models/InlineCodeNode";
+import { InlineCodeNode } from "../../models/chapter/InlineCodeNode";
 import { CaretContext, CaretContextType } from "./BookishEditor";
 import LanguageEditor from "./LanguageEditor";
 

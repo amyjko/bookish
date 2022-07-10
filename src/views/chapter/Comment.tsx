@@ -1,5 +1,5 @@
 import React, { ChangeEvent, useContext, useEffect, useRef, useState } from 'react'
-import { CommentNode } from '../../models/CommentNode'
+import { CommentNode } from '../../models/chapter/CommentNode'
 import Atom from '../editor/Atom';
 import { EditorContext } from '../page/Book';
 import { ChapterContext } from './Chapter';

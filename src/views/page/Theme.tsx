@@ -2,10 +2,10 @@ import React, { useContext } from 'react';
 import Header from "./Header";
 import Outline from './Outline';
 import Page from './Page';
-import Book, { Theme, defaultTheme } from '../../models/Book'
-import Parser from '../../models/Parser';
+import Edition from '../../models/book/Edition'
+import { Theme, defaultTheme } from '../../models/book/Theme'
+import Parser from '../../models/chapter/Parser';
 import { renderNode } from '../chapter/Renderer';
-import Switch from '../editor/Switch';
 import TextEditor from '../editor/TextEditor';
 import { DarkModeContext, EditorContext } from './Book';
 import ConfirmButton from '../editor/ConfirmButton';
@@ -79,7 +79,7 @@ const ThemeSetEditor = ( props: { header: string, group: string, theme: Record<s
 	</>
 };
 
-const Theme = (props: { book: Book }) => {
+const Theme = (props: { book: Edition }) => {
 
 	const { book } = props;
 

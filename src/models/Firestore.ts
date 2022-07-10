@@ -1,24 +1,25 @@
 import { db } from "./Firebase"
 import { collection, getDocs, getDoc, setDoc, doc, addDoc, query, where, deleteDoc, DocumentReference } from "firebase/firestore"
-import Book, { BookPreview, BookSpecification } from "./Book"
-import Chapter, { ChapterContent } from "./Chapter"
+import Edition, { EditionSpecification } from "./book/Edition"
+import { BookSpecification } from "./book/Book"
+import Chapter, { ChapterContent } from "./book/Chapter"
 
 
-export const getPreviews = async (): Promise<BookPreview[] | null> => {
+export const getPreviews = async (): Promise<BookSpecification[] | null> => {
 
     if(!db)
-        throw Error("Can't retrieve previews, not connected to Firebase.")
+        throw Error("Can't retrieve books, not connected to Firebase.")
 
     try {
-        const data = await getDocs(collection(db, "previews"));
-        return data.docs.map((doc) => ({...doc.data(), ref: doc.ref} as BookPreview))
+        const data = await getDocs(collection(db, "books"));
+        return data.docs.map((doc) => ({...doc.data(), ref: doc.ref} as BookSpecification))
     } catch {
         return null
     }
 
 }
 
-export const getUserBooks = async (userID: string): Promise<BookPreview[] | null> => {
+export const getUserBooks = async (userID: string): Promise<BookSpecification[] | null> => {
 
     if(!db)
         throw Error("Can't retrieve user's books, not connected to Firebase.")
@@ -26,7 +27,7 @@ export const getUserBooks = async (userID: string): Promise<BookPreview[] | null
     try {
         const books = await getDocs(query(collection(db, "books"), where("uids", "array-contains", userID)))
         return books.docs.map((doc) => {
-            const book = new Book(doc.ref, doc.data() as BookSpecification) as BookPreview
+            const book = new Edition(doc.ref, doc.data() as EditionSpecification) as BookSpecification
             return book
         })
     } catch(err) {
@@ -36,16 +37,16 @@ export const getUserBooks = async (userID: string): Promise<BookPreview[] | null
 
 }
 
-export const getBook = async (bookID: string): Promise<Book> => {
+export const getEdition = async (editionID: string): Promise<Edition> => {
 
     if(!db)
-        throw Error("Can't retrieve book, not connected to Firebase.")
+        throw Error("Can't retrieve edition, not connected to Firebase.")
 
-    const book = await getDoc(doc(db, "books", bookID))
+    const book = await getDoc(doc(db, "edition", editionID))
     if(book.exists())
-        return new Book(book.ref, book.data() as BookSpecification)
-    
-    throw Error("" + bookID + " doesn't exist")
+        return new Edition(book.ref, book.data() as EditionSpecification)
+    else
+        throw Error("" + editionID + " doesn't exist")
 
 }
 
@@ -54,8 +55,8 @@ export const createBook = async (userID: string): Promise<string> => {
     if(!db)
         throw Error("Can't create book, not connected to Firebase.")
 
-    // Make a new empty book
-    const newBook = new Book(undefined)
+    // Make a new empty book edition.
+    const newBook = new Edition(undefined)
     // Add the current user to the book
     newBook.addUserID(userID)
     // Add the book to the database
@@ -69,7 +70,7 @@ export const createBook = async (userID: string): Promise<string> => {
 
 }
 
-export const updateBook = async (book: Book): Promise<void> => {
+export const updateBook = async (book: Edition): Promise<void> => {
 
     if(!db)
         throw Error("Can't update book, not connected to Firebase.")

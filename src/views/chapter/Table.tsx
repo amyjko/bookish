@@ -1,5 +1,5 @@
 import React from 'react'
-import { TableNode } from "../../models/TableNode"
+import { TableNode } from "../../models/chapter/TableNode"
 
 import { renderNode, renderPosition } from './Renderer'
 

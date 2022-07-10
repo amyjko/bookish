@@ -4,13 +4,12 @@ import Header from "./Header";
 import Outline from './Outline';
 import Page from './Page';
 
-import Parser from "../../models/Parser";
-import Book from '../../models/Book';
+import Parser from "../../models/chapter/Parser";
+import Edition from '../../models/book/Edition';
 
 import { renderNode } from '../chapter/Renderer'
-import Reference from '../chapter/Reference'
 import { EditorContext } from './Book';
-import { ReferenceNode } from '../../models/ReferenceNode';
+import { ReferenceNode } from '../../models/chapter/ReferenceNode';
 import ConfirmButton from '../editor/ConfirmButton';
 
 function mineReference(ids: string[], text: string): ReferenceNode {
@@ -82,7 +81,7 @@ function getUniqueID(ids: string[], authors?: string, year?: string): string {
 	}
 }
 
-const BulkReferenceEditor = (props: { book: Book }) => {
+const BulkReferenceEditor = (props: { book: Edition }) => {
 
 	const { book } = useContext(EditorContext);
 
@@ -135,7 +134,7 @@ const BulkReferenceEditor = (props: { book: Book }) => {
 
 }
 
-const References = (props: { book: Book }) => {
+const References = (props: { book: Edition }) => {
 
 	const { editable } = useContext(EditorContext);
 
@@ -180,14 +179,14 @@ const References = (props: { book: Book }) => {
 			<Header 
 				book={book}
 				label="References title"
-				getImage={() => book.getImage(Book.ReferencesID)}
-				setImage={(embed) => book.setImage(Book.ReferencesID, embed)}
+				getImage={() => book.getImage(Edition.ReferencesID)}
+				setImage={(embed) => book.setImage(Edition.ReferencesID, embed)}
 				header="References"
 				tags={book.getTags()}
 				outline={
 					<Outline
-						previous={book.getPreviousChapterID(Book.ReferencesID)}
-						next={book.getNextChapterID(Book.ReferencesID)}
+						previous={book.getPreviousChapterID(Edition.ReferencesID)}
+						next={book.getNextChapterID(Edition.ReferencesID)}
 					/>
 				}
 			/>

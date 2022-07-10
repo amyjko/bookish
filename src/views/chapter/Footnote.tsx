@@ -2,7 +2,7 @@ import React, { useContext, useEffect } from 'react'
 import { ChapterContext } from './Chapter'
 import Marginal  from './Marginal'
 import { renderNode } from './Renderer'
-import { FootnoteNode } from "../../models/FootnoteNode"
+import { FootnoteNode } from "../../models/chapter/FootnoteNode"
 import Atom from '../editor/Atom'
 import { CaretContext } from '../editor/BookishEditor'
 

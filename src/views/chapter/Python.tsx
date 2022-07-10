@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { CodeNode } from "../../models/CodeNode";
+import { CodeNode } from "../../models/chapter/CodeNode";
 import Code from './Code';
 
 // Make Typescript happy

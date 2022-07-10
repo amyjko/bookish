@@ -1,28 +1,28 @@
 import React, { useContext, useEffect, useRef, useState } from "react"
-import { ChapterNode } from "../../models/ChapterNode";
-import { Caret, CaretRange, caretRangeToIndexRange, indexRangeToCaretRange, IndexRange } from "../../models/Caret";
-import { LinkNode } from "../../models/LinkNode";
-import { ParagraphNode } from "../../models/ParagraphNode";
-import { TextNode } from "../../models/TextNode";
+import { ChapterNode } from "../../models/chapter/ChapterNode";
+import { Caret, CaretRange, caretRangeToIndexRange, indexRangeToCaretRange, IndexRange } from "../../models/chapter/Caret";
+import { LinkNode } from "../../models/chapter/LinkNode";
+import { ParagraphNode } from "../../models/chapter/ParagraphNode";
+import { TextNode } from "../../models/chapter/TextNode";
 import { renderNode } from "../chapter/Renderer";
-import { AtomNode } from "../../models/AtomNode";
-import { FormatNode } from "../../models/FormatNode";
-import { BlocksNode } from "../../models/BlocksNode";
-import { ListNode } from "../../models/ListNode";
-import { TableNode } from "../../models/TableNode";
-import { Node as BookishNode } from "../../models/Node";
-import { MetadataNode } from "../../models/MetadataNode";
-import { RootNode } from "../../models/RootNode";
-import { Edit } from "../../models/Edit";
+import { AtomNode } from "../../models/chapter/AtomNode";
+import { FormatNode } from "../../models/chapter/FormatNode";
+import { BlocksNode } from "../../models/chapter/BlocksNode";
+import { ListNode } from "../../models/chapter/ListNode";
+import { TableNode } from "../../models/chapter/TableNode";
+import { Node as BookishNode } from "../../models/chapter/Node";
+import { MetadataNode } from "../../models/chapter/MetadataNode";
+import { RootNode } from "../../models/chapter/RootNode";
+import { Edit } from "../../models/chapter/Edit";
 
 import { Command, commands } from "./Commands";
 import Toolbar from "./Toolbar";
-import Parser from "../../models/Parser";
+import Parser from "../../models/chapter/Parser";
 import { ChapterContext, ChapterContextType } from "../chapter/Chapter";
-import { CodeNode } from "../../models/CodeNode";
-import { BlockNode } from "../../models/BlockNode";
-import { EmbedNode } from "../../models/EmbedNode";
-import { ErrorNode } from "../../models/ErrorNode";
+import { CodeNode } from "../../models/chapter/CodeNode";
+import { BlockNode } from "../../models/chapter/BlockNode";
+import { EmbedNode } from "../../models/chapter/EmbedNode";
+import { ErrorNode } from "../../models/chapter/ErrorNode";
 import Placeholder from "./Placeholder";
 
 export type CaretContextType = { 

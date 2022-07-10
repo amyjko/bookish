@@ -1,15 +1,15 @@
 import React, { useEffect, useRef, useContext } from 'react';
-import Book from '../../models/Book';
-import { EmbedNode } from '../../models/EmbedNode';
+import Edition from '../../models/book/Edition';
+import { EmbedNode } from '../../models/chapter/EmbedNode';
 
-import Parser from "../../models/Parser";
+import Parser from "../../models/chapter/Parser";
 import { renderNode } from '../chapter/Renderer'
 import BookishEditor from '../editor/BookishEditor';
 import TextEditor from '../editor/TextEditor';
 import { EditorContext } from './Book';
 
 type HeaderProps = {
-	book: Book;
+	book: Edition;
 	label: string;
 	header: string;
 	subtitle?: string;

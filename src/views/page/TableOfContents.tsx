@@ -4,9 +4,9 @@ import { Link } from 'react-router-dom'
 import Header from "./Header"
 import Authors from "../chapter/Authors"
 import Page from './Page'
-import Parser from "../../models/Parser"
-import { EmbedNode } from "../../models/EmbedNode"
-import Book from '../../models/Book'
+import Parser from "../../models/chapter/Parser"
+import { EmbedNode } from "../../models/chapter/EmbedNode"
+import Edition from '../../models/book/Edition'
 import Outline from './Outline'
 import { BaseContext, EditorContext } from './Book'
 import Acknowledgements from './Acknowledgements'
@@ -14,7 +14,7 @@ import License from './License'
 import Description from './Description'
 import Revisions from './Revisions'
 import Toggle from '../editor/Toggle'
-import Chapter from '../../models/Chapter'
+import Chapter from '../../models/book/Chapter'
 import TextEditor from '../editor/TextEditor'
 import ConfirmButton from '../editor/ConfirmButton'
 
@@ -99,7 +99,7 @@ const AddChapter = () => {
 
 }
 
-const TableOfContents = (props: { book: Book }) => {
+const TableOfContents = (props: { book: Edition }) => {
 
 	const { base } = useContext(BaseContext)
 	const { editable } = useContext(EditorContext)
@@ -252,7 +252,7 @@ const TableOfContents = (props: { book: Book }) => {
 					{
 						book.hasReferences() || editable ? 
 							<TableOfContentsRow
-								image={getImage(book.getImage(Book.ReferencesID))}
+								image={getImage(book.getImage(Edition.ReferencesID))}
 								chapterID="references"
 								title="References"
 								annotation="Everything cited"
@@ -262,7 +262,7 @@ const TableOfContents = (props: { book: Book }) => {
 					{
 						book.getGlossary() && Object.keys(book.getGlossary()).length > 0 || editable ?
 							<TableOfContentsRow
-								image={getImage(book.getImage(Book.GlossaryID))}
+								image={getImage(book.getImage(Edition.GlossaryID))}
 								chapterID="glossary"
 								title="Glossary"
 								annotation="Definitions"
@@ -270,19 +270,19 @@ const TableOfContents = (props: { book: Book }) => {
 							: null
 					}
 					<TableOfContentsRow
-						image={getImage(book.getImage(Book.IndexID))}
+						image={getImage(book.getImage(Edition.IndexID))}
 						chapterID="index"
 						title="Index"
 						annotation="Common words and where they are"
 					/>
 					<TableOfContentsRow
-						image={getImage(book.getImage(Book.SearchID))}
+						image={getImage(book.getImage(Edition.SearchID))}
 						chapterID="search"
 						title="Search"
 						annotation="Find where words occur"
 					/>
 					<TableOfContentsRow
-						image={getImage(book.getImage(Book.MediaID))}
+						image={getImage(book.getImage(Edition.MediaID))}
 						chapterID="media"
 						title="Media"
 						annotation="Images and video in the book"

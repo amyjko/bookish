@@ -2,8 +2,8 @@ import React, { useContext } from 'react';
 import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 
-import Parser from "../../models/Parser"
-import { ChapterNode } from "../../models/ChapterNode";
+import Parser from "../../models/chapter/Parser"
+import { ChapterNode } from "../../models/chapter/ChapterNode";
 import Header from '../page/Header'
 import Authors from "./Authors"
 import Outline from '../page/Outline'
@@ -12,15 +12,15 @@ import Page from '../page/Page'
 import smoothlyScrollElementToEyeLevel from '../util/Scroll'
 import { renderNode } from './Renderer'
 import Marker from "../svg/marker.svg"
-import Book from '../../models/Book'
-import ChapterModel from '../../models/Chapter'
+import Edition from '../../models/book/Edition'
+import ChapterModel from '../../models/book/Chapter'
 import { EditorContext } from '../page/Book';
 import TextEditor from '../editor/TextEditor';
 import BookishEditor from '../editor/BookishEditor';
 import Toggle from '../editor/Toggle';
 
 export type ChapterContextType = {
-	book?: Book, 
+	book?: Edition, 
 	chapter?: ChapterModel, 
 	highlightedWord?: string,
 	highlightedID?: string,
@@ -31,7 +31,7 @@ export type ChapterContextType = {
 
 export const ChapterContext = React.createContext<ChapterContextType>({})
 
-const Chapter = (props: { chapter: ChapterModel, book: Book, print?: boolean }) => {
+const Chapter = (props: { chapter: ChapterModel, book: Edition, print?: boolean }) => {
 
 	// Keep track of the scroll position to facilitate reading during reloads.
 	const rememberPosition = () => localStorage.setItem('scrollposition', "" + window.scrollY)

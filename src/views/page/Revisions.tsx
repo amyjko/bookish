@@ -1,10 +1,10 @@
 import React, { useContext } from "react"
-import Book from "../../models/Book"
-import Parser from "../../models/Parser"
+import Edition from "../../models/book/Edition"
+import Parser from "../../models/chapter/Parser"
 import { renderNode } from "../chapter/Renderer"
 import { EditorContext } from "./Book"
 
-const Revisions = (props: { book: Book }) => {
+const Revisions = (props: { book: Edition }) => {
 
 	const { editable } = useContext(EditorContext)
 	const book = props.book

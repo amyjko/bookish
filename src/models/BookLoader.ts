@@ -1,7 +1,7 @@
 import Ajv from 'ajv';
 import addFormats from 'ajv-formats';
-import Book, { BookSpecification } from './Book'
-import { ChapterSpecification } from './Chapter'
+import Edition, { EditionSpecification } from './book/Edition'
+import { ChapterSpecification } from './book/Chapter'
 
 let schema = require("../schemas/book.json");
 
@@ -12,7 +12,7 @@ let schema = require("../schemas/book.json");
 // If any errors are encountered, throws an Error.
 export default async function loadBookFromURL(url: string) {
 
-    let specification: BookSpecification | undefined = undefined
+    let specification: EditionSpecification | undefined = undefined
 
     // Fetch the JSON from the given URL
     return fetch(url + "book.json")
@@ -53,7 +53,7 @@ export default async function loadBookFromURL(url: string) {
             }
 
             // Remember the book spec
-            specification = book as unknown as BookSpecification
+            specification = book as unknown as EditionSpecification
 
             // Map all non-forthcoming chapters to a list of fetch promises
             return Promise.all(specification.chapters.filter((chapter: ChapterSpecification) => !chapter.forthcoming).map((chapter: ChapterSpecification) => 
@@ -81,7 +81,7 @@ export default async function loadBookFromURL(url: string) {
         .then(() => {
 
             // Construct a Book object given the spec and chapter text
-            return new Book(undefined, specification)
+            return new Edition(undefined, specification)
 
         })
 

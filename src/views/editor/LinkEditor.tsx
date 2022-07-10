@@ -1,5 +1,5 @@
 import React, { ChangeEvent, useContext, useState } from "react";
-import { LinkNode } from "../../models/LinkNode";
+import { LinkNode } from "../../models/chapter/LinkNode";
 import { ChapterContext } from "../chapter/Chapter";
 import URLEditor from "./URLEditor";
 

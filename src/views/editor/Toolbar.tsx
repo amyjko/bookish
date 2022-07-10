@@ -13,16 +13,16 @@ import Scissors from "../svg/scissors.svg";
 import Media from "../svg/media.svg";
 import Quote from "../svg/quote.svg";
 
-import { TextNode } from "../../models/TextNode";
-import { AtomNode } from "../../models/AtomNode";
+import { TextNode } from "../../models/chapter/TextNode";
+import { AtomNode } from "../../models/chapter/AtomNode";
 
-import { LinkNode } from "../../models/LinkNode";
-import { LabelNode } from "../../models/LabelNode";
-import { InlineCodeNode } from "../../models/InlineCodeNode";
-import { CitationsNode } from "../../models/CitationsNode";
-import { DefinitionNode } from "../../models/DefinitionNode";
-import { CodeNode } from "../../models/CodeNode";
-import { CalloutNode } from "../../models/CalloutNode";
+import { LinkNode } from "../../models/chapter/LinkNode";
+import { LabelNode } from "../../models/chapter/LabelNode";
+import { InlineCodeNode } from "../../models/chapter/InlineCodeNode";
+import { CitationsNode } from "../../models/chapter/CitationsNode";
+import { DefinitionNode } from "../../models/chapter/DefinitionNode";
+import { CodeNode } from "../../models/chapter/CodeNode";
+import { CalloutNode } from "../../models/chapter/CalloutNode";
 
 import LabelEditor from "./LabelEditor";
 import InlineCodeEditor from "./InlineCodeEditor";
@@ -31,9 +31,9 @@ import LinkEditor from "./LinkEditor";
 import DefinitionEditor from "./DefinitionEditor";
 import CaptionedCodeEditor from "./CaptionedCodeEditor";
 import CalloutEditor from "./CalloutEditor";
-import { QuoteNode } from "../../models/QuoteNode";
+import { QuoteNode } from "../../models/chapter/QuoteNode";
 import QuoteEditor from "./QuoteEditor";
-import { EmbedNode } from "../../models/EmbedNode";
+import { EmbedNode } from "../../models/chapter/EmbedNode";
 import EmbedEditor from "./EmbedEditor";
 
 const keyLabels: {[key: string]: string} = {

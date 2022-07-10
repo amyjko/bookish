@@ -2,11 +2,9 @@ import React, { useContext, useEffect, useRef } from 'react'
 import { renderNode, renderPosition } from './Renderer'
 import Code from './Code'
 import Python from './Python'
-import { CodeNode } from "../../models/CodeNode"
+import { CodeNode } from "../../models/chapter/CodeNode"
 import { EditorContext } from '../page/Book'
 import { CaretContext } from '../editor/BookishEditor'
-import { Position } from "../../models/Position"
-import PositionEditor from '../editor/PositionEditor'
 
 const CaptionedCode = (props: { node: CodeNode}) => {
 
