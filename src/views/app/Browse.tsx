@@ -15,7 +15,7 @@ export default function Browse() {
 		getPreviews().then(books => {
 			setLoading(false) 
 			if(books === null)
-				setError("Unable to load books");
+				setError("No books have been published.");
 			else
 				setBooks(books)
 		})
@@ -27,7 +27,7 @@ export default function Browse() {
 
 		<p>Here are all of the books in the Bookish library.</p>
 		{ 
-			error ? <div className=".bookish-app-alert">{error}</div> :
+			error ? <div className="bookish-app-alert">{error}</div> :
 			loading ? <p>Loading books...</p> : 
 				books.map((book, index) => { return <BookPreview key={`book${index}`} book={book} write={false} />})
 		}

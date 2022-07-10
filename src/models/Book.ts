@@ -12,6 +12,11 @@ export type BookPreview = {
     description: string;
 }
 
+export type Edition = {
+    version: string;
+    changes: string;
+}
+
 export type Definition = { phrase: string, definition: string, synonyms?: string[]}
 
 export type ThemeColors = {
@@ -87,7 +92,7 @@ export type BookSpecification = {
     license: string;
     acknowledgements?: string;
     tags?: string[];
-    revisions?: Array<[string, string]>;
+    revisions?: [string, string][];
     sources?: Record<string, string>;
     references?: Record<string, string | string[]>;
     symbols?: Record<string, string>;
