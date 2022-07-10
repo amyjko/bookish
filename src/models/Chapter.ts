@@ -1,8 +1,24 @@
 import Parser from "./Parser";
 import { ChapterNode } from "./ChapterNode";
-import Book, { ChapterSpecification } from "./Book"
-import { getChapterText, updateBook } from "./Firestore";
+import Book, { BookSaveStatus } from "./Book"
+import { getChapterText, updateChapter } from "./Firestore";
 import { DocumentReference } from "firebase/firestore";
+
+export type ChapterSpecification = {
+    ref?: DocumentReference | undefined;
+	id: string;
+    title: string;
+    authors: string[];
+    image?: string;
+    numbered?: boolean;
+    forthcoming?: boolean;
+    section?: string;
+	text?: string;
+}
+
+export type ChapterContent = {
+    text: string
+}
 
 export type Match = {
 	left: string,
@@ -10,7 +26,7 @@ export type Match = {
 	right: string
 }
 
-class Chapter {
+export default class Chapter {
 	book: Book;
 	ref: DocumentReference | undefined;
 	chapterID: string;
@@ -25,13 +41,23 @@ class Chapter {
 	index: Record<string, Array<Match>> | undefined;
 	wordCount: number | undefined;
 
+	// A list of requested edits, stored as promises, resolved
+    // when the book is ready to save.
+    edits: { resolve: Function, reject: Function }[] = [];
+    // The timer that checks for inactivity.
+    timerID: NodeJS.Timer | undefined;
+    lastEdit: number = 0;
+
+	// A set of listeners that are notified when the chapter text changes.
+	listeners = new Set<(text: string) => void>();
+
     constructor(book: Book, spec: ChapterSpecification) {
 
         this.book = book;
 		this.ref = spec.ref;
 		this.chapterID = spec.id;
         this.title = spec.title;
-        this.authors = spec.authors;
+        this.authors = spec.authors ?? [];
         this.image = spec.image;
         this.numbered = spec.numbered === true || spec.numbered === undefined;
         this.section = spec.section ? spec.section : undefined;
@@ -40,15 +66,65 @@ class Chapter {
 		// If the chapter has text, then parse it, count searchable words, and compute an index.
 		if(spec.text !== undefined)
 			this.setText(spec.text)
-		else if(this.ref)
+		else if(this.ref) {
 			getChapterText(this.ref).then(text => this.setText(text.text))
-		// Otherwise, set them all to null.
+		}
+		// Otherwise, set them all to undefined.
 		else {
 			this.ast = undefined;
 			this.wordCount = 0;
 			this.index = undefined;
 		}
 		
+        // Periodically check for inactivity, pooling edits until after an idle state.
+		this.timerID = setInterval(() => {
+			if(this.book.ref && this.ref && this.text) {
+				// If it's been more than a second since our last edit and there
+				// are edits that haven't been saved, try updating the book, 
+				// and if we succeed, resolve all of the edits, and if we fail,
+				// then reject them.
+				if(Date.now() - this.lastEdit > 1000 && this.edits.length > 0) {
+					// Tell listeners that this book model changed.
+					this.book.notifyListeners(BookSaveStatus.Saving);
+					updateChapter(this.book.ref, this.ref, this.text)
+						.then(() => {
+							// Approve the edits.
+							this.edits.forEach(edit => edit.resolve());
+							this.book.notifyListeners(BookSaveStatus.Saved);
+						})
+						.catch(() => {
+							// Reject the edits.
+							this.edits.forEach(edit => edit.reject());
+							this.book.notifyListeners(BookSaveStatus.Error);
+						})
+						.finally(() => {
+							// Reset the edit queue.
+							this.edits = [];
+						})
+				}
+			}
+		}, 500);
+
+    }
+
+	addListener(listener: (text: string) => void) { this.listeners.add(listener); }
+    removeListener(listener: (text: string) => void) { this.listeners.delete(listener); }
+    notifyListeners() { 
+		this.listeners.forEach(listener => this.text !== undefined ? listener.call(undefined, this.text) : undefined); 
+	}
+
+    // Adds a save request to the queue, to be resolved later after a period of
+    // inactivity. Returns a promise that will eventually be resolved.
+    requestSave() {
+        // Tell listeners that this book model changed.
+        this.book.notifyListeners(BookSaveStatus.Changed);
+
+        // Return a promise that will resolve or reject later after this model saves the edits to the database.
+        this.lastEdit = Date.now();
+        const promise = new Promise<void>((resolve, reject) => {
+            this.edits.push({ resolve: resolve, reject: reject })
+        });
+        return promise;
     }
 
 	toObject() {
@@ -64,7 +140,9 @@ class Chapter {
 		payload.numbered = this.numbered ? true : false;
 		if(this.section !== undefined) payload.section = this.section;
 		if(this.forthcoming) payload.forthcoming = this.forthcoming;
-		if(this.text !== undefined) payload.text = this.text;
+
+		// Note that we don't include the chapter text in the payload; that's stored in the chapters subcollection.
+		// We just return the chapter metadata here, which is stored in the book collection.
 
 		return payload;
 
@@ -111,6 +189,7 @@ class Chapter {
 		if(this.text !== text || this.ast === undefined) {
 			this.text = text;
 			this.setAST(Parser.parseChapter(this.book, this.text));
+			this.notifyListeners();
 		}
 	}
 
@@ -124,8 +203,10 @@ class Chapter {
 		this.index = this.computeIndex();
 
 		// Don't save if its the same. This is just an optimization.
-		if(changed)
-			return this.book.requestSave();
+		if(changed) {
+			if(this.book.ref && this.ref)
+				return this.requestSave();
+		}
 
 	}
 
@@ -229,5 +310,3 @@ class Chapter {
 	}
 
 }
-
-export default Chapter

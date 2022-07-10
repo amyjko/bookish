@@ -122,8 +122,9 @@ const Chapter = (props: { chapter: ChapterModel, book: Book, print?: boolean }) 
 		// Position the marginals, since there's new content.
 		layoutMarginals();
 
-		// Listen to changes on the book.
+		// Listen to changes on the book and chapter.
 		book.addListener(handleBookChange);
+		chapter.addListener(handleBookChange);
 
 		// On cleanup, unsubscribe from everything above.
 		return () => {
@@ -148,6 +149,7 @@ const Chapter = (props: { chapter: ChapterModel, book: Book, print?: boolean }) 
 			observer.disconnect()
 
 			book.removeListener(handleBookChange)
+			chapter.removeListener(handleBookChange)
 		}
 
 	}, [])
@@ -328,7 +330,7 @@ const Chapter = (props: { chapter: ChapterModel, book: Book, print?: boolean }) 
 								/> : 
 								renderNode(chapterAST)
 						) :
-						null
+						<span>Loading...</span>
 				}
 				</ChapterContext.Provider>
 				{

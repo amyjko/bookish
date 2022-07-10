@@ -1,6 +1,7 @@
 import Ajv from 'ajv';
 import addFormats from 'ajv-formats';
-import Book, { BookSpecification, ChapterSpecification } from './Book'
+import Book, { BookSpecification } from './Book'
+import { ChapterSpecification } from './Chapter'
 
 let schema = require("../schemas/book.json");
 

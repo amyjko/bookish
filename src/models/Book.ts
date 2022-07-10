@@ -1,25 +1,9 @@
 import Parser from "./Parser";
 import { EmbedNode } from "./EmbedNode";
-import Chapter from './Chapter.js';
+import Chapter, { ChapterSpecification } from './Chapter.js';
 import { addChapter, removeChapter, updateBook } from "./Firestore";
 import { DocumentReference } from "firebase/firestore";
 import { ReferenceNode } from "./ReferenceNode";
-
-export type ChapterSpecification = {
-    ref: DocumentReference | undefined;
-    id: string;
-    title: string;
-    authors: string[];
-    image?: string;
-    numbered?: boolean;
-    forthcoming?: boolean;
-    section?: string;
-    text?: string;
-}
-
-export type ChapterContent = {
-    text: string
-}
 
 export type BookPreview = {
     ref: DocumentReference;
@@ -278,10 +262,10 @@ export default class Book {
         // If there's a spec and it has chapters, process them.
         if(specification && specification.chapters.length > 0) {
             // Initialize the chapters dictionary since parsing depends this index to detect whether a chapter exists.
-            specification.chapters.forEach(chapter => this.chaptersByID[chapter.id] = undefined)
-            specification.chapters.forEach(chapter => {
-                const chap = new Chapter(this, chapter)
-                this.chaptersByID[chapter.id] = chap
+            specification.chapters.forEach(chapterSpec => this.chaptersByID[chapterSpec.id] = undefined)
+            specification.chapters.forEach(chapterSpec => {
+                const chap = new Chapter(this, chapterSpec)
+                this.chaptersByID[chapterSpec.id] = chap
                 this.chapters.push(chap)
             })
         }
@@ -427,7 +411,7 @@ export default class Book {
             forthcoming: true
         }
 
-        const chap = new Chapter(this, emptyChapter)
+        const chap = new Chapter(this, emptyChapter);
         this.chapters.push(chap);
         this.chaptersByID[emptyChapter.id] = chap
 

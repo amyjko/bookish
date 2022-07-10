@@ -102,7 +102,7 @@ const Book = (props: { book: BookModel, base?: string, editable?: boolean }) => 
 				}
 				{
 					// Map all the book chapters a route with word and number to highlight
-					book.getChapters().map((chapter, index) => {
+					book.getChapters().map(chapter => {
 						return <Route 
 								key={"chapter-route-" + chapter.getChapterID() + "-highlighted"}
 								path={chapter.getChapterID() + "/:word/:number"}
@@ -135,7 +135,7 @@ const BookStatus = (props: { book: BookModel }) => {
 		setStatus(status);
 	}
 
-	// Listen to book changes.
+	// Listen to book and chapter changes.
 	useEffect(() => {
 		props.book.addListener((status) => handleBookChange(status));
 		return () => { props.book.removeListener(handleBookChange); }

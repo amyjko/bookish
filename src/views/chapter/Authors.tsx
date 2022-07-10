@@ -46,7 +46,7 @@ const Authors = (props: {
         }
         {
             (showInherited ? inheritedAuthors : authors).map( 
-                (author, index) => [
+                (author, index, list) => [
                     book ?
                         editable && !showInherited ? 
                             <TextEditor
@@ -61,7 +61,7 @@ const Authors = (props: {
                             <span key={"author" + index}>{renderNode(Parser.parseFormat(book, author))}</span>
                         : <span key={"author" + index}>{author}</span>
                     ,
-                    index < authors.length - 1 ? (", ") : null
+                    index < list.length - 1 ? (", ") : null
                 ]
             )
         }

@@ -1,7 +1,7 @@
 import { db } from "./Firebase"
 import { collection, getDocs, getDoc, setDoc, doc, addDoc, query, where, deleteDoc, DocumentReference } from "firebase/firestore"
-import Book, { BookPreview, BookSpecification, ChapterContent } from "./Book"
-import Chapter from "./Chapter"
+import Book, { BookPreview, BookSpecification } from "./Book"
+import Chapter, { ChapterContent } from "./Chapter"
 
 
 export const getPreviews = async (): Promise<BookPreview[] | null> => {
@@ -120,5 +120,18 @@ export const getChapterText = async(chapter: DocumentReference): Promise<Chapter
         throw Error("Chapter text does not exist.")
 
     return text.data() as ChapterContent
+
+}
+
+export const updateChapter = async(book: DocumentReference, chapter: DocumentReference, text: string): Promise<void> => {
+
+    if(!db)
+        throw Error("Can't update chapter, not connected to Firebase.")
+
+    // Get the object for the book so we can store it.
+    const spec = { text: text };
+
+    // Update the book's preview
+    await setDoc(doc(db, `books/${book.id}/chapters`, chapter.id), spec);
 
 }
