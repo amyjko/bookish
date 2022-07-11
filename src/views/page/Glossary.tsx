@@ -7,7 +7,7 @@ import { renderNode } from '../chapter/Renderer'
 
 import Edition from '../../models/book/Edition.js'
 import Parser from '../../models/chapter/Parser'
-import { EditorContext } from './Book'
+import { EditorContext } from './Edition'
 import { Definition } from '../../models/book/Definition.js'
 import ConfirmButton from '../editor/ConfirmButton'
 import TextEditor from '../editor/TextEditor'
@@ -17,7 +17,7 @@ import { FormatNode } from '../../models/chapter/FormatNode'
 const Definition = (props: { id: string, definition: Definition }) => {
 
 	const { id, definition } = props;
-	const { editable, book } = useContext(EditorContext);
+	const { editable, edition: book } = useContext(EditorContext);
 	const [ newSynonym, setNewSynonym ] = useState<boolean>(false);
 	const synonymsRef = useRef<HTMLSpanElement>(null);
 

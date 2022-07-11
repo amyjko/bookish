@@ -5,6 +5,7 @@ const Switch = (props: {
     options: string[],
     value: string,
     position?: string,
+    enabled?: boolean,
     edit : (newValue: string) => void
 }) => {
 
@@ -34,6 +35,7 @@ const Switch = (props: {
                     key={`option-${index}`} 
                     className={`bookish-app-switch-option ${value === option ? "bookish-app-switch-option-selected" : ""}`} 
                     data-value={option} 
+                    disabled={props.enabled === false}
                     onClick={handleClick}>
                         {option}
                 </button>

@@ -1,7 +1,7 @@
 import React, { useContext, useEffect, useRef, useState } from 'react';
 import Parser from '../../models/chapter/Parser';
 import TextEditor from '../editor/TextEditor';
-import { EditorContext } from '../page/Book';
+import { EditorContext } from '../page/Edition';
 import { renderNode } from './Renderer';
 
 const Authors = (props: { 
@@ -12,7 +12,7 @@ const Authors = (props: {
 }) => {
 
     const { authors, inheritedAuthors } = props
-    const { editable, book } = useContext(EditorContext)
+    const { editable, edition: book } = useContext(EditorContext)
     const ref = useRef<HTMLDivElement>(null);
     const [ newAuthor, setNewAuthor ] = useState<boolean>(false);
 

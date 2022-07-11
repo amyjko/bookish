@@ -2,10 +2,11 @@ import Chapter, { ChapterSpecification } from './Chapter.js';
 import Parser from "../chapter/Parser";
 import { EmbedNode } from "../chapter/EmbedNode";
 import { ReferenceNode } from "../chapter/ReferenceNode";
-import { addChapter, removeChapter, updateBook } from "../Firestore";
+import { addChapterInFirestore, removeChapterFromEditionInFirestore, updateEditionInFirestore } from "../Firestore";
 import { DocumentReference } from "firebase/firestore";
 import { Theme } from './Theme.js';
 import { Definition } from './Definition.js';
+import Book from './Book.js';
 
 export type EditionSpecification = {
     title: string;
@@ -23,6 +24,7 @@ export type EditionSpecification = {
     glossary?: Record<string, Definition>;
     theme: Theme | null;
     uids?: Array<string>;
+    bookRef?: DocumentReference;
 }
 
 export enum BookSaveStatus {
@@ -41,7 +43,8 @@ export default class Edition {
     static IndexID = "index";
 	static GlossaryID = "glossary";
 
-    ref: DocumentReference | undefined;
+    readonly book: Book | undefined;
+    editionRef: DocumentReference | undefined;
     title: string;
     symbols: Record<string, string>;
     tags: string[];
@@ -71,12 +74,13 @@ export default class Edition {
 
     // Given an object with a valid specification and an object mapping chapter IDs to chapter text,
     // construct an object representing a book.
-    constructor(ref: DocumentReference | undefined, specification?: EditionSpecification) {
+    constructor(book: Book | undefined, editionRef: DocumentReference | undefined, specification?: EditionSpecification) {
 
         if(typeof specification !== "object" && specification !== undefined)
             throw Error("Expected a book specification object, but received " + specification)
 
-        this.ref = ref
+        this.book = book;
+        this.editionRef = editionRef
 
         // Copy all of the specification metadata to fields.
         // Choose suitable defaults if the spec is empty.
@@ -122,7 +126,7 @@ export default class Edition {
             if(Date.now() - this.lastEdit > 1000 && this.edits.length > 0) {
                 // Tell listeners that this book model changed.
                 this.notifyListeners(BookSaveStatus.Saving);
-                updateBook(this)
+                updateEditionInFirestore(this)
                     .then(() => {
                         // Approve the edits.
                         this.edits.forEach(edit => edit.resolve());
@@ -141,6 +145,8 @@ export default class Edition {
         }, 500);
 
     }
+
+    getBook() { return this.book; }
 
     addListener(listener: (status: BookSaveStatus) => void) { this.listeners.add(listener); }
     removeListener(listener: Function) { this.listeners.delete(listener); }
@@ -183,7 +189,7 @@ export default class Edition {
 
     }
 
-    getRef() { return this.ref }
+    getRef() { return this.editionRef }
 
     addUserID(uid: string) {
         this.uids.push(uid);
@@ -233,17 +239,17 @@ export default class Edition {
 
     async addChapter() {
 
-        if(!this.ref)
+        if(!this.editionRef)
             throw Error("No book ID, can't add chapter")
 
-        const bookID = this.ref
+        const bookID = this.editionRef
 
         // Synthesize a chapter ID placeholder that doesn't overlap with existing chapter names
         let number = 1;
         while(this.hasChapter("chapter" + number))
             number++;
 
-        const chapterRef = await addChapter(bookID, { text: "" })
+        const chapterRef = await addChapterInFirestore(bookID, { text: "" })
 
         // Create a default chapter on this model
         const emptyChapter = {
@@ -293,7 +299,7 @@ export default class Edition {
         this.chapters.splice(index, 1);
 
         // Ask the database to update the new book metadata then delete the chapter.
-        return this.requestSave().then(() => removeChapter(chapter));
+        return this.requestSave().then(() => removeChapterFromEditionInFirestore(chapter));
 
     }
 

@@ -8,15 +8,16 @@ import Parser from "../../models/chapter/Parser"
 import { EmbedNode } from "../../models/chapter/EmbedNode"
 import Edition from '../../models/book/Edition'
 import Outline from './Outline'
-import { BaseContext, EditorContext } from './Book'
+import { BaseContext, EditorContext } from './Edition'
 import Acknowledgements from './Acknowledgements'
 import License from './License'
 import Description from './Description'
-import Revisions from './Revisions'
+import { Revisions } from './Revisions'
 import Toggle from '../editor/Toggle'
 import Chapter from '../../models/book/Chapter'
 import TextEditor from '../editor/TextEditor'
 import ConfirmButton from '../editor/ConfirmButton'
+import Book from '../../models/book/Book'
 
 const TableOfContentsRow = (props: { 
 	image: React.ReactNode, 
@@ -83,7 +84,7 @@ const TableOfContentsRow = (props: {
 
 const AddChapter = () => {
 
-	const { book } = useContext(EditorContext)
+	const { edition: book } = useContext(EditorContext)
 	const [ waiting, setWaiting ] = useState(false)
 
 	function add() {
@@ -99,7 +100,7 @@ const AddChapter = () => {
 
 }
 
-const TableOfContents = (props: { book: Edition }) => {
+const TableOfContents = (props: { edition: Edition }) => {
 
 	const { base } = useContext(BaseContext)
 	const { editable } = useContext(EditorContext)
@@ -110,7 +111,7 @@ const TableOfContents = (props: { book: Edition }) => {
 	}, [])
 
 	// Get the book being rendered.
-	let book = props.book;
+	let edition = props.edition;
 
 	function getProgressDescription(progress: null | number) {
 
@@ -135,7 +136,7 @@ const TableOfContents = (props: { book: Edition }) => {
 		if(!embed)
 			return null;
 
-		let embedNode = Parser.parseEmbed(book, embed);
+		let embedNode = Parser.parseEmbed(edition, embed);
 		if(embedNode instanceof EmbedNode) {
 			let image = (embedNode as EmbedNode).toJSON();
 			return <TableOfContentsImage url={image.url} alt={image.alt}/>
@@ -151,7 +152,7 @@ const TableOfContents = (props: { book: Edition }) => {
 		JSON.parse(progressStorage)
 
 	// Is there a colon? Let's make a subtitle
-	let title = book.getTitle();
+	let title = edition.getTitle();
 	let subtitle = undefined;
 	let colon = title.indexOf(":");
 	if(colon >= 0) {
@@ -161,35 +162,35 @@ const TableOfContents = (props: { book: Edition }) => {
 
 	return <Page>
 		<Header 
-			book={book}
+			book={edition}
 			label="Book title"
-			getImage={() => book.getImage("cover")}
-			setImage={(embed) => book.setImage("cover", embed)}
+			getImage={() => edition.getImage("cover")}
+			setImage={(embed) => edition.setImage("cover", embed)}
 			header={title}
 			subtitle={subtitle}
-			tags={book.getTags()}
+			tags={edition.getTags()}
 			after={<Authors 
-				authors={book.getAuthors()} 
-				add={ () => book.addAuthor("")}
-				edit={(index, text) => text.length === 0 ? book.removeAuthor(index) : book.setAuthor(index, text)} 
+				authors={edition.getAuthors()} 
+				add={ () => edition.addAuthor("")}
+				edit={(index, text) => text.length === 0 ? edition.removeAuthor(index) : edition.setAuthor(index, text)} 
 			/>}
 			outline={
 				<Outline
 					previous={null}
-					next={book.getNextChapterID("")}
+					next={edition.getNextChapterID("")}
 				/>
 			}
-			save={text => props.book.setTitle(text)}
+			save={text => props.edition.setTitle(text)}
 		/>
 
-		<Description book={book} />
+		<Description book={edition} />
 
 		<h2 className="bookish-header" id="chapters">Chapters { editable ? <AddChapter/> : null }</h2>
 		<div className="bookish-table">
 			<table id="toc">
 				<tbody>
 					{
-						book.getChapters().map((chapter) => {
+						edition.getChapters().map((chapter) => {
 
 							// Get the image, chapter number, and section for rendering.
 							const chapterID = chapter.getChapterID();
@@ -223,7 +224,7 @@ const TableOfContents = (props: { book: Edition }) => {
 									image={getImage(chapter.getImage())}
 									chapter={chapter}
 									chapterID={chapterID}
-									number={book.getChapterNumber(chapterID)}
+									number={edition.getChapterNumber(chapterID)}
 									title={chapter.getTitle()}
 									annotation={
 										editable ?
@@ -250,9 +251,9 @@ const TableOfContents = (props: { book: Edition }) => {
 						})
 					}
 					{
-						book.hasReferences() || editable ? 
+						edition.hasReferences() || editable ? 
 							<TableOfContentsRow
-								image={getImage(book.getImage(Edition.ReferencesID))}
+								image={getImage(edition.getImage(Edition.ReferencesID))}
 								chapterID="references"
 								title="References"
 								annotation="Everything cited"
@@ -260,9 +261,9 @@ const TableOfContents = (props: { book: Edition }) => {
 							: null
 					}
 					{
-						book.getGlossary() && Object.keys(book.getGlossary()).length > 0 || editable ?
+						edition.getGlossary() && Object.keys(edition.getGlossary()).length > 0 || editable ?
 							<TableOfContentsRow
-								image={getImage(book.getImage(Edition.GlossaryID))}
+								image={getImage(edition.getImage(Edition.GlossaryID))}
 								chapterID="glossary"
 								title="Glossary"
 								annotation="Definitions"
@@ -270,19 +271,19 @@ const TableOfContents = (props: { book: Edition }) => {
 							: null
 					}
 					<TableOfContentsRow
-						image={getImage(book.getImage(Edition.IndexID))}
+						image={getImage(edition.getImage(Edition.IndexID))}
 						chapterID="index"
 						title="Index"
 						annotation="Common words and where they are"
 					/>
 					<TableOfContentsRow
-						image={getImage(book.getImage(Edition.SearchID))}
+						image={getImage(edition.getImage(Edition.SearchID))}
 						chapterID="search"
 						title="Search"
 						annotation="Find where words occur"
 					/>
 					<TableOfContentsRow
-						image={getImage(book.getImage(Edition.MediaID))}
+						image={getImage(edition.getImage(Edition.MediaID))}
 						chapterID="media"
 						title="Media"
 						annotation="Images and video in the book"
@@ -300,8 +301,8 @@ const TableOfContents = (props: { book: Edition }) => {
 			</table>
 		</div>
 
-		<Acknowledgements book={book} />
-		<License book={book} />
+		<Acknowledgements book={edition} />
+		<License book={edition} />
 
 		<h2 className="bookish-header" id="print">Print</h2>
 
@@ -312,10 +313,10 @@ const TableOfContents = (props: { book: Edition }) => {
 		<h2 className="bookish-header" id="citation">Citation</h2>
 
 		<p>
-			{ book.getAuthors().map(author => Parser.parseFormat(book, author).toText()).join(", ") } ({(new Date()).getFullYear() }). <em>{book.getTitle()}</em>. { location.protocol+'//'+location.host+location.pathname }, <em>retrieved { (new Date()).toLocaleDateString("en-US")}</em>.
+			{ edition.getAuthors().map(author => Parser.parseFormat(edition, author).toText()).join(", ") } ({(new Date()).getFullYear() }). <em>{edition.getTitle()}</em>. { location.protocol+'//'+location.host+location.pathname }, <em>retrieved { (new Date()).toLocaleDateString("en-US")}</em>.
 		</p>
 
-		<Revisions book={book} />
+		<Revisions edition={edition} />
 		
 	</Page>
 

@@ -3,7 +3,7 @@ import { renderNode, renderPosition } from './Renderer'
 import Code from './Code'
 import Python from './Python'
 import { CodeNode } from "../../models/chapter/CodeNode"
-import { EditorContext } from '../page/Book'
+import { EditorContext } from '../page/Edition'
 import { CaretContext } from '../editor/BookishEditor'
 
 const CaptionedCode = (props: { node: CodeNode}) => {

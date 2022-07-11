@@ -1,7 +1,7 @@
 import React, { ChangeEvent, useContext, useEffect, useRef, useState } from 'react'
 import { CommentNode } from '../../models/chapter/CommentNode'
 import Atom from '../editor/Atom';
-import { EditorContext } from '../page/Book';
+import { EditorContext } from '../page/Edition';
 import { ChapterContext } from './Chapter';
 import Marginal from './Marginal';
 

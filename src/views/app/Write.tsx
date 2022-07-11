@@ -1,14 +1,14 @@
 import React, { useEffect, useState } from 'react'
-import { useParams } from 'react-router-dom'
+import { useParams } from "react-router-dom"
 import { loadBookFromFirestore } from "../../models/Firestore"
-import Edition from '../page/Edition'
-import Loading from '../page/Loading'
-import EditionModel from '../../models/book/Edition'
+import Edition from "../page/Edition"
+import Loading from "../page/Loading"
+import EditionModel from "../../models/book/Edition"
 import Book from '../../models/book/Book'
 
-export default function Reader() {
+export default function Write() {
 
-    const [ , setBook ] = useState<Book | undefined>(undefined);
+    const [ book, setBook ] = useState<Book | undefined>(undefined);
 	const [ edition, setEdition ] = useState<EditionModel | null>(null)
     const [ error, setError ] = useState<Error | null>(null)
     const { id } = useParams()
@@ -16,13 +16,13 @@ export default function Reader() {
     function initializeBook(newBook: Book) {
 
         setBook(newBook);
-        const draft = newBook.getLatestEdition();
+        const draft = newBook.getDraft();
         if(draft)
             draft
                 .then(b => setEdition(b))
                 .catch((error) => setError(error));
         else
-            setError(Error("This book has no published editions."));
+            setError(Error("This book has no editions."));
 
     }
     
@@ -37,7 +37,8 @@ export default function Reader() {
 	}, [])
 
     return  error !== null ? <div className="bookish-app-alert">{error.message}</div> :
+            book == undefined ? <Loading/> :
             edition === null ? <Loading/> :
-                <Edition edition={edition} base={"/read/" + id} />
+                <Edition edition={edition} base={"/write/" + id} editable={true} />
 
 }

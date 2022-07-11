@@ -1,7 +1,7 @@
 import Parser from "../chapter/Parser";
 import { ChapterNode } from "../chapter/ChapterNode";
 import Edition, { BookSaveStatus } from "./Edition"
-import { getChapterText, updateChapter } from "../Firestore";
+import { loadChapterTextFromFirestore, updateChapterTextInFirestore } from "../Firestore";
 import { DocumentReference } from "firebase/firestore";
 
 export type ChapterSpecification = {
@@ -67,7 +67,7 @@ export default class Chapter {
 		if(spec.text !== undefined)
 			this.setText(spec.text)
 		else if(this.ref) {
-			getChapterText(this.ref).then(text => this.setText(text.text))
+			loadChapterTextFromFirestore(this.ref).then(text => this.setText(text.text))
 		}
 		// Otherwise, set them all to undefined.
 		else {
@@ -78,7 +78,7 @@ export default class Chapter {
 		
         // Periodically check for inactivity, pooling edits until after an idle state.
 		this.timerID = setInterval(() => {
-			if(this.edition.ref && this.ref && this.text) {
+			if(this.edition.editionRef && this.ref && this.text) {
 				// If it's been more than a second since our last edit and there
 				// are edits that haven't been saved, try updating the book, 
 				// and if we succeed, resolve all of the edits, and if we fail,
@@ -86,7 +86,7 @@ export default class Chapter {
 				if(Date.now() - this.lastEdit > 1000 && this.edits.length > 0) {
 					// Tell listeners that this book model changed.
 					this.edition.notifyListeners(BookSaveStatus.Saving);
-					updateChapter(this.edition.ref, this.ref, this.text)
+					updateChapterTextInFirestore(this.edition.editionRef, this.ref, this.text)
 						.then(() => {
 							// Approve the edits.
 							this.edits.forEach(edit => edit.resolve());
@@ -204,7 +204,7 @@ export default class Chapter {
 
 		// Don't save if its the same. This is just an optimization.
 		if(changed) {
-			if(this.edition.ref && this.ref)
+			if(this.edition.editionRef && this.ref)
 				return this.requestSave();
 		}
 

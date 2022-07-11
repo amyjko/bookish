@@ -1,12 +1,12 @@
 import React, { useContext } from 'react'
 import { ReferenceNode } from "../../models/chapter/ReferenceNode";
 import TextEditor from '../editor/TextEditor';
-import { EditorContext } from '../page/Book';
+import { EditorContext } from '../page/Edition';
 
 const Reference = (props: { node: ReferenceNode }) => {
 
     const { node } = props;
-    const { editable, book } = useContext(EditorContext);
+    const { editable, edition: book } = useContext(EditorContext);
 
     // If a short version was requested, try to abbreviate the authors.
     if(node.short) {

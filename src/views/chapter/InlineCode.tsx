@@ -2,7 +2,7 @@ import React, { useContext, useEffect, useRef } from 'react'
 import Code from './Code'
 import { InlineCodeNode } from "../../models/chapter/InlineCodeNode"
 import { renderNode } from './Renderer'
-import { EditorContext } from '../page/Book'
+import { EditorContext } from '../page/Edition'
 
 const InlineCode = (props: { node: InlineCodeNode }) => {
 

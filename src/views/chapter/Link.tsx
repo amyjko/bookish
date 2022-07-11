@@ -5,7 +5,7 @@ import { HashLink } from "../util/HashLink"
 
 import { renderNode } from './Renderer';
 import smoothlyScrollElementToEyeLevel from '../util/Scroll'
-import { BaseContext, EditorContext } from '../page/Book';
+import { BaseContext, EditorContext } from '../page/Edition';
 import { LinkNode } from "../../models/chapter/LinkNode";
 import { ChapterContext } from './Chapter';
 

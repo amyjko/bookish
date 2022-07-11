@@ -2,7 +2,7 @@ import React, { useContext } from 'react'
 import { ChapterContext } from './Chapter'
 import { LabelNode } from "../../models/chapter/LabelNode"
 import Atom from '../editor/Atom';
-import { EditorContext } from '../page/Book';
+import { EditorContext } from '../page/Edition';
 
 const Label = (props: { node: LabelNode }) => {
 

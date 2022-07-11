@@ -7,7 +7,7 @@ import Page from './Page';
 import { Link } from 'react-router-dom';
 import Edition from '../../models/book/Edition';
 import Chapter, { Match } from '../../models/book/Chapter';
-import { BaseContext } from "./Book"
+import { BaseContext } from "./Edition"
 
 const Search = (props: { book: Edition }) => {
 

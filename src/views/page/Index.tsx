@@ -6,7 +6,7 @@ import Outline from './Outline';
 import Page from './Page';
 
 import Edition from '../../models/book/Edition';
-import { BaseContext } from './Book';
+import { BaseContext } from './Edition';
 
 const Index = (props: { book: Edition }) => {
 

@@ -795,7 +795,7 @@ const BookishEditor = <RootType extends RootNode>(props: {
                 }
                 { renderNode(editedNode) }
                 { (editedNode.isEmpty() || (editedNode instanceof FormatNode && editedNode.isEmptyText())) ? 
-                    <Placeholder text={props.placeholder} /> : 
+                    <Placeholder text={props.placeholder} node={editedNode.getTextNodes()[0]}  /> : 
                     null }
             </div>
         </CaretContext.Provider>

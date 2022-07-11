@@ -1,13 +1,13 @@
 import React, { useState, useEffect } from "react"
 import { useAuth } from "./AuthContext"
-import { createBook, getUserBooks } from '../../models/Firestore'
+import { createBookInFirestore, loadUsersBooksFromFirestore } from '../../models/Firestore'
 import BookPreview from './BookPreview'
 import { useNavigate } from "react-router-dom"
-import { BookSpecification as Preview } from "../../models/book/Book"
+import Book from "../../models/book/Book"
 
 export default function Dashboard() {
 
-	const [ books, setBooks ] = useState<Preview[]>([])
+	const [ books, setBooks ] = useState<Book[]>([])
 	const [ loading, setLoading ] = useState(true)
 	const [ error, setError ] = useState('')
 	const navigate = useNavigate()
@@ -16,7 +16,7 @@ export default function Dashboard() {
 
 	function updateBooks() {
 		if(currentUser)
-			getUserBooks(currentUser.uid).then(books => {
+			loadUsersBooksFromFirestore(currentUser.uid).then(books => {
 				setLoading(false) 
 				if(books === null)
 					setError("Unable to load books");
@@ -34,7 +34,7 @@ export default function Dashboard() {
 
 		// Make the book, then go to its page
 		if(currentUser)
-			createBook(currentUser.uid)
+			createBookInFirestore(currentUser.uid)
 				.then(bookID => navigate("/write/" + bookID))
 				.catch(error => { console.error(error); setError("Couldn't create a book: " + error)})
 
@@ -55,6 +55,7 @@ export default function Dashboard() {
 		{ 
 			error ? <div className="bookish-app-alert">{error}</div> :
 			loading ? <p>Loading books...</p> : 
+			books.length === 0 ? <p>No books yet.</p> :
 				books.map((book, index) => <BookPreview key={`book${index}`} book={book} write={true} />)
 		}
 

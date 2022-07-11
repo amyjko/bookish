@@ -4,7 +4,7 @@ import { ChapterNode } from "../../models/chapter/ChapterNode"
 import Parser from "../../models/chapter/Parser"
 import { renderNode } from "../chapter/Renderer"
 import BookishEditor from "../editor/BookishEditor"
-import { EditorContext } from "./Book"
+import { EditorContext } from "./Edition"
 
 const Acknowledgements = (props: { book: Edition }) => {
 

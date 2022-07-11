@@ -5,8 +5,8 @@ import { HashLink } from '../util/HashLink';
 
 import smoothlyScrollElementToEyeLevel from '../util/Scroll';
 import { isMobile } from '../util/isMobile';
-import { DarkModeContext } from './Book';
-import { BaseContext } from './Book';
+import { DarkModeContext } from './Edition';
+import { BaseContext } from './Edition';
 
 const Outline = (props: { previous: string | null, next: string | null, collapse?: boolean, listener?: Function }) => {
 

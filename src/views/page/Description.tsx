@@ -5,7 +5,7 @@ import { FormatNode } from "../../models/chapter/FormatNode"
 import Parser from "../../models/chapter/Parser"
 import { renderNode } from "../chapter/Renderer"
 import BookishEditor from "../editor/BookishEditor"
-import { EditorContext } from "./Book"
+import { EditorContext } from "./Edition"
 
 const Description = (props: { book: Edition }) => {
 

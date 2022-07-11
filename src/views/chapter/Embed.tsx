@@ -1,6 +1,6 @@
 import React, { useContext } from 'react';
 import { EmbedNode } from "../../models/chapter/EmbedNode";
-import { EditorContext } from '../page/Book';
+import { EditorContext } from '../page/Edition';
 import { renderNode, renderPosition } from './Renderer';
 
 const Embed = (props: { node: EmbedNode }) => {

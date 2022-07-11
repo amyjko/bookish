@@ -81,7 +81,7 @@ export default async function loadBookFromURL(url: string) {
         .then(() => {
 
             // Construct a Book object given the spec and chapter text
-            return new Edition(undefined, specification)
+            return new Edition(undefined, undefined, specification)
 
         })
 

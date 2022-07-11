@@ -14,7 +14,7 @@ import { renderNode } from './Renderer'
 import Marker from "../svg/marker.svg"
 import Edition from '../../models/book/Edition'
 import ChapterModel from '../../models/book/Chapter'
-import { EditorContext } from '../page/Book';
+import { EditorContext } from '../page/Edition';
 import TextEditor from '../editor/TextEditor';
 import BookishEditor from '../editor/BookishEditor';
 import Toggle from '../editor/Toggle';

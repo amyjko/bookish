@@ -8,7 +8,7 @@ import Parser from "../../models/chapter/Parser";
 import Edition from '../../models/book/Edition';
 
 import { renderNode } from '../chapter/Renderer'
-import { EditorContext } from './Book';
+import { EditorContext } from './Edition';
 import { ReferenceNode } from '../../models/chapter/ReferenceNode';
 import ConfirmButton from '../editor/ConfirmButton';
 
@@ -83,7 +83,7 @@ function getUniqueID(ids: string[], authors?: string, year?: string): string {
 
 const BulkReferenceEditor = (props: { book: Edition }) => {
 
-	const { book } = useContext(EditorContext);
+	const { edition: book } = useContext(EditorContext);
 
 	const textRef = useRef<HTMLTextAreaElement>(null);
 	const [ text, setText ] = useState<string>("");

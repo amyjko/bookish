@@ -1,18 +1,18 @@
 import React from "react"
 import { useState, useEffect } from "react"
-import { BookSpecification as Preview } from "../../models/book/Book"
-import { getPreviews } from '../../models/Firestore'
+import Book from "../../models/book/Book"
+import { loadBooksFromFirestore } from '../../models/Firestore'
 import BookPreview from './BookPreview'
 
 export default function Browse() {
 
-	const [ books, setBooks ] = useState<Preview[]>([])
+	const [ books, setBooks ] = useState<Book[]>([])
 	const [ loading, setLoading ] = useState<boolean>(true)
 	const [ error, setError ] = useState('')
 
 	// Get the books when the component loads.
 	useEffect(() => {
-		getPreviews().then(books => {
+		loadBooksFromFirestore().then(books => {
 			setLoading(false) 
 			if(books === null)
 				setError("No books have been published.");

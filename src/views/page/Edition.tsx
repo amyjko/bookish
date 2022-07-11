@@ -11,10 +11,11 @@ import Media from "./Media";
 import Unknown from "./Unknown";
 import Print from "./Print"
 import { Theme as ThemeType } from "../../models/book/Theme"
-import BookModel from "../../models/book/Edition"
+import EditionModel from "../../models/book/Edition"
 
 import smoothscroll from 'smoothscroll-polyfill';
 import Theme from './Theme';
+import Book from '../../models/book/Book';
 
 // Poly fill smooth scrolling for Safari.
 smoothscroll.polyfill();
@@ -22,12 +23,12 @@ smoothscroll.polyfill();
 export const DarkModeContext = React.createContext<{ darkMode: boolean, setDarkMode: Function | undefined }>({ darkMode: false, setDarkMode: undefined})
 export const BaseContext = React.createContext<{ base: string }>({ base: "" })
 export const EditorContext = React.createContext<{ 
-	book: BookModel | undefined,
-	editable: boolean }>({ book: undefined, editable: false })
+	edition: EditionModel | undefined,
+	editable: boolean }>({ edition: undefined, editable: false })
 
-const Book = (props: { book: BookModel, base?: string, editable?: boolean }) => {
+const Edition = (props: { edition: EditionModel, base?: string, editable?: boolean }) => {
 
-	const { book } = props
+	const { edition } = props
 	const location = useLocation()
 	const [, updateState] = React.useState<{}>();
 	const forceUpdate = React.useCallback(() => updateState({}), []);
@@ -51,7 +52,7 @@ const Book = (props: { book: BookModel, base?: string, editable?: boolean }) => 
 		navigate(location.hash.replace('#', ''))
 	
 	// Set the window title based on the specification.
-	document.title = book.getTitle();
+	document.title = edition.getTitle();
 
 	const updateDarkMode = () => {
 		if(darkMode) {
@@ -74,52 +75,56 @@ const Book = (props: { book: BookModel, base?: string, editable?: boolean }) => 
 	
 	// Listen to book changes, stop when unmounted.
 	useEffect(() => {
-		book.addListener(bookChange)
-		return () => { book.removeListener(bookChange) }
-	}, [book])
+		edition.getBook()?.addListener(bookChange);
+		edition.addListener(bookChange)
+		return () => { 
+			edition.removeListener(bookChange) 
+			edition.getBook()?.removeListener(bookChange);
+		}
+	}, [edition])
 
 	// When dark mode changes, update dark mode.
 	useEffect(updateDarkMode, [ darkMode ])
 
 	// Set the theme, whatever it is.
-	setTheme(book.getTheme());
+	setTheme(edition.getTheme());
 
 	// Render the book
 	return <div className={"bookish"  + (darkMode ? " bookish-dark" : "")}>
 		<DarkModeContext.Provider value={{ darkMode, setDarkMode}}>
 		<BaseContext.Provider value={{ base }}>
-		<EditorContext.Provider value={{ book, editable: props.editable ? true : false }}>
+		<EditorContext.Provider value={{ edition: edition, editable: props.editable ? true : false }}>
 			<Routes>
-				<Route path="/" element={<TableOfContents book={book}/>} />
+				<Route path="/" element={<TableOfContents edition={edition}/>} />
 				{
 					// Map all the book chapters to a bare route
-					book.getChapters().map((chapter, index) => {
+					edition.getChapters().map(chapter => {
 						return <Route 
 								key={"chapter-route-" + chapter.getChapterID()} 
 								path={"/" + chapter.getChapterID()} 
-								element={<Chapter key={"chapter-" + chapter.getChapterID()} chapter={chapter} book={book} />} />
+								element={<Chapter key={"chapter-" + chapter.getChapterID()} chapter={chapter} book={edition} />} />
 					})
 				}
 				{
 					// Map all the book chapters a route with word and number to highlight
-					book.getChapters().map(chapter => {
+					edition.getChapters().map(chapter => {
 						return <Route 
 								key={"chapter-route-" + chapter.getChapterID() + "-highlighted"}
 								path={chapter.getChapterID() + "/:word/:number"}
-								element={<Chapter key={"chapter-" + chapter.getChapterID() + "-highlighted"} chapter={chapter} book={book} />} />
+								element={<Chapter key={"chapter-" + chapter.getChapterID() + "-highlighted"} chapter={chapter} book={edition} />} />
 					})
 				}
-				<Route path="references" element={<References book={book} />} />
-				<Route path="glossary" element={<Glossary book={book} />} />
-				<Route path="index" element={<Index book={book} />} />
-				<Route path="index/:letter" element={<Index book={book} />} />
-				<Route path="search" element={<Search book={book} />} />
-				<Route path="media" element={<Media book={book} />} />
-				<Route path="theme" element={<Theme book={book} />} />
-				<Route path="print" element={<Print book={book} />} />
-				<Route path="*" element={<Unknown message="This page doesn't exist." book={book} />}/>
+				<Route path="references" element={<References book={edition} />} />
+				<Route path="glossary" element={<Glossary book={edition} />} />
+				<Route path="index" element={<Index book={edition} />} />
+				<Route path="index/:letter" element={<Index book={edition} />} />
+				<Route path="search" element={<Search book={edition} />} />
+				<Route path="media" element={<Media book={edition} />} />
+				<Route path="theme" element={<Theme book={edition} />} />
+				<Route path="print" element={<Print book={edition} />} />
+				<Route path="*" element={<Unknown message="This page doesn't exist." book={edition} />}/>
 			</Routes>
-			<BookStatus book={book}/>
+			<BookStatus book={edition.getBook()} edition={edition}/>
 		</EditorContext.Provider>
 		</BaseContext.Provider>
 		</DarkModeContext.Provider>
@@ -127,7 +132,7 @@ const Book = (props: { book: BookModel, base?: string, editable?: boolean }) => 
 	
 }
 
-const BookStatus = (props: { book: BookModel }) => {
+const BookStatus = (props: { book: Book | undefined, edition: EditionModel }) => {
 
 	const [ status, setStatus ] = useState<BookSaveStatus>(BookSaveStatus.Saved);
 
@@ -137,8 +142,13 @@ const BookStatus = (props: { book: BookModel }) => {
 
 	// Listen to book and chapter changes.
 	useEffect(() => {
-		props.book.addListener((status) => handleBookChange(status));
-		return () => { props.book.removeListener(handleBookChange); }
+
+		props.book?.addListener(status => handleBookChange(status));
+		props.edition.addListener((status) => handleBookChange(status));
+		return () => { 
+			props.book?.removeListener(handleBookChange);
+			props.edition.removeListener(handleBookChange); 
+		}
 	}, []);
 
 	return <div className={`bookish-editor-status ${status === BookSaveStatus.Saving ? "bookish-editor-status-saving" : status === BookSaveStatus.Error ? "bookish-editor-status-error" : ""}`}>
@@ -188,4 +198,4 @@ function toRules(set: Record<string, string>) {
 	}).join("\n\t\t");
 }
 
-export default Book
+export default Edition

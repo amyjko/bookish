@@ -6,7 +6,7 @@ import Parser from "../../models/chapter/Parser";
 import { renderNode } from '../chapter/Renderer'
 import BookishEditor from '../editor/BookishEditor';
 import TextEditor from '../editor/TextEditor';
-import { EditorContext } from './Book';
+import { EditorContext } from './Edition';
 
 type HeaderProps = {
 	book: Edition;
@@ -27,7 +27,7 @@ const Header = (props: HeaderProps) => {
 
 	const title = useRef<HTMLHeadingElement | null>(null)
 	const reminder = useRef<HTMLDivElement>(null)
-	const { book, editable } = useContext(EditorContext)
+	const { edition: book, editable } = useContext(EditorContext)
 
 	function updateScrollReminder() {
 		if(title.current && reminder.current) {

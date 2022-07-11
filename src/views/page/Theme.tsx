@@ -7,7 +7,7 @@ import { Theme, defaultTheme } from '../../models/book/Theme'
 import Parser from '../../models/chapter/Parser';
 import { renderNode } from '../chapter/Renderer';
 import TextEditor from '../editor/TextEditor';
-import { DarkModeContext, EditorContext } from './Book';
+import { DarkModeContext, EditorContext } from './Edition';
 import ConfirmButton from '../editor/ConfirmButton';
 
 const Preview = (props: { theme: Theme }) => {
@@ -42,7 +42,7 @@ const placeholders = {
 const VariableEditor = ( props: { group: string, name: string, value: string }) => {
 
 	const { group, name, value } = props;
-	const { book } = useContext(EditorContext);
+	const { edition: book } = useContext(EditorContext);
 	if(book === undefined) return <span>{ value }</span>;
 
 	return <tr>

@@ -11,7 +11,7 @@ import Private from "./views/app/Private"
 import Dashboard from "./views/app/Dashboard"
 import Header from "./views/app/Header"
 import Footer from "./views/app/Footer"
-import Editor from "./views/app/Editor"
+import Write from "./views/app/Write"
 import Reader from "./views/app/Reader"
 import About from "./views/app/About"
 
@@ -41,7 +41,7 @@ function App() {
             <Route path="/read" element={<Browse/>} />
             <Route path="/read/:id/*" element={<Reader/>} />
             <Route path="/about" element={<About/>} />
-            <Route path="/write/:id/*" element={<Private><Editor/></Private>} />
+            <Route path="/write/:id/*" element={<Private><Write/></Private>} />
             <Route path="*" element={<p>Oops, this page doesn't exist.</p>} />
           </Routes>
           <Footer />

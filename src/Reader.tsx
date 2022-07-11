@@ -1,7 +1,7 @@
 import React from 'react'
 import ReactDOM from 'react-dom';
 import { BrowserRouter } from 'react-router-dom';
-import Book from './views/page/Book'
+import Edition from './views/page/Edition'
 import Loading from "./views/page/Loading";
 import loadBookFromURL from "./models/BookLoader"
 
@@ -20,7 +20,7 @@ loadBookFromURL(baseURL)
 		ReactDOM.unmountComponentAtNode(root)
 		ReactDOM.render(
 			<BrowserRouter basename={baseURL}>
-				<Book book={book} />
+				<Edition edition={book} />
 			</BrowserRouter>,
 			root
 		)

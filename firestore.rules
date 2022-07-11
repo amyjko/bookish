@@ -1,20 +1,20 @@
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
-    match /previews {
-      allow read: if true;
-    }
-    match /releases {
-      allow read: if true;
-      allow read, write: if request.auth != null && request.auth.uid in resource.data.uids;
-    }
     match /books/{book} {
+      allow read: if true;
+      allow create: if request.auth != null;
+      allow write: if request.auth != null && request.auth.uid in resource.data.uids;
+      allow update: if request.auth != null && request.auth.uid in resource.data.uids;
+    }
+    match /editions/{edition} {
       allow create: if request.auth != null && request.auth.uid in request.resource.data.uids;
       allow read: if request.auth != null && request.auth.uid in resource.data.uids;
       allow update: if request.auth != null && request.auth.uid in resource.data.uids;
+      allow delete: if request.auth != null && request.auth.uid in resource.data.uids;
 
       function getBook() {
-        return get(/databases/$(database)/documents/books/$(book)).data
+        return get(/databases/$(database)/documents/editions/$(edition)).data
       }
 
       match /chapters/{chapter} {
