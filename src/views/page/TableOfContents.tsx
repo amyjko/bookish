@@ -200,7 +200,7 @@ const TableOfContents = (props: { edition: Edition }) => {
 								readingTime === undefined ? "Forthcoming" :
 								readingTime < 5 ? "<5 min read" :
 								readingTime < 60 ? "~" + Math.floor(readingTime / 5) * 5 + " min read" :
-								"~" + Math.round(10 * readingTime / 60) / 10 + " hour read";
+								"~" + Math.floor(readingTime / 60) + " hour read";
 
 							const etc = <>
 								<small className="bookish-muted">
