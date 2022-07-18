@@ -7,20 +7,18 @@ const Page = (props: { afterLoaded?: Function, children: React.ReactNode | React
 	const [ lastHeight, setLastHeight] = useState<number>(0)
 	const [ intervalID, setIntervalID ] = useState<NodeJS.Timer | null>(null)
 	const [ count, setCount ] = useState<number>(0)
+	const [ mountTime, setMountTime ] = useState<number>(Date.now())
 
 	function watchLoading() {
 
 		const bodyHeight = document.body.clientHeight;
 
-		// Has the height not changed?
-		if(lastHeight === bodyHeight) {
-			// If it hasn't changed for more than 20 checks or the images or loaded, time to show the page!
-			if(imagesAreLoaded()) {
-				// Stop watching the images
-				stopWatching();
-				// Set to loaded to hide the overlay and notify callback if there is one.
-				setLoaded(true)
-			}
+		// If the height hasn't changed and images are loaded OR it's been 2 seconds, load.
+		if((lastHeight === bodyHeight && imagesAreLoaded()) || (Date.now() - mountTime) > 2000) {
+			// Stop watching the images
+			stopWatching();
+			// Set to loaded to hide the overlay and notify callback if there is one.
+			setLoaded(true)
 		}
 		// Reset the count.
 		else {
