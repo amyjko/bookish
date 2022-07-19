@@ -20,7 +20,9 @@ function mineReference(ids: string[], text: string): ReferenceNode {
 	if(year && yearMatches) text = text.replace(yearMatches[1], "");
 	
 	// Split the remaining text by period-space sequences, assuming chunks of information are segmented by sentences.
-	let chunks = text.split(/(?<![A-Z])[?.]\s/);
+	// let chunks = text.split(/(?<![A-Z])[?.]\s/);
+	// Grrr, Safari doesn't support negative lookbehind. I'm going to break this until I have time for a fix.
+	let chunks = text.split(/[?.]\s/);
 
 	// First find the URL. If we find it, remove it from the chunks.
 	let url = chunks.find(t => t.indexOf("http") >= 0);
