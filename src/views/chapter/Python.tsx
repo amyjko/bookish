@@ -17,8 +17,8 @@ const Python = (props: { node: CodeNode, code: string }) => {
     // What is currently rendered to the console (not always program output).
     const [output, setOutput] = useState<string>("")
 
-    // Whether the runtime is loaded.
-    const [loaded, setLoaded] = useState<boolean>(false)
+    // Whether the runtime is loaded. Initialized based on presence of global.
+    const [loaded, setLoaded] = useState<boolean>(skulptLoaded());
 
     let ref = useRef<HTMLDivElement>(null)
 
@@ -50,6 +50,10 @@ const Python = (props: { node: CodeNode, code: string }) => {
 
     })
 
+    function skulptLoaded() {
+        return window.hasOwnProperty("Sk");
+    }
+
     function reset() {
 
         setCode(props.code)
@@ -74,7 +78,7 @@ const Python = (props: { node: CodeNode, code: string }) => {
 
     function start() {
 
-        if(Sk) {
+        if(skulptLoaded()) {
 
             // Communicate that executing is starting, wait a second, then execute the program.
             // This is important in case the user wants to run it again; it provides confirmation that it was run again.
