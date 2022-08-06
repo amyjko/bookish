@@ -113,7 +113,7 @@ const Python = (props: { node: CodeNode, code: string }) => {
     return <div className="bookish-python" ref={ref}>
         <Code inline={false} language={"python"} editable edited={handleEdit} nodeID={props.node.nodeID}>{code}</Code>
         <div className="bookish-code-language">{"python"}</div>
-        <div>
+        <div className="bookish-python-controls">
             <button disabled={code === props.code } onClick={reset}>{"\u21BB"}</button>
             <button disabled={!loaded} onClick={start}>{"\u25B6\uFE0E"}</button>
             <div className="bookish-python-output">{spans}</div>

@@ -1229,10 +1229,17 @@ code {
 
 /* PYTHON SUPPORT */
 
+.bookish-python-controls {
+	display: flex;
+    flex-direction: row;
+    align-items: stretch;
+    width: 100%;
+}
+
 .bookish-python button {
 	background: var(--bookish-block-background-color);
 	border: 1px solid var(--bookish-border-color-light);
-	width: 5%;
+	width: 3em;
 	height: 3rem;
 	padding: 0;
 	display: inline-block;
@@ -1240,7 +1247,7 @@ code {
 }
 
 .bookish-python .bookish-python-output {
-	width: 90%;
+	flex: 1;
 	border: 1px solid lightGray;
 	padding: 0.5rem;
 	height: 3rem;
