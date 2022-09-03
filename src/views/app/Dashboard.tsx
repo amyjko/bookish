@@ -48,17 +48,17 @@ export default function Dashboard() {
 		<h1>Write</h1>
 
 		<p>
-			Here are the books you have permissions to edit.
+			<button onClick={newBook}>Create book</button>
 		</p>
 
 		<p>
-			<button onClick={newBook}>Create book</button>
+			Books you can edit.
 		</p>
 
 		{ 
 			error ? <div className="bookish-app-alert">{error}</div> :
 			loading ? <p>Loading books...</p> : 
-			books.length === 0 ? <p>No books yet.</p> :
+			books.length === 0 ? <p>You don't have have any books.</p> :
 				books.map((book, index) => <BookPreview key={`book${index}`} book={book} write={true} />)
 		}
 
