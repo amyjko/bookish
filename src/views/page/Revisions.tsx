@@ -94,7 +94,7 @@ export const Revisions = (props: { edition: Edition }) => {
 											}
 										</td>
 										<td>
-											<a href={`/write/${revision.ref.id}`}>{(new Date(revision.time).toLocaleDateString("en-us"))}</a>
+											<a href={`/write/${book.ref.id}/${bookRevisions.length - index}`}>{(new Date(revision.time).toLocaleDateString("en-us"))}</a>
 											{
 												revision === bookRevisions.find(e => e.published) ?
 													<span><br/><em className="bookish-app-chrome-muted">Live</em></span> : 

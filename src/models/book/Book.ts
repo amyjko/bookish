@@ -114,8 +114,15 @@ export default class Book {
     getRef() { return this.ref }
     getRefID() { return this.ref.id }
 
-    getDraft(): undefined | Promise<Edition> {
+    getDraftEdition(): undefined | Promise<Edition> {
         return this.spec.revisions.length === 0 ? undefined : loadEditionFromFirestore(this, this.spec.revisions[0].ref.id);
+    }
+
+    /* Note: editions are numbered 1-n, but stored in reverse chronological order. */
+    getEditionNumber(number: number) {
+        return number < 1 || number > this.spec.revisions.length ? 
+            undefined : 
+            loadEditionFromFirestore(this, this.spec.revisions[this.spec.revisions.length - number].ref.id);
     }
 
     getLatestEdition(): undefined | Promise<Edition> {

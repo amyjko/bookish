@@ -106,7 +106,7 @@ export const addDraftInFirestore = async (book: Book): Promise<void> => {
         throw Error("Can't publish draft, no Firebase connection.");
 
     // Get the latest draft.
-    const latestDraft = await book.getDraft();
+    const latestDraft = await book.getDraftEdition();
     if(latestDraft === undefined) return;
 
     // Create a copy of the existing draft as a new edition

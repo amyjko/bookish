@@ -11,12 +11,13 @@ export default function Write() {
     const [ book, setBook ] = useState<Book | undefined>(undefined);
 	const [ edition, setEdition ] = useState<EditionModel | null>(null)
     const [ error, setError ] = useState<Error | null>(null)
-    const { id } = useParams()
+    const { bookid, editionid } = useParams()
 
-    function initializeBook(newBook: Book) {
+    function initializeBook(book: Book) {
 
-        setBook(newBook);
-        const draft = newBook.getDraft();
+        setBook(book);
+        const editionNumber = editionid === undefined ? undefined : parseInt(editionid);
+        const draft = editionNumber === undefined || isNaN(editionNumber) ? book.getDraftEdition() : book.getEditionNumber(editionNumber);
         if(draft)
             draft
                 .then(b => setEdition(b))
@@ -28,8 +29,8 @@ export default function Write() {
     
 	// When this mounts, get the book corresponding to the ID in the route
 	useEffect(() => {
-        if(id)
-            loadBookFromFirestore(id)
+        if(bookid)
+            loadBookFromFirestore(bookid)
                 .then(book => initializeBook(book))
                 .catch((error => setError(error)))
         else
@@ -39,6 +40,6 @@ export default function Write() {
     return  error !== null ? <div className="bookish-app-alert">{error.message}</div> :
             book == undefined ? <Loading/> :
             edition === null ? <Loading/> :
-                <Edition edition={edition} base={"/write/" + id} editable={true} />
+                <Edition edition={edition} base={"/write/" + bookid} editable={true} />
 
 }
