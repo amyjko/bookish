@@ -3,8 +3,11 @@ import { useState, useEffect } from "react"
 import Book from "../../models/book/Book"
 import { loadPublishedBooksFromFirestore } from '../../models/Firestore'
 import BookPreview from './BookPreview'
+import setTitle from "./setTitle"
 
 export default function Browse() {
+
+	setTitle("Bookish — Read");
 
 	const [ books, setBooks ] = useState<Book[]>([])
 	const [ loading, setLoading ] = useState<boolean>(true)

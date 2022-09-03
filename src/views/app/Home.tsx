@@ -1,7 +1,9 @@
-import { Link } from 'react-router-dom'
 import React from 'react'
+import setTitle from './setTitle'
 
 export default function Home() {
+
+    setTitle("Bookish");
 
     return <>
         <h1>Bookish</h1>

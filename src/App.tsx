@@ -13,7 +13,6 @@ import Header from "./views/app/Header"
 import Footer from "./views/app/Footer"
 import Write from "./views/app/Write"
 import Reader from "./views/app/Reader"
-import About from "./views/app/About"
 
 function App() {
 
@@ -41,7 +40,6 @@ function App() {
             <Route path="/read" element={<Browse/>} />
             <Route path="/read/:bookid/*" element={<Reader/>} />
             <Route path="/read/:bookid/:editionid/*" element={<Reader/>} />
-            <Route path="/about" element={<About/>} />
             <Route path="/write/:bookid/*" element={<Private><Write/></Private>} />
             <Route path="/write/:bookid/:editionid/*" element={<Private><Write/></Private>} />
             <Route path="*" element={<p>Oops, this page doesn't exist.</p>} />

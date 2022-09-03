@@ -4,8 +4,11 @@ import { createBookInFirestore, loadUsersBooksFromFirestore } from '../../models
 import BookPreview from './BookPreview'
 import { useNavigate } from "react-router-dom"
 import Book from "../../models/book/Book"
+import setTitle from "./setTitle"
 
 export default function Dashboard() {
+
+	setTitle("Bookish — Write");
 
 	const [ books, setBooks ] = useState<Book[]>([])
 	const [ loading, setLoading ] = useState(true)
