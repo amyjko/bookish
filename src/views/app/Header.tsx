@@ -22,11 +22,13 @@ export default function Header() {
 		<Link to="/read">Read</Link>
 		<Link to="/write">Write</Link>
 		<Link to="/about">About</Link>
-		{
-			currentUser === null ?
-				<Link to="/login">Login</Link> :
-				<Link to="/" onClick={handleLogout}>Logout</Link>		
-		}
-		<small>{ currentUser && currentUser.email }</small>
+		<small>
+			{ currentUser && currentUser.email }
+			{
+				currentUser === null ?
+					<Link to="/login">Login</Link> :
+					<Link to="/" onClick={handleLogout}>Logout</Link>		
+			}
+		</small>
 	</div>
 }
