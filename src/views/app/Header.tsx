@@ -1,11 +1,12 @@
 import React from "react"
 import { useAuth } from "./AuthContext"
 import { Link } from "react-router-dom"
+import BookishNavLink from "./BookishNavLink"
 
 export default function Header() {
 
 	const { currentUser, logout } = useAuth()
-
+	
 	// Ask the auth context to logout, and provided an error if it fails.
 	async function handleLogout() {
 		if(logout)
@@ -17,16 +18,16 @@ export default function Header() {
 	}
 	
 	return <div className="bookish-app-header">
-		<img src="/images/icons/icon.png"/>
-		<Link to="/"> Home</Link>
-		<Link to="/read">Read</Link>
-		<Link to="/write">Write</Link>
-		<Link to="/about">About</Link>
+		<img src="/images/icons/icon.png"/>&nbsp;
+		<BookishNavLink to="/">Home</BookishNavLink>
+		<BookishNavLink to="/read">Read</BookishNavLink>
+		<BookishNavLink to="/write">Write</BookishNavLink>
+		<BookishNavLink to="/about">About</BookishNavLink>
 		<small>
 			{ currentUser && currentUser.email }
 			{
 				currentUser === null ?
-					<Link to="/login">Login</Link> :
+					<BookishNavLink to="/login">Login</BookishNavLink> :
 					<Link to="/" onClick={handleLogout}>Logout</Link>		
 			}
 		</small>

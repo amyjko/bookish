@@ -361,6 +361,11 @@ button.bookish-editor-confirm {
     text-decoration: none;
 }
 
+.bookish-link-inactive {
+    color: var(--bookish-app-muted);
+    pointer-events: none;
+}
+
 input[type=text].bookish-editor-text-invalid {
     animation: invalid 1s infinite;
 }
