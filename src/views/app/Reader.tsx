@@ -17,7 +17,7 @@ export default function Reader() {
 
         setBook(newBook);
         const editionNumber = editionid === undefined ? undefined : parseInt(editionid);
-        const edition = editionNumber === undefined || isNaN(editionNumber) ? newBook.getDraftEdition() : newBook.getEditionNumber(editionNumber);
+        const edition = editionNumber === undefined || isNaN(editionNumber) ? newBook.getLatestEdition() : newBook.getEditionNumber(editionNumber);
         if(edition)
             edition
                 .then(b => setEdition(b))

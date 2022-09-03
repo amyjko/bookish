@@ -118,19 +118,19 @@ export const Revisions = (props: { edition: Edition }) => {
 											}
 										</td>
 										<td>
-											<span>
 											{
 												editable ?
-													<Switch 
-														options={["hidden", "published"]} 
-														enabled={revision.published || revision.summary !== ""}
-														value={revision.published ? "published" : "hidden"} 
-														edit={ published => handlePublish(index, published === "published") }
-													/>
+													<span>
+														<Switch 
+															options={["hidden", "published"]} 
+															enabled={revision.published || revision.summary !== ""}
+															value={revision.published ? "published" : "hidden"} 
+															edit={ published => handlePublish(index, published === "published") }
+														/>
+													{ revision === bookRevisions.find(e => e.published) ? "*" : null}
+												</span>
 												: null
 											}
-											{ revision === bookRevisions.find(e => e.published) ? "*" : null}
-											</span>
 										</td>
 									</tr>
 							})
