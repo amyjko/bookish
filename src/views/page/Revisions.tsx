@@ -51,7 +51,7 @@ export const Revisions = (props: { edition: Edition }) => {
 		{
 			book && bookRevisions ?
 			<>
-				<h2 className="bookish-header" id="revisions">Editions <button onClick={handleDraftEdition}>+</button></h2>
+				<h2 className="bookish-header" id="revisions">Editions { editable ? <button onClick={handleDraftEdition}>+</button> : null}</h2>
 				{ 
 					editable ?
 						<div className="bookish-instructions">
@@ -77,21 +77,23 @@ export const Revisions = (props: { edition: Edition }) => {
 						{
 							bookRevisions.map((revision, index) => {
 
-								const editing = editable && revision.ref.id === edition.getRef()?.id;
+								const viewing = revision.ref.id === edition.getRef()?.id;
 
 								// We don't show the latest draft since it has no summary yet.
 								return !editable && !revision.published ? null : 
 									<tr 
 										key={`revision-${revision.ref.id}`} 
-										className={`${!revision.published ? "bookish-edition-hidden" : ""} ${editing ? "bookish-edition-editing": ""} `}
+										className={`${!revision.published ? "bookish-edition-hidden" : ""} ${viewing ? "bookish-edition-editing": ""} `}
 									>
 										<td>
 											{
 												editable ?
-													editing ? 
+													viewing ? 
 														"Editing" :
 														<a href={`/write/${book.ref.id}/${bookRevisions.length - index}`}>Edit</a> :
-													<a href={`/read/${book.ref.id}/${bookRevisions.length - index}`}>View</a>
+													viewing ?
+														"Viewing" :
+														<a href={`/read/${book.ref.id}/${bookRevisions.length - index}`}>View</a>
 											}											
 											<br/><span className="bookish-editor-note">{(new Date(revision.time).toLocaleDateString("en-us"))}</span>
 										</td>
@@ -122,7 +124,7 @@ export const Revisions = (props: { edition: Edition }) => {
 													/>
 												: null
 											}
-											{ revision === bookRevisions.find(e => e.published) ? <span className="bookish-tag">Live</span> : null}
+											{ revision === bookRevisions.find(e => e.published) ? <span className="bookish-tag">Latest</span> : null}
 											</span>
 										</td>
 									</tr>
