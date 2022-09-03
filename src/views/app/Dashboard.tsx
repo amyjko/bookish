@@ -42,10 +42,10 @@ export default function Dashboard() {
 	
 	return <>
 
-		<h1>Your books</h1>
+		<h1>Write</h1>
 
 		<p>
-			Here are all of your books. Click to edit them.
+			Here are the books you have permissions to edit.
 		</p>
 
 		<p>

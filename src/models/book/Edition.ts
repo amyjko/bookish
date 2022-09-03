@@ -200,7 +200,6 @@ export default class Edition {
         // Update locally, then update on the server.
         this.title = title;
         return this.requestSave();
-
     }
 
     getDescription() { return this.description; }
@@ -223,7 +222,7 @@ export default class Edition {
         this.license = text;
         return this.requestSave();
     }
-    
+
     getChapters() { return this.chapters }
     hasChapter(chapterID: string): boolean { return chapterID in this.chaptersByID || ["references", "glossary", "index", "search", "media"].includes(chapterID); }
     getChapter(chapterID: string): Chapter | undefined { return this.hasChapter(chapterID) ? this.chaptersByID[chapterID] : undefined; }
@@ -589,6 +588,13 @@ export default class Edition {
         });
 
         return media;
+
+    }
+
+    isLatestPublishedEdition(): boolean {
+
+        const latestEditionID = this.book?.getLatestPublishedEditionID()
+        return latestEditionID !== undefined && latestEditionID === this.editionRef?.id;
 
     }
 

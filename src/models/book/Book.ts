@@ -10,11 +10,14 @@ export type Revision = {
 }
 
 export type BookSpecification = {
+    // All of these are caches from the latest edition, saved when an edition is updated.
     title: string;
     authors: string[];
     description: string;
     cover: string | null;
+    // A list of editions
     revisions: Revision[];
+    // A list of user ids that have access to edit the book.
     uids: string[];
 };
 
@@ -125,10 +128,14 @@ export default class Book {
             loadEditionFromFirestore(this, this.spec.revisions[this.spec.revisions.length - number].ref.id);
     }
 
-    getLatestEdition(): undefined | Promise<Edition> {
-        const latest = this.spec.revisions.find(e => e.published);
-        return latest === undefined ? undefined : loadEditionFromFirestore(this, latest.ref.id);
+    getLatestPublishedEdition(): undefined | Promise<Edition> {
+        const latest = this.getLatestPublishedEditionID();
+        return latest === undefined ? undefined : loadEditionFromFirestore(this, latest);
     }
+
+    getLatestPublishedEditionID() {
+        return this.spec.revisions.find(e => e.published)?.ref.id;
+    }    
 
     getRevisions() { return this.spec.revisions.slice(); }
     setRevisions(revisions: Revision[]) {
@@ -152,6 +159,15 @@ export default class Book {
 
     hasPublishedEdition() {
         return this.spec.revisions.find(revision => revision.published) !== undefined;
+    }
+
+    updateMetadataFromEdition(edition: Edition) {
+
+        this.setTitle(edition.getTitle());
+        this.setCover(edition.getImage("cover") ?? null);
+        this.setAuthors(edition.getAuthors());
+        this.setDescription(edition.getDescription());
+
     }
 
 }

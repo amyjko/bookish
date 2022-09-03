@@ -79,17 +79,56 @@
     padding-left: 2rem;
     padding-right: 2rem;
     margin: auto;
+    margin-bottom: 2rem;
     max-width: 40rem;
 }
 
 .bookish-app-book-preview {
-    display: inline-block;
-    width: auto;
+    display: flex;
+    width: 100%;
     border: var(--bookish-app-chrome-border-width) solid var(--bookish-app-chrome-border-color);
     padding: var(--bookish-app-chrome-padding);
+    border-radius: var(--bookish-app-chrome-roundedness);
+    text-align: left;
+}
+
+.bookish-app-book-preview-cover {
+    width: 5em;
+    height: auto;
     margin-right: var(--bookish-app-chrome-padding);
-    margin-bottom: var(--bookish-app-chrome-padding);
-    border-radius: 5px;
+}
+
+.bookish-app-book-preview-cover.bookish-app-book-preview-nocover {
+    background-color: var(--bookish-app-chrome-muted);
+    height: 5em;
+}
+
+.bookish-app-book-preview-cover .bookish-figure {
+    margin: 0;
+}
+
+.bookish-app-book-preview-cover .bookish-figure-caption {
+    display: none;
+}
+
+.bookish-app-book-preview-title {
+    flex: 1;
+    margin-right: var(--bookish-app-chrome-padding);
+}
+
+.bookish-app-book-preview-authors {
+    flex: 1;
+    margin-right: var(--bookish-app-chrome-padding);
+}
+
+.bookish-app-book-preview-description {
+    flex: 2;
+    overflow: hidden;
+    max-height: 10em;
+}
+
+.bookish-app-book-preview-description p {
+    margin: 0;
 }
 
 .bookish-app-alert {

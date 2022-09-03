@@ -27,9 +27,9 @@ export default function Browse() {
 
 	return <>
 
-		<h1>Want to read?</h1>
+		<h1>Read</h1>
 
-		<p>Here are all of the books in the Bookish library.</p>
+		<p>Here are the books in the Bookish library.</p>
 		{ 
 			error ? <div className="bookish-app-alert">{error}</div> :
 			loading ? <p>Loading books...</p> : 

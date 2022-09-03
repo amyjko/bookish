@@ -136,14 +136,9 @@ export const publishDraftInFirestore = async (book: Book, index: number, publish
     // Update the edition's published status.
     book.setPublished(published, index);
     
-    // Update the book with the draft's latest latest metadata.
-    const draft = await book.getLatestEdition();
-    if(draft) {
-        book.setTitle(draft.getTitle());
-        book.setCover(draft.getImage("cover") ?? null);
-        book.setAuthors(draft.getAuthors());
-        book.setDescription(draft.getDescription());
-    }
+    // Update the book with the latest published edition's metadata.
+    const draft = await book.getLatestPublishedEdition();
+    if(draft) book.updateMetadataFromEdition(draft);
 
     // Return the revised Book for viewing
     updateBookInFirestore(book);
@@ -155,16 +150,21 @@ export const updateEditionInFirestore = async (edition: Edition): Promise<void> 
     if(!db)
         throw Error("Can't update edition, not connected to Firebase.")
 
-    // Get the object for the book so we can store it.
+    // Get the object for the edition so we can store it.
     const spec = edition.toObject();
     const editionRef = edition.getRef();
 
-    // Make sure the given book has an ID
+    // Make sure the given edition has a database reference ID
     if(!editionRef)
         throw Error("Book given has no ID");
 
-    // Update the book's preview
+    // Update the edition's document.
     await setDoc(doc(db, "editions", editionRef.id), spec);
+
+    // Get the book of the editiion, and if the edition updated is the latest edition,
+    // update the book's cache of title, cover, authors, and description.
+    if(edition.book !== undefined && edition.isLatestPublishedEdition())
+        edition.book.updateMetadataFromEdition(edition);
 
 }
 
