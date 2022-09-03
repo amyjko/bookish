@@ -1,7 +1,7 @@
 import React, { useContext } from "react"
 import Edition from "../../models/book/Edition"
 import Parser from "../../models/chapter/Parser"
-import { addDraftInFirestore, deleteEditionInFirestore, publishDraftInFirestore } from "../../models/Firestore"
+import { addDraftInFirestore, publishDraftInFirestore } from "../../models/Firestore"
 import { renderNode } from "../chapter/Renderer"
 import BookishEditor from "../editor/BookishEditor"
 import Switch from "../editor/Switch"
@@ -31,11 +31,6 @@ export const Revisions = (props: { edition: Edition }) => {
 	function handleDraftEdition() {
 		if(book === undefined) return;
 		addDraftInFirestore(book);
-	}
-
-	function handleDeleteEdition(index: number) {
-		if(book === undefined) return;
-		deleteEditionInFirestore(book, index);
 	}
 
 	return <>
@@ -74,39 +69,34 @@ export const Revisions = (props: { edition: Edition }) => {
 				}				
 				<table className="bookish-table">
 					<colgroup>
-						<col width="5%" />
-						<col width="20%" />
+						<col width="10%" />
+						<col width="50%" />
 						<col width="40%" />
-						<col width="35%" />
 					</colgroup>
 					<tbody>
 						{
-							bookRevisions.map((revision, index) => 
+							bookRevisions.map((revision, index) => {
+
+								const editing = editable && revision.ref.id === edition.getRef()?.id;
+
 								// We don't show the latest draft since it has no summary yet.
-								!editable && !revision.published ? 
-									null : 
-									<tr key={`revision-${revision.ref.id}`}>
+								return !editable && !revision.published ? null : 
+									<tr 
+										key={`revision-${revision.ref.id}`} 
+										className={`${!revision.published ? "bookish-edition-hidden" : ""} ${editing ? "bookish-edition-editing": ""} `}
+									>
 										<td>
 											{
 												editable ?
-													<button onClick={() => handleDeleteEdition(index)} disabled={edition.getRef()?.id === revision.ref.id || bookRevisions.length === 1}>-</button> : 
-													null
-											}
+													editing ? 
+														"Editing" :
+														<a href={`/write/${book.ref.id}/${bookRevisions.length - index}`}>Edit</a> :
+													<a href={`/read/${book.ref.id}/${bookRevisions.length - index}`}>View</a>
+											}											
+											<br/><span className="bookish-editor-note">{(new Date(revision.time).toLocaleDateString("en-us"))}</span>
 										</td>
 										<td>
-											<a href={`/write/${book.ref.id}/${bookRevisions.length - index}`}>{(new Date(revision.time).toLocaleDateString("en-us"))}</a>
-											{
-												revision === bookRevisions.find(e => e.published) ?
-													<span><br/><em className="bookish-app-chrome-muted">Live</em></span> : 
-													null
-											}
-											{
-												revision.ref.id === edition.getRef()?.id ?
-													<span><br/><em className="bookish-app-chrome-muted">Editing</em></span> : 
-													null
-											}
-										</td>
-										<td>{
+											{ 
 											editable ? 
 												<BookishEditor 
 													ast={Parser.parseFormat(undefined, revision.summary).withTextIfEmpty()}
@@ -115,23 +105,28 @@ export const Revisions = (props: { edition: Edition }) => {
 													placeholder={"Summarize this edition's changes."} 
 													autofocus={false}
 												/> : 
-											revision.summary === "" ? <em>No summary of changes</em> : 
-											revision.summary}
+											revision.summary === "" ? 
+												<em>No summary of changes</em> : 
+												revision.summary
+											}
 										</td>
 										<td>
+											<span>
 											{
 												editable ?
 													<Switch 
-														options={["draft", "published"]} 
+														options={["hidden", "published"]} 
 														enabled={revision.published || revision.summary !== ""}
-														value={revision.published ? "published" : "draft"} 
+														value={revision.published ? "published" : "hidden"} 
 														edit={ published => handlePublish(index, published === "published") }
 													/>
 												: null
 											}
+											{ revision === bookRevisions.find(e => e.published) ? <span className="bookish-tag">Live</span> : null}
+											</span>
 										</td>
 									</tr>
-							)
+							})
 						}
 					</tbody>
 				</table>

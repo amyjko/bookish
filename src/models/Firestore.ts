@@ -119,7 +119,7 @@ export const addDraftInFirestore = async (book: Book): Promise<void> => {
         time: Date.now(),
         summary: "",
         published: false
-    })
+    });
 
     book.setRevisions(revisions);
 

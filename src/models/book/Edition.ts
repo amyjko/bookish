@@ -97,7 +97,7 @@ export default class Edition {
         this.images = specification && specification.images ? specification.images : {}
         this.sources = specification && specification.sources ? specification.sources : {}
         this.theme = specification && specification.theme ? specification.theme : null;
-        this.uids = specification && specification.uids ? specification.uids : []
+        this.uids = specification && specification.uids ? specification.uids : [];
 
         // No listeners yet
         this.listeners = new Set()
@@ -223,7 +223,7 @@ export default class Edition {
         this.license = text;
         return this.requestSave();
     }
-
+    
     getChapters() { return this.chapters }
     hasChapter(chapterID: string): boolean { return chapterID in this.chaptersByID || ["references", "glossary", "index", "search", "media"].includes(chapterID); }
     getChapter(chapterID: string): Chapter | undefined { return this.hasChapter(chapterID) ? this.chaptersByID[chapterID] : undefined; }

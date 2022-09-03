@@ -9,6 +9,7 @@
 	--bookish-bullet-font-family: "Verdana";
 
     /* Define some UI defaults not used in the Bookish theme. */
+    --bookish-app-background: white;
     --bookish-app-chrome-background: rgb(244, 244, 244);
     --bookish-app-chrome-color: black;
     --bookish-app-chrome-border-color: #d5d5d5;
@@ -404,6 +405,10 @@ input[type=text].bookish-editor-text-invalid {
     border: var(--bookish-app-chrome-border-width) dashed var(--bookish-app-chrome-border-color);
 }
 
+.bookish-app .bookish-table {
+    border-collapse: collapse;
+}
+
 .bookish-editor-toolbar {
     position: fixed;
     top: 0;
@@ -544,4 +549,14 @@ input[type=text].bookish-editor-text-invalid {
 
 .bookish-instructions p {
     margin-top: 0;
+}
+
+.bookish-edition-hidden {
+    background: repeating-linear-gradient(
+        45deg,
+        var(--bookish-app-background),
+        var(--bookish-app-background) 10px,
+        var(--bookish-app-chrome-background) 10px,
+        var(--bookish-app-chrome-background) 20px
+      );
 }

@@ -1,5 +1,5 @@
 import { DocumentReference } from "firebase/firestore";
-import { loadEditionFromFirestore, publishDraftInFirestore, updateBookInFirestore } from "../Firestore";
+import { loadEditionFromFirestore, updateBookInFirestore } from "../Firestore";
 import Edition, { BookSaveStatus } from "./Edition";
 
 export type Revision = {
@@ -143,9 +143,9 @@ export default class Book {
         }
     }
 
-    setPublished(published: boolean, index: number) {
-        if(index >= 0 && index < this.spec.revisions.length) {
-            this.spec.revisions[index].published = published;
+    setPublished(published: boolean, revisionNumber: number) {
+        if(revisionNumber >= 0 && revisionNumber < this.spec.revisions.length) {
+            this.spec.revisions[revisionNumber].published = published;
             return this.requestSave();
         }
     }
