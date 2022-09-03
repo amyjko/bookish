@@ -22,9 +22,11 @@
     --bookish-app-error-font-weight: 400;
 
     --bookish-app-chrome-padding: 0.5em;
-    --bookish-app-chrome-roundedness: 0px;
+    --bookish-app-chrome-border-width: 1px;
+    --bookish-app-chrome-roundedness: 2px;
     --bookish-app-chrome-font-size: 11pt;
     --bookish-app-chrome-spacing: 0.5em;
+    --bookish-app-chrome-line-height: 1.5em;
 
 }
 
@@ -82,7 +84,7 @@
 .bookish-app-book-preview {
     display: inline-block;
     width: auto;
-    border: 1px solid var(--bookish-app-chrome-border-color);
+    border: var(--bookish-app-chrome-border-width) solid var(--bookish-app-chrome-border-color);
     padding: var(--bookish-app-chrome-padding);
     margin-right: var(--bookish-app-chrome-padding);
     margin-bottom: var(--bookish-app-chrome-padding);
@@ -104,7 +106,7 @@ input, button {
 input[type="email"], input[type="text"], select {
     padding: var(--bookish-app-chrome-padding);
     font-size: var(--bookish-app-chrome-font-size);
-    border: 1px solid var(--bookish-app-chrome-border-color);
+    border: var(--bookish-app-chrome-border-width) solid var(--bookish-app-chrome-border-color);
     background-color: var(--bookish-app-chrome-background);
 }
 
@@ -356,7 +358,7 @@ input[type=text].bookish-editor-text-invalid {
 
 .bookish-app-comment {
     background: var(--bookish-app-chrome-background);
-    border: 1px solid var(--bookish-app-chrome-border-color);
+    border: var(--bookish-app-chrome-border-width) solid var(--bookish-app-chrome-border-color);
     border-radius: 0 var(--bookish-app-chrome-padding) var(--bookish-app-chrome-padding) var(--bookish-app-chrome-padding);
     padding: var(--bookish-app-chrome-padding);
     font-size: var(--bookish-app-chrome-font-size);
@@ -379,7 +381,7 @@ input[type=text].bookish-editor-text-invalid {
     cursor: pointer;
     padding-left: var(--bookish-app-chrome-padding);
     padding-right: var(--bookish-app-chrome-padding);
-    border: 1px solid var(--bookish-app-chrome-border-color);
+    border: var(--bookish-app-chrome-border-width) solid var(--bookish-app-chrome-border-color);
 }
 
 .bookish-app-switch-option:first-child {
@@ -399,7 +401,7 @@ input[type=text].bookish-editor-text-invalid {
 }
 
 .bookish-editor .bookish-table table td {
-    border: 1px dashed var(--bookish-app-chrome-border-color);
+    border: var(--bookish-app-chrome-border-width) dashed var(--bookish-app-chrome-border-color);
 }
 
 .bookish-editor-toolbar {
@@ -408,7 +410,7 @@ input[type=text].bookish-editor-text-invalid {
     left: 0;
     right: 0;
     background: var(--bookish-background-color);
-    border: 1px solid var(--bookish-app-chrome-border-color);
+    border: var(--bookish-app-chrome-border-width) solid var(--bookish-app-chrome-border-color);
     padding: var(--bookish-app-chrome-padding);
     font-family: var(--bookish-app-chrome-font-family);
     font-size: var(--bookish-app-chrome-font-size);
@@ -511,7 +513,7 @@ input[type=text].bookish-editor-text-invalid {
 
 .bookish-theme-preview {
     padding: 1em;
-    border: 1px solid black;
+    border: var(--bookish-app-chrome-border-width) solid black;
     transform: translate(-25%, -25%) scale(0.5);
     position: sticky;
     margin-top: 2em;
@@ -522,4 +524,24 @@ input[type=text].bookish-editor-text-invalid {
 
 .bookish-dark .bookish-theme-preview {
     border-color: white;
+}
+
+.bookish-instructions {
+    border-top: var(--bookish-app-chrome-border-width) solid var(--bookish-app-chrome-border-color);
+    border-bottom: var(--bookish-app-chrome-border-width) solid var(--bookish-app-chrome-border-color);
+    padding: var(--bookish-app-chrome-padding);
+    border-radius: var(--bookish-app-chrome-roundedness);
+    background-color: var(--bookish-app-chrome-background);
+    margin-bottom: var(--bookish-app-chrome-padding);
+}
+
+.bookish-instructions p, .bookish-instructions li {
+    font-family: var(--bookish-app-chrome-font-family);
+    font-size: var(--bookish-app-chrome-font-size);
+    line-height: var(--bookish-app-chrome-line-height);
+    margin-bottom: 0;
+}
+
+.bookish-instructions p {
+    margin-top: 0;
 }

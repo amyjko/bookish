@@ -57,6 +57,21 @@ export const Revisions = (props: { edition: Edition }) => {
 			book && bookRevisions ?
 			<>
 				<h2 className="bookish-header" id="revisions">Editions <button onClick={handleDraftEdition}>+</button></h2>
+				{ 
+					editable ?
+						<div className="bookish-instructions">
+							<p>
+								Each book has one or more editions, allowing you to track revisions and ensure previous versions remain available.
+							</p>
+							<ul>
+								<li>Add an edition before making revisions.</li>
+								<li>Add descriptions of revisions so readers know what's changed.</li>
+								<li>Draft editions aren't visible until they are published.</li>
+								<li>You can delete an edition, unless it's the last one.</li>
+							</ul> 
+						</div>
+						: null			
+				}				
 				<table className="bookish-table">
 					<colgroup>
 						<col width="5%" />
