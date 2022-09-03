@@ -39,7 +39,8 @@ function App() {
             <Route path="/write" element={<Private><Dashboard/></Private>} />
             <Route path="/finishlogin" element={<FinishLogin/>} />
             <Route path="/read" element={<Browse/>} />
-            <Route path="/read/:id/*" element={<Reader/>} />
+            <Route path="/read/:bookid/*" element={<Reader/>} />
+            <Route path="/read/:bookid/:editionid/*" element={<Reader/>} />
             <Route path="/about" element={<About/>} />
             <Route path="/write/:bookid/*" element={<Private><Write/></Private>} />
             <Route path="/write/:bookid/:editionid/*" element={<Private><Write/></Private>} />

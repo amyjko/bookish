@@ -17,9 +17,9 @@ export default function Write() {
 
         setBook(book);
         const editionNumber = editionid === undefined ? undefined : parseInt(editionid);
-        const draft = editionNumber === undefined || isNaN(editionNumber) ? book.getDraftEdition() : book.getEditionNumber(editionNumber);
-        if(draft)
-            draft
+        const edition = editionNumber === undefined || isNaN(editionNumber) ? book.getDraftEdition() : book.getEditionNumber(editionNumber);
+        if(edition)
+            edition
                 .then(b => setEdition(b))
                 .catch((error) => setError(error));
         else

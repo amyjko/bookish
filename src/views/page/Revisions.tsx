@@ -69,14 +69,16 @@ export const Revisions = (props: { edition: Edition }) => {
 				}				
 				<table className="bookish-table">
 					<colgroup>
-						<col width="10%" />
+						<col width="5%" />
+						<col width="5%" />
 						<col width="50%" />
-						<col width="40%" />
+						<col width="35%" />
 					</colgroup>
 					<tbody>
 						{
 							bookRevisions.map((revision, index) => {
 
+								const editionNumber = bookRevisions.length - index;
 								const viewing = revision.ref.id === edition.getRef()?.id;
 
 								// We don't show the latest draft since it has no summary yet.
@@ -85,6 +87,9 @@ export const Revisions = (props: { edition: Edition }) => {
 										key={`revision-${revision.ref.id}`} 
 										className={`${!revision.published ? "bookish-edition-hidden" : ""} ${viewing ? "bookish-edition-editing": ""} `}
 									>
+										<td>
+											<em>{ editionNumber + (editionNumber === 1 ? "st" : editionNumber === 2 ? "nd" : editionNumber === 3 ? "rd" : "th") }</em> <span className="bookish-editor-note">{(new Date(revision.time).toLocaleDateString("en-us"))}</span>
+										</td>
 										<td>
 											{
 												editable ?
@@ -95,7 +100,6 @@ export const Revisions = (props: { edition: Edition }) => {
 														"Viewing" :
 														<a href={`/read/${book.ref.id}/${bookRevisions.length - index}`}>View</a>
 											}											
-											<br/><span className="bookish-editor-note">{(new Date(revision.time).toLocaleDateString("en-us"))}</span>
 										</td>
 										<td>
 											{ 
