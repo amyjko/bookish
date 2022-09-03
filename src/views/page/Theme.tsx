@@ -90,8 +90,8 @@ const Theme = (props: { book: Edition }) => {
 			<Header 
 				book={props.book}
 				label="Theme"
-				getImage={() => undefined}
-				setImage={(embed) => undefined}
+				getImage={() => null}
+				setImage={embed => undefined}
 				header="Theme"
 				outline={
 					<Outline

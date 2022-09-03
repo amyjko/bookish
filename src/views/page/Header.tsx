@@ -17,8 +17,8 @@ type HeaderProps = {
 	after?: React.ReactNode;
 	print?: boolean;
 	tags?: string[];
-	getImage: () => string | undefined;
-	setImage: (embed: string | undefined) => Promise<void> | undefined
+	getImage: () => string | null;
+	setImage: (embed: string | null) => Promise<void> | undefined
 	outline: React.ReactNode;
 	save?: (text: string) => Promise<void> | undefined;
 }
@@ -40,7 +40,7 @@ const Header = (props: HeaderProps) => {
 	}
 
 	function addCover() { props.setImage("|||||"); }
-	function removeCover() { props.setImage(undefined); }
+	function removeCover() { props.setImage(null); }
 
     useEffect(() => {
 
@@ -110,9 +110,7 @@ const Header = (props: HeaderProps) => {
 				}
 				</h1>
 				{ props.after }
-				{ props.tags ? 
-					<div>{props.tags.map((tag, index) => <span key={"tag-" + index} className="bookish-tag">{tag}</span>)}</div> : 
-					null }
+				{ props.tags ? <div>{props.tags.map((tag, index) => <span key={"tag-" + index} className="bookish-tag">{tag}</span>)}</div> : null }
 			</div>
 		</div>
 	);

@@ -17,7 +17,6 @@ import Toggle from '../editor/Toggle'
 import Chapter from '../../models/book/Chapter'
 import TextEditor from '../editor/TextEditor'
 import ConfirmButton from '../editor/ConfirmButton'
-import Book from '../../models/book/Book'
 
 const TableOfContentsRow = (props: { 
 	image: React.ReactNode, 
@@ -130,7 +129,7 @@ const TableOfContents = (props: { edition: Edition }) => {
 
 	}
 
-	function getImage(embed: string | undefined) {
+	function getImage(embed: string | null) {
 
 		// No image? Return null for React to render nothing.
 		if(!embed)
@@ -165,7 +164,7 @@ const TableOfContents = (props: { edition: Edition }) => {
 			book={edition}
 			label="Book title"
 			getImage={() => edition.getImage("cover")}
-			setImage={(embed) => edition.setImage("cover", embed)}
+			setImage={embed => edition.setImage("cover", embed)}
 			header={title}
 			subtitle={subtitle}
 			tags={edition.getTags()}

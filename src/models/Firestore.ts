@@ -211,7 +211,7 @@ export const removeChapterFromEditionInFirestore = async(chapter: Chapter): Prom
     const ref = chapter.getRef()
 
     if(!ref)
-        throw Error("Can't delete chapter, no bookID")
+        throw Error("Can't delete chapter, it doesn't have a document ID.")
 
     await deleteDoc(ref);
 

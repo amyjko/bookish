@@ -221,7 +221,7 @@ const Chapter = (props: { chapter: ChapterModel, book: Edition, print?: boolean 
 					book={book}
 					label="Chapter title"
 					getImage={() => chapter.getImage()}
-					setImage={(embed) => chapter.setImage(embed)}
+					setImage={embed => chapter.setImage(embed)}
 					print={props.print}
 					outline=
 					{

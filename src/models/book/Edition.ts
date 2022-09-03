@@ -15,15 +15,15 @@ export type EditionSpecification = {
     description: string;
     chapters: ChapterSpecification[];
     license: string;
-    acknowledgements?: string;
-    tags?: string[];
-    revisions?: [string, string][];
-    sources?: Record<string, string>;
-    references?: Record<string, string | string[]>;
-    symbols?: Record<string, string>;
-    glossary?: Record<string, Definition>;
+    acknowledgements: string;
+    tags: string[];
+    revisions: [string, string][];
+    sources: Record<string, string>;
+    references: Record<string, string | string[]>;
+    symbols: Record<string, string>;
+    glossary: Record<string, Definition>;
     theme: Theme | null;
-    uids?: Array<string>;
+    uids: Array<string>;
     bookRef?: DocumentReference;
 }
 
@@ -43,22 +43,10 @@ export default class Edition {
     static IndexID = "index";
 	static GlossaryID = "glossary";
 
+    readonly specification: EditionSpecification;
     readonly book: Book | undefined;
-    editionRef: DocumentReference | undefined;
-    title: string;
-    symbols: Record<string, string>;
-    tags: string[];
-    license: string;
-    references: Record<string, string | Array<string>>;
-    glossary: Record<string, { phrase: string, definition: string, synonyms?: string[]}>;
-    authors: string[];
-    description: string;
-    acknowledgements: string;
-    revisions: Array<[string, string]>;
-    images: Record<string, string | null>;
-    sources: Record<string, string>;
-    theme: Theme | null;
-    uids: string[];
+    readonly editionRef: DocumentReference | undefined;
+
     chapters: Chapter[];
     chaptersByID: Record<string, Chapter | undefined>;
 
@@ -78,26 +66,29 @@ export default class Edition {
 
         if(typeof specification !== "object" && specification !== undefined)
             throw Error("Expected a book specification object, but received " + specification)
-
+            
         this.book = book;
         this.editionRef = editionRef
 
         // Copy all of the specification metadata to fields.
-        // Choose suitable defaults if the spec is empty.
-        this.title = specification ? specification.title : "Untitled"
-        this.symbols = specification && specification.symbols ? specification.symbols : {}
-        this.tags = specification && specification.tags ? specification.tags : []
-        this.license = specification ? specification.license : "All rights reserved.",
-        this.references = specification && specification.references ? specification.references : {}
-        this.glossary = specification && specification.glossary ? specification.glossary : {}
-        this.authors = specification && specification.authors ? specification.authors : []
-        this.description = specification ? specification.description : "What's your book about?"
-        this.acknowledgements = specification && specification.acknowledgements ? specification.acknowledgements : ""
-        this.revisions = specification && specification.revisions ? specification.revisions : []
-        this.images = specification && specification.images ? specification.images : {}
-        this.sources = specification && specification.sources ? specification.sources : {}
-        this.theme = specification && specification.theme ? specification.theme : null;
-        this.uids = specification && specification.uids ? specification.uids : [];
+        // Choose suitable defaults if the spec is lacking a field.
+        this.specification = {
+            title: specification ? specification.title : "Untitled",
+            symbols: specification && specification.symbols ? specification.symbols : {},
+            tags: specification && specification.tags ? specification.tags : [],
+            license: specification ? specification.license : "All rights reserved.",
+            references: specification && specification.references ? specification.references : {},
+            glossary: specification && specification.glossary ? specification.glossary : {},
+            authors: specification && specification.authors ? specification.authors : [],
+            description: specification ? specification.description : "",
+            acknowledgements: specification && specification.acknowledgements ? specification.acknowledgements : "",
+            revisions: specification && specification.revisions ? specification.revisions : [],
+            images: specification && specification.revisions ? specification.images : {},
+            sources: specification && specification.revisions ? specification.sources : {},
+            theme: specification && specification.theme ? specification.theme : null,
+            uids: specification && specification.uids ? specification.uids : [],
+            chapters: specification && specification.chapters ? specification.chapters : []
+        };
 
         // No listeners yet
         this.listeners = new Set()
@@ -107,10 +98,10 @@ export default class Edition {
         this.chaptersByID = {}
 
         // If there's a spec and it has chapters, process them.
-        if(specification && specification.chapters.length > 0) {
+        if(this.specification.chapters.length > 0) {
             // Initialize the chapters dictionary since parsing depends this index to detect whether a chapter exists.
-            specification.chapters.forEach(chapterSpec => this.chaptersByID[chapterSpec.id] = undefined)
-            specification.chapters.forEach(chapterSpec => {
+            this.specification.chapters.forEach(chapterSpec => this.chaptersByID[chapterSpec.id] = undefined)
+            this.specification.chapters.forEach(chapterSpec => {
                 const chap = new Chapter(this, chapterSpec)
                 this.chaptersByID[chapterSpec.id] = chap
                 this.chapters.push(chap)
@@ -166,60 +157,47 @@ export default class Edition {
         return promise;
     }
 
-    // Convert the book back into JSON for storage. Deep copies arrays and objects to avoid other code mutating this object.
+    // Convert the book to an object for storage.
     toObject() {
 
-        return {
-            title: this.title,
-            authors: JSON.parse(JSON.stringify(this.authors)),
-            uids: JSON.parse(JSON.stringify(this.uids)),
-            images: JSON.parse(JSON.stringify(this.images)),
-            description: this.description,
-            acknowledgements: this.acknowledgements,
-            chapters: this.chapters.map(chapter => chapter.toObject()),
-            tags: JSON.parse(JSON.stringify(this.tags)),
-            revisions: JSON.parse(JSON.stringify(this.revisions)),
-            license: this.license,
-            sources: JSON.parse(JSON.stringify(this.sources)),
-            references: JSON.parse(JSON.stringify(this.references)),
-            symbols: JSON.parse(JSON.stringify(this.symbols)),
-            theme: JSON.parse(JSON.stringify(this.theme)),
-            glossary: JSON.parse(JSON.stringify(this.glossary))
-        }
+        // Deep copy, then let the chapter models handle the chapters.
+        const spec = JSON.parse(JSON.stringify(this.specification));
+        spec.chapters = this.chapters.map(chapter => chapter.toObject());
+        return spec;
 
     }
 
     getRef() { return this.editionRef }
 
     addUserID(uid: string) {
-        this.uids.push(uid);
+        this.specification.uids.push(uid);
     }
 
-    getTitle() { return this.title; }
+    getTitle() { return this.specification.title; }
     setTitle(title: string): Promise<void> { 
         // Update locally, then update on the server.
-        this.title = title;
+        this.specification.title = title;
         return this.requestSave();
     }
 
-    getDescription() { return this.description; }
+    getDescription() { return this.specification.description; }
     setDescription(text: string) { 
         // Update locally, then update on the server.
-        this.description = text;
+        this.specification.description = text;
         return this.requestSave();
     }
 
-	getAcknowledgements() { return this.acknowledgements; }
+	getAcknowledgements() { return this.specification.acknowledgements; }
     setAcknowledgements(text: string) { 
         // Update locally, then update on the server.
-        this.acknowledgements = text;
+        this.specification.acknowledgements = text;
         return this.requestSave();
     }
 
-    getLicense() { return this.license; }
+    getLicense() { return this.specification.license; }
     setLicense(text: string) { 
         // Update locally, then update on the server.
-        this.license = text;
+        this.specification.license = text;
         return this.requestSave();
     }
 
@@ -250,18 +228,20 @@ export default class Edition {
 
         const chapterRef = await addChapterInFirestore(bookID, { text: "" })
 
-        // Create a default chapter on this model
+        // Create a default chapter on this model. Remember the document reference so we can modify it later.
         const emptyChapter = {
             ref: chapterRef,
             id: `chapter${number}`,
             title: "Untitled Chapter",
             authors: [],
-            forthcoming: true
+            numbered: true,
+            forthcoming: true,
+            image: null
         }
 
         const chap = new Chapter(this, emptyChapter);
         this.chapters.push(chap);
-        this.chaptersByID[emptyChapter.id] = chap
+        this.chaptersByID[emptyChapter.id] = chap;
 
         // Ask the database to create the chapter, returning the promise
         return this.requestSave();
@@ -302,38 +282,38 @@ export default class Edition {
 
     }
 
-    getSymbols() { return this.symbols }
+    getSymbols() { return this.specification.symbols; }
 
-    hasReferences() { return this.references && Object.keys(this.references).length > 0; }
-	getReferences() { return this.references; }
-    getReference(citationID: string) { return citationID in this.references ? this.references[citationID] : undefined; }
+    hasReferences() { return this.specification.references && Object.keys(this.specification.references).length > 0; }
+	getReferences() { return this.specification.references; }
+    getReference(citationID: string) { return citationID in this.specification.references ? this.specification.references[citationID] : undefined; }
     addReferences(references: ReferenceNode[]) {
         // Generate a unique ID for the reference.
-        references.forEach(ref => this.references[ref.citationID] = ref.toList());
+        references.forEach(ref => this.specification.references[ref.citationID] = ref.toList());
         return this.requestSave();
     }
     editReference(ref: ReferenceNode) {
-        if(!(ref.citationID in this.references)) return;
-        this.references[ref.citationID] = ref.toList();
+        if(!(ref.citationID in this.specification.references)) return;
+        this.specification.references[ref.citationID] = ref.toList();
         return this.requestSave(); 
     }
     editReferenceID(newCitationID: string, ref: ReferenceNode) {
-        if(!(ref.citationID in this.references)) return;
-        delete this.references[ref.citationID];
-        this.references[newCitationID] = ref.withCitationID(newCitationID).toList();
+        if(!(ref.citationID in this.specification.references)) return;
+        delete this.specification.references[ref.citationID];
+        this.specification.references[newCitationID] = ref.withCitationID(newCitationID).toList();
         return this.requestSave(); 
     }
     removeReference(citationID: string) {
-        if(!(citationID in this.references)) return;
-        delete this.references[citationID];
+        if(!(citationID in this.specification.references)) return;
+        delete this.specification.references[citationID];
         return this.requestSave();
     }
 
-    hasGlossary() { return this.glossary && Object.keys(this.glossary).length > 0 }
-	getGlossary() { return this.glossary }
-    hasDefinition(id: string) { return id in this.glossary; }
+    hasGlossary() { return this.specification.glossary && Object.keys(this.specification.glossary).length > 0 }
+	getGlossary() { return this.specification.glossary }
+    hasDefinition(id: string) { return id in this.specification.glossary; }
     addDefinition(id: string, phrase: string, definition: string, synonyms: string[]) {
-        this.glossary[id] = {
+        this.specification.glossary[id] = {
             phrase: phrase,
             definition: definition,
             synonyms: synonyms
@@ -341,59 +321,59 @@ export default class Edition {
         return this.requestSave();
     }
     removeDefinition(id: string) {
-        delete this.glossary[id];
+        delete this.specification.glossary[id];
         return this.requestSave();
     }
     editDefinition(id: string, definition: Definition) {
-        this.glossary[id] = definition;
+        this.specification.glossary[id] = definition;
         return this.requestSave();
     }
     editDefinitionID(id: string, newID: string) {
-        if(!(id in this.glossary)) return;
-        const definition = this.glossary[id];
-        delete this.glossary[id];
-        this.glossary[newID] = definition;
+        if(!(id in this.specification.glossary)) return;
+        const definition = this.specification.glossary[id];
+        delete this.specification.glossary[id];
+        this.specification.glossary[newID] = definition;
         return this.requestSave();
     }
 
-	getTags() { return this.tags }
+	getTags() { return this.specification.tags }
 
-    getTheme() { return this.theme; }
+    getTheme() { return this.specification.theme; }
     setTheme(theme: Theme | null) {
-        this.theme = theme;
+        this.specification.theme = theme;
         return this.requestSave();
     }
     setThemeValue(group: string, name: string, value: string) {
-        if((this.theme as Record<string, Record<string, string>>)[group][name] === value) return;
-        (this.theme as Record<string, Record<string, string>>)[group][name] = value
+        if((this.specification.theme as Record<string, Record<string, string>>)[group][name] === value) return;
+        (this.specification.theme as Record<string, Record<string, string>>)[group][name] = value
         return this.requestSave();
     }
 
     // Don't let callers get their sneaky hands on this mutable array...
-	getAuthors() { return [...this.authors ]; }
+	getAuthors() { return [...this.specification.authors ]; }
     addAuthor(name: string) {
-        this.authors.push(name)
+        this.specification.authors.push(name)
         return this.requestSave();
     }
     setAuthor(index: number, name: string) {
-        if(index >= 0 && index < this.authors.length)
-            this.authors[index] = name;
+        if(index >= 0 && index < this.specification.authors.length)
+            this.specification.authors[index] = name;
 
             return this.requestSave();
     }
     removeAuthor(index: number) {
-        if(index >= 0 && index < this.authors.length)
-            this.authors.splice(index, 1);
+        if(index >= 0 && index < this.specification.authors.length)
+            this.specification.authors.splice(index, 1);
         return this.requestSave();
     }
 
-	getRevisions() { return [...this.revisions]; }
+	getRevisions() { return [...this.specification.revisions]; }
 
-    hasImage(id: string) { return id in this.images && this.images[id] !== null; }
-    getImage(id: string) { return this.images[id] ?? undefined; }
-    setImage(id: string, embed: string | undefined) {
-        if(this.images[id] === embed) return;
-        this.images[id] = embed ?? null;
+    hasImage(id: string) { return id in this.specification.images && this.specification.images[id] !== null; }
+    getImage(id: string) { return this.specification.images[id] ?? null; }
+    setImage(id: string, embed: string | null) {
+        if(this.specification.images[id] === embed) return;
+        this.specification.images[id] = embed ?? null;
         return this.requestSave();
     }
 	
@@ -430,8 +410,8 @@ export default class Edition {
 	}
 
 	getSource(sourceID: string) { 
-		return sourceID.charAt(0) === "#" && sourceID.substring(1) in this.sources ? 
-            this.sources[sourceID.substring(1)] : 
+		return sourceID.charAt(0) === "#" && sourceID.substring(1) in this.specification.sources ? 
+            this.specification.sources[sourceID.substring(1)] : 
             null;
 	}
 
@@ -468,7 +448,7 @@ export default class Edition {
                     if(word !== "" && word.length > 2) {
                         if(!(word in bookIndex))
                             bookIndex[word] = new Set();
-                        bookIndex[word].add(chapter.chapterID);
+                        bookIndex[word].add(chapter.getChapterID());
                     }
                 });
 		});
@@ -514,9 +494,9 @@ export default class Edition {
         switch(chapterID) {
 
             // Handle back matter chapters.
-            case Edition.ReferencesID: return this.chapters.length > 0 ? this.chapters[this.chapters.length - 1].chapterID : null; // Last chapter of the book
-            case Edition.GlossaryID: return this.hasReferences() ? Edition.ReferencesID : this.chapters.length > 0 ? this.chapters[this.chapters.length - 1].chapterID : Edition.TableOfContentsID;
-            case Edition.IndexID: return this.hasGlossary() ? Edition.GlossaryID : this.hasReferences() ? Edition.ReferencesID : this.chapters.length > 0 ? this.chapters[this.chapters.length - 1].chapterID : Edition.TableOfContentsID;
+            case Edition.ReferencesID: return this.chapters.length > 0 ? this.chapters[this.chapters.length - 1].getChapterID() : null; // Last chapter of the book
+            case Edition.GlossaryID: return this.hasReferences() ? Edition.ReferencesID : this.chapters.length > 0 ? this.chapters[this.chapters.length - 1].getChapterID() : Edition.TableOfContentsID;
+            case Edition.IndexID: return this.hasGlossary() ? Edition.GlossaryID : this.hasReferences() ? Edition.ReferencesID : this.chapters.length > 0 ? this.chapters[this.chapters.length - 1].getChapterID() : Edition.TableOfContentsID;
             case Edition.SearchID: return Edition.IndexID;
             case Edition.MediaID: return Edition.SearchID;
             default:
@@ -557,7 +537,7 @@ export default class Edition {
 		this.getChapters().forEach(c => {
 
             const image = c.getImage()
-            let cover = image === undefined ? undefined : Parser.parseEmbed(this, image);
+            let cover = image === null ? undefined : Parser.parseEmbed(this, image);
             if(cover && cover instanceof EmbedNode && !urls.has(cover.getURL())) {
                 media.push(cover);
                 urls.add(cover.getURL());

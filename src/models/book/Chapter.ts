@@ -5,13 +5,13 @@ import { loadChapterTextFromFirestore, updateChapterTextInFirestore } from "../F
 import { DocumentReference } from "firebase/firestore";
 
 export type ChapterSpecification = {
-    ref?: DocumentReference | undefined;
+    ref?: DocumentReference;
 	id: string;
     title: string;
     authors: string[];
-    image?: string;
-    numbered?: boolean;
-    forthcoming?: boolean;
+    image: string | null;
+    numbered: boolean;
+    forthcoming: boolean;
     section?: string;
 	text?: string;
 }
@@ -27,16 +27,13 @@ export type Match = {
 }
 
 export default class Chapter {
+
+	// The metadata from the database.
+	readonly spec: ChapterSpecification;
+
 	edition: Edition;
-	ref: DocumentReference | undefined;
-	chapterID: string;
-	title: string;
-	authors: string[];
-	image?: string;
-	numbered: boolean;
-	section: string | undefined;
-	forthcoming: boolean;
-	text: string | undefined;
+	
+	// Caches
 	ast: ChapterNode | undefined;
 	index: Record<string, Array<Match>> | undefined;
 	wordCount: number | undefined;
@@ -44,7 +41,8 @@ export default class Chapter {
 	// A list of requested edits, stored as promises, resolved
     // when the book is ready to save.
     edits: { resolve: Function, reject: Function }[] = [];
-    // The timer that checks for inactivity.
+
+	// The timer that checks for inactivity.
     timerID: NodeJS.Timer | undefined;
     lastEdit: number = 0;
 
@@ -53,21 +51,25 @@ export default class Chapter {
 
     constructor(edition: Edition, spec: ChapterSpecification) {
 
-        this.edition = edition;
-		this.ref = spec.ref;
-		this.chapterID = spec.id;
-        this.title = spec.title;
-        this.authors = spec.authors ?? [];
-        this.image = spec.image;
-        this.numbered = spec.numbered === true || spec.numbered === undefined;
-        this.section = spec.section ? spec.section : undefined;
-		this.forthcoming = spec.forthcoming === true;
+		this.edition = edition;
+
+		// Copy the spec, filling in defaults as necessary.
+		this.spec = {
+			ref: spec.ref,
+			id: spec.id,
+			title: spec.title,
+			authors: spec.authors ?? [],
+			image: spec.image ?? null,
+			numbered: spec.numbered === true || spec.numbered === undefined,
+			forthcoming: spec.forthcoming === true,
+			text: spec.text
+		}
 
 		// If the chapter has text, then parse it, count searchable words, and compute an index.
-		if(spec.text !== undefined)
-			this.setText(spec.text)
-		else if(this.ref) {
-			loadChapterTextFromFirestore(this.ref).then(text => this.setText(text.text))
+		if(this.spec.text !== undefined)
+			this.setText(this.spec.text)
+		else if(this.spec.ref) {
+			loadChapterTextFromFirestore(this.spec.ref).then(text => this.setText(text.text))
 		}
 		// Otherwise, set them all to undefined.
 		else {
@@ -78,7 +80,7 @@ export default class Chapter {
 		
         // Periodically check for inactivity, pooling edits until after an idle state.
 		this.timerID = setInterval(() => {
-			if(this.edition.editionRef && this.ref && this.text) {
+			if(this.edition.editionRef && this.spec.ref && this.spec.text) {
 				// If it's been more than a second since our last edit and there
 				// are edits that haven't been saved, try updating the book, 
 				// and if we succeed, resolve all of the edits, and if we fail,
@@ -86,7 +88,7 @@ export default class Chapter {
 				if(Date.now() - this.lastEdit > 1000 && this.edits.length > 0) {
 					// Tell listeners that this book model changed.
 					this.edition.notifyListeners(BookSaveStatus.Saving);
-					updateChapterTextInFirestore(this.edition.editionRef, this.ref, this.text)
+					updateChapterTextInFirestore(this.edition.editionRef, this.spec.ref, this.spec.text)
 						.then(() => {
 							// Approve the edits.
 							this.edits.forEach(edit => edit.resolve());
@@ -110,7 +112,7 @@ export default class Chapter {
 	addListener(listener: (text: string) => void) { this.listeners.add(listener); }
     removeListener(listener: (text: string) => void) { this.listeners.delete(listener); }
     notifyListeners() { 
-		this.listeners.forEach(listener => this.text !== undefined ? listener.call(undefined, this.text) : undefined); 
+		this.listeners.forEach(listener => this.spec.text !== undefined ? listener.call(undefined, this.spec.text) : undefined); 
 	}
 
     // Adds a save request to the queue, to be resolved later after a period of
@@ -129,20 +131,15 @@ export default class Chapter {
 
 	toObject() {
 
-		let payload = {
-			ref: this.ref,
-			id: this.chapterID,
-			title: this.title,
-			authors: [...this.authors]
-		} as ChapterSpecification
+		// Deep copy to prevent external mutations.
+		const payload = JSON.parse(JSON.stringify(this.spec));
 
-		if(this.image !== undefined) payload.image = this.image;
-		payload.numbered = this.numbered ? true : false;
-		if(this.section !== undefined) payload.section = this.section;
-		if(this.forthcoming) payload.forthcoming = this.forthcoming;
+		// Reassign a copy of the Firebase ref, since the deep copy doesn't work for it.
+		payload.ref = this.spec.ref;
 
 		// Note that we don't include the chapter text in the payload; that's stored in the chapters subcollection.
 		// We just return the chapter metadata here, which is stored in the book collection.
+		delete payload.text;
 
 		return payload;
 
@@ -150,45 +147,45 @@ export default class Chapter {
 
 	getBook() { return this.edition }
 
-	getRef() { return this.ref; }
+	getRef() { return this.spec.ref; }
 
-	getChapterID() { return this.chapterID; }
+	getChapterID() { return this.spec.id; }
 	setChapterID(id: string) {
-		if(this.chapterID !== id) {
-			this.chapterID = id;
+		if(this.spec.id !== id) {
+			this.spec.id = id;
 			return this.edition.requestSave();
 		}
 	}
 
-    getSection(): string | undefined { return this.section; }
+    getSection(): string | undefined { return this.spec.section; }
 	setSection(section: string) {
-		if(this.section !== section) {
-			this.section = section;
+		if(this.spec.section !== section) {
+			this.spec.section = section;
 			return this.edition.requestSave();
 		}
 	}
 
-	isForthcoming() { return this.forthcoming; }
+	isForthcoming() { return this.spec.forthcoming; }
 	setForthcoming(forthcoming: boolean) {
-		if(this.forthcoming !== forthcoming) {
-			this.forthcoming = forthcoming;
+		if(this.spec.forthcoming !== forthcoming) {
+			this.spec.forthcoming = forthcoming;
 			return this.edition.requestSave();
 		}
 	}
 
-	isNumbered() { return this.numbered; }
+	isNumbered() { return this.spec.numbered; }
 	setNumbered(numbered: boolean) {
-		if(numbered !== this.numbered) {
-			this.numbered = numbered;
+		if(numbered !== this.spec.numbered) {
+			this.spec.numbered = numbered;
 			return this.edition.requestSave();
 		}
 	}
 
-	getText() { return this.text; }
+	getText() { return this.spec.text; }
 	setText(text: string) {
-		if(this.text !== text || this.ast === undefined) {
-			this.text = text;
-			this.setAST(Parser.parseChapter(this.edition, this.text));
+		if(this.spec.text !== text || this.ast === undefined) {
+			this.spec.text = text;
+			this.setAST(Parser.parseChapter(this.edition, this.spec.text));
 			this.notifyListeners();
 		}
 	}
@@ -197,43 +194,43 @@ export default class Chapter {
 
 		this.ast = node;
 		const newText = this.ast.toBookdown();
-		const changed = this.text !== newText;
-		this.text = newText;
+		const changed = this.spec.text !== newText;
+		this.spec.text = newText;
 		this.wordCount = this.ast.toText().split(/\s+/).length;
 		this.index = this.computeIndex();
 
 		// Don't save if its the same. This is just an optimization.
 		if(changed) {
-			if(this.edition.editionRef && this.ref)
+			if(this.edition.editionRef && this.spec.ref)
 				return this.requestSave();
 		}
 
 	}
 
 	addAuthor(name: string) {
-        this.authors.push(name);
+        this.spec.authors.push(name);
 		return this.edition.requestSave();
     }
 
-	getAuthors() { return this.authors; }
+	getAuthors() { return this.spec.authors; }
     setAuthor(index: number, name: string) {
-        if(index >= 0 && index < this.authors.length) {
-            this.authors[index] = name;
+        if(index >= 0 && index < this.spec.authors.length) {
+            this.spec.authors[index] = name;
 			return this.edition.requestSave();
 		}
 	}
 
     removeAuthor(index: number) {
-        if(index >= 0 && index < this.authors.length) {
-            this.authors.splice(index, 1)
+        if(index >= 0 && index < this.spec.authors.length) {
+            this.spec.authors.splice(index, 1)
 			return this.edition.requestSave();
 		}
 	}
 
-	getTitle() { return this.title; }
+	getTitle() { return this.spec.title; }
 	setTitle(title: string) {
-		if(title !== this.title) {
-			this.title = title;
+		if(title !== this.spec.title) {
+			this.spec.title = title;
 			return this.edition.requestSave();
 		}
 	}
@@ -243,10 +240,10 @@ export default class Chapter {
 
 	delete() { return this.edition.deleteChapter(this.getChapterID()) }
 
-	getImage() { return this.image; }
-	setImage(embed: string | undefined) { 
-		if(this.image === embed) return;
-		this.image = embed;
+	getImage() { return this.spec.image; }
+	setImage(embed: string | null) { 
+		if(this.spec.image === embed) return;
+		this.spec.image = embed;
 		return this.edition.requestSave();
 	}
 

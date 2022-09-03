@@ -39,6 +39,6 @@ export default function Reader() {
 
     return  error !== null ? <div className="bookish-app-alert">{error.message}</div> :
             edition === null ? <Loading/> :
-                <Edition edition={edition} base={"/read/" + bookid} />
+                <Edition edition={edition} base={`/read/${bookid}${editionid === undefined ? "" : "/" + editionid}`} />
 
 }
