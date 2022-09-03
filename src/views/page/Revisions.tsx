@@ -63,7 +63,8 @@ export const Revisions = (props: { edition: Edition }) => {
 								<li>Add descriptions of revisions so readers know what's changed.</li>
 								<li>Draft editions aren't visible until they are published.</li>
 								<li>You can delete an edition, unless it's the last one.</li>
-							</ul> 
+								<li>The edition with a * is the default edition for readers.</li>
+							</ul>
 						</div>
 						: null			
 				}				
@@ -128,7 +129,7 @@ export const Revisions = (props: { edition: Edition }) => {
 													/>
 												: null
 											}
-											{ revision === bookRevisions.find(e => e.published) ? <span className="bookish-tag">Latest</span> : null}
+											{ revision === bookRevisions.find(e => e.published) ? "*" : null}
 											</span>
 										</td>
 									</tr>
