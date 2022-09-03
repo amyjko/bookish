@@ -5,16 +5,16 @@ import Book, { BookSpecification } from "./book/Book"
 import Chapter, { ChapterContent } from "./book/Chapter"
 
 
-export const loadBooksFromFirestore = async (): Promise<Book[] | null> => {
+export const loadPublishedBooksFromFirestore = async (): Promise<Book[]> => {
 
     if(!db)
-        throw Error("Can't retrieve books, not connected to Firebase.")
+        throw Error("Can't retrieve books, not connected to the database.")
 
     try {
         const data = await getDocs(collection(db, "books"));
-        return data.docs.map(doc => new Book(doc.ref, doc.data() as BookSpecification))
+        return data.docs.map(doc => new Book(doc.ref, doc.data() as BookSpecification)).filter(book => book.hasPublishedEdition())
     } catch {
-        return null
+        throw Error("Couldn't load books, problem reading from the database.")
     }
 
 }

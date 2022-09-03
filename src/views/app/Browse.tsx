@@ -1,7 +1,7 @@
 import React from "react"
 import { useState, useEffect } from "react"
 import Book from "../../models/book/Book"
-import { loadBooksFromFirestore } from '../../models/Firestore'
+import { loadPublishedBooksFromFirestore } from '../../models/Firestore'
 import BookPreview from './BookPreview'
 
 export default function Browse() {
@@ -12,13 +12,17 @@ export default function Browse() {
 
 	// Get the books when the component loads.
 	useEffect(() => {
-		loadBooksFromFirestore().then(books => {
-			setLoading(false) 
-			if(books === null)
-				setError("No books have been published.");
-			else
-				setBooks(books)
-		})
+		loadPublishedBooksFromFirestore()
+			.then(books => {
+				setLoading(false) 
+				if(books.length === 0)
+					setError("No books have been published.");
+				else
+					setBooks(books)
+			})
+			.catch(error => {
+				setError(error);
+			})
 	}, [])
 
 	return <>

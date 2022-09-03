@@ -150,4 +150,8 @@ export default class Book {
         }
     }
 
+    hasPublishedEdition() {
+        return this.spec.revisions.find(revision => revision.published) !== undefined;
+    }
+
 }
