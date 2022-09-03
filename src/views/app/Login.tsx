@@ -40,7 +40,7 @@ export default function Login() {
 		<p>We'll send you an email to login, no password required.</p>
 
 		<form onSubmit={handleSubmit}>
-			<input autoComplete="username" type="email" placeholder="email" ref={emailRef} required disabled={loading} /> <button type="submit" disabled={loading}>Login</button>
+			<input autoComplete="username" type="email" placeholder="email" ref={emailRef} required disabled={loading || emailRef.current?.value.length === 0} /> <button type="submit" disabled={loading}>Login</button>
 		</form>
 
 		{ feedback && <div className="bookish-app-alert">{feedback}</div> }
