@@ -146,8 +146,8 @@ input, button {
 input[type="email"], input[type="text"], select {
     padding: var(--bookish-app-chrome-padding);
     font-size: var(--bookish-app-chrome-font-size);
-    border: var(--bookish-app-chrome-border-width) solid var(--bookish-app-chrome-border-color);
-    background-color: var(--bookish-app-chrome-background);
+    border: none;
+    border-bottom: var(--bookish-app-chrome-border-width) solid var(--bookish-app-chrome-border-color);
 }
 
 button {

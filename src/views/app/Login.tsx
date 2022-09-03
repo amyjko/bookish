@@ -47,8 +47,7 @@ export default function Login() {
 		{ feedback && <div className="bookish-app-alert">{feedback}</div> }
 
 		<form onSubmit={handleSubmit}>
-			<input type="email" placeholder="email" ref={emailRef} required />
-			<button type="submit" disabled={loading}>Login</button>
+			<input type="email" placeholder="email" ref={emailRef} required /> <button type="submit" disabled={loading}>Login</button>
 		</form>
 	</>
 
