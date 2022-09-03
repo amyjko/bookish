@@ -40,6 +40,6 @@ export default function Write() {
     return  error !== null ? <div className="bookish-app-alert">{error.message}</div> :
             book == undefined ? <Loading/> :
             edition === null ? <Loading/> :
-                <Edition edition={edition} base={`/write/${bookid}${editionid === undefined ? "" : "/" + editionid}`} editable={true} />
+                <Edition edition={edition} base={`/write/${bookid}/${edition.getEditionNumber()}`} editable={true} />
 
 }

@@ -578,4 +578,13 @@ export default class Edition {
 
     }
 
+    /* Edition numbers are 1 to N */
+    getEditionNumber() {
+        const revisions = this.book?.getRevisions();
+        if(revisions === undefined) return undefined;
+        for(let i = 0; i < revisions.length; i++)
+            if(revisions[i].ref.id === this.editionRef?.id) return revisions.length - i;
+        return undefined;
+    }
+
 }
