@@ -22,7 +22,6 @@ export default function Header() {
 		<BookishNavLink to="/">Home</BookishNavLink>
 		<BookishNavLink to="/read">Read</BookishNavLink>
 		<BookishNavLink to="/write">Write</BookishNavLink>
-		<BookishNavLink to="/about">About</BookishNavLink>
 		<small>
 			{ currentUser && currentUser.email }
 			{
