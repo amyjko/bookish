@@ -11,6 +11,7 @@ import { renderNode } from '../chapter/Renderer'
 import { EditorContext } from './Edition';
 import { ReferenceNode } from '../../models/chapter/ReferenceNode';
 import ConfirmButton from '../editor/ConfirmButton';
+import Instructions from './Instructions';
 
 function mineReference(ids: string[], text: string): ReferenceNode {
 
@@ -120,13 +121,11 @@ const BulkReferenceEditor = (props: { book: Edition }) => {
 	function handleChange() { setText(textRef.current ? textRef.current.value : ""); }
 
 	return <>
-		<p>
-			<em>
-				Paste some references, one per line, and we'll do our best to pull out the relevant parts,
-				looking for things that look like author lists, years, sources, and URLs.
-				Be sure to verify it though &mdash; it's likely to get some things wrong!
-			</em>
-		</p>
+		<Instructions>
+			To cite references in a chapter, add them here.
+			You can add one at a time, or try pasting them in bulk, and we'll do our best to pull out the relevant parts, looking for things that look like author lists, years, sources, and URLs.
+			Be sure to verify it though &mdash; it's likely to get some things wrong!
+		</Instructions>
 		<div>
 			<textarea onChange={handleChange} rows={5} ref={textRef} style={{width: "100%"}}></textarea>
 			<button disabled={text.length === 0} onClick={handleBulkAdd}>Add bulk references</button>

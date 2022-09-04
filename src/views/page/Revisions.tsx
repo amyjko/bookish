@@ -6,6 +6,7 @@ import { renderNode } from "../chapter/Renderer"
 import BookishEditor from "../editor/BookishEditor"
 import Switch from "../editor/Switch"
 import { EditorContext } from "./Edition"
+import Instructions from "./Instructions"
 
 export const Revisions = (props: { edition: Edition }) => {
 
@@ -52,22 +53,11 @@ export const Revisions = (props: { edition: Edition }) => {
 			book && bookRevisions ?
 			<>
 				<h2 className="bookish-header" id="revisions">Editions { editable ? <button onClick={handleDraftEdition}>+</button> : null}</h2>
-				{ 
-					editable ?
-						<div className="bookish-instructions">
-							<p>
-								Each book has one or more editions, allowing you to track revisions and ensure previous versions remain available.
-							</p>
-							<ul>
-								<li>Add an edition before making revisions.</li>
-								<li>Add descriptions of revisions so readers know what's changed.</li>
-								<li>Draft editions aren't visible until they are published.</li>
-								<li>You can delete an edition, unless it's the last one.</li>
-								<li>The edition with a * is the default edition for readers.</li>
-							</ul>
-						</div>
-						: null			
-				}				
+				<Instructions>
+					Each book has one or more editions, allowing you to track revisions and ensure previous versions remain available.
+					When you're ready to revise, make a new edition, then publish it when you're done.
+					The edition with a * is the default edition readers will see, unless they epxplicitly choose to view a previous edition.
+				</Instructions>
 				<table className="bookish-table">
 					<colgroup>
 						<col width="5%" />

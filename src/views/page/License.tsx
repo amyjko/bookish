@@ -5,6 +5,7 @@ import Parser from "../../models/chapter/Parser"
 import { renderNode } from "../chapter/Renderer"
 import BookishEditor from "../editor/BookishEditor"
 import { EditorContext } from "./Edition"
+import Instructions from "./Instructions"
 
 const License = (props: { book: Edition }) => {
 
@@ -14,6 +15,12 @@ const License = (props: { book: Edition }) => {
 
 	return <>
 		<h2 className="bookish-header" id="license">License</h2>
+
+		<Instructions>
+			By default of U.S. Copyright Law, your content copyrighted and owned by all authors. 
+			Edit this if you'd like to grant different rights.
+		</Instructions>
+
 		{
 			editable ?
 			<>

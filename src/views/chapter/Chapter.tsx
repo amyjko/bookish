@@ -18,6 +18,7 @@ import { EditorContext } from '../page/Edition';
 import TextEditor from '../editor/TextEditor';
 import BookishEditor from '../editor/BookishEditor';
 import Toggle from '../editor/Toggle';
+import Instructions from '../page/Instructions';
 
 export type ChapterContextType = {
 	book?: Edition, 
@@ -305,6 +306,14 @@ const Chapter = (props: { chapter: ChapterModel, book: Edition, print?: boolean 
 					save={ text => props.chapter.setTitle(text) }
 				/>
 				<Marker/>
+				<Instructions>
+					Edit your chapter's title, authors, and cover image above.
+					You can also change the ID of the chapter, which appears in it's URL.
+					Write your chapter text below, using the many formatting options in the toolbar above to format text, add headers, lists, tables, comments, citations, footnotes, and more.
+					It's okay to try things, you can always undo!
+					Saves are automatic, each time you stop typing.
+				</Instructions>
+
 				{ /* Render the chapter body, passing some context */ }
 				<ChapterContext.Provider 
 					value={{

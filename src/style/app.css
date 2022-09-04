@@ -29,6 +29,8 @@
     --bookish-app-chrome-spacing: 0.5em;
     --bookish-app-chrome-line-height: 1.5em;
 
+    --bookish-app-margin: 1em;
+
 }
 
 @keyframes waiting {
@@ -157,6 +159,12 @@ input[type="email"], input[type="text"], select {
     border-bottom: var(--bookish-app-chrome-border-width) solid var(--bookish-app-chrome-border-color);
 }
 
+textarea {
+    border: none;
+    border-top: var(--bookish-app-chrome-border-width) solid var(--bookish-app-chrome-border-color);
+    border-bottom: var(--bookish-app-chrome-border-width) solid var(--bookish-app-chrome-border-color);
+}
+
 button {
     background-color: var(--bookish-app-chrome-background);
     padding: var(--bookish-app-chrome-padding);
@@ -238,7 +246,7 @@ button:disabled {
     opacity: 0;
 }
 
-input:focus, button:focus, select:focus {
+input:focus, button:focus, select:focus, textarea:focus {
     outline: 2px solid var(--bookish-highlight-color);
     z-index: 2;
 }
@@ -582,12 +590,13 @@ input[type=text].bookish-editor-text-invalid {
 }
 
 .bookish-instructions {
-    border-top: var(--bookish-app-chrome-border-width) solid var(--bookish-app-chrome-border-color);
-    border-bottom: var(--bookish-app-chrome-border-width) solid var(--bookish-app-chrome-border-color);
-    padding: var(--bookish-app-chrome-padding);
-    border-radius: var(--bookish-app-chrome-roundedness);
-    background-color: var(--bookish-app-chrome-background);
-    margin-bottom: var(--bookish-app-chrome-padding);
+    font-style: italic;
+    margin-top: var(--bookish-app-margin);
+    margin-bottom: var(--bookish-app-margin);
+    line-height: 1.2;
+    padding: var(--bookish-app-margin);
+    border: 2px solid var(--bookish-app-chrome-border-color);
+    border-radius: 5px;
 }
 
 .bookish-instructions p, .bookish-instructions li {

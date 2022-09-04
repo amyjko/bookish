@@ -17,6 +17,7 @@ import Toggle from '../editor/Toggle'
 import Chapter from '../../models/book/Chapter'
 import TextEditor from '../editor/TextEditor'
 import ConfirmButton from '../editor/ConfirmButton'
+import Instructions from './Instructions'
 
 const TableOfContentsRow = (props: { 
 	image: React.ReactNode, 
@@ -182,9 +183,25 @@ const TableOfContents = (props: { edition: Edition }) => {
 			save={text => props.edition.setTitle(text)}
 		/>
 
+		<Instructions>
+			Above you can edit your book's authors, title, and cover image.
+		</Instructions>
+
 		<Description book={edition} />
 
+		<Instructions>
+			This will appear on the <Link to="/read">book browsing</Link> page and in your table of contents.
+			Write an informative description of what your book is about.
+		</Instructions>
+
 		<h2 className="bookish-header" id="chapters">Chapters { editable ? <AddChapter/> : null }</h2>
+
+		<Instructions>
+			Add, remove, and reorder chapters here.
+			You can add optional book sections to each chapter, toggle chapters as numbered/unnumbered or published/forthcoming.
+			Click the title to edit the chapter.
+		</Instructions>
+
 		<div className="bookish-table">
 			<table id="toc">
 				<tbody>
@@ -305,11 +322,21 @@ const TableOfContents = (props: { edition: Edition }) => {
 
 		<h2 className="bookish-header" id="print">Print</h2>
 
+		<Instructions>
+			This offers a way for readers to print the entire book as a single page.
+		</Instructions>
+
 		<p>
-			Want to print this book or generate a PDF? See <Link to={base + "print"}>all chapters on a single page</Link> and then print or export.
+			Want to print this book or generate a PDF? 
+			See <Link to={base + "print"}>all chapters on a single page</Link> and then print or export.
+			Long books can take some time to render.
 		</p>
 
 		<h2 className="bookish-header" id="citation">Citation</h2>
+
+		<Instructions>
+			This citation is dynamically created from the current authors, title, and date.
+		</Instructions>
 
 		<p>
 			{ edition.getAuthors().map(author => Parser.parseFormat(edition, author).toText()).join(", ") } ({(new Date()).getFullYear() }). <em>{edition.getTitle()}</em>. { location.protocol+'//'+location.host+location.pathname }, <em>retrieved { (new Date()).toLocaleDateString("en-US")}</em>.

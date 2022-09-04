@@ -5,6 +5,7 @@ import Parser from "../../models/chapter/Parser"
 import { renderNode } from "../chapter/Renderer"
 import BookishEditor from "../editor/BookishEditor"
 import { EditorContext } from "./Edition"
+import Instructions from "./Instructions"
 
 const Acknowledgements = (props: { book: Edition }) => {
 
@@ -15,6 +16,11 @@ const Acknowledgements = (props: { book: Edition }) => {
 	const acksNode = Parser.parseChapter(book, book.getAcknowledgements());
 
 	return <>
+		<Instructions>
+			This section is not shown if empty.
+			But surely you have someone to thank!
+		</Instructions>
+
 		{/* If editable, show acknowledgements even if they're empty, otherwise hide */}
 		{
 			editable ? 
