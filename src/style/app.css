@@ -74,6 +74,11 @@
     vertical-align: baseline;
 }
 
+.bookish-app-callout {
+    font-size: x-large;
+    margin: 1em;
+}
+
 .bookish-app-text, .bookish-app-text p {
     text-align: left;
     padding-left: 2rem;

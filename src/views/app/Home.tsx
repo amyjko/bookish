@@ -8,15 +8,9 @@ export default function Home() {
     return <>
         <h1>Bookish</h1>
 
-        <p><em>Where books are bound for the web.</em></p>
-
-        <hr/>
+        <div className="bookish-app-callout">Bookish is a platform for reading and writing simple, accessible, beautiful online books.</div>
 
         <div className="bookish-app-text">
-
-            <p>
-                Bookish is a platform for reading, writing, and publishing online books.
-            </p>
 
             <p>
                 Why not use print publishers, e-book platforms, or innovative platforms like <a href="https://www.pubpub.org" target="_blank">PubPub</a>?
