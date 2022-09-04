@@ -23,7 +23,7 @@ export default function Header() {
 		<BookishNavLink to="/read">Read</BookishNavLink>
 		<BookishNavLink to="/write">Write</BookishNavLink>
 		<small>
-			{ currentUser && currentUser.email }
+			{ currentUser && currentUser.email && <BookishNavLink to="/email">{currentUser.email}</BookishNavLink> }
 			{
 				currentUser === null ?
 					<BookishNavLink to="/login">Login</BookishNavLink> :

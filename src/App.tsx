@@ -13,6 +13,7 @@ import Header from "./views/app/Header"
 import Footer from "./views/app/Footer"
 import Write from "./views/app/Write"
 import Reader from "./views/app/Reader"
+import ChangeEmail from './views/app/ChangeEmail';
 
 function App() {
 
@@ -37,6 +38,7 @@ function App() {
             <Route path="/login" element={<Login/>} />
             <Route path="/write" element={<Private><Dashboard/></Private>} />
             <Route path="/finishlogin" element={<FinishLogin/>} />
+            <Route path="/email" element={<ChangeEmail/>} />
             <Route path="/read" element={<Browse/>} />
             <Route path="/read/:bookid/*" element={<Reader/>} />
             <Route path="/read/:bookid/:editionid/*" element={<Reader/>} />

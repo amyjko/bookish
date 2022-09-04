@@ -1,16 +1,20 @@
+import { updateEmail } from "firebase/auth"
 import React, { useRef, useState } from "react"
 import { useAuth } from "./AuthContext"
 
 export default function Login() {
 
 	const emailRef = useRef<HTMLInputElement>(null)
-	const { login } = useAuth()
+	const { currentUser } = useAuth()
 
-	// Not loading by default
 	const [ loading, setLoading ] = useState(false)
-
-	// Track feedback with state
 	const [ feedback, setFeedback ] = useState("")
+
+	const errors: Record<string,string> = {
+		"auth/invalide-mail": "This wasn't a valid email.",
+		"auth/email-already-in-use": "This email is already associated with an account.",
+		"auto/requires-recent-login": "You haven't logged in recently enough. Log out, log in again, then try again."
+	};
 
 	async function handleSubmit(e: React.FormEvent) {
 
@@ -18,14 +22,16 @@ export default function Login() {
 		e.preventDefault();
 
 		// Enter loading state, try to login and wait for it to complete, and then leave loading state.
-		if(login && emailRef && emailRef.current) {
+		if(currentUser && emailRef && emailRef.current) {
 			try {
 				// Give some feedback when loading.
 				setLoading(true);
-				await login(emailRef.current.value);
-				setFeedback("Check your email for a login link.")
-			} catch(err) {
-				setFeedback("Hm, couldn't create an account: " + err)
+				const previousEmail = currentUser.email;
+				await updateEmail(currentUser, emailRef.current.value);
+				setFeedback(`Check your original email address, ${previousEmail}, for a confirmation link.`);
+			} catch(error: any) {
+				if(typeof error.code === "string")
+					setFeedback(errors[error.code])
 			} finally {
 				setLoading(false)
 			}
@@ -35,9 +41,11 @@ export default function Login() {
 
 	return <>
 
-		<h1>Login to write</h1>
+		<h1>Change e-mail</h1>
 
-		<p>We'll send you an email to login, no password required.</p>
+		<p>
+			To change your login email, type your new email address below.
+		</p>
 
 		<form onSubmit={handleSubmit}>
 			<input autoComplete="username" type="email" placeholder="email" ref={emailRef} required disabled={loading || emailRef.current?.value.length === 0} /> <button type="submit" disabled={loading}>Login</button>

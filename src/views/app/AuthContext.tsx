@@ -37,11 +37,7 @@ const AuthProvider: React.FC<{}> = ({ children }) => {
                     // Remember the email in local storage so we don't have to ask for it again
                     // after returning to the link above.
                     window.localStorage.setItem("email", email)
-                })
-                .catch((error) => {
-                    // TODO Need to more properly handle this error.
-                    console.error(error)
-                })
+                });
 
         }
 
