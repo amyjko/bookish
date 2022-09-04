@@ -9,6 +9,7 @@ import { renderNode } from '../chapter/Renderer';
 import TextEditor from '../editor/TextEditor';
 import { DarkModeContext, EditorContext } from './Edition';
 import ConfirmButton from '../editor/ConfirmButton';
+import Instructions from './Instructions';
 
 const Preview = (props: { theme: Theme }) => {
 
@@ -100,8 +101,12 @@ const Theme = (props: { book: Edition }) => {
 					/>
 				}
 			/>
-			
-			<p>This is the theme editor. You can use it to choose from existing themes or create a custom theme for your book.</p>
+
+			<Instructions>
+				This is the theme editor. 
+				You can use it to choose from existing themes or create a custom theme for your book's appearance.
+				To use it, you'll need to know a bit about how to format CSS <a target="_blank" href="https://developer.mozilla.org/en-US/docs/Web/CSS/color">colors</a>, <a target="_blank" href="https://developer.mozilla.org/en-US/docs/Web/CSS/font-size">fonts</a>, and <a target="_blank" href="https://developer.mozilla.org/en-US/docs/Learn/CSS/Building_blocks/Values_and_units">sizes</a>.
+			</Instructions>
 
 			{
 				theme === null ?

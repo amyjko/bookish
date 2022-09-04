@@ -7,6 +7,7 @@ import Page from './Page';
 
 import Edition from '../../models/book/Edition';
 import { BaseContext } from './Edition';
+import Instructions from './Instructions';
 
 const Index = (props: { book: Edition }) => {
 
@@ -91,6 +92,11 @@ const Index = (props: { book: Edition }) => {
                 />
             }
         />
+
+        <Instructions>
+            This index is created automatically.
+            It's not perfect; we may add more control over it in the future.
+        </Instructions>
 
         <p><em>This index includes all words, excluding common English words, words with apostrophes, and words ending in -ly.</em></p>
 

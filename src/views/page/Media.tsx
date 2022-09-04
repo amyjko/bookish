@@ -6,6 +6,7 @@ import Outline from './Outline';
 import Edition from '../../models/book/Edition';
 import Page from './Page'
 import { renderNode } from '../chapter/Renderer';
+import Instructions from './Instructions';
 
 export default function Media(props: { book: Edition }) {
 
@@ -32,6 +33,9 @@ export default function Media(props: { book: Edition }) {
 					/>
 				}
 			/>
+			<Instructions>
+				This index of media is created automatically.
+			</Instructions>
 
 			{
 				media.length === 0 ?
