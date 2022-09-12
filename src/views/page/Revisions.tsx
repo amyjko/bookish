@@ -56,7 +56,7 @@ export const Revisions = (props: { edition: Edition }) => {
 				<Instructions>
 					Each book has one or more editions, allowing you to track revisions and ensure previous versions remain available.
 					When you're ready to revise, make a new edition, then publish it when you're done.
-					The edition with a * is the default edition readers will see, unless they epxplicitly choose to view a previous edition.
+					The edition with a * is the default edition readers will see, unless they explicitly choose to view a previous edition.
 				</Instructions>
 				<table className="bookish-table">
 					<colgroup>
