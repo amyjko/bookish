@@ -165,7 +165,7 @@ textarea {
     border-bottom: var(--bookish-app-chrome-border-width) solid var(--bookish-app-chrome-border-color);
 }
 
-button {
+button, .bookish-file-upload {
     background-color: var(--bookish-app-chrome-background);
     padding: var(--bookish-app-chrome-padding);
     border-top-right-radius: var(--bookish-app-chrome-roundedness);
@@ -175,13 +175,13 @@ button {
     border: none;
 }
 
-button:hover:enabled {
+button:hover:enabled, .bookish-file-upload:hover {
     background-color: var(--bookish-app-chrome-hover-background);
     color: var(--bookish-app-chrome-hover-color);
     cursor: pointer;
 }
 
-button:disabled {
+button:disabled, .bookish-file-upload input:disabled {
     opacity: 0.3;
     border-color: var(--bookish-app-chrome-muted);
     cursor: auto;
@@ -257,20 +257,29 @@ input:focus, button:focus, select:focus, textarea:focus {
     box-shadow: none !important;
 }
 
+.bookish-file-upload {
+
+	font-family: var(--bookish-app-chrome-font);
+	font-size: var(--bookish-app-chrome-font-size);
+}
+
+.bookish-file-upload input[type="file"] {
+    display: none;
+}
+
 input[type="text"].bookish-text-editor-error {
     outline-color: var(--bookish-app-error-color);
 }
 
 .bookish-text-editor .bookish-text-editor-error {
     position: absolute;
-    left: calc(100% + 0.5em);
-    top: 0.15rem;
+    left: 0;
+    top: 100%;
     width: max-content;
     z-index: 3;
     line-height: 1em;
-    margin-top: -0.5em;
+    margin-left: -0.5em;
     padding: 0.5em 0.5em;
-    backdrop-filter: blur(5px) opacity(50%);
 }
 
 .bookish-editor-placeholder {

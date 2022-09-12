@@ -517,6 +517,7 @@ hr {
 	background-color: var(--bookish-error-background-color);
 	color: var(--bookish-error-color);
 	display: flex;
+	flex-direction: column;
 	justify-content: center;
 	align-items: center;
 }

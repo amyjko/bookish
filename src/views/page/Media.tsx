@@ -45,15 +45,13 @@ export default function Media(props: { book: Edition }) {
 
 			{
 				media.map((embed, index) =>
-					embed.getURL().indexOf("http") === 0 ?
-						null :
-						<span className={"bookish-figure-preview"} key={"image" + index}>
-							<img 
-								src={"images/" + embed.getURL()} 
-								alt={embed.getDescription()}
-							/>
-							<div className="bookish-figure-credit">{renderNode(embed.getCredit())}</div>
-						</span>
+					<span className={"bookish-figure-preview"} key={"image" + index}>
+						<img 
+							src={embed.getURL().indexOf("http") === 0 ? embed.getURL() : "images/" + embed.getURL()} 
+							alt={embed.getDescription()}
+						/>
+						<div className="bookish-figure-credit">{renderNode(embed.getCredit())}</div>
+					</span>
 				)
 			}
 	</Page>
