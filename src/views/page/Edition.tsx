@@ -119,7 +119,7 @@ const Edition = (props: { edition: EditionModel, base?: string, editable?: boole
 				<Route path="index" element={<Index book={edition} />} />
 				<Route path="index/:letter" element={<Index book={edition} />} />
 				<Route path="search" element={<Search book={edition} />} />
-				<Route path="media" element={<Media book={edition} />} />
+				<Route path="media" element={<Media edition={edition} />} />
 				<Route path="theme" element={<Theme book={edition} />} />
 				<Route path="print" element={<Print book={edition} />} />
 				<Route path="*" element={<Unknown message="This page doesn't exist." book={edition} />}/>
