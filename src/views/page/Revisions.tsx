@@ -107,7 +107,7 @@ export const Revisions = (props: { edition: Edition }) => {
 												revision.summary
 											}
 										</td>
-										<td>
+										<td style={{whiteSpace: "nowrap" }}>
 											{
 												editable ?
 													<span>
