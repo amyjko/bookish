@@ -633,3 +633,13 @@ input[type=text].bookish-editor-text-invalid {
     margin-top: 1em;
     margin-bottom: 1em;   
 }
+
+.bookish-image-chooser {
+    margin-top: var(--bookish-app-chrome-padding);
+}
+.bookish-image-chooser .bookish-image-chooser-image {
+    display: inline-block;
+    height: 3em;
+    margin-right: var(--bookish-app-chrome-padding);
+    cursor: pointer;
+}

@@ -1,5 +1,6 @@
 import { DocumentReference } from "firebase/firestore";
 import { loadEditionFromFirestore, updateBookInFirestore } from "../Firestore";
+import BookMedia from "./BookMedia";
 import Edition, { BookSaveStatus } from "./Edition";
 
 export type Revision = {
@@ -36,6 +37,8 @@ export default class Book {
 
     listeners: Set<Function> = new Set();
 
+    media: BookMedia;
+
     constructor(ref: DocumentReference, spec: BookSpecification) {
 
         this.ref = ref;
@@ -68,7 +71,11 @@ export default class Book {
             }
         }, 500);
 
+        this.media = new BookMedia(this);
+
     }
+
+    getMedia() { return this.media; }
 
     // Adds a save request to the queue, to be resolved later after a period of
     // inactivity. Returns a promise that will eventually be resolved.

@@ -7,9 +7,27 @@ import { CaretContext, CaretContextType } from './BookishEditor';
 import TextEditor from './TextEditor';
 import { Spacer } from './Toolbar';
 import { storage } from '../../models/Firebase';
-import { getDownloadURL, ref, uploadBytesResumable } from 'firebase/storage';
 import { EditorContext } from '../page/Edition';
-import { v4 as uuidv4 } from 'uuid';
+import { Image } from '../../models/book/BookMedia';
+
+const ImageChooser = (props: { images: Image[], select: (image: Image) => void}) => {
+
+    return <div className="bookish-image-chooser">
+        {
+            props.images === undefined ? <span>Loading images</span> :
+            props.images.length === 0 ? <span>No images uplaoded.</span> :
+            props.images.map(image => 
+                <img 
+                    className="bookish-image-chooser-image" 
+                    key={image.url}
+                    src={image.url} 
+                    alt={image.description} 
+                    onClick={() => props.select.call(undefined, image)}
+                />)
+        }
+        </div>
+
+}
 
 const EmbedEditor = (props: {
     embed: EmbedNode
@@ -20,6 +38,8 @@ const EmbedEditor = (props: {
     const caret = useContext<CaretContextType>(CaretContext);
     const { edition } = useContext(EditorContext);
     const [ upload, setUpload ] = useState<undefined|number|string>(undefined);
+
+    const media = edition?.getBook()?.getMedia();
 
     function isValidURL(url: string): string | undefined {
         // Is it a valid URL?
@@ -34,38 +54,25 @@ const EmbedEditor = (props: {
     function handleImageChange(event: ChangeEvent<HTMLInputElement>) {
 
         const file = event.target.files === null ? undefined : event.target.files[0];
+        const media = edition?.getBook()?.getMedia();
 
         if(file === undefined) return;
         if(storage === undefined) return;
-        if(edition === undefined) return;
+        if(media === undefined) return;
 
-        // The canonical path format for Bookish images in the store is image/{bookid}/{imageid}
-        // where {bookid} is the Firestore ID of the book being edited and {imageid} is just a random id.
-        const images = ref(storage, `images/${edition.getBook()?.getRefID()}/${uuidv4()}`);
-        const uploadTask = uploadBytesResumable(images, file);
-        uploadTask.on("state_changed",
-            (snapshot) => {
-                // Get task progress, including the number of bytes uploaded and the total number of bytes to be uploaded
-                setUpload(`${Math.round((snapshot.bytesTransferred / snapshot.totalBytes) * 100)}% done${snapshot.state === "paused" ? "; paused" : ""}`);
-            }, 
-            (error) => {
-                // https://firebase.google.com/docs/storage/web/handle-errors
-                setUpload(
-                    error.code === "storage/unauthorized" ? "Wrong permissions to upload" :
-                    error.code === "storage/canceled" ? "Upload canceled" :                    
-                    error.code === "storage/quota-exceeded" ? "Storage limit reached" :
-                    error.code === "storage/unauthenticated" ? "Log in again to upload" :
-                    "Unknown upload error"
-                );
-            }, 
-            () => {
+        media.upload(file, 
+            (progress: number) => setUpload(`${progress}% done`),
+            (error: string) => setUpload(error),
+            (url: string) => {
                 // Upload completed successfully, now we can get the download URL
-                getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
-                    caret?.edit(embed, embed.withURL(downloadURL).withDescription(""));
-                });
+                caret?.edit(embed, embed.withURL(url).withDescription(""));
                 setUpload(undefined);
             }
         );
+    }
+
+    function handleImageSelection(image: Image) {
+        caret?.edit(embed, embed.withURL(image.url).withDescription(image.description));
     }
 
     const positionEditor = 
@@ -81,7 +88,7 @@ const EmbedEditor = (props: {
         <code>
             <URLEditor 
                 url={embed.getURL()} 
-                validator={isValidURL} 
+                validator={isValidURL}
                 edit={(url: string) => caret?.edit(embed, embed.withURL(url))} 
             />
         </code>
@@ -99,7 +106,9 @@ const EmbedEditor = (props: {
                 clip={true}
             />
         </code>
+        <Spacer/>
         <span>{upload}</span>
+        { media === undefined ? null : <ImageChooser images={media.getImages()} select={handleImageSelection} /> }
     </>
 
 }
