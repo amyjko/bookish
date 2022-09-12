@@ -1,11 +1,12 @@
-import { getDownloadURL, listAll, ref, uploadBytesResumable } from "firebase/storage";
+import { deleteObject, getDownloadURL, listAll, ref, StorageReference, uploadBytesResumable } from "firebase/storage";
 import Book from "./Book";
 import { v4 as uuidv4 } from 'uuid';
 import { storage } from "../Firebase";
 
 export type Image = {
     url: string,
-    description: string
+    description: string,
+    ref: StorageReference
 }
 
 export default class BookMedia {
@@ -43,7 +44,7 @@ export default class BookMedia {
             res.items.forEach((itemRef) => {
                 getDownloadURL(itemRef).then((url) => {
                     if(this._images !== undefined)
-                        this._images.push({ url: url, description: "" });
+                        this._images.push({ url: url, description: "", ref: itemRef });
                 })
             });
         }).catch((error) => {
@@ -72,9 +73,20 @@ export default class BookMedia {
                 ), 
             () => getDownloadURL(uploadTask.snapshot.ref).then((url) => {
                 finishedHandler.call(undefined, url);
-                this._images.push({ url: url, description: "" })
+                this._images.push({ url: url, description: "", ref: uploadTask.snapshot.ref })
             })
         );
+    }
+
+    async remove(image: Image) {
+
+        if(storage === undefined) return;
+
+        const imageRef = ref(storage, image.ref.fullPath)
+        return deleteObject(imageRef).then(() => {
+            this._images = this._images.filter(i => i.url !== image.url);
+        });
+
     }
 
 }
