@@ -32,14 +32,14 @@ export default function Home() {
                     <strong>Beauty</strong>.
                     Typography matters. 
                     Print books can be beautiful, but are complex to make and inaccessible.
-                    Many e-book and web-based book platforms are &emdash; less than beautiful.
-                    Bookish strives for typography that focuses on reading, not navigating.
+                    Many e-book and web-based book platforms are … less than beautiful, focusing on navigation over reading.
+                    Bookish tries to prioritizes content over structure.
                 </li>
             </ol>
 
             <p>
                 Bookish is is built and maintained by <a href="http://amyjko.com" target="_blank">Amy J. Ko</a>, a Professor at the <a href="https://www.washington.edu/" target="_blank">University of Washington</a> <a href="https://ischool.uw.edu" target="_blank">Information School</a>.
-                She originally built it to write books to support her teaching, but eventually decided to polish it enough for others to use.
+                She originally built Bookish to write books to support her teaching.
             </p>
 
             <p>
