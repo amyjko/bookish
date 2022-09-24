@@ -1,4 +1,4 @@
-import { deleteObject, getDownloadURL, listAll, ref, StorageReference, uploadBytesResumable } from "firebase/storage";
+import { deleteObject, getDownloadURL, listAll, ref, StorageReference, uploadBytes } from "firebase/storage";
 import Book from "./Book";
 import { v4 as uuidv4 } from 'uuid';
 import { storage } from "../Firebase";
@@ -23,6 +23,7 @@ export default class BookMedia {
 
     }
 
+    /** Get all non-thumbnail images. */
     getImages(): Image[] { return this._images; }
 
     getImagePath() { return `images/${this.book.getRefID()}/`; }
@@ -40,7 +41,6 @@ export default class BookMedia {
         // Find all the prefixes and items.
         listAll(listRef)
         .then((res) => {
-            // We don't have subdirectories of images, but in case we do, here's how to track them.
             res.items.forEach((itemRef) => {
                 getDownloadURL(itemRef).then((url) => {
                     if(this._images !== undefined)
@@ -52,30 +52,53 @@ export default class BookMedia {
             console.error(error);
         });
     }
+
+    getThumbnailURL(url: string, thumbnailRef: StorageReference, error: (message:string) => void, finished: (url: string, thumbnailURL: string) => void, attempt=0) {
+        getDownloadURL(thumbnailRef)
+            .then(thumbnail => finished(url, thumbnail))
+            // Try again in a bit.
+            .catch(() => attempt > 10 ? error("Couldn't upload image") : setTimeout(() => this.getThumbnailURL(url, thumbnailRef, error, finished, attempt + 1), 250));
+    }
     
-    upload(file: File, progressHandler: (progress: number) => void, errorHandler: (message:string) => void, finishedHandler: (url: string) => void) {
+    upload(file: File, progressHandler: (progress: number) => void, errorHandler: (message:string) => void, finishedHandler: (url: string, thumbnailURL: string) => void) {
 
         if(storage === undefined) return;
 
         // The canonical path format for Bookish images in the store is image/{bookid}/{imageid}
         // where {bookid} is the Firestore ID of the book being edited and {imageid} is just a random id.
-        const images = ref(storage, `${this.getImagePath()}/${uuidv4()}`);
-        const uploadTask = uploadBytesResumable(images, file);
-        uploadTask.on("state_changed",
-            (snapshot) => progressHandler.call(undefined, Math.round((snapshot.bytesTransferred / snapshot.totalBytes) * 100)),
-            // https://firebase.google.com/docs/storage/web/handle-errors
-            (error) => errorHandler.call(undefined, 
-                    error.code === "storage/unauthorized" ? "Wrong permissions to upload" :
-                    error.code === "storage/canceled" ? "Upload canceled" :                    
-                    error.code === "storage/quota-exceeded" ? "Storage limit reached" :
-                    error.code === "storage/unauthenticated" ? "Log in again to upload" :
-                    "Unknown upload error"
-                ), 
-            () => getDownloadURL(uploadTask.snapshot.ref).then((url) => {
-                finishedHandler.call(undefined, url);
-                this._images.push({ url: url, description: "", ref: uploadTask.snapshot.ref })
-            })
-        );
+        const imageName = `image-${uuidv4()}`;
+        const imageRef = ref(storage, `${this.getImagePath()}/${imageName}`);
+        const thumbnailRef = ref(storage, `${this.getImagePath()}/thumbnails/${imageName}`);
+
+        uploadBytes(imageRef, file)
+            .then((snapshot) => {
+                getDownloadURL(snapshot.ref)
+                .then(url => {
+                    // Remember the image
+                    this._images.push({ url: url, description: "", ref: snapshot.ref });
+                    // Give some time for the cloud function to create a thumbnail, then try to get it's URL.
+                    setTimeout(() => this.getThumbnailURL(url, thumbnailRef, errorHandler, finishedHandler), 250);
+                })
+                .catch(() => errorHandler("Unable to get image URL."))
+            });
+
+        // This seems to be broken in Firebase right now. Switched above to a no-feedback approach.
+        // const uploadTask = uploadBytesResumable(imageRef, file);
+        // uploadTask.on("state_changed",
+        //     // During upload, notify of progress by sending an integer percent complete.
+        //     (snapshot) => progressHandler(Math.round((snapshot.bytesTransferred / snapshot.totalBytes) * 100)),
+        //     // If there's an error, map it to a message.
+        //     // https://firebase.google.com/docs/storage/web/handle-errors
+        //     (error) => {
+        //         console.error(error);
+        //         errorHandler( 
+        //             error.code === "storage/unauthorized" ? "Wrong permissions to upload" :
+        //             error.code === "storage/canceled" ? "Upload canceled" :                    
+        //             error.code === "storage/quota-exceeded" ? "Storage limit reached" :
+        //             error.code === "storage/unauthenticated" ? "Log in again to upload" :
+        //             "Unknown upload error"
+        //         )
+        //     }, 
     }
 
     async remove(image: Image) {

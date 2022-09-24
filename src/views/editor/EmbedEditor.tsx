@@ -63,9 +63,9 @@ const EmbedEditor = (props: {
         media.upload(file, 
             (progress: number) => setUpload(`${progress}% done`),
             (error: string) => setUpload(error),
-            (url: string) => {
+            (url: string, thumbnail: string) => {
                 // Upload completed successfully, now we can get the download URL
-                caret?.edit(embed, embed.withURL(url).withDescription(""));
+                caret?.edit(embed, embed.withURLs(url, thumbnail).withDescription(""));
                 setUpload(undefined);
             }
         );

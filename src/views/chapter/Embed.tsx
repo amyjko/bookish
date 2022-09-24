@@ -44,10 +44,11 @@ const Embed = (props: { node: EmbedNode }) => {
 		
 				media.upload(file, 
 					(progress: number) => setDragFeedback(`${progress}% done`),
-					(error: string) => setDragFeedback(error),
-					(url: string) => {
+					(error: string) => { setDragFeedback(error); setDragging(false); },
+					(url: string, thumbnails: string) => {
 						// Upload completed successfully, now we can get the download URL
-						caret?.edit(node, node.withURL(url).withDescription(""));
+						caret?.edit(node, node.withURLs(url, thumbnails).withDescription(""));
+						setDragging(false);
 						setDragFeedback(undefined);
 					}
 				);				
@@ -101,7 +102,10 @@ const Embed = (props: { node: EmbedNode }) => {
 				:
 					<img 
 						className={"bookish-figure-image"}
-						src={url.startsWith("http") ? url : "images/" + url} 
+						src={url.startsWith("http") ? url : "images/" + url}
+						// If the image is hosted, included a source set
+						srcSet={node.hasSmallURL() ? `${node.getSmallURL()} 320w, ${url} 1024w` : undefined }
+						sizes={node.hasSmallURL() ? "(min-width: 1024px) 1024px, 320px" : undefined }
 						alt={description}
 					/>
 			}

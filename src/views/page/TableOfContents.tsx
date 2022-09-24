@@ -133,15 +133,13 @@ const TableOfContents = (props: { edition: Edition }) => {
 	function getImage(embed: string | null) {
 
 		// No image? Return null for React to render nothing.
-		if(!embed)
+		if(embed === null)
 			return null;
 
 		let embedNode = Parser.parseEmbed(edition, embed);
-		if(embedNode instanceof EmbedNode) {
-			let image = (embedNode as EmbedNode).toJSON();
-			return <TableOfContentsImage url={image.url} alt={image.alt}/>
-		}
-		else return null;
+		return embedNode instanceof EmbedNode ? 
+			<TableOfContentsImage embed={embedNode} /> :
+			null;
 
 	}
 
@@ -348,13 +346,14 @@ const TableOfContents = (props: { edition: Edition }) => {
 
 }
 
-function TableOfContentsImage(props: { url: string, alt: string}) {
+function TableOfContentsImage(props: { embed: EmbedNode }) {
+
+	const { embed } = props;
 
 	return <img 
 		style={{width: "5em"}} 
-		// Load the small images. Big ones are too slow!
-		src={props.url.startsWith("http") ? props.url : "images/small/" + props.url}
-		alt={props.alt}
+		src={embed.getSmallURL() }
+		alt={props.embed.getDescription() }
 	/>
 
 }

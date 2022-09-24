@@ -59,7 +59,7 @@ export default function Media(props: { edition: Edition }) {
 				embeds.map((embed, index) =>
 					<span className={"bookish-figure-preview"} key={"image" + index}>
 						<img 
-							src={embed.getURL().indexOf("http") === 0 ? embed.getURL() : "images/" + embed.getURL()} 
+							src={embed.getSmallURL()} 
 							alt={embed.getDescription()}
 						/>
 						<div className="bookish-figure-credit">
