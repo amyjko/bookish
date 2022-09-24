@@ -1,7 +1,9 @@
-import React, { useContext } from 'react';
+import React, { useContext, useState } from 'react';
 import { EmbedNode } from "../../models/chapter/EmbedNode";
 import { EditorContext } from '../page/Edition';
 import { renderNode, renderPosition } from './Renderer';
+import { storage } from '../../models/Firebase';
+import { CaretContext, CaretContextType } from '../editor/BookishEditor';
 
 const Embed = (props: { node: EmbedNode }) => {
 
@@ -12,15 +14,77 @@ const Embed = (props: { node: EmbedNode }) => {
 	const credit = node.getCredit();
 	const caption = node.getCaption();
 
-	const { editable } = useContext(EditorContext);
+	const { editable, edition } = useContext(EditorContext);
+    const caret = useContext<CaretContextType>(CaretContext);
+
+	const [ dragging, setDragging ] = useState(false);
+	const [ dragFeedback, setDragFeedback ] = useState<undefined|string>(undefined);
+
+	function handleDrop(event: React.DragEvent<HTMLDivElement>) {
+		event.preventDefault();
+		if(event.dataTransfer?.items) {
+			// Get the files and convert them to file opens, then filter by allowed file extensions
+			const imageFiles = [...event.dataTransfer.items]
+				.filter(item => item.kind === 'file')
+				.map(item => item.getAsFile())
+				.filter(file => file !== null && /.*\.(jpg|jpeg|png)/i.test(file.name));
+			if(imageFiles.length === 0)
+				setDragFeedback("Only JPEG or PNG images are allowed.");
+			else if(imageFiles.length > 1)
+				setDragFeedback("Only one image at a time please!");
+			else {
+				setDragFeedback("Uploading…");
+
+				const file = imageFiles[0];
+				const media = edition?.getBook()?.getMedia();
+
+				if(file === null) return;
+				if(storage === undefined) return;
+				if(media === undefined) return;
+		
+				media.upload(file, 
+					(progress: number) => setDragFeedback(`${progress}% done`),
+					(error: string) => setDragFeedback(error),
+					(url: string) => {
+						// Upload completed successfully, now we can get the download URL
+						caret?.edit(node, node.withURL(url).withDescription(""));
+						setDragFeedback(undefined);
+					}
+				);				
+			}
+
+		}
+	}
+
+	function handleDrag(event: React.DragEvent<HTMLDivElement>) { 
+		event?.preventDefault(); 
+		setDragging(true); 
+		setDragFeedback("Drop to upload…");
+	}
+
+	function handleDragLeave(event: React.DragEvent<HTMLDivElement>) { 
+		if(event.target !== event.currentTarget) return;
+		event?.preventDefault(); 
+		setDragging(false); 
+		setDragFeedback(undefined);
+	}
 
 	return <div className={"bookish-figure " + renderPosition(position)} data-nodeid={props.node.nodeID}>
 			{
-				url.trim().length === 0 ? <div className="bookish-figure-unspecified">{ 
+				url.trim().length === 0 ? 
 					editable ? 
-						<span>Click to choose or upload an image, or specify an image or video URL.</span> : 
-						<span>No image or video specified</span>
-					}</div> :
+						<div 
+							className={`bookish-figure-unspecified ${dragging ? "bookish-figure-dragging" : ""}`}
+							onDrop={handleDrop}
+							onDragOver={handleDrag}
+							onDragLeave={handleDragLeave}
+						>{
+							dragFeedback === undefined ? 
+								"Click or drag to choose or upload an image, or enter an image or video URL." :
+								dragFeedback
+						}</div> : 
+						<div className="bookish-figure-unspecified">No image or video specified</div>
+					:
 				url.includes("https://www.youtube.com") || 
 				url.includes("https://youtu.be") || 
 				url.includes("https://www.tiktok.com") || 

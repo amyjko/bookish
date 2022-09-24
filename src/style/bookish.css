@@ -522,6 +522,10 @@ hr {
 	align-items: center;
 }
 
+.bookish-figure-dragging {
+	background-color: var(--bookish-highlight-color);
+}
+
 .bookish-scroll-reminder {
 	position: fixed;
 	bottom: 4em;
