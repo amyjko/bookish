@@ -33,6 +33,7 @@ export class EmbedNode extends BlockNode {
     getURL() { return this.#url.split(" ")[0]; }
     getSmallURL() { return this.isLocal() ? "images/small/" + this.getURL() : this.hasSmallURL() ? this.#url.split(" ")[1] : this.getURL(); }
     hasSmallURL() { return this.#url.split(" ").length > 1 && this.#url.split(" ")[1].trim().length > 0; }
+    isHosted() { return this.#url.includes("bookish"); }
     isLocal() { return !this.#url.startsWith("http"); }
     getDescription() { return this.#description; }
     getCaption() { return this.#caption; }

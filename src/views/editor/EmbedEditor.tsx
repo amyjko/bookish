@@ -86,11 +86,15 @@ const EmbedEditor = (props: {
         <label className="bookish-file-upload"><input type="file" onChange={handleImageChange} accept=".jpg,.jpeg,.png,.gif,image/jpeg,image/png,image/gif"/>Upload</label>
         <Spacer/>
         <code>
-            <URLEditor 
-                url={embed.getURL()} 
-                validator={isValidURL}
-                edit={(url: string) => caret?.edit(embed, embed.withURL(url))} 
-            />
+            {
+                !embed.isHosted() ? 
+                    <URLEditor 
+                    url={embed.getURL()} 
+                    validator={isValidURL}
+                    edit={(url: string) => caret?.edit(embed, embed.withURL(url))}
+                    /> :
+                null
+            }
         </code>
         <Spacer/>
         <code>
