@@ -1,8 +1,6 @@
 import React, { useContext, useEffect, useState } from 'react';
-
 import Header from "./Header";
 import Outline from './Outline';
-
 import Edition from '../../models/book/Edition';
 import Page from './Page'
 import { renderNode } from '../chapter/Renderer';
@@ -15,16 +13,17 @@ export default function Media(props: { edition: Edition }) {
 	const { editable } = useContext(EditorContext);
 	const [ images, setImages ] = useState<undefined | Image[]>([]);
 
-    // Always start at the top of the page.
-	useEffect(() => {
-		window.scrollTo(0, 0);
-
-		setImages(media?.getImages());
-	}, [])
-
 	const edition = props.edition;
 	const embeds = edition.getMedia();
 	const media = edition.getBook()?.getMedia();
+
+    // Always start at the top of the page.
+	useEffect(() => {
+		window.scrollTo(0, 0);
+		media?.getImages()
+			.then(images => 
+				setImages(images));
+	}, [])
 
 	const unlinkedImages = images?.filter(image => embeds.find(embed => embed.getURL() === image.url) === undefined);
 
@@ -52,8 +51,8 @@ export default function Media(props: { edition: Edition }) {
 
 			{
 				embeds.length === 0 ?
-					<p>There are no images in the book.</p> :
-					<p>These are the images in the book:</p>
+					<p>No images or videos appear in the book.</p> :
+					<p>These are the images and videos in the book:</p>
 			}
 			{
 				embeds.map((embed, index) =>
@@ -86,7 +85,7 @@ export default function Media(props: { edition: Edition }) {
 									src={image.url} 
 									alt={image.description}
 								/>
-								<div className="bookish-figure-credit">uploaded <button onClick={() => media?.remove(image).then(() => setImages(media.getImages()))}>x</button></div>
+								<div className="bookish-figure-credit">uploaded <button onClick={() => media?.remove(image).then(images => setImages(images))}>x</button></div>
 							</span>
 						)
 					}

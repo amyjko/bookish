@@ -1,4 +1,4 @@
-import React, { ChangeEvent, useContext, useState } from 'react';
+import React, { ChangeEvent, useContext, useEffect, useState } from 'react';
 import { Position } from '../../models/chapter/Position';
 import PositionEditor from "./PositionEditor";
 import { EmbedNode } from '../../models/chapter/EmbedNode';
@@ -10,13 +10,21 @@ import { storage } from '../../models/Firebase';
 import { EditorContext } from '../page/Edition';
 import { Image } from '../../models/book/BookMedia';
 
-const ImageChooser = (props: { images: Image[], select: (image: Image) => void}) => {
+const ImageChooser = (props: { select: (image: Image) => void}) => {
+	
+    const { edition } = useContext(EditorContext);
+	const [ images, setImages ] = useState<undefined | Image[]>(undefined);
+
+    // Load the latest images in the book.
+	useEffect(() => {
+		edition?.getBook()?.getMedia().getImages().then(images => setImages(images));
+	}, [])
 
     return <div className="bookish-image-chooser">
         {
-            props.images === undefined ? <span>Loading images</span> :
-            props.images.length === 0 ? <span>No images uplaoded.</span> :
-            props.images.map(image => 
+            images === undefined ? <span>Loading images</span> :
+            images.length === 0 ? <span>No images uplaoded.</span> :
+            images.map(image => 
                 <img 
                     className="bookish-image-chooser-image" 
                     key={image.url}
@@ -112,7 +120,7 @@ const EmbedEditor = (props: {
         </code>
         <Spacer/>
         <span>{upload}</span>
-        { media === undefined ? null : <ImageChooser images={media.getImages()} select={handleImageSelection} /> }
+        { media === undefined ? null : <ImageChooser select={handleImageSelection} /> }
     </>
 
 }

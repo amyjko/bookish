@@ -12,45 +12,58 @@ export type Image = {
 export default class BookMedia {
 
     readonly book: Book;
-    _images: Image[];
+    _images: Image[] | undefined;
 
     constructor(book: Book) {
 
         this.book = book;
-        this._images = [];
-
-        this.cacheImages();
 
     }
 
     /** Get all non-thumbnail images. */
-    getImages(): Image[] { return this._images; }
+    async getImages(): Promise<Image[]> { 
+        
+        return this._images === undefined ? this.cacheImages() : this._images;
+    
+    }
 
     getImagePath() { return `images/${this.book.getRefID()}/`; }
 
     /** Get a listing of all of the images for the book. */
-    cacheImages() {
+    async cacheImages(): Promise<Image[]> {
 
-        if(storage === undefined) return;
-
-        this._images = [];
+        if(storage === undefined) return [];
 
         // Create a reference under which you want to list
         const listRef = ref(storage, this.getImagePath());
 
         // Find all the prefixes and items.
-        listAll(listRef)
-        .then((res) => {
-            res.items.forEach((itemRef) => {
-                getDownloadURL(itemRef).then((url) => {
-                    if(this._images !== undefined)
-                        this._images.push({ url: url, description: "", ref: itemRef });
-                })
-            });
-        }).catch((error) => {
-            console.error("Unable to retrieve book images from Firebase Storage.");
-            console.error(error);
-        });
+        this._images = (await this.retrieveImages()).filter(image => image !== undefined) as Image[];
+
+        return this._images;
+
+    }
+
+    async retrieveImages(): Promise<(Image|undefined)[]> {
+
+        if(storage === undefined) return [];
+
+        // Create a reference under which you want to list
+        const listRef = ref(storage, this.getImagePath());
+
+        // Find all the prefixes and items.
+        return listAll(listRef)
+            .then((res) => Promise.all(res.items.map(
+                itemRef => getDownloadURL(itemRef)
+                    .then((url) => {
+                        const image = { url: url, description: "", ref: itemRef };
+                        if(this._images !== undefined) {
+                            this._images.push(image);
+                        }
+                        return image;
+                    })
+            )))
+        
     }
 
     getThumbnailURL(url: string, thumbnailRef: StorageReference, error: (message:string) => void, finished: (url: string, thumbnailURL: string) => void, attempt=0) {
@@ -74,13 +87,12 @@ export default class BookMedia {
             .then((snapshot) => {
                 getDownloadURL(snapshot.ref)
                 .then(url => {
-                    // Remember the image
-                    this._images.push({ url: url, description: "", ref: snapshot.ref });
                     // Give some time for the cloud function to create a thumbnail, then try to get it's URL.
                     setTimeout(() => this.getThumbnailURL(url, thumbnailRef, errorHandler, finishedHandler), 250);
                 })
                 .catch(() => errorHandler("Unable to get image URL."))
-            });
+            })
+            .then(() => this.getImages());        
 
         // This seems to be broken in Firebase right now. Switched above to a no-feedback approach.
         // const uploadTask = uploadBytesResumable(imageRef, file);
@@ -106,9 +118,12 @@ export default class BookMedia {
         if(storage === undefined) return;
 
         const imageRef = ref(storage, image.ref.fullPath)
-        return deleteObject(imageRef).then(() => {
-            this._images = this._images.filter(i => i.url !== image.url);
-        });
+        await deleteObject(imageRef);
+
+        // Clear the cache;
+        this._images = undefined;
+        
+        return await this.getImages();
 
     }
 
