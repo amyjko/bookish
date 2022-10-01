@@ -92,7 +92,7 @@ const LinkEditor = (props: {
             { options.map((option, index) => <option key={index} value={option.value}>{option.label}</option>) }
         </select>
         <code>
-            <URLEditor key={selectedOption} url={url} validator={getURLError} edit={ url => { saveEdit(url); } } />
+            <URLEditor key={selectedOption} url={url} validator={getURLError} edit={ url => { saveEdit(url); return undefined; }} />
         </code>
     </span>
 

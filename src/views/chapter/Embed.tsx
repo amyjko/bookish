@@ -1,4 +1,4 @@
-import React, { useContext, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { EmbedNode } from "../../models/chapter/EmbedNode";
 import { EditorContext } from '../page/Edition';
 import { renderNode, renderPosition } from './Renderer';
@@ -71,6 +71,9 @@ const Embed = (props: { node: EmbedNode }) => {
 		setDragFeedback(undefined);
 	}
 
+	function handleLoad() {
+		setImageError(false);
+	}
 	function handleError() {
 		setImageError(true);
 	}
@@ -105,20 +108,23 @@ const Embed = (props: { node: EmbedNode }) => {
 						</iframe>
 					</div> 
 				:
-					imageError ?
-						<div className="bookish-figure-unspecified">{ editable ? "Unable to load image. Is the URL correct? Are you offline?" : "Unable to load image" }</div>
-						:
-						<img 
+					<img 
 						className={"bookish-figure-image"}
 						src={url.startsWith("http") ? url : "images/" + url}
 						// If the image is hosted, included a source set
 						srcSet={node.hasSmallURL() ? `${node.getSmallURL()} 320w, ${url} 1024w` : undefined }
 						sizes={node.hasSmallURL() ? "(min-width: 1024px) 1024px, 320px" : undefined }
 						alt={description}
+						onLoad={handleLoad}
 						onError={handleError}
 					/>
 			}
 			<div className="bookish-figure-caption"><div className="bookish-figure-credit">{renderNode(credit)}</div>{renderNode(caption)}</div>
+			{ 
+				imageError ?
+					<div className="bookish-figure-unspecified">{ editable ? "Unable to load image. Is the URL correct? Are you offline?" : "Unable to load image" }</div> :
+					null
+			}
 		</div>
 
 }

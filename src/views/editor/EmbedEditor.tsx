@@ -52,7 +52,7 @@ const ImageChooser = (props: {
                             key={image.url}
                             src={image.url} 
                             alt={""}
-                            onClick={(e) => { props.select.call(undefined, image); e.stopPropagation(); }}
+                            onClick={(e) => { props.select(image); e.stopPropagation(); }}
                         />
                     )
             }
