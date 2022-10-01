@@ -17,6 +17,7 @@
     --bookish-app-chrome-hover-color: #FFFFFF;
     --bookish-app-chrome-muted: #AAAAAA;
     --bookish-app-chrome-font-family: "Verdana";
+    --bookish-app-highlight-width: 3px;
 
     --bookish-app-error-background: rgb(255, 231, 231);
     --bookish-app-error-color: rgb(191, 15, 15);
@@ -637,9 +638,14 @@ input[type=text].bookish-editor-text-invalid {
 .bookish-image-chooser {
     margin-top: var(--bookish-app-chrome-padding);
 }
-.bookish-image-chooser .bookish-image-chooser-image {
+
+.bookish-image-chooser-image {
     display: inline-block;
     height: 3em;
     margin-right: var(--bookish-app-chrome-padding);
     cursor: pointer;
+}
+
+.bookish-image-chooser-image.selected {
+    outline: var(--bookish-app-highlight-width) solid var(--bookish-highlight-color);
 }

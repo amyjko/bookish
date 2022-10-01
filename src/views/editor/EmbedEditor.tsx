@@ -10,7 +10,10 @@ import { storage } from '../../models/Firebase';
 import { EditorContext } from '../page/Edition';
 import { Image } from '../../models/book/BookMedia';
 
-const ImageChooser = (props: { select: (image: Image) => void}) => {
+const ImageChooser = (props: { 
+    select: (image: Image) => void,
+    selection: string
+}) => {
 	
     const { edition } = useContext(EditorContext);
 	const [ images, setImages ] = useState<undefined | Image[]>(undefined);
@@ -23,15 +26,20 @@ const ImageChooser = (props: { select: (image: Image) => void}) => {
     return <div className="bookish-image-chooser">
         {
             images === undefined ? <span>Loading images</span> :
-            images.length === 0 ? <span>No images uplaoded.</span> :
-            images.map(image => 
-                <img 
-                    className="bookish-image-chooser-image" 
-                    key={image.url}
-                    src={image.url} 
-                    alt={image.description} 
-                    onClick={() => props.select.call(undefined, image)}
-                />)
+            images.length === 0 ? <span>No images uploaded.</span> :
+            // Sort the images by their URL. There's probably a more meaningful sort,
+            // such as placing unused images at the front of the list.
+            images
+                .sort((a, b) => a.url.localeCompare(b.url))
+                .map(image => 
+                    <img 
+                        className={`bookish-image-chooser-image ${image.url === props.selection ? "selected" : ""}`}
+                        key={image.url}
+                        src={image.url} 
+                        alt={image.description} 
+                        onClick={() => props.select.call(undefined, image)}
+                    />
+                )
         }
         </div>
 
@@ -120,7 +128,7 @@ const EmbedEditor = (props: {
         </code>
         <Spacer/>
         <span>{upload}</span>
-        { media === undefined ? null : <ImageChooser select={handleImageSelection} /> }
+        { media === undefined ? null : <ImageChooser select={handleImageSelection} selection={embed.getURL()} /> }
     </>
 
 }

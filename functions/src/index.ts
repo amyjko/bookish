@@ -53,7 +53,7 @@ async function resizeImage(filePath: string, bucketID: string, contentType: stri
 export const createThumbnail = functions.storage.object().onFinalize(async (object: ObjectMetadata) => {
 
     if(object.name === undefined) {
-        console.log("Unknown file uplaoded.");
+        console.log("Unknown file uploaded.");
         return;
     }
     if(!object.name.startsWith("images/")) {
