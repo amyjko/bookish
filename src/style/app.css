@@ -637,6 +637,13 @@ input[type=text].bookish-editor-text-invalid {
 
 .bookish-image-chooser {
     margin-top: var(--bookish-app-chrome-padding);
+    height: 3em;
+    overflow-y: hidden;
+}
+
+.bookish-image-chooser.expanded {
+    height: auto;
+    overflow-y: auto;
 }
 
 .bookish-image-chooser-image {

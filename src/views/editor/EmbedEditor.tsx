@@ -17,31 +17,39 @@ const ImageChooser = (props: {
 	
     const { edition } = useContext(EditorContext);
 	const [ images, setImages ] = useState<undefined | Image[]>(undefined);
+    const [ expanded, setExpanded ] = useState<boolean>(false);
 
     // Load the latest images in the book.
 	useEffect(() => {
 		edition?.getBook()?.getMedia().getImages().then(images => setImages(images));
 	}, [])
 
-    return <div className="bookish-image-chooser">
-        {
-            images === undefined ? <span>Loading images</span> :
-            images.length === 0 ? <span>No images uploaded.</span> :
-            // Sort the images by their URL. There's probably a more meaningful sort,
-            // such as placing unused images at the front of the list.
-            images
-                .sort((a, b) => a.url.localeCompare(b.url))
-                .map(image => 
-                    <img 
-                        className={`bookish-image-chooser-image ${image.url === props.selection ? "selected" : ""}`}
-                        key={image.url}
-                        src={image.url} 
-                        alt={image.description} 
-                        onClick={() => props.select.call(undefined, image)}
-                    />
-                )
-        }
+    return <div 
+            className={`bookish-image-chooser ${expanded ? "expanded" : ""}`}
+            onClick={() => setExpanded(!expanded)}
+            onMouseEnter={() => setExpanded(true)}
+            onMouseLeave={() => setExpanded(false)}
+        >
+        <div>
+            {
+                images === undefined ? <span>Loading images</span> :
+                images.length === 0 ? <span>No images uploaded.</span> :
+                // Sort the images by their URL. There's probably a more meaningful sort,
+                // such as placing unused images at the front of the list.
+                images
+                    .sort((a, b) => a.url.localeCompare(b.url))
+                    .map(image => 
+                        <img 
+                            className={`bookish-image-chooser-image ${image.url === props.selection ? "selected" : ""}`}
+                            key={image.url}
+                            src={image.url} 
+                            alt={image.description} 
+                            onClick={(e) => { props.select.call(undefined, image); e.stopPropagation(); }}
+                        />
+                    )
+            }
         </div>
+    </div>
 
 }
 
