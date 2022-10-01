@@ -19,9 +19,17 @@ const ImageChooser = (props: {
 	const [ images, setImages ] = useState<undefined | Image[]>(undefined);
     const [ expanded, setExpanded ] = useState<boolean>(false);
 
-    // Load the latest images in the book.
+    function updateImages(images: Image[]) {
+        setImages(images);
+    }
+
+    // Load the latest images in the book, and keep them updated as they change.
 	useEffect(() => {
-		edition?.getBook()?.getMedia().getImages().then(images => setImages(images));
+        const media = edition?.getBook()?.getMedia();
+        if(media !== undefined)
+    		media.notify(updateImages);
+
+        return () => media?.stopNotifying(updateImages);
 	}, [])
 
     return <div 
@@ -96,7 +104,12 @@ const EmbedEditor = (props: {
     }
 
     function handleImageSelection(image: Image) {
-        caret?.edit(embed, embed.withURL(image.url).withDescription(image.description));
+        // Toggle the embed
+        caret?.edit(embed, 
+            embed.getURL() === image.url ?
+                embed.withURL("").withDescription("") :
+                embed.withURL(image.url).withDescription(image.description)
+        );
     }
 
     const positionEditor = 

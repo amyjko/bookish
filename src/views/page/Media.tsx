@@ -14,18 +14,21 @@ export default function Media(props: { edition: Edition }) {
 	const [ images, setImages ] = useState<undefined | Image[]>([]);
 
 	const edition = props.edition;
-	const embeds = edition.getMedia();
+	const embeds = edition.getEmbeds();
 	const media = edition.getBook()?.getMedia();
+
+	function updateImages(images: Image[]) {
+		setImages(images);
+	}
 
     // Always start at the top of the page.
 	useEffect(() => {
 		window.scrollTo(0, 0);
-		media?.getImages()
-			.then(images => 
-				setImages(images));
+		media?.notify(updateImages);
+		return () => media?.stopNotifying(updateImages);
 	}, [])
 
-	const unlinkedImages = images?.filter(image => embeds.find(embed => embed.getURL() === image.url) === undefined);
+	const unused = images?.filter(image => embeds.find(embed => embed.getURL() === image.url) === undefined);
 
 	return <Page>
 			<Header 
@@ -70,7 +73,7 @@ export default function Media(props: { edition: Edition }) {
 				)
 			}
 			{
-				editable === undefined || unlinkedImages === undefined || unlinkedImages.length === 0 ? null :
+				editable === undefined || unused === undefined || unused.length === 0 ? null :
 				<>
 					<h2>Unused</h2>
 					<Instructions>
@@ -79,7 +82,7 @@ export default function Media(props: { edition: Edition }) {
 						Note, however, that these images may be used in other editions of this book.
 					</Instructions>
 					{
-						unlinkedImages.map((image, index) =>
+						unused.map((image, index) =>
 							<span className={"bookish-figure-preview"} key={"image" + index}>
 								<img 
 									src={image.url} 

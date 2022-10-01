@@ -14,10 +14,23 @@ export default class BookMedia {
     readonly book: Book;
     _images: Image[] | undefined;
 
+    // A list of functions to call when the book media changes.
+    readonly observers: Set<(images: Image[]) => void> = new Set();
+
     constructor(book: Book) {
 
         this.book = book;
 
+    }
+
+    notify(observer: (images: Image[]) => void) {
+        this.observers.add(observer);
+        // Notify it right away!
+        this.getImages().then(images => observer(images));
+    }
+
+    stopNotifying(observer: (images: Image[]) => void) {
+        this.observers.delete(observer);
     }
 
     /** Get all non-thumbnail images. */
@@ -34,11 +47,12 @@ export default class BookMedia {
 
         if(storage === undefined) return [];
 
-        // Create a reference under which you want to list
-        const listRef = ref(storage, this.getImagePath());
-
         // Find all the prefixes and items.
         this._images = (await this.retrieveImages()).filter(image => image !== undefined) as Image[];
+
+        // Notify observers
+        for(const observer of this.observers)
+            observer(this._images.slice());
 
         return this._images;
 
@@ -92,7 +106,7 @@ export default class BookMedia {
                 })
                 .catch(() => errorHandler("Unable to get image URL."))
             })
-            .then(() => this.getImages());        
+            .then(() => this.cacheImages());
 
         // This seems to be broken in Firebase right now. Switched above to a no-feedback approach.
         // const uploadTask = uploadBytesResumable(imageRef, file);
@@ -119,11 +133,8 @@ export default class BookMedia {
 
         const imageRef = ref(storage, image.ref.fullPath)
         await deleteObject(imageRef);
-
-        // Clear the cache;
-        this._images = undefined;
         
-        return await this.getImages();
+        return await this.cacheImages();
 
     }
 

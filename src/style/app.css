@@ -655,4 +655,5 @@ input[type=text].bookish-editor-text-invalid {
 
 .bookish-image-chooser-image.selected {
     outline: var(--bookish-app-highlight-width) solid var(--bookish-highlight-color);
+    outline-offset: calc(-1 * var(--bookish-app-highlight-width));
 }
