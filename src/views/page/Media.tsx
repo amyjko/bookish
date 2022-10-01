@@ -7,6 +7,25 @@ import { renderNode } from '../chapter/Renderer';
 import Instructions from './Instructions';
 import { EditorContext } from './Edition';
 import { Image } from '../../models/book/BookMedia';
+import { FormatNode } from '../../models/chapter/FormatNode';
+
+const MediaPreview = (props: { 
+	url: string,
+	alt: string,
+	credit: React.ReactNode
+}) => {
+
+	const { url, alt, credit } = props;
+
+	return <span className={"bookish-figure-preview"}>
+		<img 
+			src={url} 
+			alt={alt}
+		/>
+		<div className="bookish-figure-credit">{credit}</div>
+	</span>
+
+}
 
 export default function Media(props: { edition: Edition }) {
 
@@ -59,17 +78,12 @@ export default function Media(props: { edition: Edition }) {
 			}
 			{
 				embeds.map((embed, index) =>
-					<span className={"bookish-figure-preview"} key={"image" + index}>
-						<img 
-							src={embed.getSmallURL()} 
-							alt={embed.getDescription()}
-						/>
-						<div className="bookish-figure-credit">
-							{renderNode(embed.getCredit())}
-							{ editable ? (images && images.find(i => i.url === embed.getURL() === undefined) ? "linked" : "uploaded") : null }
-						</div>
-						
-					</span>
+					<MediaPreview 
+						key={"image" + index}
+						url={embed.getSmallURL()} 
+						alt={embed.getDescription()} 
+						credit={ <span>{editable ? (images && images.find(i => i.url === embed.getURL()) === undefined) ? "linked" : "uploaded" : null }{embed.getCredit().isEmptyText() ? null : " • "}{renderNode(embed.getCredit())}</span>}
+					/>
 				)
 			}
 			{
@@ -83,13 +97,12 @@ export default function Media(props: { edition: Edition }) {
 					</Instructions>
 					{
 						unused.map((image, index) =>
-							<span className={"bookish-figure-preview"} key={"image" + index}>
-								<img 
-									src={image.url} 
-									alt={image.description}
-								/>
-								<div className="bookish-figure-credit">uploaded <button onClick={() => media?.remove(image).then(images => setImages(images))}>x</button></div>
-							</span>
+							<MediaPreview
+								key={"image" + index}
+								url={image.url}
+								alt={""}
+								credit={<span>uploaded <button onClick={() => media?.remove(image).then(images => setImages(images))}>x</button></span>}
+							/>
 						)
 					}
 				</>

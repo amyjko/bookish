@@ -51,7 +51,7 @@ const ImageChooser = (props: {
                             className={`bookish-image-chooser-image ${image.url === props.selection ? "selected" : ""}`}
                             key={image.url}
                             src={image.url} 
-                            alt={image.description} 
+                            alt={""}
                             onClick={(e) => { props.select.call(undefined, image); e.stopPropagation(); }}
                         />
                     )
@@ -108,7 +108,7 @@ const EmbedEditor = (props: {
         caret?.edit(embed, 
             embed.getURL() === image.url ?
                 embed.withURL("").withDescription("") :
-                embed.withURL(image.url).withDescription(image.description)
+                embed.withURL(image.url)
         );
     }
 

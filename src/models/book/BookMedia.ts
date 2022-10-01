@@ -5,7 +5,6 @@ import { storage } from "../Firebase";
 
 export type Image = {
     url: string,
-    description: string,
     ref: StorageReference
 }
 
