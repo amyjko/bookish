@@ -42,6 +42,7 @@ export default class Edition {
 	static MediaID = "media";
     static IndexID = "index";
 	static GlossaryID = "glossary";
+    static UnknownID = "unknown";
 
     readonly specification: EditionSpecification;
     readonly book: Book | undefined;

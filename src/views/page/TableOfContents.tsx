@@ -268,7 +268,7 @@ const TableOfContents = (props: { edition: Edition }) => {
 						edition.hasReferences() || editable ? 
 							<TableOfContentsRow
 								image={getImage(edition.getImage(Edition.ReferencesID))}
-								chapterID="references"
+								chapterID={Edition.ReferencesID}
 								title="References"
 								annotation="Everything cited"
 							/> 
@@ -278,7 +278,7 @@ const TableOfContents = (props: { edition: Edition }) => {
 						edition.getGlossary() && Object.keys(edition.getGlossary()).length > 0 || editable ?
 							<TableOfContentsRow
 								image={getImage(edition.getImage(Edition.GlossaryID))}
-								chapterID="glossary"
+								chapterID={Edition.GlossaryID}
 								title="Glossary"
 								annotation="Definitions"
 							/> 
@@ -286,19 +286,19 @@ const TableOfContents = (props: { edition: Edition }) => {
 					}
 					<TableOfContentsRow
 						image={getImage(edition.getImage(Edition.IndexID))}
-						chapterID="index"
+						chapterID={Edition.IndexID}
 						title="Index"
 						annotation="Common words and where they are"
 					/>
 					<TableOfContentsRow
 						image={getImage(edition.getImage(Edition.SearchID))}
-						chapterID="search"
+						chapterID={Edition.SearchID}
 						title="Search"
 						annotation="Find where words occur"
 					/>
 					<TableOfContentsRow
 						image={getImage(edition.getImage(Edition.MediaID))}
-						chapterID="media"
+						chapterID={Edition.MediaID}
 						title="Media"
 						annotation="Images and video in the book"
 					/>
@@ -309,6 +309,15 @@ const TableOfContents = (props: { edition: Edition }) => {
 							chapterID="theme"
 							title="Theme"
 							annotation="Style the book"
+						/> : null
+					}
+					{
+						editable ?
+							<TableOfContentsRow
+							image={getImage(edition.getImage(Edition.UnknownID))}
+							chapterID="unknown"
+							title="Unknown"
+							annotation="Customize bad links."
 						/> : null
 					}
 				</tbody>
