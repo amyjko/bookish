@@ -106,7 +106,7 @@ const Embed = (props: { node: EmbedNode }) => {
 					</div> 
 				:
 					imageError ?
-						<div className="bookish-figure-unspecified">Unable to load image. Is the URL correct? Are you offline?</div>
+						<div className="bookish-figure-unspecified">{ editable ? "Unable to load image. Is the URL correct? Are you offline?" : "Unable to load image" }</div>
 						:
 						<img 
 						className={"bookish-figure-image"}
