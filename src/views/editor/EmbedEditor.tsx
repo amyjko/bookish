@@ -128,7 +128,12 @@ const EmbedEditor = (props: {
                     <URLEditor 
                     url={embed.getURL()} 
                     validator={isValidURL}
-                    edit={(url: string) => caret?.edit(embed, embed.withURL(url))}
+                    edit={(url: string) => {
+                        const revisedEmbed = embed.withURL(url);
+                        const revisedURL = revisedEmbed.getURL();
+                        caret?.edit(embed, revisedEmbed);
+                        return revisedURL;
+                    }}
                     /> :
                 null
             }

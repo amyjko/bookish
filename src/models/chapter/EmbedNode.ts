@@ -80,7 +80,15 @@ export class EmbedNode extends BlockNode {
             undefined;    
     }
 
-    withURL(url: string) { return new EmbedNode(url, this.#description, this.#caption, this.#credit, this.#position); }
+    withURL(url: string) { 
+    
+        // If the URL is a YouTube URL, convert to an embed URL, since a raw YouTube URL is never valid for embedding.
+        if(url.includes("www.youtube.com/watch?v="))
+            url = url.replace('/watch?v=', '/embed/')
+    
+        return new EmbedNode(url, this.#description, this.#caption, this.#credit, this.#position); 
+    
+    }
     withURLs(url: string, thumbnail: string) { return new EmbedNode(url + " " + thumbnail, this.#description, this.#caption, this.#credit, this.#position); }
     withDescription(description: string) { return new EmbedNode(this.#url, description, this.#caption, this.#credit, this.#position); }
     withCaption(caption: FormatNode) { return new EmbedNode(this.#url, this.#description, caption, this.#credit, this.#position); }
