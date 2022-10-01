@@ -37,7 +37,7 @@ export default function Login() {
 
 		<h1>Login to write</h1>
 
-		<p>We'll send you an email to login, no password required.</p>
+		<p>We'll send you an email each time to login, no password required.</p>
 
 		<form onSubmit={handleSubmit}>
 			<input autoComplete="username" type="email" placeholder="email" ref={emailRef} required disabled={loading || emailRef.current?.value.length === 0} /> <button type="submit" disabled={loading}>Login</button>

@@ -17,6 +17,7 @@
     --bookish-app-chrome-hover-color: #FFFFFF;
     --bookish-app-chrome-muted: #AAAAAA;
     --bookish-app-chrome-font-family: "Verdana";
+    --bookish-app-highlight-width: 3px;
 
     --bookish-app-error-background: rgb(255, 231, 231);
     --bookish-app-error-color: rgb(191, 15, 15);
@@ -165,7 +166,7 @@ textarea {
     border-bottom: var(--bookish-app-chrome-border-width) solid var(--bookish-app-chrome-border-color);
 }
 
-button {
+button, .bookish-file-upload {
     background-color: var(--bookish-app-chrome-background);
     padding: var(--bookish-app-chrome-padding);
     border-top-right-radius: var(--bookish-app-chrome-roundedness);
@@ -175,13 +176,13 @@ button {
     border: none;
 }
 
-button:hover:enabled {
+button:hover:enabled, .bookish-file-upload:hover {
     background-color: var(--bookish-app-chrome-hover-background);
     color: var(--bookish-app-chrome-hover-color);
     cursor: pointer;
 }
 
-button:disabled {
+button:disabled, .bookish-file-upload input:disabled {
     opacity: 0.3;
     border-color: var(--bookish-app-chrome-muted);
     cursor: auto;
@@ -257,20 +258,29 @@ input:focus, button:focus, select:focus, textarea:focus {
     box-shadow: none !important;
 }
 
+.bookish-file-upload {
+
+	font-family: var(--bookish-app-chrome-font);
+	font-size: var(--bookish-app-chrome-font-size);
+}
+
+.bookish-file-upload input[type="file"] {
+    display: none;
+}
+
 input[type="text"].bookish-text-editor-error {
     outline-color: var(--bookish-app-error-color);
 }
 
 .bookish-text-editor .bookish-text-editor-error {
     position: absolute;
-    left: calc(100% + 0.5em);
-    top: 0.15rem;
+    left: 0;
+    top: 100%;
     width: max-content;
     z-index: 3;
     line-height: 1em;
-    margin-top: -0.5em;
+    margin-left: -0.5em;
     padding: 0.5em 0.5em;
-    backdrop-filter: blur(5px) opacity(50%);
 }
 
 .bookish-editor-placeholder {
@@ -623,4 +633,27 @@ input[type=text].bookish-editor-text-invalid {
 .bookish-editor hr {
     margin-top: 1em;
     margin-bottom: 1em;   
+}
+
+.bookish-image-chooser {
+    margin-top: var(--bookish-app-chrome-padding);
+    height: 3em;
+    overflow-y: hidden;
+}
+
+.bookish-image-chooser.expanded {
+    height: auto;
+    overflow-y: auto;
+}
+
+.bookish-image-chooser-image {
+    display: inline-block;
+    height: 3em;
+    margin-right: var(--bookish-app-chrome-padding);
+    cursor: pointer;
+}
+
+.bookish-image-chooser-image.selected {
+    outline: var(--bookish-app-highlight-width) solid var(--bookish-highlight-color);
+    outline-offset: calc(-1 * var(--bookish-app-highlight-width));
 }

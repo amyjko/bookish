@@ -42,6 +42,7 @@ export default class Edition {
 	static MediaID = "media";
     static IndexID = "index";
 	static GlossaryID = "glossary";
+    static UnknownID = "unknown";
 
     readonly specification: EditionSpecification;
     readonly book: Book | undefined;
@@ -520,37 +521,30 @@ export default class Edition {
 	}
 
     // Get all of the embeds in the book
-    getMedia(): EmbedNode[] {
+    getEmbeds(): EmbedNode[] {
 
-        let media: EmbedNode[] = [];
-        let urls = new Set(); // This just prevents duplicates.
+        let embeds: EmbedNode[] = [];
 
         // Add the book cover
-        const cover = this.getImage("cover")
+        const cover = this.getImage("cover");
         if(cover) {
             let coverNode = Parser.parseEmbed(this, cover);
             if(coverNode instanceof EmbedNode)
-                media.push(coverNode);
+                embeds.push(coverNode);
         }
 
         // Add the cover and images from each chapter.
 		this.getChapters().forEach(c => {
 
-            const image = c.getImage()
+            const image = c.getImage();
             let cover = image === null ? undefined : Parser.parseEmbed(this, image);
-            if(cover && cover instanceof EmbedNode && !urls.has(cover.getURL())) {
-                media.push(cover);
-                urls.add(cover.getURL());
-            }
+            if(cover && cover instanceof EmbedNode)
+                embeds.push(cover);
 
-            let embeds = c?.getAST()?.getEmbeds();
-            if(embeds)
-                embeds.forEach((embed: EmbedNode) => {
-                    if(!urls.has(embed.getURL())) {
-                        media.push(embed);
-                        urls.add(embed.getURL());
-                    }
-                })
+            // Get the chapter body's embeds
+            let bodyEmbeds = c?.getAST()?.getEmbeds();
+            if(bodyEmbeds)
+                bodyEmbeds.forEach((embed: EmbedNode) => embeds.push(embed))
 
         });
 
@@ -560,14 +554,12 @@ export default class Edition {
             const img = this.getImage(id)
             if(img) {
                 let image = Parser.parseEmbed(this, img);
-                if(image instanceof EmbedNode && !urls.has(image.getURL())) {
-                    media.push(image);
-                    urls.add(image.getURL());
-                }    
+                if(image instanceof EmbedNode) 
+                    embeds.push(image);
             }
         });
 
-        return media;
+        return embeds;
 
     }
 
