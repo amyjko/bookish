@@ -13,6 +13,7 @@ import ConfirmButton from '../editor/ConfirmButton'
 import TextEditor from '../editor/TextEditor'
 import BookishEditor from '../editor/BookishEditor'
 import { FormatNode } from '../../models/chapter/FormatNode'
+import Format from '../chapter/Format'
 
 const Definition = (props: { id: string, definition: Definition }) => {
 
@@ -74,8 +75,8 @@ const Definition = (props: { id: string, definition: Definition }) => {
 				synonyms: definition.synonyms
 			})}
 			chapter={false}
-			placeholder="How would you define this?"
 			autofocus={false}
+			render={ node => <Format node={node} placeholder="How would you define this?"/>}
 		/> :
 		definition.definition === "" ? 
 			<em>Definition</em> : 

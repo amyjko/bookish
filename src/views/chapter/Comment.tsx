@@ -1,4 +1,4 @@
-import React, { ChangeEvent, useContext, useEffect, useRef, useState } from 'react'
+import React, { useContext, useEffect } from 'react'
 import { CommentNode } from '../../models/chapter/CommentNode'
 import Atom from '../editor/Atom';
 import { EditorContext } from '../page/Edition';
@@ -6,8 +6,8 @@ import { ChapterContext } from './Chapter';
 import Marginal from './Marginal';
 
 import CommentIcon from "../svg/comment.svg";
-import { renderNode } from './Renderer';
 import { CaretContext } from '../editor/BookishEditor';
+import Format from './Format';
 
 const Comment = (props: { node: CommentNode }) => {
 
@@ -34,7 +34,7 @@ const Comment = (props: { node: CommentNode }) => {
             <Marginal 
                 id={"comment-" + (chapterNode === undefined ? "?" : chapterNode.getComments().indexOf(comment))}
                 interactor={<span className="bookish-comment-symbol"><CommentIcon/></span>}
-                content={<span className={`bookish-app-comment ${focused ? "bookish-app-comment-focused" : ""}`}>{renderNode(comment.getMeta())}</span>}
+                content={<span className={`bookish-app-comment ${focused ? "bookish-app-comment-focused" : ""}`}><Format node={comment.getMeta()} placeholder="comment"/></span>}
             />
             :
             <></>

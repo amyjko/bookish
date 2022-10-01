@@ -2,6 +2,7 @@ import React, { useContext } from "react"
 import Edition from "../../models/book/Edition"
 import { FormatNode } from "../../models/chapter/FormatNode"
 import Parser from "../../models/chapter/Parser"
+import Format from "../chapter/Format"
 import { renderNode } from "../chapter/Renderer"
 import BookishEditor from "../editor/BookishEditor"
 import { EditorContext } from "./Edition"
@@ -28,8 +29,8 @@ const License = (props: { book: Edition }) => {
 					ast={formatNode} 
 					save={(node: FormatNode) => book.setLicense(node.toBookdown())}
 					chapter={false}
-					placeholder="All rights reserved."
 					autofocus={false}
+					render={ node => <Format node={node} placeholder="In the U.S., all rights reserved by default."/>}
 				/>
 			</>
 			:

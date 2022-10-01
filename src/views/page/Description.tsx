@@ -3,6 +3,7 @@ import Edition from "../../models/book/Edition"
 import { ChapterNode } from "../../models/chapter/ChapterNode"
 import { FormatNode } from "../../models/chapter/FormatNode"
 import Parser from "../../models/chapter/Parser"
+import ChapterBody from "../chapter/ChapterBody"
 import { renderNode } from "../chapter/Renderer"
 import BookishEditor from "../editor/BookishEditor"
 import { EditorContext } from "./Edition"
@@ -19,10 +20,10 @@ const Description = (props: { book: Edition }) => {
 			editable ? 
 				<BookishEditor 
 					ast={descriptionNode} 
-					save={(node: ChapterNode | FormatNode) => book.setDescription(node.toBookdown())}
+					save={node => book.setDescription(node.toBookdown())}
 					chapter={false}
-					placeholder="What this book about?"
 					autofocus={false}
+					render={ node => <ChapterBody node={node} placeholder="What this book about?"/> }
 				/>
 				:
 				renderNode(descriptionNode)

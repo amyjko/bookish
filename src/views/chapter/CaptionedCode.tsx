@@ -5,15 +5,14 @@ import Python from './Python'
 import { CodeNode } from "../../models/chapter/CodeNode"
 import { EditorContext } from '../page/Edition'
 import { CaretContext } from '../editor/BookishEditor'
+import Format from './Format'
 
 const CaptionedCode = (props: { node: CodeNode}) => {
 
     const { node } = props;
     
     const caption = node.getCaption();
-    const position = node.getPosition();
     const language = node.getLanguage();
-    const executable = node.isExecutable();
 
     const { editable } = useContext(EditorContext);
     const caret = useContext(CaretContext);
@@ -41,7 +40,7 @@ const CaptionedCode = (props: { node: CodeNode}) => {
         }
         {
             caption ? 
-                <div className="bookish-figure-caption">{renderNode(caption)}</div>
+                <div className="bookish-figure-caption"><Format node={caption} placeholder="caption"/></div>
                 : 
                 null
         }

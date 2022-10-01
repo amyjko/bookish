@@ -2,6 +2,7 @@ import React, { useContext } from "react"
 import Edition from "../../models/book/Edition"
 import Parser from "../../models/chapter/Parser"
 import { addDraftInFirestore, publishDraftInFirestore } from "../../models/Firestore"
+import Format from "../chapter/Format"
 import { renderNode } from "../chapter/Renderer"
 import BookishEditor from "../editor/BookishEditor"
 import Switch from "../editor/Switch"
@@ -99,8 +100,8 @@ export const Revisions = (props: { edition: Edition }) => {
 													ast={Parser.parseFormat(undefined, revision.summary).withTextIfEmpty()}
 													save={ newSummary => book.setEditionChangeSummary(newSummary.toBookdown(), index) } 
 													chapter={false}
-													placeholder={"Summarize this edition's changes."} 
 													autofocus={false}
+													render={ node => <Format node={node} placeholder="Summarize this edition's changes."/>}
 												/> : 
 											revision.summary === "" ? 
 												<em>No summary of changes</em> : 

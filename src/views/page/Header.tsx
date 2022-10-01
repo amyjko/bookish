@@ -3,6 +3,7 @@ import Edition from '../../models/book/Edition';
 import { EmbedNode } from '../../models/chapter/EmbedNode';
 
 import Parser from "../../models/chapter/Parser";
+import Embed from '../chapter/Embed';
 import { renderNode } from '../chapter/Renderer'
 import BookishEditor from '../editor/BookishEditor';
 import TextEditor from '../editor/TextEditor';
@@ -73,10 +74,10 @@ const Header = (props: HeaderProps) => {
 							book && editable && embedNode instanceof EmbedNode ?
 								<BookishEditor 
 									ast={embedNode} 
-									save={(node: EmbedNode) => props.setImage(node.toBookdown())}
+									save={node => props.setImage(node.toBookdown())}
 									chapter={false}
-									placeholder=""
 									autofocus={false}
+									render={ node => <Embed node={node} />}
 								/> :
 								renderNode(embedNode)
 						}

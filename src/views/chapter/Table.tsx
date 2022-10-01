@@ -1,5 +1,6 @@
 import React from 'react'
 import { TableNode } from "../../models/chapter/TableNode"
+import Format from './Format'
 
 import { renderNode, renderPosition } from './Renderer'
 
@@ -29,9 +30,9 @@ const Table = (props: { node: TableNode}) => {
                 </tbody>
             </table>
         </div>
-        { caption === undefined ? null : <div className="bookish-figure-caption">{renderNode(caption)}</div> }
+        { caption === undefined ? null : <div className="bookish-figure-caption"><Format node={caption} placeholder="caption"/></div> }
     </div>
 
 }
 
-export default Table
+export default Table;

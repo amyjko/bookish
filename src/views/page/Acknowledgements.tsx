@@ -2,6 +2,7 @@ import React, { useContext } from "react"
 import Edition from "../../models/book/Edition"
 import { ChapterNode } from "../../models/chapter/ChapterNode"
 import Parser from "../../models/chapter/Parser"
+import ChapterBody from "../chapter/ChapterBody"
 import { renderNode } from "../chapter/Renderer"
 import BookishEditor from "../editor/BookishEditor"
 import { EditorContext } from "./Edition"
@@ -30,8 +31,8 @@ const Acknowledgements = (props: { book: Edition }) => {
 						ast={acksNode} 
 						save={(node: ChapterNode) => book.setAcknowledgements(node.toBookdown())}
 						chapter={false}
-						placeholder="Who would you like to thank?"
 						autofocus={false}
+						render={node => <ChapterBody node={node} placeholder="Who would you like to thank?"/>}
 					/>
 				</>
 				:

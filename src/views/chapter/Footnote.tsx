@@ -1,10 +1,10 @@
 import React, { useContext, useEffect } from 'react'
 import { ChapterContext } from './Chapter'
 import Marginal  from './Marginal'
-import { renderNode } from './Renderer'
 import { FootnoteNode } from "../../models/chapter/FootnoteNode"
 import Atom from '../editor/Atom'
 import { CaretContext } from '../editor/BookishEditor'
+import Format from './Format'
 
 const Footnote = (props: { node: FootnoteNode }) => {
 
@@ -45,7 +45,7 @@ const Footnote = (props: { node: FootnoteNode }) => {
                 <Marginal 
                     id={"footnote-" + number}
                     interactor={<sup className="bookish-footnote-symbol">{letter}</sup>}
-                    content={<span className={`bookish-footnote ${focused ? "bookish-footnote-focused" : ""}`} onMouseDown={handleMouseDown}><sup className="bookish-footnote-symbol">{letter}</sup> {renderNode(content)}</span>} 
+                    content={<span className={`bookish-footnote ${focused ? "bookish-footnote-focused" : ""}`} onMouseDown={handleMouseDown}><sup className="bookish-footnote-symbol">{letter}</sup><Format node={content} placeholder="footnote"/></span>} 
                 />
             </span>
         }

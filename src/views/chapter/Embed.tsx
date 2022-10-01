@@ -4,6 +4,7 @@ import { EditorContext } from '../page/Edition';
 import { renderNode, renderPosition } from './Renderer';
 import { storage } from '../../models/Firebase';
 import { CaretContext, CaretContextType } from '../editor/BookishEditor';
+import Format from './Format';
 
 const Embed = (props: { node: EmbedNode }) => {
 
@@ -119,7 +120,7 @@ const Embed = (props: { node: EmbedNode }) => {
 						onError={handleError}
 					/>
 			}
-			<div className="bookish-figure-caption"><div className="bookish-figure-credit">{renderNode(credit)}</div>{renderNode(caption)}</div>
+			<div className="bookish-figure-caption"><div className="bookish-figure-credit">{<Format node={credit} placeholder="credit" />}</div>{<Format node={caption} placeholder="caption" />}</div>
 			{ 
 				imageError ?
 					<div className="bookish-figure-unspecified">{ editable ? "Unable to load image. Is the URL correct? Are you offline?" : "Unable to load image" }</div> :

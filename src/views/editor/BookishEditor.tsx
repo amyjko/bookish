@@ -23,7 +23,6 @@ import { CodeNode } from "../../models/chapter/CodeNode";
 import { BlockNode } from "../../models/chapter/BlockNode";
 import { EmbedNode } from "../../models/chapter/EmbedNode";
 import { ErrorNode } from "../../models/chapter/ErrorNode";
-import Placeholder from "./Placeholder";
 
 export type CaretContextType = { 
     range: CaretRange | undefined, 
@@ -33,7 +32,7 @@ export type CaretContextType = {
     context: CaretState | undefined,
     edit: (previous: BookishNode, edited: BookishNode) => void,
     root: RootNode,
-    focused: boolean,
+    focused: boolean
 } | undefined;
 
 export const CaretContext = React.createContext<CaretContextType>(undefined);
@@ -86,8 +85,8 @@ const BookishEditor = <RootType extends RootNode>(props: {
     ast: RootType,
     save: (node: RootType) => Promise<void> | undefined,
     chapter: boolean,
-    placeholder: string,
-    autofocus: boolean
+    autofocus: boolean,
+    render: (node: RootType) => React.ReactNode
 }) => {
 
     const editorRef = useRef<HTMLDivElement>(null);
@@ -793,10 +792,7 @@ const BookishEditor = <RootType extends RootNode>(props: {
                             }}>
                         </div> : null
                 }
-                { renderNode(editedNode) }
-                { (editedNode.isEmpty() || (editedNode instanceof FormatNode && editedNode.isEmptyText())) ? 
-                    <Placeholder text={props.placeholder} node={editedNode.getTextNodes()[0]}  /> : 
-                    null }
+                { props.render(editedNode) }
             </div>
         </CaretContext.Provider>
     ;

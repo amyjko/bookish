@@ -19,6 +19,7 @@ import TextEditor from '../editor/TextEditor';
 import BookishEditor from '../editor/BookishEditor';
 import Toggle from '../editor/Toggle';
 import Instructions from '../page/Instructions';
+import ChapterBody from './ChapterBody';
 
 export type ChapterContextType = {
 	book?: Edition, 
@@ -334,9 +335,10 @@ const Chapter = (props: { chapter: ChapterModel, book: Edition, print?: boolean 
 									ast={chapterAST}
 									save={ (node: ChapterNode) => chapter.setAST(node) }
 									chapter={true}
-									placeholder="Ready to start this chapter?"
 									autofocus
-								/> : 
+									render={node => <ChapterBody node={node} placeholder="Type here"/>}
+								/> 
+								: 
 								renderNode(chapterAST)
 						) :
 						<span>Loading...</span>
@@ -538,4 +540,4 @@ function layoutMarginals() {
 	
 }
 
-export default Chapter
+export default Chapter;

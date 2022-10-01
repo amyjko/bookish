@@ -283,13 +283,6 @@ input[type="text"].bookish-text-editor-error {
     padding: 0.5em 0.5em;
 }
 
-.bookish-editor-placeholder {
-    color: var(--bookish-muted-color);
-    font-style: italic;
-    /* Rather than making the editor relative positioned, just translate late it up to the first line */
-    margin-top: calc(-1 * var(--bookish-paragraph-line-height));
-}
-
 .bookish-editor-error, .bookish-text-editor-error {
     font-family: var(--bookish-app-chrome-font-family);
     font-size: var(--bookish-small-font-size);
@@ -656,4 +649,9 @@ input[type=text].bookish-editor-text-invalid {
 .bookish-image-chooser-image.selected {
     outline: var(--bookish-app-highlight-width) solid var(--bookish-highlight-color);
     outline-offset: calc(-1 * var(--bookish-app-highlight-width));
+}
+
+.bookish-editor-placeholder {
+    color: var(--bookish-app-chrome-muted);
+    font-style: italic;
 }
