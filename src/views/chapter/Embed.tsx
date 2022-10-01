@@ -19,6 +19,7 @@ const Embed = (props: { node: EmbedNode }) => {
 
 	const [ dragging, setDragging ] = useState(false);
 	const [ dragFeedback, setDragFeedback ] = useState<undefined|string>(undefined);
+	const [ imageError, setImageError ] = useState<boolean>(false);
 
 	function handleDrop(event: React.DragEvent<HTMLDivElement>) {
 		event.preventDefault();
@@ -70,6 +71,10 @@ const Embed = (props: { node: EmbedNode }) => {
 		setDragFeedback(undefined);
 	}
 
+	function handleError() {
+		setImageError(true);
+	}
+
 	return <div className={"bookish-figure " + renderPosition(position)} data-nodeid={props.node.nodeID}>
 			{
 				url.trim().length === 0 ? 
@@ -100,13 +105,17 @@ const Embed = (props: { node: EmbedNode }) => {
 						</iframe>
 					</div> 
 				:
-					<img 
+					imageError ?
+						<div className="bookish-figure-unspecified">Unable to load image. Is the URL correct? Are you offline?</div>
+						:
+						<img 
 						className={"bookish-figure-image"}
 						src={url.startsWith("http") ? url : "images/" + url}
 						// If the image is hosted, included a source set
 						srcSet={node.hasSmallURL() ? `${node.getSmallURL()} 320w, ${url} 1024w` : undefined }
 						sizes={node.hasSmallURL() ? "(min-width: 1024px) 1024px, 320px" : undefined }
 						alt={description}
+						onError={handleError}
 					/>
 			}
 			<div className="bookish-figure-caption"><div className="bookish-figure-credit">{renderNode(credit)}</div>{renderNode(caption)}</div>
