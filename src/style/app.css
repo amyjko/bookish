@@ -599,7 +599,7 @@ input[type=text].bookish-editor-text-invalid {
     line-height: 1.2;
     padding: var(--bookish-app-margin);
     border: 2px solid var(--bookish-app-chrome-border-color);
-    border-radius: 5px;
+    border-radius: var(--bookish-roundedness);
 }
 
 .bookish-instructions p, .bookish-instructions li {
