@@ -3,10 +3,9 @@ import Edition from "../../models/book/Edition"
 import Parser from "../../models/chapter/Parser"
 import { addDraftInFirestore, publishDraftInFirestore } from "../../models/Firestore"
 import Format from "../chapter/Format"
-import { renderNode } from "../chapter/Renderer"
 import BookishEditor from "../editor/BookishEditor"
 import Switch from "../editor/Switch"
-import { EditorContext } from "./Edition"
+import { EditorContext } from "./EditorContext"
 import Instructions from "./Instructions"
 
 export const Revisions = (props: { edition: Edition }) => {
@@ -44,7 +43,7 @@ export const Revisions = (props: { edition: Edition }) => {
 					<ul>
 						{
 							editionRevisions.map((revision, index) =>
-								<li key={"revision" + index}><em>{revision[0]}</em>. { renderNode(Parser.parseFormat(edition, revision[1])) }</li>
+								<li key={"revision" + index}><em>{revision[0]}</em>. <Format node={Parser.parseFormat(edition, revision[1])} /></li>
 							)
 						}						
 					</ul>

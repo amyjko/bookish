@@ -9,22 +9,19 @@ import Index from "./Index";
 import Search from "./Search";
 import Media from "./Media";
 import Unknown from "./Unknown";
-import Print from "./Print"
-import { Theme as ThemeType } from "../../models/book/Theme"
-import EditionModel from "../../models/book/Edition"
+import Print from "./Print";
+import { Theme as ThemeType } from "../../models/book/Theme";
+import EditionModel from "../../models/book/Edition";
 
 import smoothscroll from 'smoothscroll-polyfill';
-import Theme from './Theme';
 import Book from '../../models/book/Book';
+import ThemeEditor from './ThemeEditor';
+import { EditorContext } from './EditorContext';
+import { DarkModeContext } from './DarkModeContext';
+import { BaseContext } from './BaseContext';
 
 // Poly fill smooth scrolling for Safari.
 smoothscroll.polyfill();
-
-export const DarkModeContext = React.createContext<{ darkMode: boolean, setDarkMode: Function | undefined }>({ darkMode: false, setDarkMode: undefined})
-export const BaseContext = React.createContext<{ base: string }>({ base: "" })
-export const EditorContext = React.createContext<{ 
-	edition: EditionModel | undefined,
-	editable: boolean }>({ edition: undefined, editable: false })
 
 const Edition = (props: { edition: EditionModel, base?: string, editable?: boolean }) => {
 
@@ -120,7 +117,7 @@ const Edition = (props: { edition: EditionModel, base?: string, editable?: boole
 				<Route path="index/:letter" element={<Index book={edition} />} />
 				<Route path="search" element={<Search book={edition} />} />
 				<Route path="media" element={<Media edition={edition} />} />
-				<Route path="theme" element={<Theme book={edition} />} />
+				<Route path="theme" element={<ThemeEditor book={edition} />} />
 				<Route path="print" element={<Print book={edition} />} />
 				<Route path="*" element={<Unknown message="This page doesn't exist." book={edition} />}/>
 			</Routes>

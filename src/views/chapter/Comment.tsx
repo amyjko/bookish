@@ -1,13 +1,13 @@
-import React, { useContext, useEffect } from 'react'
+import { useContext, useEffect } from 'react'
 import { CommentNode } from '../../models/chapter/CommentNode'
 import Atom from '../editor/Atom';
-import { EditorContext } from '../page/Edition';
-import { ChapterContext } from './Chapter';
+import { ChapterContext } from './ChapterContext';
 import Marginal from './Marginal';
 
-import CommentIcon from "../svg/comment.svg";
-import { CaretContext } from '../editor/BookishEditor';
+import CommentIcon from "../../assets/svg/comment.svg";
 import Format from './Format';
+import { EditorContext } from '../page/EditorContext';
+import { CaretContext } from '../editor/CaretContext';
 
 const Comment = (props: { node: CommentNode }) => {
 

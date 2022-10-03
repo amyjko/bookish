@@ -1,5 +1,5 @@
 import React, { useContext } from 'react'
-import { EditorContext } from './Edition'
+import { EditorContext } from './EditorContext';
 
 const Print = (props: { children: React.ReactNode }) => {
 

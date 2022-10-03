@@ -6,8 +6,9 @@ import Outline from './Outline';
 import Page from './Page';
 
 import Edition from '../../models/book/Edition';
-import { BaseContext } from './Edition';
 import Instructions from './Instructions';
+import { BaseContext } from './BaseContext';
+import ChapterIDs from '../../models/book/ChapterID';
 
 const Index = (props: { book: Edition }) => {
 
@@ -81,14 +82,14 @@ const Index = (props: { book: Edition }) => {
         <Header 
             book={book}
             label="Index title"
-			getImage={() => book.getImage(Edition.IndexID)}
-			setImage={(embed) => book.setImage(Edition.IndexID, embed)}
+			getImage={() => book.getImage(ChapterIDs.IndexID)}
+			setImage={(embed) => book.setImage(ChapterIDs.IndexID, embed)}
             header="Index"
             tags={book.getTags()}
             outline={
                 <Outline
-                    previous={book.getPreviousChapterID(Edition.IndexID)}
-                    next={book.getNextChapterID(Edition.IndexID)}
+                    previous={book.getPreviousChapterID(ChapterIDs.IndexID)}
+                    next={book.getNextChapterID(ChapterIDs.IndexID)}
                 />
             }
         />

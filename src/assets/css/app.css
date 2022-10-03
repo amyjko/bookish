@@ -521,6 +521,11 @@ input[type=text].bookish-editor-text-invalid {
     margin-right: var(--bookish-app-chrome-padding);
 }
 
+.bookish-editor-toolbar-icon img {
+    width: 1em;
+    height: 1em;
+}
+
 .bookish-editor-toolbar-group {
     display: inline-block;
     margin-right: calc(2 * var(--bookish-app-chrome-padding));
@@ -655,3 +660,8 @@ input[type=text].bookish-editor-text-invalid {
     color: var(--bookish-app-chrome-muted);
     font-style: italic;
 }
+
+.firebase-emulator-warning {
+    opacity: 0.15;
+    pointer-events: none;
+  }

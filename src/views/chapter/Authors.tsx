@@ -1,8 +1,8 @@
-import React, { useContext, useEffect, useRef, useState } from 'react';
+import { useContext, useEffect, useRef, useState } from 'react';
 import Parser from '../../models/chapter/Parser';
 import TextEditor from '../editor/TextEditor';
-import { EditorContext } from '../page/Edition';
-import { renderNode } from './Renderer';
+import { EditorContext } from '../page/EditorContext';
+import Format from './Format';
 
 const Authors = (props: { 
     authors: string[], 
@@ -58,7 +58,7 @@ const Authors = (props: {
                                 save={ text => props.edit.call(undefined, index, text) }
                             />
                             :
-                            <span key={"author" + index}>{renderNode(Parser.parseFormat(book, author))}</span>
+                            <span key={"author" + index}><Format node={Parser.parseFormat(book, author)} /></span>
                         : <span key={"author" + index}>{author}</span>
                     ,
                     index < list.length - 1 ? (", ") : null

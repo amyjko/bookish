@@ -2,9 +2,9 @@ import React, { useContext, useEffect } from 'react'
 import Marginal  from './Marginal'
 import Parser from '../../models/chapter/Parser'
 import { CitationsNode } from "../../models/chapter/CitationsNode"
-import { renderNode } from './Renderer'
-import { ChapterContext, ChapterContextType } from './Chapter'
+import { ChapterContext, ChapterContextType } from './ChapterContext'
 import Atom from '../editor/Atom'
+import renderReference from './renderReference'
 
 const Citations = (props: {node: CitationsNode}) => {
 
@@ -87,7 +87,7 @@ const Citations = (props: {node: CitationsNode}) => {
                                                 key={index} 
                                                 className="bookish-reference">
                                                     <sup className="bookish-citation-symbol">{citationNumber}</sup>
-                                                    { renderNode(Parser.parseReference(citationID, ref, book, true)) }
+                                                    { renderReference(Parser.parseReference(citationID, ref, book, true)) }
                                             </span> :
                                             null
                                     }) :

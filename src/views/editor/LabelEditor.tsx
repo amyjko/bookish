@@ -1,7 +1,7 @@
-import React, { useContext } from "react";
+import { useContext } from "react";
 import { LabelNode } from "../../models/chapter/LabelNode";
-import { ChapterContext } from "../chapter/Chapter";
-import { CaretContext, CaretContextType } from "./BookishEditor";
+import { ChapterContext } from "../chapter/ChapterContext";
+import { CaretContext, CaretContextType } from "./CaretContext";
 import TextEditor from "./TextEditor";
 
 const LabelEditor = (props: {

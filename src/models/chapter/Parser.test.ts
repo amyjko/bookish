@@ -1,3 +1,5 @@
+import { test, expect } from 'vitest'
+
 import Parser from "./Parser"
 
 test("Empty chapter", () => {

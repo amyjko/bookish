@@ -7,6 +7,7 @@ import { DocumentReference } from "firebase/firestore";
 import { Theme } from './Theme.js';
 import { Definition } from './Definition.js';
 import Book from './Book.js';
+import ChapterIDs from './ChapterID.js';
 
 export type EditionSpecification = {
     title: string;
@@ -35,14 +36,6 @@ export enum BookSaveStatus {
 }
 
 export default class Edition {
-
-    static TableOfContentsID = "";
-    static ReferencesID = "references";
-    static SearchID = "search";
-	static MediaID = "media";
-    static IndexID = "index";
-	static GlossaryID = "glossary";
-    static UnknownID = "unknown";
 
     readonly specification: EditionSpecification;
     readonly book: Book | undefined;
@@ -463,12 +456,12 @@ export default class Edition {
 
         // Handle back matter chapters.
         switch(chapterID) {
-            case Edition.ReferencesID: return this.hasGlossary() ? Edition.GlossaryID : Edition.IndexID;
-            case Edition.GlossaryID: return Edition.IndexID;
-            case Edition.IndexID: return Edition.SearchID;
-            case Edition.SearchID: return Edition.MediaID;
-            case Edition.MediaID: return Edition.TableOfContentsID;
-            case Edition.TableOfContentsID: return this.chapters.length > 0 ? this.chapters[0].getChapterID() : null;
+            case ChapterIDs.ReferencesID: return this.hasGlossary() ? ChapterIDs.GlossaryID : ChapterIDs.IndexID;
+            case ChapterIDs.GlossaryID: return ChapterIDs.IndexID;
+            case ChapterIDs.IndexID: return ChapterIDs.SearchID;
+            case ChapterIDs.SearchID: return ChapterIDs.MediaID;
+            case ChapterIDs.MediaID: return ChapterIDs.TableOfContentsID;
+            case ChapterIDs.TableOfContentsID: return this.chapters.length > 0 ? this.chapters[0].getChapterID() : null;
             default:
                 let after = false;
                 for(let i = 0; i < this.chapters.length; i++) {
@@ -481,7 +474,7 @@ export default class Edition {
                 }
                 // If the given ID was the last chapter, go to the next back matter chapter.
                 if(after)
-                    return this.hasReferences() ? Edition.ReferencesID : this.hasGlossary() ? Edition.GlossaryID : Edition.IndexID;
+                    return this.hasReferences() ? ChapterIDs.ReferencesID : this.hasGlossary() ? ChapterIDs.GlossaryID : ChapterIDs.IndexID;
                 // Otherwise, it wasn't a valid ID
                 else
                     return null;
@@ -495,11 +488,11 @@ export default class Edition {
         switch(chapterID) {
 
             // Handle back matter chapters.
-            case Edition.ReferencesID: return this.chapters.length > 0 ? this.chapters[this.chapters.length - 1].getChapterID() : null; // Last chapter of the book
-            case Edition.GlossaryID: return this.hasReferences() ? Edition.ReferencesID : this.chapters.length > 0 ? this.chapters[this.chapters.length - 1].getChapterID() : Edition.TableOfContentsID;
-            case Edition.IndexID: return this.hasGlossary() ? Edition.GlossaryID : this.hasReferences() ? Edition.ReferencesID : this.chapters.length > 0 ? this.chapters[this.chapters.length - 1].getChapterID() : Edition.TableOfContentsID;
-            case Edition.SearchID: return Edition.IndexID;
-            case Edition.MediaID: return Edition.SearchID;
+            case ChapterIDs.ReferencesID: return this.chapters.length > 0 ? this.chapters[this.chapters.length - 1].getChapterID() : null; // Last chapter of the book
+            case ChapterIDs.GlossaryID: return this.hasReferences() ? ChapterIDs.ReferencesID : this.chapters.length > 0 ? this.chapters[this.chapters.length - 1].getChapterID() : ChapterIDs.TableOfContentsID;
+            case ChapterIDs.IndexID: return this.hasGlossary() ? ChapterIDs.GlossaryID : this.hasReferences() ? ChapterIDs.ReferencesID : this.chapters.length > 0 ? this.chapters[this.chapters.length - 1].getChapterID() : ChapterIDs.TableOfContentsID;
+            case ChapterIDs.SearchID: return ChapterIDs.IndexID;
+            case ChapterIDs.MediaID: return ChapterIDs.SearchID;
             default:
                 let before = false;
                 for(let i = this.chapters.length - 1; i >= 0; i--) {
@@ -512,7 +505,7 @@ export default class Edition {
                 }
                 // If the given ID was the last chapter, go to the next back matter chapter.
                 if(before)
-                    return Edition.TableOfContentsID;
+                    return ChapterIDs.TableOfContentsID;
                 // Otherwise, it wasn't a valid ID
                 else
                     return null;

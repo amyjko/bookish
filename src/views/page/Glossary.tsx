@@ -1,21 +1,21 @@
-import React, { useContext, useEffect, useRef, useState } from 'react'
+import { useContext, useEffect, useRef, useState } from 'react'
 
 import Header from "./Header"
 import Outline from './Outline'
 import Page from './Page'
-import { renderNode } from '../chapter/Renderer'
 
 import Edition from '../../models/book/Edition.js'
 import Parser from '../../models/chapter/Parser'
-import { EditorContext } from './Edition'
 import { Definition } from '../../models/book/Definition.js'
 import ConfirmButton from '../editor/ConfirmButton'
 import TextEditor from '../editor/TextEditor'
 import BookishEditor from '../editor/BookishEditor'
 import { FormatNode } from '../../models/chapter/FormatNode'
 import Format from '../chapter/Format'
+import { EditorContext } from './EditorContext'
+import ChapterIDs from '../../models/book/ChapterID'
 
-const Definition = (props: { id: string, definition: Definition }) => {
+const DefinitionView = (props: { id: string, definition: Definition }) => {
 
 	const { id, definition } = props;
 	const { editable, edition: book } = useContext(EditorContext);
@@ -80,7 +80,7 @@ const Definition = (props: { id: string, definition: Definition }) => {
 		/> :
 		definition.definition === "" ? 
 			<em>Definition</em> : 
-			renderNode(format) 
+			<Format node={format}/>
 
 	function addSynonym() {
 		if(book && definition.synonyms) {
@@ -180,14 +180,14 @@ const Glossary = (props: { book: Edition }) => {
 			<Header 
 				book={book}
 				label="Glossary title"
-				getImage={() => book.getImage(Edition.GlossaryID)}
-				setImage={(embed) => book.setImage(Edition.GlossaryID, embed)}
+				getImage={() => book.getImage(ChapterIDs.GlossaryID)}
+				setImage={(embed) => book.setImage(ChapterIDs.GlossaryID, embed)}
 				header="Glossary"
 				tags={book.getTags()}
 				outline={
 					<Outline
-						previous={book.getPreviousChapterID(Edition.GlossaryID)}
-						next={book.getNextChapterID(Edition.GlossaryID)}
+						previous={book.getPreviousChapterID(ChapterIDs.GlossaryID)}
+						next={book.getNextChapterID(ChapterIDs.GlossaryID)}
 					/>
 				}
 			/>
@@ -210,7 +210,7 @@ const Glossary = (props: { book: Edition }) => {
 									<col style={{width: "60%" }} />
 								</colgroup>
 								<tbody>
-								{ keys.map((id, index) => <Definition key={id} id={id} definition={glossary[id]} />) }
+								{ keys.map((id, index) => <DefinitionView key={id} id={id} definition={glossary[id]} />) }
 								</tbody>
 							</table>
 						</div>
@@ -221,4 +221,4 @@ const Glossary = (props: { book: Edition }) => {
 
 }
 
-export default Glossary
+export default Glossary;

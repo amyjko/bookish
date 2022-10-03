@@ -15,7 +15,7 @@ export function useAuth() {
 }
 
 // Wraps authentication functionality in a React context for use by components.
-const AuthProvider: React.FC<{}> = ({ children }) => {
+const AuthProvider: React.FC<{children?: React.ReactNode}> = ({ children }) => {
 
     // Track the user and user loading status in state
     const [ currentUser, setCurrentUser ] = useState<User | null>(null);
@@ -27,7 +27,7 @@ const AuthProvider: React.FC<{}> = ({ children }) => {
         if(auth) {
 
             const actionCodeSettings = {
-                url: process.env.DOMAIN + "/finishlogin",
+                url: location.origin + "/finishlogin",
                 handleCodeInApp: true
             }
 

@@ -1,10 +1,9 @@
 import React, { useContext, useEffect, useRef, useState } from "react"
 import { ChapterNode } from "../../models/chapter/ChapterNode";
-import { Caret, CaretRange, caretRangeToIndexRange, indexRangeToCaretRange, IndexRange } from "../../models/chapter/Caret";
+import { Caret, CaretRange, caretRangeToIndexRange, indexRangeToCaretRange } from "../../models/chapter/Caret";
 import { LinkNode } from "../../models/chapter/LinkNode";
 import { ParagraphNode } from "../../models/chapter/ParagraphNode";
 import { TextNode } from "../../models/chapter/TextNode";
-import { renderNode } from "../chapter/Renderer";
 import { AtomNode } from "../../models/chapter/AtomNode";
 import { FormatNode } from "../../models/chapter/FormatNode";
 import { BlocksNode } from "../../models/chapter/BlocksNode";
@@ -15,69 +14,20 @@ import { MetadataNode } from "../../models/chapter/MetadataNode";
 import { RootNode } from "../../models/chapter/RootNode";
 import { Edit } from "../../models/chapter/Edit";
 
-import { Command, commands } from "./Commands";
+import { commands } from "./Commands";
+import { Command } from "./Command";
 import Toolbar from "./Toolbar";
 import Parser from "../../models/chapter/Parser";
-import { ChapterContext, ChapterContextType } from "../chapter/Chapter";
 import { CodeNode } from "../../models/chapter/CodeNode";
 import { BlockNode } from "../../models/chapter/BlockNode";
 import { EmbedNode } from "../../models/chapter/EmbedNode";
 import { ErrorNode } from "../../models/chapter/ErrorNode";
-
-export type CaretContextType = { 
-    range: CaretRange | undefined, 
-    coordinate: { x: number, y: number} | undefined,
-    setCaretRange: Function,
-    forceUpdate: Function,
-    context: CaretState | undefined,
-    edit: (previous: BookishNode, edited: BookishNode) => void,
-    root: RootNode,
-    focused: boolean
-} | undefined;
-
-export const CaretContext = React.createContext<CaretContextType>(undefined);
-
-export type CaretState = {
-    chapter: boolean,
-    range: CaretRange,
-    start: Caret,
-    end: Caret,
-    isSelection: boolean,
-    root: RootNode, 
-    blocks: BlocksNode | undefined,
-    paragraph: ParagraphNode | undefined,
-    block: BlockNode | undefined,
-    includesList: boolean,
-    code: CodeNode | undefined,
-    list: ListNode | undefined,
-    table: TableNode | undefined,
-    format: FormatNode | undefined, 
-    atom: AtomNode<any> | undefined,
-    meta: MetadataNode<any> | undefined,
-    startIsText: boolean,
-    endIsText: boolean,
-    startIsTextOrAtom: boolean, 
-    endIsTextOrAtom: boolean,
-    atParagraphStart: boolean,
-    undoStack: UndoState[],
-    undoPosition: number,
-    undo: () => Edit,
-    redo: () => Edit,
-    clipboard: Clipboard,
-    setClipboard: React.Dispatch<React.SetStateAction<Clipboard>>
-}
-
-export type Clipboard = undefined | BookishNode;
-
-export type UndoState = {
-    command: Command | undefined,
-    bookdown: string,
-    range: IndexRange
-}
-
-export type CaretUtilities = {
-    getCaretOnLine: (caret: Caret, below: boolean) => Caret
-}
+import { CaretContext } from "./CaretContext";
+import { CaretState } from "./CaretState";
+import { UndoState } from "./UndoState";
+import { Clipboard } from "./Clipboard";
+import { CaretUtilities } from "./CaretUtilities";
+import { ChapterContext, ChapterContextType } from "../chapter/ChapterContext";
 
 const IDLE_TIME = 500;
 

@@ -1,6 +1,7 @@
 import Parser from "../chapter/Parser";
 import { ChapterNode } from "../chapter/ChapterNode";
-import Edition, { BookSaveStatus } from "./Edition"
+import type Edition from "./Edition"
+import { BookSaveStatus } from "./Edition"
 import { loadChapterTextFromFirestore, updateChapterTextInFirestore } from "../Firestore";
 import { DocumentReference } from "firebase/firestore";
 

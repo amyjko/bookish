@@ -1,13 +1,13 @@
 import React, { useContext, useEffect, useState } from 'react';
 import Header from "./Header";
 import Outline from './Outline';
-import Edition from '../../models/book/Edition';
+import type Edition from '../../models/book/Edition';
 import Page from './Page'
-import { renderNode } from '../chapter/Renderer';
 import Instructions from './Instructions';
-import { EditorContext } from './Edition';
 import { Image } from '../../models/book/BookMedia';
-import { FormatNode } from '../../models/chapter/FormatNode';
+import { EditorContext } from './EditorContext';
+import ChapterIDs from '../../models/book/ChapterID';
+import Format from '../chapter/Format';
 
 const MediaPreview = (props: { 
 	url: string,
@@ -53,14 +53,14 @@ export default function Media(props: { edition: Edition }) {
 			<Header 
 				book={edition}
 				label="Media title"
-				getImage={() => edition.getImage(Edition.MediaID)}
-				setImage={(embed) => edition.setImage(Edition.MediaID, embed)}
+				getImage={() => edition.getImage(ChapterIDs.MediaID)}
+				setImage={(embed) => edition.setImage(ChapterIDs.MediaID, embed)}
 				header="Media"
 				tags={edition.getTags()}
 				outline={
 					<Outline
-						previous={edition.getPreviousChapterID(Edition.MediaID)}
-						next={edition.getNextChapterID(Edition.MediaID)}
+						previous={edition.getPreviousChapterID(ChapterIDs.MediaID)}
+						next={edition.getNextChapterID(ChapterIDs.MediaID)}
 					/>
 				}
 			/>
@@ -82,7 +82,7 @@ export default function Media(props: { edition: Edition }) {
 						key={"image" + index}
 						url={embed.getSmallURL()} 
 						alt={embed.getDescription()} 
-						credit={ <span>{editable ? (images && images.find(i => i.url === embed.getURL()) === undefined) ? "linked" : "uploaded" : null }{embed.getCredit().isEmptyText() ? null : " • "}{renderNode(embed.getCredit())}</span>}
+						credit={ <span>{editable ? (images && images.find(i => i.url === embed.getURL()) === undefined) ? "linked" : "uploaded" : null }{embed.getCredit().isEmptyText() ? null : " • "}<Format node={embed.getCredit()}/></span>}
 					/>
 				)
 			}

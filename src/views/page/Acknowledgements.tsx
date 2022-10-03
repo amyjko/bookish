@@ -3,9 +3,8 @@ import Edition from "../../models/book/Edition"
 import { ChapterNode } from "../../models/chapter/ChapterNode"
 import Parser from "../../models/chapter/Parser"
 import ChapterBody from "../chapter/ChapterBody"
-import { renderNode } from "../chapter/Renderer"
 import BookishEditor from "../editor/BookishEditor"
-import { EditorContext } from "./Edition"
+import { EditorContext } from "./EditorContext"
 import Instructions from "./Instructions"
 
 const Acknowledgements = (props: { book: Edition }) => {
@@ -39,7 +38,7 @@ const Acknowledgements = (props: { book: Edition }) => {
 				book.getAcknowledgements() ?
 					<>
 						{ acknowledgementsHeader }
-						{ renderNode(acksNode) }
+						<ChapterBody node={acksNode}/>
 					</>
 					: null
 		}

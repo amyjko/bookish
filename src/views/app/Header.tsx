@@ -1,7 +1,8 @@
-import React from "react"
 import { useAuth } from "./AuthContext"
 import { Link } from "react-router-dom"
 import BookishNavLink from "./BookishNavLink"
+
+import icon from "../../assets/icons/icon.png";
 
 export default function Header() {
 
@@ -18,7 +19,7 @@ export default function Header() {
 	}
 	
 	return <div className="bookish-app-header">
-		<img src="/images/icons/icon.png"/>&nbsp;
+		<img src={icon}/>&nbsp;
 		<BookishNavLink to="/">Home</BookishNavLink>
 		<BookishNavLink to="/read">Read</BookishNavLink>
 		<BookishNavLink to="/write">Write</BookishNavLink>

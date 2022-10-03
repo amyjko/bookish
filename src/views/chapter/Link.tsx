@@ -1,13 +1,14 @@
-import React, { isValidElement, useContext } from 'react'
+import { useContext } from 'react'
 
 import { Link as RouterLink } from 'react-router-dom';
 import { HashLink } from "../util/HashLink"
 
-import { renderNode } from './Renderer';
 import smoothlyScrollElementToEyeLevel from '../util/Scroll'
-import { BaseContext, EditorContext } from '../page/Edition';
 import { LinkNode } from "../../models/chapter/LinkNode";
-import { ChapterContext } from './Chapter';
+import { ChapterContext } from './ChapterContext';
+import { BaseContext } from '../page/BaseContext';
+import { EditorContext } from '../page/EditorContext';
+import Text from './Text'
 
 const Link = (props: { node: LinkNode}) => {
 
@@ -18,7 +19,7 @@ const Link = (props: { node: LinkNode}) => {
 
     const url = node.getMeta();
     const content = node.getText();
-    const contentDOM = renderNode(content);
+    const contentDOM = <Text node={content} />;
 
     function isInvalidChapterLink() {
         // If it's internal, validate it.

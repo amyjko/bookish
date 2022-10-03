@@ -21,10 +21,7 @@ import { TableNode } from "./TableNode";
 import { TextNode } from "./TextNode";
 import { Position } from "./Position";
 import { BlockNode } from "./BlockNode";
-
-export type Bookkeeping = {
-    symbols: Record<string, string>;
-}
+import { Bookkeeping } from "./Bookkeeping";
 
 const numberedRE = /^[0-9]+\.+/;
 const bulletRE = /^\*+\s+/;

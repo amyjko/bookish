@@ -1,14 +1,17 @@
-import React, { ChangeEvent, useContext, useEffect, useState } from 'react';
+import { ChangeEvent, useContext, useEffect, useState } from 'react';
 import { Position } from '../../models/chapter/Position';
 import PositionEditor from "./PositionEditor";
 import { EmbedNode } from '../../models/chapter/EmbedNode';
 import URLEditor from './URLEditor';
-import { CaretContext, CaretContextType } from './BookishEditor';
 import TextEditor from './TextEditor';
-import { Spacer } from './Toolbar';
 import { storage } from '../../models/Firebase';
-import { EditorContext } from '../page/Edition';
 import { Image } from '../../models/book/BookMedia';
+import { EditorContext } from '../page/EditorContext';
+import { CaretContext, CaretContextType } from './CaretContext';
+
+const Spacer = (props: {}) => {
+    return <span style={{ display: "inline-block", width: "1em"}}></span>
+}
 
 const ImageChooser = (props: { 
     select: (image: Image) => void,

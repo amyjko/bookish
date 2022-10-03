@@ -1,10 +1,10 @@
 import React, { useContext, useEffect } from 'react'
-import { ChapterContext } from './Chapter'
+import { ChapterContext } from './ChapterContext'
 import Marginal  from './Marginal'
 import { FootnoteNode } from "../../models/chapter/FootnoteNode"
 import Atom from '../editor/Atom'
-import { CaretContext } from '../editor/BookishEditor'
 import Format from './Format'
+import { CaretContext } from '../editor/CaretContext'
 
 const Footnote = (props: { node: FootnoteNode }) => {
 

@@ -1,8 +1,7 @@
-import React from 'react'
 import { ChapterNode } from "../../models/chapter/ChapterNode"
 import { ParagraphNode } from '../../models/chapter/ParagraphNode'
+import Block from "./Block"
 import Paragraph from './Paragraph'
-import { renderNode } from './Renderer'
 
 const ChapterBody = (props: { node: ChapterNode, placeholder?: string }) => {
 
@@ -21,7 +20,7 @@ const ChapterBody = (props: { node: ChapterNode, placeholder?: string }) => {
         { 
             blocks.length === 1 && blocks[0] instanceof ParagraphNode && blocks[0].getFormat().isEmptyText() ?
                 <Paragraph node={blocks[0]} placeholder={placeholder} /> :
-                node.getBlocks().map((block, index) => renderNode(block, "block-" + index)) 
+                node.getBlocks().map((block, index) => <Block node={block} key={"block-" + index}/>) 
         }
     </div>
 

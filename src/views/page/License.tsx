@@ -1,11 +1,10 @@
-import React, { useContext } from "react"
+import { useContext } from "react"
 import Edition from "../../models/book/Edition"
 import { FormatNode } from "../../models/chapter/FormatNode"
 import Parser from "../../models/chapter/Parser"
 import Format from "../chapter/Format"
-import { renderNode } from "../chapter/Renderer"
 import BookishEditor from "../editor/BookishEditor"
-import { EditorContext } from "./Edition"
+import { EditorContext } from "./EditorContext"
 import Instructions from "./Instructions"
 
 const License = (props: { book: Edition }) => {
@@ -34,7 +33,7 @@ const License = (props: { book: Edition }) => {
 				/>
 			</>
 			:
-			<p>{ renderNode(formatNode) }</p>
+			<p><Format node={formatNode}/></p>
 		}
 	</>
 

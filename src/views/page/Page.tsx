@@ -7,7 +7,7 @@ const Page = (props: { afterLoaded?: Function, children: React.ReactNode | React
 	const [ lastHeight, setLastHeight] = useState<number>(0)
 	const [ intervalID, setIntervalID ] = useState<NodeJS.Timer | null>(null)
 	const [ count, setCount ] = useState<number>(0)
-	const [ mountTime, setMountTime ] = useState<number>(Date.now())
+	const [ mountTime ] = useState<number>(Date.now())
 
 	function watchLoading() {
 

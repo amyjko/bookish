@@ -1,8 +1,6 @@
-import React from 'react'
 import { TableNode } from "../../models/chapter/TableNode"
 import Format from './Format'
-
-import { renderNode, renderPosition } from './Renderer'
+import renderPosition from "./renderPosition"
 
 const Table = (props: { node: TableNode}) => {
 
@@ -21,8 +19,8 @@ const Table = (props: { node: TableNode}) => {
                         <tr key={"row-" + index}>
                             {
                                 row.length === 1 ?
-                                    [<td key={"cell-" + index} colSpan={rows.reduce((max, row) => Math.max(row.length, max), 0)}>{renderNode(row[0], "cell-" + index)}</td>] :
-                                    row.map((cell, index) => <td key={"cell-" + index}>{renderNode(cell, "cell-" + index)}</td>)
+                                    [<td key={"cell-" + index} colSpan={rows.reduce((max, row) => Math.max(row.length, max), 0)}><Format node={row[0]} key={"cell-" + index}/></td>] :
+                                    row.map((cell, index) => <td key={"cell-" + index}><Format node={cell} key={"cell-" + index}/></td>)
                             }
                         </tr>
                     )

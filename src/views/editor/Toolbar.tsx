@@ -1,17 +1,18 @@
 import React, { ReactNode, useRef } from "react";
-import { CaretState } from "./BookishEditor";
-import { Command, commands } from "./Commands";
+import { CaretState } from "./CaretState";
+import { commands } from "./Commands";
+import { Command } from "./Command";
 
-import Text from "../svg/text.svg";
-import Hash from "../svg/hash.svg";
-import Level from "../svg/level.svg";
-import Block from "../svg/block.svg";
-import List from "../svg/list.svg";
-import LinkIcon from "../svg/link.svg";
-import Code from "../svg/code.svg";
-import Scissors from "../svg/scissors.svg";
-import Media from "../svg/media.svg";
-import Quote from "../svg/quote.svg";
+import Text from "../../assets/svg/text.svg";
+import Hash from "../../assets/svg/hash.svg";
+import Level from "../../assets/svg/level.svg";
+import Block from "../../assets/svg/block.svg";
+import List from "../../assets/svg/list.svg";
+import LinkIcon from "../../assets/svg/link.svg";
+import Code from "../../assets/svg/code.svg";
+import Scissors from "../../assets/svg/scissors.svg";
+import Media from "../../assets/svg/media.svg";
+import Quote from "../../assets/svg/quote.svg";
 
 import { TextNode } from "../../models/chapter/TextNode";
 import { AtomNode } from "../../models/chapter/AtomNode";
@@ -61,7 +62,7 @@ const categoryOrder: {[key:string] : number } = {
     "block": 10,
 }
 
-const categoryIcons: {[key:string]: Function | string} = {
+const categoryIcons: {[key:string]: string} = {
     "text": Text,
     "clipboard": Scissors,
     "annotation": Hash,
@@ -70,10 +71,6 @@ const categoryIcons: {[key:string]: Function | string} = {
     "list": List,
     "table": "▦",
     "history": "\u2026"
-}
-
-export const Spacer = (props: {}) => {
-    return <span style={{ display: "inline-block", width: "1em"}}></span>
 }
 
 const Toolbar = (props: { 
@@ -94,8 +91,8 @@ const Toolbar = (props: {
         return `${command.control ? controlSymbol : ""}${command.alt ? altSymbol : ""}${command.shift ? "\u21E7" : ""}${keyLabel}`;
     }
 
-    function wrapIcon(icon: Function | string) {
-        return <span className='bookish-editor-toolbar-icon'>{icon instanceof Function ? icon.call(undefined) : icon}</span>;
+    function wrapIcon(icon: string) {
+        return <span className='bookish-editor-toolbar-icon'>{icon.includes(".svg") ? <img src={icon}/> : icon}</span>;
     }
 
     const context = props.context;
@@ -192,7 +189,7 @@ const Toolbar = (props: {
                                         onClick={() => executor?.call(undefined, command, "")}
                                         onKeyPress={(event) => event.key === " " || event.key === "Enter" ? executor?.call(undefined, command, "") : undefined }
                                     >
-                                        { command.icon ? command.icon.call(undefined) : command.label ? command.label : command.description }
+                                        { command.icon ? wrapIcon(command.icon) : command.label ? command.label : command.description }
                                     </button>
                                 )
                         }

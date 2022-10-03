@@ -1,15 +1,16 @@
-import React, { useContext } from 'react';
+import { useContext } from 'react';
 import Header from "./Header";
 import Outline from './Outline';
 import Page from './Page';
 import Edition from '../../models/book/Edition'
 import { Theme, defaultTheme } from '../../models/book/Theme'
 import Parser from '../../models/chapter/Parser';
-import { renderNode } from '../chapter/Renderer';
 import TextEditor from '../editor/TextEditor';
-import { DarkModeContext, EditorContext } from './Edition';
 import ConfirmButton from '../editor/ConfirmButton';
 import Instructions from './Instructions';
+import { EditorContext } from './EditorContext';
+import { DarkModeContext } from './DarkModeContext';
+import ChapterBody from '../chapter/ChapterBody';
 
 const Preview = (props: { theme: Theme }) => {
 
@@ -27,7 +28,7 @@ const Preview = (props: { theme: Theme }) => {
 	`);
 
 	return <div className="bookish-theme-preview" style={{ backgroundColor: darkMode? props.theme.dark.backgroundColor : props.theme.light.backgroundColor }}>
-		{ renderNode(preview) }
+		<ChapterBody node={preview}/>
 	</div>
 }
 
@@ -80,7 +81,7 @@ const ThemeSetEditor = ( props: { header: string, group: string, theme: Record<s
 	</>
 };
 
-const Theme = (props: { book: Edition }) => {
+const ThemeEditor = (props: { book: Edition }) => {
 
 	const { book } = props;
 
@@ -135,4 +136,4 @@ const Theme = (props: { book: Edition }) => {
 
 }
 
-export default Theme;
+export default ThemeEditor;

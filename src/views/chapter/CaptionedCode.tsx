@@ -1,11 +1,11 @@
-import React, { useContext, useEffect, useRef } from 'react'
-import { renderNode, renderPosition } from './Renderer'
+import { useContext, useRef } from 'react'
 import Code from './Code'
 import Python from './Python'
 import { CodeNode } from "../../models/chapter/CodeNode"
-import { EditorContext } from '../page/Edition'
-import { CaretContext } from '../editor/BookishEditor'
 import Format from './Format'
+import Text from './Text'
+import { EditorContext } from '../page/EditorContext'
+import renderPosition from './renderPosition'
 
 const CaptionedCode = (props: { node: CodeNode}) => {
 
@@ -15,11 +15,10 @@ const CaptionedCode = (props: { node: CodeNode}) => {
     const language = node.getLanguage();
 
     const { editable } = useContext(EditorContext);
-    const caret = useContext(CaretContext);
 
     const codeRef = useRef(null);
 
-    const languages = [ "C", "C++", "CSS", "Go", "HTML", "Java", "JavaScript", "Markdown", "Plaintext", "Python", "TypeScript" ];
+    // const languages = [ "C", "C++", "CSS", "Go", "HTML", "Java", "JavaScript", "Markdown", "Plaintext", "Python", "TypeScript" ];
 
     return <div className={"bookish-figure " + renderPosition(node.getPosition())} data-nodeid={props.node.nodeID}>
         {
@@ -28,7 +27,7 @@ const CaptionedCode = (props: { node: CodeNode}) => {
                 className={`bookish-code bookish-code-block language-${language}`}
                 ref={codeRef}
             >
-                {renderNode(node.getCodeNode())}
+                <Text node={node.getCodeNode()}/>
             </code>
             :
                 node.getLanguage() === "python" && node.isExecutable() ? 

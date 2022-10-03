@@ -10,28 +10,17 @@ import Outline from '../page/Outline'
 import Page from '../page/Page'
 
 import smoothlyScrollElementToEyeLevel from '../util/Scroll'
-import { renderNode } from './Renderer'
-import Marker from "../svg/marker.svg"
+import Marker from "../../assets/svg/marker.svg"
 import Edition from '../../models/book/Edition'
 import ChapterModel from '../../models/book/Chapter'
-import { EditorContext } from '../page/Edition';
 import TextEditor from '../editor/TextEditor';
 import BookishEditor from '../editor/BookishEditor';
 import Toggle from '../editor/Toggle';
 import Instructions from '../page/Instructions';
 import ChapterBody from './ChapterBody';
-
-export type ChapterContextType = {
-	book?: Edition, 
-	chapter?: ChapterModel, 
-	highlightedWord?: string,
-	highlightedID?: string,
-	marginalID?: string,
-	setMarginal?: Function,
-	layoutMarginals?: Function
-}
-
-export const ChapterContext = React.createContext<ChapterContextType>({})
+import { EditorContext } from '../page/EditorContext';
+import { ChapterContext } from './ChapterContext';
+import renderReference from './renderReference';
 
 const Chapter = (props: { chapter: ChapterModel, book: Edition, print?: boolean }) => {
 
@@ -306,7 +295,8 @@ const Chapter = (props: { chapter: ChapterModel, book: Edition, print?: boolean 
 					}
 					save={ text => props.chapter.setTitle(text) }
 				/>
-				<Marker/>
+				{/* We load this on the page but hide it; it's used as a filter for highlighing in CSS */}
+				<img src={Marker} style={{display: "none"}}/>
 				<Instructions>
 					Edit your chapter's title, authors, and cover image above.
 					You can also change the ID of the chapter, which appears in it's URL.
@@ -339,7 +329,7 @@ const Chapter = (props: { chapter: ChapterModel, book: Edition, print?: boolean 
 									render={node => <ChapterBody node={node} placeholder="Type here"/>}
 								/> 
 								: 
-								renderNode(chapterAST)
+								<ChapterBody node={chapterAST} />
 						) :
 						<span>Loading...</span>
 				}
@@ -356,7 +346,7 @@ const Chapter = (props: { chapter: ChapterModel, book: Edition, print?: boolean 
 								if(citationID in refs) {
 									let ref = refs[citationID];
 									return <li key={"citation-" + citationID} className={"bookish-reference"} id={"ref-" + citationID}>
-										{ renderNode(Parser.parseReference(citationID, ref, book)) }
+										{ renderReference(Parser.parseReference(citationID, ref, book)) }
 									</li>
 
 								}

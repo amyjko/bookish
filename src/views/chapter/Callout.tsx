@@ -1,13 +1,11 @@
-import React from 'react'
 import { CalloutNode } from "../../models/chapter/CalloutNode"
-import { renderNode, renderPosition } from './Renderer'
+import Block from "./Block";
+import renderPosition from "./renderPosition";
 
 const Callout = (props: { node: CalloutNode }) => {
 
-    const { node } = props;
-
     return <div className={"bookish-callout " + renderPosition(props.node.getPosition())} data-nodeid={props.node.nodeID}>
-        { props.node.getBlocks().map((element, index) => renderNode(element, "callout-" + index))}
+        { props.node.getBlocks().map((element, index) => <Block node={element} key={"callout-" + index}/>)}
     </div>
 
 }

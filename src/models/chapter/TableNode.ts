@@ -5,7 +5,7 @@ import { TextNode } from "./TextNode";
 import { BlockNode } from "./BlockNode";
 import { CaretRange } from "./Caret";
 
-export type Location = { row: number, column: number };
+type Location = { row: number, column: number };
 
 export class TableNode extends BlockNode {
 

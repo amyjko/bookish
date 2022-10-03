@@ -1,5 +1,5 @@
 import React from 'react';
-import ReactDOM from 'react-dom';
+import ReactDOM from 'react-dom/client'
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { AuthProvider } from './views/app/AuthContext'
 
@@ -15,11 +15,14 @@ import Write from "./views/app/Write"
 import Reader from "./views/app/Reader"
 import ChangeEmail from './views/app/ChangeEmail';
 
+import "./assets/css/bookish.css";
+import "./assets/css/app.css";
+
 function App() {
 
   // Don't show the app in production yet.
   // Need to finish it first!
-  if(!process.env.dev)
+  if(import.meta.env.PROD)
     return <>
       <br/>
       <br/>
@@ -53,7 +56,8 @@ function App() {
 
 }
 
-ReactDOM.render(
-  <App/>,
-  document.body.appendChild(document.createElement("div"))
+ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
+  <React.StrictMode>
+    <App/>
+  </React.StrictMode>
 );

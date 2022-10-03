@@ -1,12 +1,12 @@
-import React, { useState, useContext, useEffect, useRef } from 'react';
+import { useState, useContext, useEffect, useRef } from 'react';
 
-import { Link, NavLink } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { HashLink } from '../util/HashLink';
 
 import smoothlyScrollElementToEyeLevel from '../util/Scroll';
 import { isMobile } from '../util/isMobile';
-import { DarkModeContext } from './Edition';
-import { BaseContext } from './Edition';
+import { DarkModeContext } from './DarkModeContext';
+import { BaseContext } from './BaseContext';
 
 const Outline = (props: { previous: string | null, next: string | null, collapse?: boolean, listener?: Function }) => {
 

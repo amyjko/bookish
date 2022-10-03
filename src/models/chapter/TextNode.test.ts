@@ -1,3 +1,5 @@
+import { test, expect } from 'vitest'
+
 import { TextNode } from "./TextNode"
 
 test("Insert character", () => {

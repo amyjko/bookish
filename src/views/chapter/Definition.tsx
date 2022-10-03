@@ -1,9 +1,10 @@
-import React, { useContext, useEffect } from 'react'
+import { useContext, useEffect } from 'react'
 import Marginal  from './Marginal'
-import { renderNode } from './Renderer'
 import Parser from '../../models/chapter/Parser'
 import { DefinitionNode } from "../../models/chapter/DefinitionNode"
-import { ChapterContext, ChapterContextType } from './Chapter'
+import { ChapterContext, ChapterContextType } from './ChapterContext'
+import Text from './Text'
+import Format from './Format'
 
 const Definition = (props: { node: DefinitionNode}) => {
 
@@ -28,7 +29,7 @@ const Definition = (props: { node: DefinitionNode}) => {
         }
     });
 
-    const phraseView = renderNode(phrase);
+    const phraseView = <Text node={phrase}/>
     const marginalView = 
         // Error if there's no corresponding entry.
         <span className={`bookish-definition ${entry === undefined ? "bookish-error" : ""}`} data-nodeid={props.node.nodeID}>
@@ -41,7 +42,7 @@ const Definition = (props: { node: DefinitionNode}) => {
                             entry === undefined ? 
                                 <span className="bookish-error">Unknown glossary entry "{ glossaryID }"</span> :
                                 <>
-                                    <strong className="bookish-definition-entry-phrase">{entry.phrase}</strong>: { renderNode(Parser.parseFormat(context.book, entry.definition), "definition") }
+                                    <strong className="bookish-definition-entry-phrase">{entry.phrase}</strong>: { <Format node={Parser.parseFormat(context.book, entry.definition)} key="definition" /> }
                                     { entry.synonyms && entry.synonyms.length > 0 ? <span className="bookish-definition-entry-synonyms"><br/><br/>{entry.synonyms.join(", ")}</span> : null }
                                 </>
                         }

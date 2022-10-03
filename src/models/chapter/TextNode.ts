@@ -3,7 +3,7 @@ import { FormatNode } from "./FormatNode";
 import { Node } from "./Node";
 import { AtomNode } from "./AtomNode";
 import { BlocksNode } from "./BlocksNode";
-import { RootNode } from "./RootNode";
+import type { RootNode } from "./RootNode";
 
 export class TextNode extends Node {
 

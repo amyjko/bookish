@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useContext, ReactElement } from 'react';
-import { ChapterContext } from './Chapter';
+import { ChapterContext } from './ChapterContext';
 
 import { isMobile, watchMobile } from '../util/isMobile';
 

@@ -1,13 +1,17 @@
-import React from 'react'
-import { ListNode } from "../../models/chapter/ListNode"
-import { renderNode } from './Renderer'
+import { FormatNode } from "../../models/chapter/FormatNode";
+import { ListNode, ListNodeType } from "../../models/chapter/ListNode"
+import Format from "./Format";
+
+function renderItem(item: ListNodeType, key?: string) {
+    return item instanceof FormatNode ? <Format node={item} key={key}/> : <List node={item} key={key}/>
+}
 
 const List = (props: { node: ListNode}) => {
 
     const items = props.node.getItems().map((item, index) =>
         item.getType() === "list" ?
-            renderNode(item, "item-" + index) :
-            <li key={"item-" + index}>{renderNode(item)}</li>
+            renderItem(item, "item-" + index) :
+            <li key={"item-" + index}>{renderItem(item)}</li>
     );
 
     return props.node.isNumbered() ?

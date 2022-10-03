@@ -2,8 +2,7 @@ import Ajv from 'ajv';
 import addFormats from 'ajv-formats';
 import Edition, { EditionSpecification } from './book/Edition'
 import { ChapterSpecification } from './book/Chapter'
-
-let schema = require("../schemas/book.json");
+import schema from "../schemas/book.json";
 
 // Returns a Promise that, given a URL to 
 //   1) a to a valid "book.json" (see /src/schemas/book.json for a validity spec),

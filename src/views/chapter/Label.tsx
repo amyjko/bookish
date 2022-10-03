@@ -1,8 +1,8 @@
-import React, { useContext } from 'react'
-import { ChapterContext } from './Chapter'
+import { useContext } from 'react'
+import { ChapterContext } from './ChapterContext'
 import { LabelNode } from "../../models/chapter/LabelNode"
 import Atom from '../editor/Atom';
-import { EditorContext } from '../page/Edition';
+import { EditorContext } from '../page/EditorContext';
 
 const Label = (props: { node: LabelNode }) => {
 

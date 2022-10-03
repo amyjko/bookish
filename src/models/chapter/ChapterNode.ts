@@ -1,4 +1,4 @@
-import { Bookkeeping } from "./Parser";
+import { Bookkeeping } from "./Bookkeeping";
 import { BlockNode } from "./BlockNode";
 import { ErrorNode } from "./ErrorNode";
 import { TextNode } from "./TextNode";

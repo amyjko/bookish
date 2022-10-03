@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useRef, useState } from 'react';
+import { useContext, useEffect, useRef, useState } from 'react';
 
 import Header from "./Header";
 import Outline from './Outline';
@@ -7,11 +7,12 @@ import Page from './Page';
 import Parser from "../../models/chapter/Parser";
 import Edition from '../../models/book/Edition';
 
-import { renderNode } from '../chapter/Renderer'
-import { EditorContext } from './Edition';
 import { ReferenceNode } from '../../models/chapter/ReferenceNode';
 import ConfirmButton from '../editor/ConfirmButton';
 import Instructions from './Instructions';
+import { EditorContext } from './EditorContext';
+import ChapterIDs from '../../models/book/ChapterID';
+import renderReference from '../chapter/renderReference';
 
 function mineReference(ids: string[], text: string): ReferenceNode {
 
@@ -170,7 +171,7 @@ const References = (props: { book: Edition }) => {
 				command={() => book.removeReference(citationID)}
 			/>
 	
-			renderedReferences.push(<p key={`citation${citationID}`}>{renderNode(ref)} {editable ? <>{deleteButton}</> : null}</p>);
+			renderedReferences.push(<p key={`citation${citationID}`}>{renderReference(ref)} {editable ? <>{deleteButton}</> : null}</p>);
 		})
 
 	}
@@ -180,14 +181,14 @@ const References = (props: { book: Edition }) => {
 			<Header 
 				book={book}
 				label="References title"
-				getImage={() => book.getImage(Edition.ReferencesID)}
-				setImage={(embed) => book.setImage(Edition.ReferencesID, embed)}
+				getImage={() => book.getImage(ChapterIDs.ReferencesID)}
+				setImage={(embed) => book.setImage(ChapterIDs.ReferencesID, embed)}
 				header="References"
 				tags={book.getTags()}
 				outline={
 					<Outline
-						previous={book.getPreviousChapterID(Edition.ReferencesID)}
-						next={book.getNextChapterID(Edition.ReferencesID)}
+						previous={book.getPreviousChapterID(ChapterIDs.ReferencesID)}
+						next={book.getNextChapterID(ChapterIDs.ReferencesID)}
 					/>
 				}
 			/>

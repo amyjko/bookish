@@ -1,10 +1,10 @@
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useContext, useState } from 'react';
 import { EmbedNode } from "../../models/chapter/EmbedNode";
-import { EditorContext } from '../page/Edition';
-import { renderNode, renderPosition } from './Renderer';
+import renderPosition from './renderPosition';
 import { storage } from '../../models/Firebase';
-import { CaretContext, CaretContextType } from '../editor/BookishEditor';
 import Format from './Format';
+import { CaretContext, CaretContextType } from '../editor/CaretContext';
+import { EditorContext } from '../page/EditorContext';
 
 const Embed = (props: { node: EmbedNode }) => {
 

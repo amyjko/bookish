@@ -1,6 +1,6 @@
 import React, { useContext, useRef } from 'react'
 import { TextNode } from "../../models/chapter/TextNode";
-import { ChapterContext } from './Chapter';
+import { ChapterContext } from './ChapterContext';
 
 function replaceMultipleSpacesWithNonBreakingSpaces(original: string) {
 

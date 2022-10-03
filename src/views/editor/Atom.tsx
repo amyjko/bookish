@@ -1,7 +1,7 @@
-import React, { ReactNode, useContext } from 'react'
+import React, { useContext } from 'react'
 
-import { CaretContext } from './BookishEditor';
 import { AtomNode } from '../../models/chapter/AtomNode';
+import { CaretContext } from './CaretContext';
 
 const Atom = (props: { node: AtomNode<any>, textView: React.ReactElement }) => {
 

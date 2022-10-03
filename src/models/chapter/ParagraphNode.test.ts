@@ -1,3 +1,5 @@
+import { test, expect } from 'vitest'
+
 import { FootnoteNode } from "./FootnoteNode";
 import { FormatNode } from "./FormatNode";
 import { ParagraphNode } from "./ParagraphNode";

@@ -8,7 +8,6 @@ import Parser from "../../models/chapter/Parser"
 import { EmbedNode } from "../../models/chapter/EmbedNode"
 import Edition from '../../models/book/Edition'
 import Outline from './Outline'
-import { BaseContext, EditorContext } from './Edition'
 import Acknowledgements from './Acknowledgements'
 import License from './License'
 import Description from './Description'
@@ -18,6 +17,9 @@ import Chapter from '../../models/book/Chapter'
 import TextEditor from '../editor/TextEditor'
 import ConfirmButton from '../editor/ConfirmButton'
 import Instructions from './Instructions'
+import { EditorContext } from './EditorContext'
+import { BaseContext } from './BaseContext'
+import ChapterIDs from '../../models/book/ChapterID'
 
 const TableOfContentsRow = (props: { 
 	image: React.ReactNode, 
@@ -267,8 +269,8 @@ const TableOfContents = (props: { edition: Edition }) => {
 					{
 						edition.hasReferences() || editable ? 
 							<TableOfContentsRow
-								image={getImage(edition.getImage(Edition.ReferencesID))}
-								chapterID={Edition.ReferencesID}
+								image={getImage(edition.getImage(ChapterIDs.ReferencesID))}
+								chapterID={ChapterIDs.ReferencesID}
 								title="References"
 								annotation="Everything cited"
 							/> 
@@ -277,28 +279,28 @@ const TableOfContents = (props: { edition: Edition }) => {
 					{
 						edition.getGlossary() && Object.keys(edition.getGlossary()).length > 0 || editable ?
 							<TableOfContentsRow
-								image={getImage(edition.getImage(Edition.GlossaryID))}
-								chapterID={Edition.GlossaryID}
+								image={getImage(edition.getImage(ChapterIDs.GlossaryID))}
+								chapterID={ChapterIDs.GlossaryID}
 								title="Glossary"
 								annotation="Definitions"
 							/> 
 							: null
 					}
 					<TableOfContentsRow
-						image={getImage(edition.getImage(Edition.IndexID))}
-						chapterID={Edition.IndexID}
+						image={getImage(edition.getImage(ChapterIDs.IndexID))}
+						chapterID={ChapterIDs.IndexID}
 						title="Index"
 						annotation="Common words and where they are"
 					/>
 					<TableOfContentsRow
-						image={getImage(edition.getImage(Edition.SearchID))}
-						chapterID={Edition.SearchID}
+						image={getImage(edition.getImage(ChapterIDs.SearchID))}
+						chapterID={ChapterIDs.SearchID}
 						title="Search"
 						annotation="Find where words occur"
 					/>
 					<TableOfContentsRow
-						image={getImage(edition.getImage(Edition.MediaID))}
-						chapterID={Edition.MediaID}
+						image={getImage(edition.getImage(ChapterIDs.MediaID))}
+						chapterID={ChapterIDs.MediaID}
 						title="Media"
 						annotation="Images and video in the book"
 					/>
@@ -314,7 +316,7 @@ const TableOfContents = (props: { edition: Edition }) => {
 					{
 						editable ?
 							<TableOfContentsRow
-							image={getImage(edition.getImage(Edition.UnknownID))}
+							image={getImage(edition.getImage(ChapterIDs.UnknownID))}
 							chapterID="unknown"
 							title="Unknown"
 							annotation="Customize bad links."

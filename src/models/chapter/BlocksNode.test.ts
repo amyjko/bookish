@@ -1,3 +1,5 @@
+import { test, expect } from 'vitest'
+
 import { CalloutNode } from "./CalloutNode";
 import { ChapterNode } from "./ChapterNode";
 import { CodeNode } from "./CodeNode";

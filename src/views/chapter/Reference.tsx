@@ -1,7 +1,7 @@
-import React, { useContext } from 'react'
+import { useContext } from 'react'
 import { ReferenceNode } from "../../models/chapter/ReferenceNode";
 import TextEditor from '../editor/TextEditor';
-import { EditorContext } from '../page/Edition';
+import { EditorContext } from '../page/EditorContext';
 
 const Reference = (props: { node: ReferenceNode }) => {
 

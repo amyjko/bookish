@@ -1,3 +1,5 @@
+import { test, expect } from 'vitest'
+
 import { FormatNode } from "./FormatNode";
 import { ListNode } from "./ListNode";
 import { TextNode } from "./TextNode";

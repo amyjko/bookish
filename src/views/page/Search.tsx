@@ -1,19 +1,20 @@
-import React, { useEffect, useState, useRef, useContext, ChangeEvent, KeyboardEvent, FormEvent } from 'react';
+import React, { useEffect, useState, useRef, useContext, KeyboardEvent } from 'react';
 
 import Header from "./Header";
 import Outline from './Outline';
 import Page from './Page';
 
 import { Link } from 'react-router-dom';
-import Edition from '../../models/book/Edition';
+import type Edition from '../../models/book/Edition';
 import Chapter, { Match } from '../../models/book/Chapter';
-import { BaseContext } from "./Edition"
+import ChapterIDs from '../../models/book/ChapterID';
+import { BaseContext } from './BaseContext';
 
 const Search = (props: { book: Edition }) => {
 
-    let [ query, setQuery ] = useState("")
-    let { base } = useContext(BaseContext)
-    const input = useRef<HTMLInputElement>(null)
+    let [ query, setQuery ] = useState("");
+    let { base } = useContext(BaseContext);
+    const input = useRef<HTMLInputElement>(null);
 
     function handleQueryChange(event: React.ChangeEvent<HTMLInputElement>) {
         setQuery(event.target.value)
@@ -84,14 +85,14 @@ const Search = (props: { book: Edition }) => {
         <Header 
             book={book}
             label="Search title"
-			getImage={() => book.getImage(Edition.SearchID)}
-			setImage={(embed) => book.setImage(Edition.SearchID, embed)}
+			getImage={() => book.getImage(ChapterIDs.SearchID)}
+			setImage={(embed) => book.setImage(ChapterIDs.SearchID, embed)}
             header="Search"
             tags={book.getTags()}
             outline={
                 <Outline
-                    previous={book.getPreviousChapterID(Edition.SearchID)}
-                    next={book.getNextChapterID(Edition.SearchID)}
+                    previous={book.getPreviousChapterID(ChapterIDs.SearchID)}
+                    next={book.getNextChapterID(ChapterIDs.SearchID)}
                 />    
             }
         />

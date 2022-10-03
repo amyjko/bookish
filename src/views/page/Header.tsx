@@ -1,13 +1,12 @@
 import React, { useEffect, useRef, useContext } from 'react';
 import Edition from '../../models/book/Edition';
 import { EmbedNode } from '../../models/chapter/EmbedNode';
-
 import Parser from "../../models/chapter/Parser";
 import Embed from '../chapter/Embed';
-import { renderNode } from '../chapter/Renderer'
+import ErrorMessage from '../chapter/ErrorMessage';
 import BookishEditor from '../editor/BookishEditor';
 import TextEditor from '../editor/TextEditor';
-import { EditorContext } from './Edition';
+import { EditorContext } from './EditorContext';
 
 type HeaderProps = {
 	book: Edition;
@@ -79,7 +78,7 @@ const Header = (props: HeaderProps) => {
 									autofocus={false}
 									render={ node => <Embed node={node} />}
 								/> :
-								renderNode(embedNode)
+								embedNode instanceof EmbedNode ? <Embed node={embedNode}/> : <ErrorMessage node={embedNode} />
 						}
 						{ props.print ? null : <div ref={reminder} className="bookish-scroll-reminder"></div> }
 					</div> :

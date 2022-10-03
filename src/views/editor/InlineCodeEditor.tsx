@@ -1,6 +1,6 @@
-import React, { useContext } from "react";
+import { useContext } from "react";
 import { InlineCodeNode } from "../../models/chapter/InlineCodeNode";
-import { CaretContext, CaretContextType } from "./BookishEditor";
+import { CaretContext, CaretContextType } from "./CaretContext";
 import LanguageEditor from "./LanguageEditor";
 
 const InlineCodeEditor = (props: {

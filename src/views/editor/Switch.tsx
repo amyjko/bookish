@@ -1,5 +1,5 @@
 import React, { useContext } from 'react'
-import { CaretContext } from './BookishEditor';
+import { CaretContext } from './CaretContext';
 
 const Switch = (props: { 
     options: string[],

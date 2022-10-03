@@ -5,6 +5,7 @@ import Outline from './Outline';
 import Page from './Page';
 import Edition from '../../models/book/Edition'
 import Instructions from './Instructions';
+import ChapterIDs from '../../models/book/ChapterID';
 
 const Unknown = (props: { book: Edition, message: React.ReactNode }) => {
 
@@ -13,8 +14,8 @@ const Unknown = (props: { book: Edition, message: React.ReactNode }) => {
 			<Header 
 				book={props.book}
 				label="Unknown page title"
-				getImage={() => props.book.getImage(Edition.UnknownID)}
-				setImage={(embed) => props.book.setImage(Edition.UnknownID, embed)}
+				getImage={() => props.book.getImage(ChapterIDs.UnknownID)}
+				setImage={(embed) => props.book.setImage(ChapterIDs.UnknownID, embed)}
 				header="Oops."
 				outline={
 					<Outline

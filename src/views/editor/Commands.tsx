@@ -23,44 +23,27 @@ import { RootNode } from "../../models/chapter/RootNode";
 import { Edit } from "../../models/chapter/Edit";
 import { Node } from "../../models/chapter/Node";
 
-import { CaretState, CaretUtilities } from "./BookishEditor";
+import { CaretState } from "./CaretState";
 
 // From: https://thenounproject.com/browse/collection-icon/minio-text-editor-bold-13520/?p=1
-import Clear from "../svg/clear.svg";
-import Bold from "../svg/bold.svg";
-import Italic from "../svg/italic.svg";
-import Link from "../svg/link.svg";
-import Media from "../svg/media.svg";
-import Subscript from "../svg/sub.svg";
-import Superscript from "../svg/super.svg";
-import Comment from "../svg/comment.svg";
-import Indent from "../svg/indent.svg";
-import Unindent from "../svg/unindent.svg";
-import Paragraph from "../svg/paragraph.svg";
-import Bullets from "../svg/bullets.svg";
-import Numbers from "../svg/numbers.svg";
-import Quote from "../svg/quote.svg";
-import Code from "../svg/code.svg";
-import Undo from "../svg/undo.svg";
-import Redo from "../svg/redo.svg";
-
-export type Command = {
-    label?: string,
-    icon?: Function,
-    description: string
-    category: string,
-    control: boolean,
-    alt: boolean,
-    shift: boolean | undefined,
-    key?: string | string[],
-    code?: string,
-    visible: boolean | ((context: CaretState) => boolean),
-    active: boolean | ((context: CaretState, key?: string) => boolean),
-    handler: (
-        context: CaretState,
-        utilities: CaretUtilities,
-        key: string) => Edit
-}
+import Clear from "../../assets/svg/clear.svg";
+import Bold from "../../assets/svg/bold.svg";
+import Italic from "../../assets/svg/italic.svg";
+import Link from "../../assets/svg/link.svg";
+import Media from "../../assets/svg/media.svg";
+import Subscript from "../../assets/svg/sub.svg";
+import Superscript from "../../assets/svg/super.svg";
+import Comment from "../../assets/svg/comment.svg";
+import Indent from "../../assets/svg/indent.svg";
+import Unindent from "../../assets/svg/unindent.svg";
+import Paragraph from "../../assets/svg/paragraph.svg";
+import Bullets from "../../assets/svg/bullets.svg";
+import Numbers from "../../assets/svg/numbers.svg";
+import Quote from "../../assets/svg/quote.svg";
+import Code from "../../assets/svg/code.svg";
+import Undo from "../../assets/svg/undo.svg";
+import Redo from "../../assets/svg/redo.svg";
+import { Command } from "./Command";
 
 function insertTableRowColumn(context: CaretState, table: TableNode, format: FormatNode, row: boolean, before: boolean): Edit {
     const location = table.locate(format);

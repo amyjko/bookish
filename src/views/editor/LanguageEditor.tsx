@@ -1,5 +1,5 @@
-import React, { ChangeEvent, useContext } from "react";
-import { CaretContext } from "./BookishEditor";
+import { ChangeEvent, useContext } from "react";
+import { CaretContext } from "./CaretContext";
 
 
 const LanguageEditor = (props: {
