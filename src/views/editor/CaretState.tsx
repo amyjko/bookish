@@ -42,4 +42,5 @@ export type CaretState = {
     redo: () => Edit;
     clipboard: Clipboard;
     handleCopy: (node: Node) => void;
+    handlePaste: (context: CaretState, node: Node, save: boolean) => Edit;
 };

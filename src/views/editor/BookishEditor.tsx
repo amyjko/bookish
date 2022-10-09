@@ -475,7 +475,8 @@ const BookishEditor = <RootType extends RootNode>(props: {
             undo: undo,
             redo: redo,
             clipboard: clipboard,
-            handleCopy: handleCopy
+            handleCopy: handleCopy,
+            handlePaste: handlePaste
         };
     }
 
@@ -716,6 +717,54 @@ const BookishEditor = <RootType extends RootNode>(props: {
         else
             window.alert("Your browser doesn't support copying to the clipboard :(");
 
+    }
+
+    function handlePaste(context: CaretState, node: BookishNode, save: boolean) {
+
+        // Track revisions in these two variables.
+        let newRoot = context.root;
+        let newCaret = context.start;
+
+        // Is there any text to remove? Remove it first.
+        if(context.isSelection) {
+            const edit = newRoot.withRangeFormatted(context.range, undefined);
+            if(edit === undefined || !(edit.root instanceof ChapterNode)) return;
+            newRoot = edit.root;
+            newCaret = edit.range.start;
+        }
+
+        // Find the parents of the caret node, from nearest to furthest
+        const parents = context.root.getParentsOf(newCaret.node);
+        if(parents === undefined) return;
+
+        // Pop parents, nearest to farthest, searching for one that handles an insertion.
+        let edit = undefined;
+        let parent = undefined;
+        while(parents.length > 0) {
+            parent = parents.pop();
+            if(parent === undefined) break;
+            // It's critical that we insert a copy and not the node in case people copy multiple times. A node can only appear once in a tree.
+            edit = parent.withNodeInserted(newCaret, node.copy());
+            if(edit !== undefined) break;
+        }
+
+        // Insert the node at the caret.
+        if(parent !== undefined && edit !== undefined) {
+            const newChapter = context.root.withNodeReplaced(parent, edit.root);
+            if(newChapter === undefined) return;
+
+            if(save) {
+                // Set the range to force a rerender, assuming something in the document changed.
+                setCaretRange(edit.range);
+        
+                // Save the copy in the undo stack if this isn't a navigation or selection state.
+                saveEdit(newChapter as RootType, edit.range);
+            }
+            else
+                return { root: newChapter, range: edit.range};
+
+        }
+        
     }
 
     const isAtom = caretRange && caretRange.start.node instanceof AtomNode;

@@ -903,44 +903,38 @@ export const commands: Command[] = [
         category: "clipboard",
         control: true, alt: false, shift: false, key: ["v"],
         visible: true,
-        active: context => context.clipboard !== undefined, 
-        handler: context => { 
-            if(context.clipboard === undefined || context.root === undefined) return;
+        active: context => true,
+        handler: context => {
+            if(context.root === undefined) return undefined;
 
-            // Track revisions in these two variables.
-            let newRoot = context.root;
-            let newCaret = context.start;
-
-            // Is there any text to remove? Remove it first.
-            if(context.isSelection) {
-                const edit = newRoot.withRangeFormatted(context.range, undefined);
-                if(edit === undefined || !(edit.root instanceof ChapterNode)) return;
-                newRoot = edit.root;
-                newCaret = edit.range.start;
+            // See if there's something on the clipboard.
+            if(navigator.clipboard) {
+                navigator.clipboard.read()
+                    .then((items: ClipboardItems) => {
+                        // If there's nothing, paste whatever is on the editor clipboard, if there is something.
+                        if(items.length === 0 && context.clipboard !== undefined)
+                            context.handlePaste(context, context.clipboard, true);
+                        else {
+                            for(const item of items) {
+                                for(const type of item.types) {
+                                    if(type === "text/plain")
+                                        item.getType(type)
+                                            .then((blob: Blob) => {
+                                                blob.text().then(text => {
+                                                    context.handlePaste(context, new TextNode(text), true);
+                                                })
+                                            })
+                                }
+                            }  
+                        }
+                    })
+            }
+            // If there is no OS clipboard access, but there is something in the editor clipboard, copy it.
+            else if(context.clipboard !== undefined) {
+                return context.handlePaste(context, context.clipboard, false);
             }
 
-            // Find the parents of the caret node, from nearest to furthest
-            const parents = context.root.getParentsOf(newCaret.node);
-            if(parents === undefined) return;
-
-            // Pop parents, nearest to farthest, searching for one that handles an insertion.
-            let edit = undefined;
-            let parent = undefined;
-            while(parents.length > 0) {
-                parent = parents.pop();
-                if(parent === undefined) break;
-                // It's critical that we insert a copy and not the node in case people copy multiple times. A node can only appear once in a tree.
-                edit = parent.withNodeInserted(newCaret, context.clipboard.copy());
-                if(edit !== undefined) break;
-            }
-
-            // Insert the node at the caret.
-            if(parent !== undefined && edit !== undefined) {
-                const newChapter = context.root.withNodeReplaced(parent, edit.root);
-                if(newChapter === undefined) return;
-                return { root: newChapter, range: edit.range};
-            }
-
+            return undefined;
         }
     },
     {
