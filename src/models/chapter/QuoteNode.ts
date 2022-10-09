@@ -34,6 +34,7 @@ export class QuoteNode extends BlocksNode {
     toBookdown(): string {
         return `"\n${this.getBlocks().map(element => element.toBookdown()).join("\n\n")}\n"${this.#position === "|" ? "" : this.#position}${this.#credit ? this.#credit.toBookdown() : ""}`;
     }
+    toHTML() { return `"${super.toHTML()}"<center>${this.#credit.toHTML()}</center>`; }
 
     getChildren(): Node[] { return [ ...this.getBlocks(), this.#credit ]; }
 

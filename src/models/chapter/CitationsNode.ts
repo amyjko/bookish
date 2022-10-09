@@ -11,6 +11,8 @@ export class CitationsNode extends AtomNode<string[]> {
     getDefaultCaret(): Caret { return { node: this, index: 0 }; };
     toText(): string { return ""; }
     toBookdown(): string { return `<${this.getMeta().join(",")}>`; }
+    toHTML(): string { return `(${this.getMeta().join(",")})`; }
+
     getParentOf(node: Node): Node | undefined { return undefined; }
     
     copy() { return new CitationsNode([...this.getMeta()]) as this; } 

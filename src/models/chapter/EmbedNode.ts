@@ -53,6 +53,7 @@ export class EmbedNode extends BlockNode {
     }
     
     toText(): string { return this.#caption.toText(); }
+    toHTML(): string { return `<img src="${this.getURL()}" alt="${this.getDescription()}" />`; }
     toBookdown(): string {
         return `|${this.#urls}|${this.#description}|${this.#caption.toBookdown()}|${this.#credit.toBookdown()}|`;
     }

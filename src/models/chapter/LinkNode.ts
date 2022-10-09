@@ -9,13 +9,9 @@ export class LinkNode extends MetadataNode<string> {
 
     getType() { return "link"; }
 
-    toText(): string {
-        return this.getText().toText();
-    }
-
-    toBookdown(): string {
-        return `[${this.getText().toBookdown()}|${this.getMeta()}]`;
-    }
+    toText(): string { return this.getText().toText(); }
+    toHTML() { return `<a href="${this.getMeta()}">${this.getText().toHTML()}</a>`; }
+    toBookdown(): string { return `[${this.getText().toBookdown()}|${this.getMeta()}]`; }
 
     copy() {
         return new LinkNode(this.getText(), this.getMeta()) as this;

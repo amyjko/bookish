@@ -874,9 +874,8 @@ export const commands: Command[] = [
             // Save the copied content to the clipboard
             const copy = context.root.copyRange(context.range);
             const edit = context.root.withRangeFormatted(context.range, undefined);
-            if(edit === undefined) return;
-
-            context.setClipboard(copy);
+            if(edit === undefined || copy === undefined) return;
+            context.handleCopy(copy);
 
             return rootWithNode<RootNode>(context, context.root, edit.root as RootNode, () => edit.range.start);
         }
@@ -893,7 +892,7 @@ export const commands: Command[] = [
             // Save the copied content to the clipboard
             const copy = context.root.copyRange(context.range);
             if(copy !== undefined)
-                context.setClipboard(copy);
+                context.handleCopy(copy);
             return undefined;
         
         }

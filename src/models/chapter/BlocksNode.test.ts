@@ -8,6 +8,7 @@ import { FootnoteNode } from "./FootnoteNode";
 import { FormatNode } from "./FormatNode";
 import { ListNode } from "./ListNode";
 import { ParagraphNode } from "./ParagraphNode";
+import Parser from './Parser';
 import { QuoteNode } from "./QuoteNode";
 import { RuleNode } from "./RuleNode";
 import { TableNode } from "./TableNode";
@@ -388,5 +389,14 @@ test("Copy/paste", () => {
 
     expect(partialCalloutAndQuote?.toBookdown())
         .toBe(`\n\n=\nthree\n=\n\n\n\n"\nI'm tired\n"\n\n`)
+
+})
+
+test("to HTML", () => {
+
+    expect(Parser.parseChapter(undefined, "Hi.\n\nI am paragraphs.").toHTML()).toBe("<p>Hi.</p><p>I am paragraphs.</p>")
+    expect(Parser.parseChapter(undefined, "* I am one\n\n* I am two\n\n* I am three").toHTML()).toBe("<p></p><ul><li>I am one</li><li>I am two</li><li>I am three</li></ul><p></p>")
+    expect(Parser.parseChapter(undefined, "1. I am one\n\n2. I am two\n\n3. I am three").toHTML()).toBe("<p></p><ol><li>I am one</li><li>I am two</li><li>I am three</li></ol><p></p>")
+    expect(Parser.parseChapter(undefined, "|image.jpg|A picture|A caption|A credit|").toHTML()).toBe('<p></p><img src="image.jpg" alt="A picture" /><p></p>')
 
 })

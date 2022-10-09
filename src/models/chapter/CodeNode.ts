@@ -37,6 +37,7 @@ export class CodeNode extends BlockNode {
     getFormats() { return [ this.#caption ]; }
 
     toText() { return ""; }
+    toHTML(): string { return `<pre><code>${this.#code.toHTML()}</code><pre><center>${this.#caption.toHTML()}</center>`; }
 
     toBookdown(): string {
         // Remember to escape any back ticks.

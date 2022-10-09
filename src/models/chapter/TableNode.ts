@@ -42,6 +42,10 @@ export class TableNode extends BlockNode {
             `\n${this.#position === "|" ? "" : this.#position}${this.#caption ? "" + this.#caption.toBookdown() : ""}`;
     }
 
+    toHTML() { 
+        return `<table><tbody>${this.#rows.map(row => `<tr>${row.map(cell => `<td>${cell.toHTML()}</td>`).join("")}`).join("")}</tbody></table><center>${this.#caption.toHTML()}</center>`;
+    }
+
     getChildren() {
         const children = [];
         this.#rows.forEach(row => row.forEach(cell => children.push(cell)));

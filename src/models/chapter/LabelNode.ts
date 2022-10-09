@@ -15,6 +15,7 @@ export class LabelNode extends AtomNode<string> {
     getDefaultCaret(): Caret { return { node: this, index: 0 }; }
 
     toText(): string { return ""; }
+    toHTML() { return ""; }
 
     toBookdown(format?: FormatNode): string {
         const id = this.getMeta();

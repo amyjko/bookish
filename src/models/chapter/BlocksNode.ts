@@ -751,4 +751,8 @@ export abstract class BlocksNode extends BlockNode {
 
     }
 
+    toHTML() {
+        return this.#blocks.map(b => b.toHTML()).join("");
+    }
+
 }

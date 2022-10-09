@@ -475,7 +475,7 @@ const BookishEditor = <RootType extends RootNode>(props: {
             undo: undo,
             redo: redo,
             clipboard: clipboard,
-            setClipboard: setClipboard
+            handleCopy: handleCopy
         };
     }
 
@@ -696,6 +696,26 @@ const BookishEditor = <RootType extends RootNode>(props: {
     function handleUnfocus() {
         if(document.activeElement !== null && editorRef.current !== null && !editorRef.current.contains(document.activeElement))
             setEditorFocused(false);
+    }
+
+    function handleCopy(node: BookishNode) {
+
+        // Set the editor's clipboard.
+        setClipboard(node);
+
+        // Set the OS clipboard.
+        if(navigator.clipboard) {
+
+            navigator.clipboard.write([
+                new ClipboardItem({
+                    "text/plain": new Blob([ node.toBookdown() ], { type: "text/plain" }),
+                    "text/html": new Blob([ node.toHTML() ], { type: "text/html" })
+                })
+            ]);
+        }
+        else
+            window.alert("Your browser doesn't support copying to the clipboard :(");
+
     }
 
     const isAtom = caretRange && caretRange.start.node instanceof AtomNode;

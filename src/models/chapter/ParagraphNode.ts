@@ -57,6 +57,11 @@ export class ParagraphNode extends BlockNode {
         return (this.#level === 1 ? "# " : this.#level === 2 ? "## " : this.#level === 3 ? "### " : "") + this.#format.toBookdown();
     }
 
+    toHTML(): string { 
+        const tag = this.#level === 1 ? "h1" : this.#level === 2 ? "h2" : this.#level === 3 ? "h2" : "p"
+        return `<${tag}>${this.#format.toHTML()}</${tag}>`;
+    }
+
     withLevel(level: number): ParagraphNode { return new ParagraphNode(level, this.#format); }
 
     withContent(content: FormatNode): ParagraphNode { return new ParagraphNode(this.#level, content); }

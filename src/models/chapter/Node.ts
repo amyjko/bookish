@@ -16,8 +16,11 @@ export abstract class Node {
     // Returns space-separated text in the string, helpful for searching.
     abstract toText(): string;
     
-    // Returns a syntactically valid Bookdown string representing the node.
+    // Returns a syntactically valid Bookdown string representing the node and it's children.
     abstract toBookdown(): string;
+
+    // Returns valid HTML representing the node and it's children.
+    abstract toHTML(): string;
     
     // Returns a string represent the type of node this is.
     abstract getType(): string;

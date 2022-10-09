@@ -43,6 +43,15 @@ export class TextNode extends Node {
 
     }
 
+    toHTML() { 
+        return this.#text
+            .replace("<", "&lt;")
+            .replace(">", "&gt;")
+            .replace("&", "&amp;")
+            .replace('"', "&quot;")
+            .replace("'", "&#39;");
+    }
+
     getChildren() { return []; }
 
     copy() { return new TextNode(this.#text) as this; }

@@ -1,4 +1,3 @@
-import React from "react";
 import { Caret, CaretRange } from "../../models/chapter/Caret";
 import { ParagraphNode } from "../../models/chapter/ParagraphNode";
 import { AtomNode } from "../../models/chapter/AtomNode";
@@ -13,6 +12,7 @@ import { CodeNode } from "../../models/chapter/CodeNode";
 import { BlockNode } from "../../models/chapter/BlockNode";
 import { Clipboard } from "./Clipboard";
 import type { UndoState } from "./UndoState";
+import type { Node } from "../../models/chapter/Node";
 
 export type CaretState = {
     chapter: boolean;
@@ -41,5 +41,5 @@ export type CaretState = {
     undo: () => Edit;
     redo: () => Edit;
     clipboard: Clipboard;
-    setClipboard: React.Dispatch<React.SetStateAction<Clipboard>>;
+    handleCopy: (node: Node) => void;
 };

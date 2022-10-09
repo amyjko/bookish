@@ -43,6 +43,20 @@ export class FormatNode extends Node {
     toText(): string {
         return this.#segments.map(segment => segment.toText()).join(" ");
     }
+    toHTML(): string { 
+        const format = this.#format;
+        const segments = this.#segments.map(s => s.toHTML()).join("");
+        if(format === "*")
+            return `<strong>${segments}</strong>`;
+        else if(format === "_")
+            return `<em>${segments}</em>`;
+        else if(format === "^")
+            return `<sup>${segments}</sup>`;
+        else if(format === "v")
+            return `<sub>${segments}</sub>`;
+        else
+            return segments;
+    }
 
     toBookdown(): string {
         return (this.#format === "v" ? "^v" : this.#format) + this.#segments.map(s => s instanceof AtomNode ? s.toBookdown(this) : s.toBookdown()).join("") + (this.#format === "v" ? "^" : this.#format);

@@ -12,6 +12,7 @@ export class CommentNode extends AtomNode<FormatNode> {
 
     getType() { return "comment"; }
     toText(): string { return ""; }
+    toHTML(): string { return `(${this.getMeta().toHTML()})`; }
 
     getDefaultCaret(): Caret | undefined { return this.getMeta().getFirstCaret(); }
 

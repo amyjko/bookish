@@ -72,6 +72,12 @@ export class ListNode extends BlockNode {
             this.#items.map(item => (item instanceof ListNode ? "" : "*".repeat(level) + " ") + item.toBookdown(level + 1)).join("\n");
     }
 
+    toHTML(): string { 
+        return this.isNumbered() ?
+            `<ol>${this.#items.map(i => `<li>${i.toHTML()}</li>`).join("")}</ol>` :            
+            `<ul>${this.#items.map(i => `<li>${i.toHTML()}</li>`).join("")}</ul>`;
+     }
+
     getParentOf(node: Node): Node | undefined {
         return this.#items.map(b => b === node ? this : b.getParentOf(node)).find(b => b !== undefined);
     }

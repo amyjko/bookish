@@ -15,6 +15,7 @@ export class FootnoteNode extends AtomNode<FormatNode> {
 
     toText(): string { return this.getMeta().toText(); }
     toBookdown(): string { return `{${this.getMeta().toBookdown()}}`; }
+    toHTML(): string { return `(${this.getMeta().toHTML()})`; }
 
     copy() { return new FootnoteNode(this.getMeta().copy()) as this; }
 

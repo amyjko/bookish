@@ -12,6 +12,7 @@ export class DefinitionNode extends MetadataNode<string> {
     toText(): string {
         return this.getText().toText();
     }
+    toHTML(): string { return `${this.getText().toHTML()}`; }
 
     toBookdown(): string {
         return `~${this.getText().toBookdown()}~${this.getMeta()}`; 

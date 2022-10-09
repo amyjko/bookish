@@ -1,5 +1,5 @@
 import { Node } from "./Node";
-import { Caret, CaretRange, IndexRange, indexToCaret, caretToIndex } from "./Caret";
+import { Caret, CaretRange, indexToCaret, caretToIndex } from "./Caret";
 import { Edit } from "./Edit";
 import { Format, FormatNode, FormatNodeSegmentType } from "./FormatNode";
 import { TextNode } from "./TextNode";
