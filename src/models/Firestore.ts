@@ -243,16 +243,18 @@ export const updateChapterTextInFirestore = async(edition: DocumentReference, ch
 
 }
 
-export const subdomainIsAvailable = async (subdomain: string): Promise<boolean> => {
+export const subdomainIsAvailable = async (subdomain: string, book: Book): Promise<boolean> => {
 
     if(!db)
         throw Error("Not connected to Firebase.");
 
-    return (await getDocs(query(collection(db, "books"), where("domain", "==", subdomain)))).empty;
+    const matches = await getDocs(query(collection(db, "books"), where("domain", "==", subdomain)));
+
+    return matches.empty || matches.docs[0].id === book.getRefID();
 
 }
 
-export const getBookIDFromSubdomain = async (subdomain: string): Promise<string> => {
+export const getBookIDFromBookName = async (subdomain: string): Promise<string> => {
 
     if(!db)
         throw Error("Can't find book ID from URL, not connected to Firebase.")

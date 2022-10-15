@@ -64,19 +64,20 @@ const TextEditor = (props: {
         if(textField?.current) {
             const newValue = textField?.current.value;
             setText(newValue)
-            if(validate(newValue) === undefined && props.saveOnExit !== true)
+            if(props.saveOnExit !== true)
                 save(newValue);
         }
     }
 
     function save(text: string) {
-        const revisedText = props.save(text);
-        if(typeof revisedText === "string")
-            setText(revisedText);
-        if(revisedText instanceof Promise)
-            revisedText.catch((error: Error) => 
-                setError(error.message));
-
+        if(validate(text) === undefined) {
+            const revisedText = props.save(text);
+            if(typeof revisedText === "string")
+                setText(revisedText);
+            if(revisedText instanceof Promise)
+                revisedText.catch((error: Error) => 
+                    setError(error.message));
+        }
     }
 
     function validate(value: string): string | undefined {

@@ -25,7 +25,7 @@ export default function BookPreview(props: { book: Book, write: boolean }) {
 			<div className="bookish-app-book-preview-title">{
 				subdomain === undefined || props.write ?
 					<Link to={refID === undefined ? "" : (props.write ? "/write/" : "/read/") + refID}>{title}</Link> :
-					<a href={getSubdomainURL(subdomain)}>{title}</a>
+					<Link to={`/${subdomain}`}>{title}</Link>
 			}
 			</div>
 			<div className="bookish-app-book-preview-authors">{ authors.length === 0 ? <em>No authors</em> : authors.map((author, index) => <span key={index}>{author}{ index !== authors.length - 1 ? <span>,&nbsp;</span> : null}</span>) }</div>

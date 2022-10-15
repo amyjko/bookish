@@ -22,6 +22,7 @@ import { BaseContext } from './BaseContext'
 import ChapterIDs from '../../models/book/ChapterID'
 import Book from '../../models/book/Book'
 import { subdomainIsAvailable } from '../../models/Firestore'
+import { RoutesContext } from '../../App'
 
 const TableOfContentsRow = (props: { 
 	image: React.ReactNode, 
@@ -383,7 +384,15 @@ const AddChapter = () => {
 
 }
 
-const SubdomainEditor = (props: { book: Book}) => {
+const SubdomainEditor = (props: { book: Book }) => {
+
+	const routes = useContext(RoutesContext);
+
+	const invalidNames = 
+		// Find the first part of the path
+		routes.map(route => route.path.split("/")[1])
+		// Filter out the undefined, wildcard, or book name paths, and duplicates
+		.filter((path, index, paths) => path !== undefined && path !== "*" && !path.startsWith(":") && paths.lastIndexOf(path) <= index);
 
 	return <span className="bookish-muted">
 		<TextEditor 
@@ -392,7 +401,7 @@ const SubdomainEditor = (props: { book: Book}) => {
 			save={
 				// Save the new domain
 				async domain => {
-					const available = await subdomainIsAvailable(domain);
+					const available = await subdomainIsAvailable(domain, props.book);
 					if(available)
 						props.book.setSubdomain(domain);
 					else throw Error("Domain isn't available");
@@ -400,7 +409,8 @@ const SubdomainEditor = (props: { book: Book}) => {
 			}
 			placeholder="book domain"
 			valid={(newDomain) =>
-				newDomain.length > 0 && !/^[A-Za-z0-9](?:[A-Za-z0-9\-]{0,61}[A-Za-z0-9])?$/.test(newDomain) ? "Book domains must be fewer than 63 characters and can only be a-z, A-Z, and 0-9." :
+				// If not the empty string, must be a valid URL subdomain, and none of the existing routes.
+				invalidNames.includes(newDomain) || (newDomain.length > 0 && !/^[A-Za-z0-9](?:[A-Za-z0-9\-]{0,61}[A-Za-z0-9])?$/.test(newDomain)) ? `Book domains must be fewer than 63 characters, made of symbols a-z, A-Z, and 0-9, and not one of ${invalidNames.join(", ")}.` :
 				undefined
 			}
 			saveOnExit={true}

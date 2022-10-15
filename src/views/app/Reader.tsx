@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom'
-import { getBookIDFromSubdomain, loadBookFromFirestore } from "../../models/Firestore"
+import { getBookIDFromBookName, loadBookFromFirestore } from "../../models/Firestore"
 import Edition from '../page/Edition'
 import Loading from '../page/Loading'
 import EditionModel from '../../models/book/Edition'
@@ -12,9 +12,10 @@ export default function Reader() {
     const [ , setBook ] = useState<Book | undefined>(undefined);
 	const [ edition, setEdition ] = useState<EditionModel | null>(null)
     const [ error, setError ] = useState<Error | null>(null)
-    const { bookid, editionid } = useParams()
+    const { bookid, editionid, bookname } = useParams()
 
     const subdomain = getSubdomain();
+    const possibleBookname = subdomain ?? bookname;
 
     function initializeBook(newBook: Book) {
 
@@ -36,8 +37,8 @@ export default function Reader() {
             loadBookFromFirestore(bookid)
                 .then(book => initializeBook(book))
                 .catch((error => setError(error)))
-        else if(subdomain !== undefined) {
-            getBookIDFromSubdomain(subdomain)
+        else if(possibleBookname !== undefined) {
+            getBookIDFromBookName(possibleBookname)
                 .then(bookid => loadBookFromFirestore(bookid)
                     .then(book => initializeBook(book))
                     .catch((error => setError(error)))
@@ -50,6 +51,10 @@ export default function Reader() {
 
     return  error !== null ? <div className="bookish-app-alert">{error.message}</div> :
             edition === null ? <Loading/> :
-                <Edition edition={edition} base={subdomain === undefined ? `/read/${bookid}/${edition.getEditionNumber()}` : ""} />
+                <Edition edition={edition} base={
+                    possibleBookname === undefined ? `/read/${bookid}/${edition.getEditionNumber()}` : 
+                    subdomain !== undefined ? "":
+                    `/${bookname}`
+                } />
 
 }
