@@ -18,19 +18,19 @@ import Quote from "./Quote";
 import Rule from "./Rule";
 import Table from "./Table";
 
-const Block = (props: { node: BlockNode, key?: string }) => {
+const Block = (props: { node: BlockNode }) => {
 
-    const { node, key } = props;
+    const { node } = props;
 
-    return node instanceof ParagraphNode ? <Paragraph node={node} key={key} /> :
-        node instanceof ListNode ? <List node={node} key={key}  /> :
-        node instanceof EmbedNode ? <Embed node={node} key={key}  /> :
-        node instanceof CalloutNode ? <Callout node={node} key={key}  /> :
-        node instanceof QuoteNode ? <Quote node={node} key={key}  /> :
-        node instanceof CodeNode ? <CaptionedCode node={node} key={key}  /> :
-        node instanceof ErrorNode ? <ErrorMessage node={node} key={key}  /> :
-        node instanceof RuleNode ? <Rule node={node} key={key}  /> :
-        node instanceof TableNode ? <Table node={node} key={key}  /> :
+    return node instanceof ParagraphNode ? <Paragraph node={node} /> :
+        node instanceof ListNode ? <List node={node} /> :
+        node instanceof EmbedNode ? <Embed node={node} /> :
+        node instanceof CalloutNode ? <Callout node={node} /> :
+        node instanceof QuoteNode ? <Quote node={node} /> :
+        node instanceof CodeNode ? <CaptionedCode node={node} /> :
+        node instanceof ErrorNode ? <ErrorMessage node={node} /> :
+        node instanceof RuleNode ? <Rule node={node} /> :
+        node instanceof TableNode ? <Table node={node} /> :
         <p>Unknown node type</p>
 
 };

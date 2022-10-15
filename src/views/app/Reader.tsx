@@ -1,10 +1,11 @@
-import React, { useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom'
-import { loadBookFromFirestore } from "../../models/Firestore"
+import { getBookIDFromSubdomain, loadBookFromFirestore } from "../../models/Firestore"
 import Edition from '../page/Edition'
 import Loading from '../page/Loading'
 import EditionModel from '../../models/book/Edition'
 import Book from '../../models/book/Book'
+import { getSubdomain } from '../util/getSubdomain'
 
 export default function Reader() {
 
@@ -12,6 +13,8 @@ export default function Reader() {
 	const [ edition, setEdition ] = useState<EditionModel | null>(null)
     const [ error, setError ] = useState<Error | null>(null)
     const { bookid, editionid } = useParams()
+
+    const subdomain = getSubdomain();
 
     function initializeBook(newBook: Book) {
 
@@ -29,16 +32,24 @@ export default function Reader() {
     
 	// When this mounts, get the book corresponding to the ID in the route
 	useEffect(() => {
-        if(bookid)
+        if(bookid !== undefined)
             loadBookFromFirestore(bookid)
                 .then(book => initializeBook(book))
                 .catch((error => setError(error)))
+        else if(subdomain !== undefined) {
+            getBookIDFromSubdomain(subdomain)
+                .then(bookid => loadBookFromFirestore(bookid)
+                    .then(book => initializeBook(book))
+                    .catch((error => setError(error)))
+                )
+                .catch(error => setError(error));
+        }
         else
-            setError(Error("No book specified in URL."))
+            setError(Error("There's no book by this name."))
 	}, [])
 
     return  error !== null ? <div className="bookish-app-alert">{error.message}</div> :
             edition === null ? <Loading/> :
-                <Edition edition={edition} base={`/read/${bookid}/${edition.getEditionNumber()}`} />
+                <Edition edition={edition} base={subdomain === undefined ? `/read/${bookid}/${edition.getEditionNumber()}` : ""} />
 
 }

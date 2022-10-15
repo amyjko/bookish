@@ -18,6 +18,8 @@ export type BookSpecification = {
     cover: string | null;
     // A list of editions
     revisions: Revision[];
+    // An optional subdomain
+    domain?: string;
     // A list of user ids that have access to edit the book.
     uids: string[];
 };
@@ -96,6 +98,15 @@ export default class Book {
     notifyListeners(status: BookSaveStatus) { this.listeners.forEach(listener => listener.call(undefined, status)); }
 
     toObject() { return this.spec; }
+
+    getSubdomain() { return this.spec.domain; }
+    setSubdomain(domain: string) { 
+        if(domain.length === 0)
+            delete this.spec.domain;
+        else
+            this.spec.domain = domain;
+        return this.requestSave();
+    }
 
     getTitle() { return this.spec.title; }
     setTitle(title: string) { 

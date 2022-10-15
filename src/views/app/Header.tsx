@@ -3,6 +3,7 @@ import { Link } from "react-router-dom"
 import BookishNavLink from "./BookishNavLink"
 
 import icon from "../../assets/icons/icon.png";
+import { getSubdomain, pathWithoutSubdomain } from "../util/getSubdomain";
 
 export default function Header() {
 
@@ -18,17 +19,25 @@ export default function Header() {
 			}
 	}
 	
+	const subdomain = getSubdomain();
+
+	function getLink(path: string, label: string) {
+		return subdomain !== undefined ? 
+			<a href={pathWithoutSubdomain(path)}>{label}</a> : 
+			<BookishNavLink to={path}>{label}</BookishNavLink>
+	}
+
 	return <div className="bookish-app-header">
 		<img src={icon}/>&nbsp;
-		<BookishNavLink to="/">Home</BookishNavLink>
-		<BookishNavLink to="/read">Read</BookishNavLink>
-		<BookishNavLink to="/write">Write</BookishNavLink>
+		{ getLink("/", "Home") }
+		{ getLink("/read", "Read") }
+		{ getLink("/write", "Write") }
 		<small>
-			{ currentUser && currentUser.email && <BookishNavLink to="/email">{currentUser.email}</BookishNavLink> }
+			{ currentUser && currentUser.email && getLink("/email", currentUser.email) }
 			{
 				currentUser === null ?
-					<BookishNavLink to="/login">Login</BookishNavLink> :
-					<Link to="/" onClick={handleLogout}>Logout</Link>		
+					getLink("/login", "Login") :
+					<Link to={pathWithoutSubdomain("/")} onClick={handleLogout}>Logout</Link>		
 			}
 		</small>
 	</div>

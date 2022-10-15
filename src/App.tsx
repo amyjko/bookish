@@ -15,10 +15,14 @@ import Write from "./views/app/Write"
 import Reader from "./views/app/Reader"
 import ChangeEmail from './views/app/ChangeEmail';
 
+import { getSubdomain } from './views/util/getSubdomain';
+
 import "./assets/css/bookish.css";
 import "./assets/css/app.css";
 
 function App() {
+
+  const subdomain = getSubdomain();
 
   // Don't show the app in production yet.
   // Need to finish it first!
@@ -37,7 +41,8 @@ function App() {
         <Router>
           <Header/>
           <Routes>
-            <Route path="/" element={<Home/>} />
+            {/* Bare domains either go home, or if there is a subdomain, to a book */}
+            <Route path="/*" element={subdomain ? <Reader/> : <Home/>} />
             <Route path="/login" element={<Login/>} />
             <Route path="/write" element={<Private><Dashboard/></Private>} />
             <Route path="/finishlogin" element={<FinishLogin/>} />

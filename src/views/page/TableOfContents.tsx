@@ -113,7 +113,8 @@ const TableOfContents = (props: { edition: Edition }) => {
 	}, [])
 
 	// Get the book being rendered.
-	let edition = props.edition;
+	const edition = props.edition;
+	const book = edition.getBook();
 
 	function getProgressDescription(progress: null | number) {
 
@@ -169,6 +170,33 @@ const TableOfContents = (props: { edition: Edition }) => {
 			header={title}
 			subtitle={subtitle}
 			tags={edition.getTags()}
+			before={
+				<span>
+				{/* Add an editable subdomain if in editor mode */}
+				{
+					editable && book ?
+						<span className="bookish-muted">
+							<TextEditor 
+								text={book.getSubdomain() ?? ""} 
+								label="Book domain editor"
+								save={ 
+									// Save the new domain
+									domain => book.setSubdomain(domain)
+								}
+								placeholder="book domain"
+								valid={(newDomain) => 
+									!/^[A-Za-z0-9](?:[A-Za-z0-9\-]{0,61}[A-Za-z0-9])?$/.test(newDomain) ? "Book domains must be fewer than 63 characters and can only be a-z, A-Z, and 0-9." :
+									undefined
+								}
+								saveOnExit={true}
+							/>
+							<br/>
+						</span>
+						:
+						null
+				}
+				</span>
+			}
 			after={<Authors 
 				authors={edition.getAuthors()} 
 				add={ () => edition.addAuthor("")}
@@ -190,7 +218,7 @@ const TableOfContents = (props: { edition: Edition }) => {
 		<Description book={edition} />
 
 		<Instructions>
-			This will appear on the <Link to="/read">book browsing</Link> page and in your table of contents.
+			This will appear on the <Link to={base + "/read"}>book browsing</Link> page and in your table of contents.
 			Write an informative description of what your book is about.
 		</Instructions>
 
