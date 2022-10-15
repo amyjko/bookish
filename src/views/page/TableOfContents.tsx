@@ -20,6 +20,8 @@ import Instructions from './Instructions'
 import { EditorContext } from './EditorContext'
 import { BaseContext } from './BaseContext'
 import ChapterIDs from '../../models/book/ChapterID'
+import Book from '../../models/book/Book'
+import { subdomainIsAvailable } from '../../models/Firestore'
 
 const TableOfContentsRow = (props: { 
 	image: React.ReactNode, 
@@ -81,24 +83,6 @@ const TableOfContentsRow = (props: {
 			}
 		</tr>
 	</>
-
-}
-
-const AddChapter = () => {
-
-	const { edition: book } = useContext(EditorContext)
-	const [ waiting, setWaiting ] = useState(false)
-
-	function add() {
-		if(book) {
-			setWaiting(true)
-			let add = book.addChapter();
-			if(add)
-				add.then(() => { setWaiting(false); })
-		}
-	}
-
-	return <button disabled={waiting || book === undefined} onClick={add}>+</button>
 
 }
 
@@ -175,23 +159,7 @@ const TableOfContents = (props: { edition: Edition }) => {
 				{/* Add an editable subdomain if in editor mode */}
 				{
 					editable && book ?
-						<span className="bookish-muted">
-							<TextEditor 
-								text={book.getSubdomain() ?? ""} 
-								label="Book domain editor"
-								save={ 
-									// Save the new domain
-									domain => book.setSubdomain(domain)
-								}
-								placeholder="book domain"
-								valid={(newDomain) => 
-									!/^[A-Za-z0-9](?:[A-Za-z0-9\-]{0,61}[A-Za-z0-9])?$/.test(newDomain) ? "Book domains must be fewer than 63 characters and can only be a-z, A-Z, and 0-9." :
-									undefined
-								}
-								saveOnExit={true}
-							/>
-							<br/>
-						</span>
+						<SubdomainEditor book={book} />
 						:
 						null
 				}
@@ -385,7 +353,7 @@ const TableOfContents = (props: { edition: Edition }) => {
 
 }
 
-function TableOfContentsImage(props: { embed: EmbedNode }) {
+const TableOfContentsImage = (props: { embed: EmbedNode }) => {
 
 	const { embed } = props;
 
@@ -394,6 +362,51 @@ function TableOfContentsImage(props: { embed: EmbedNode }) {
 		src={embed.getSmallURL() }
 		alt={props.embed.getDescription() }
 	/>
+
+}
+
+const AddChapter = () => {
+
+	const { edition: book } = useContext(EditorContext)
+	const [ waiting, setWaiting ] = useState(false)
+
+	function add() {
+		if(book) {
+			setWaiting(true)
+			let add = book.addChapter();
+			if(add)
+				add.then(() => { setWaiting(false); })
+		}
+	}
+
+	return <button disabled={waiting || book === undefined} onClick={add}>+</button>
+
+}
+
+const SubdomainEditor = (props: { book: Book}) => {
+
+	return <span className="bookish-muted">
+		<TextEditor 
+			text={props.book.getSubdomain() ?? ""} 
+			label="Book domain editor"
+			save={
+				// Save the new domain
+				async domain => {
+					const available = await subdomainIsAvailable(domain);
+					if(available)
+						props.book.setSubdomain(domain);
+					else throw Error("Domain isn't available");
+				}
+			}
+			placeholder="book domain"
+			valid={(newDomain) =>
+				newDomain.length > 0 && !/^[A-Za-z0-9](?:[A-Za-z0-9\-]{0,61}[A-Za-z0-9])?$/.test(newDomain) ? "Book domains must be fewer than 63 characters and can only be a-z, A-Z, and 0-9." :
+				undefined
+			}
+			saveOnExit={true}
+		/>
+		<br/>
+	</span>
 
 }
 

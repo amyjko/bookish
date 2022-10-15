@@ -57,7 +57,7 @@ const TextEditor = (props: {
     function stopEditing() {
         setStatus(Status.Viewing);
         if(props.saveOnExit === true)
-            save(text);
+            save(text)
     }
 
     function edit() {
@@ -73,6 +73,10 @@ const TextEditor = (props: {
         const revisedText = props.save(text);
         if(typeof revisedText === "string")
             setText(revisedText);
+        if(revisedText instanceof Promise)
+            revisedText.catch((error: Error) => 
+                setError(error.message));
+
     }
 
     function validate(value: string): string | undefined {
