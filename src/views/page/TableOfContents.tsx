@@ -374,9 +374,7 @@ const AddChapter = () => {
 	function add() {
 		if(book) {
 			setWaiting(true)
-			let add = book.addChapter();
-			if(add)
-				add.then(() => { setWaiting(false); })
+			book.addChapter().then(() => setWaiting(false));
 		}
 	}
 

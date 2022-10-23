@@ -39,7 +39,7 @@ export default class Edition {
 
     readonly specification: EditionSpecification;
     readonly book: Book | undefined;
-    readonly editionRef: DocumentReference | undefined;
+    editionRef: DocumentReference | undefined;
 
     chapters: Chapter[];
     chaptersByID: Record<string, Chapter | undefined>;
@@ -102,7 +102,12 @@ export default class Edition {
 
     }
 
-    saveEdits() { 
+    setRef(ref: DocumentReference) {
+        if(this.editionRef) throw Error("Can only set a ref of an edition when not yet set.");
+        this.editionRef = ref;
+    }
+
+    async saveEdits() { 
         // If it's been more than a second since our last edit and there
         // are edits that haven't been saved, try updating the book, 
         // and if we succeed, resolve all of the edits, and if we fail,
@@ -110,7 +115,7 @@ export default class Edition {
         if(Date.now() - this.lastEdit > 1000 && this.edits.length > 0) {
             // Tell listeners that this book model changed.
             this.notifyListeners(BookSaveStatus.Saving);
-            updateEditionInFirestore(this)
+            return updateEditionInFirestore(this)
                 .then(() => {
                     // Approve the edits.
                     this.edits.forEach(edit => edit.resolve());
@@ -209,16 +214,16 @@ export default class Edition {
     async addChapter() {
 
         if(!this.editionRef)
-            throw Error("No book ID, can't add chapter")
+            throw Error("No edition ID, can't add chapter")
 
-        const bookID = this.editionRef
+        const editionID = this.editionRef;
 
         // Synthesize a chapter ID placeholder that doesn't overlap with existing chapter names
         let number = 1;
         while(this.hasChapter("chapter" + number))
             number++;
 
-        const chapterRef = await addChapterInFirestore(bookID, { text: "" })
+        const chapterRef = await addChapterInFirestore(editionID, { text: "" })
 
         // Create a default chapter on this model. Remember the document reference so we can modify it later.
         const emptyChapter = {
@@ -236,7 +241,7 @@ export default class Edition {
         this.chaptersByID[emptyChapter.id] = chap;
 
         // Ask the database to create the chapter, returning the promise
-        return this.requestSave();
+        this.requestSave();
 
     }
 

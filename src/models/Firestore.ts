@@ -66,12 +66,20 @@ export const createBookInFirestore = async (userID: string): Promise<string> => 
     if(!db)
         throw Error("Can't create book, not connected to Firebase.")
 
-    // Make a new empty edition.
-    const newEdition = new Edition(undefined, undefined);
+    // Make a new empty edition with a single chapter.
+    const newEdition = new Edition();
+
     // Add the current user to the book
     newEdition.addUserID(userID)
+
     // Add the book to the editions collection
-    const editionRef = await addDoc(collection(db, "editions"), newEdition.toObject())
+    const editionRef = await addDoc(collection(db, "editions"), newEdition.toObject());
+    newEdition.setRef(editionRef);
+
+    // Add a new chapter to the edition and update it in the database.
+    await newEdition.addChapter();
+    await updateEditionInFirestore(newEdition);
+
     // Note that we don't create a sub-collection of chapters here.
     // Firestore creates sub-collections automatically when documents are added.
 
@@ -93,7 +101,7 @@ export const createBookInFirestore = async (userID: string): Promise<string> => 
     }
 
     // Create the book
-    const bookRef = await addDoc(collection(db, "books"), newBook)
+    const bookRef = await addDoc(collection(db, "books"), newBook);
 
     // Return the book id
     return bookRef.id
