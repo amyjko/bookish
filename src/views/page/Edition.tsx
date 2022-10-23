@@ -70,13 +70,21 @@ const Edition = (props: { edition: EditionModel, base?: string, editable?: boole
 		forceUpdate()
 	}
 	
-	// Listen to book changes, stop when unmounted.
+	// Listen to book changes, stop when unmounted. Redo this when edition changes.
 	useEffect(() => {
 		edition.getBook()?.addListener(bookChange);
 		edition.addListener(bookChange)
+
+		// Create a timer that saves edits periodically and stops when unmounted.
+		const saverID = setInterval(() => {
+			edition.getBook()?.saveEdits();
+			edition.saveEdits();
+		}, 500);
+
 		return () => { 
 			edition.removeListener(bookChange) 
 			edition.getBook()?.removeListener(bookChange);
+			clearInterval(saverID);
 		}
 	}, [edition])
 

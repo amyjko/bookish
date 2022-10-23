@@ -117,6 +117,11 @@ const Chapter = (props: { chapter: ChapterModel, book: Edition, print?: boolean 
 		book.addListener(handleBookChange);
 		chapter.addListener(handleBookChange);
 
+		// Periodically save the chapter's edits.
+		const chapterSaverID = setInterval(() => {
+			chapter.saveEdits()
+		}, 500);
+
 		// On cleanup, unsubscribe from everything above.
 		return () => {
 
@@ -141,6 +146,9 @@ const Chapter = (props: { chapter: ChapterModel, book: Edition, print?: boolean 
 
 			book.removeListener(handleBookChange)
 			chapter.removeListener(handleBookChange)
+
+			// Stop saving.
+			clearInterval(chapterSaverID);
 		}
 
 	}, [])

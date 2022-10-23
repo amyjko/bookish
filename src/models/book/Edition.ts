@@ -102,32 +102,32 @@ export default class Edition {
             })
         }
 
-        // Periodically check for inactivity, and then update the book.
-        this.timerID = setInterval(() => {
-            // If it's been more than a second since our last edit and there
-            // are edits that haven't been saved, try updating the book, 
-            // and if we succeed, resolve all of the edits, and if we fail,
-            // then reject them.
-            if(Date.now() - this.lastEdit > 1000 && this.edits.length > 0) {
-                // Tell listeners that this book model changed.
-                this.notifyListeners(BookSaveStatus.Saving);
-                updateEditionInFirestore(this)
-                    .then(() => {
-                        // Approve the edits.
-                        this.edits.forEach(edit => edit.resolve());
-                        this.notifyListeners(BookSaveStatus.Saved);
-                    })
-                    .catch(() => {
-                        // Reject the edits.
-                        this.edits.forEach(edit => edit.reject());
-                        this.notifyListeners(BookSaveStatus.Error);
-                    })
-                    .finally(() => {
-                        // Reset the edit queue.
-                        this.edits = [];
-                    })
-            }
-        }, 500);
+    }
+
+    saveEdits() { 
+        // If it's been more than a second since our last edit and there
+        // are edits that haven't been saved, try updating the book, 
+        // and if we succeed, resolve all of the edits, and if we fail,
+        // then reject them.
+        if(Date.now() - this.lastEdit > 1000 && this.edits.length > 0) {
+            // Tell listeners that this book model changed.
+            this.notifyListeners(BookSaveStatus.Saving);
+            updateEditionInFirestore(this)
+                .then(() => {
+                    // Approve the edits.
+                    this.edits.forEach(edit => edit.resolve());
+                    this.notifyListeners(BookSaveStatus.Saved);
+                })
+                .catch(() => {
+                    // Reject the edits.
+                    this.edits.forEach(edit => edit.reject());
+                    this.notifyListeners(BookSaveStatus.Error);
+                })
+                .finally(() => {
+                    // Reset the edit queue.
+                    this.edits = [];
+                })
+        }
 
     }
 
