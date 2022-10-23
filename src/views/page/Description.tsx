@@ -19,7 +19,6 @@ const Description = (props: { book: Edition }) => {
 					ast={descriptionNode} 
 					save={node => book.setDescription(node.toBookdown())}
 					chapter={false}
-					autofocus={false}
 					render={ node => <ChapterBody node={node} placeholder="What this book about?"/> }
 				/>
 				:

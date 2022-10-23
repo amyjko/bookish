@@ -30,7 +30,6 @@ const Acknowledgements = (props: { book: Edition }) => {
 						ast={acksNode} 
 						save={(node: ChapterNode) => book.setAcknowledgements(node.toBookdown())}
 						chapter={false}
-						autofocus={false}
 						render={node => <ChapterBody node={node} placeholder="Who would you like to thank?"/>}
 					/>
 				</>

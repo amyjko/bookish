@@ -99,7 +99,6 @@ export const Revisions = (props: { edition: Edition }) => {
 													ast={Parser.parseFormat(undefined, revision.summary).withTextIfEmpty()}
 													save={ newSummary => book.setEditionChangeSummary(newSummary.toBookdown(), index) } 
 													chapter={false}
-													autofocus={false}
 													render={ node => <Format node={node} placeholder="Summarize this edition's changes."/>}
 												/> : 
 											revision.summary === "" ? 

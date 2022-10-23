@@ -75,7 +75,6 @@ const DefinitionView = (props: { id: string, definition: Definition }) => {
 				synonyms: definition.synonyms
 			})}
 			chapter={false}
-			autofocus={false}
 			render={ node => <Format node={node} placeholder="How would you define this?"/>}
 		/> :
 		definition.definition === "" ? 

@@ -28,7 +28,6 @@ const License = (props: { book: Edition }) => {
 					ast={formatNode} 
 					save={(node: FormatNode) => book.setLicense(node.toBookdown())}
 					chapter={false}
-					autofocus={false}
 					render={ node => <Format node={node} placeholder="In the U.S., all rights reserved by default."/>}
 				/>
 			</>

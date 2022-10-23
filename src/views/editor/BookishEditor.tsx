@@ -35,7 +35,7 @@ const BookishEditor = <RootType extends RootNode>(props: {
     ast: RootType,
     save: (node: RootType) => Promise<void> | undefined,
     chapter: boolean,
-    autofocus: boolean,
+    autofocus?: boolean,
     render: (node: RootType) => React.ReactNode
 }) => {
 
@@ -204,8 +204,8 @@ const BookishEditor = <RootType extends RootNode>(props: {
         // Save the new caret position so we render it.
         setCaretCoordinate(newCaretPosition);
 
-        // If the caret position is outside the window, scroll to make it visible.
-        if(newCaretPosition) {
+        // If the caret position is outside the window, and the editor is focused, scroll to make the caret visible.
+        if(newCaretPosition && focused) {
             const caretTop = newCaretPosition.y;
             const caretBottom = caretTop + newCaretPosition.height;
             const windowHeight = window.innerHeight;
@@ -490,7 +490,7 @@ const BookishEditor = <RootType extends RootNode>(props: {
 
         // Only handle keystrokes when this is focused.
         // Otherwise, we let any focusable elements in this editor handle them.
-        if(document.activeElement !== editorRef.current)
+        if(!focused)
             return;
 
         // Remember the time of this keystroke.

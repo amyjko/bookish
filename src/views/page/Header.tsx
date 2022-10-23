@@ -75,7 +75,6 @@ const Header = (props: HeaderProps) => {
 									ast={embedNode} 
 									save={node => props.setImage(node.toBookdown())}
 									chapter={false}
-									autofocus={false}
 									render={ node => <Embed node={node} />}
 								/> :
 								embedNode instanceof EmbedNode ? <Embed node={embedNode}/> : <ErrorMessage node={embedNode} />
