@@ -14,7 +14,8 @@
 		"build-reader": "vite build --config vite.reader.config.js",
 		"preview": "vite preview",
 		"test": "vitest",
-		"coverage": "vitest run --coverage"
+		"coverage": "vitest run --coverage",
+		"check": "tsc --watch"
 	},
 	"devDependencies": {
 		"@types/react": "^18.0.21",
