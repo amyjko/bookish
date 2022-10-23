@@ -81,7 +81,7 @@ export default class Chapter {
 		
         // Periodically check for inactivity, pooling edits until after an idle state.
 		this.timerID = setInterval(() => {
-			if(this.edition.editionRef && this.spec.ref && this.spec.text) {
+			if(this.edition.editionRef && this.spec.ref && this.spec.text !== undefined) {
 				// If it's been more than a second since our last edit and there
 				// are edits that haven't been saved, try updating the book, 
 				// and if we succeed, resolve all of the edits, and if we fail,
