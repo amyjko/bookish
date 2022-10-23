@@ -33,8 +33,6 @@ export default class Book {
     // when the book is ready to save.
     edits: { resolve: Function, reject: Function }[] = [];
 
-    // The timer that checks for inactivity.
-    timerID: NodeJS.Timer | undefined;
     lastEdit: number = 0;
 
     listeners: Set<Function> = new Set();

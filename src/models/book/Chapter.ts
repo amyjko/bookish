@@ -43,8 +43,6 @@ export default class Chapter {
     // when the book is ready to save.
     edits: { resolve: Function, reject: Function }[] = [];
 
-	// The timer that checks for inactivity.
-    timerID: NodeJS.Timer | undefined;
     lastEdit: number = 0;
 
 	// A set of listeners that are notified when the chapter text changes.

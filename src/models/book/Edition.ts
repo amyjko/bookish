@@ -50,13 +50,11 @@ export default class Edition {
     // when the book is ready to save.
     edits: { resolve: Function, reject: Function }[] = [];
 
-    // The timer that checks for inactivity.
-    timerID: NodeJS.Timer | undefined;
     lastEdit: number = 0;
 
     // Given an object with a valid specification and an object mapping chapter IDs to chapter text,
     // construct an object representing a book.
-    constructor(book: Book | undefined, editionRef: DocumentReference | undefined, specification?: EditionSpecification) {
+    constructor(book?: Book, editionRef?: DocumentReference, specification?: EditionSpecification) {
 
         if(typeof specification !== "object" && specification !== undefined)
             throw Error("Expected a book specification object, but received " + specification)
