@@ -65,11 +65,11 @@
     onMount(() => {
 
         const caret = editedNode.getFirstCaret();
-        if(caret) {
+        if(caret)
             caretRange = { start: caret, end: caret };
 
         // Focus the editor on load.
-        if(editorRef && autofocus === true)
+        if(editorRef && autofocus === true) {
             editorRef.focus();
         }
 
@@ -103,6 +103,9 @@
     // 1) we can rely on the browser to render selections rather than rendering it ourselves.
     // 2) We can measure the caret position, so we can render our own fancy one rather than relying on inconsistent cross browser behavior.
     afterUpdate(() => {
+
+        if(!editorFocused) return;
+
         // Measure the location of the selection using the browser's selection.
         let docSelection = document.getSelection();
         let newCaretPosition = undefined;
@@ -197,9 +200,8 @@
                 }
             }
             // If the range is empty, remove the browser's selection too.
-            else {
+            else if(editorFocused) 
                 document.getSelection()?.empty();
-            }
         }
 
         // Save the new caret position so we render it.
@@ -781,7 +783,7 @@
     // Create a caret store for the editor and make it available to children.
     let caretStore = setContext<CaretStore>(CARET, writable<CaretContext>());
 
-    // Update the caret store whenever any of the below change.
+    // Update the caret store it whenever any of the below change.
     $: caretStore.set({ 
         range: caretRange, 
         coordinate: caretCoordinate, 

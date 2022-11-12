@@ -35,7 +35,7 @@
         {#if editable }
             <em>
                 <TextEditor
-                    text={node.authors} 
+                    startText={node.authors} 
                     label={'Author list editor.'}
                     placeholder="Authors"
                     valid={ text => {
@@ -55,7 +55,7 @@
         <!-- Year -->
         <br/>({#if editable }
                 <TextEditor
-                    text={node.year} 
+                    startText={node.year} 
                     label={'Year editor.'} 
                     placeholder="Year"
                     valid={ text => {
@@ -70,7 +70,7 @@
         <!-- Title -->
         {#if editable }
             <br/><TextEditor
-                text={node.title} 
+                startText={node.title} 
                 label={'Title editor.'} 
                 placeholder="Title"
                 valid={ text => {
@@ -90,7 +90,7 @@
         {#if editable }
             <br/><em>
                 <TextEditor
-                    text={node.source}
+                    startText={node.source}
                     label={'Source editor.'} 
                     placeholder="Source"
                     valid={ text => {
@@ -105,7 +105,7 @@
         {/if}. 
         {#if editable }
             <br/><TextEditor
-                text={node.summary} 
+                startText={node.summary} 
                 label={'Summary editor.'} 
                 placeholder="Summary"
                 valid={ () => undefined }

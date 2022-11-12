@@ -59,7 +59,7 @@
         {#if editable && edition }
             <strong>
                 <TextEditor
-                    text={definition.phrase} 
+                    startText={definition.phrase} 
                     label={'Glossary phrase editor.'} 
                     placeholder="Phrase"
                     valid={ text => {
@@ -106,7 +106,7 @@
                     {#each syns as syn, index }
                         <span class="bookish-editor-synonym bookish-editor-note">
                             <TextEditor
-                                text={syn} 
+                                startText={syn} 
                                 label={'Synonym editor.'}
                                 placeholder="Synonym"
                                 valid={ () => undefined }

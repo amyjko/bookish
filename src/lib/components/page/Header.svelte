@@ -92,7 +92,7 @@
             {#if editable && save }
                 <TextEditor 
                     label={label}
-                    text={header + (subtitle ? ": " + subtitle : "")}
+                    startText={header + (subtitle ? ": " + subtitle : "")}
                     placeholder="Title"
                     valid={text => text.length === 0 ? "Titles have to be at least one character long." : undefined }
                     save={save}

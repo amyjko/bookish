@@ -1,11 +1,12 @@
 <script lang="ts">
+    import { afterUpdate, beforeUpdate } from "svelte";
 
     enum Status {
         Viewing,
         Editing
     }
 
-    export let text: string;
+    export let startText: string;
     export let label: string;
     export let placeholder: string;
     export let valid: (text: string) => string | undefined;
@@ -14,9 +15,10 @@
     export let width: number | undefined = undefined;
     export let clip: boolean = false;
 
+    let text = startText;
     let status = Status.Viewing;
     let error: undefined | string = valid(text);
-    let textField:  HTMLInputElement | null = null;
+    let field:  HTMLInputElement | null = null;
     let sizer: HTMLSpanElement | null = null;
 
     // Grow the sizer when text or status changes.
@@ -35,11 +37,13 @@
 
     // When status changes, focus or blur.
     $: {
-        if(textField) {
-            if(status === Status.Editing)
-                textField.focus();
-            else
-                textField.blur();
+        if(field) {
+            if(status === Status.Editing) {
+                field.focus();
+            }
+            else {
+                field.blur();
+            }
         }
     }
 
@@ -64,26 +68,26 @@
     }
 
     function edit() {
-        if(textField) {
-            text = textField.value;
+        if(field) {
+            text = field.value;
             if(saveOnExit === false)
                 saveText(text);
         }
     }
 
-    function saveText(text: string) {
-        if(validate(text) === undefined) {
-            const revisedText = save(text);
-            if(typeof revisedText === "string")
+    function saveText(newText: string) {
+        if(validate(newText) === undefined) {
+            const revisedText = save(newText);
+            if(typeof revisedText === "string") {
                 text = revisedText;
+            }
             if(revisedText instanceof Promise)
                 revisedText.catch((err: Error) => error = err.message)
         }
     }
 
     function validate(value: string): string | undefined {
-        error = valid(value);
-        return error;
+        return valid(value);
     }
 
     function handleKeyPress(event: KeyboardEvent) {
@@ -96,15 +100,14 @@
 <span class={`bookish-text-editor ${showPlaceholder() ? "bookish-text-editor-placeholder" : ""} ${status === Status.Viewing ? "bookish-text-editor-viewing" : ""}`}>
     <span class="bookish-text-editor-sizer" aria-hidden={true} bind:this={sizer} on:click={startEditing}></span>
     <input
-        bind:this={textField}
         type="text" 
+        bind:this={field}
+        bind:value={text}
         required
         role="textbox"
-        tabindex={0}
         aria-invalid={error !== undefined}
         aria-label={label}
         placeholder={placeholder}
-        bind:value={text}
         on:change={edit}
         on:keypress={handleKeyPress}
         on:blur={stopEditing}

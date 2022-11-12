@@ -252,7 +252,7 @@
                 {#if editable }
                     <span class="bookish-muted">
                         <TextEditor 
-                            text={chapter.getChapterID()} 
+                            startText={chapter.getChapterID()} 
                             label="Chapter URL ID editor"
                             save={ 
                                 // After the ID is edited, reload the page with the new URL.

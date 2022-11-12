@@ -19,7 +19,7 @@
 
 <span class="bookish-muted">
     <TextEditor 
-        text={book.getSubdomain() ?? ""} 
+        startText={book.getSubdomain() ?? ""} 
         label="Book domain editor"
         save={
             // Save the new domain

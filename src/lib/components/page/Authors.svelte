@@ -28,8 +28,9 @@
             const editors = authorList.querySelectorAll("input");
             if(editors.length > 0) {
                 const lastAuthor = editors[editors.length - 1];
-                if(lastAuthor instanceof HTMLElement)
+                if(lastAuthor instanceof HTMLElement) {
                     lastAuthor.focus();
+                }
             }
             newAuthor = false;
         }
@@ -49,7 +50,7 @@
         {#each authors as author, index }
             {#if editable }
                 <TextEditor
-                    text={author} 
+                    startText={author} 
                     label={'Author name editor'} 
                     placeholder="Author"
                     valid={ () => undefined }

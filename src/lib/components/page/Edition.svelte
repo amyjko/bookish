@@ -31,8 +31,8 @@
     export let edition: EditionModel;
 
     // Expose the edition to descendents in a store and update the context when the edition changes.
-    let editionStore = writable<EditionModel>(edition);
-    $: currentEdition = setContext<EditionStore>(EDITION, editionStore);
+    let currentEdition = writable<EditionModel>(edition);
+    setContext<EditionStore>(EDITION, currentEdition);
 
     // Expose the book to descendents in a store and update the context when the edition changes.
     $: setContext<Book|undefined>(BOOK, edition.getBook());

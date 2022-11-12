@@ -48,9 +48,9 @@
 		JSON.parse(progressStorage)
 
 	// Is there a colon? Let's make a subtitle
-	let title = $edition.getTitle();
+	$: title = $edition.getTitle();
 	let subtitle: string | undefined = undefined;
-	let colon = title.indexOf(":");
+	$: colon = title.indexOf(":");
 	if(colon >= 0) {
 		subtitle = title.substring(colon + 1).trim();
 		title = title.substring(0, colon).trim();
@@ -139,7 +139,7 @@
                             {#if editable }
                                 <TextEditor
                                     label={"Chapter section editor"}
-                                    text={section ? section : ""}
+                                    startText={section ? section : ""}
                                     placeholder="Section"
                                     valid={ () => undefined }
                                     save={text => chapter.setSection(text) }
