@@ -6,11 +6,11 @@
     export let node: ParagraphNode;
     export let placeholder: string | undefined = undefined;
 
-    let level = node.getLevel();
-    let chapter = getChapter();
+    $: level = node.getLevel();
+    $: chapter = getChapter();
 
-    const id = node.getLevel() === 0 ? undefined : "header-" + ($chapter.chapter.getAST()?.getHeaders().indexOf(node) ?? "");
-    const classes = node.getLevel() === 0 ? undefined: "bookish-header" + ($chapter.highlightedID === id ? " bookish-content-highlight" : "")
+    $: id = node.getLevel() === 0 ? undefined : "header-" + ($chapter.chapter.getAST()?.getHeaders().indexOf(node) ?? "");
+    $: classes = node.getLevel() === 0 ? undefined: "bookish-header" + ($chapter.highlightedID === id ? " bookish-content-highlight" : "")
 
 </script>
 
