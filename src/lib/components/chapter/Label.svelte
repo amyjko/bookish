@@ -8,14 +8,14 @@
     let editable = isEditable();
     let chapter = getChapter();
 
-    $: ast = $chapter.chapter.getAST();
+    $: ast = $chapter?.chapter.getAST();
     $: duplicate = ast === undefined ? false : ast.getLabels().filter(l => l.getMeta() === node.getMeta()).length > 1;
 
 </script>
 
 <Atom node={node}>
     <span 
-        class={"bookish-label" + ($chapter.highlightedID === node.getMeta() ? " bookish-content-highlight" : "")} 
+        class={"bookish-label" + ($chapter?.highlightedID === node.getMeta() ? " bookish-content-highlight" : "")} 
         id={node.getMeta()}
         data-nodeid={node.nodeID}
     >

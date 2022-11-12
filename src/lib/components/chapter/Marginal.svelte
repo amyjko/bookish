@@ -6,21 +6,21 @@
     export let id: string;
 
 	let hovered = false;
-	let context = getChapter();
+	let chapter = getChapter();
 
 	// If there's no marginal selected or this is different from the current selection, this is hidden.
 	function isHidden() { 
-		return $context.marginalID === null || $context.marginalID !== id
+		return $chapter?.marginalID === null || $chapter?.marginalID !== id
 	}
 
 	function toggle() {
 
-		if($context.setMarginal) {
+		if($chapter) {
 			if(isMobile() && isHidden())
-				$context.setMarginal(id);
+				$chapter.setMarginal(id);
 			// Otherwise, deselect.
 			else
-				$context.setMarginal(undefined);
+				$chapter.setMarginal(undefined);
 		}
 
 	}

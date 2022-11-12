@@ -14,7 +14,7 @@
     let edition = getEdition();
 
     // What footnote number is this?
-    $: chapterNode = $chapter.chapter?.getAST();
+    $: chapterNode = $chapter?.chapter?.getAST();
     $: number = chapterNode?.getFootnotes().indexOf(node);
     $: letter = number === undefined ? undefined : $edition.getFootnoteSymbol(number);
 

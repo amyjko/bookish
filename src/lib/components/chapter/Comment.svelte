@@ -14,7 +14,7 @@
     let editable = isEditable();
     let caret = getCaret();
 
-    $: chapterNode = $chapter.chapter.getAST();
+    $: chapterNode = $chapter?.chapter.getAST();
     $: focused = $caret && $caret.range && node.contains($caret.range.start.node);
 
     // Position the marginals on every render.

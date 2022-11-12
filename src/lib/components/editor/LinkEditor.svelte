@@ -49,7 +49,7 @@
             return;
 
         // The chapter ID is optional; if it's missing, it refers to this chapter.
-        const correspondingChapter = chapterID === "" ? $chapter.chapter.getAST() : $edition.getChapter(chapterID)?.getAST();
+        const correspondingChapter = chapterID === "" && $chapter? $chapter.chapter.getAST() : $edition.getChapter(chapterID)?.getAST();
         if(correspondingChapter === undefined)
             return "Not a valid URL or chapter.";
         
@@ -75,13 +75,15 @@
     </button>
     <select name="chapterID" on:change={handleChapterChange} value={url}>
         <option value="">URL</option>
-        <option value={$chapter.chapter.getChapterID()}>{$chapter.chapter.getTitle()}</option>
-        <!-- Build the list of options (chapters and then any of the chapter's labels.) -->
-        {#each $edition.getChapters() as chapter }     
-            {#each chapter.getAST()?.getLabels() ?? [] as label }
-                <option value={`${chapter.getChapterID()}:${label.getMeta()}`}>{chapter.getTitle() + ": " + label.getMeta()}</option>
+        {#if $chapter }
+            <option value={$chapter.chapter.getChapterID()}>{$chapter.chapter.getTitle()}</option>
+            <!-- Build the list of options (chapters and then any of the chapter's labels.) -->
+            {#each $edition.getChapters() as chapter }     
+                {#each chapter.getAST()?.getLabels() ?? [] as label }
+                    <option value={`${chapter.getChapterID()}:${label.getMeta()}`}>{chapter.getTitle() + ": " + label.getMeta()}</option>
+                {/each}
             {/each}
-        {/each}
+        {/if}
     </select>
     <code>
         <URLEditor url={url} validator={getURLError} edit={ url => { saveEdit(url); return undefined; }} />

@@ -12,7 +12,7 @@
     let chapter = getChapter();
     let edition = getEdition();
 
-    $: chapterNode = $chapter.chapter.getAST();
+    $: chapterNode = $chapter?.chapter.getAST();
 
     // Sort citations numerically, however they're numbered.
     $: citations = node.getMeta().sort((a, b) => {
@@ -35,13 +35,13 @@
 </script>
 
 <Atom {node}>
-    {#if chapter }
+    {#if chapterNode }
         <span class="bookish-citation"  data-nodeid={node.nodeID}>
             <Marginal id={"citation-" + citations.join("-")}>
                 <slot name="interactor">
                     {#each citations as citationID, index}
                         {@const citationNumber = chapterNode?.getCitationNumber(citationID) }
-                        {#if citationNumber !== null && citationID in $edition.getReferences()}
+                        {#if citationNumber && citationID in $edition.getReferences()}
                             <sup class="bookish-citation-symbol">{citationNumber}</sup>
                         {:else}
                             <span class="bookish-error">Unknown reference: <code>{citationID}</code></span>
@@ -56,7 +56,7 @@
                         {#each citations as citationID }
                             {@const citationNumber = chapterNode?.getCitationNumber(citationID) }
                             {@const ref = $edition.getReference(citationID) }
-                            {#if ref }
+                            {#if citationNumber && ref }
                                 <span class="bookish-reference">
                                     <sup class="bookish-citation-symbol">{citationNumber}</sup>
                                     <PossibleReference node={Parser.parseReference(citationID, ref, $edition, true)}/>
@@ -67,7 +67,5 @@
                 </slot>
             </Marginal>
         </span>
-    {:else}
-        <sup class="bookish-error">Citations not allowed in non-chapters</sup>
     {/if}
 </Atom>

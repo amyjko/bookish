@@ -36,7 +36,7 @@
 		z-index: 3;
 	}
 
-	:gloal(.bookish-dark .bookish-theme-preview) {
+	:global(.bookish-dark .bookish-theme-preview) {
 		border-color: white;
 	}
 

@@ -9,8 +9,8 @@
     $: level = node.getLevel();
     $: chapter = getChapter();
 
-    $: id = node.getLevel() === 0 ? undefined : "header-" + ($chapter.chapter.getAST()?.getHeaders().indexOf(node) ?? "");
-    $: classes = node.getLevel() === 0 ? undefined: "bookish-header" + ($chapter.highlightedID === id ? " bookish-content-highlight" : "")
+    $: id = node.getLevel() === 0 || $chapter === undefined ? undefined : "header-" + ($chapter.chapter.getAST()?.getHeaders().indexOf(node) ?? "");
+    $: classes = node.getLevel() === 0 ? undefined: "bookish-header" + ($chapter && $chapter.highlightedID === id ? " bookish-content-highlight" : "")
 
 </script>
 

@@ -8,7 +8,7 @@
     let chapter = getChapter();
     let caret = getCaret();
 
-    $: ast = $chapter.chapter.getAST();
+    $: ast = $chapter?.chapter.getAST();
 
 </script>
 

@@ -7,5 +7,5 @@ type ChapterContext = {
 	marginalID?: string,
 	setMarginal: (id: string | undefined) => void,
 	layoutMarginals: () => void
-}
+} | undefined;
 export default ChapterContext;
