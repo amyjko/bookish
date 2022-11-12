@@ -165,7 +165,7 @@
                             <button 
                                 disabled={command.active === false || (command.active instanceof Function && command.active.call(undefined, context) === false)}
                                 title={command.description + " " + getShortcutDescription(command)}
-                                tabIndex={0}
+                                tabindex={0}
                                 on:click={() => executor?.call(undefined, command, "")}
                                 on:keypress={(event) => event.key === " " || event.key === "Enter" ? executor?.call(undefined, command, "") : undefined }
                             >

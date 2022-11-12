@@ -100,7 +100,7 @@
         type="text" 
         required
         role="textbox"
-        tabIndex={0}
+        tabindex={0}
         aria-invalid={error !== undefined}
         aria-label={label}
         placeholder={placeholder}
