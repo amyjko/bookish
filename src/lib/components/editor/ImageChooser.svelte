@@ -1,14 +1,13 @@
 <script lang="ts">
 
     import type { Image } from '$lib/models/book/BookMedia';
-    import { getContext, onMount } from 'svelte';
-    import type Book from '$lib/models/book/Book';
-    import { BOOK } from '../page/Contexts';
+    import { onMount } from 'svelte';
+    import { getBook } from '../page/Contexts';
     
     export let select: (image: Image) => void;
     export let selection: string;
 	
-    let book = getContext<Book>(BOOK);
+    let book = getBook();
 	let images: Image[] | undefined = undefined;
     let expanded = false;
 

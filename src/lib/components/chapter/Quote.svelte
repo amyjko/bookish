@@ -6,8 +6,8 @@
 
     export let node: QuoteNode;
 
-    let credit = node.getCredit();
-    let position = node.getPosition();
+    $: credit = node.getCredit();
+    $: position = node.getPosition();
 
 </script>
 

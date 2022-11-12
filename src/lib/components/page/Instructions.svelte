@@ -1,8 +1,7 @@
 <script lang="ts">
-    import { getContext } from "svelte";
-    import { EDITABLE } from "./Contexts";
+    import { isEditable } from "./Contexts";
 
-    let editable = getContext<boolean>(EDITABLE);
+    let editable = isEditable();
 </script>
 
 {#if editable }

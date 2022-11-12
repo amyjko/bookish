@@ -5,13 +5,12 @@
     import Parser from "$lib/models/chapter/Parser";
     import ConfirmButton from '$lib/components/editor/ConfirmButton.svelte';
     import ChapterIDs from '$lib/models/book/ChapterID';
-    import { getContext } from "svelte";
     import BulkReferenceEditor from "./BulkReferenceEditor.svelte"
     import PossibleReference from "./PossibleReference.svelte";
-    import { EDITABLE, getEdition } from "./Contexts";
+    import { getEdition, isEditable } from "./Contexts";
 
     let edition = getEdition();
-    let editable = getContext<boolean>(EDITABLE);
+    let editable = isEditable();
     
     $: references = $edition.hasReferences() ? $edition.getReferences() : null;
 

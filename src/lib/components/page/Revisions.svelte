@@ -1,15 +1,14 @@
 <script lang="ts">
-    import { getContext } from "svelte";
     import Parser from "$lib/models/chapter/Parser"
     import { addDraftInFirestore, publishDraftInFirestore } from "$lib/models/Firestore"
     import Format from "$lib/components/chapter/Format.svelte"
     import BookishEditor from "$lib/components/editor/BookishEditor.svelte"
     import Switch from "$lib/components/editor/Switch.svelte"
     import Instructions from "$lib/components/page/Instructions.svelte"
-    import { EDITABLE, getEdition } from "./Contexts";
+    import { getEdition, isEditable } from "./Contexts";
 
     let edition = getEdition();
-    let editable = getContext<boolean>(EDITABLE);
+    let editable = isEditable();
     $: book = $edition.getBook();
 
 	// Legacy revisions

@@ -7,7 +7,7 @@
 
     let edition = getEdition();
 
-    let embedNode = embed === null ? null : Parser.parseEmbed($edition, embed);
+    $: embedNode = embed === null ? null : Parser.parseEmbed($edition, embed);
 
 </script>
 

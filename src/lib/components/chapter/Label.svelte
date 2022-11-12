@@ -1,12 +1,11 @@
 <script lang="ts">
     import type LabelNode from "$lib/models/chapter/LabelNode"
     import Atom from '$lib/components/chapter/Atom.svelte';
-    import { EDITABLE, getChapter } from "../page/Contexts";
-    import { getContext } from "svelte";
+    import { getChapter, isEditable } from "../page/Contexts";
 
     export let node: LabelNode;
 
-    let editable = getContext<boolean>(EDITABLE);
+    let editable = isEditable();
     let chapter = getChapter();
 
     $: ast = $chapter.chapter.getAST();

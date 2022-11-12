@@ -3,14 +3,11 @@
     import Header from "./Header.svelte";
     import Outline from './Outline.svelte';
     import Page from './Page.svelte';
-    import type Edition from '$lib/models/book/Edition'
     import Instructions from './Instructions.svelte';
     import ChapterIDs from '$lib/models/book/ChapterID';
-    import { getContext } from "svelte";
-    import { EDITION } from "./Contexts";
-    import type { Writable } from "svelte/store";
+    import { getEdition } from "./Contexts";
 
-    let edition = getContext<Writable<Edition>>(EDITION);
+    let edition = getEdition();
 
 </script>
 <Page title={`${$edition.getTitle()} - Unknown Page`}>

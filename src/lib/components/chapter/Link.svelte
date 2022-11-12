@@ -1,15 +1,13 @@
 <script lang="ts">
     import type LinkNode from "$lib/models/chapter/LinkNode";
-    import { getContext } from "svelte";
-    import { BASE, EDITABLE, EDITION } from "../page/Contexts";
+    import { getBase, getEdition, isEditable } from "../page/Contexts";
     import Text from './Text.svelte'
-    import type Edition from "$lib/models/book/Edition";
 
     export let node: LinkNode;
 
-    let base = getContext<string>(BASE);
-    let editable = getContext<boolean>(EDITABLE);
-    let edition = getContext<Edition>(EDITION);
+    let base = getBase();
+    let editable = isEditable();
+    let edition = getEdition();
 
     $: url = node.getMeta();
     $: content = node.getText();
@@ -25,7 +23,7 @@
                 chapter = parts[0];
             }
 
-            if(chapter !== "" && edition && !edition.hasChapter(chapter))
+            if(chapter !== "" && !$edition.hasChapter(chapter))
                 return true;
 
         }

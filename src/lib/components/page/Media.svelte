@@ -7,11 +7,11 @@
     import ChapterIDs from '$lib/models/book/ChapterID';
     import Format from '$lib/components/chapter/Format.svelte';
     import MediaPreview from "./MediaPreview.svelte";
-    import { getContext, onMount } from "svelte";
-    import { EDITABLE, getEdition } from "./Contexts";
+    import { onMount } from "svelte";
+    import { getEdition, isEditable } from "./Contexts";
 
     let edition = getEdition();
-    let editable = getContext<boolean>(EDITABLE);
+    let editable = isEditable();
     let images: Image[] | undefined = [];
 
     $: embeds = $edition.getEmbeds();

@@ -32,10 +32,9 @@
     import commands from "./Commands";
     import Toolbar from "./Toolbar.svelte";
 
-    import { CARET, EDITION, type CaretStore } from "../page/Contexts";
-    import { afterUpdate, getContext, onMount, setContext } from "svelte";
-    import type Edition from "$lib/models/book/Edition";
-    import { writable, type Writable } from "svelte/store";
+    import { CARET, getEdition, type CaretStore } from "../page/Contexts";
+    import { afterUpdate, onMount, setContext } from "svelte";
+    import { writable } from "svelte/store";
 
     const IDLE_TIME = 500;
 
@@ -60,7 +59,7 @@
     let editedNode: RootNode = ast;
     let ignoredInput = false;
 
-    let edition = getContext<Writable<Edition>>(EDITION);
+    let edition = getEdition();
 
     onMount(() => {
 
@@ -696,7 +695,6 @@
 
     function handleUnfocus() {
         if(document.activeElement !== null && editorRef !== null && !editorRef.contains(document.activeElement)) {
-            console.log(document.activeElement);
             editorFocused = false;
         }
     }

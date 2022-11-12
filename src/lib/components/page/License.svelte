@@ -1,16 +1,14 @@
 <script lang="ts">
-
-    import { getContext } from "svelte";
     import Parser from "$lib/models/chapter/Parser"
     import BookishEditor from "$lib/components/editor/BookishEditor.svelte";
     import Instructions from "$lib/components/page/Instructions.svelte";
     import Format from "$lib/components/chapter/Format.svelte";
-    import { EDITABLE, getEdition } from "./Contexts";
+    import { getEdition, isEditable } from "./Contexts";
 
     let edition = getEdition();
-    let editable = getContext<boolean>(EDITABLE);
+    let editable = isEditable();
 
-    let formatNode = Parser.parseFormat($edition, $edition.getLicense()).withTextIfEmpty();
+    $: formatNode = Parser.parseFormat($edition, $edition.getLicense()).withTextIfEmpty();
 
 </script>
 

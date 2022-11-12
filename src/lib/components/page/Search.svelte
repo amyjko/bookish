@@ -3,16 +3,14 @@
     import Outline from './Outline.svelte';
     import Page from './Page.svelte';
     import Link from "../Link.svelte";
-    import type Edition from '$lib/models/book/Edition';
     import Chapter from '$lib/models/book/Chapter';
     import type { Match } from '$lib/models/book/Chapter';
     import ChapterIDs from '$lib/models/book/ChapterID';
-    import { getContext, onMount } from "svelte";
-    import { BASE, EDITION } from "./Contexts";
-    import type { Writable } from "svelte/store";
+    import { onMount } from "svelte";
+    import { getBase, getEdition } from "./Contexts";
 
-    $: edition = getContext<Writable<Edition>>(EDITION);
-    let base = getContext<string>(BASE);
+    $: edition = getEdition();
+    let base = getBase();
 
     let query = "";
     let input: HTMLInputElement | null = null;

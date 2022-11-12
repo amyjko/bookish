@@ -3,18 +3,18 @@
     import Atom from './Atom.svelte';
     import Marginal from './Marginal.svelte';
     import Format from './Format.svelte';
-    import { EDITABLE, getChapter } from '../page/Contexts';
+    import { getChapter, isEditable } from '../page/Contexts';
     import { getCaret } from '../page/Contexts';
-    import { afterUpdate, getContext } from 'svelte';
+    import { afterUpdate } from 'svelte';
     import ToolbarIcon from '../editor/ToolbarIcon.svelte';
 
     export let node: CommentNode;
     
     let chapter = getChapter();
-    let editable = getContext<boolean>(EDITABLE);
+    let editable = isEditable();
     let caret = getCaret();
-    $: chapterNode = $chapter.chapter.getAST();
 
+    $: chapterNode = $chapter.chapter.getAST();
     $: focused = $caret && $caret.range && node.contains($caret.range.start.node);
 
     // Position the marginals on every render.

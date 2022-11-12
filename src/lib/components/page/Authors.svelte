@@ -2,8 +2,8 @@
     import Parser from '$lib/models/chapter/Parser';
     import TextEditor from '$lib/components/editor/TextEditor.svelte';
     import Format from '$lib/components/chapter/Format.svelte';
-    import { afterUpdate, getContext } from 'svelte';
-    import { EDITABLE, getEdition } from './Contexts';
+    import { afterUpdate } from 'svelte';
+    import { getEdition, isEditable } from './Contexts';
 
     export let authors: string[];
     export let inheritedAuthors: string[] | undefined = undefined;
@@ -11,7 +11,7 @@
     export let edit: (index: number, text: string) => Promise<void> | undefined;
     export let remove: (index: number) => Promise<void> | undefined;
 
-    let editable = getContext<boolean>(EDITABLE);
+    let editable = isEditable();
     let edition = getEdition();
 
     let authorList: HTMLDivElement | null = null;

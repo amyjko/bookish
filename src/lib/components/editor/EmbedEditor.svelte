@@ -4,16 +4,14 @@
     import TextEditor from './TextEditor.svelte';
     import { storage } from '$lib/models/Firebase';
     import type { Image } from '$lib/models/book/BookMedia';
-    import { BOOK, getCaret } from '../page/Contexts';
+    import { getBook, getCaret } from '../page/Contexts';
     import ToolbarSpacer from './ToolbarSpacer.svelte';
     import ImageChooser from './ImageChooser.svelte';
     import URLEditor from './URLEditor.svelte';
-    import { getContext } from 'svelte';
-    import type Book from '$lib/models/book/Book';
 
     export let embed: EmbedNode;
 
-    let book = getContext<Book>(BOOK);
+    let book = getBook();
     let caret = getCaret();
     let upload: undefined|number|string = undefined;
 

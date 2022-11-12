@@ -5,12 +5,11 @@
     import Instructions from '$lib/components/page/Instructions.svelte';
     import ChapterIDs from '$lib/models/book/ChapterID';
     import Link from "$lib/components/Link.svelte";
-    import { getContext } from "svelte";
-    import { BASE, getEdition } from "./Contexts";
+    import { getBase, getEdition } from "./Contexts";
     import { page } from "$app/stores";
 
     let edition = getEdition();
-    let base = getContext<string>(BASE);
+    let base = getBase();
 
     // What letter are we matching?
     let letter = $page.params.letter;

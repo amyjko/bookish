@@ -2,10 +2,9 @@
     import Parser from "$lib/models/chapter/Parser";
     import ChapterBody from "$lib/components/chapter/ChapterBody.svelte";
     import BookishEditor from "$lib/components/editor/BookishEditor.svelte";
-    import { getContext } from "svelte";
-    import { EDITABLE, getEdition } from "./Contexts";
+    import { getEdition, isEditable } from "./Contexts";
 
-    let editable = getContext<boolean>(EDITABLE);
+    let editable = isEditable();
     let edition = getEdition();
 
 	$: descriptionNode = Parser.parseChapter($edition, $edition.getDescription());

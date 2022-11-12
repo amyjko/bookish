@@ -1,5 +1,4 @@
 <script lang="ts">
-    import { getContext } from "svelte";
     import FormatNode from "$lib/models/chapter/FormatNode";
     import CitationsNode from "$lib/models/chapter/CitationsNode";
     import CommentNode from "$lib/models/chapter/CommentNode";
@@ -19,13 +18,12 @@
     import Comment from "./Comment.svelte";
     import Text from "./Text.svelte";
     import Format from "./Format.svelte";
-
-    import { EDITABLE } from "../page/Contexts";
+    import { isEditable } from "../page/Contexts";
 
     export let node: FormatNode;
     export let placeholder: string | undefined = undefined;
 
-    let editable = getContext(EDITABLE);
+    let editable = isEditable();
 
     $: format = node.getFormat();
     $: tag = 

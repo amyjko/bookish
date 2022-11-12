@@ -1,12 +1,9 @@
 <script lang="ts">
     import Chapter from "$lib/components/page/Chapter.svelte";
     import { page } from "$app/stores"
-    import { getContext } from "svelte";
-    import { EDITION } from "$lib/components/page/Contexts";
-    import type Edition from "$lib/models/book/Edition";
-    import type { Writable } from "svelte/store";
+    import { getEdition } from "$lib/components/page/Contexts";
 
-    $: edition = getContext<Writable<Edition>>(EDITION);
+    $: edition = getEdition();
     $: chapterID = $page.params.chapterid;
     $: chapter = $edition.getChapter(chapterID);
 

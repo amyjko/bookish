@@ -4,9 +4,9 @@
     import Embed from '$lib/components/chapter/Embed.svelte';
     import ErrorMessage from '$lib/components/chapter/ErrorMessage.svelte';
     import BookishEditor from '$lib/components/editor/BookishEditor.svelte';
-    import { getContext, onMount } from 'svelte';
+    import { onMount } from 'svelte';
     import TextEditor from '$lib/components/editor/TextEditor.svelte';
-    import { EDITABLE, getEdition } from './Contexts';
+    import { getEdition, isEditable } from './Contexts';
     import type ErrorNode from '../../models/chapter/ErrorNode';
 
 	export let label: string;
@@ -22,7 +22,7 @@
 	let reminder: HTMLDivElement | null = null;
 
     let edition = getEdition();
-    let editable = getContext<boolean>(EDITABLE);
+    let editable = isEditable();
 
 	function updateScrollReminder() {
 		if(title && reminder) {

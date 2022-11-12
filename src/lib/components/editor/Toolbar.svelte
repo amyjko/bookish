@@ -135,7 +135,7 @@
         }
     }
 
-    function handleMouse(event: MouseEvent) {
+    function handleMouse() {
         // This prevents the body from taking focus.
         if(toolbarRef && visible === true)
             toolbarRef.focus();

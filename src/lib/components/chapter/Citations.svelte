@@ -15,7 +15,7 @@
     $: chapterNode = $chapter.chapter.getAST();
 
     // Sort citations numerically, however they're numbered.
-    let citations = node.getMeta().sort((a, b) => {
+    $: citations = node.getMeta().sort((a, b) => {
         if(chapterNode === undefined) return 0;
         let aNumber = chapterNode.getCitationNumber(a);
         let bNumber = chapterNode.getCitationNumber(b);

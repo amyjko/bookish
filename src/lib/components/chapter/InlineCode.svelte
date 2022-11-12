@@ -1,13 +1,12 @@
 <script lang="ts">
     import type InlineCodeNode from "$lib/models/chapter/InlineCodeNode";
-    import { getContext } from "svelte";
-    import { EDITABLE } from "../page/Contexts";
+    import { isEditable } from "../page/Contexts";
     import Code from './Code.svelte'
     import Text from './Text.svelte'
 
     export let node: InlineCodeNode;
 
-    let editable = getContext(EDITABLE);
+    let editable = isEditable();
 
 </script>
 

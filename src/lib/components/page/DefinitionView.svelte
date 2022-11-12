@@ -6,18 +6,19 @@
     import TextEditor from '$lib/components/editor/TextEditor.svelte'
     import BookishEditor from '$lib/components/editor/BookishEditor.svelte'
     import Format from '$lib/components/chapter/Format.svelte'
-    import { afterUpdate, getContext } from 'svelte';
-    import { EDITABLE, getEdition } from './Contexts';
+    import { afterUpdate } from 'svelte';
+    import { getEdition, isEditable } from './Contexts';
 
     export let id: string;
     export let definition: Definition;
 
     let edition = getEdition();
-	let editable = getContext<boolean>(EDITABLE);
+	let editable = isEditable();
 
 	// Focus after adding a new synonym.
     let newSynonym = false;
 	let synonymsEditor: HTMLSpanElement | null = null;
+    
 	afterUpdate(() => {
 		if(newSynonym && synonymsEditor) {
 			const editors = synonymsEditor.querySelectorAll("input");

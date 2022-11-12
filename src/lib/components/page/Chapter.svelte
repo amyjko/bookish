@@ -13,9 +13,9 @@
     import ChapterBody from '$lib/components/chapter/ChapterBody.svelte';
     import PossibleReference from "./PossibleReference.svelte";
 
-    import { CHAPTER, EDITABLE, getEdition, type ChapterStore } from "./Contexts";
+    import { CHAPTER, getEdition, isEditable, type ChapterStore } from "./Contexts";
     import { writable } from "svelte/store";
-    import { getContext, onMount, setContext } from "svelte";
+    import { onMount, setContext } from "svelte";
     import { hideOutlineIfObscured, layoutMarginals } from "./margins";
     import scrollToEyeLevel from "../../util/scrollToEyeLevel";
     import type ChapterContext from "$lib/components/page/ChapterContext";
@@ -27,7 +27,7 @@
     export let print: boolean = false;
 
     let edition = getEdition();
-    let editable = getContext<boolean>(EDITABLE);
+    let editable = isEditable();
 
 	// Keep track of the scroll position to facilitate reading during reloads.
 	function rememberPosition() { localStorage.setItem('scrollposition', "" + window.scrollY); }
@@ -201,10 +201,10 @@
 	}
 
 	// Prepare to render the chapter by getting some data from the chapter and book.
-	$: chapterID = chapter.getChapterID();
+	$: chapterID = $currentChapter.getChapterID();
 	$: chapterNumber = $edition.getChapterNumber(chapterID);
 	$: chapterSection = $edition.getChapterSection(chapterID);
-	$: chapterAST = chapter.getAST();
+	$: chapterAST = $currentChapter.getAST();
 	$: citations = chapterAST ? chapterAST.getCitations() : undefined;
 
     let chapterStore = writable<ChapterContext>();

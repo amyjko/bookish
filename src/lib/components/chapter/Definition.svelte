@@ -9,15 +9,14 @@
 
     export let node: DefinitionNode;
 
-    $: glossaryID = node.getMeta();
-    $: phrase = node.getText();
-
     let edition = getEdition();
     let chapter = getChapter();
 
     // Find the definition.
-    let glossary = $edition.getGlossary();
-    let entry = glossary[glossaryID];
+    $: glossaryID = node.getMeta();
+    $: phrase = node.getText();
+    $: glossary = $edition.getGlossary();
+    $: entry = glossary[glossaryID];
 
     // Position the marginals on every render.
     afterUpdate(() => $chapter?.layoutMarginals());

@@ -1,11 +1,10 @@
 <script lang="ts">
-    import { getContext } from "svelte";
     import Link from "$lib/components/Link.svelte";
     import TableOfContentsImage from "./TableOfContentsImage.svelte";
     import type Chapter from "$lib/models/book/Chapter";
     import Toggle from "$lib/components/editor/Toggle.svelte";
     import ConfirmButton from "$lib/components/editor/ConfirmButton.svelte";
-    import { BASE, EDITABLE, getEdition } from "./Contexts";
+    import { getBase, getEdition, isEditable } from "./Contexts";
 
     export let chapterID: string;
     export let chapter: Chapter | undefined = undefined;
@@ -14,8 +13,8 @@
     export let forthcoming: boolean = false;
 
     let edition = getEdition();
-    let base = getContext<string>(BASE);
-	let editable = getContext<string>(EDITABLE);
+    let base = getBase();
+	let editable = isEditable();
 
 	function moveUp() { chapter?.move(-1) }
 	function moveDown() { chapter?.move(1) }

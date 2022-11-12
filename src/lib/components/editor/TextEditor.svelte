@@ -1,6 +1,4 @@
 <script lang="ts">
-    import { afterUpdate, beforeUpdate } from "svelte";
-
     enum Status {
         Viewing,
         Editing

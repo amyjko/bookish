@@ -5,8 +5,8 @@
 
     export let node: TableNode;
 
-    let rows = node.getRows();
-    let caption = node.getCaption();
+    $: rows = node.getRows();
+    $: caption = node.getCaption();
 
 </script>
 

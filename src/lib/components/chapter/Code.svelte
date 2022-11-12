@@ -30,7 +30,7 @@
     }
 
     // There's no way to mute highlightjs warnings on missing languages, so we check here.
-    let lang = language ? (hljs.getLanguage(language) === undefined ? "text" : language) : "plaintext";
+    $: lang = language ? (hljs.getLanguage(language) === undefined ? "text" : language) : "plaintext";
 
 </script>
 

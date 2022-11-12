@@ -3,10 +3,7 @@
     import renderPosition from './renderPosition';
     import { storage } from '$lib/models/Firebase';
     import Format from './Format.svelte';
-    import { getContext } from "svelte";
-    import type Edition from "$lib/models/book/Edition";
-    import { EDITABLE, EDITION, getCaret } from "../page/Contexts";
-    import type { Writable } from "svelte/store";
+    import { getCaret, getEdition, isEditable } from "../page/Contexts";
 
     export let node: EmbedNode;
     export let placeholder: string | undefined = undefined;
@@ -18,8 +15,8 @@
 	$: caption = node.getCaption();
 
     let caret = getCaret();
-    let editable = getContext<boolean>(EDITABLE);
-    let edition = getContext<Writable<Edition>>(EDITION);
+    let editable = isEditable();
+    let edition = getEdition();
 
 	let dragging = false;
 	let dragFeedback: undefined | string = undefined;

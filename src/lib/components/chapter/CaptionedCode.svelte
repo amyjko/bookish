@@ -5,15 +5,14 @@
     import Format from './Format.svelte'
     import Text from './Text.svelte'
     import renderPosition from './renderPosition'
-    import { getContext } from 'svelte';
-    import { EDITABLE } from "../page/Contexts";
+    import { isEditable } from "../page/Contexts";
 
     export let node: CodeNode;
 
-    let caption = node.getCaption();
-    let language = node.getLanguage();
+    $: caption = node.getCaption();
+    $: language = node.getLanguage();
 
-    let editable = getContext<boolean>(EDITABLE);
+    let editable = isEditable();
 
     // const languages = [ "C", "C++", "CSS", "Go", "HTML", "Java", "JavaScript", "Markdown", "Plaintext", "Python", "TypeScript" ];
 

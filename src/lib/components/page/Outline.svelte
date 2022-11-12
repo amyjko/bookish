@@ -1,8 +1,8 @@
 <script lang="ts">
     import { isMobile } from '$lib/util/isMobile';
-    import { getContext, onMount } from 'svelte';
+    import { onMount } from 'svelte';
     import Link from '$lib/components/Link.svelte';
-    import { BASE, getDarkMode } from './Contexts';
+    import { getBase, getDarkMode } from './Contexts';
 
     export let previous: string | null;
     export let next: string | null;
@@ -13,7 +13,7 @@
     let headerIndex = -1;
     let expanded = false;
     let dark = getDarkMode();
-    let base = getContext<string>(BASE);
+    let base = getBase();
     let outline: HTMLDivElement | null = null;
 
     function toggleExpanded() {

@@ -3,13 +3,12 @@
     import Outline from './Outline.svelte'
     import Page from './Page.svelte'
     import ChapterIDs from '$lib/models/book/ChapterID'
-    import { getContext } from "svelte";
     import DefinitionView from "./DefinitionView.svelte";
-    import { EDITABLE, getEdition } from "./Contexts";
+    import { getEdition, isEditable } from "./Contexts";
     import Instructions from "./Instructions.svelte";
 
     let edition = getEdition();
-	let editable = getContext<boolean>(EDITABLE);
+	let editable = isEditable();
 
 	$: glossary = $edition.getGlossary();
 	// Sort by canonical phrases

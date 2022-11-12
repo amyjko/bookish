@@ -6,7 +6,7 @@
     export let group: string;
     export let theme: Record<string, Record<string,string>>;
 
-    let set = theme[group];
+    $: set = theme[group];
 
 </script>
 

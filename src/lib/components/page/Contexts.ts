@@ -5,6 +5,7 @@
 
 import { getContext } from "svelte";
 import type { Writable } from "svelte/store";
+import type Book from "../../models/book/Book";
 import type Edition from "../../models/book/Edition";
 import type Authentication from "../Authentication";
 import type CaretContext from "../editor/CaretContext";
@@ -30,6 +31,11 @@ export type ChapterStore = Writable<ChapterContext>;
 export const CHAPTER = Symbol("chapter");
 export function getChapter() { return getContext<ChapterStore>(CHAPTER); }
 
-export const BOOK = Symbol("book");
-export const BASE = Symbol("base");
 export const EDITABLE = Symbol("editable");
+export function isEditable() { return getContext(EDITABLE); }
+
+export const BASE = Symbol("base");
+export function getBase() { return getContext<string>(BASE); }
+
+export const BOOK = Symbol("book");
+export function getBook() { return getContext<Book>(BOOK); }

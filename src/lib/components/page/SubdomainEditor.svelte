@@ -1,10 +1,9 @@
 <script lang="ts">
-    import { getContext } from "svelte";
-    import type Book from "$lib/models/book/Book";
     import TextEditor from "$lib/components/editor/TextEditor.svelte";
     import { subdomainIsAvailable } from "$lib/models/Firestore";
+    import { getBook } from "./Contexts";
 
-    let book = getContext<Book>("book");
+    let book = getBook();
 
     // 	const routes = useContext(RoutesContext);
     

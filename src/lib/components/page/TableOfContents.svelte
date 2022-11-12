@@ -1,7 +1,5 @@
 <script lang="ts">
-    import { getContext } from "svelte";
     import Instructions from "$lib/components/page/Instructions.svelte";
-    import type Book from "$lib/models/book/Book";
     import Parser from "$lib/models/chapter/Parser";
     import TableOfContentsRow from "./TableOfContentsRow.svelte";
     import ChapterIDs from "$lib/models/book/ChapterID";
@@ -17,12 +15,12 @@
     import Authors from "$lib/components/page/Authors.svelte";
     import TextEditor from "$lib/components/editor/TextEditor.svelte";
     import Toggle from "$lib/components/editor/Toggle.svelte";
-    import { BASE, BOOK, EDITABLE, getEdition } from "./Contexts";
+    import { getBase, getBook, getEdition, isEditable } from "./Contexts";
 
     let edition = getEdition();
-    let book = getContext<Book>(BOOK);
-	let base = getContext<string>(BASE);
-	let editable = getContext<boolean>(EDITABLE);
+    let book = getBook();
+	let base = getBase();
+	let editable = isEditable();
 
 	function getProgressDescription(progress: null | number) {
 
@@ -48,15 +46,18 @@
 		JSON.parse(progressStorage)
 
 	// Is there a colon? Let's make a subtitle
-	$: title = $edition.getTitle();
+    $: title = $edition.getTitle();
 	let subtitle: string | undefined = undefined;
-	$: colon = title.indexOf(":");
-	if(colon >= 0) {
-		subtitle = title.substring(colon + 1).trim();
-		title = title.substring(0, colon).trim();
-	}
+	$: {
+    	let colon = title.indexOf(":");
+        if(colon >= 0) {
+            subtitle = title.substring(colon + 1).trim();
+            title = title.substring(0, colon).trim();
+        }
+    }
 
     let waitingForChapter = false;
+
     function addChapter() {
         waitingForChapter = true;
         $edition.addChapter().then(() => waitingForChapter = false);
