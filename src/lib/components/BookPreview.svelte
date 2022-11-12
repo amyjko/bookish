@@ -52,3 +52,42 @@
         {/if}
     </div>
 </div>
+
+<style>
+    .bookish-app-book-preview {
+        display: flex;
+        width: 100%;
+        border: var(--bookish-app-chrome-border-width) solid var(--bookish-app-chrome-border-color);
+        padding: var(--bookish-app-chrome-padding);
+        border-radius: var(--bookish-app-chrome-roundedness);
+        text-align: left;
+    }
+
+    .bookish-app-book-preview-cover {
+        width: 5em;
+        height: auto;
+        margin-right: var(--bookish-app-chrome-padding);
+    }
+
+    .bookish-app-book-preview-cover.bookish-app-book-preview-nocover {
+        background-color: var(--bookish-app-chrome-muted);
+        height: 5em;
+    }
+
+    .bookish-app-book-preview-title {
+        flex: 1;
+        margin-right: var(--bookish-app-chrome-padding);
+    }
+
+    .bookish-app-book-preview-authors {
+        flex: 1;
+        margin-right: var(--bookish-app-chrome-padding);
+    }
+
+    .bookish-app-book-preview-description {
+        flex: 2;
+        overflow: hidden;
+        max-height: 10em;
+    }
+
+</style>

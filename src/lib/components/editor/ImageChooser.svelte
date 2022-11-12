@@ -47,3 +47,28 @@
         {/each}
     {/if}
 </div>
+
+<style>
+    .bookish-image-chooser {
+        margin-top: var(--bookish-app-chrome-padding);
+        height: 3em;
+        overflow-y: hidden;
+    }
+
+    .bookish-image-chooser.expanded {
+        height: auto;
+        overflow-y: auto;
+    }
+
+    .bookish-image-chooser-image {
+        display: inline-block;
+        height: 3em;
+        margin-right: var(--bookish-app-chrome-padding);
+        cursor: pointer;
+    }
+
+    .bookish-image-chooser-image.selected {
+        outline: var(--bookish-app-highlight-width) solid var(--bookish-highlight-color);
+        outline-offset: calc(-1 * var(--bookish-app-highlight-width));
+    }
+</style>

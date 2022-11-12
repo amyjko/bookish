@@ -10,3 +10,35 @@
 <span class="bookish-editor-toolbar-group">
     <ToolbarIcon name={icon}/><slot></slot>
 </span>
+
+<style>
+    .bookish-editor-toolbar-group {
+        display: inline-block;
+        margin-right: calc(2 * var(--bookish-app-chrome-padding));
+        margin-bottom: var(--bookish-app-chrome-padding);
+    }
+
+    .bookish-editor-toolbar-group :global(button) {
+        vertical-align: middle;
+        height: 2.25em;
+    }
+
+    .bookish-editor-toolbar-group :global(button:first-of-type) {
+        border-top-right-radius: 0;
+    }
+
+    .bookish-editor-toolbar-group :global(button:last-child) {
+        border-bottom-left-radius: 0;
+    }
+
+    .bookish-editor-toolbar-group :global(button:not(:first-of-type):not(:last-child)) {
+        border-radius: 0;
+    }
+
+    .bookish-editor-toolbar-group :global(input), 
+    .bookish-editor-toolbar-group :global(select) {
+        margin-left: var(--bookish-app-chrome-padding);
+        margin-right: var(--bookish-app-chrome-padding);
+    }
+
+</style>

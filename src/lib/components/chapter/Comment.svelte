@@ -34,3 +34,20 @@
         </Marginal>
     {/if}
 </Atom>
+
+<style>
+    .bookish-app-comment {
+        background: var(--bookish-app-chrome-background);
+        border: var(--bookish-app-chrome-border-width) solid var(--bookish-app-chrome-border-color);
+        border-radius: 0 var(--bookish-app-chrome-padding) var(--bookish-app-chrome-padding) var(--bookish-app-chrome-padding);
+        padding: var(--bookish-app-chrome-padding);
+        font-size: var(--bookish-app-chrome-font-size);
+        display: inline-block;
+        line-height: 1.5em;
+    }
+
+    .bookish-app-comment-focused, .bookish-footnote-focused {
+        outline: 2px solid var(--bookish-highlight-color);
+    }
+
+</style>

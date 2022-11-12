@@ -18,3 +18,26 @@
 
 <!-- Prevent the editor from receiving the click. -->
 <span class={`bookish-editor-atom ${selected ? "bookish-editor-atom-selected" : ""} ${$caret?.focused ? "bookish-editor-atom-selected-focused" : ""}`} on:mousedown|stopPropagation={handleMouseDown}><slot></slot></span>
+
+<style>
+    .bookish-editor-atom {
+        cursor: pointer;
+    }
+
+    .bookish-editor-atom-selected {
+        border-radius: 2px;
+        outline-style: solid;
+        outline-color: var(--bookish-paragraph-color);
+        outline-offset: 2px;
+    }
+
+    .bookish-editor-atom-selected-focused {
+        animation: 1s atom-selected infinite;
+    }
+
+    @keyframes atom-selected {
+        from, to { outline-width: 2px; }
+        50% { outline-width: 4px; }
+    }
+
+</style>

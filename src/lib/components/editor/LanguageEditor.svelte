@@ -1,4 +1,6 @@
 <script lang="ts">
+    import Note from "./Note.svelte";
+
     export let language: string;
     export let edit: (newValue: string) => void
 
@@ -10,4 +12,4 @@
 <select bind:value={value} on:change={() => edit(value)}>
     {#each languages as lang}<option value={lang.toLocaleLowerCase()}>{lang}</option>{/each}
 </select>
-<span class="bookish-editor-note">Choose a programming language to enable syntax highlighting.</span>
+<Note>Choose a programming language to enable syntax highlighting.</Note>

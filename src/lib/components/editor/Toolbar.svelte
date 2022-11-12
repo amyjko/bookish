@@ -191,3 +191,31 @@
         {#if embedNode}<ToolbarGroup linebreak icon="media.svg"><EmbedEditor embed={embedNode} /></ToolbarGroup>{/if}
     </div>
 {/if}
+
+<style>
+
+    .bookish-editor-toolbar {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        background: var(--bookish-background-color);
+        border: var(--bookish-app-chrome-border-width) solid var(--bookish-app-chrome-border-color);
+        padding: var(--bookish-app-chrome-padding);
+        font-family: var(--bookish-app-chrome-font-family);
+        font-size: var(--bookish-app-chrome-font-size);
+        z-index: 2;
+    }
+
+    .bookish-editor-toolbar :global(img) {
+        width: 1em;
+        height: 1em;
+    }
+
+    .bookish-editor-toolbar :global(hr) {
+        margin-top: var(--bookish-app-chrome-padding);
+        margin-bottom: var(--bookish-app-chrome-padding);
+        line-height: 1em;
+    }
+
+</style>

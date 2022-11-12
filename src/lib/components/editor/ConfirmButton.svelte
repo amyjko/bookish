@@ -19,7 +19,7 @@
     
         if(!confirming && !executing) {
             confirming = true;
-            timeoutID = setTimeout(() => { if(isMounted) confirming = true; }, 2000);
+            timeoutID = setTimeout(() => { if(isMounted) confirming = false; }, 2000);
         } else if(confirming) {
             command()?.finally(() => {
                     if(isMounted) {
@@ -40,3 +40,9 @@
     class={confirming ? "bookish-editor-confirm" : ""}>
         { confirming ? confirmLabel : commandLabel }
 </button>
+
+<style>
+    button.bookish-editor-confirm {
+        animation: failure 100ms infinite;
+    }
+</style>

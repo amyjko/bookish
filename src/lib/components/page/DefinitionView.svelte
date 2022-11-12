@@ -6,6 +6,7 @@
     import TextEditor from '$lib/components/editor/TextEditor.svelte'
     import BookishEditor from '$lib/components/editor/BookishEditor.svelte'
     import Format from '$lib/components/chapter/Format.svelte'
+    import Note from '../editor/Note.svelte'
     import { afterUpdate } from 'svelte';
     import { getEdition, isEditable } from './Contexts';
 
@@ -105,7 +106,7 @@
                     <em>No synonyms</em>
                 {:else}
                     {#each syns as syn, index }
-                        <span class="bookish-editor-synonym bookish-editor-note">
+                        <Note>
                             <TextEditor
                                 startText={syn} 
                                 label={'Synonym editor.'}
@@ -125,14 +126,14 @@
                                     });
                                 }}
                             />
-                        </span>
+                        </Note>
                         {#if syns.length > 1 && index < syns.length - 1 },&nbsp;{/if}
                     {/each}
                 {/if}
             </span>
         {:else}
             {#if definition.synonyms !== undefined && definition.synonyms.length > 0 }
-                <span class="bookish-editor-note"><em>{definition.synonyms.join(", ")}</em></span>
+                <Note>{definition.synonyms.join(", ")}</Note>
             {/if}
         {/if}
     </td>

@@ -26,3 +26,35 @@
         </button>
     {/each}
 </span>
+
+<style>
+    .bookish-app-switch {
+        font-family: var(--bookish-app-chrome-font-family);
+        font-size: var(--bookish-app-chrome-font-size);
+    }
+
+    .bookish-app-switch-option {
+        display: inline-block;
+        background-color: var(--bookish-app-chrome-background);
+        cursor: pointer;
+        padding-left: var(--bookish-app-chrome-padding);
+        padding-right: var(--bookish-app-chrome-padding);
+        border: var(--bookish-app-chrome-border-width) solid var(--bookish-app-chrome-border-color);
+    }
+
+    .bookish-app-switch-option:first-child {
+        border-top-left-radius: var(--bookish-app-chrome-roundedness);
+        border-bottom-left-radius: var(--bookish-app-chrome-roundedness);
+        margin-left: var(--bookish-app-chrome-padding);
+    }
+
+    .bookish-app-switch-option:last-child {
+        border-top-right-radius: var(--bookish-app-chrome-roundedness);
+        border-bottom-right-radius: var(--bookish-app-chrome-roundedness);
+        margin-right: var(--bookish-app-chrome-padding);
+    }
+
+    .bookish-app-switch-option-selected {
+        background-color: var(--bookish-app-chrome-hover-background);
+    }
+</style>

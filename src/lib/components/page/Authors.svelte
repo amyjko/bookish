@@ -4,6 +4,7 @@
     import Format from '$lib/components/chapter/Format.svelte';
     import { afterUpdate } from 'svelte';
     import { getEdition, isEditable } from './Contexts';
+    import Note from '../editor/Note.svelte';
 
     export let authors: string[];
     export let inheritedAuthors: string[] | undefined = undefined;
@@ -41,7 +42,7 @@
 <div class="bookish-authors" bind:this={authorList}>
     {#if authors.length === 0 }
         {#if editable && inheritedAuthors !== undefined && inheritedAuthors.length > 0 }
-            <span class="bookish-editor-note">&nbsp;(book authors)&nbsp;</span>
+            <Note>&nbsp;(book authors)&nbsp;</Note>
         {:else}
             No authors
         {/if}

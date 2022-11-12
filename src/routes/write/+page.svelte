@@ -5,6 +5,7 @@
     import { goto } from '$app/navigation';
     import { onMount } from 'svelte';
     import { getAuth } from '$lib/components/page/Contexts';
+	import Alert from "$lib/components/page/Alert.svelte";
 
 	let books: Book[] = [];
 	let loading = true;
@@ -50,7 +51,7 @@
 </p>
 
 {#if error }
-    <div class="bookish-app-alert">{error}</div>
+    <Alert>{error}</Alert>
 {:else if loading }
     <p>Loading books...</p>
 {:else}

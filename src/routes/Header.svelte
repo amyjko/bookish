@@ -35,3 +35,21 @@
         <Link to={getLink("/login")}>Login</Link>
     {/if}
 </div>
+
+<style>
+    .bookish-app-header {
+        margin-top: var(--bookish-app-chrome-spacing); 
+        margin-bottom: var(--bookish-app-chrome-spacing); 
+    }
+
+    :global(.bookish-app-header a) {
+        display: inline-block;
+        margin-left: var(--bookish-app-chrome-spacing);
+        margin-right: var(--bookish-app-chrome-spacing);
+    }
+
+    .bookish-app-header img {
+        height: 1em;
+        vertical-align: baseline;
+    }
+</style>

@@ -1,9 +1,10 @@
 <script lang="ts">
     import { isSignInWithEmailLink, signInWithEmailLink } from "firebase/auth"
     import { onMount } from "svelte";
-    import { auth } from "../../lib/models/Firebase";
-    import Link from "../../lib/components/Link.svelte";
+    import { auth } from "$lib/models/Firebase";
+    import Link from "$lib/components/Link.svelte";
     import { goto } from "$app/navigation";
+    import Alert from "$lib/components/page/Alert.svelte";
 	
 	let error: string | undefined = undefined;
 
@@ -56,7 +57,7 @@
 
 <h1>Logging in…</h1>
 {#if error}
-    <div class="bookish-app-alert">{error}</div>
+    <Alert>{error}</Alert>
     <Link to="/login">Try again?</Link>
 {:else}
     <p>Redirecting...</p>

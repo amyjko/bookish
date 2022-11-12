@@ -1,6 +1,7 @@
 <script lang="ts">
     import { updateEmail } from "firebase/auth";
     import { getAuth } from "../../lib/components/page/Contexts";
+	import Alert from "$lib/components/page/Alert.svelte";
     
     let email: string;
     let auth = getAuth();
@@ -49,5 +50,5 @@
 </form>
 
 {#if feedback }
-    <div class="bookish-app-alert">{feedback}</div>
+    <Alert>{feedback}</Alert>
 {/if}

@@ -822,3 +822,86 @@
     {/if}
     <svelte:component this={component} node={editedNode} placeholder={placeholder} />
 </div>
+
+<style>
+    .bookish-editor:focus {
+        outline: 2px solid var(--bookish-highlight-color);
+        outline-offset: var(--bookish-app-chrome-padding);
+        border-radius: var(--bookish-app-chrome-roundedness);
+    }
+
+    .bookish-editor.bookish-editor-atom-focused:focus {
+        outline: none;
+    }
+
+    .bookish-editor-caret {
+        left: 0;
+        top: 0;
+        width: 0px;
+        background: none;
+        outline: 1px solid var(--bookish-paragraph-color);
+        display: inline-block;
+        box-sizing: border-box;
+        position: absolute;
+        z-index: 1;
+    }
+
+    @keyframes bookish-editor-caret-blink {
+        100% {
+            outline: none;
+        }
+    }
+
+    .bookish-editor-caret-disabled {
+        outline-color: var(--bookish-app-chrome-muted);
+    }
+
+    .bookish-editor-caret-blink {
+        animation: bookish-editor-caret-blink 1s steps(2) infinite;
+    }
+
+    .bookish-editor-caret-italic {
+        transform: skew(-10deg);
+    }
+
+    .bookish-editor-caret-bold {
+        outline-width: 2px;
+    }
+
+    .bookish-editor-caret-ignored {
+        animation: failure 100ms 10;
+    }
+
+    .bookish-editor-caret-linked {
+        outline-width: 1px;
+        outline-color: var(--bookish-link-color);
+    }
+
+    .bookish-editor-inline-editor {
+        display: inline-block;
+        position: relative;
+    }
+
+    .bookish-editor-inline-form {
+        position: absolute;
+        left: 0;
+        top: 0;
+        min-width: 7em;
+        width: auto;
+        z-index: 2;
+    }
+
+    .bookish-link-active {
+        font-weight: bold;
+    }
+
+    :global(.bookish-editor .bookish-table table td) {
+        border: var(--bookish-app-chrome-border-width) dashed var(--bookish-app-chrome-border-color);
+    }
+
+    .bookish-editor :global(hr) {
+        margin-top: 1em;
+        margin-bottom: 1em;   
+    }
+
+</style>

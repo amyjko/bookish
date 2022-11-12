@@ -52,3 +52,10 @@
 {:else}       
     <a href={base + "/" + url}><Text node={content} /></a>
 {/if}
+
+<style>
+    .bookish-editor-link {
+        color: var(--bookish-link-color);
+        font-weight: var(--bookish-link-font-weight);
+    }
+</style>

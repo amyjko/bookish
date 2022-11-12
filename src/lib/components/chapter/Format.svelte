@@ -55,3 +55,10 @@
         { placeholder }
     {/if}
 </svelte:element>
+
+<style>
+    .bookish-editor-placeholder {
+        color: var(--bookish-app-chrome-muted);
+        font-style: italic;
+    }    
+</style>

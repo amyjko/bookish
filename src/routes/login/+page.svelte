@@ -1,5 +1,6 @@
 <script lang="ts">
     import { getAuth } from "$lib/components/page/Contexts";
+	import Alert from "$lib/components/page/Alert.svelte";
 
 	let email: HTMLInputElement;
 	let auth = getAuth()
@@ -38,5 +39,5 @@
 </form>
 
 {#if feedback }
-    <div class="bookish-app-alert">{feedback}</div>
+    <Alert>{feedback}</Alert>
 {/if}

@@ -35,3 +35,24 @@
         ""
     }
 </div>
+
+<style>
+    .bookish-editor-status {
+        position: fixed;
+        top: var(--bookish-app-chrome-spacing);
+        right: var(--bookish-app-chrome-spacing);
+        z-index: 3;
+        color: var(--bookish-muted-color);
+        font-family: var(--bookish-header-font-family);
+        font-size: var(--bookish-small-font-size);
+    }
+
+    .bookish-editor-status-error {
+        color: var(--bookish-app-error-color);
+        animation: failure 100ms infinite;
+    }
+
+    .bookish-editor-status-saving {
+        animation: waiting 100ms infinite;
+    }
+</style>

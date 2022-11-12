@@ -29,7 +29,7 @@
     />
     {
         citations.getMeta().length === 0 ?
-            <span className="bookish-editor-note bookish-editor-note-error">Choose at least one citation.</span> :
+            <span className="bookish-editor-note">Choose at least one citation.</span> :
             null
     } -->
 </span>

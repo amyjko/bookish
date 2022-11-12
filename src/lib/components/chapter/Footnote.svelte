@@ -37,3 +37,9 @@
         </Marginal>
     </span>
 </Atom>
+
+<style>
+    .bookish-footnote-focused {
+        outline: 2px solid var(--bookish-highlight-color);
+    }
+</style>

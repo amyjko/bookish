@@ -40,3 +40,9 @@
 >
     <slot></slot>
 </div>
+
+<style>
+    .bookish-app-interactive {
+        cursor: pointer;
+    }
+</style>

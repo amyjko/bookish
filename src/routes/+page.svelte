@@ -44,3 +44,20 @@
         Write <a href="mailto:ajko@uw.edu">Amy</a> if you'd like to collaborate, or <External to="https://github.com/amyjko/bookish/issues">submit an issue</External> or <External to="https://github.com/amyjko/bookish/pulls">pull request</External> directly.
     </p>
 </div>
+
+<style>
+    .bookish-app-callout {
+        font-size: x-large;
+        margin: 1em;
+    }
+
+    .bookish-app-text, .bookish-app-text p {
+        text-align: left;
+        padding-left: 2rem;
+        padding-right: 2rem;
+        margin: auto;
+        margin-bottom: 2rem;
+        max-width: 40rem;
+    }
+
+</style>

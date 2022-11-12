@@ -5,6 +5,7 @@
     import BookishEditor from "$lib/components/editor/BookishEditor.svelte"
     import Switch from "$lib/components/editor/Switch.svelte"
     import Instructions from "$lib/components/page/Instructions.svelte"
+    import Note from "../editor/Note.svelte"
     import { getEdition, isEditable } from "./Contexts";
 
     let edition = getEdition();
@@ -64,7 +65,7 @@
                         class={`${!revision.published ? "bookish-edition-hidden" : ""} ${viewing ? "bookish-edition-editing": ""} `}
                     >
                         <td>
-                            <em>{ editionNumber + (editionNumber === 1 ? "st" : editionNumber === 2 ? "nd" : editionNumber === 3 ? "rd" : "th") }</em> <span class="bookish-editor-note">{(new Date(revision.time).toLocaleDateString("en-us"))}</span>
+                            <em>{ editionNumber + (editionNumber === 1 ? "st" : editionNumber === 2 ? "nd" : editionNumber === 3 ? "rd" : "th") }</em> <Note>{(new Date(revision.time).toLocaleDateString("en-us"))}</Note>
                         </td>
                         <td>
                             {#if editable }
@@ -116,3 +117,15 @@
         </tbody>
     </table>
 {/if}
+
+<style>
+    .bookish-edition-hidden {
+        background: repeating-linear-gradient(
+            45deg,
+            var(--bookish-app-background),
+            var(--bookish-app-background) 10px,
+            var(--bookish-app-chrome-background) 10px,
+            var(--bookish-app-chrome-background) 20px
+        );
+    }
+</style>
