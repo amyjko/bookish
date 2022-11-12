@@ -5,6 +5,7 @@
     import Atom from './Atom.svelte';
     import { getChapter, getEdition } from '../page/Contexts';
     import PossibleReference from '../page/PossibleReference.svelte';
+    import { afterUpdate } from 'svelte';
 
     export let node: CitationsNode;
 
@@ -27,6 +28,9 @@
             else return aNumber - bNumber;
         }
     });
+
+    // Position the marginals on every render.
+    afterUpdate(() => $chapter?.layoutMarginals());
 
 </script>
 

@@ -11,7 +11,7 @@
     
     function handleMouseDown() {
         // Select this so that the view stays focused.
-        // caret.setCaretRange({ start: { node: node, index: 0 }, end: { node: node, index: 0 }});
+        $caret?.setCaret({ start: { node: node, index: 0 }, end: { node: node, index: 0 }});
     }
 
 </script>

@@ -9,6 +9,7 @@ type CaretContext = {
     forceUpdate: Function,
     context: CaretState | undefined,
     edit: (previous: Node, edited: Node) => void,
+    setCaret: (range: CaretRange) => void,
     root: RootNode,
     focused: boolean
 } | undefined;

@@ -3,31 +3,25 @@
     import Atom from '$lib/components/chapter/Atom.svelte'
     import Marginal from '$lib/components/chapter/Marginal.svelte'
     import Format from './Format.svelte';
-    import { getContext } from "svelte";
-    import type Chapter from "$lib/models/book/Chapter";
-    import { getCaret, getEdition } from "../page/Contexts";
+    import { getCaret, getChapter, getEdition } from "../page/Contexts";
+    import { afterUpdate } from "svelte";
 
     export let node: FootnoteNode;
 
     $: content = node.getMeta();
     let caret = getCaret();
-    let chapter = getContext<Chapter>("chapter");
+    let chapter = getChapter();
     let edition = getEdition();
 
-    $: chapterNode = chapter.getAST();
-
     // What footnote number is this?
-    $: number = chapter.getAST()?.getFootnotes().indexOf(node);
+    $: chapterNode = $chapter.chapter?.getAST();
+    $: number = chapterNode?.getFootnotes().indexOf(node);
     $: letter = number === undefined ? undefined : $edition.getFootnoteSymbol(number);
 
     const focused = chapterNode && $caret && $caret.range && $caret.range.start.node.hasAncestor(chapterNode, node);
 
     // Position the marginals on every render.
-    // afterUpdate(() => {
-    //     if(context && context.layoutMarginals) {
-    //         context.layoutMarginals();
-    //     }
-    // });
+    afterUpdate(() => $chapter?.layoutMarginals());
     
 </script>
 

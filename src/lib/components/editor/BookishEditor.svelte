@@ -781,18 +781,20 @@
     }
 
     // Create a caret store for the editor and make it available to children.
-    let caretStore = setContext<CaretStore>(CARET, writable<CaretContext>());
+    let caretStore = setContext<CaretStore>(CARET, writable<CaretContext>())
 
     // Update the caret store it whenever any of the below change.
     $: caretStore.set({ 
         range: caretRange, 
         coordinate: caretCoordinate, 
         forceUpdate: forceUpdate,
+        setCaret: range => caretRange = range,
         edit: editNode,
         context: context,
         root: editedNode,
         focused: editorFocused
-    });    
+    });
+    
 
 </script>
 

@@ -4,21 +4,23 @@
     import Text from './Text.svelte'
     import Format from './Format.svelte'
     import Marginal from './Marginal.svelte'
-    import { EDITION } from '../page/Contexts';
-    import { getContext } from 'svelte';
-    import type Edition from '$lib/models/book/Edition';
-    import type { Writable } from 'svelte/store';
+    import { getChapter, getEdition } from '../page/Contexts';
+    import { afterUpdate } from 'svelte';
 
     export let node: DefinitionNode;
 
     $: glossaryID = node.getMeta();
     $: phrase = node.getText();
 
-    let edition = getContext<Writable<Edition>>(EDITION);
+    let edition = getEdition();
+    let chapter = getChapter();
 
     // Find the definition.
     let glossary = $edition.getGlossary();
     let entry = glossary[glossaryID];
+
+    // Position the marginals on every render.
+    afterUpdate(() => $chapter?.layoutMarginals());
 
 </script>    
 

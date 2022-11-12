@@ -5,7 +5,7 @@
     import Format from './Format.svelte';
     import { EDITABLE, getChapter } from '../page/Contexts';
     import { getCaret } from '../page/Contexts';
-    import { getContext } from 'svelte';
+    import { afterUpdate, getContext } from 'svelte';
     import ToolbarIcon from '../editor/ToolbarIcon.svelte';
 
     export let node: CommentNode;
@@ -16,6 +16,9 @@
     $: chapterNode = $chapter.chapter.getAST();
 
     $: focused = $caret && $caret.range && node.contains($caret.range.start.node);
+
+    // Position the marginals on every render.
+    afterUpdate(() => $chapter?.layoutMarginals());
 
 </script>
 
