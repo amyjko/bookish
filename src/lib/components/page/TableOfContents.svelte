@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { getContext, onMount } from "svelte";
+    import { getContext } from "svelte";
     import Instructions from "$lib/components/page/Instructions.svelte";
     import type Edition from "$lib/models/book/Edition";
     import type Book from "$lib/models/book/Book";
@@ -121,7 +121,6 @@
             <tbody>
                 {#each $edition.getChapters() as chapter }
                     {@const chapterID = chapter.getChapterID() }
-                    {@const chapterAST = chapter.getAST() }
                     {@const readingTime = chapter.getReadingTime() }
                     {@const readingEstimate =
                             readingTime === undefined ? "Forthcoming" :
@@ -144,7 +143,7 @@
                                     label={"Chapter section editor"}
                                     text={section ? section : ""}
                                     placeholder="Section"
-                                    valid={ text => undefined }
+                                    valid={ () => undefined }
                                     save={text => chapter.setSection(text) }
                                 />
                             {:else}

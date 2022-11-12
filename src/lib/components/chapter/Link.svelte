@@ -20,11 +20,9 @@
 
             // Pull out any labels and just get the chapter name.
             let chapter = url;
-            let label = null;
             if(url.indexOf(":") >= 0) {
                 let parts = chapter.split(":");
                 chapter = parts[0];
-                label = parts[1];
             }
 
             if(chapter !== "" && edition && !edition.hasChapter(chapter))

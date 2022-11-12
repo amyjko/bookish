@@ -105,7 +105,6 @@
 
 		// Find the header that we're past so we can update the outline.
 		let indexOfNearestHeaderAbove = -1; // -1 represents the title
-        let nearbyHeader = null;
         Array.from(document.getElementsByClassName("bookish-header")).forEach((header, index) => {
             // Is this a header we care about?
             if(header.tagName === "H1" || header.tagName === "H2" || header.tagName === "H3") {
@@ -114,9 +113,6 @@
                 // Are we past this header?
                 if(top > headerTop - threshold)
 					indexOfNearestHeaderAbove = index;
-                // Are we within 
-                if(Math.abs(headerTop - top) < threshold)
-                    nearbyHeader = header;
 			}
 		});
 

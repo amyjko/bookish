@@ -9,15 +9,11 @@
     import { afterUpdate, onMount } from "svelte";
     import Code from './Code.svelte';
 
-
     export let node: CodeNode;
     export let startCode: string;
 
     // Start with whatever code was passed in.
     let code = startCode;
-
-    // What is currently rendered to the console (not always program output).
-    let programOutput = "";
 
     // What is currently rendered to the console (not always program output).
     let output = "";
@@ -56,8 +52,6 @@
     function reset() { code = startCode; }
     function handleEdit(newCode: string) { code = newCode; }
     function handleOutput(out: string) {
-        // Remember the output
-        programOutput = out;
 
         // Update the state to re-render.
         output = out;
@@ -67,7 +61,6 @@
         if(skulptLoaded()) {
             // Communicate that executing is starting, wait a second, then execute the program.
             // This is important in case the user wants to run it again; it provides confirmation that it was run again.
-            programOutput = "";
             output = "Executing...";
             setTimeout(() => execute(), 500);
         }

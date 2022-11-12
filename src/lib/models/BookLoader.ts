@@ -1,7 +1,8 @@
 import Ajv from 'ajv';
 import addFormats from 'ajv-formats';
-import Edition, { EditionSpecification } from './book/Edition'
-import { ChapterSpecification } from './book/Chapter'
+import Edition from './book/Edition'
+import type { EditionSpecification } from './book/Edition';
+import type { ChapterSpecification } from './book/Chapter'
 import schema from "../../schemas/book.json";
 
 // Returns a Promise that, given a URL to 

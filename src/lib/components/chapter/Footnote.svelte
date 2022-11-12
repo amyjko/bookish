@@ -7,26 +7,30 @@
     import type Chapter from "$lib/models/book/Chapter";
     import type Edition from "$lib/models/book/Edition";
     import type { Writable } from "svelte/store";
+    import type CaretContext from "../editor/CaretContext";
+    import { CARET } from "../page/Symbols";
 
     export let node: FootnoteNode;
 
-    const content = node.getMeta();
-    const caret = useContext(CaretContext);
-    const chapter = getContext<Chapter>("chapter");
-    const edition = getContext<Writable<Edition>>("edition");
+    $: content = node.getMeta();
+    let caret = getContext<CaretContext>(CARET);
+    let chapter = getContext<Chapter>("chapter");
+    let edition = getContext<Writable<Edition>>("edition");
+
+    $: chapterNode = chapter.getAST();
 
     // What footnote number is this?
-    let number = chapter.getAST()?.getFootnotes().indexOf(node);
-    let letter = $edition.getFootnoteSymbol(number);
+    $: number = chapter.getAST()?.getFootnotes().indexOf(node);
+    $: letter = number === undefined ? undefined : $edition.getFootnoteSymbol(number);
 
-    const focused = caret && caret.range && caret.range.start.node.hasAncestor(chapter, node);
+    const focused = caret && caret.range && chapterNode && caret.range.start.node.hasAncestor(chapterNode, node);
 
     // Position the marginals on every render.
-    useEffect(() => {
-        if(context && context.layoutMarginals) {
-            context.layoutMarginals();
-        }
-    });
+    // afterUpdate(() => {
+    //     if(context && context.layoutMarginals) {
+    //         context.layoutMarginals();
+    //     }
+    // });
     
 </script>
 

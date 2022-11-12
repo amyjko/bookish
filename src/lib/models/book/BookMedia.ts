@@ -89,6 +89,8 @@ export default class BookMedia {
     
     upload(file: File, progressHandler: (progress: number) => void, errorHandler: (message:string) => void, finishedHandler: (url: string, thumbnailURL: string) => void) {
 
+        progressHandler;
+
         if(storage === undefined) return;
 
         // The canonical path format for Bookish images in the store is image/{bookid}/{imageid}

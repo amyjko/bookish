@@ -7,7 +7,7 @@
 
 <span>
     {#if name.endsWith(".svg")}
-        <img src="/svg/{name}"/>
+        <img alt={`${name.replace(".svg", "")} icon`} src="/svg/{name}"/>
     {:else}
         {name}
     {/if}

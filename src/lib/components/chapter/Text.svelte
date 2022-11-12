@@ -10,8 +10,6 @@
 
     let context = getContext<ChapterContext>(CHAPTER);
 
-    let ref: HTMLSpanElement | null = null;
-
     function replaceMultipleSpacesWithNonBreakingSpaces(original: string) {
         let revisedText = ""
         for(let i = 0; i < original.length; i++) {
@@ -74,5 +72,5 @@
         <span class={`bookish-text ${segment[1] ? "bookish-content-highlight" : ""}`}>{segment[0]}</span>
     {/each}
 {:else}
-    <span bind:this={ref} class={"bookish-text"} data-nodeid={node.nodeID}>{text}</span>
+    <span class={"bookish-text"} data-nodeid={node.nodeID}>{text}</span>
 {/if}

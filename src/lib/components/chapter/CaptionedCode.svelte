@@ -15,8 +15,6 @@
 
     let editable = getContext<boolean>(EDITABLE);
 
-    let codeRef: HTMLElement | null = null;
-
     // const languages = [ "C", "C++", "CSS", "Go", "HTML", "Java", "JavaScript", "Markdown", "Plaintext", "Python", "TypeScript" ];
 
 </script>
@@ -25,13 +23,12 @@
     {#if editable }
         <code 
             class={`bookish-code bookish-code-block language-${language}`}
-            bind:this={codeRef}
         >
             <Text node={node.getCodeNode()}/>
         </code>
     {:else}
         {#if node.getLanguage() === "python" && node.isExecutable() }
-            <Python node={node} code={node.getCode()}></Python>
+            <Python node={node} startCode={node.getCode()}></Python>
         {:else}
             <div>
                 <Code editable={false} inline={false} language={node.getLanguage()} nodeID={node.getCodeNode().nodeID}>{node.getCode()}</Code>

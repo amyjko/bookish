@@ -1,7 +1,7 @@
 <script lang="ts">
     import type ErrorNode from "$lib/models/chapter/ErrorNode"
 
-    let node: ErrorNode;
+    export let node: ErrorNode;
 
 </script>
 

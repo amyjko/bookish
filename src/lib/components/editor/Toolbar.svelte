@@ -187,7 +187,7 @@
         {#if metaNode instanceof InlineCodeNode}<ToolbarGroup icon="code.svg"><InlineCodeEditor code={metaNode}/></ToolbarGroup>{/if}
         {#if metaNode instanceof CitationsNode}<ToolbarGroup icon="a\u00b9"><CitationsEditor citations={metaNode}/></ToolbarGroup>{/if}
         {#if metaNode instanceof DefinitionNode}<ToolbarGroup icon="Aa"><DefinitionEditor definition={metaNode}/></ToolbarGroup>{/if}
-        {#if metaNode instanceof CodeNode && context}<ToolbarGroup icon="code.svg"><CaptionedCodeEditor code={context.start.node.getParent(chapter)}/></ToolbarGroup>{/if}
+        {#if metaNode instanceof CodeNode && context}<ToolbarGroup icon="code.svg"><CaptionedCodeEditor code={metaNode}/></ToolbarGroup>{/if}
         {#if calloutNode}<ToolbarGroup icon="🄰"><CalloutEditor callout={calloutNode} /></ToolbarGroup>{/if}
         {#if quoteNode}<ToolbarGroup icon="quote.svg"><QuoteEditor quote={quoteNode} /></ToolbarGroup>{/if}
         {#if embedNode}<ToolbarGroup linebreak icon="media.svg"><EmbedEditor embed={embedNode} /></ToolbarGroup>{/if}

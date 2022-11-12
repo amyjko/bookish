@@ -34,6 +34,7 @@
 	}
 
 </script>
+
 {#if editionRevisions.length > 0 }
     <h2 class="bookish-header" id="revisions">Revisions</h2>
     <ul>
@@ -58,7 +59,7 @@
         </colgroup>
         <tbody>
             {#each bookRevisions as revision, index}
-                {@const editionNumber = bookRevisions.length - index }
+                {@const editionNumber = bookRevisions === undefined ? -1 : bookRevisions.length - index }
                 {@const viewing = revision.ref.id === $edition.getRef()?.id }
 
                 {#if editable || revision.published}

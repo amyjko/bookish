@@ -1,6 +1,5 @@
 import type Node from "./Node";
 import BlockNode from "./BlockNode";
-import type { CaretRange } from "./Caret";
 
 export default class RuleNode extends BlockNode {
     
@@ -12,11 +11,11 @@ export default class RuleNode extends BlockNode {
     toText(): string { return ""; }
     toBookdown(): string { return "-"; }
     toHTML() { return `<hr/>`; }
-    getParentOf(node: Node): Node | undefined { return undefined; }
+    getParentOf(): Node | undefined { return undefined; }
     getFormats() { return []; }
     getChildren(): Node[] { return []; }
     copy() { return new RuleNode() as this; }
-    withChildReplaced(node: Node, replacement: Node | undefined) { return undefined; }
-    withContentInRange(range: CaretRange): this | undefined { return this.copy(); }
+    withChildReplaced() { return undefined; }
+    withContentInRange(): this | undefined { return this.copy(); }
 
 }

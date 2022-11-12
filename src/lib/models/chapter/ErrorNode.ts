@@ -19,7 +19,7 @@ export default class ErrorNode extends BlockNode {
     toHTML() { return this.#text ?? ""; }
 
     getChildren() { return []; }
-    getParentOf(node: Node): Node | undefined { return undefined; }
+    getParentOf(): Node | undefined { return undefined; }
 
     copy() { return new ErrorNode(this.#text, this.#error) as this; }
 

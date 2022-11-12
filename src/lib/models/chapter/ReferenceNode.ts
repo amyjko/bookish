@@ -1,4 +1,3 @@
-import type { CaretRange } from "./Caret";
 import Node from "./Node";
 
 export default class ReferenceNode extends Node {
@@ -30,7 +29,7 @@ export default class ReferenceNode extends Node {
 
     getChildren() { return [] }
  
-    getParentOf(node: Node): Node | undefined { return undefined; }
+    getParentOf(): Node | undefined { return undefined; }
     
     toText() { return this.authors + " "  + this.year + " " + this.title + " " + this.source + (this.summary ? this.summary : ""); }
     toBookdown(): string { return ""; }
@@ -46,9 +45,9 @@ export default class ReferenceNode extends Node {
         return new ReferenceNode(this.citationID, this.authors, this.year, this.title, this.source, this.url, this.summary, this.short) as this;
     }
 
-    withChildReplaced(node: Node, replacement: Node | undefined) { return undefined; }
+    withChildReplaced() { return undefined; }
 
-    withContentInRange(range: CaretRange): this | undefined { return this.copy(); }
+    withContentInRange(): this | undefined { return this.copy(); }
 
     withCitationID(id: string) { return new ReferenceNode(id, this.authors, this.year, this.title, this.source, this.url, this.summary, this.short); }
     withAuthors(authors: string) { return new ReferenceNode(this.citationID, authors, this.year, this.title, this.source, this.url, this.summary, this.short); }

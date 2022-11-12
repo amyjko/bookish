@@ -40,7 +40,7 @@
             <Marginal id={"citation-" + citations.join("-")}>
                 <slot name="interactor">
                     {#each citations as citationID, index}
-                        {@const citationNumber = chapter.getCitationNumber(citationID) }
+                        {@const citationNumber = chapter?.getCitationNumber(citationID) }
                         {#if citationNumber !== null && citationID in $edition.getReferences()}
                             <sup class="bookish-citation-symbol">{citationNumber}</sup>
                         {:else}
@@ -54,7 +54,7 @@
                 <slot name="content">
                     <span class="bookish-references">
                         {#each citations as citationID }
-                            {@const citationNumber = chapter.getCitationNumber(citationID) }
+                            {@const citationNumber = chapter?.getCitationNumber(citationID) }
                             {@const ref = $edition.getReference(citationID) }
                             {#if ref }
                                 <span class="bookish-reference">

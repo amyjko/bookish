@@ -233,7 +233,7 @@ export default abstract class Node {
     
     // By default, a node doesn't know how to insert anything into itself. Subclasses
     // are responsible for overriding this if they want to support specific insertions.
-    withNodeInserted(caret: Caret, node: Node): Edit { return undefined; }
+    withNodeInserted(caret: Caret, node: Node): Edit { caret; node; return undefined; }
 
     copyRange(range: CaretRange): Node | undefined {
         const sortedRange = this.sortRange(range);

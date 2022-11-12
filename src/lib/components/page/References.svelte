@@ -6,7 +6,7 @@
     import type Edition from '$lib/models/book/Edition';
     import ConfirmButton from '$lib/components/editor/ConfirmButton.svelte';
     import ChapterIDs from '$lib/models/book/ChapterID';
-    import { getContext, onMount } from "svelte";
+    import { getContext } from "svelte";
     import BulkReferenceEditor from "./BulkReferenceEditor.svelte"
     import PossibleReference from "./PossibleReference.svelte";
     import { EDITABLE, EDITION } from "./Symbols";
@@ -44,7 +44,7 @@
         <p><em>Sorted by last name of first author.</em></p>
 
         {#each Object.keys(references).sort() as citationID }
-            {@const ref = Parser.parseReference(citationID, references[citationID], $edition) }
+            {@const ref = Parser.parseReference(citationID, references === null ? "" : references[citationID], $edition) }
             <!-- {#if letter === undefined || citationID.charAt(0) !== letter) {
                 letter = citationID.charAt(0);
                 renderedReferences.push(<h2 key={"letter-" + letter} className="bookish-header" id={"references-" + letter}>{letter.toUpperCase()}</h2>);

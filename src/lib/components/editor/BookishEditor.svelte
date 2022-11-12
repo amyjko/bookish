@@ -33,7 +33,7 @@
     import Toolbar from "./Toolbar.svelte";
 
     import { CARET, EDITION } from "../page/Symbols";
-    import { afterUpdate, getContext, onMount, setContext, SvelteComponent } from "svelte";
+    import { afterUpdate, getContext, onMount, setContext } from "svelte";
     import type Edition from "$lib/models/book/Edition";
     import type { Writable } from "svelte/store";
 

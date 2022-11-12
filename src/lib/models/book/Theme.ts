@@ -1,4 +1,4 @@
-import type { ThemeColors } from "./ThemeColors";
+import type ThemeColors from "./ThemeColors";
 
 type Theme = {
     // Background colors

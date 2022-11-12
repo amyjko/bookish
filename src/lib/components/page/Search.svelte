@@ -33,11 +33,10 @@
         results = [];
 
         const lowerQuery = query.toLowerCase();
-        let matchCount = 0;
 
         // Go through all the chapter indexes and find matches.
         if(query.length > 2)
-            $edition.getChapters().forEach((chapter: Chapter) => {
+            for(const chapter of $edition.getChapters()) {
                 let index = chapter.getIndex();
                 // No index yet? Skip this chapter.
                 if(index) {
@@ -45,7 +44,7 @@
                     const chapterMatches: Match[] = [];
 
                     // What are all of the words in the index that match the query?
-                    Object.keys(index).forEach(word => {
+                    for(const word of Object.keys(index)) {
                         if(query.length > 0 && word.indexOf(lowerQuery) >= 0) {
                             if(index) {
                                 let matches = index[word];
@@ -54,9 +53,7 @@
                                 });
                             }
                         }
-                    });
-
-                    matchCount += chapterMatches.length;
+                    }
                     
                     if(chapterMatches.length > 0) {
                         results.push(chapter);
@@ -72,7 +69,7 @@
                         })
                     }
                 }
-            });
+            }
     }
 
 </script>

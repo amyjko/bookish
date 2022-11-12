@@ -4,7 +4,7 @@
     import Page from './Page.svelte'
     import type Edition from '$lib/models/book/Edition.js'
     import ChapterIDs from '$lib/models/book/ChapterID'
-    import { getContext, onMount } from "svelte";
+    import { getContext } from "svelte";
     import DefinitionView from "./DefinitionView.svelte";
     import { EDITABLE, EDITION } from "./Symbols";
     import type { Writable } from "svelte/store";

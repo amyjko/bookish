@@ -19,7 +19,7 @@ export default class TextNode extends Node {
     getText() { return this.#text; }
     getLength() { return this.#text.length; }
     getCaretPositionCount() { return this.#text.length; }
-    getParentOf(node: Node): Node | undefined { return undefined; }
+    getParentOf(): Node | undefined { return undefined; }
     getFirstCaret(): Caret { return { node: this, index: 0}; }
     getLastCaret(): Caret { return { node: this, index: this.#text.length }; }
 
@@ -152,7 +152,7 @@ export default class TextNode extends Node {
 
     }
 
-    withChildReplaced(node: Node, replacement: Node | undefined) { return undefined; }
+    withChildReplaced() { return undefined; }
     
     withCharacterAt(char: string, index: number): TextNode | undefined {
         if(index < 0 || index > this.#text.length) return undefined;

@@ -22,14 +22,14 @@ export default abstract class AtomNode<MetadataType> extends Node {
     // the atom node should be isolated from).
     getChildren() { return this.#meta instanceof Node ? [ this.#meta ] : [] }
 
-    nextWord(root: RootNode, index?: number): Caret {
+    nextWord(root: RootNode): Caret {
         const next = root.getNextTextOrAtom(this);
         return next ?
             { node: next, index: 0 } :
             { node: this, index: 0 };
     }
 
-    previousWord(root: RootNode, index?: number): Caret {
+    previousWord(root: RootNode): Caret {
         const previous = root.getPreviousTextOrAtom(this);
         return previous ?
             { node: previous, index: previous instanceof TextNode ? previous.getLength() : 0 } :

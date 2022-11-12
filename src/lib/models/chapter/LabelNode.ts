@@ -1,6 +1,5 @@
 import AtomNode from "./AtomNode";
 import type Caret from "./Caret";
-import type { CaretRange } from "./Caret";
 import type FormatNode from "./FormatNode";
 import type Node from "./Node";
 
@@ -26,13 +25,13 @@ export default class LabelNode extends AtomNode<string> {
         return `:${id === "" ? ERROR_PLACEHOLDER : id}${nextText?.startsWith(" ") ? "" : " "}`; 
     }
 
-    getParentOf(node: Node): Node | undefined { return undefined; }
+    getParentOf(): Node | undefined { return undefined; }
 
     copy() { return new LabelNode(this.getMeta()) as this; }
 
     withMeta(newID: string) { return new LabelNode(newID); }
-    withChildReplaced(node: Node, replacement: Node | undefined){ return undefined; }
+    withChildReplaced() { return undefined; }
     
-    withContentInRange(range: CaretRange): this | undefined { return this.copy(); }
+    withContentInRange(): this | undefined { return this.copy(); }
 
 }

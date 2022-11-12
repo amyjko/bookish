@@ -81,7 +81,7 @@
             <table>
                 <tbody>
                     <!-- Build a list of words in alphabetical order. -->
-                    {#each Object.keys(bookIndex).sort((a, b) => a.localeCompare(b)) as word, index }
+                    {#each Object.keys(bookIndex).sort((a, b) => a.localeCompare(b)) as word }
                         {@const firstLetter = word.charAt(0).toLowerCase() }
                         {#if letter === firstLetter }
                 

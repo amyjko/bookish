@@ -266,7 +266,7 @@ export default class Edition {
 
     }
 
-    deleteChapter(chapterID: string): Promise<void> {
+    async deleteChapter(chapterID: string): Promise<void> {
 
         let index = this.chapters.findIndex(chapter => chapter.getChapterID() === chapterID);
         if(index < 0)

@@ -129,7 +129,7 @@ const commands: Command[] = [
         description: "move to previous character",
         category: "navigation",
         control: false, alt: false, shift: false, key: "ArrowLeft",
-        visible: context => false,
+        visible: () => false,
         active: context => context.endIsTextOrAtom,
         handler: context => {
             if(context.end.node instanceof TextNode || context.end.node instanceof AtomNode) {
@@ -292,7 +292,7 @@ const commands: Command[] = [
         category: "selection",
         control: true, alt: false, shift: false, key: "a",
         visible: false,
-        active: context => true,
+        active: () => true,
         handler: context => {
             // If in a footnote, expand to the footnote.
             if(context.atom) {
@@ -443,14 +443,14 @@ const commands: Command[] = [
                     if(newListWithoutSublistItem === undefined) return;
                     const newListWithSublistItem = newListWithoutSublistItem.withItemAfter(lastItem, newSublist);
                     if(newListWithSublistItem === undefined) return;                    
-                    return rootWithNode(context, listParent, newListWithSublistItem, n => lastCaret)
+                    return rootWithNode(context, listParent, newListWithSublistItem, () => lastCaret)
                 }
                 else if(listParent instanceof BlocksNode) {
                     const listWithoutItem = context.list.withoutItem(lastItem);
                     if(listWithoutItem === undefined) return;
                     const newBlocks = listParent.withChildReplaced(context.list, listWithoutItem)?.withBlockInsertedAfter(listWithoutItem, new ParagraphNode(0, lastItem));
                     if(newBlocks === undefined) return;
-                    return rootWithNode(context, listParent, newBlocks, n => lastCaret );
+                    return rootWithNode(context, listParent, newBlocks, () => lastCaret );
                 }
             }
             else
@@ -595,7 +595,7 @@ const commands: Command[] = [
         control: true, alt: false, shift: false, key: "t",
         visible: context => context.chapter && context.atom === undefined && context.meta === undefined,
         active: context => context.chapter && context.atom === undefined && context.meta === undefined,
-        handler: context => context.root.withSegmentAtSelection(context.range, text => new CitationsNode([]))
+        handler: context => context.root.withSegmentAtSelection(context.range, () => new CitationsNode([]))
     },
     {
         label: "•",
@@ -604,7 +604,7 @@ const commands: Command[] = [
         control: true, alt: false, shift: false, key: "l",
         visible: context => context.chapter && context.atom === undefined && context.meta === undefined,
         active: context => context.chapter && context.atom === undefined && context.meta === undefined,
-        handler: context => context.root.withSegmentAtSelection(context.range, text => new LabelNode(""))
+        handler: context => context.root.withSegmentAtSelection(context.range, () => new LabelNode(""))
     },
     {
         label: "comment",
@@ -681,7 +681,7 @@ const commands: Command[] = [
                     context, 
                     context.blocks, 
                     context.blocks.withBlockInsertedBefore(context.paragraph, new CalloutNode([ newParagraph ])), 
-                    callout => newParagraph.getFirstCaret()
+                    () => newParagraph.getFirstCaret()
                 );
             }
         } 
@@ -702,7 +702,7 @@ const commands: Command[] = [
                     context, 
                     context.blocks, 
                     context.blocks.withBlockInsertedBefore(context.paragraph, new QuoteNode([ newParagraph ])),
-                    quote => newParagraph.getFirstCaret()
+                    () => newParagraph.getFirstCaret()
                 );
             }
         } 
@@ -722,7 +722,7 @@ const commands: Command[] = [
                     context, 
                     context.blocks, 
                     context.blocks.withBlockInsertedBefore(context.paragraph, newCode), 
-                    code => { return { node: newCode.getCodeNode(), index: 0 } }
+                    () => { return { node: newCode.getCodeNode(), index: 0 } }
                 );
             }
         } 
@@ -743,7 +743,7 @@ const commands: Command[] = [
                     context, 
                     context.blocks, 
                     context.blocks.withBlockInsertedBefore(context.paragraph, newEmbed), 
-                    embed => newEmbed.getCaption().getFirstCaret()
+                    () => newEmbed.getCaption().getFirstCaret()
                 );
             }
         } 
@@ -769,7 +769,7 @@ const commands: Command[] = [
                     context, 
                     context.blocks, 
                     context.blocks.withBlockInsertedBefore(context.paragraph, newTable), 
-                    table => { return { node: newTable.getRows()[0][0].getTextNodes()[0], index: 0 } }
+                    () => { return { node: newTable.getRows()[0][0].getTextNodes()[0], index: 0 } }
                 );
             }
         } 
@@ -885,7 +885,7 @@ const commands: Command[] = [
         category: "clipboard",
         control: true, alt: false, shift: false, key: ["v"],
         visible: true,
-        active: context => true,
+        active: () => true,
         handler: context => {
             if(context.root === undefined) return undefined;
 
@@ -925,8 +925,9 @@ const commands: Command[] = [
         category: "text",
         control: false, alt: false, shift: undefined, key: undefined,
         visible: false,
-        active: (context, key) => key !== undefined && key.length === 1,
+        active: (context, key) => context && key !== undefined && key.length === 1,
         handler: (context, utilities, key) => {
+            utilities;
             const range = context.range;
             if(key.length === 1) {
                 // Insert at the start.
