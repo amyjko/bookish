@@ -7,14 +7,10 @@
     export let edit : (newValue: string) => void;
 
     function handleClick(event: MouseEvent) {
-
-        // Don't let anything else handle the click.
-        event.stopPropagation();
         const newValue = (event.currentTarget as HTMLElement).dataset.value;
         if(newValue && options.includes(newValue)) {
-            edit.call(undefined, newValue);
+            edit(newValue);
         }
-
     }
 
 </script>
@@ -25,7 +21,7 @@
             class={`bookish-app-switch-option ${value === option ? "bookish-app-switch-option-selected" : ""}`} 
             data-value={option} 
             disabled={enabled === false}
-            on:click={handleClick}>
+            on:click|stopPropagation={handleClick}>
                 {option}
         </button>
     {/each}
