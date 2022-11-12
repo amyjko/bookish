@@ -13,7 +13,7 @@
     let chapter = getChapter();
     let editable = getContext<boolean>(EDITABLE);
     let caret = getCaret();
-    $: chapterNode = chapter.getAST();
+    $: chapterNode = $chapter.chapter.getAST();
 
     $: focused = $caret && $caret.range && node.contains($caret.range.start.node);
 

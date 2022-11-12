@@ -5,7 +5,6 @@
 
 import { getContext } from "svelte";
 import type { Writable } from "svelte/store";
-import type Chapter from "../../models/book/Chapter";
 import type Edition from "../../models/book/Edition";
 import type Authentication from "../Authentication";
 import type CaretContext from "../editor/CaretContext";

@@ -49,7 +49,7 @@
             return;
 
         // The chapter ID is optional; if it's missing, it refers to this chapter.
-        const correspondingChapter = chapterID === "" ? chapter.getAST() : $edition.getChapter(chapterID)?.getAST();
+        const correspondingChapter = chapterID === "" ? $chapter.chapter.getAST() : $edition.getChapter(chapterID)?.getAST();
         if(correspondingChapter === undefined)
             return "Not a valid URL or chapter.";
         

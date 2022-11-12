@@ -5,7 +5,7 @@
     import { goto } from '$app/navigation';
     import Status from "./Status.svelte";
     import { onMount, setContext } from 'svelte';
-    import { writable, type Writable } from "svelte/store";
+    import { writable } from "svelte/store";
     import { BASE, BOOK, DARK_MODE, EDITABLE, EDITION, type DarkModeStore, type EditionStore } from "./Contexts";
     import type Book from "$lib/models/book/Book";
 
