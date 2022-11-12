@@ -1,13 +1,13 @@
 import { ChangeEvent, useContext, useEffect, useState } from 'react';
-import { Position } from '../../models/chapter/Position';
+import { Position } from '../../lib/models/chapter/Position';
 import PositionEditor from "./PositionEditor";
-import { EmbedNode } from '../../models/chapter/EmbedNode';
+import { EmbedNode } from '../../lib/models/chapter/EmbedNode';
 import URLEditor from './URLEditor';
 import TextEditor from './TextEditor';
-import { storage } from '../../models/Firebase';
-import { Image } from '../../models/book/BookMedia';
+import { storage } from '../../lib/models/Firebase';
+import { Image } from '../../lib/models/book/BookMedia';
 import { EditorContext } from '../page/EditorContext';
-import { CaretContext, CaretContextType } from './CaretContext';
+import { CaretContext, CaretContextType } from '../../lib/components/editor/CaretContext';
 
 const Spacer = (props: {}) => {
     return <span style={{ display: "inline-block", width: "1em"}}></span>

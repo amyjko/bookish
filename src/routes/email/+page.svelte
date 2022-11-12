@@ -1,0 +1,55 @@
+<script lang="ts">
+    import { updateEmail } from "firebase/auth";
+    import { getContext } from "svelte";
+    import type { Writable } from "svelte/store";
+    import type Authentication from "../../lib/components/Authentication";
+    
+    let email: string;
+    let auth = getContext<Writable<Authentication>>("auth");
+
+    let loading  = false;
+	let feedback = "";
+    let changed = false;
+
+	const errors: Record<string,string> = {
+		"auth/invalide-mail": "This wasn't a valid email.",
+		"auth/email-already-in-use": "This email is already associated with an account.",
+		"auto/requires-recent-login": "You haven't logged in recently enough. Log out, log in again, then try again."
+	};
+
+	async function handleSubmit() {
+
+		// Enter loading state, try to login and wait for it to complete, and then leave loading state.
+		if($auth.user !== null && email) {
+			try {
+				// Give some feedback when loading.
+				loading = true;
+				const previousEmail = $auth.user.email;
+				await updateEmail($auth.user, email);
+				feedback = `Check your original email address, ${previousEmail}, for a confirmation link.`;
+                changed = true;
+			} catch(error: any) {
+				if(typeof error.code === "string")
+					feedback = errors[error.code] ?? "Couldn't update email for an unknown reason."
+			} finally {
+				loading = false;
+			}
+		}
+
+	}
+
+</script>
+
+<h1>Change e-mail</h1>
+
+<p>
+    To change your login email, type your new email address below.
+</p>
+
+<form on:submit|preventDefault={handleSubmit}>
+    <input autocomplete="username" type="email" placeholder="email" bind:value={email} required disabled={loading}/> <button type="submit" disabled={loading || email == undefined || email.length === 0 || changed}>Update e-mail</button>
+</form>
+
+{#if feedback }
+    <div class="bookish-app-alert">{feedback}</div>
+{/if}

@@ -1,7 +1,7 @@
 import React from "react"
 import { useState, useEffect } from "react"
-import Book from "../../models/book/Book"
-import { loadPublishedBooksFromFirestore } from '../../models/Firestore'
+import Book from "../../lib/models/book/Book"
+import { loadPublishedBooksFromFirestore } from '../../lib/models/Firestore'
 import BookPreview from './BookPreview'
 import setTitle from "./setTitle"
 

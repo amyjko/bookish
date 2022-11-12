@@ -1,0 +1,18 @@
+<script lang="ts">
+    import type InlineCodeNode from "$lib/models/chapter/InlineCodeNode";
+    import { getContext } from "svelte";
+    import { EDITABLE } from "../page/Symbols";
+    import Code from './Code.svelte'
+    import Text from './Text.svelte'
+
+    export let node: InlineCodeNode;
+
+    let editable = getContext(EDITABLE);
+
+</script>
+
+{#if editable }
+    <span class="bookish-code bookish-code-inline hljs" data-nodeid={node.nodeID}><Text node={node.getText()}/></span>
+{:else}
+    <Code editable={false} inline={true} language={node.getMeta()} nodeID={node.getText().nodeID}>{node.getText().getText()}</Code>
+{/if}

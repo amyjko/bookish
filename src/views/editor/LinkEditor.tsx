@@ -1,10 +1,10 @@
 import { ChangeEvent, useContext, useState } from "react";
-import { LinkNode } from "../../models/chapter/LinkNode";
-import { ChapterContext } from "../chapter/ChapterContext";
+import { LinkNode } from "../../lib/models/chapter/LinkNode";
+import { ChapterContext } from "../../lib/components/page/ChapterContext";
 import URLEditor from "./URLEditor";
 
 import Unlink from "../../assets/svg/unlink.svg";
-import { CaretContext } from "./CaretContext";
+import { CaretContext } from "../../lib/components/editor/CaretContext";
 
 const LinkEditor = (props: {
     link: LinkNode

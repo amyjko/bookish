@@ -1,10 +1,10 @@
 import { useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom'
-import { getBookIDFromBookName, loadBookFromFirestore } from "../../models/Firestore"
+import { getBookIDFromBookName, loadBookFromFirestore } from "../../lib/models/Firestore"
 import Edition from '../page/Edition'
 import Loading from '../page/Loading'
-import EditionModel from '../../models/book/Edition'
-import Book from '../../models/book/Book'
+import EditionModel from '../../lib/models/book/Edition'
+import Book from '../../lib/models/book/Book'
 import { getSubdomain } from '../util/getSubdomain'
 
 export default function Reader() {

@@ -6,24 +6,28 @@
 	"description": "A platform for reading and writing readable, accessible, beautiful online books.",
 	"license": "MIT",
 	"repository": "https://github.com/amyjko/bookish.git",
+
 	"scripts": {
-		"build-examples": "cp -r examples public/",
-		"emu": "firebase emulators:start",
-		"dev": "vite",
-		"build": "tsc && vite build && npm run build-reader",
+		"dev": "vite dev",
+		"build": "vite build",
 		"build-reader": "vite build --config vite.reader.config.js",
+		"emu": "firebase emulators:start",
+
 		"preview": "vite preview",
 		"test": "vitest",
-		"coverage": "vitest run --coverage",
-		"check": "tsc --watch"
+		"check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
+		"check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch"
 	},
 	"devDependencies": {
-		"@types/react": "^18.0.21",
-		"@types/react-dom": "^18.0.6",
-		"@types/smoothscroll-polyfill": "^0.3.1",
+		"@sveltejs/adapter-auto": "next",
+		"@sveltejs/kit": "next",
+		"svelte": "^3.44.0",
+		"svelte-check": "^2.7.1",
+		"svelte-preprocess": "^4.10.6",
+		"tslib": "^2.3.1",
+		"typescript": "^4.7.4",
 		"@types/uuid": "^8.3.4",
-		"@vitejs/plugin-react": "^2.1.0",
-		"typescript": "^4.6.4",
+		"@types/smoothscroll-polyfill": "^0.3.1",
 		"vite": "^3.1.0",
 		"vitest": "^0.23.4"
 	},
@@ -33,12 +37,6 @@
 		"firebase": "^9.9.4",
 		"firebase-functions": "^3.24.1",
 		"highlight.js": "11.1.0",
-		"react": "^18.2.0",
-		"react-dom": "^18.2.0",
-		"react-router": "^6.2.1",
-		"react-router-dom": "^6.2.1",
-		"react-router-hash-link": "^2.4.3",
-		"react-select": "^5.3.0",
 		"smoothscroll-polyfill": "^0.4.4",
 		"uuid": "^9.0.0"
 	}

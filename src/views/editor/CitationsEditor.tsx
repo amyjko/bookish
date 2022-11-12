@@ -1,8 +1,8 @@
 import { useContext } from "react";
-import { CitationsNode } from "../../models/chapter/CitationsNode";
-import { ChapterContext, ChapterContextType } from "../chapter/ChapterContext";
+import { CitationsNode } from "../../lib/models/chapter/CitationsNode";
+import { ChapterContext, ChapterContextType } from "../../lib/components/page/ChapterContext";
 import Select, { MultiValue } from 'react-select';
-import { CaretContext } from "./CaretContext";
+import { CaretContext } from "../../lib/components/editor/CaretContext";
 
 const CitationsEditor = (props: {
     citations: CitationsNode
