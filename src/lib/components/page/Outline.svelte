@@ -160,7 +160,12 @@
         aria-label={$dark === true ? "Switch to light mode" : "Switch to dark mode"}
         tabIndex=0
         on:click={toggleReadingMode}
-        on:keydown|preventDefault={event => /^(Enter|\s)$/.test(event.key) ? toggleReadingMode() : undefined }
+        on:keydown={event => { 
+            if(event.key === "Enter" || event.key === " ") { 
+                toggleReadingMode(); 
+                event.stopPropagation();
+             }
+        }}
     >
         {$dark ? darkLabel : lightLabel}
     </div>
@@ -171,7 +176,10 @@
         aria-label={expanded ? "Collapse navigation menu" : "Expand navigation menu"}
         tabIndex=0
         on:click={headers.length > 0 ? toggleExpanded : undefined }
-        on:keydown|preventDefault={event => /^(Enter|\s)$/.test(event.key) ? toggleExpanded() : undefined }
+        on:keydown={event => {
+            if(event.key === "Enter" || event.key === " ")
+                toggleExpanded()
+        }}
     >
         { expandLabel }
     </div>

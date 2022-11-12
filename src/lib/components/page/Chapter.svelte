@@ -231,21 +231,21 @@
             setImage={embed => chapter.setImage(embed)}
             print={print}
         >
-                <!-- Collapse the outline if a marginal is selected. -->
-                <Outline
-                    slot="outline"
-                    collapse={marginal !== undefined}
-                    previous={$edition.getPreviousChapterID(chapterID)}
-                    next={$edition.getNextChapterID(chapterID)}
-                    listener={ expanded => {
-                        // If the outline is being expanded, hide the marginal, otherwise leave it alone.
-                        if(expanded)
-                            marginal = undefined;
+            <!-- Collapse the outline if a marginal is selected. -->
+            <Outline
+                slot="outline"
+                collapse={marginal !== undefined}
+                previous={$edition.getPreviousChapterID(chapterID)}
+                next={$edition.getNextChapterID(chapterID)}
+                listener={ expanded => {
+                    // If the outline is being expanded, hide the marginal, otherwise leave it alone.
+                    if(expanded)
+                        marginal = undefined;
 
-                        // Check if we need to hide the outline after positioning.
-                        hideOutlineIfObscured();
-                    }}
-                />
+                    // Check if we need to hide the outline after positioning.
+                    hideOutlineIfObscured();
+                }}
+            />
             <!-- Add an editable chapter ID if in editor mode -->
             <span slot="before">
                 {#if editable }

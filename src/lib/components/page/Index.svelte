@@ -12,9 +12,9 @@
     let base = getBase();
 
     // What letter are we matching?
-    let letter = $page.params.letter;
+    $: letter = $page.params.letter;
 
-    let bookIndex = $edition.getBookIndex();
+    $: bookIndex = $edition.getBookIndex();
 
     let letters: Record<string, boolean> = {};
     // Figure out what letters have words
@@ -22,6 +22,8 @@
         for(const word of Object.keys(bookIndex).sort((a, b) => a.localeCompare(b)))
             letters[word.charAt(0).toLocaleLowerCase()] = true;
     }
+
+    $: console.log(bookIndex);
 
 </script>
 
