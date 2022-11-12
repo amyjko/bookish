@@ -5,7 +5,7 @@ type ChapterContext = {
 	highlightedWord?: string,
 	highlightedID?: string,
 	marginalID?: string,
-	setMarginal?: Function,
+	setMarginal: (id: string | undefined) => void,
 	layoutMarginals: () => void
 }
 export default ChapterContext;

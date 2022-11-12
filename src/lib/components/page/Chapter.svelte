@@ -214,6 +214,7 @@
         highlightedWord: word,
         highlightedID: highlightedID,
         marginalID: marginal,
+        setMarginal: (id: string | undefined) => marginal = id,
         layoutMarginals: layoutMarginals
     });
 
