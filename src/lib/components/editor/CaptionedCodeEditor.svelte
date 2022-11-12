@@ -3,27 +3,25 @@
     import LanguageEditor from "./LanguageEditor.svelte";
     import PositionEditor from "./PositionEditor.svelte";
     import Switch from "$lib/components/editor/Switch.svelte";
-    import { CARET } from "../page/Symbols";
-    import type CaretContext from "./CaretContext";
-    import { getContext } from "svelte";
+    import { getCaret } from "../page/Contexts";
 
     export let code: CodeNode;
 
-    let caret = getContext<CaretContext>(CARET);
+    let caret = getCaret();
 
 </script>
 <span>
     <PositionEditor
         value={code.getPosition()}
-        edit={value => caret?.edit(code, code.withPosition(value)) }
+        edit={value => $caret?.edit(code, code.withPosition(value)) }
     />
-    <LanguageEditor language={code.getLanguage()} edit={lang => caret?.edit(code, code.withLanguage(lang)) } />
+    <LanguageEditor language={code.getLanguage()} edit={lang => $caret?.edit(code, code.withLanguage(lang)) } />
     {#if code.getLanguage() === "python"}
         <Switch
             options={["executable", "read only"]}
             value={code.isExecutable() ? "executable" : "read only"}
             position=">"
-            edit={value => caret?.edit(code, code.withExecutable(value === "executable")) }
+            edit={value => $caret?.edit(code, code.withExecutable(value === "executable")) }
         />
     {/if}
 </span>

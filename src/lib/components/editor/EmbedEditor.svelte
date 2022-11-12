@@ -4,20 +4,17 @@
     import TextEditor from './TextEditor.svelte';
     import { storage } from '$lib/models/Firebase';
     import type { Image } from '$lib/models/book/BookMedia';
-    import { BOOK, CARET, EDITION } from '../page/Symbols';
+    import { BOOK, getCaret } from '../page/Contexts';
     import ToolbarSpacer from './ToolbarSpacer.svelte';
     import ImageChooser from './ImageChooser.svelte';
     import URLEditor from './URLEditor.svelte';
     import { getContext } from 'svelte';
     import type Book from '$lib/models/book/Book';
-    import type CaretContext from './CaretContext';
-    import type Edition from '$lib/models/book/Edition';
 
     export let embed: EmbedNode;
 
     let book = getContext<Book>(BOOK);
-    let caret = getContext<CaretContext>(CARET);
-    let edition = getContext<Edition>(EDITION);
+    let caret = getCaret();
     let upload: undefined|number|string = undefined;
 
     $: description = embed.getDescription();
@@ -37,7 +34,7 @@
 
         const target = event.target as HTMLInputElement;
         const file = target.files === null ? undefined : target.files[0];
-        const media = edition?.getBook()?.getMedia();
+        const media = book.getMedia();
 
         if(file === undefined) return;
         if(storage === undefined) return;
@@ -48,7 +45,7 @@
             (error: string) => upload = error,
             (url: string, thumbnail: string) => {
                 // Upload completed successfully, now we can get the download URL
-                caret?.edit(embed, embed.withURLs(url, thumbnail).withDescription(""));
+                $caret?.edit(embed, embed.withURLs(url, thumbnail).withDescription(""));
                 upload = undefined;
             }
         );
@@ -56,7 +53,7 @@
 
     function handleImageSelection(image: Image) {
         // Toggle the embed
-        caret?.edit(embed, 
+        $caret?.edit(embed, 
             embed.getURL() === image.url ?
                 embed.withURL("").withDescription("") :
                 embed.withURL(image.url)
@@ -65,10 +62,10 @@
 
 </script>
 
-{#if caret?.root instanceof EmbedNode}
+{#if $caret?.root instanceof EmbedNode}
     <ToolbarSpacer/>
 {:else}
-    Position <PositionEditor value={embed.getPosition()} edit={position => caret?.edit(embed, embed.withPosition(position)) } />
+    Position <PositionEditor value={embed.getPosition()} edit={position => $caret?.edit(embed, embed.withPosition(position)) } />
 {/if}
 <label class="bookish-file-upload">
     <input type="file" on:input={handleImageChange} accept=".jpg,.jpeg,.png,.gif,image/jpeg,image/png,image/gif"/>
@@ -83,7 +80,7 @@
             edit={url => {
                 const revisedEmbed = embed.withURL(url);
                 const revisedURL = revisedEmbed.getURL();
-                caret?.edit(embed, revisedEmbed);
+                $caret?.edit(embed, revisedEmbed);
                 return revisedURL;
             }}
         />
@@ -96,7 +93,7 @@
         label={'Image description'} 
         placeholder={'description'} 
         valid={ alt => alt.length === 0 ? "Image description required" : undefined }
-        save={ alt => { caret?.edit(embed, embed.withDescription(alt)); } }
+        save={ alt => { $caret?.edit(embed, embed.withDescription(alt)); } }
         width={20}
         clip={true}
     />

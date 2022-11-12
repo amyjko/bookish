@@ -1,17 +1,15 @@
 <script lang="ts">
     import type CalloutNode from "$lib/models/chapter/CalloutNode"
-    import type CaretContext from '$lib/components/editor/CaretContext';
     import PositionEditor from "./PositionEditor.svelte";
-    import { CARET } from '../page/Symbols';
-    import { getContext } from "svelte";
+    import { getCaret } from '../page/Contexts';
 
     export let callout: CalloutNode;
 
-    let caret = getContext<CaretContext>(CARET);
+    let caret = getCaret();
 
 </script>
 
 <PositionEditor 
     value={callout.getPosition()} 
-    edit={position => caret?.edit(callout, callout.withPosition(position))}
+    edit={position => $caret?.edit(callout, callout.withPosition(position))}
 />

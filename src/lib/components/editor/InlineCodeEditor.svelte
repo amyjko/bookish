@@ -1,15 +1,13 @@
 <script lang="ts">
     import type InlineCodeNode from "$lib/models/chapter/InlineCodeNode";
-    import type CaretContext from "$lib/components/editor/CaretContext";
     import LanguageEditor from "./LanguageEditor.svelte";
-    import { getContext } from "svelte";
-    import { CARET } from "../page/Symbols";
+    import { getCaret } from "../page/Contexts";
 
     export let code: InlineCodeNode;
 
-    let caret = getContext<CaretContext>(CARET);
+    let caret = getCaret();
 </script>
 
 <span>
-    <LanguageEditor language={code.getMeta()} edit={lang => caret?.edit(code, code.withMeta(lang)) } />
+    <LanguageEditor language={code.getMeta()} edit={lang => $caret?.edit(code, code.withMeta(lang)) } />
 </span>

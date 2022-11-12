@@ -3,20 +3,19 @@
     import Atom from './Atom.svelte';
     import Marginal from './Marginal.svelte';
     import Format from './Format.svelte';
-    import { CARET, CHAPTER, EDITABLE } from '../page/Symbols';
+    import { EDITABLE, getChapter } from '../page/Contexts';
+    import { getCaret } from '../page/Contexts';
     import { getContext } from 'svelte';
-    import type ChapterContext from '../page/ChapterContext';
-    import type CaretContext from '../editor/CaretContext';
     import ToolbarIcon from '../editor/ToolbarIcon.svelte';
 
     export let node: CommentNode;
     
-    let context = getContext<ChapterContext>(CHAPTER);
+    let chapter = getChapter();
     let editable = getContext<boolean>(EDITABLE);
-    let caret = getContext<CaretContext>(CARET);
-    $: chapterNode = context.chapter.getAST();
+    let caret = getCaret();
+    $: chapterNode = chapter.getAST();
 
-    $: focused = caret?.range && node.contains(caret.range.start.node);
+    $: focused = $caret && $caret.range && node.contains($caret.range.start.node);
 
 </script>
 

@@ -32,10 +32,10 @@
     import commands from "./Commands";
     import Toolbar from "./Toolbar.svelte";
 
-    import { CARET, EDITION } from "../page/Symbols";
+    import { CARET, EDITION, type CaretStore } from "../page/Contexts";
     import { afterUpdate, getContext, onMount, setContext } from "svelte";
     import type Edition from "$lib/models/book/Edition";
-    import type { Writable } from "svelte/store";
+    import { writable, type Writable } from "svelte/store";
 
     const IDLE_TIME = 500;
 
@@ -778,7 +778,11 @@
         context = getCaretContext();
     }
 
-    $: setContext<CaretContext>(CARET, { 
+    // Create a caret store for the editor and make it available to children.
+    let caretStore = setContext<CaretStore>(CARET, writable<CaretContext>());
+
+    // Update the caret store whenever any of the below change.
+    $: caretStore.set({ 
         range: caretRange, 
         coordinate: caretCoordinate, 
         forceUpdate: forceUpdate,
@@ -786,7 +790,7 @@
         context: context,
         root: editedNode,
         focused: editorFocused
-    });
+    });    
 
 </script>
 

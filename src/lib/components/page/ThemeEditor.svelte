@@ -2,18 +2,15 @@
     import Header from "./Header.svelte";
     import Outline from './Outline.svelte';
     import Page from './Page.svelte';
-    import type Edition from '$lib/models/book/Edition'
     import { defaultTheme } from '$lib/models/book/Theme'
     import ConfirmButton from '$lib/components/editor/ConfirmButton.svelte'
     import Instructions from './Instructions.svelte'
     import ThemeSetEditor from './ThemeSetEditor.svelte'
     import ThemeEditorPreview from './ThemeEditorPreview.svelte'
-    import { getContext } from "svelte";
     import External from "../External.svelte";
-    import { EDITION } from "./Symbols";
-    import type { Writable } from "svelte/store";
+    import { getEdition } from "./Contexts";
 
-    $: edition = getContext<Writable<Edition>>(EDITION);
+    let edition = getEdition();
     $: theme = $edition.getTheme();
 
 </script>

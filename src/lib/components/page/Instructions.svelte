@@ -1,6 +1,6 @@
 <script lang="ts">
     import { getContext } from "svelte";
-    import { EDITABLE } from "./Symbols";
+    import { EDITABLE } from "./Contexts";
 
     let editable = getContext<boolean>(EDITABLE);
 </script>

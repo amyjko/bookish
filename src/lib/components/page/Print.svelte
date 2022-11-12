@@ -1,11 +1,8 @@
 <script lang="ts">
-    import { getContext } from 'svelte';
-    import type Edition from '$lib/models/book/Edition';
     import Chapter from './Chapter.svelte';
-    import { EDITION } from './Symbols';
-    import type { Writable } from 'svelte/store';
+    import { getEdition } from './Contexts';
 
-    let edition = getContext<Writable<Edition>>(EDITION);
+    let edition = getEdition();
 
 </script>
 

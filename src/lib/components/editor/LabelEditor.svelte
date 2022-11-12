@@ -1,17 +1,14 @@
 <script lang="ts">
     import type LabelNode from "$lib/models/chapter/LabelNode";
-    import type CaretContext from "$lib/components/editor/CaretContext";
     import TextEditor from "./TextEditor.svelte";
-    import { CARET, CHAPTER } from "../page/Symbols";
-    import { getContext } from "svelte";
-    import type Chapter from "$lib/models/book/Chapter";
+    import { getCaret, getChapter } from "../page/Contexts";
 
     export let label: LabelNode;
 
-    let chapter = getContext<Chapter>(CHAPTER);
-    let caret = getContext<CaretContext>(CARET);
+    let chapter = getChapter();
+    let caret = getCaret();
 
-    $: ast = chapter.getAST();
+    $: ast = $chapter.chapter.getAST();
 
 </script>
 
@@ -26,7 +23,7 @@
             // If it's different than what it is and there's already one, then error.
             if(ast && ast.getLabels().filter(l => l.getMeta() === id).length > (label.getMeta() === id ? 1 : 0)) return "Another label has this ID";
         }}
-        save={labelID => caret?.edit(label, label.withMeta(labelID)) }
+        save={labelID => $caret?.edit(label, label.withMeta(labelID)) }
         saveOnExit
     />
 </code>

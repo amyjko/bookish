@@ -1,11 +1,9 @@
 <script lang="ts">
     import { updateEmail } from "firebase/auth";
-    import { getContext } from "svelte";
-    import type { Writable } from "svelte/store";
-    import type Authentication from "../../lib/components/Authentication";
+    import { getAuth } from "../../lib/components/page/Contexts";
     
     let email: string;
-    let auth = getContext<Writable<Authentication>>("auth");
+    let auth = getAuth();
 
     let loading  = false;
 	let feedback = "";

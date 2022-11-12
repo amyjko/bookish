@@ -6,7 +6,7 @@
     import Text from './Text.svelte'
     import renderPosition from './renderPosition'
     import { getContext } from 'svelte';
-    import { EDITABLE } from "../page/Symbols";
+    import { EDITABLE } from "../page/Contexts";
 
     export let node: CodeNode;
 

@@ -5,6 +5,7 @@
     import { writable, type Writable } from "svelte/store";
     import { auth } from "../models/Firebase";
     import type Authentication from "./Authentication";
+    import { AUTH, type AuthContext } from "./page/Contexts";
 
     // Track the user and user loading status in state
     let loading = true;
@@ -56,7 +57,7 @@
     });
 
     // Expose the state and the login/logout functionality.
-    setContext<Writable<Authentication>>("auth", authentication);
+    setContext<AuthContext>(AUTH, authentication);
 
 </script>
 

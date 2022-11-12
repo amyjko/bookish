@@ -2,17 +2,14 @@
     import Header from "$lib/components/page/Header.svelte";
     import Outline from '$lib/components/page/Outline.svelte';
     import Page from '$lib/components/page/Page.svelte';
-
-    import type Edition from '$lib/models/book/Edition';
     import Instructions from '$lib/components/page/Instructions.svelte';
     import ChapterIDs from '$lib/models/book/ChapterID';
     import Link from "$lib/components/Link.svelte";
     import { getContext } from "svelte";
-    import type { Writable } from "svelte/store";
-    import { BASE, EDITION } from "./Symbols";
+    import { BASE, getEdition } from "./Contexts";
     import { page } from "$app/stores";
 
-    let edition = getContext<Writable<Edition>>(EDITION);
+    let edition = getEdition();
     let base = getContext<string>(BASE);
 
     // What letter are we matching?

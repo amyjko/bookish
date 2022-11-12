@@ -1,14 +1,12 @@
 <script lang="ts">
     import type TextNode from "$lib/models/chapter/TextNode";
-    import { getContext } from "svelte";
-    import type ChapterContext from "../page/ChapterContext";
-    import { CHAPTER } from "../page/Symbols";
+    import { getChapter } from "../page/Contexts";
 
     export let node: TextNode;
 
     $: text = node.getText();
 
-    let context = getContext<ChapterContext>(CHAPTER);
+    let context = getChapter();
 
     function replaceMultipleSpacesWithNonBreakingSpaces(original: string) {
         let revisedText = ""
@@ -37,8 +35,8 @@
             text = "\ufeff";
 
         // Is there a query we're supposed to highlight? If so, highlight it.
-        if(context && context.highlightedWord) {
-            const query = context.highlightedWord;
+        if($context && $context.highlightedWord) {
+            const query = $context.highlightedWord;
             const lowerText = text.toLowerCase();
             // Does this text contain the query? Highlight it.
             if(lowerText.indexOf(query) >= 0) {

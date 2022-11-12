@@ -1,14 +1,12 @@
 <script lang="ts">
-    import type Edition from "$lib/models/book/Edition";
     import Parser from "$lib/models/chapter/Parser";
     import ChapterBody from "$lib/components/chapter/ChapterBody.svelte";
     import BookishEditor from "$lib/components/editor/BookishEditor.svelte";
     import { getContext } from "svelte";
-    import { EDITABLE, EDITION } from "./Symbols";
-    import type { Writable } from "svelte/store";
+    import { EDITABLE, getEdition } from "./Contexts";
 
     let editable = getContext<boolean>(EDITABLE);
-    let edition = getContext<Writable<Edition>>(EDITION);
+    let edition = getEdition();
 
 	const descriptionNode = Parser.parseChapter($edition, $edition.getDescription());
 

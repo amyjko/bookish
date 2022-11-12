@@ -1,10 +1,8 @@
 <script lang="ts">
-    import { getContext } from "svelte";
-    import type { Writable } from "svelte/store";
-    import type Authentication from "../../lib/components/Authentication";
+    import { getAuth } from "$lib/components/page/Contexts";
 
 	let email: HTMLInputElement;
-	let auth = getContext<Writable<Authentication>>("auth");
+	let auth = getAuth()
 
 	// Not loading by default
 	let loading = false;

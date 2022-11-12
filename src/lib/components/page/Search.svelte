@@ -8,7 +8,7 @@
     import type { Match } from '$lib/models/book/Chapter';
     import ChapterIDs from '$lib/models/book/ChapterID';
     import { getContext, onMount } from "svelte";
-    import { BASE, EDITION } from "./Symbols";
+    import { BASE, EDITION } from "./Contexts";
     import type { Writable } from "svelte/store";
 
     $: edition = getContext<Writable<Edition>>(EDITION);

@@ -5,9 +5,8 @@
     import Format from './Format.svelte';
     import { getContext } from "svelte";
     import type Edition from "$lib/models/book/Edition";
-    import { CARET, EDITABLE, EDITION } from "../page/Symbols";
+    import { EDITABLE, EDITION, getCaret } from "../page/Contexts";
     import type { Writable } from "svelte/store";
-    import type CaretContext from "../editor/CaretContext";
 
     export let node: EmbedNode;
     export let placeholder: string | undefined = undefined;
@@ -18,7 +17,7 @@
 	const credit = node.getCredit();
 	const caption = node.getCaption();
 
-    let caret = getContext<CaretContext>(CARET);
+    let caret = getCaret();
     let editable = getContext<boolean>(EDITABLE);
     let edition = getContext<Writable<Edition>>(EDITION);
 
@@ -53,7 +52,7 @@
 					(error: string) => { dragFeedback = error; dragging = false; },
 					(url: string, thumbnails: string) => {
 						// Upload completed successfully, now we can get the download URL
-						caret?.edit(node, node.withURLs(url, thumbnails).withDescription(""));
+						$caret?.edit(node, node.withURLs(url, thumbnails).withDescription(""));
 						dragging = false;
 						dragFeedback = undefined;
 					}

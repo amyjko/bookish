@@ -1,27 +1,26 @@
 <script lang="ts">
     import { isMobile, watchMobile } from '$lib/util/isMobile';
-    import { getContext, onMount } from 'svelte';
-    import type ChapterContext from '../page/ChapterContext';
-    import { CHAPTER } from '../page/Symbols';
+    import { onMount } from 'svelte';
+    import { getChapter } from '../page/Contexts';
 
     export let id: string;
 
 	let hovered = false;
-	let context = getContext<ChapterContext>(CHAPTER);
+	let context = getChapter();
 
 	// If there's no marginal selected or this is different from the current selection, this is hidden.
 	function isHidden() { 
-		return context.marginalID === null || context.marginalID !== id
+		return $context.marginalID === null || $context.marginalID !== id
 	}
 
 	function toggle() {
 
-		if(context.setMarginal) {
+		if($context.setMarginal) {
 			if(isMobile() && isHidden())
-				context.setMarginal(id);
+				$context.setMarginal(id);
 			// Otherwise, deselect.
 			else
-				context.setMarginal(undefined);
+				$context.setMarginal(undefined);
 		}
 
 	}

@@ -7,7 +7,7 @@
     import Instructions from './Instructions.svelte';
     import ChapterIDs from '$lib/models/book/ChapterID';
     import { getContext } from "svelte";
-    import { EDITION } from "./Symbols";
+    import { EDITION } from "./Contexts";
     import type { Writable } from "svelte/store";
 
     let edition = getContext<Writable<Edition>>(EDITION);

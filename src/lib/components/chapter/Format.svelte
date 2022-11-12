@@ -20,7 +20,7 @@
     import Text from "./Text.svelte";
     import Format from "./Format.svelte";
 
-    import { EDITABLE } from "../page/Symbols";
+    import { EDITABLE } from "../page/Contexts";
 
     export let node: FormatNode;
     export let placeholder: string | undefined = undefined;

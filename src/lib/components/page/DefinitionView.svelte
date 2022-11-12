@@ -7,14 +7,12 @@
     import BookishEditor from '$lib/components/editor/BookishEditor.svelte'
     import Format from '$lib/components/chapter/Format.svelte'
     import { afterUpdate, getContext } from 'svelte';
-    import type Edition from '$lib/models/book/Edition';
-    import { EDITABLE, EDITION } from './Symbols';
-    import type { Writable } from 'svelte/store';
+    import { EDITABLE, getEdition } from './Contexts';
 
     export let id: string;
     export let definition: Definition;
 
-    let edition = getContext<Writable<Edition>>(EDITION);
+    let edition = getEdition();
 	let editable = getContext<boolean>(EDITABLE);
 
 	// Focus after adding a new synonym.

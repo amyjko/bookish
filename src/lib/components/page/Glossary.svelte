@@ -2,15 +2,13 @@
     import Header from "./Header.svelte"
     import Outline from './Outline.svelte'
     import Page from './Page.svelte'
-    import type Edition from '$lib/models/book/Edition.js'
     import ChapterIDs from '$lib/models/book/ChapterID'
     import { getContext } from "svelte";
     import DefinitionView from "./DefinitionView.svelte";
-    import { EDITABLE, EDITION } from "./Symbols";
-    import type { Writable } from "svelte/store";
+    import { EDITABLE, getEdition } from "./Contexts";
     import Instructions from "./Instructions.svelte";
 
-    let edition = getContext<Writable<Edition>>(EDITION);
+    let edition = getEdition();
 	let editable = getContext<boolean>(EDITABLE);
 
 	$: glossary = $edition.getGlossary();

@@ -2,26 +2,22 @@
     import Marginal  from './Marginal.svelte'
     import Parser from '$lib/models/chapter/Parser'
     import type CitationsNode from "$lib/models/chapter/CitationsNode"
-    import type ChapterContext from '../page/ChapterContext'
     import Atom from './Atom.svelte';
-    import { CHAPTER, EDITION } from '../page/Symbols';
-    import type Edition from '$lib/models/book/Edition';
+    import { getChapter, getEdition } from '../page/Contexts';
     import PossibleReference from '../page/PossibleReference.svelte';
-    import { getContext } from 'svelte';
-    import type { Writable } from 'svelte/store';
 
     export let node: CitationsNode;
 
-    let context = getContext<ChapterContext>(CHAPTER);
-    let edition = getContext<Writable<Edition>>(EDITION);
+    let chapter = getChapter();
+    let edition = getEdition();
 
-    $: chapter = context.chapter.getAST();
+    $: chapterNode = chapter.getAST();
 
     // Sort citations numerically, however they're numbered.
     let citations = node.getMeta().sort((a, b) => {
-        if(chapter === undefined) return 0;
-        let aNumber = chapter.getCitationNumber(a);
-        let bNumber = chapter.getCitationNumber(b);
+        if(chapterNode === undefined) return 0;
+        let aNumber = chapterNode.getCitationNumber(a);
+        let bNumber = chapterNode.getCitationNumber(b);
         if(aNumber === null) {
             if(bNumber === null) return 0;
             else return 1;

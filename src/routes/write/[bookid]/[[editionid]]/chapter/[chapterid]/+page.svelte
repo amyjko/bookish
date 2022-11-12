@@ -2,7 +2,7 @@
     import Chapter from "$lib/components/page/Chapter.svelte";
     import { page } from "$app/stores"
     import { getContext } from "svelte";
-    import { EDITION } from "$lib/components/page/Symbols";
+    import { EDITION } from "$lib/components/page/Contexts";
     import type Edition from "$lib/models/book/Edition";
     import type { Writable } from "svelte/store";
 

@@ -1,7 +1,7 @@
 <script lang="ts">
     import type LinkNode from "$lib/models/chapter/LinkNode";
     import { getContext } from "svelte";
-    import { BASE, EDITABLE, EDITION } from "../page/Symbols";
+    import { BASE, EDITABLE, EDITION } from "../page/Contexts";
     import Text from './Text.svelte'
     import type Edition from "$lib/models/book/Edition";
 

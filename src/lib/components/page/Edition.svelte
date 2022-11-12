@@ -6,7 +6,8 @@
     import Status from "./Status.svelte";
     import { onMount, setContext } from 'svelte';
     import { writable, type Writable } from "svelte/store";
-    import { BASE, DARK_MODE, EDITABLE, EDITION } from "./Symbols";
+    import { BASE, BOOK, DARK_MODE, EDITABLE, EDITION, type DarkModeStore, type EditionStore } from "./Contexts";
+    import type Book from "$lib/models/book/Book";
 
     // Poly fill smooth scrolling for Safari.
     smoothscroll.polyfill();
@@ -30,7 +31,11 @@
     export let edition: EditionModel;
 
     // Expose the edition to descendents in a store and update the context when the edition changes.
-    $: currentEdition = setContext<Writable<EditionModel>>(EDITION, writable<EditionModel>(edition));
+    let editionStore = writable<EditionModel>(edition);
+    $: currentEdition = setContext<EditionStore>(EDITION, editionStore);
+
+    // Expose the book to descendents in a store and update the context when the edition changes.
+    $: setContext<Book|undefined>(BOOK, edition.getBook());
 
     // When edition changes, unsubscribe to the previous edition and subscribe to the new one.
     // We use a simple assignment to tell Svelte about the change.
@@ -68,7 +73,7 @@
     );
 
     // Expose dark mode to descendants
-    setContext<Writable<boolean>>(DARK_MODE, darkMode);
+    setContext<DarkModeStore>(DARK_MODE, darkMode);
 
     // When dark mode changes, update the body's class list.
     $: {

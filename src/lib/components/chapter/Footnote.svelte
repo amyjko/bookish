@@ -5,17 +5,14 @@
     import Format from './Format.svelte';
     import { getContext } from "svelte";
     import type Chapter from "$lib/models/book/Chapter";
-    import type Edition from "$lib/models/book/Edition";
-    import type { Writable } from "svelte/store";
-    import type CaretContext from "../editor/CaretContext";
-    import { CARET } from "../page/Symbols";
+    import { getCaret, getEdition } from "../page/Contexts";
 
     export let node: FootnoteNode;
 
     $: content = node.getMeta();
-    let caret = getContext<CaretContext>(CARET);
+    let caret = getCaret();
     let chapter = getContext<Chapter>("chapter");
-    let edition = getContext<Writable<Edition>>("edition");
+    let edition = getEdition();
 
     $: chapterNode = chapter.getAST();
 
@@ -23,7 +20,7 @@
     $: number = chapter.getAST()?.getFootnotes().indexOf(node);
     $: letter = number === undefined ? undefined : $edition.getFootnoteSymbol(number);
 
-    const focused = caret && caret.range && chapterNode && caret.range.start.node.hasAncestor(chapterNode, node);
+    const focused = chapterNode && $caret && $caret.range && $caret.range.start.node.hasAncestor(chapterNode, node);
 
     // Position the marginals on every render.
     // afterUpdate(() => {

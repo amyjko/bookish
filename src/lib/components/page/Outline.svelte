@@ -2,8 +2,7 @@
     import { isMobile } from '$lib/util/isMobile';
     import { getContext, onMount } from 'svelte';
     import Link from '$lib/components/Link.svelte';
-    import type { Writable } from 'svelte/store';
-    import { BASE, DARK_MODE } from './Symbols';
+    import { BASE, getDarkMode } from './Contexts';
 
     export let previous: string | null;
     export let next: string | null;
@@ -13,7 +12,7 @@
     let headerString: string | null = null;
     let headerIndex = -1;
     let expanded = false;
-    let dark = getContext<Writable<boolean>>(DARK_MODE);
+    let dark = getDarkMode();
     let base = getContext<string>(BASE);
     let outline: HTMLDivElement | null = null;
 
@@ -167,12 +166,12 @@
     <div 
         class="bookish-outline-reading-mode" 
         role="button"
-        aria-label={dark ? "Switch to light mode" : "Switch to dark mode"}
+        aria-label={$dark === true ? "Switch to light mode" : "Switch to dark mode"}
         tabindex=0
         on:click={toggleReadingMode}
         on:keydown|preventDefault={event => /^(Enter|\s)$/.test(event.key) ? toggleReadingMode() : undefined }
     >
-        {dark ? darkLabel : lightLabel}
+        {$dark ? darkLabel : lightLabel}
     </div>
     <!-- Visual cue of expandability, only visible in footer mode. -->
     <div 

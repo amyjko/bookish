@@ -1,6 +1,5 @@
 <script lang="ts">
     import Parser from "$lib/models/chapter/Parser"
-    import type Edition from '$lib/models/book/Edition'
     import type ChapterModel from '$lib/models/book/Chapter'
 
     import Header from '$lib/components/page/Header.svelte'
@@ -14,8 +13,8 @@
     import ChapterBody from '$lib/components/chapter/ChapterBody.svelte';
     import PossibleReference from "./PossibleReference.svelte";
 
-    import { CHAPTER, EDITABLE, EDITION } from "./Symbols";
-    import { writable, type Writable } from "svelte/store";
+    import { CHAPTER, EDITABLE, getEdition, type ChapterStore } from "./Contexts";
+    import { writable } from "svelte/store";
     import { getContext, onMount, setContext } from "svelte";
     import { hideOutlineIfObscured, layoutMarginals } from "./margins";
     import scrollToEyeLevel from "../../util/scrollToEyeLevel";
@@ -27,7 +26,7 @@
     export let chapter: ChapterModel;
     export let print: boolean = false;
 
-    let edition = getContext<Writable<Edition>>(EDITION);
+    let edition = getEdition();
     let editable = getContext<boolean>(EDITABLE);
 
 	// Keep track of the scroll position to facilitate reading during reloads.
@@ -208,7 +207,9 @@
 	$: chapterAST = chapter.getAST();
 	$: citations = chapterAST ? chapterAST.getCitations() : undefined;
 
-    $: setContext<ChapterContext>(CHAPTER, {
+    let chapterStore = writable<ChapterContext>();
+    setContext<ChapterStore>(CHAPTER, chapterStore);
+    $: chapterStore.set({
         chapter: chapter,
         highlightedWord: word,
         highlightedID: highlightedID,

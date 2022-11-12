@@ -3,7 +3,7 @@
     import type { Image } from '$lib/models/book/BookMedia';
     import { getContext, onMount } from 'svelte';
     import type Book from '$lib/models/book/Book';
-    import { BOOK } from '../page/Symbols';
+    import { BOOK } from '../page/Contexts';
     
     export let select: (image: Image) => void;
     export let selection: string;

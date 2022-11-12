@@ -1,10 +1,8 @@
 <script lang="ts">
     import { goto } from "$app/navigation";
-    import { getContext } from "svelte";
-    import type {  Writable } from "svelte/store";
-    import type Authentication from "../../lib/components/Authentication";
+    import { getAuth } from "$lib/components/page/Contexts";
 
-    let auth = getContext<Writable<Authentication>>("auth");
+    let auth = getAuth();
 
     // Redirect to the login page if not authenticated.
     if($auth.user === null) goto("/login");

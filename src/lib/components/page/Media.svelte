@@ -1,7 +1,6 @@
 <script lang="ts">
     import Header from "$lib/components/page/Header.svelte";
     import Outline from '$lib/components/page/Outline.svelte';
-    import type Edition from '$lib/models/book/Edition';
     import type { Image } from '$lib/models/book/BookMedia';
     import Page from '$lib/components/page/Page.svelte'
     import Instructions from '$lib/components/page/Instructions.svelte';
@@ -9,10 +8,9 @@
     import Format from '$lib/components/chapter/Format.svelte';
     import MediaPreview from "./MediaPreview.svelte";
     import { getContext, onMount } from "svelte";
-    import { EDITABLE, EDITION } from "./Symbols";
-    import type { Writable } from "svelte/store";
+    import { EDITABLE, getEdition } from "./Contexts";
 
-    let edition = getContext<Writable<Edition>>(EDITION);
+    let edition = getEdition();
     let editable = getContext<boolean>(EDITABLE);
     let images: Image[] | undefined = [];
 

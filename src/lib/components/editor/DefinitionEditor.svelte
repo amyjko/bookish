@@ -1,25 +1,22 @@
 <script lang="ts">
     import type DefinitionNode from "$lib/models/chapter/DefinitionNode";
-    import type CaretContext from "$lib/components/editor/CaretContext";
-    import { getContext } from "svelte";
-    import { CARET, EDITION } from "../page/Symbols";
-    import type Edition from "$lib/models/book/Edition";
+    import { getCaret, getEdition } from "../page/Contexts";
 
     export let definition: DefinitionNode;
 
-    let edition = getContext<Edition>(EDITION);
-    let caret = getContext<CaretContext>(CARET);
+    let edition = getEdition();
+    let caret = getCaret();
  
-    $: glossary = edition.getGlossary();
+    $: glossary = $edition.getGlossary();
 
     function handleChange(event: Event) {
         const target = event.target as HTMLSelectElement;
-        caret?.edit(definition, definition.withMeta(target.value))
+        $caret?.edit(definition, definition.withMeta(target.value))
     }
 
     // Sort the glossary entries by phrase
     $: entries = Object.keys(glossary).map(key => { return { glossaryID: key, phrase: glossary[key].phrase }; }).sort((a, b) => a.phrase.localeCompare(b.phrase));    
-    $: refID = edition.getRef()?.id;
+    $: refID = $edition.getRef()?.id;
     $: glossaryLink = `/write/${refID}/glossary`;
 
 </script>

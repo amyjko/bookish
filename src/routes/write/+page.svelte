@@ -3,15 +3,14 @@
     import BookPreview from '$lib/components/BookPreview.svelte'
     import type Book from "$lib/models/book/Book"
     import { goto } from '$app/navigation';
-    import { getContext, onMount } from 'svelte';
-    import type Authentication from '$lib/components/Authentication';
-    import type { Writable } from 'svelte/store';
+    import { onMount } from 'svelte';
+    import { getAuth } from '$lib/components/page/Contexts';
 
 	let books: Book[] = [];
 	let loading = true;
 	let error = "";
 
-	let auth = getContext<Writable<Authentication>>("auth");
+	let auth = getAuth();
 
 	function updateBooks() {
 		if($auth.user)

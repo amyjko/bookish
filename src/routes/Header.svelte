@@ -1,13 +1,11 @@
 <script lang="ts">
-    import { getContext } from "svelte";
-    import type { Writable } from "svelte/store";
-    import type Authentication from "../lib/components/Authentication";
     import Link from "../lib/components/Link.svelte";
+    import { getAuth } from "../lib/components/page/Contexts";
     import { getSubdomain, pathWithoutSubdomain } from "../lib/util/getSubdomain";
 
     let subdomain = getSubdomain();
 
-    let auth = getContext<Writable<Authentication>>("auth");
+    let auth = getAuth();
 
     // Ask the auth context to logout, and provided an error if it fails.
     async function handleLogout() {

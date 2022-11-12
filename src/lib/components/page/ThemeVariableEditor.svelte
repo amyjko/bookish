@@ -2,7 +2,7 @@
     import { getContext } from "svelte";
     import type Edition from "$lib/models/book/Edition";
     import TextEditor from "$lib/components/editor/TextEditor.svelte";
-    import { EDITION } from "./Symbols";
+    import { EDITION } from "./Contexts";
     import type { Writable } from "svelte/store";
 
     const placeholders: Record<string,string> = {

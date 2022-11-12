@@ -2,12 +2,10 @@
     import { getContext } from "svelte";
     import Link from "$lib/components/Link.svelte";
     import TableOfContentsImage from "./TableOfContentsImage.svelte";
-    import type Edition from "$lib/models/book/Edition";
     import type Chapter from "$lib/models/book/Chapter";
     import Toggle from "$lib/components/editor/Toggle.svelte";
     import ConfirmButton from "$lib/components/editor/ConfirmButton.svelte";
-    import { BASE, EDITABLE, EDITION } from "./Symbols";
-    import type { Writable } from "svelte/store";
+    import { BASE, EDITABLE, getEdition } from "./Contexts";
 
     export let chapterID: string;
     export let chapter: Chapter | undefined = undefined;
@@ -15,7 +13,7 @@
     export let number: number | undefined = undefined;
     export let forthcoming: boolean = false;
 
-    let edition = getContext<Writable<Edition>>(EDITION);
+    let edition = getEdition();
     let base = getContext<string>(BASE);
 	let editable = getContext<string>(EDITABLE);
 

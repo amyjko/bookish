@@ -1,7 +1,6 @@
 <script lang="ts">
     import { getContext } from "svelte";
     import Instructions from "$lib/components/page/Instructions.svelte";
-    import type Edition from "$lib/models/book/Edition";
     import type Book from "$lib/models/book/Book";
     import Parser from "$lib/models/chapter/Parser";
     import TableOfContentsRow from "./TableOfContentsRow.svelte";
@@ -18,10 +17,9 @@
     import Authors from "$lib/components/page/Authors.svelte";
     import TextEditor from "$lib/components/editor/TextEditor.svelte";
     import Toggle from "$lib/components/editor/Toggle.svelte";
-    import { BASE, BOOK, EDITABLE, EDITION } from "./Symbols";
-    import type { Writable } from "svelte/store";
+    import { BASE, BOOK, EDITABLE, getEdition } from "./Contexts";
 
-    let edition = getContext<Writable<Edition>>(EDITION);
+    let edition = getEdition();
     let book = getContext<Book>(BOOK);
 	let base = getContext<string>(BASE);
 	let editable = getContext<boolean>(EDITABLE);

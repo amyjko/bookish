@@ -2,14 +2,12 @@
     import type ReferenceNode from "$lib/models/chapter/ReferenceNode";
     import TextEditor from "../editor/TextEditor.svelte";
     import { getContext } from "svelte";
-    import type Edition from "$lib/models/book/Edition";
-    import { EDITABLE, EDITION } from "./Symbols";
-    import type { Writable } from "svelte/store";
+    import { EDITABLE, getEdition } from "./Contexts";
 
     export let node: ReferenceNode;
     
     let editable = getContext<boolean>(EDITABLE);
-    let edition = getContext<Writable<Edition>>(EDITION);
+    let edition = getEdition();
 
 </script>
 

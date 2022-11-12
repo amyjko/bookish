@@ -1,16 +1,14 @@
 <script lang="ts">
     import { getContext } from "svelte";
-    import type Edition from "$lib/models/book/Edition"
     import Parser from "$lib/models/chapter/Parser"
     import { addDraftInFirestore, publishDraftInFirestore } from "$lib/models/Firestore"
     import Format from "$lib/components/chapter/Format.svelte"
     import BookishEditor from "$lib/components/editor/BookishEditor.svelte"
     import Switch from "$lib/components/editor/Switch.svelte"
     import Instructions from "$lib/components/page/Instructions.svelte"
-    import { EDITABLE, EDITION } from "./Symbols";
-    import type { Writable } from "svelte/store";
+    import { EDITABLE, getEdition } from "./Contexts";
 
-    let edition = getContext<Writable<Edition>>(EDITION);
+    let edition = getEdition();
     let editable = getContext<boolean>(EDITABLE);
     $: book = $edition.getBook();
 

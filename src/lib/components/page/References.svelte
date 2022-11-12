@@ -3,16 +3,14 @@
     import Outline from './Outline.svelte';
     import Page from './Page.svelte';
     import Parser from "$lib/models/chapter/Parser";
-    import type Edition from '$lib/models/book/Edition';
     import ConfirmButton from '$lib/components/editor/ConfirmButton.svelte';
     import ChapterIDs from '$lib/models/book/ChapterID';
     import { getContext } from "svelte";
     import BulkReferenceEditor from "./BulkReferenceEditor.svelte"
     import PossibleReference from "./PossibleReference.svelte";
-    import { EDITABLE, EDITION } from "./Symbols";
-    import type { Writable } from "svelte/store";
+    import { EDITABLE, getEdition } from "./Contexts";
 
-    let edition = getContext<Writable<Edition>>(EDITION);
+    let edition = getEdition();
     let editable = getContext<boolean>(EDITABLE);
     
     $: references = $edition.hasReferences() ? $edition.getReferences() : null;

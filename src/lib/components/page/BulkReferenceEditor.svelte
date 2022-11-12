@@ -1,13 +1,10 @@
 <script lang="ts">
-    import { getContext } from "svelte";
-    import type Edition from "$lib/models/book/Edition";
     import Instructions from "./Instructions.svelte";
     import { getUniqueReferenceID, mineReference } from "$lib/util/mineReference";
     import ReferenceNode from "$lib/models/chapter/ReferenceNode";
-    import { EDITION } from "./Symbols";
-    import type { Writable } from "svelte/store";
+    import { getEdition } from "./Contexts";
 
-    let edition = getContext<Writable<Edition>>(EDITION);
+    let edition = getEdition();
 	let text = "";
 
 	function handleBulkAdd() {
