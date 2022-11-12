@@ -695,8 +695,10 @@
     }
 
     function handleUnfocus() {
-        if(document.activeElement !== null && editorRef !== null && !editorRef.contains(document.activeElement))
+        if(document.activeElement !== null && editorRef !== null && !editorRef.contains(document.activeElement)) {
+            console.log(document.activeElement);
             editorFocused = false;
+        }
     }
 
     function handleCopy(node: BookishNode) {
@@ -807,7 +809,7 @@
     on:focus={handleFocus}
     on:blur={handleUnfocus}
     role="textbox"
-    tabindex=0
+    tabindex="0"
 >
     {#if context && caretCoordinate }
         <Toolbar context={context} executor={executeCommand} visible={editorFocused} />

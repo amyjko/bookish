@@ -167,7 +167,7 @@
         class="bookish-outline-reading-mode" 
         role="button"
         aria-label={$dark === true ? "Switch to light mode" : "Switch to dark mode"}
-        tabindex=0
+        tabindex="0"
         on:click={toggleReadingMode}
         on:keydown|preventDefault={event => /^(Enter|\s)$/.test(event.key) ? toggleReadingMode() : undefined }
     >
@@ -178,7 +178,7 @@
         class={"bookish-outline-collapse-cue" + (headers.length === 0 ? " bookish-outline-collapse-cue-disabled" : "") }
         role="button" 
         aria-label={expanded ? "Collapse navigation menu" : "Expand navigation menu"}
-        tabindex=0
+        tabindex="0"
         on:click={headers.length > 0 ? toggleExpanded : undefined }
         on:keydown|preventDefault={event => /^(Enter|\s)$/.test(event.key) ? toggleExpanded() : undefined }
     >

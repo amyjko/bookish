@@ -137,10 +137,8 @@
 
     function handleMouse(event: MouseEvent) {
         // This prevents the body from taking focus.
-        if(toolbarRef && visible === true) {
-            event.stopPropagation();
-            return false;
-        }
+        if(toolbarRef && visible === true)
+            toolbarRef.focus();
     }
 
     $: containsFocus = toolbarRef && toolbarRef.contains(document.activeElement);
@@ -152,7 +150,7 @@
     <div 
         class="bookish-editor-toolbar" 
         on:keypress={handleKeyPress} 
-        on:mousedown={handleMouse}
+        on:mousedown|stopPropagation|preventDefault={handleMouse}
         on:click={handleMouse}
         style={`margin: ${isVisible ? "0px" : "-20em"};`} 
         bind:this={toolbarRef}
@@ -165,9 +163,9 @@
                             <button 
                                 disabled={command.active === false || (command.active instanceof Function && command.active.call(undefined, context) === false)}
                                 title={command.description + " " + getShortcutDescription(command)}
-                                tabindex={0}
-                                on:click={() => executor?.call(undefined, command, "")}
-                                on:keypress={(event) => event.key === " " || event.key === "Enter" ? executor?.call(undefined, command, "") : undefined }
+                                tabindex="0"
+                                on:click|stopPropagation|preventDefault={() => executor?.call(undefined, command, "")}
+                                on:keypress={event => event.key === " " || event.key === "Enter" ? executor?.call(undefined, command, "") : undefined }
                             >
                                 {#if command.icon }
                                     <ToolbarIcon name={command.icon}/>
