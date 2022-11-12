@@ -8,7 +8,7 @@
     let editable = getContext<boolean>(EDITABLE);
     let edition = getEdition();
 
-	const descriptionNode = Parser.parseChapter($edition, $edition.getDescription());
+	$: descriptionNode = Parser.parseChapter($edition, $edition.getDescription());
 
 </script>
 

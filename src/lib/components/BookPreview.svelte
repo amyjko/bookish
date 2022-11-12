@@ -11,14 +11,14 @@
     export let book: Book;
     export let write: boolean;
 
-    const refID = book.getRefID();
-    const cover = book.getCover();
-    const authors = book.getAuthors();
-    const description = book.getDescription();
-    const subdomain = book.getSubdomain();
-    const title = book.getTitle() === "" ? "Untitled" : book.getTitle();
+    $: refID = book.getRefID();
+    $: cover = book.getCover();
+    $: authors = book.getAuthors();
+    $: description = book.getDescription();
+    $: subdomain = book.getSubdomain();
+    $: title = book.getTitle() === "" ? "Untitled" : book.getTitle();
 
-	const embed = cover === null ? null : Parser.parseEmbed(undefined, cover);
+	$:  embed = cover === null ? null : Parser.parseEmbed(undefined, cover);
 
 </script>
 

@@ -18,7 +18,7 @@
     $: number = chapterNode?.getFootnotes().indexOf(node);
     $: letter = number === undefined ? undefined : $edition.getFootnoteSymbol(number);
 
-    const focused = chapterNode && $caret && $caret.range && $caret.range.start.node.hasAncestor(chapterNode, node);
+    $: focused = chapterNode && $caret && $caret.range && $caret.range.start.node.hasAncestor(chapterNode, node);
 
     // Position the marginals on every render.
     afterUpdate(() => $chapter?.layoutMarginals());

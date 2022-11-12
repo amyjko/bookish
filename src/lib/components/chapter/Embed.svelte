@@ -11,11 +11,11 @@
     export let node: EmbedNode;
     export let placeholder: string | undefined = undefined;
 
-    const url = node.getURL();
-	const position = node.getPosition();
-	const description = node.getDescription();
-	const credit = node.getCredit();
-	const caption = node.getCaption();
+    $: url = node.getURL();
+	$: position = node.getPosition();
+	$: description = node.getDescription();
+	$: credit = node.getCredit();
+	$: caption = node.getCaption();
 
     let caret = getCaret();
     let editable = getContext<boolean>(EDITABLE);

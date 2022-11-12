@@ -30,11 +30,11 @@
     let editable = getContext<boolean>(EDITABLE);
 
 	// Keep track of the scroll position to facilitate reading during reloads.
-	const rememberPosition = () => localStorage.setItem('scrollposition', "" + window.scrollY)
+	function rememberPosition() { localStorage.setItem('scrollposition', "" + window.scrollY); }
 
 	// When the window resizes, the responsive layout might cause the marginals to move to the footer.
 	// when this happens, we want to immediately remove all of the explicit positioning.
-	const handleResize = () => layoutMarginals();
+	function handleResize() { layoutMarginals(); }
 	
 	// The currently selected marginal; we only do one at a time.
 	let marginal: string | undefined = undefined;

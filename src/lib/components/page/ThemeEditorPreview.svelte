@@ -8,7 +8,7 @@
 
     let darkMode = getDarkMode();
 
-	const preview = Parser.parseChapter(undefined, `
+	$: preview = Parser.parseChapter(undefined, `
 		# Header 1
 		## Header 2
 		### Header 3

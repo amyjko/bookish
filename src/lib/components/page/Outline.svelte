@@ -62,7 +62,7 @@
 
     function getHighlightThreshold() { return window.innerHeight / 3; }
 
-    const position = () => {
+    function position() {
 
 		// Left align the floating outline with the left margin of the chapter
         // and the top of the title, unless we're past it.
@@ -97,7 +97,7 @@
 
     }
 
-    const highlight = () => {
+    function highlight() {
 
 		const top = window.scrollY;
         const threshold = getHighlightThreshold();
