@@ -23,7 +23,18 @@
             letters[word.charAt(0).toLocaleLowerCase()] = true;
     }
 
-    $: console.log(bookIndex);
+    let words: (string | true)[] = [];
+    $: {
+        let count = 0;
+        Object.keys(bookIndex).sort((a, b) => a.localeCompare(b)).forEach(word => {
+            const firstLetter = word.charAt(0).toLowerCase()
+            if(letter === firstLetter) {
+                count++;
+                if(count % 20 === 0) words.push(true);
+                words.push(word);
+            }
+        });
+    } 
 
 </script>
 
@@ -78,20 +89,10 @@
         <div class="bookish-table">
             <table>
                 <tbody>
-                    <!-- Build a list of words in alphabetical order. -->
-                    {#each Object.keys(bookIndex).sort((a, b) => a.localeCompare(b)) as word }
-                        {@const firstLetter = word.charAt(0).toLowerCase() }
-                        {#if letter === firstLetter }
-                
-                            <!-- if(count === undefined) {
-                                count = 0;
-                            } 
-                            else if(count >= 20) {
-                                count = 0;
-                                rows.push(<tr key={word}><td colSpan={2}><h2 className="bookish-header" id={"word-" + word}>{word}</h2></td></tr>)
-                            }
-                
-                            rows.push( -->
+                    {#each words as word, index }
+                        {#if word === true}
+                            <tr><td colspan={2}><h2 class="bookish-header">{words[index + 1]}</h2></td></tr>
+                        {:else}
                             <tr>
                                 <td>{word}</td>
                                 <td>
