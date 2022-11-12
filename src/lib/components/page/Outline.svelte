@@ -15,6 +15,7 @@
     let dark = getDarkMode();
     let base = getBase();
     let outline: HTMLDivElement | null = null;
+    let headers: Element[] = [];
 
     function toggleExpanded() {
 
@@ -40,19 +41,16 @@
 
 		position();
         highlight();
+        updateHeaders();
 
 	}
-
-    function getHeaders(): Element[] {
-        return Array.from(document.getElementsByClassName("bookish-header"));
-    }
 
     function updateHeaders() {
 
         // When the outline updates (due to the page its on updating), generate a unique string for the current header outline.
         // If it's different from the last rendered state, refresh.
-        let newHeaderString = "";
-        getHeaders().forEach(el => newHeaderString += el.outerHTML);
+        headers = Array.from(document.getElementsByClassName("bookish-header"));
+        let newHeaderString = headers.reduce((sum, el) => sum + el.outerHTML, "");
 
         // If the headers change, update the outline.
         if(headerString !== newHeaderString)
@@ -131,12 +129,8 @@
         // but we don't have a precise mechanism to listen to chapter changes, so we do this instead.
         document.addEventListener("selectionchange", updateHeaders);
 
-        // Update the headers.
-        updateHeaders();
-
         // Position outline after first render.
         layout();
-
 
         // Stop listening!
         return () => {
@@ -152,9 +146,6 @@
     let expandLabel = "\u2630";
     let lightLabel = "\u263C";
     let darkLabel = "\u263E";
-
-    // Scan for headers and put them into a stable list.
-    let headers: Element[] = getHeaders();
 
 </script>
 

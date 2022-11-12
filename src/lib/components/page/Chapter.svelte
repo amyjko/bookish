@@ -231,7 +231,6 @@
             setImage={embed => chapter.setImage(embed)}
             print={print}
         >
-            {#if !print }
                 <!-- Collapse the outline if a marginal is selected. -->
                 <Outline
                     slot="outline"
@@ -247,7 +246,6 @@
                         hideOutlineIfObscured();
                     }}
                 />
-            {/if}
             <!-- Add an editable chapter ID if in editor mode -->
             <span slot="before">
                 {#if editable }

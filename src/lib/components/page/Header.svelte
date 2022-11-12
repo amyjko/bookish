@@ -78,7 +78,9 @@
         <!-- Add a bit of space to account for the lack of an image. -->
         <p>&nbsp;</p>
     {/if}
-    <slot name="outline"></slot>
+    {#if !print}
+        <slot name="outline"></slot>
+    {/if}
     {#if editable }
         {#if embedNode === undefined }
             <button on:click={addCover}>+ cover image</button> 
