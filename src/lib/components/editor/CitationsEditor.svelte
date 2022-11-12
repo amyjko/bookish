@@ -3,6 +3,8 @@
 
     export let citations: CitationsNode;
 
+    citations;
+
     // let book = getContext<Book>(BOOK);
     // let caret = getContext(CaretContext)(CARET);
 

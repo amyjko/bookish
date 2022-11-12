@@ -807,7 +807,7 @@
     on:focus={handleFocus}
     on:blur={handleUnfocus}
     role="textbox"
-    tabindex="0"
+    tabIndex=0
 >
     {#if context && caretCoordinate }
         <Toolbar context={context} executor={executeCommand} visible={editorFocused} />

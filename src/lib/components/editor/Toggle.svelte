@@ -32,7 +32,7 @@
 
 <div 
     class={`bookish-app-interactive ${saving === Status.Saving ? " bookish-text-editor-saving" : ""} ${saving === Status.Error ? " bookish-text-editor-error" : ""}`}
-    tabindex="0"
+    tabIndex=0
     role="switch"
     aria-checked={on}
     on:keydown|preventDefault={event => event.key === "Enter" || event.key === "Space" ? toggle() : undefined }

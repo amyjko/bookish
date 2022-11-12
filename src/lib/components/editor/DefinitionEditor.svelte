@@ -23,7 +23,7 @@
 
 <span>
     <select 
-        tabindex="0"
+        tabIndex=0
         value={definition.getMeta()} 
         on:change={handleChange}
     >

@@ -26,7 +26,9 @@
 
 <div 
     class={`bookish-image-chooser ${expanded ? "expanded" : ""}`}
+    tabIndex=0
     on:click={() => expanded = !expanded}
+    on:keydown={event => event.key === "Enter" || event.key === " " ? expanded = !expanded : undefined }
     on:mouseenter={() => expanded = true}
     on:mouseleave={() => expanded = false}
 >
@@ -39,8 +41,10 @@
             <img 
                 class={`bookish-image-chooser-image ${image.url === selection ? "selected" : ""}`}
                 src={image.url} 
-                alt={""}
+                alt={`Image named ${image.url}`}
+                tabIndex=0
                 on:click|stopPropagation={() => select(image)}
+                on:keydown={event => event.key === "Enter" || event.key === " " ? select(image) : undefined }
             />
         {:else}
             No images uploaded
