@@ -16,6 +16,7 @@
     import TextEditor from "$lib/components/editor/TextEditor.svelte";
     import Toggle from "$lib/components/editor/Toggle.svelte";
     import { getBase, getEdition, isEditable } from "./Contexts";
+    import Chapter from "./Chapter.svelte";
 
     let edition = getEdition();
 	let base = getBase();
@@ -146,7 +147,7 @@
                                     save={text => chapter.setSection(text) }
                                 />
                             {:else}
-                                {chapter.getSection()}
+                                {#if section }{section}{/if}
                             {/if}
                         </span>
                         <span slot="etc">
