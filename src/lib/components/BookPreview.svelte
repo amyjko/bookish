@@ -32,7 +32,7 @@
     </div>
     <div class="bookish-app-book-preview-title">
         {#if subdomain === undefined || write }
-            <Link to={refID === undefined ? "" : (write ? "/write/" : "/read/") + refID}>{title}</Link>
+            <Link to={refID === undefined ? "" : (write ? "/write/" : "/") + refID}>{title}</Link>
         {:else}
             <Link to={`/${subdomain}`}>{title}</Link>
         {/if}
