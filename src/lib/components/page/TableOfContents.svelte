@@ -80,8 +80,7 @@
         tags={$edition.getTags()}
         save={text => $edition.setTitle(text)}
     >
-        {#if editable && book }
-            <!-- Add an editable subdomain if in editor mode -->
+        {#if editable }
             <SubdomainEditor slot="before"/>
         {/if}
         <Outline slot="outline"
