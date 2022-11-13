@@ -40,7 +40,7 @@
 <span 
     class={"bookish-marginal-interactor" + (hovered ? " bookish-marginal-hovered" : "") + (isHidden() ? "" : " bookish-marginal-selected")} 
 	tabIndex=0
-    on:click={toggle}	
+    on:mousedown={toggle}
 	on:keydown={event => event.key === "Enter" || event.key === " " ? toggle() : undefined }
     on:mouseenter={handleEnter} 
     on:mouseleave={handleExit}
@@ -50,7 +50,7 @@
 <span 
     class={"bookish-marginal" + (isHidden() ? " bookish-marginal-hidden" : "") + (hovered ? " bookish-marginal-hovered" : "")} 
 	tabIndex=0
-    on:click={toggle} 
+    on:mousedown|stopPropagation={toggle} 
 	on:keydown={event => event.key === "Enter" || event.key === " " ? toggle() : undefined }
     on:mouseenter={handleEnter} 
     on:mouseleave={handleExit}

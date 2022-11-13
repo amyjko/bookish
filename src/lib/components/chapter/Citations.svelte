@@ -38,7 +38,7 @@
     {#if chapterNode }
         <span class="bookish-citation"  data-nodeid={node.nodeID}>
             <Marginal id={"citation-" + citations.join("-")}>
-                <slot name="interactor">
+                <svelte:fragment slot="interactor">
                     {#each citations as citationID, index}
                         {@const citationNumber = chapterNode?.getCitationNumber(citationID) }
                         {#if citationNumber && citationID in $edition.getReferences()}
@@ -50,21 +50,19 @@
                     {:else}
                         <sup class="bookish-citation-symbol">{"\u2014"}</sup>            
                     {/each}
-                </slot>
-                <slot name="content">
-                    <span class="bookish-references">
-                        {#each citations as citationID }
-                            {@const citationNumber = chapterNode?.getCitationNumber(citationID) }
-                            {@const ref = $edition.getReference(citationID) }
-                            {#if citationNumber && ref }
-                                <span class="bookish-reference">
-                                    <sup class="bookish-citation-symbol">{citationNumber}</sup>
-                                    <PossibleReference node={Parser.parseReference(citationID, ref, $edition, true)}/>
-                                </span>
-                            {/if}
-                        {/each}
-                    </span>
-                </slot>
+                </svelte:fragment>
+                <span slot="content" class="bookish-references">
+                    {#each citations as citationID }
+                        {@const citationNumber = chapterNode?.getCitationNumber(citationID) }
+                        {@const ref = $edition.getReference(citationID) }
+                        {#if citationNumber && ref }
+                            <span class="bookish-reference">
+                                <sup class="bookish-citation-symbol">{citationNumber}</sup>
+                                <PossibleReference node={Parser.parseReference(citationID, ref, $edition, true)}/>
+                            </span>
+                        {/if}
+                    {/each}
+                </span>
             </Marginal>
         </span>
     {/if}

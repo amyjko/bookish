@@ -17,7 +17,7 @@
 </script>
 
 <!-- Prevent the editor from receiving the click. -->
-<span class={`bookish-editor-atom ${selected ? "bookish-editor-atom-selected" : ""} ${$caret?.focused ? "bookish-editor-atom-selected-focused" : ""}`} on:mousedown|stopPropagation={handleMouseDown}><slot></slot></span>
+<span class={`bookish-editor-atom ${selected ? "bookish-editor-atom-selected" : ""} ${$caret?.focused ? "bookish-editor-atom-selected-focused" : ""}`} on:mousedown|stopPropagation|preventDefault={handleMouseDown}><slot></slot></span>
 
 <style>
     .bookish-editor-atom {

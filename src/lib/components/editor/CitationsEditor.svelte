@@ -1,37 +1,50 @@
 <script lang="ts">
     import type CitationsNode from "$lib/models/chapter/CitationsNode";
+    import { getCaret, getEdition } from "../page/Contexts";
+    import Note from "./Note.svelte";
 
     export let citations: CitationsNode;
 
-    citations;
+    let edition = getEdition();
+    let caret = getCaret();
+    let selection: string | undefined;
 
-    // let book = getContext<Book>(BOOK);
-    // let caret = getContext(CaretContext)(CARET);
+    function handleSelection() {
+        if(selection) {
+            update(new Set([ ...citations.getMeta(), selection ]));
+            selection = undefined;
+        }
+    }
 
-    // function handleCitationsChange(newValue: MultiValue<{value: string, label: string}>) {
+    function removeSelection(citationID: string) {
+        let ids = new Set(citations.getMeta());
+        ids.delete(citationID);
+        update(ids);
+    }
 
-    //     let newCitations = newValue.map(val => val.value);
-    //     caret?.edit(citations, citations.withMeta(newCitations));
+    function update(set: Set<string>) {
+        $caret?.edit(citations, citations.withMeta(Array.from(set)));
+    }
 
-    // }
-
+    $: uncited = Object.keys($edition.getReferences()).filter(citationID => !citations.getMeta().includes(citationID)).sort();
 </script>
 
-<span>
-    TBD
-    <!-- TBD -->
-    <!-- <Select 
-        isMulti 
-        class="bookish-editor-select"
-        classNamePrefix="bookish-editor-select"
-        placeholder="Choose one or more citations."
-        value={ citations.getMeta().map(val => { return { value: val, label: val }; }) }
-        options={Object.keys(book.getReferences()).sort().map(citationID => { return {value: citationID, label: citationID }; })} 
-        onChange={handleCitationsChange}
-    />
-    {
-        citations.getMeta().length === 0 ?
-            <span className="bookish-editor-note">Choose at least one citation.</span> :
-            null
-    } -->
-</span>
+<select bind:value={selection} on:change={handleSelection}>
+    <option value={undefined}><em>{uncited.length > 0 ? "Choose references" : "No uncited references"}</em></option>
+    {#each uncited as citationID}
+        <option value={citationID}>{citationID}</option>
+    {/each}
+
+</select>
+{#each citations.getMeta() as citationID}
+    <sup>
+        {citationID}
+        <span tabIndex=0
+            style="cursor:pointer"
+            on:click={() => removeSelection(citationID) }
+            on:keydown={ event => { if(event.key === "Enter" || event.key === " ") removeSelection(citationID); }}
+        >&times;</span>
+    </sup>
+{:else}
+    <Note>&mdash;</Note>
+{/each}

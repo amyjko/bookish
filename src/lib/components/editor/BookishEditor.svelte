@@ -46,7 +46,7 @@
     export let component: ConstructorOfATypedSvelteComponent;
     export let placeholder: string;
 
-    let editorRef: HTMLDivElement | null = null;
+    let element: HTMLDivElement | null = null;
 
     let caretRange: CaretRange | undefined = undefined;
     let caretCoordinate: { x: number, y: number, height: number} | undefined = undefined;
@@ -68,8 +68,8 @@
             caretRange = { start: caret, end: caret };
 
         // Focus the editor on load.
-        if(editorRef && autofocus === true) {
-            editorRef.focus();
+        if(element && autofocus === true) {
+            element.focus();
         }
 
         // Listen to selection changes
@@ -118,7 +118,7 @@
 
                 // If we found both selected nodes and we have a reference to the DOM, update the 
                 // browser's selection if necessary and measure it's position so we can draw our own caret.
-                if(startNode && endNode && editorRef) {
+                if(startNode && endNode && element) {
 
                     // If the current selection isn't different from the new one, then we don't do any of this.
                     // This prevents an infinite loop when, for example, the user clicks, the browser selection changes, 
@@ -211,7 +211,7 @@
             const caretTop = newCaretPosition.y;
             const caretBottom = caretTop + newCaretPosition.height;
             const windowHeight = window.innerHeight;
-            const toolbar = editorRef?.querySelector(".bookish-editor-toolbar");
+            const toolbar = element?.querySelector(".bookish-editor-toolbar");
             const toolbarHeight = toolbar ? toolbar.clientHeight : 0;
 
             const buffer = newCaretPosition.height * 5;
@@ -553,11 +553,11 @@
                     }
                 }
 
-                if(editorRef) {
+                if(element) {
                     const controls = [
-                        editorRef.querySelector(".bookish-editor-toolbar input"),
-                        editorRef.querySelector(".bookish-editor-toolbar select"),
-                        editorRef.querySelector(".bookish-editor-toolbar button")
+                        element.querySelector(".bookish-editor-toolbar input"),
+                        element.querySelector(".bookish-editor-toolbar select"),
+                        element.querySelector(".bookish-editor-toolbar button")
                     ];
                     const match = controls.find(control => control && control instanceof HTMLElement);
                     if(match && match instanceof HTMLElement) {
@@ -662,12 +662,13 @@
     }
 
     function handleMouseDown() {
-        
-        if(!editorRef)
+
+        if(!element)
             return;
 
         // Grab focus.
-        editorRef.focus();
+        element.focus();
+               
         // Update the caret range to ensure it's positioned correctly, since it depends on relative positioned parents.
         if(caretRange)
             caretRange = { start: caretRange.start, end: caretRange.end };
@@ -689,14 +690,8 @@
         }
     }
 
-    function handleFocus() {
-        editorFocused = true;
-    }
-
-    function handleUnfocus() {
-        if(document.activeElement !== null && editorRef !== null && !editorRef.contains(document.activeElement)) {
-            editorFocused = false;
-        }
+    function updateFocus() { 
+        editorFocused = document.activeElement === element || (element !== null && element.contains(document.activeElement));
     }
 
     function handleCopy(node: BookishNode) {
@@ -788,7 +783,7 @@
         range: caretRange, 
         coordinate: caretCoordinate, 
         forceUpdate: forceUpdate,
-        setCaret: range => caretRange = range,
+        setCaret: range => { caretRange = range; element?.focus(); } ,
         edit: editNode,
         context: context,
         root: editedNode,
@@ -800,12 +795,12 @@
 
 <div 
     class={`bookish-editor ${inAtom ? "bookish-editor-atom-focused" : ""}`}
-    bind:this={editorRef}
+    bind:this={element}
     on:keydown={handleKeyDown}
     on:keyup={handleKeyUp}
-    on:mousedown={handleMouseDown}
-    on:focus={handleFocus}
-    on:blur={handleUnfocus}
+    on:mousedown|stopPropagation={handleMouseDown}
+    on:focus={updateFocus}
+    on:blur={updateFocus}
     role="textbox"
     tabIndex=0
 >

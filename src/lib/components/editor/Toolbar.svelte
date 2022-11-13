@@ -28,6 +28,7 @@
     import EmbedEditor from "$lib/components/editor/EmbedEditor.svelte";
     import ToolbarGroup from "./ToolbarGroup.svelte";
     import ToolbarIcon from "./ToolbarIcon.svelte";
+    import { onMount } from "svelte";
 
     const keyLabels: {[key: string]: string} = {
         "Digit0": "0",
@@ -71,7 +72,30 @@
 
     $: chapter = context?.root;
 
-    let toolbarRef: HTMLDivElement | null = null;
+    let element: HTMLElement | null = null;
+    let categories: string[] | undefined = undefined;
+    let commandsByCategory: {[key: string]: Command[]} = {};
+    let metaNode: MetadataNode<any> | AtomNode<any> | undefined = undefined;
+    let calloutNode: CalloutNode | undefined = undefined;
+    let quoteNode: QuoteNode | undefined = undefined;
+    let embedNode: EmbedNode | undefined = undefined;
+    $: isVisible = visible || containsFocus();
+
+    // Listen to focus changes to decide whether the toolbar is visible.
+    onMount(() => {
+        window.addEventListener("focus", updateVisible);
+        window.addEventListener("blur", updateVisible);
+
+        return () => {
+            window.removeEventListener("focus", updateVisible);
+            window.removeEventListener("blur", updateVisible);
+        }
+    });
+
+    function containsFocus() { return element !== null && element.contains(document.activeElement); }
+    function updateVisible(event: FocusEvent) {
+        isVisible = visible || containsFocus();
+    }
 
     function getShortcutDescription(command: Command) {
         const macOS = navigator.platform.indexOf('Mac') > -1;
@@ -81,13 +105,6 @@
         const keyLabel = (key in keyLabels ? keyLabels[key] : key).toLocaleUpperCase();
         return `${command.control ? controlSymbol : ""}${command.alt ? altSymbol : ""}${command.shift ? "\u21E7" : ""}${keyLabel}`;
     }
-
-    let categories: string[] | undefined = undefined;
-    let commandsByCategory: {[key: string]: Command[]} = {};
-    let metaNode: MetadataNode<any> | AtomNode<any> | undefined = undefined;
-    let calloutNode: CalloutNode | undefined = undefined;
-    let quoteNode: QuoteNode | undefined = undefined;
-    let embedNode: EmbedNode | undefined = undefined;
 
     // Update the above when the dependencies below change.
     $: {
@@ -125,8 +142,8 @@
 
     function handleKeyPress(event: KeyboardEvent) {
         // Return focus to the editor if someone presses an unhandled enter
-        if(event.key === "Enter" && toolbarRef) {
-            const editor = toolbarRef.closest(".bookish-editor");
+        if(event.key === "Enter" && element) {
+            const editor = element.closest(".bookish-editor");
             if(editor instanceof HTMLElement) {
                 event.stopPropagation();
                 editor.focus();
@@ -135,25 +152,16 @@
         }
     }
 
-    function handleMouse() {
-        // This prevents the body from taking focus.
-        if(toolbarRef && visible === true)
-            toolbarRef.focus();
-    }
-
-    $: containsFocus = toolbarRef && toolbarRef.contains(document.activeElement);
-    $: isVisible = visible === true || containsFocus;
-
 </script>
 
 {#if chapter}
-    <div 
+    <section 
         class="bookish-editor-toolbar" 
         on:keypress={handleKeyPress} 
-        on:mousedown|stopPropagation|preventDefault={handleMouse}
-        on:click={handleMouse}
         style={`margin: ${isVisible ? "0px" : "-20em"};`} 
-        bind:this={toolbarRef}
+        bind:this={element}
+        on:mousedown|stopPropagation={ () => element?.focus() }
+        tabIndex=0
     >
         {#if context && categories && executor}
             {#each categories as cat }
@@ -183,13 +191,13 @@
         {#if metaNode instanceof LinkNode}<ToolbarGroup icon="link.svg"><LinkEditor link={metaNode}/></ToolbarGroup>{/if}
         {#if metaNode instanceof LabelNode}<ToolbarGroup icon="•"><LabelEditor label={metaNode}/></ToolbarGroup>{/if}
         {#if metaNode instanceof InlineCodeNode}<ToolbarGroup icon="code.svg"><InlineCodeEditor code={metaNode}/></ToolbarGroup>{/if}
-        {#if metaNode instanceof CitationsNode}<ToolbarGroup icon="a\u00b9"><CitationsEditor citations={metaNode}/></ToolbarGroup>{/if}
+        {#if metaNode instanceof CitationsNode}<ToolbarGroup icon="¹"><CitationsEditor citations={metaNode}/></ToolbarGroup>{/if}
         {#if metaNode instanceof DefinitionNode}<ToolbarGroup icon="Aa"><DefinitionEditor definition={metaNode}/></ToolbarGroup>{/if}
         {#if metaNode instanceof CodeNode && context}<ToolbarGroup icon="code.svg"><CaptionedCodeEditor code={metaNode}/></ToolbarGroup>{/if}
         {#if calloutNode}<ToolbarGroup icon="🄰"><CalloutEditor callout={calloutNode} /></ToolbarGroup>{/if}
         {#if quoteNode}<ToolbarGroup icon="quote.svg"><QuoteEditor quote={quoteNode} /></ToolbarGroup>{/if}
         {#if embedNode}<ToolbarGroup linebreak icon="media.svg"><EmbedEditor embed={embedNode} /></ToolbarGroup>{/if}
-    </div>
+    </section>
 {/if}
 
 <style>
@@ -205,6 +213,7 @@
         font-family: var(--bookish-app-chrome-font-family);
         font-size: var(--bookish-app-chrome-font-size);
         z-index: 2;
+        transition: top 1s;
     }
 
     .bookish-editor-toolbar :global(img) {
