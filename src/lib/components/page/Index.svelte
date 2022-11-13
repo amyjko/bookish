@@ -25,6 +25,7 @@
 
     let words: (string | true)[] = [];
     $: {
+        words = [];
         let count = 0;
         Object.keys(bookIndex).sort((a, b) => a.localeCompare(b)).forEach(word => {
             const firstLetter = word.charAt(0).toLowerCase()

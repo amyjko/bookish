@@ -116,7 +116,7 @@ export default class Chapter {
     // Adds a save request to the queue, to be resolved later after a period of
     // inactivity. Returns a promise that will eventually be resolved.
     requestSave() {
-        // Tell listeners that this book model changed.
+        // Tell listeners that this chapter model changed.
         this.edition.notifyListeners(BookSaveStatus.Changed);
 
         // Return a promise that will resolve or reject later after this model saves the edits to the database.
@@ -181,11 +181,7 @@ export default class Chapter {
 
 	getText() { return this.spec.text; }
 	setText(text: string) {
-		if(this.spec.text !== text || this.ast === undefined) {
-			this.spec.text = text;
-			this.setAST(Parser.parseChapter(this.edition, this.spec.text));
-			this.notifyListeners();
-		}
+		this.setAST(Parser.parseChapter(this.edition, text));
 	}
 
 	setAST(node: ChapterNode) {
@@ -199,6 +195,7 @@ export default class Chapter {
 
 		// Don't save if its the same. This is just an optimization.
 		if(changed) {
+			this.notifyListeners();
 			if(this.edition.editionRef && this.spec.ref)
 				return this.requestSave();
 		}
