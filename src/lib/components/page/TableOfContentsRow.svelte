@@ -11,7 +11,6 @@
     export let title: string;
     export let number: number | undefined = undefined;
     export let forthcoming: boolean = false;
-    export let backmatter: boolean = false;
 
     let edition = getEdition();
     let base = getBase();
@@ -41,7 +40,7 @@
         {#if forthcoming && !editable}
             <span>{title}</span>
         {:else}
-            <Link to={`${base}/${backmatter ? "" : "chapter/"}${chapterID}`}>{title}</Link>
+            <Link to={`${base}/${chapterID}`}>{title}</Link>
         {/if}
         <small class="bookish-muted"><br/><em><slot name="annotation"></slot></em></small>
     </td>

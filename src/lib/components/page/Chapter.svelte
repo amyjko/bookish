@@ -22,16 +22,12 @@
     import { goto } from "$app/navigation";
     import type Chapter from "$lib/models/book/Chapter";
     import ChapterNode from "$lib/models/chapter/ChapterNode";
-    import { page } from "$app/stores";
 
     export let chapter: ChapterModel;
     export let print: boolean = false;
 
     let edition = getEdition();
     let editable = isEditable();
-
-    // What word are we highlighting, if any?
-    $: word = $page.params.word ?? "";
 
 	// Keep track of the scroll position to facilitate reading during reloads.
 	function rememberPosition() { localStorage.setItem('scrollposition', "" + window.scrollY); }
@@ -169,11 +165,10 @@
 		layoutMarginals();
 
 		// If there's a word we're trying to highlight in the URL path, scroll to the corresponding match.
-		if(word) {
+		if(location.search) {
 			const highlights = document.getElementsByClassName("bookish-text bookish-content-highlight")
-            const parts = word.split("-")
-			const num = parts[1] === undefined ? 0 : parseInt(word[1]);
-			if(highlights.length > 0 && num < highlights.length && num >= 0) {
+			const num = getHighlightedNumber();
+			if(num && highlights.length > 0 && num < highlights.length && num >= 0) {
 				scrollToEyeLevel(highlights[num])
 			}
 		}
@@ -201,6 +196,12 @@
 
 	}
 
+    function getHighlightedWord() { return location.search.split("&")[0]?.split("=")[1] ?? undefined; }
+    function getHighlightedNumber() { 
+        const number = location.search.split("&")[1]?.split("=")[1];
+        return number === undefined ? undefined : parseInt(number);
+    }
+
 	// Prepare to render the chapter by getting some data from the chapter and book.
 	$: chapterID = $currentChapter.getChapterID();
 	$: chapterNumber = $edition.getChapterNumber(chapterID);
@@ -212,7 +213,7 @@
     setContext<ChapterStore>(CHAPTER, chapterStore);
     $: chapterStore.set({
         chapter: chapter,
-        highlightedWord: word.split("-")[0],
+        highlightedWord: getHighlightedWord(),
         highlightedID: highlightedID,
         marginalID: marginal,
         setMarginal: (id: string | undefined) => marginal = id,

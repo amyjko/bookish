@@ -163,7 +163,6 @@
                     <TableOfContentsRow
                         chapterID={ChapterIDs.ReferencesID}
                         title="References"
-                        backmatter
                     >
                         <span slot="annotation">Everything cited</span>
                     </TableOfContentsRow>
@@ -172,7 +171,6 @@
                     <TableOfContentsRow
                         chapterID={ChapterIDs.GlossaryID}
                         title="Glossary"
-                        backmatter
                     > 
                         <span slot="annotation">Definitions</span>
                     </TableOfContentsRow>
@@ -180,14 +178,12 @@
                 <TableOfContentsRow
                     chapterID={ChapterIDs.IndexID}
                     title="Index"
-                    backmatter
                 > 
                     <span slot="annotation">Common words and where they are</span>
                 </TableOfContentsRow>
                 <TableOfContentsRow
                     chapterID={ChapterIDs.SearchID}
                     title="Search"
-                    backmatter
                 > 
                     <span slot="annotation">Find where words occur</span>
                 </TableOfContentsRow>
@@ -195,7 +191,6 @@
                 <TableOfContentsRow
                     chapterID={ChapterIDs.MediaID}
                     title="Media"
-                    backmatter
                 > 
                     <span slot="annotation">Images and video in the book</span>
                 </TableOfContentsRow>
@@ -203,14 +198,12 @@
                     <TableOfContentsRow
                         chapterID="theme"
                         title="Theme"
-                        backmatter
                     > 
                         <span slot="annotation">Style the book</span>
                     </TableOfContentsRow>
                     <TableOfContentsRow
                         chapterID="unknown"
                         title="Unknown"
-                        backmatter
                     > 
                         <span slot="annotation">Customize bad links</span>
                     </TableOfContentsRow>

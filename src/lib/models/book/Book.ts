@@ -137,6 +137,10 @@ export default class Book {
         return this.spec.revisions.length === 0 ? undefined : loadEditionFromFirestore(this, this.spec.revisions[0].ref.id);
     }
 
+    isValidEditionNumber(edition: number) {
+        return this.getEditionNumber(edition) !== undefined;
+    }
+
     /* Note: editions are numbered 1-n, but stored in reverse chronological order. */
     getEditionNumber(number: number) {
         return number < 1 || number > this.spec.revisions.length ? 

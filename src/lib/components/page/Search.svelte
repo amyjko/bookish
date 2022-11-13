@@ -59,7 +59,7 @@
                             // Only highlight the part of the word that matches.
                             const start = match.match.toLowerCase().indexOf(lowerQuery);
                             results.push({ 
-                                link: `${base}/chapter/${chapter.getChapterID()}/${match.match.toLowerCase()}-${index}`,
+                                link: `${base}/${chapter.getChapterID()}?word=${match.match.toLowerCase()}&number=${index}`,
                                 left: match.left + match.match.substring(0, start),
                                 match: match.match.substring(start, start + query.length),
                                 right: match.match.substring(start + query.length) + match.right
