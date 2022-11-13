@@ -1,5 +1,6 @@
 <script lang="ts">
     import type ReferenceNode from "$lib/models/chapter/ReferenceNode";
+    import { afterUpdate } from "svelte";
     import TextEditor from "../editor/TextEditor.svelte";
     import { getEdition, isEditable } from "./Contexts";
 
@@ -7,6 +8,26 @@
     
     let editable = isEditable();
     let edition = getEdition();
+
+    let reference: HTMLElement | null = null;
+    let editing = false;
+    let entered = false;
+
+    afterUpdate(() => {
+        if(editing && entered && reference) {
+            entered = false;
+            reference.querySelector("input")?.focus();
+        }
+    });
+
+    function startEditing() {
+        editing = true; 
+        entered = true;
+    }
+
+    function stopEditing() {
+        editing = false;
+    }
 
 </script>
 
@@ -17,7 +38,7 @@
                         authorList.length === 2 ?   authorList[0].trim() + " & " + authorList[1].trim() :
                                                     authorList[0].trim() + ", et al."}
     <span data-nodeid={node.nodeID} class="bookish-reference-text">
-        {authors} 
+        {authors}
         ({node.year}).
         {#if node.url === null }
             {node.title}
@@ -29,9 +50,16 @@
     </span>
 {:else}
     <!-- If editable, place in rows to make room for text editors to not have to wrap. -->
-    <span data-nodeid={node.nodeID} class="bookish-reference-text">
+    <span 
+        data-nodeid={node.nodeID} 
+        class="bookish-reference-text"
+        tabIndex=0
+        on:click|stopPropagation={() => { if(editable && !editing) startEditing(); }}
+        on:keydown={event => { if(editable && !editing && (event.key === "Enter" || event.key === " ")) { startEditing(); event.stopPropagation(); }}}
+        bind:this={reference}
+    >
         <!-- Authors -->
-        {#if editable }
+        {#if editable && editing }
             <em>
                 <TextEditor
                     startText={node.authors} 
@@ -52,7 +80,7 @@
             {/if}
         {/if}
         <!-- Year -->
-        <br/>({#if editable }
+        <br/>({#if editable && editing }
                 <TextEditor
                     startText={node.year} 
                     label={'Year editor.'} 
@@ -67,7 +95,7 @@
                 {#if node.year }{node.year}{:else}<em>Year</em>{/if}
             {/if}). 
         <!-- Title -->
-        {#if editable }
+        {#if editable && editing }
             <br/><TextEditor
                 startText={node.title} 
                 label={'Title editor.'} 
@@ -86,7 +114,7 @@
             {/if}
         {/if}. 
         <!-- Source -->
-        {#if editable }
+        {#if editable && editing }
             <br/><em>
                 <TextEditor
                     startText={node.source}
@@ -102,7 +130,7 @@
         {:else}
             <em>{#if node.source}{node.source}{:else}Source{/if}</em>
         {/if}. 
-        {#if editable }
+        {#if editable && editing }
             <br/><TextEditor
                 startText={node.summary} 
                 label={'Summary editor.'} 
@@ -115,6 +143,12 @@
             {#if node.summary}
                 <span class="bookish-reference-summary">{node.summary}</span>
             {/if}
+        {/if}
+        {#if editing }
+            <br/><button 
+                on:click|stopPropagation={() => stopEditing()}
+                on:keydown={event => { if(editing && (event.key === "Enter" || event.key === " ")) { stopEditing(); event.stopPropagation(); }}}
+                >done editing</button>
         {/if}
     </span>
 {/if}
