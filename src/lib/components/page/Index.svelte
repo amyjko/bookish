@@ -108,7 +108,7 @@
                                         }) as chapterID, index }
                                         <!-- Map them to links to the first occurrence in the chapter. -->
                                         <span>
-                                            Chapter {#if $edition.getChapterNumber(chapterID) !== undefined}<span> {$edition.getChapterNumber(chapterID)}. </span>{/if}<Link to={base + "/" + chapterID + "/" + word + "/0"}>{$edition.getChapterName(chapterID)}</Link>
+                                            Chapter {#if $edition.getChapterNumber(chapterID) !== undefined}<span> {$edition.getChapterNumber(chapterID)}. </span>{/if}<Link to={`${base}/chapter/${chapterID}/${word}`}>{$edition.getChapterName(chapterID)}</Link>
                                             {#if index < bookIndex[word].size - 1 }<br/>{/if}
                                         </span>
                                     {/each}

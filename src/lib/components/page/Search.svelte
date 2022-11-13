@@ -9,7 +9,7 @@
     import { onMount } from "svelte";
     import { getBase, getEdition } from "./Contexts";
 
-    $: edition = getEdition();
+    let edition = getEdition();
     let base = getBase();
 
     let query = "";
@@ -59,7 +59,7 @@
                             // Only highlight the part of the word that matches.
                             const start = match.match.toLowerCase().indexOf(lowerQuery);
                             results.push({ 
-                                link: base + "/" + chapter.getChapterID() + "/" + match.match.toLowerCase() + "/" + index,
+                                link: `${base}/chapter/${chapter.getChapterID()}/${match.match.toLowerCase()}-${index}`,
                                 left: match.left + match.match.substring(0, start),
                                 match: match.match.substring(start, start + query.length),
                                 right: match.match.substring(start + query.length) + match.right

@@ -22,12 +22,16 @@
     import { goto } from "$app/navigation";
     import type Chapter from "$lib/models/book/Chapter";
     import ChapterNode from "$lib/models/chapter/ChapterNode";
+    import { page } from "$app/stores";
 
     export let chapter: ChapterModel;
     export let print: boolean = false;
 
     let edition = getEdition();
     let editable = isEditable();
+
+    // What word are we highlighting, if any?
+    $: word = $page.params.word ?? "";
 
 	// Keep track of the scroll position to facilitate reading during reloads.
 	function rememberPosition() { localStorage.setItem('scrollposition', "" + window.scrollY); }
@@ -158,10 +162,6 @@
 		$currentChapter.addListener(chapterChanged);
     }
 
-	// Get the word and number to highlight from the URL
-	let word: string = "";
-    let number: string = "";
-
 	// This gets called after the page is done loading. There are various things we scroll to.
 	function scrollToLastLocation() {
 
@@ -169,9 +169,10 @@
 		layoutMarginals();
 
 		// If there's a word we're trying to highlight in the URL path, scroll to the corresponding match.
-		if(word && number) {
+		if(word) {
 			const highlights = document.getElementsByClassName("bookish-text bookish-content-highlight")
-			const num = parseInt(number)
+            const parts = word.split("-")
+			const num = parts[1] === undefined ? 0 : parseInt(word[1]);
 			if(highlights.length > 0 && num < highlights.length && num >= 0) {
 				scrollToEyeLevel(highlights[num])
 			}
@@ -211,7 +212,7 @@
     setContext<ChapterStore>(CHAPTER, chapterStore);
     $: chapterStore.set({
         chapter: chapter,
-        highlightedWord: word,
+        highlightedWord: word.split("-")[0],
         highlightedID: highlightedID,
         marginalID: marginal,
         setMarginal: (id: string | undefined) => marginal = id,
