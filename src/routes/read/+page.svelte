@@ -1,8 +1,7 @@
 <script lang="ts">
-    import { createBookInFirestore, loadBookFromFirestore, loadPublishedBooksFromFirestore, loadUsersBooksFromFirestore } from '$lib/models/Firestore';
+    import { loadPublishedBooksFromFirestore } from '$lib/models/Firestore';
     import BookPreview from '$lib/components/BookPreview.svelte'
     import type Book from "$lib/models/book/Book"
-    import { goto } from '$app/navigation';
     import { onMount } from 'svelte';
 	import Alert from "$lib/components/page/Alert.svelte";
 

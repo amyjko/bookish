@@ -15,10 +15,9 @@
     import Authors from "$lib/components/page/Authors.svelte";
     import TextEditor from "$lib/components/editor/TextEditor.svelte";
     import Toggle from "$lib/components/editor/Toggle.svelte";
-    import { getBase, getBook, getEdition, isEditable } from "./Contexts";
+    import { getBase, getEdition, isEditable } from "./Contexts";
 
     let edition = getEdition();
-    let book = getBook();
 	let base = getBase();
 	let editable = isEditable();
 
@@ -80,9 +79,11 @@
         tags={$edition.getTags()}
         save={text => $edition.setTitle(text)}
     >
-        {#if editable }
-            <SubdomainEditor slot="before"/>
-        {/if}
+        <svelte:fragment slot="before">
+            {#if editable}
+                <SubdomainEditor slot="before"/>
+            {/if}
+        </svelte:fragment>
         <Outline slot="outline"
             previous={null}
             next={$edition.getNextChapterID("")}

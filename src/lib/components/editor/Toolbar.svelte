@@ -93,7 +93,7 @@
     });
 
     function containsFocus() { return element !== null && element.contains(document.activeElement); }
-    function updateVisible(event: FocusEvent) {
+    function updateVisible() {
         isVisible = visible || containsFocus();
     }
 

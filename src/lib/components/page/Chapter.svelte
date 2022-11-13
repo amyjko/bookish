@@ -249,7 +249,7 @@
                 }}
             />
             <!-- Add an editable chapter ID if in editor mode -->
-            <span slot="before">
+            <svelte:fragment slot="before">
                 {#if editable }
                     <span class="bookish-muted">
                         <TextEditor 
@@ -288,7 +288,7 @@
                 {#if chapterSection !== undefined }
                     <span class="bookish-section-name">&nbsp;&nbsp;{chapterSection}</span>
                 {/if}
-            </span>						
+            </svelte:fragment>						
             <!-- If there are chapter authors, render those, otherwise use the book authors -->
             <Authors 
                 slot="after"

@@ -36,17 +36,25 @@ export const loadUsersBooksFromFirestore = async (userID: string): Promise<Book[
 
 }
 
-export const loadBookFromFirestore = async (bookID: string): Promise<Book> => {
+export const getBookFromIDOrName = async (bookIDOrName: string): Promise<Book | null> => {
+
+    const book = await loadBookFromFirestore(bookIDOrName);
+
+    if(book) return book;
+
+    const bookID = await getBookIDFromBookName(bookIDOrName);
+    return loadBookFromFirestore(bookID);
+
+}
+
+export const loadBookFromFirestore = async (bookID: string): Promise<Book | null> => {
 
     if(!db)
-        throw Error("Can't retrieve user's books, not connected to Firebase.")
+        return null;
 
     const bookRef = doc(db, "books", bookID);
     const book = await getDoc(bookRef);
-    if(!book.exists())
-        throw new Error(`Couldn't find book ${bookID}`);
-
-    return new Book(bookRef, book.data() as BookSpecification);
+    return !book.exists() ? null : new Book(bookRef, book.data() as BookSpecification);
 
 }
 
