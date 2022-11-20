@@ -28,28 +28,6 @@
 </div>
 
 <style>
-    .bookish-figure {
-        margin-bottom: var(--bookish-paragraph-spacing);
-    }
-
-    .bookish-figure {
-        margin-top: var(--bookish-paragraph-spacing);
-        margin-bottom: var(--bookish-paragraph-spacing);
-        width: 100%;
-    }
-
-    .bookish-figure-image {
-        border-radius: var(--bookish-roundedness);
-        max-width: 100%;
-        width: 100%;
-        height: auto;
-        margin-bottom: 0;
-    }
-
-    :global(.bookish-dark) .bookish-figure-image {
-        filter: brightness(50%);
-    }
-
     .bookish-figure-caption {
         text-align: center;
         color: var(--bookish-muted-color);

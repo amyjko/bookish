@@ -133,7 +133,7 @@
         width: 100vw;
     }
 
-    .bookish-figure-full :global(bookish-figure) {
+    .bookish-figure-full :global(.bookish-figure) {
         /* No margin above full figures, which tend to come first in a page. */
         margin-top: 0;
     }

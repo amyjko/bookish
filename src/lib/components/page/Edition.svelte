@@ -310,4 +310,8 @@
         font-style: italic;
     }
     
+    .bookish-dark .bookish-figure-image {
+        filter: brightness(50%);
+    }
+
 </style>
