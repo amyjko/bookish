@@ -46,7 +46,7 @@
         {:else}
             <Link to={`${base}/${chapterID}`}>{title}</Link>
         {/if}
-        <small><Muted><br/><em><slot name="annotation"></slot></em></Muted></small>
+        <div><Muted><em><slot name="annotation"></slot></em></Muted></div>
     </td>
     <td><slot name="etc"></slot></td>
     {#if editable }
