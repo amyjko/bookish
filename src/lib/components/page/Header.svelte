@@ -21,18 +21,15 @@
 
 	let title: HTMLHeadingElement | null = null;
 	let reminder: HTMLDivElement | null = null;
+    let showReminder: boolean = true;
 
     let edition = getEdition();
     let editable = isEditable();
 
 	function updateScrollReminder() {
-		if(title && reminder) {
-			// If the bottom of the window is below the top of the title, hide the reminder.
-			if(window.scrollY + window.innerHeight > title.getBoundingClientRect().top + window.scrollY)
-				reminder.classList.add("bookish-past-title");
-			else
-				reminder.classList.remove("bookish-past-title");
-		}
+        // If the bottom of the window is below the top of the title, hide the reminder.
+        if(title)
+			showReminder = window.scrollY + window.innerHeight <= title.getBoundingClientRect().top + window.scrollY;
 	}
 
 	function addCover() { if(setImage) setImage("|||||") ; }
@@ -73,7 +70,9 @@
             {:else}
                 <ErrorMessage node={embedNode} />
             {/if}
-            {#if !print }<div bind:this={reminder} class="bookish-scroll-reminder"></div>{/if}
+            {#if !print && showReminder}
+                <div class="bookish-scroll-reminder"></div>
+            {/if}
         </div>
     {:else}
         <!-- Add a bit of space to account for the lack of an image. -->
