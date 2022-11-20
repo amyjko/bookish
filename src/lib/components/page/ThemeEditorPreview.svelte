@@ -7,6 +7,7 @@
     export let theme: Theme;
 
     let darkMode = getDarkMode();
+	$: backgroundColor = $darkMode ? theme.dark?.backgroundColor : theme.light?.backgroundColor
 
 	$: preview = Parser.parseChapter(undefined, `
 		# Header 1
@@ -21,7 +22,7 @@
 
 </script>
 
-<div class="bookish-theme-preview" style={`background-color: ${$darkMode ? theme.dark.backgroundColor : theme.light.backgroundColor };`}>
+<div class="bookish-theme-preview" style={backgroundColor ? `background-color: ${backgroundColor};` : ""}>
     <ChapterBody node={preview}/>
 </div>
 

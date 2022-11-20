@@ -2,45 +2,45 @@ import type ThemeColors from "./ThemeColors";
 
 type Theme = {
     // Background colors
-    light: ThemeColors,
-    dark: ThemeColors,
+    light?: ThemeColors,
+    dark?: ThemeColors,
     // Fonts
-    fonts: {
-        paragraphFontFamily: string;
-        headerFontFamily: string;
-        codeFontFamily: string;
-        bulletFontFamily: string;
+    fonts?: {
+        paragraphFontFamily?: string;
+        headerFontFamily?: string;
+        codeFontFamily?: string;
+        bulletFontFamily?: string;
     }
     // Fonts
-    sizes: {
-        paragraphFontSize: string;
-        blockFontSize: string;
-        smallFontSize: string;
-        titleFontSize: string;
-        header1FontSize: string;
-        header2FontSize: string;
-        header3FontSize: string;
-        codeFontSize: string;
+    sizes?: {
+        paragraphFontSize?: string;
+        blockFontSize?: string;
+        smallFontSize?: string;
+        titleFontSize?: string;
+        header1FontSize?: string;
+        header2FontSize?: string;
+        header3FontSize?: string;
+        codeFontSize?: string;
     }
-    weights: {
-        headerFontWeight: string;
-        paragraphFontWeight: string;
-        boldFontWeight: string;
-        linkFontWeight: string;
-        codeFontWeight: string;
-        bulletFontWeight: string;
+    weights?: {
+        headerFontWeight?: string;
+        paragraphFontWeight?: string;
+        boldFontWeight?: string;
+        linkFontWeight?: string;
+        codeFontWeight?: string;
+        bulletFontWeight?: string;
     }
     // Spacing
-    spacing: {
-        paragraphLineHeight: string;
-        paragraphLineHeightTight: string;
-        headerLineHeight: string;
-        paragraphSpacing: string;
-        headerSpacing: string;
-        indent: string;
-        inlinePadding: string;
-        blockPadding: string;
-        roundedness: string;
+    spacing?: {
+        paragraphLineHeight?: string;
+        paragraphLineHeightTight?: string;
+        headerLineHeight?: string;
+        paragraphSpacing?: string;
+        headerSpacing?: string;
+        indent?: string;
+        inlinePadding?: string;
+        blockPadding?: string;
+        roundedness?: string;
     }
 }
 

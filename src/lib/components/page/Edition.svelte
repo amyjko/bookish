@@ -93,7 +93,7 @@
         goto(location.hash.replace('#', ''))    
 
     // Set the theme, whatever it is, and change it when the edition changes.
-    $: setTheme(edition.getTheme());
+    $: setTheme($currentEdition.getTheme());
     
     function setTheme(theme: Theme | null) {
 
@@ -110,14 +110,14 @@
         themeTag.setAttribute("id", "bookish-theme");
 
         const css = `:root {
-                ${toRules(theme.light)}
-                ${toRules(theme.fonts)}
-                ${toRules(theme.sizes)}
-                ${toRules(theme.weights)}
-                ${toRules(theme.spacing)}
+                ${theme.light ? toRules(theme.light) : ""}
+                ${theme.fonts ? toRules(theme.fonts) : ""}
+                ${theme.sizes ? toRules(theme.sizes) : ""}
+                ${theme.weights ? toRules(theme.weights) : ""}
+                ${theme.spacing ? toRules(theme.spacing) : ""}
             }
             .bookish-dark {
-                ${toRules(theme.dark)}
+                ${theme.dark ? toRules(theme.dark) : ""}
             }`;
         themeTag.appendChild(document.createTextNode(css));
         document.head.appendChild(themeTag);
@@ -126,8 +126,11 @@
 
     function toRules(set: Record<string, string>) {
         return Object.keys(set).map(name => {
-            const cssVariable = "--bookish-" + name.replace(/([a-z])([A-Z])/g, "$1 $2").split(" ").map(s => s.toLowerCase()).join("-");
-            return `${cssVariable}: ${set[name]};`
+            const value = set[name];
+            if(value.length > 0) {
+                const cssVariable = "--bookish-" + name.replace(/([a-z])([A-Z])/g, "$1 $2").split(" ").map(s => s.toLowerCase()).join("-");
+                return `${cssVariable}: ${value};`
+            }
         }).join("\n\t\t");
     }
 
