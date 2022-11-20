@@ -562,7 +562,7 @@ export const CriticalTheme: Theme = {
         headerFontWeight: "700",
         paragraphFontWeight: "400",
         boldFontWeight: "700",
-        linkFontWeight: "700",
+        linkFontWeight: "400",
         codeFontWeight: "400",
         bulletFontWeight: "400"
     },
