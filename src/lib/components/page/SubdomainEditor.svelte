@@ -2,6 +2,7 @@
     import TextEditor from "$lib/components/editor/TextEditor.svelte";
     import { subdomainIsAvailable } from "$lib/models/Firestore";
     import { getBook } from "./Contexts";
+    import Muted from "./Muted.svelte";
 
     let book = getBook();
     
@@ -9,7 +10,7 @@
     
 </script>
 
-<span class="bookish-muted">
+<Muted>
     <TextEditor 
         startText={book.getSubdomain() ?? ""} 
         label="Book domain editor"
@@ -31,4 +32,4 @@
         saveOnExit={true}
     />
     <br/>
-</span>
+</Muted>

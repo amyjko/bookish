@@ -8,6 +8,7 @@
     import LabelNode from "$lib/models/chapter/LabelNode";
     import LinkNode from "$lib/models/chapter/LinkNode";
     import TextNode from "$lib/models/chapter/TextNode";
+    import Problem from "./Problem.svelte";
 
     import Citations from "./Citations.svelte";
     import Definition from "./Definition.svelte";
@@ -48,7 +49,7 @@
         {:else if segment instanceof LabelNode}<Label node={segment} />
         {:else if segment instanceof CommentNode}<Comment node={segment} />
         {:else if segment instanceof FormatNode}<Format node={segment} />
-        {:else}<span class="bookish-error">Unknown segment type node={segment}</span>
+        {:else}<Problem>Unknown segment type node={segment}</Problem>
         {/if}
     {/each}
     {#if showPlaceholder }
@@ -61,4 +62,8 @@
         color: var(--bookish-app-chrome-muted);
         font-style: italic;
     }    
+
+    strong, b {
+        font-weight: var(--bookish-bold-font-weight);
+    }
 </style>

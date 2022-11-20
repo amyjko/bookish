@@ -67,3 +67,12 @@
         &nbsp;<button on:click={addAuthor}>+</button>
     {/if}
 </div>
+
+<style>
+    .bookish-authors {
+        font-family: var(--bookish-paragraph-font-family);
+        font-style: italic;
+        margin-top: 0;
+        margin-bottom: var(--bookish-paragraph-spacing);
+    }
+</style>

@@ -5,6 +5,8 @@
     import Toggle from "$lib/components/editor/Toggle.svelte";
     import ConfirmButton from "$lib/components/editor/ConfirmButton.svelte";
     import { getBase, getEdition, isEditable } from "./Contexts";
+    import Muted from "./Muted.svelte";
+    import ChapterNumber from "./ChapterNumber.svelte";
 
     export let chapterID: string;
     export let chapter: Chapter | undefined = undefined;
@@ -26,23 +28,25 @@
     <td>
         {#if editable && chapter}
             <Toggle on={number !== undefined} save={ on => chapter && chapter.setNumbered(on) }>
-                <div class="bookish-chapter-number">
-                    {#if number !== undefined}
-                        Chapter {number}
-                    {:else}
-                        <span class="bookish-muted">Unnumbered</span>
-                    {/if}
+                <div>
+                    <ChapterNumber>
+                        {#if number !== undefined}
+                            Chapter {number}
+                        {:else}
+                            <Muted>Unnumbered</Muted>
+                        {/if}
+                    </ChapterNumber>
                 </div>
             </Toggle>
         {:else if number !== undefined }
-            <div class="bookish-chapter-number">{"Chapter " + number}</div>
+            <div><ChapterNumber>{"Chapter " + number}</ChapterNumber></div>
         {/if}
         {#if forthcoming && !editable}
             <span>{title}</span>
         {:else}
             <Link to={`${base}/${chapterID}`}>{title}</Link>
         {/if}
-        <small class="bookish-muted"><br/><em><slot name="annotation"></slot></em></small>
+        <small><Muted><br/><em><slot name="annotation"></slot></em></Muted></small>
     </td>
     <td><slot name="etc"></slot></td>
     {#if editable }
@@ -61,3 +65,9 @@
         </td>
     {/if}
 </tr>
+
+<style>
+    .bookish-forthcoming {
+        opacity: 0.5;
+    }
+</style>

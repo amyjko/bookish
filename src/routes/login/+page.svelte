@@ -1,6 +1,7 @@
 <script lang="ts">
     import { getAuth } from "$lib/components/page/Contexts";
 	import Alert from "$lib/components/page/Alert.svelte";
+    import Title from "$lib/components/page/Title.svelte";
 
 	let email: HTMLInputElement;
 	let auth = getAuth()
@@ -30,7 +31,7 @@
 
 </script>
 
-<h1>Login to write</h1>
+<Title>Login to write</Title>
 
 <p>We'll send you an email each time to login, no password required.</p>
 

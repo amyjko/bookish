@@ -6,6 +6,7 @@
     import { onMount } from 'svelte';
     import { getAuth } from '$lib/components/page/Contexts';
 	import Alert from "$lib/components/page/Alert.svelte";
+    import Title from '$lib/components/page/Title.svelte';
 
 	let books: Book[] = [];
 	let loading = true;
@@ -40,7 +41,7 @@
 	
 </script>
 
-<h1>Write</h1>
+<Title>Write</Title>
 
 <p>
     <button on:click={newBook}>Create book</button>

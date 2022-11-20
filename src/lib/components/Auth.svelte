@@ -19,7 +19,7 @@
         if(auth) {
 
             const actionCodeSettings = {
-                url: location.origin + "/finishlogin",
+                url: location.origin + "/confirm",
                 handleCodeInApp: true
             }
 

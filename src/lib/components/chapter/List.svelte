@@ -15,3 +15,63 @@
         {/if}
     {/each}
 </svelte:element>
+
+<style>
+    ol {
+        list-style: none;
+        counter-reset: item;
+    }
+
+    ol > li {
+        counter-increment: item;
+    }
+
+    ol > li {
+        list-style-type: none;
+    }
+
+    ol > :global(ol > li) {
+        list-style-type: none;
+    }
+
+    ol > :global(ol > ol > li) {
+        list-style-type: none;
+    }
+
+    ol > :global(li::before), ul > :global(ol > li::before), ul > :global(ul > ol > li::before) {
+        content: counter(item) ". ";
+        color: var(--bookish-bullet-color);
+        display: inline-block;
+        width: 1em;
+        margin-left: -1.5rem;
+        margin-right: .5rem;
+        text-align: right;
+    }
+
+    ol > :global(ol > li::before), ul > :global(ol > ol > li::before) {
+        content: counter(item, lower-alpha) ". ";
+    }
+
+    ol > :global(ol > ol > li:before) {
+        content: counter(item, upper-alpha) ". ";
+    }
+
+    li {
+        margin-bottom: calc(0.5 * var(--bookish-paragraph-spacing));
+    }
+
+    ul li {
+        list-style: none;
+    }
+
+    ul li::before {
+        content: "*";
+        color: var(--bookish-bullet-color);
+        display: inline-block;
+        width: 1rem;
+        margin-left: -1rem;
+        font-family: var(--bookish-bullet-font-family);
+        font-weight: var(--bookish-bullet-font-weight);
+    }
+
+</style>

@@ -42,4 +42,48 @@
     .bookish-footnote-focused {
         outline: 2px solid var(--bookish-highlight-color);
     }
+
+    .bookish-footnote {
+        font-family: "Epilogue";
+        font-weight: 300;
+        font-size: var(--bookish-small-font-size);
+        line-height: 1.5em;
+    }
+
+    .bookish-footnote {
+        font-size: var(--bookish-small-font-size);
+        font-style: normal;
+        color: var(--bookish-paragraph-color);
+    }
+
+    .bookish-footnote-symbol, .bookish-citation-symbol {
+        font-family: var(--bookish-paragraph-font-family);
+        font-weight: normal;
+        color: var(--bookish-link-color);
+        position: relative;
+    }
+
+    /* This enables us to layout the numbers and letters in a neat right-aligned floating grid. */
+    .bookish-footnote {
+        position: relative;
+    }
+
+    .bookish-footnote {
+        display: block;
+        line-height: var(--bookish-paragraph-line-height-tight);
+        margin-left: 1rem;
+        margin-bottom: 1rem;
+        text-align: left;
+    }
+
+    .bookish-footnote .bookish-footnote-symbol {
+        display: block;
+        float: left;
+        margin-top: -0.5em;
+        position: absolute;
+        left: -1.75em;
+        text-align: right;
+        width: 1.5em; /* Just enough space for 2 digits, a bit of a hack */
+    }
+
 </style>

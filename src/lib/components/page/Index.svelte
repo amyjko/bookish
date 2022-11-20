@@ -7,6 +7,7 @@
     import Link from "$lib/components/Link.svelte";
     import { getBase, getEdition } from "./Contexts";
     import { page } from "$app/stores";
+    import Muted from "./Muted.svelte";
 
     let edition = getEdition();
     let base = getBase();
@@ -76,7 +77,7 @@
                             {#if letter === symbol } 
                                 <strong><span style="font-size: 200%">{symbol}</span></strong>
                             {:else}
-                                <span class={"bookish-muted"}>{symbol}</span>
+                                <Muted>{symbol}</Muted>
                             {/if}
                         </span>
                     {/if}

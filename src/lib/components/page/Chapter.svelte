@@ -12,6 +12,8 @@
     import Instructions from '$lib/components/page/Instructions.svelte';
     import ChapterBody from '$lib/components/chapter/ChapterBody.svelte';
     import PossibleReference from "./PossibleReference.svelte";
+    import ChapterNumber from "./ChapterNumber.svelte";
+    import Problem from "../chapter/Problem.svelte";
 
     import { CHAPTER, getEdition, isEditable, type ChapterStore } from "./Contexts";
     import { writable } from "svelte/store";
@@ -22,6 +24,8 @@
     import { goto } from "$app/navigation";
     import type Chapter from "$lib/models/book/Chapter";
     import ChapterNode from "$lib/models/chapter/ChapterNode";
+    import Muted from "./Muted.svelte";
+    import Title from "./Title.svelte";
 
     export let chapter: ChapterModel;
     export let print: boolean = false;
@@ -251,7 +255,7 @@
             <!-- Add an editable chapter ID if in editor mode -->
             <svelte:fragment slot="before">
                 {#if editable }
-                    <span class="bookish-muted">
+                    <Muted>
                         <TextEditor 
                             startText={chapter.getChapterID()} 
                             label="Chapter URL ID editor"
@@ -272,18 +276,18 @@
                             saveOnExit={true}
                         />
                         <br/>
-                    </span>
+                    </Muted>
                 {/if}
                 {#if editable }
                     <Toggle on={chapter.isNumbered()} save={ on => chapter.setNumbered(on) }>
                         {#if chapterNumber !== undefined }
-                            <span class="bookish-chapter-number">Chapter {chapterNumber}</span>
+                            <ChapterNumber>Chapter {chapterNumber}</ChapterNumber>
                         {:else}
-                            <span class="bookish-muted">Unnumbered</span>
+                            <Muted>Unnumbered</Muted>
                         {/if}
                     </Toggle>
                 {:else if chapterNumber !== undefined }
-                    <span class="bookish-chapter-number">Chapter {chapterNumber}</span> 
+                    <ChapterNumber>Chapter {chapterNumber}</ChapterNumber> 
                 {/if}
                 {#if chapterSection !== undefined }
                     <span class="bookish-section-name">&nbsp;&nbsp;{chapterSection}</span>
@@ -328,7 +332,7 @@
         {/if}
         {#if citations && citations.size > 0 }
             {@const refs = $edition.getReferences() }
-            <h1 id="references" class="bookish-header">References</h1>
+            <Title>References</Title>
             <ol>
                 {#each [...citations].sort() as citationID }
                     {#if citationID in refs }
@@ -336,10 +340,23 @@
                             <PossibleReference node={Parser.parseReference(citationID, refs[citationID], $edition)}/>
                         </li>
                     {:else}
-                        <li class="bookish-error">Unknown reference: <code>{citationID}</code></li>
+                        <li><Problem>Unknown reference: <code>{citationID}</code></Problem></li>
                     {/if}
                 {/each}
             </ol>
         {/if}
     </div>
 </Page>
+
+<style>
+    .bookish-section-name {
+        display: inline-block;
+        font-family: var(--bookish-paragraph-font-family);
+        font-size: var(--bookish-small-font-size);
+        font-weight: normal;
+        font-style: normal;
+        color: var(--bookish-muted-color);
+        line-height: 1em;
+    }
+
+</style>

@@ -1,8 +1,9 @@
 <script lang="ts">
-    import External from "../lib/components/External.svelte";
+    import External from "$lib/components/External.svelte";
+    import Title from "$lib/components/page/Title.svelte";
 </script>
 
-<h1>Bookish</h1>
+<Title>Bookish</Title>
 
 <div class="bookish-app-callout">Bookish is a platform for reading and writing simple, accessible, beautiful online books.</div>
 

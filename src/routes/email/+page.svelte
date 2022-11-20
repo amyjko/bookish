@@ -2,6 +2,7 @@
     import { updateEmail } from "firebase/auth";
     import { getAuth } from "../../lib/components/page/Contexts";
 	import Alert from "$lib/components/page/Alert.svelte";
+    import Title from "$lib/components/page/Title.svelte";
     
     let email: string;
     let auth = getAuth();
@@ -39,7 +40,7 @@
 
 </script>
 
-<h1>Change e-mail</h1>
+<Title>Change e-mail</Title>
 
 <p>
     To change your login email, type your new email address below.

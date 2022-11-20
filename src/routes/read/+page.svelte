@@ -4,6 +4,7 @@
     import type Book from "$lib/models/book/Book"
     import { onMount } from 'svelte';
 	import Alert from "$lib/components/page/Alert.svelte";
+    import Title from '$lib/components/page/Title.svelte';
 
 	let books: Book[] = [];
 	let loading = true;
@@ -26,7 +27,7 @@
 	
 </script>
 
-<h1>Read</h1>
+<Title>Read</Title>
 
 <p>
     Books you can read.

@@ -2,6 +2,7 @@
     import Marginal  from './Marginal.svelte'
     import Parser from '$lib/models/chapter/Parser'
     import type CitationsNode from "$lib/models/chapter/CitationsNode"
+    import Problem from './Problem.svelte';
     import Atom from './Atom.svelte';
     import { getChapter, getEdition } from '../page/Contexts';
     import PossibleReference from '../page/PossibleReference.svelte';
@@ -44,7 +45,7 @@
                         {#if citationNumber && citationID in $edition.getReferences()}
                             <sup class="bookish-citation-symbol">{citationNumber}</sup>
                         {:else}
-                            <span class="bookish-error">Unknown reference: <code>{citationID}</code></span>
+                            <Problem>Unknown reference: <code>{citationID}</code></Problem>
                         {/if}
                         {#if citations.length > 1 && index < citations.length - 1 }<sup>,</sup>{/if}
                     {:else}
@@ -67,3 +68,44 @@
         </span>
     {/if}
 </Atom>
+
+<style>
+    .bookish-reference {
+        font-family: var(--bookish-paragraph-font-family);
+        list-style-position: outside;
+    }
+
+    :global(ol li.bookish-reference::before) {
+        color: var(--bookish-paragraph-color);
+    }
+
+    :global(.bookish-marginal) .bookish-reference {
+        font-size: var(--bookish-small-font-size);
+        font-style: normal;
+        color: var(--bookish-paragraph-color);
+    }
+
+    /* This enables us to layout the numbers and letters in a neat right-aligned floating grid. */
+    .bookish-reference {
+        position: relative;
+    }
+
+    .bookish-references .bookish-reference {
+        display: block;
+        line-height: var(--bookish-paragraph-line-height-tight);
+        margin-left: 1rem;
+        margin-bottom: 1rem;
+        text-align: left;
+    }
+
+    .bookish-reference .bookish-citation-symbol {
+        display: block;
+        float: left;
+        margin-top: -0.5em;
+        position: absolute;
+        left: -1.75em;
+        text-align: right;
+        width: 1.5em; /* Just enough space for 2 digits, a bit of a hack */
+    }
+
+</style>

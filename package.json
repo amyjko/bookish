@@ -1,7 +1,7 @@
 {
-	"name": "bookish",
-	"private": true,
-	"version": "0.8.0",
+	"name": "bookish-press",
+	"private": false,
+	"version": "0.4.16",
 	"type": "module",
 	"description": "A platform for reading and writing readable, accessible, beautiful online books.",
 	"license": "MIT",
@@ -12,16 +12,17 @@
 		"build-reader": "vite build --config vite.reader.config.js",
 		"emu": "firebase emulators:start",
 		"preview": "vite preview",
+		"package": "svelte-package --watch",
 		"test": "vitest",
-		"check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
-		"check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch"
+		"check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch"
 	},
 	"devDependencies": {
 		"@sveltejs/adapter-auto": "next",
 		"@sveltejs/kit": "next",
+		"@sveltejs/adapter-static": "^1.0.0-next.48",
+		"@sveltejs/package": "^1.0.0-next.5",
 		"@types/smoothscroll-polyfill": "^0.3.1",
 		"@types/uuid": "^8.3.4",
-		"svelte": "^3.44.0",
 		"svelte-check": "^2.7.1",
 		"svelte-preprocess": "^4.10.6",
 		"tslib": "^2.3.1",
@@ -30,13 +31,14 @@
 		"vitest": "^0.23.4"
 	},
 	"dependencies": {
-		"@sveltejs/adapter-static": "^1.0.0-next.48",
 		"ajv": "^8.8.2",
 		"ajv-formats": "^2.1.1",
-		"firebase": "^9.9.4",
-		"firebase-functions": "^3.24.1",
+		"firebase": "latest",
+		"firebase-functions": "latest",
 		"highlight.js": "11.1.0",
 		"smoothscroll-polyfill": "^0.4.4",
-		"uuid": "^9.0.0"
-	}
+		"uuid": "^9.0.0",
+		"svelte": "^3.44.0"
+	},
+	"types": "./src/lib/index.d.ts"
 }

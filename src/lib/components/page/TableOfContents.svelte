@@ -39,7 +39,7 @@
 	}
 
 	// Get the chapter progress
-	let progressStorage = localStorage.getItem("chapterProgress");
+	let progressStorage = typeof localStorage !== "undefined" ? localStorage.getItem("chapterProgress") : null;
 	let progress = progressStorage === null ?
 		{} :
 		JSON.parse(progressStorage)

@@ -1,18 +1,14 @@
 <script lang="ts">
     import type EmbedNode from "$lib/models/chapter/EmbedNode";
-    import renderPosition from './renderPosition';
     import { storage } from '$lib/models/Firebase';
-    import Format from './Format.svelte';
     import { getCaret, getEdition, isEditable } from "../page/Contexts";
+    import Figure from "./Figure.svelte";
 
     export let node: EmbedNode;
     export let placeholder: string | undefined = undefined;
 
     $: url = node.getURL();
-	$: position = node.getPosition();
 	$: description = node.getDescription();
-	$: credit = node.getCredit();
-	$: caption = node.getCaption();
 
     let caret = getCaret();
     let editable = isEditable();
@@ -82,57 +78,97 @@
 
 </script>
 
-<div class={"bookish-figure " + renderPosition(position)} data-nodeid={node.nodeID}>
-    {#if url.trim().length === 0 }
-        {#if editable }
-            <div 
-                class={`bookish-figure-unspecified ${dragging ? "bookish-figure-dragging" : ""}`}
-                on:drop|preventDefault={handleDrop}
-                on:dragover={handleDrag}
-                on:dragleave={handleDragLeave}
-            >{
-                dragFeedback !== undefined ? dragFeedback :
-                placeholder !== undefined ? placeholder :
-                    "Click or drag to choose or upload an image, or enter an image or video URL."
-            }
-            </div>
+{#if imageError }
+    <div class="bookish-figure-unspecified">{ editable ? "Unable to load image. Is the URL correct? Are you offline?" : "Unable to load image" }</div>
+{:else}
+    <Figure {node} caption={node.getCaption()}>
+        {#if url.trim().length === 0 }
+            {#if editable }
+                <div 
+                    class={`bookish-figure-unspecified ${dragging ? "bookish-figure-dragging" : ""}`}
+                    on:drop|preventDefault={handleDrop}
+                    on:dragover={handleDrag}
+                    on:dragleave={handleDragLeave}
+                >{
+                    dragFeedback !== undefined ? dragFeedback :
+                    placeholder !== undefined ? placeholder :
+                        "Click or drag to choose or upload an image, or enter an image or video URL."
+                }
+                </div>
+            {:else}
+                <div class="bookish-figure-unspecified">No image or video specified</div>
+            {/if}
         {:else}
-            <div class="bookish-figure-unspecified">No image or video specified</div>
+            {#if url.includes("https://www.youtube.com") || 
+                url.includes("https://youtu.be") || 
+                url.includes("https://www.tiktok.com") || 
+                url.includes("vimeo.com") }
+                <div class="bookish-figure-embed">
+                    <iframe 
+                        class="bookish-figure-frame"
+                        title="Embedded video content from streaming service"
+                        src={url} 
+                        frameBorder="0" 
+                        allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" 
+                        allowFullScreen>
+                    </iframe>
+                </div>
+            {:else}
+                <img 
+                    class={"bookish-figure-image"}
+                    src={url.startsWith("http") ? url : "images/" + url}
+                    srcset={node.hasSmallURL() ? `${node.getSmallURL()} 320w, ${url} 1024w` : undefined }
+                    sizes={node.hasSmallURL() ? "(min-width: 1024px) 1024px, 320px" : undefined }
+                    alt={description}
+                    on:load={handleLoad}
+                    on:error={handleError}
+                />
+            {/if}
         {/if}
-    {:else}
-        {#if url.includes("https://www.youtube.com") || 
-            url.includes("https://youtu.be") || 
-            url.includes("https://www.tiktok.com") || 
-            url.includes("vimeo.com") }
-            <div class="bookish-figure-embed">
-                <iframe 
-                    class="bookish-figure-frame"
-                    title="Embedded video content from streaming service"
-                    src={url} 
-                    frameBorder="0" 
-                    allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" 
-                    allowFullScreen>
-                </iframe>
-            </div>
-        {:else}
-            <img 
-                class={"bookish-figure-image"}
-                src={url.startsWith("http") ? url : "images/" + url}
-                srcset={node.hasSmallURL() ? `${node.getSmallURL()} 320w, ${url} 1024w` : undefined }
-                sizes={node.hasSmallURL() ? "(min-width: 1024px) 1024px, 320px" : undefined }
-                alt={description}
-                on:load={handleLoad}
-                on:error={handleError}
-            />
-        {/if}
-    {/if}
-    <div class="bookish-figure-caption">
-        <div class="bookish-figure-credit">
-            <Format node={credit} placeholder="credit" />
-        </div>
-        <Format node={caption} placeholder="caption" />
-    </div>
-    {#if imageError }
-        <div class="bookish-figure-unspecified">{ editable ? "Unable to load image. Is the URL correct? Are you offline?" : "Unable to load image" }</div>
-    {/if}
-</div>
+    </Figure>
+{/if}
+
+<style>
+    .bookish-figure-embed {
+        position: relative;
+        display: block;
+        width: 100%;
+        padding: 0;
+        overflow: hidden;
+        border-radius: var(--bookish-roundedness);
+    }
+
+    .bookish-figure-embed::before {
+        /* Make the embed 16:9 */
+        padding-top: 56.25%;
+        display: block;
+        content: "";
+    }
+
+    .bookish-figure-unspecified {
+        width: 100%;
+        height: 8em;
+        background-color: var(--bookish-error-background-color);
+        color: var(--bookish-error-color);
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .bookish-figure-dragging {
+        background-color: var(--bookish-highlight-color);
+    }
+
+    .bookish-figure-frame {
+        /* Fill the container */
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        border: 0;
+    }
+
+</style>

@@ -2,14 +2,12 @@
     import type CodeNode from "$lib/models/chapter/CodeNode"
     import Code from './Code.svelte'
     import Python from './Python.svelte'
-    import Format from './Format.svelte'
     import Text from './Text.svelte'
-    import renderPosition from './renderPosition'
     import { isEditable } from "../page/Contexts";
+    import Figure from "./Figure.svelte";
 
     export let node: CodeNode;
 
-    $: caption = node.getCaption();
     $: language = node.getLanguage();
 
     let editable = isEditable();
@@ -18,7 +16,7 @@
 
 </script>
 
-<div class={"bookish-figure " + renderPosition(node.getPosition())} data-nodeid={node.nodeID}>
+<Figure {node} caption={node.getCaption()}>
     {#if editable }
         <code 
             class={`bookish-code bookish-code-block language-${language}`}
@@ -35,7 +33,4 @@
             </div>
         {/if}
     {/if}
-    {#if caption }
-        <div class="bookish-figure-caption"><Format node={caption} placeholder="caption"/></div>
-    {/if}
-</div>
+</Figure>

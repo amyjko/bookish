@@ -42,3 +42,99 @@
     bind:this={el}>
         <slot></slot>
 </code>
+
+<style>
+    .bookish-code {
+        font-family: var(--bookish-code-font-family);
+        font-weight: var(--bookish-code-font-weight);
+        font-size: var(--bookish-code-font-size);
+        white-space: pre-wrap;	
+        border: 1px solid var(--bookish-border-color-light);
+        color: var(--bookish-muted-color);
+        background-color: var(--bookish-block-background-color);
+        clear: both;
+    }
+
+    code {
+        font-family: var(--bookish-code-font-family);
+        font-weight: var(--bookish-code-font-weight);
+        font-size: var(--bookish-code-font-size);	
+    }
+
+    .bookish-code-block {
+        display: block;
+        padding: var(--bookish-block-padding);
+        line-height: var(--bookish-paragraph-line-height-tight);
+        border-radius: var(--bookish-roundedness);
+    }
+
+    .bookish-code-inline {
+        display: inline;
+        padding: calc(1.5 * var(--bookish-inline-padding)) var(--bookish-inline-padding);
+    }
+
+    .bookish-code-inline :global(code) {
+        display: inline;	
+        padding: 0em;
+    }
+
+    .bookish-code-language {
+        float: right;
+        margin-top: -3em;
+        font-size: small;
+        color: gray;
+        margin-right: 0.5em;
+    }
+
+    /* Default color */
+    .hljs,
+    .hljs-title,
+    .hljs-params,
+    .hljs-section {
+        color: var(--bookish-paragraph-color);
+    }
+
+    /* Comment */
+    .hljs-comment,
+    .hljs-quote {
+        color: var(--bookish-comment-color);
+    }
+
+    .hljs-variable,
+    .hljs-template-variable,
+    .hljs-tag,
+    .hljs-name,
+    .hljs-selector-id,
+    .hljs-selector-class,
+    .hljs-regexp,
+    .hljs-deletion {
+        color: var(--bookish-error-color);
+    }
+
+    .hljs-number,
+    .hljs-built_in,
+    .hljs-builtin-name,
+    .hljs-literal,
+    .hljs-string,
+    .hljs-symbol,
+    .hljs-meta,
+    .hljs-addition {
+        color: var(--bookish-link-color);
+    }
+
+    .hljs-type,
+    .hljs-attribute,
+    .hljs-keyword,
+    .hljs-selector-tag {
+    color: var(--bookish-highlight-color);
+    }
+
+    .hljs-emphasis {
+    font-style: italic;
+    }
+
+    .hljs-strong {
+    font-weight: bold;
+    }
+
+</style>

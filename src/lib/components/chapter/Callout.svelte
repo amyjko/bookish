@@ -12,3 +12,28 @@
         <Block node={element} />
     {/each}
 </div>
+
+<style>
+    .bookish-callout {
+        border: none;
+        border-top: 2px solid var(--bookish-border-color-bold);
+        border-bottom: 2px solid var(--bookish-border-color-bold);
+        margin: var(--bookish-paragraph-spacing);
+        padding-left: 0;
+        padding-right: 0;
+        padding-top: var(--bookish-paragraph-spacing);
+        padding-bottom: var(--bookish-paragraph-spacing);
+        line-height: var(--bookish-paragraph-line-height-tight);
+        clear: both;
+        position: relative;
+    }
+
+    .bookish-callout :global(h2), .bookish-callout :global(h3), .bookish-callout :global(h4) {
+        margin-top: 0;
+    }
+
+    .bookish-callout :global(ol), .bookish-callout :global(ul) {
+        padding-left: 1rem;
+    }
+
+</style>

@@ -152,3 +152,16 @@
         {/if}
     </span>
 {/if}
+
+<style>
+
+    .bookish-reference-text .bookish-reference-summary {
+        font-size: var(--bookish-small-font-size);
+        padding-left: var(--bookish-indent);
+        display: inline-block;
+        border-left: 1px solid var(--bookish-border-color-light);
+        margin-top: 1em;
+        font-style: italic;
+    }
+
+</style>

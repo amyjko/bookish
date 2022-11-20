@@ -19,3 +19,8 @@
 {:else}
     <svelte:element this={`h${level + 1}`} class={classes} id={id} data-nodeid={node.nodeID}><Format node={node.getFormat()} /></svelte:element>
 {/if}
+
+<style>
+
+
+</style>

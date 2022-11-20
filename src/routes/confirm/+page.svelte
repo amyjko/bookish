@@ -5,6 +5,7 @@
     import Link from "$lib/components/Link.svelte";
     import { goto } from "$app/navigation";
     import Alert from "$lib/components/page/Alert.svelte";
+    import Title from "$lib/components/page/Title.svelte";
 	
 	let error: string | undefined = undefined;
 
@@ -55,7 +56,7 @@
 
 </script>
 
-<h1>Logging in…</h1>
+<Title>Logging in…</Title>
 {#if error}
     <Alert>{error}</Alert>
     <Link to="/login">Try again?</Link>

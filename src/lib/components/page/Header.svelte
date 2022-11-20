@@ -4,6 +4,7 @@
     import Embed from '$lib/components/chapter/Embed.svelte';
     import ErrorMessage from '$lib/components/chapter/ErrorMessage.svelte';
     import BookishEditor from '$lib/components/editor/BookishEditor.svelte';
+    import Title from './Title.svelte';
     import { onMount } from 'svelte';
     import TextEditor from '$lib/components/editor/TextEditor.svelte';
     import { getEdition, isEditable } from './Contexts';
@@ -88,9 +89,9 @@
             <button on:click={removeCover}>x cover image</button>
         {/if}
     {/if}
-    <div class="bookish-chapter-header-text">
+    <div bind:this={title} class="bookish-chapter-header-text">
         <slot name="before"></slot>
-        <h1 bind:this={title} class="bookish-title">
+        <Title>
             {#if editable && save }
                 <TextEditor 
                     label={label}
@@ -103,10 +104,69 @@
                 { header }
                 {#if subtitle }<div class="bookish-subtitle">{subtitle}</div>{/if}
             {/if}
-        </h1>
+        </Title>
         <slot name="after"></slot>
         {#if tags }
             <div>{#each tags as tag}<span class="bookish-tag">{tag}</span>{/each}</div>
         {/if}
     </div>
 </div>
+
+<style>
+    .bookish-subtitle {
+        font-size: var(--bookish-header-1-font-size);
+        font-weight: normal;
+        font-style: italic;
+        margin-top: 0; /* Shouldn't have any space below title */
+        margin-bottom: calc(var(--bookish-title-font-size) * 0.5);
+        line-height: var(--bookish-header-line-height);
+    }
+
+    .bookish-figure-full {
+        left: 50%;
+        margin-left: -50vw;
+        margin-right: -50vw;
+        margin-bottom: 3em;
+        max-width: 100vw;
+        position: relative;
+        right: 50%;
+        width: 100vw;
+    }
+
+    .bookish-figure-full :global(bookish-figure) {
+        /* No margin above full figures, which tend to come first in a page. */
+        margin-top: 0;
+    }
+
+    .bookish-scroll-reminder {
+        position: fixed;
+        bottom: 4em;
+        left: 50%;
+        animation: bookish-bounce 3s infinite;
+        animation-timing-function: ease;
+        width: 0;
+        height: 0;
+        margin-left: -1rem;
+        border-left: 1rem solid transparent;
+        border-right: 1rem solid transparent;
+        border-top: 1rem solid white;
+        mix-blend-mode: difference;
+    }
+
+    @keyframes bookish-bounce {
+        0% { bottom: 4em; }
+        50% { bottom: 5em; }
+        100% { bottom: 4em; }
+    }
+
+    .bookish-tag {
+        font-size: var(--bookish-small-font-size);
+        display: inline-block;
+        padding: var(--bookish-inline-padding) calc(2 * var(--bookish-inline-padding));
+        border-radius: var(--bookish-roundedness);
+        background-color: var(--bookish-border-color-light);
+        font-weight: bold;
+        text-transform: uppercase;
+    }
+
+</style>

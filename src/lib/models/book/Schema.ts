@@ -1,4 +1,4 @@
-{
+export const Schema = {
 	"$schema": "http://json-schema.org/draft-07/schema#",
 	"title": "Bookish book schema",
     "type": "object",

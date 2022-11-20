@@ -63,7 +63,38 @@
 {#if loaded === false }
     <Loading/>
 {:else}
-    <div class={"bookish-page" + (loaded ? " bookish-page-loaded": "")}>
+    <div class={"bookish-page" + (loaded ? " loaded": "")}>
         <slot></slot>
     </div>
 {/if}
+
+<style>
+	/* A page, such as table of contents, chapter, or references */
+	.bookish-page {
+		max-width: 720px;
+
+		/* This helps marginals relative to the page */
+		position: relative;
+
+		/* To make room for navigation footer. Without this, the page is too short to show it. */
+		padding-left: var(--bookish-block-padding);
+		padding-right: var(--bookish-block-padding);
+		padding-bottom: 5em;
+
+		/* Center the application in the viewport */
+		margin-top: 0;
+		margin-left: auto;
+		margin-right: auto;
+
+		/* Hidden by default until tagged as loaded */
+		opacity: 0;
+		transition: opacity 0.25s ease-in;
+
+		z-index: 1;
+	}
+
+	.loaded {
+		opacity: 1;
+	}
+
+</style>

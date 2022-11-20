@@ -57,3 +57,127 @@
 >
     <slot name="content"></slot>
 </span>
+
+<style>
+	/* Mobile */
+	@media screen and (max-width: 1200px) {
+
+		/* Fixed position for small screens. */
+		.bookish-marginal {
+			background-color: var(--bookish-background-color);
+			padding: 0.75em;
+			position: fixed;
+			width: auto;
+			height: auto;
+			left: 0;
+			right: 0;
+			bottom: 0;
+			z-index: 2;
+			cursor: pointer;
+			transform: translateY(0);
+			transition: transform 0.2s ease-in;
+		}
+
+		/* Handle nested marginals by just not showing them. */
+		.bookish-marginal :global(.bookish-marginal) {
+			display: none;
+		}
+
+		.bookish-marginal-interactor {
+			cursor: pointer;
+		}
+
+		.bookish-marginal-interactor:hover {
+			font-weight: bold;
+		}
+
+		:global(.bookish-definition) .bookish-marginal-interactor:hover {
+			font-weight: normal;
+		}
+
+		.bookish-definition:hover {
+			border-bottom-color: var(--bookish-border-color-bold) !important;
+		}
+
+		.bookish-marginal-hidden {
+			transform: translateY(100%);
+			transition: transform 0.2s ease-out;
+			height: 0;
+			bottom: 0;
+		}
+
+	}
+
+	/* Desktop */
+	@media screen and (min-width: 1200px) {
+
+		.bookish-marginal-left-inset {
+			float: left;
+			clear: both;
+			width: 75%;
+			margin-left: -30% !important;
+			margin-right: 2em;
+		}
+
+		.bookish-marginal-right-inset {
+			float: right;
+			clear: both;
+			width: 75%;
+			margin-right: -30% !important;
+			margin-left: 2em;
+		}
+
+		/* On larger screens, put marginal right things in the right margin. */
+		.bookish-marginal {
+			float: right;
+			width: 12rem;
+			display: block;
+			padding-bottom: 0.5rem;
+			position: absolute;
+		}
+
+		:global(.bookish-definition) .bookish-marginal-interactor.bookish-marginal-hovered {
+			border-bottom-color: var(--bookish-link-color) !important;
+			border-bottom-width: 3px;
+		}
+
+		:global(.bookish-definition .bookish-marginal.bookish-marginal-hovered .bookish-definition-entry) {
+			background: linear-gradient(to right, var(--bookish-link-color) 0px, var(--bookish-link-color) 3px, transparent 3px) no-repeat right;
+		}
+
+	}
+
+	/* A little circle around the citation and footer symbols, when hovered on a device that supports hovering. */
+	@media (hover: hover) {
+		.bookish-marginal-interactor.bookish-marginal-hovered :global(.bookish-citation-symbol:before),
+		.bookish-marginal-interactor.bookish-marginal-hovered :global(.bookish-footnote-symbol:before),
+		.bookish-marginal-interactor.bookish-marginal-hovered :global(.bookish-comment-symbol:before)
+		{
+			opacity: 0.3;
+		}
+	}
+
+	/* A little circle around the citation and footer symbols, when hovered */
+	.bookish-marginal-interactor.bookish-marginal-selected :global(.bookish-citation-symbol:before),
+	.bookish-marginal-interactor.bookish-marginal-selected :global(.bookish-footnote-symbol:before),
+	.bookish-marginal-interactor.bookish-marginal-selected :global(.bookish-comment-symbol:before) {
+		opacity: 0.7;
+	}
+
+	.bookish-marginal-interactor :global(.bookish-citation-symbol:before),
+	.bookish-marginal-interactor :global(.bookish-footnote-symbol:before),
+	.bookish-marginal-interactor :global(.bookish-comment-symbol:before) {
+		content: "";
+		width: 3em;
+		height: 3em;
+		top: -1em;
+		left: calc(-1.5em + 50%); /* Centered plus half of the span width */
+		border-radius: 3em;
+		position: absolute;
+		z-index: -1;
+		opacity: 0.0;
+		background-color: var(--bookish-highlight-color);
+		transition: opacity .2s;
+	}
+
+</style>

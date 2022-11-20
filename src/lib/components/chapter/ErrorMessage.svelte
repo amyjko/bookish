@@ -1,8 +1,9 @@
 <script lang="ts">
     import type ErrorNode from "$lib/models/chapter/ErrorNode"
+    import Problem from "./Problem.svelte";
 
     export let node: ErrorNode;
 
 </script>
 
-<span class="bookish-error" data-nodeid={node.nodeID}>Error: {node.getError()}</span>
+<Problem data-nodeid={node.nodeID}>Error: {node.getError()}</Problem>

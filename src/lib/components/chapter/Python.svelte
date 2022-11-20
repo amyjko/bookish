@@ -97,3 +97,38 @@
         </div>
     </div>
 </div>
+
+<style>
+
+    .bookish-python-controls {
+        display: flex;
+        flex-direction: row;
+        align-items: stretch;
+        width: 100%;
+    }
+
+    .bookish-python button {
+        background: var(--bookish-block-background-color);
+        border: 1px solid var(--bookish-border-color-light);
+        width: 3em;
+        height: 3rem;
+        padding: 0;
+        display: inline-block;
+        vertical-align: top;
+    }
+
+    .bookish-python .bookish-python-output {
+        flex: 1;
+        border: 1px solid lightGray;
+        padding: 0.5rem;
+        height: 3rem;
+        overflow-y: scroll;
+        display: inline-block;
+        vertical-align: top;
+        color: var(--bookish-paragraph-color);
+        font-family: var(--bookish-code-font-family);
+        font-weight: var(--bookish-code-font-weight);
+        font-size: var(--bookish-block-font-size);
+    }
+
+</style>

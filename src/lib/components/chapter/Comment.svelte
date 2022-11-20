@@ -50,4 +50,8 @@
         outline: 2px solid var(--bookish-highlight-color);
     }
 
+    .bookish-comment-symbol {
+        position: relative;
+    }
+
 </style>

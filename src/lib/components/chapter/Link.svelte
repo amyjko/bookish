@@ -2,6 +2,7 @@
     import type LinkNode from "$lib/models/chapter/LinkNode";
     import { getBase, getEdition, isEditable } from "../page/Contexts";
     import Text from './Text.svelte'
+    import Problem from "./Problem.svelte";
 
     export let node: LinkNode;
 
@@ -36,7 +37,7 @@
     <span class="bookish-editor-link"><Text node={content} /></span>
 <!-- If this is an invalid chapter link, say so -->
 {:else if isInvalidChapterLink()}
-    <span class="bookish-error">Unknown chapter name reference '{url}'</span>
+    <Problem>Unknown chapter name reference '{url}'</Problem>
 <!-- If this is external link, make an anchor that opens a new window. -->
 {:else if url.startsWith("http")}
     <a href={url} target="_blank" rel="noreferrer"><Text node={content} /></a>

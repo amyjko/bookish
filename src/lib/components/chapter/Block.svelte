@@ -19,6 +19,7 @@
     import Quote from "./Quote.svelte";
     import Rule from "./Rule.svelte";
     import Table from "./Table.svelte";
+    import Problem from "./Problem.svelte";
 
     export let node: BlockNode;
 
@@ -33,5 +34,5 @@
 {:else if node instanceof ErrorNode}<ErrorMessage {node} />
 {:else if node instanceof RuleNode}<Rule {node} />
 {:else if node instanceof TableNode}<Table {node} />
-{:else}<p class="bookish-error">Unknown node type</p>
+{:else}<p><Problem>Unknown node type</Problem></p>
 {/if}
