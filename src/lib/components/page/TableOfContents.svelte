@@ -64,11 +64,6 @@
 
 </script>
 
-<svelte:head>
-    <title>{$edition.getTitle()}</title>
-    <meta name="description" content={$edition.getTitle()}>
-</svelte:head>
-
 <Page title={$edition.getTitle()}>
     <Header 
         label="Book title"
