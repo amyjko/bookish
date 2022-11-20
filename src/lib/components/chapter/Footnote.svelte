@@ -44,16 +44,13 @@
     }
 
     .bookish-footnote {
-        font-family: "Epilogue";
-        font-weight: 300;
-        font-size: var(--bookish-small-font-size);
-        line-height: 1.5em;
-    }
-
-    .bookish-footnote {
+        font-family: var(--bookish-paragraph-font-family);
         font-size: var(--bookish-small-font-size);
         font-style: normal;
         color: var(--bookish-paragraph-color);
+        font-weight: 300;
+        font-size: var(--bookish-small-font-size);
+        line-height: 1.5em;
     }
 
     .bookish-footnote-symbol, .bookish-citation-symbol {
