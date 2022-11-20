@@ -493,7 +493,8 @@ export const CriticalTheme: Theme = {
     imports: [
         'https://fonts.googleapis.com/css2?family=Arvo:ital,wght@0,400;0,700;1,400;1,700&display=block',
         'https://fonts.googleapis.com/css2?family=DM+Mono&display=block',
-        'https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@500&display=block'
+        'https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@500&display=block',
+        'https://fonts.googleapis.com/css2?family=Bitter:ital,wght@0,400;0,700;1,400;1,700&display=swap'
     ],    
     
     // Background colors
@@ -538,7 +539,7 @@ export const CriticalTheme: Theme = {
     
     // Fonts
     fonts: {
-        paragraphFontFamily: '"Modum", serif',
+        paragraphFontFamily: '"Bitter", serif',
         headerFontFamily: '"Arvo", serif',
         codeFontFamily: '"DM Mono", monospace',
         bulletFontFamily: '"M Plus Rounded 1c", serif'
@@ -561,9 +562,9 @@ export const CriticalTheme: Theme = {
         headerFontWeight: "700",
         paragraphFontWeight: "400",
         boldFontWeight: "700",
-        linkFontWeight: "400",
+        linkFontWeight: "700",
         codeFontWeight: "400",
-        bulletFontWeight: "500"
+        bulletFontWeight: "400"
     },
     
     // Spacing
