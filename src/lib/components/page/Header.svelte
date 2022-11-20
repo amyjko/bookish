@@ -20,7 +20,6 @@
 	export let save: ((text: string) => Promise<void> | undefined) | null = null;
 
 	let title: HTMLHeadingElement | null = null;
-	let reminder: HTMLDivElement | null = null;
     let showReminder: boolean = true;
 
     let edition = getEdition();
