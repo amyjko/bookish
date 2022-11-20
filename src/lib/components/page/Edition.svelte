@@ -100,33 +100,74 @@
 
         // If the theme is being unset, make sure we've removed any overrding style declaration.
         // This let's the default theme kick in.
-        document.getElementById("bookish-theme")?.remove();
+        let themeTagImports = document.getElementById("bookish-theme-imports");
+        let themeTagCSS = document.getElementById("bookish-theme");
 
-        // Bail if there's no theme to set.
-        if(theme === null)
-            return;
+        // We only want to set it if it's actually different than what's currently set.
+        // Otherwise during editing we get lots of jittery changes on each edit, because the
+        // whole edition is rerendering. To check this, we set a data attribute on the style tag containing
+        // a stringify of the theme set. We do this separately for the imports, since they can have more
+        // major changes than the spacing and color sizes, changing fonts especially.
+        const themeTagCSSValue = themeTagCSS?.dataset.css;
+        const themeTagImportsValue = themeTagImports?.dataset.imports;
+        const newThemeTagCSSValue = JSON.stringify(theme);
+        const newThemeTagImportsValue = JSON.stringify(theme?.imports);
 
-        // If it's being set, create a new style tag.
-        const themeTag = document.createElement("style");
+        if(theme !== null) {
+            // If the imports changed, update theme.
+            if(themeTagImportsValue !== newThemeTagImportsValue) {
+                // If it's being set, create a new style tag.
+                const newThemeImportsTag = document.createElement("style");
 
-        // Give it an ID so we can remove it later.
-        themeTag.setAttribute("id", "bookish-theme");
+                // Give it an ID so we can remove it later.
+                newThemeImportsTag.setAttribute("id", "bookish-theme-imports");
+                newThemeImportsTag.dataset.imports = newThemeTagImportsValue;
 
-        // Insert any import statements, then any rules.
-        const css = `
-            ${(theme.imports ?? []).map(url => `@import url(${url});`).join("\n")}
-            :root {
-                ${theme.light ? toRules(theme.light) : ""}
-                ${theme.fonts ? toRules(theme.fonts) : ""}
-                ${theme.sizes ? toRules(theme.sizes) : ""}
-                ${theme.weights ? toRules(theme.weights) : ""}
-                ${theme.spacing ? toRules(theme.spacing) : ""}
+                // Insert any import statements, then any rules.
+                const css = `${(theme.imports ?? []).map(url => `@import url(${url});`).join("\n")}`;
+                newThemeImportsTag.appendChild(document.createTextNode(css));
+                document.head.appendChild(newThemeImportsTag);
+
+                // Remove the old tag
+                themeTagImports?.remove();
             }
-            .bookish-dark {
-                ${theme.dark ? toRules(theme.dark) : ""}
-            }`;
-        themeTag.appendChild(document.createTextNode(css));
-        document.head.appendChild(themeTag);
+
+            // If the rules changed, update them.
+            if(themeTagCSSValue !== newThemeTagCSSValue) {
+
+                // If it's being set, create a new style tag.
+                const newThemeCSSTag = document.createElement("style");
+
+                // Give it an ID so we can remove it later.
+                newThemeCSSTag.setAttribute("id", "bookish-theme");
+                newThemeCSSTag.dataset.css = newThemeTagCSSValue;
+
+                // Insert any import statements, then any rules.
+                const css = `
+                    ${(theme.imports ?? []).map(url => `@import url(${url});`).join("\n")}
+                    :root {
+                        ${theme.light ? toRules(theme.light) : ""}
+                        ${theme.fonts ? toRules(theme.fonts) : ""}
+                        ${theme.sizes ? toRules(theme.sizes) : ""}
+                        ${theme.weights ? toRules(theme.weights) : ""}
+                        ${theme.spacing ? toRules(theme.spacing) : ""}
+                    }
+                    .bookish-dark {
+                        ${theme.dark ? toRules(theme.dark) : ""}
+                    }`
+                ;
+                newThemeCSSTag.appendChild(document.createTextNode(css));
+                document.head.appendChild(newThemeCSSTag);
+
+                // Remove the old tag
+                themeTagCSS?.remove();
+
+            }
+        } else {
+            // Remove the old tags, unsetting the theme.
+            themeTagImports?.remove();
+            themeTagCSS?.remove();
+        }
 
     }
 
