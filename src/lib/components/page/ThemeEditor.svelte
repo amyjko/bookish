@@ -2,7 +2,7 @@
     import Header from "./Header.svelte";
     import Outline from './Outline.svelte';
     import Page from './Page.svelte';
-    import { defaultTheme } from '$lib/models/book/Theme'
+    import { BookishTheme, CriticalTheme, HumanTheme, SeriousTheme, SketchyTheme, TechTheme } from '$lib/models/book/Theme'
     import ConfirmButton from '$lib/components/editor/ConfirmButton.svelte'
     import Instructions from './Instructions.svelte'
     import ThemeSetEditor from './ThemeSetEditor.svelte'
@@ -10,6 +10,16 @@
     import External from "../External.svelte";
     import { getEdition } from "./Contexts";
     import TextEditor from "../editor/TextEditor.svelte";
+    import type Theme from "$lib/models/book/Theme";
+
+    const themes: Record<string,Theme> = {
+        Bookish: BookishTheme,
+        Serious: SeriousTheme,
+        Tech: TechTheme,
+        Human: HumanTheme,
+        Sketchy: SketchyTheme,
+        Critical: CriticalTheme,
+    };
 
     let edition = getEdition();
     $: theme = $edition.getTheme();
@@ -43,8 +53,12 @@
         To use it, you'll need to know a bit about how to format CSS <External to="https://developer.mozilla.org/en-US/docs/Web/CSS/color">colors</External>, <External to="https://developer.mozilla.org/en-US/docs/Web/CSS/font-size">fonts</External>, and <External to="https://developer.mozilla.org/en-US/docs/Learn/CSS/Building_blocks/Values_and_units">sizes</External>.
     </Instructions>
 
-    {#if theme === null }
-        <button on:click={() => $edition.setTheme(defaultTheme)}>Customize</button>
+    {#each Object.entries(themes) as [ name, option ] }
+        <button on:click={() => $edition.setTheme(option)} disabled={theme === option}>{name}</button>
+    {/each}
+    <!-- If it's not one of the  -->
+    {#if theme === null || Object.values(themes).includes(theme)}
+        <button on:click={() => $edition.setTheme({ ...(theme === null ? BookishTheme : theme ) })}>Customize</button>        
     {:else}
         <ConfirmButton
             commandLabel="Revert to default"
@@ -52,12 +66,12 @@
             command={() => $edition.setTheme(null)}
         />
         <ThemeEditorPreview theme={theme}/>
-        <ThemeSetEditor header={"Light mode colors"} group="light" properties={theme.light ?? getEmptyGroup(defaultTheme.light)} />
-        <ThemeSetEditor header={"Dark mode colors"} group="dark" properties={theme.dark ?? getEmptyGroup(defaultTheme.dark)} />
-        <ThemeSetEditor header={"Fonts"} group="fonts" properties={theme.fonts ?? getEmptyGroup(defaultTheme.fonts)} />
-        <ThemeSetEditor header={"Font sizes"} group="sizes" properties={theme.sizes ?? getEmptyGroup(defaultTheme.sizes)} />
-        <ThemeSetEditor header={"Font weights"} group="weights" properties={theme.weights ?? getEmptyGroup(defaultTheme.weights)} />
-        <ThemeSetEditor header={"Spacing"} group="spacing" properties={theme.spacing ?? getEmptyGroup(defaultTheme.spacing)} />
+        <ThemeSetEditor header={"Light mode colors"} group="light" properties={theme.light ?? getEmptyGroup(BookishTheme.light)} />
+        <ThemeSetEditor header={"Dark mode colors"} group="dark" properties={theme.dark ?? getEmptyGroup(BookishTheme.dark)} />
+        <ThemeSetEditor header={"Fonts"} group="fonts" properties={theme.fonts ?? getEmptyGroup(BookishTheme.fonts)} />
+        <ThemeSetEditor header={"Font sizes"} group="sizes" properties={theme.sizes ?? getEmptyGroup(BookishTheme.sizes)} />
+        <ThemeSetEditor header={"Font weights"} group="weights" properties={theme.weights ?? getEmptyGroup(BookishTheme.weights)} />
+        <ThemeSetEditor header={"Spacing"} group="spacing" properties={theme.spacing ?? getEmptyGroup(BookishTheme.spacing)} />
 
         <div class="bookish-table">
             <table >
