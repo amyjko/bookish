@@ -100,6 +100,9 @@ export const Schema = {
                 "additionalProperties": false,
                 "required": ["phrase", "definition"]
             }
+        },
+        "theme": {
+            "type": "object"
         }
     }
 }
