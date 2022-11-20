@@ -16,6 +16,7 @@
     import TextEditor from "$lib/components/editor/TextEditor.svelte";
     import Toggle from "$lib/components/editor/Toggle.svelte";
     import { getBase, getEdition, isEditable } from "./Contexts";
+    import Muted from "./Muted.svelte";
 
     let edition = getEdition();
 	let base = getBase();
@@ -145,13 +146,15 @@
                             {/if}
                         </span>
                         <span slot="etc">
-                            {#if editable}
-                                <Toggle on={chapter.isForthcoming()} save={on => chapter.setForthcoming(on)}>
-                                    {etc}
-                                </Toggle>
-                            {:else}
-                                { etc }
-                            {/if}
+                            <Muted>
+                                {#if editable}
+                                    <Toggle on={chapter.isForthcoming()} save={on => chapter.setForthcoming(on)}>
+                                        {etc}
+                                    </Toggle>
+                                {:else}
+                                    { etc }
+                                {/if}
+                            </Muted>
                         </span>
                     </TableOfContentsRow>
                 {/each}
