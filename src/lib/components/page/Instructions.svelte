@@ -15,7 +15,7 @@
         margin-bottom: var(--bookish-app-margin);
         line-height: 1.2;
         padding: var(--bookish-app-margin);
-        border: 2px solid var(--bookish-app-chrome-border-color);
+        border: 1px solid var(--bookish-app-chrome-border-color);
         border-radius: var(--bookish-roundedness);
     }
 
