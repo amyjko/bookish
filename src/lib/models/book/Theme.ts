@@ -1,6 +1,8 @@
 import type ThemeColors from "./ThemeColors";
 
 type Theme = {
+    // A list of URLs to CSS files (for including @font-face declarations other other custom style).
+    imports?: string[];
     // Background colors
     light?: ThemeColors,
     dark?: ThemeColors,

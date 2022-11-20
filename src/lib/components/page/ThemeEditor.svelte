@@ -9,9 +9,17 @@
     import ThemeEditorPreview from './ThemeEditorPreview.svelte'
     import External from "../External.svelte";
     import { getEdition } from "./Contexts";
+    import TextEditor from "../editor/TextEditor.svelte";
 
     let edition = getEdition();
     $: theme = $edition.getTheme();
+
+    function getEmptyGroup(group: Record<string,string>) {
+        const empty: Record<string, string> = {};
+        for(const key in Object.keys(group))
+            empty[key] = "";
+        return empty;
+    }
 
 </script>
 
@@ -44,12 +52,57 @@
             command={() => $edition.setTheme(null)}
         />
         <ThemeEditorPreview theme={theme}/>
-        <ThemeSetEditor header={"Light mode colors"} group="light" theme={theme} />
-        <ThemeSetEditor header={"Dark mode colors"} group="dark" theme={theme} />
-        <ThemeSetEditor header={"Fonts"} group="fonts" theme={theme} />
-        <ThemeSetEditor header={"Font sizes"} group="sizes" theme={theme} />
-        <ThemeSetEditor header={"Font weights"} group="weights" theme={theme} />
-        <ThemeSetEditor header={"Spacing"} group="spacing" theme={theme} />
+        <ThemeSetEditor header={"Light mode colors"} group="light" properties={theme.light ?? getEmptyGroup(defaultTheme.light)} />
+        <ThemeSetEditor header={"Dark mode colors"} group="dark" properties={theme.dark ?? getEmptyGroup(defaultTheme.dark)} />
+        <ThemeSetEditor header={"Fonts"} group="fonts" properties={theme.fonts ?? getEmptyGroup(defaultTheme.fonts)} />
+        <ThemeSetEditor header={"Font sizes"} group="sizes" properties={theme.sizes ?? getEmptyGroup(defaultTheme.sizes)} />
+        <ThemeSetEditor header={"Font weights"} group="weights" properties={theme.weights ?? getEmptyGroup(defaultTheme.weights)} />
+        <ThemeSetEditor header={"Spacing"} group="spacing" properties={theme.spacing ?? getEmptyGroup(defaultTheme.spacing)} />
+
+        <div class="bookish-table">
+            <table >
+                <tbody>
+                    <tr>
+                        <td>
+                            <em>Add URLs to your own CSS to customize fonts and styles further.</em>
+                        </td>
+                        <td style='text-align:right;'>
+                            <button on:click={() => {
+                                if(theme === null) return;
+                                if(theme.imports === undefined)
+                                    theme.imports = [];
+                                theme.imports.push("");
+                                $edition.setTheme(theme);
+                            }}>+</button>
+                        </td>
+                    </tr>
+                    {#each theme.imports ?? [] as url, index}
+                        <tr>
+                            <td>
+                                <TextEditor 
+                                    startText={url} 
+                                    label={`CSS url`}
+                                    placeholder={"CSS url"}
+                                    valid={ () => undefined }
+                                    save={text => {
+                                        const newTheme = { ... theme };
+                                        if(newTheme.imports === undefined) newTheme.imports = [];
+                                        newTheme.imports[index] = text;
+                                        $edition.setTheme(theme);
+                                    }}
+                                />
+                            </td>
+                            <td style="text-align: right">
+                                <button on:click={() => {
+                                    theme?.imports?.splice(index, 1);
+                                    $edition.setTheme(theme);
+                                }}>–</button>
+                            </td>
+                        </tr>
+                    {/each}
+                </tbody>
+            </table>
+        </div>
     {/if}
 
 </Page>

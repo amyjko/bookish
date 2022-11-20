@@ -4,9 +4,7 @@
 
     export let header: string;
     export let group: string;
-    export let theme: Record<string, Record<string,string>>;
-
-    $: set = theme[group];
+    export let properties: Record<string,string>;
 
 </script>
 
@@ -14,8 +12,8 @@
 <div class="bookish-table">
     <table>
         <tbody>
-        {#each Object.keys(set).sort() as name }
-            <ThemeVariableEditor group={group} name={name} value={set[name]} />
+        {#each Object.keys(properties).sort() as property }
+            <ThemeVariableEditor group={group} name={property} value={properties[property]} />
         {/each}
         </tbody>
     </table>

@@ -95,21 +95,27 @@
     // Set the theme, whatever it is, and change it when the edition changes.
     $: setTheme($currentEdition.getTheme());
     
+    /** Given a theme, sets the appropriate CSS rules in the browser to apply the theme.*/
     function setTheme(theme: Theme | null) {
-
-        // Remove any existing theme.
-        document.getElementById("bookish-theme")?.remove();
 
         // If the theme is being unset, make sure we've removed any overrding style declaration.
         // This let's the default theme kick in.
+        document.getElementById("bookish-theme")?.remove();
+
+        // Bail if there's no theme to set.
         if(theme === null)
             return;
 
         // If it's being set, create a new style tag.
         const themeTag = document.createElement("style");
+
+        // Give it an ID so we can remove it later.
         themeTag.setAttribute("id", "bookish-theme");
 
-        const css = `:root {
+        // Insert any import statements, then any rules.
+        const css = `
+            ${(theme.imports ?? []).map(url => `@import url(${url});`).join("\n")}
+            :root {
                 ${theme.light ? toRules(theme.light) : ""}
                 ${theme.fonts ? toRules(theme.fonts) : ""}
                 ${theme.sizes ? toRules(theme.sizes) : ""}
