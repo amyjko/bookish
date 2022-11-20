@@ -78,14 +78,6 @@
         padding: 0em;
     }
 
-    .bookish-code-language {
-        float: right;
-        margin-top: -3em;
-        font-size: small;
-        color: gray;
-        margin-right: 0.5em;
-    }
-
     /* Default color */
     .hljs,
     .hljs-title,

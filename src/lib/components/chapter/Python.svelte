@@ -86,7 +86,6 @@
 
 <div class="bookish-python" bind:this={ref}>
     <Code inline={false} language={"python"} editable edited={handleEdit} nodeID={node.nodeID}>{code}</Code>
-    <div class="bookish-code-language">{"python"}</div>
     <div class="bookish-python-controls">
         <button disabled={startCode === code } on:click={reset}>{"\u21BB"}</button>
         <button disabled={!loaded} on:click={start}>{"\u25B6\uFE0E"}</button>

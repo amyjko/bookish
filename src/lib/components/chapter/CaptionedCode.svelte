@@ -29,8 +29,18 @@
         {:else}
             <div>
                 <Code editable={false} inline={false} language={node.getLanguage()} nodeID={node.getCodeNode().nodeID}>{node.getCode()}</Code>
-                {#if node.getLanguage() !== "plaintext"}<div class="bookish-code-language">{node.getLanguage()}</div>{/if}
             </div>
         {/if}
     {/if}
+    {#if node.getLanguage() !== "plaintext"}<div class="bookish-code-language">{node.getLanguage()}</div>{/if}
 </Figure>
+
+<style>
+    .bookish-code-language {
+        float: right;
+        margin-top: -3em;
+        font-size: small;
+        color: gray;
+        margin-right: 0.5em;
+    }
+</style>
