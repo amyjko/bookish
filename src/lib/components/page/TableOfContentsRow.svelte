@@ -24,7 +24,7 @@
 </script>
 
 <tr class={forthcoming ? "bookish-forthcoming" : ""}>
-    <td><TableOfContentsImage embed={$edition.getImage(chapterID)} /></td>
+    <td><TableOfContentsImage embed={chapter ? chapter.getImage() : $edition.getImage(chapterID)} /></td>
     <td>
         {#if editable && chapter}
             <Toggle on={number !== undefined} save={ on => chapter && chapter.setNumbered(on) }>
