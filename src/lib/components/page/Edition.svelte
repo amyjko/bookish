@@ -135,7 +135,9 @@
 
 <div class="bookish {$darkMode ? " bookish-dark" : ""}">
     <slot></slot>
-    <Status book={edition.getBook()} edition={edition}/>
+    {#if editable}
+        <Status book={edition.getBook()} edition={edition}/>
+    {/if}
 </div>
 
 <style global>
