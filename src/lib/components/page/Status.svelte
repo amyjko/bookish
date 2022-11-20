@@ -55,4 +55,12 @@
     .bookish-editor-status-saving {
         animation: waiting 100ms infinite;
     }
+
+    @keyframes waiting {
+        from, to { transform: scale(1, 1); }
+        25% { transform: scale(1, 1.2); }
+        50% { transform: scale(1, 1.0); }
+        75% { transform: scale(1, 1.1); }
+    }
+
 </style>

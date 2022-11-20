@@ -23,6 +23,42 @@
 {/if}
 
 <style>
+
+    /* Custom fonts for app */
+    @import url('https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,600;1,400&family=Kite+One&display=swap');
+
+    :global(:root) {
+
+        /* Bookish app theme customizations */
+        --bookish-paragraph-font-family: "EB Garamond", serif;
+        --bookish-header-font-family: "Kite One", serif;
+        --bookish-bullet-font-family: "Verdana";
+
+        /* Define some UI defaults not used in the Bookish theme. */
+        --bookish-app-background: white;
+        --bookish-app-chrome-background: rgb(244, 244, 244);
+        --bookish-app-chrome-color: black;
+        --bookish-app-chrome-border-color: #d5d5d5;
+        --bookish-app-chrome-hover-background: #E8AF22;
+        --bookish-app-chrome-hover-color: #FFFFFF;
+        --bookish-app-chrome-muted: #AAAAAA;
+        --bookish-app-chrome-font-family: "Verdana";
+        --bookish-app-highlight-width: 3px;
+
+        --bookish-app-error-background: rgb(255, 231, 231);
+        --bookish-app-error-color: rgb(191, 15, 15);
+        --bookish-app-error-font-weight: 400;
+
+        --bookish-app-chrome-padding: 0.5em;
+        --bookish-app-chrome-border-width: 1px;
+        --bookish-app-chrome-roundedness: 2px;
+        --bookish-app-chrome-font-size: 11pt;
+        --bookish-app-chrome-spacing: 0.5em;
+        --bookish-app-chrome-line-height: 1.5em;
+
+        --bookish-app-margin: 1em;
+
+    }    
     .bookish-app {
         text-align: center;
         font-weight: var(--bookish-paragraph-font-weight);
@@ -88,5 +124,22 @@
 
     :global(.bookish-file-upload input[type="file"]) {
         display: none;
+    }
+
+    :global(.firebase-emulator-warning) {
+        opacity: 0.05;
+        pointer-events: none;
+    }
+
+    @keyframes -global-failure {
+        0% {
+            transform: translate(-2px, 0px);
+        }
+        50% {
+            transform: translate(0px, 0px);
+        }
+        100% {
+            transform: translate(2px, 0px);
+        }
     }
 </style>
