@@ -98,6 +98,13 @@
         text-align: left;
     }
 
+    .bookish-citation-symbol {
+        font-family: var(--bookish-paragraph-font-family);
+        font-weight: normal;
+        color: var(--bookish-link-color);
+        position: relative;
+    }
+
     .bookish-reference .bookish-citation-symbol {
         display: block;
         float: left;

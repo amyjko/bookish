@@ -53,7 +53,7 @@
         line-height: 1.5em;
     }
 
-    .bookish-footnote-symbol, .bookish-citation-symbol {
+    .bookish-footnote-symbol {
         font-family: var(--bookish-paragraph-font-family);
         font-weight: normal;
         color: var(--bookish-link-color);
