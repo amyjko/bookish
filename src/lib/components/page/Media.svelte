@@ -62,7 +62,7 @@
             url={embed.getSmallURL()} 
             alt={embed.getDescription()}
         >
-            <span>{editable ? (images && images.find(i => i.url === embed.getURL()) === undefined) ? "linked" : "uploaded" : null }{embed.getCredit().isEmptyText() ? null : " • "}<Format node={embed.getCredit()}/></span>
+            <span>{#if editable}{images && images.find(i => i.url === embed.getURL()) === undefined ? "linked" : "uploaded"}{embed.getCredit().isEmptyText() ? "" : " • "}{/if}<Format node={embed.getCredit()}/></span>
         </MediaPreview>
     {/each}
     {#if editable !== undefined && unused !== undefined && unused.length > 0 }

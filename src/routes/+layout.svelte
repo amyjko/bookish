@@ -64,7 +64,6 @@
         font-weight: var(--bookish-paragraph-font-weight);
         font-family: var(--bookish-paragraph-font-family);
         font-size: var(--bookish-paragraph-font-size);
-        line-height: var(--bookish-paragraph-line-height);
     }
 
     :global(input, button) {

@@ -23,4 +23,12 @@
         width: 100%;
         height: auto;
     }
+
+    .bookish-figure-credit {
+        display: block;
+        text-align: right;
+        font-style: italic;
+        font-size: var(--bookish-small-font-size);
+    }
+
 </style>

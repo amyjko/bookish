@@ -20,7 +20,12 @@
     <svelte:element this={`h${level + 1}`} class={classes} id={id} data-nodeid={node.nodeID}><Format node={node.getFormat()} /></svelte:element>
 {/if}
 
-<style>
+<style> 
+    p {
+        line-height: var(--bookish-paragraph-line-height);
+    }
 
-
+    h1, h2, h3 {
+        line-height: var(--bookish-header-line-height);
+    }
 </style>

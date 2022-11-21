@@ -284,7 +284,6 @@
         font-weight: var(--bookish-paragraph-font-weight);
         font-family: var(--bookish-paragraph-font-family);
         font-size: var(--bookish-paragraph-font-size);
-        line-height: var(--bookish-paragraph-line-height);
         background-color: var(--bookish-background-color);
         color: var(--bookish-paragraph-color);
         width: 100%;
