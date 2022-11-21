@@ -3,7 +3,6 @@
     import Outline from './Outline.svelte';
     import Page from './Page.svelte';
     import Parser from "$lib/models/chapter/Parser";
-    import ConfirmButton from '$lib/components/editor/ConfirmButton.svelte';
     import ChapterIDs from '$lib/models/book/ChapterID';
     import BulkReferenceEditor from "./BulkReferenceEditor.svelte"
     import PossibleReference from "./PossibleReference.svelte";

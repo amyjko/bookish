@@ -51,8 +51,6 @@
     </span>
 {:else if !editable || !editing }
 <!-- If not editable, just render the reference. -->
-
-    <!-- If editable, place in rows to make room for text editors to not have to wrap. -->
     <span 
         data-nodeid={node.nodeID} 
         class="bookish-reference-text"
@@ -70,7 +68,6 @@
             command={() => $edition.removeReference(node.citationID)}
         />
     {/if}
-
 {:else}
     <!-- If editable, place in rows to make room for text editors to not have to wrap. -->
     <table class="bookish-table" bind:this={reference}>
@@ -178,7 +175,7 @@
                     >
                         done
                     </button>
-                <td>
+                </td>
         </tbody>
     </table>
 {/if}
