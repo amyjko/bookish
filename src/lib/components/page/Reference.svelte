@@ -80,9 +80,8 @@
             {/if}
         {/if}
         <!-- Year -->
-        ({#if editable && editing }
-            <br/>
-            <TextEditor
+        {#if editable && editing }
+            <br/><TextEditor
                     startText={node.year} 
                     label={'Year editor.'} 
                     placeholder="Year"
@@ -93,8 +92,8 @@
                     save={text => $edition.editReference(node.withYear(text))}
                 />
             {:else}
-                {#if node.year }{node.year}{:else}<em>Year</em>{/if}
-            {/if}). 
+                {#if node.year }({node.year}){:else}<em>Year</em>{/if}.
+            {/if}
         <!-- Title -->
         {#if editable && editing }
             <br/><TextEditor
