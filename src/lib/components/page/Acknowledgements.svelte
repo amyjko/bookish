@@ -14,8 +14,6 @@
 
 </script>
 
-<h2 class="bookish-header" id="acknowledgements">Acknowledgements</h2>
-
 <Instructions>
     This section is not shown if empty.
     But surely you have someone to thank!
