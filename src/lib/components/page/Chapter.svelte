@@ -303,8 +303,7 @@
                 remove={index => chapter.removeAuthor(index)}
             />
         </Header>
-        <!-- We load this on the page but hide it; it's used as a filter for highlighing in CSS -->
-        <img src={"/svg/marker.svg"} alt="highlight mark" style="display: none"/>
+
         <Instructions>
             Edit your chapter's title, authors, and cover image above.
             You can also change the ID of the chapter, which appears in it's URL.
