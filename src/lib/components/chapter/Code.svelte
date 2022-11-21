@@ -1,6 +1,7 @@
 <script lang="ts">
-    import { afterUpdate } from 'svelte';
-    import Prism from "prismjs";
+    import { afterUpdate } from 'svelte'
+    import Prism from "./ExtendedPrism";
+
     export let editable: boolean;
     export let inline: boolean;
     export let nodeID: number | undefined;
