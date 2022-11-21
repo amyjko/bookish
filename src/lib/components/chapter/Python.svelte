@@ -54,7 +54,7 @@
     function handleOutput(out: string) {
 
         // Update the state to re-render.
-        output = out;
+        output += out;
     }
 
     function start() {
