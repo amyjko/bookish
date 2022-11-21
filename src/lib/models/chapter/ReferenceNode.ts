@@ -34,12 +34,7 @@ export default class ReferenceNode extends Node {
     toText() { return this.authors + " "  + this.year + " " + this.title + " " + this.source + (this.summary ? this.summary : ""); }
     toBookdown(): string { return ""; }
     toHTML() { return ""; }
-    toList() { 
-        const list = [ this.authors, this.year, this.title, this.source ];
-        if(this.url) list.push(this.url);
-        if(this.summary) list.push(this.summary);
-        return list;
-    }
+    toList() { return [ this.authors, this.year, this.title, this.source, this.url, this.summary ]; }
 
     copy() {
         return new ReferenceNode(this.citationID, this.authors, this.year, this.title, this.source, this.url, this.summary, this.short) as this;

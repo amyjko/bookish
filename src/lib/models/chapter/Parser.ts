@@ -113,8 +113,8 @@ export default class Parser {
                 let year = ref[1];
                 let title = ref[2];
                 let source = ref[3];
-                let url = ref.length === 5 ? ref[4] : "";
-                let summary = ref.length === 6 ? ref[5] : "";
+                let url = ref.length >= 5 ? ref[4] : "";
+                let summary = ref.length >= 6 ? ref[5] : "";
 
                 if(source.charAt(0) === "#") {
                     let src = edition.getSource(source)
