@@ -38,7 +38,7 @@
 <style>
     .bookish-code-language {
         float: right;
-        margin-top: -3em;
+        margin-top: 0;
         font-size: small;
         color: gray;
         margin-right: 0.5em;

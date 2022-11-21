@@ -11,14 +11,12 @@
     
     // When the component mounts or updates, highlight the code inside.
     afterUpdate(() => {
-        console.log("Updated");
         if(element) {
             Prism.highlightElement(element)
         }
     });
 
     function handleChange() {
-        console.log("Changed");
         if(element && edited)
             edited(element.innerText);
     }
