@@ -29,19 +29,15 @@
     <Marginal
         id={"glossary-" + glossaryID}
     >
-        <slot name="interactor">
-            <Text node={phrase}/>
-        </slot>
-        <slot name="content">
-            <span class="bookish-definition-entry">
-                {#if entry === undefined }
-                    <Problem>Unknown glossary entry "{ glossaryID }"</Problem>
-                {:else}
-                    <strong class="bookish-definition-entry-phrase">{entry.phrase}</strong>: <Format node={Parser.parseFormat($edition, entry.definition)}/>
-                    {#if entry.synonyms && entry.synonyms.length > 0}<span class="bookish-definition-entry-synonyms"><br/><br/>{entry.synonyms.join(", ")}</span>{/if}
-                {/if}
-            </span>
-        </slot>
+        <Text slot="interactor" node={phrase}/>
+        <span slot="content" class="bookish-definition-entry">
+            {#if entry === undefined }
+                <Problem>Unknown glossary entry "{ glossaryID }"</Problem>
+            {:else}
+                <strong class="bookish-definition-entry-phrase">{entry.phrase}</strong>: <Format node={Parser.parseFormat($edition, entry.definition)}/>
+                {#if entry.synonyms && entry.synonyms.length > 0}<span class="bookish-definition-entry-synonyms"><br/><br/>{entry.synonyms.join(", ")}</span>{/if}
+            {/if}
+        </span>
     </Marginal>
 </span>
 
