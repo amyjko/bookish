@@ -22,7 +22,7 @@
     // For example, when the book is hosted alone, all routes might start with the bare root "/", 
     // but when the book is being viewed or edited in the Bookish app, it needs a prefix for the
     // route in the app.
-    export let base: string = "";
+    export let base: string = "/";
 
     // When the base changes, update the context.
     $: setContext<string>(BASE, base);
