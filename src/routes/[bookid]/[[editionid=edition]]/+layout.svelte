@@ -14,7 +14,7 @@
 {:else if data === null || data.book === undefined}
     <Alert>Unable to load book.</Alert>
 {:else}
-    <Edition edition={data.edition} base={`/${data.book.getSubdomain() ?? data.book.getRefID()}${data.latest ? "" : `/${data.edition.getEditionNumber()}`}`} editable={false}>
+    <Edition edition={data.edition} base={`/${data.book.getSubdomain() ?? data.book.getRefID()}${data.latest ? "" : `/${data.edition.getEditionNumber()}`}/`} editable={false}>
         <slot></slot>
     </Edition>
 {/if}

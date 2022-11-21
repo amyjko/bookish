@@ -15,7 +15,7 @@
     <Alert>Unable to load book.</Alert>
 {:else}
 
-    <Edition edition={data.edition} base={`/write/${data.book.getRefID()}/${data.edition.getEditionNumber()}`} editable={true}>
+    <Edition edition={data.edition} base={`/write/${data.book.getRefID()}/${data.edition.getEditionNumber()}/`} editable={true}>
         <slot></slot>
     </Edition>
 {/if}

@@ -187,11 +187,11 @@
 
         <!-- Book navigation links -->
         <div class="bookish-outline-header-nav">
-            {#if previous !== null}<Link to={base + "/" + previous}>{previousLabel}</Link>{:else}<span class="bookish-outline-header-nav-disabled">{previousLabel}</span>{/if}
+            {#if previous !== null}<Link to={base + previous}>{previousLabel}</Link>{:else}<span class="bookish-outline-header-nav-disabled">{previousLabel}</span>{/if}
             &nbsp;&middot;&nbsp;
-            <Link to={base + "/"}>Home</Link>
+            <Link to={base}>Home</Link>
             &nbsp;&middot;&nbsp;
-            {#if next !== null}<Link to={base + "/" + next}>{nextLabel}</Link>{:else}<span class="bookish-outline-header-nav-disabled">{nextLabel}</span>{/if}
+            {#if next !== null}<Link to={base + next}>{nextLabel}</Link>{:else}<span class="bookish-outline-header-nav-disabled">{nextLabel}</span>{/if}
         </div>
         <!--  Scan through the headers and add a properly formatted link for each. -->
         {#each headers as header, index }

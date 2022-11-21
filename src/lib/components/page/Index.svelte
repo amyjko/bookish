@@ -71,7 +71,7 @@
             {#each "abcdefghijklmnopqrstuvwxyz".split("") as symbol, index}
                 <span style="display: inline-block">
                     {#if symbol in letters && letter !== symbol }
-                        <Link to={base + "/index/" + symbol}>{symbol}</Link>
+                        <Link to={base + "index/" + symbol}>{symbol}</Link>
                     {:else}
                         <span>
                             {#if letter === symbol } 
@@ -109,7 +109,7 @@
                                         }) as chapterID, index }
                                         <!-- Map them to links to the first occurrence in the chapter. -->
                                         <span>
-                                            Chapter {#if $edition.getChapterNumber(chapterID) !== undefined}<span> {$edition.getChapterNumber(chapterID)}. </span>{/if}<Link to={`${base}/${chapterID}?word=${word}`}>{$edition.getChapterName(chapterID)}</Link>
+                                            Chapter {#if $edition.getChapterNumber(chapterID) !== undefined}<span> {$edition.getChapterNumber(chapterID)}. </span>{/if}<Link to={`${base}${chapterID}?word=${word}`}>{$edition.getChapterName(chapterID)}</Link>
                                             {#if index < bookIndex[word].size - 1 }<br/>{/if}
                                         </span>
                                     {/each}
