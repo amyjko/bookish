@@ -40,11 +40,11 @@
         font-family: var(--bookish-code-font-family);
         font-weight: var(--bookish-code-font-weight);
         font-size: var(--bookish-code-font-size);
-        white-space: pre-wrap;	
         border: 1px solid var(--bookish-border-color-light);
         color: var(--bookish-muted-color);
         background-color: var(--bookish-block-background-color);
         clear: both;
+        overflow-x: scroll;
     }
 
     code {
