@@ -18,9 +18,10 @@
 	},
 	"devDependencies": {
 		"@sveltejs/adapter-auto": "next",
-		"@sveltejs/kit": "next",
 		"@sveltejs/adapter-static": "^1.0.0-next.48",
+		"@sveltejs/kit": "next",
 		"@sveltejs/package": "^1.0.0-next.5",
+		"@types/prismjs": "^1.26.0",
 		"@types/smoothscroll-polyfill": "^0.3.1",
 		"@types/uuid": "^8.3.4",
 		"svelte-check": "^2.7.1",
@@ -35,10 +36,10 @@
 		"ajv-formats": "^2.1.1",
 		"firebase": "latest",
 		"firebase-functions": "latest",
-		"highlight.js": "11.1.0",
+		"prismjs": "^1.29.0",
 		"smoothscroll-polyfill": "^0.4.4",
-		"uuid": "^9.0.0",
-		"svelte": "^3.44.0"
+		"svelte": "^3.44.0",
+		"uuid": "^9.0.0"
 	},
 	"types": "./src/lib/index.d.ts"
 }

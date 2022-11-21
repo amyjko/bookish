@@ -1,49 +1,41 @@
 <script lang="ts">
-    import hljs from 'highlight.js';
-    import { onMount } from 'svelte';
-
-    // Suppress unescaped HTML warning, trusting the escaping of the parser.
-    hljs.configure({ ignoreUnescapedHTML: true });
-
+    import { afterUpdate } from 'svelte';
+    import Prism from "prismjs";
     export let editable: boolean;
     export let inline: boolean;
     export let nodeID: number | undefined;
     export let edited: ((text: string) => void) | undefined = undefined;
     export let language: string | undefined = undefined;
 
-    let el: HTMLElement | null = null;
-
-    // Find any code tags inside and highlight them.
-    function highlightCode() {
-        if(el)
-            hljs.highlightElement(el);
-    }
+    let element: HTMLElement | null = null;
     
     // When the component mounts or updates, highlight the code inside.
-    onMount(() => {
-        highlightCode();
+    afterUpdate(() => {
+        console.log("Updated");
+        if(element) {
+            Prism.highlightElement(element)
+        }
     });
 
     function handleChange() {
-        if(el && edited)
-            edited(el.innerText);
+        console.log("Changed");
+        if(element && edited)
+            edited(element.innerText);
     }
-
-    // There's no way to mute highlightjs warnings on missing languages, so we check here.
-    $: lang = language ? (hljs.getLanguage(language) === undefined ? "text" : language) : "plaintext";
 
 </script>
 
 <code 
     data-nodeid={nodeID}
+    bind:this={element}
     contenteditable={editable}
-    class={`bookish-code ${inline ? "bookish-code-inline" : "bookish-code-block"} ${"language-" + lang}`} 
+    class={`bookish-code ${inline ? "bookish-code-inline" : "bookish-code-block"} ${language ? `language-${language}` : ""}`} 
     on:blur={handleChange}
-    bind:this={el}>
+>
         <slot></slot>
 </code>
 
-<style>
+<style global>
     .bookish-code {
         font-family: var(--bookish-code-font-family);
         font-weight: var(--bookish-code-font-weight);
@@ -78,55 +70,100 @@
         padding: 0em;
     }
 
-    /* Default color */
-    .hljs,
-    .hljs-title,
-    .hljs-params,
-    .hljs-section {
-        color: var(--bookish-paragraph-color);
+    /* PrismJS 1.29.0
+    https://prismjs.com/download.html#themes=prism&languages=markup+css+clike+javascript+python */
+    /**
+    * prism.js default theme for JavaScript, CSS and HTML
+    * Based on dabblet (http://dabblet.com)
+    * @author Lea Verou
+    */
+
+    code[class*="language-"] {
+        color: black;
+        background: none;
+        font-family: var(--bookish-code-font-family);
+        font-size: 1em;
+        text-align: left;
+        white-space: pre;
+        word-spacing: normal;
+        word-break: normal;
+        word-wrap: normal;
+        line-height: 1.5;
+
+        -moz-tab-size: 4;
+        -o-tab-size: 4;
+        tab-size: 4;
+
+        -webkit-hyphens: none;
+        -moz-hyphens: none;
+        -ms-hyphens: none;
+        hyphens: none;
     }
 
-    /* Comment */
-    .hljs-comment,
-    .hljs-quote {
+    .token.comment,
+    .token.prolog,
+    .token.doctype,
+    .token.cdata {
         color: var(--bookish-comment-color);
     }
 
-    .hljs-variable,
-    .hljs-template-variable,
-    .hljs-tag,
-    .hljs-name,
-    .hljs-selector-id,
-    .hljs-selector-class,
-    .hljs-regexp,
-    .hljs-deletion {
+    .token.punctuation {
+        color: var(--bookish-muted-color);
+    }
+
+    .token.namespace {
+        opacity: .7;
+    }
+
+    .token.property,
+    .token.tag,
+    .token.boolean,
+    .token.number,
+    .token.constant,
+    .token.symbol,
+    .token.deleted {
         color: var(--bookish-error-color);
     }
 
-    .hljs-number,
-    .hljs-built_in,
-    .hljs-builtin-name,
-    .hljs-literal,
-    .hljs-string,
-    .hljs-symbol,
-    .hljs-meta,
-    .hljs-addition {
+    .token.selector,
+    .token.attr-name,
+    .token.string,
+    .token.char,
+    .token.builtin,
+    .token.inserted {
+        color: var(--bookish-pragraph-color);
+    }
+
+    .token.operator,
+    .token.entity,
+    .token.url {
+        color: var(--bookish-bullet-color);
+    }
+
+    .token.atrule,
+    .token.attr-value,
+    .token.keyword {
         color: var(--bookish-link-color);
     }
 
-    .hljs-type,
-    .hljs-attribute,
-    .hljs-keyword,
-    .hljs-selector-tag {
-    color: var(--bookish-highlight-color);
+    .token.regex,
+    .token.important,
+    .token.variable,
+    .token.function,
+    .token.class-name {
+        color: var(--bookish-highlight-color);
     }
 
-    .hljs-emphasis {
-    font-style: italic;
+    .token.important,
+    .token.bold {
+        font-weight: bold;
+    }
+    .token.italic {
+        font-style: italic;
     }
 
-    .hljs-strong {
-    font-weight: bold;
+    .token.entity {
+        cursor: help;
     }
 
 </style>

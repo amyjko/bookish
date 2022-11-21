@@ -495,7 +495,7 @@ export const CriticalTheme: Theme = {
         'https://fonts.googleapis.com/css2?family=DM+Mono&display=block',
         'https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@500&display=block',
         'https://fonts.googleapis.com/css2?family=Bitter:ital,wght@0,400;0,700;1,400;1,700&display=swap'
-    ],    
+    ],
     
     // Background colors
     light: {
