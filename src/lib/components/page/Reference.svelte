@@ -80,8 +80,9 @@
             {/if}
         {/if}
         <!-- Year -->
-        <br/>({#if editable && editing }
-                <TextEditor
+        ({#if editable && editing }
+            <br/>
+            <TextEditor
                     startText={node.year} 
                     label={'Year editor.'} 
                     placeholder="Year"
@@ -141,26 +142,31 @@
             />
         {:else}
             {#if node.summary}
-                <span class="bookish-reference-summary">{node.summary}</span>
+                <div class="bookish-reference-summary">{node.summary}</div>
             {/if}
         {/if}
         {#if editing }
             <br/><button 
-                on:click|stopPropagation={() => stopEditing()}
-                on:keydown={event => { if(editing && (event.key === "Enter" || event.key === " ")) { stopEditing(); event.stopPropagation(); }}}
-                >done editing</button>
+                    on:click|stopPropagation={() => stopEditing()}
+                    on:keydown={event => { if(editing && (event.key === "Enter" || event.key === " ")) { stopEditing(); event.stopPropagation(); }}}
+                >
+                    done
+                </button>
         {/if}
     </span>
 {/if}
 
 <style>
 
+    .bookish-reference-text {
+        line-height: var(--bookish-paragraph-line-height-tight);
+    }
+
     .bookish-reference-text .bookish-reference-summary {
         font-size: var(--bookish-small-font-size);
-        padding-left: var(--bookish-indent);
-        display: inline-block;
+        padding-left: var(--bookish-block-padding);
         border-left: 1px solid var(--bookish-border-color-light);
-        margin-top: 1em;
+        margin-top: var(--bookish-block-padding);
         font-style: italic;
     }
 

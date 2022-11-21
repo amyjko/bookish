@@ -293,7 +293,7 @@ export default class Edition {
     editReference(ref: ReferenceNode) {
         if(!(ref.citationID in this.specification.references)) return;
         this.specification.references[ref.citationID] = ref.toList();
-        return this.requestSave(); 
+        return this.requestSave();
     }
     editReferenceID(newCitationID: string, ref: ReferenceNode) {
         if(!(ref.citationID in this.specification.references)) return;

@@ -47,16 +47,22 @@
                 renderedReferences.push(<h2 key={"letter-" + letter} className="bookish-header" id={"references-" + letter}>{letter.toUpperCase()}</h2>);
             } -->
 
-            <p>
-                <PossibleReference node={ref} />
-                {#if editable}
-                    <ConfirmButton
-                        commandLabel="x"
-                        confirmLabel="Confirm"
-                        command={() => $edition.removeReference(citationID)}
-                    />
-                {/if}
-            </p>
+            <table>
+                <tbody>
+                    <td>
+                        <PossibleReference node={ref} />
+                    </td>
+                    {#if editable}
+                        <td style="vertical-align: top; text-align: right; width: 15%">
+                            <ConfirmButton
+                                commandLabel="x"
+                                confirmLabel="Confirm"
+                                command={() => $edition.removeReference(citationID)}
+                            />
+                        </td>
+                    {/if}
+                </tbody>
+            </table>
         {/each}
 
     {:else}
