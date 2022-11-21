@@ -487,7 +487,7 @@ const commands: Command[] = [
     },        
     {
         label: "unindent",
-        icon: 'svg/unindent.svg',
+        icon: 'unindent.svg',
         description: "unindent list item",
         category: "list",
         control: false, alt: false, shift: true, key: "Tab",
