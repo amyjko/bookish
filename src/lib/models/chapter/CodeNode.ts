@@ -42,7 +42,7 @@ export default class CodeNode extends BlockNode {
     toBookdown(): string {
         // Remember to escape any back ticks.
         return "`" + 
-                (this.#language !== "plaintext" ? this.#language : "") + 
+                (this.#language !== "plaintext" ? this.#language : "") + (this.#executable ? "!" : "") +
                 "\n" + 
                 this.#code.getText().replace(/`/g, '\\`') + 
                 "\n`" + 
