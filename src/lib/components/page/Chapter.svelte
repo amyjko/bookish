@@ -15,7 +15,7 @@
     import ChapterNumber from "./ChapterNumber.svelte";
     import Problem from "../chapter/Problem.svelte";
 
-    import { CHAPTER, getEdition, isEditable, type ChapterStore } from "./Contexts";
+    import { CHAPTER, getBook, getEdition, isEditable, type ChapterStore } from "./Contexts";
     import { writable } from "svelte/store";
     import { onMount, setContext } from "svelte";
     import { hideOutlineIfObscured, layoutMarginals } from "./margins";
@@ -30,6 +30,7 @@
     export let chapter: ChapterModel;
     export let print: boolean = false;
 
+    let book = getBook();
     let edition = getEdition();
     let editable = isEditable();
 
@@ -212,6 +213,7 @@
 	$: chapterSection = $edition.getChapterSection(chapterID);
 	$: chapterAST = $currentChapter.getAST();
 	$: citations = chapterAST ? chapterAST.getCitations() : undefined;
+    $: editionNumber = $edition.getEditionNumber();
 
     let chapterStore = writable<ChapterContext>();
     setContext<ChapterStore>(CHAPTER, chapterStore);
@@ -261,11 +263,11 @@
                             label="Chapter URL ID editor"
                             save={ 
                                 // After the ID is edited, reload the page with the new URL.
-                                id => chapter.setChapterID(id)?.then(() => {
-                                    const ref = $edition.getRef();
-                                    if(ref?.id)
-                                        goto(`/write/${ref?.id}/chapter/${id}`)
-                                })
+                                newChapterID => {
+                                    const promise = chapter.setChapterID(newChapterID);
+                                    // Navigate to the new ID
+                                    goto(`/write/${book.ref.id}/${editionNumber}/${newChapterID}`)
+                                }
                             }
                             placeholder="chapter ID"
                             valid={(newChapterID) => 

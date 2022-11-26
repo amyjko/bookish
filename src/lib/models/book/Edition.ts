@@ -43,7 +43,6 @@ export default class Edition {
     editionRef: DocumentReference | undefined;
 
     chapters: Chapter[];
-    chaptersByID: Record<string, Chapter | undefined>;
 
     listeners: Set<Function>;
 
@@ -88,15 +87,12 @@ export default class Edition {
 
         // Create a list and dictionary of Chapter objects.
         this.chapters = []
-        this.chaptersByID = {}
 
         // If there's a spec and it has chapters, process them.
         if(this.specification.chapters.length > 0) {
             // Initialize the chapters dictionary since parsing depends this index to detect whether a chapter exists.
-            this.specification.chapters.forEach(chapterSpec => this.chaptersByID[chapterSpec.id] = undefined)
             this.specification.chapters.forEach(chapterSpec => {
                 const chap = new Chapter(this, chapterSpec)
-                this.chaptersByID[chapterSpec.id] = chap
                 this.chapters.push(chap)
             })
         }
@@ -200,8 +196,8 @@ export default class Edition {
     }
 
     getChapters() { return this.chapters }
-    hasChapter(chapterID: string): boolean { return chapterID in this.chaptersByID || ["references", "glossary", "index", "search", "media"].includes(chapterID); }
-    getChapter(chapterID: string): Chapter | undefined { return this.hasChapter(chapterID) ? this.chaptersByID[chapterID] : undefined; }
+    hasChapter(chapterID: string): boolean { return this.getChapter(chapterID) !== undefined || ["references", "glossary", "index", "search", "media"].includes(chapterID); }
+    getChapter(chapterID: string): Chapter | undefined { return this.chapters.find(chapter => chapter.getChapterID() === chapterID); }
     getChapterPosition(chapterID: string): number | undefined {
         var position = 0;
         for(; position < this.chapters.length; position++)
@@ -239,7 +235,6 @@ export default class Edition {
 
         const chap = new Chapter(this, emptyChapter);
         this.chapters.push(chap);
-        this.chaptersByID[emptyChapter.id] = chap;
 
         // Ask the database to create the chapter, returning the promise
         this.requestSave();
@@ -419,7 +414,7 @@ export default class Edition {
     }
 
     getChapterSection(chapterID: string): string | undefined { 
-        const chapter = this.chaptersByID[chapterID];
+        const chapter = this.getChapter(chapterID);
         return chapter?.getSection();
     }
 
