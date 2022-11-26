@@ -264,7 +264,7 @@
                             save={ 
                                 // After the ID is edited, reload the page with the new URL.
                                 newChapterID => {
-                                    const promise = chapter.setChapterID(newChapterID);
+                                    chapter.setChapterID(newChapterID);
                                     // Navigate to the new ID
                                     goto(`/write/${book.ref.id}/${editionNumber}/${newChapterID}`)
                                 }
