@@ -9,12 +9,7 @@
 
     // Ask the auth context to logout, and provided an error if it fails.
     async function handleLogout() {
-        try {
-            await $auth.logout()
-        } catch(err) {
-            console.error(err);
-            // TODO Handle errors.
-        }
+        $auth.logout()
     }
 
     function getLink(path: string) {

@@ -12,7 +12,7 @@
     let changed = false;
 
 	const errors: Record<string,string> = {
-		"auth/invalide-mail": "This wasn't a valid email.",
+		"auth/invalid-mail": "This wasn't a valid email.",
 		"auth/email-already-in-use": "This email is already associated with an account.",
 		"auto/requires-recent-login": "You haven't logged in recently enough. Log out, log in again, then try again."
 	};
@@ -21,19 +21,22 @@
 
 		// Enter loading state, try to login and wait for it to complete, and then leave loading state.
 		if($auth.user !== null && email) {
-			try {
-				// Give some feedback when loading.
-				loading = true;
-				const previousEmail = $auth.user.email;
-				await updateEmail($auth.user, email);
-				feedback = `Check your original email address, ${previousEmail}, for a confirmation link.`;
-                changed = true;
-			} catch(error: any) {
-				if(typeof error.code === "string")
-					feedback = errors[error.code] ?? "Couldn't update email for an unknown reason."
-			} finally {
-				loading = false;
-			}
+			// Give some feedback when loading.
+			loading = true;
+			const previousEmail = $auth.user.email;
+			feedback = `Sending email update confirmation to ${previousEmail}...`
+			updateEmail($auth.user, email)
+				.then(() => {
+					feedback = `Check your original email address, ${previousEmail}, for a confirmation link.`;
+					changed = true;
+				})
+				.catch((error: any) => {
+					if(typeof error.code === "string")
+						feedback = errors[error.code] ?? "Couldn't update email for an unknown reason."
+				})
+				.finally(() => {
+					loading = false;
+				});
 		}
 
 	}
