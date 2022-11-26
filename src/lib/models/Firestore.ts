@@ -43,7 +43,7 @@ export const getBookFromIDOrName = async (bookIDOrName: string): Promise<Book | 
     if(book) return book;
 
     const bookID = await getBookIDFromBookName(bookIDOrName);
-    return loadBookFromFirestore(bookID);
+    return bookID !== null ? loadBookFromFirestore(bookID) : null;
 
 }
 
@@ -272,7 +272,7 @@ export const subdomainIsAvailable = async (subdomain: string, book: Book): Promi
 
 }
 
-export const getBookIDFromBookName = async (subdomain: string): Promise<string> => {
+export const getBookIDFromBookName = async (subdomain: string): Promise<string | null> => {
 
     if(!db)
         throw Error("Can't find book ID from URL, not connected to Firebase.")
@@ -281,7 +281,7 @@ export const getBookIDFromBookName = async (subdomain: string): Promise<string> 
 
     if(!matches.empty)
         return matches.docs[0].id;
-
-    throw Error("No book by this name.");
+    else
+        return null;
 
 }
