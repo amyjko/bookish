@@ -30,12 +30,32 @@
 		updateBooks()
 	});
 
+	let creating = false;
+	let timeSinceCreation = 0;
+	let creationFeedback = "";
+
 	function newBook() {
+		creating = true;
+		creationFeedback = "Creating book...";
+		timeSinceCreation = Date.now();
+		const timerID = setInterval(() => {
+			const delta = Date.now() - timeSinceCreation;
+			creationFeedback = 
+				delta < 3000 ? "Creating book..." :
+				delta < 6000 ? "Still trying to create book..." :
+				delta < 9000 ? "Internet is slow or offline, but will keep trying..." :
+				"Sorry this is taking so long! If the internet connection comes back, we will create the book."
+		}, 1000);
 		// Make the book, then go to its page
 		if($auth.user)
 			createBookInFirestore($auth.user.uid)
-				.then(bookID => goto("/write/" + bookID))
-				.catch(error => { console.error(error); error = "Couldn't create a book: " + error; })
+				.then(bookID => 
+					goto("/write/" + bookID))
+				.catch(error => {
+					creating = false;
+					error = "Couldn't create a book: " + error; 
+				})
+				.finally(() => clearInterval(timerID))
 
 	}
 	
@@ -44,8 +64,11 @@
 <Title>Write</Title>
 
 <p>
-    <button on:click={newBook}>Create book</button>
+    <button on:click={newBook} disabled={creating}>Create book</button>
 </p>
+{#if creating}
+	<Alert>{creationFeedback}</Alert>
+{/if}
 
 <p>
     Books you can edit.
