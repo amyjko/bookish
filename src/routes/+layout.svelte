@@ -1,17 +1,21 @@
 <script lang="ts">
     import Footer from "./Footer.svelte";
     import Header from "./Header.svelte";
-    import Auth from "../lib/components/Auth.svelte";
-
+    import Auth from "$lib/components/Auth.svelte";
+    import Large from "$lib/components/app/Large.svelte";
+    import Lead from "$lib/components/app/Lead.svelte";
+    import Writing from "$lib/components/app/Writing.svelte";
+    import Paragraph from "$lib/components/app/Paragraph.svelte";
 </script>
 
+
 {#if import.meta.env.PROD }
-    <br/>
-    <br/>
-    <br/>
-    <br/>
-    <br/>
-    <div style="text-align:center"><strong>Bookish</strong> is coming.</div>
+    <Writing>
+        <Lead><Large>Bookish</Large> is coming.</Lead>
+        <Paragraph>
+            A new way to write books online.
+        </Paragraph>
+    </Writing>
 {:else}
     <div class="bookish-app">
         <Auth>
@@ -25,67 +29,55 @@
 <style>
 
     /* Custom fonts for app */
-    @import url('https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,600;1,400&family=Kite+One&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;700&display=swap');
 
     :global(:root) {
 
-        /* Bookish app theme customizations */
-        --bookish-paragraph-font-family: "EB Garamond", serif;
-        --bookish-header-font-family: "Kite One", serif;
-        --bookish-bullet-font-family: "Verdana";
-
         /* Define some UI defaults not used in the Bookish theme. */
+        --bookish-app-font-family: "Outfit", sans-serif;
+        --bookish-app-header-font: "Outfit", sans-serif;
+        --bookish-app-font-size: 14pt;
+        --bookish-app-link-color: #1B499C;
+        --bookish-app-chrome-hover-background: #1B499C;
         --bookish-app-background: white;
         --bookish-app-chrome-background: rgb(244, 244, 244);
+        --bookish-app-font-color: black;
         --bookish-app-chrome-color: black;
-        --bookish-app-chrome-border-color: #d5d5d5;
-        --bookish-app-chrome-hover-background: #E8AF22;
+        --bookish-app-chrome-border-color: #444444;
         --bookish-app-chrome-hover-color: #FFFFFF;
         --bookish-app-chrome-muted: #AAAAAA;
-        --bookish-app-chrome-font-family: "Verdana";
         --bookish-app-highlight-width: 3px;
 
         --bookish-app-error-background: rgb(255, 231, 231);
         --bookish-app-error-color: rgb(191, 15, 15);
         --bookish-app-error-font-weight: 400;
 
+        --bookish-app-content-spacing: 2em;
+
+        --bookish-app-chrome-font-family: "Outfit", sans-serif;
+        --bookish-app-chrome-font-size: 13pt;
         --bookish-app-chrome-padding: 0.5em;
-        --bookish-app-chrome-border-width: 1px;
-        --bookish-app-chrome-roundedness: 2px;
-        --bookish-app-chrome-font-size: 11pt;
+        --bookish-app-chrome-border-width: 3px;
+        --bookish-app-chrome-roundedness: 5px;
         --bookish-app-chrome-spacing: 0.5em;
         --bookish-app-chrome-line-height: 1.5em;
 
         --bookish-app-margin: 1em;
 
-    }    
+    }
+
     .bookish-app {
-        text-align: center;
-        font-weight: var(--bookish-paragraph-font-weight);
-        font-family: var(--bookish-paragraph-font-family);
-        font-size: var(--bookish-paragraph-font-size);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        font-weight: 300;
+        color: var(--bookish-app-font-color);
+        font-family: var(--bookish-app-font-family);
+        font-size: 14pt;
+        background-color: var(--bookish-app-background);
     }
 
-    :global(input, button) {
-        font-family: var(--bookish-app-chrome-font-family);
-        font-size: var(--bookish-app-chrome-font-size);
-        color: var(--bookish-app-chrome-color);
-    }
-
-    :global(input[type="email"], input[type="text"], select) {
-        padding: var(--bookish-app-chrome-padding);
-        font-size: var(--bookish-app-chrome-font-size);
-        border: none;
-        border-bottom: var(--bookish-app-chrome-border-width) solid var(--bookish-app-chrome-border-color);
-    }
-
-    :global(textarea) {
-        border: none;
-        border-top: var(--bookish-app-chrome-border-width) solid var(--bookish-app-chrome-border-color);
-        border-bottom: var(--bookish-app-chrome-border-width) solid var(--bookish-app-chrome-border-color);
-    }
-
-    :global(button, .bookish-file-upload) {
+    :global(.bookish-file-upload) {
         background-color: var(--bookish-app-chrome-background);
         padding: var(--bookish-app-chrome-padding);
         border-top-right-radius: var(--bookish-app-chrome-roundedness);
@@ -95,25 +87,16 @@
         border: none;
     }
 
-    :global(button:hover:enabled, .bookish-file-upload:hover) {
+    :global(.bookish-file-upload:hover) {
         background-color: var(--bookish-app-chrome-hover-background);
         color: var(--bookish-app-chrome-hover-color);
         cursor: pointer;
     }
 
-    :global(button:disabled, .bookish-file-upload input:disabled) {
+    :global(.bookish-file-upload input:disabled) {
         opacity: 0.3;
         border-color: var(--bookish-app-chrome-muted);
         cursor: auto;
-    }
-
-    :global(.bookish-header button) {
-        vertical-align: middle;
-    }
-
-    :global(input:focus, button:focus, select:focus, textarea:focus) {
-        outline: 2px solid var(--bookish-highlight-color);
-        z-index: 2;
     }
 
     :global(.bookish-file-upload) {

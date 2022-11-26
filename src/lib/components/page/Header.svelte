@@ -9,6 +9,7 @@
     import TextEditor from '$lib/components/editor/TextEditor.svelte';
     import { getEdition, isEditable } from './Contexts';
     import type ErrorNode from '../../models/chapter/ErrorNode';
+    import Button from '../app/Button.svelte';
 
 	export let label: string;
 	export let header: string;
@@ -82,9 +83,9 @@
     {/if}
     {#if editable }
         {#if embedNode === undefined }
-            <button on:click={addCover}>+ cover image</button> 
+            <Button tooltip="Add a header image to this page" command={addCover}>+ cover image</Button> 
         {:else}
-            <button on:click={removeCover}>x cover image</button>
+            <Button tooltip="Remove the header image from this page" command={removeCover}>x cover image</Button>
         {/if}
     {/if}
     <div bind:this={title} class="bookish-chapter-header-text">

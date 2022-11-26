@@ -29,6 +29,7 @@
     import ToolbarGroup from "./ToolbarGroup.svelte";
     import ToolbarIcon from "./ToolbarIcon.svelte";
     import { onMount } from "svelte";
+    import Button from "../app/Button.svelte";
 
     const keyLabels: {[key: string]: string} = {
         "Digit0": "0",
@@ -168,12 +169,11 @@
                 {#if commandsByCategory[cat].length > 0 }
                     <ToolbarGroup linebreak={false} icon={ cat in categoryIcons ? categoryIcons[cat] : cat.charAt(0).toUpperCase() + cat.slice(1) }>
                         {#each commandsByCategory[cat] as command }
-                            <button 
+                            <Button 
                                 disabled={command.active === false || (command.active instanceof Function && command.active.call(undefined, context) === false)}
-                                title={command.description + " " + getShortcutDescription(command)}
+                                tooltip={command.description + " " + getShortcutDescription(command)}
                                 tabIndex=0
-                                on:click|stopPropagation|preventDefault={() => executor?.call(undefined, command, "")}
-                                on:keypress={event => event.key === " " || event.key === "Enter" ? executor?.call(undefined, command, "") : undefined }
+                                command={() => executor?.call(undefined, command, "")}
                             >
                                 {#if command.icon }
                                     <ToolbarIcon name={command.icon}/>
@@ -182,7 +182,7 @@
                                 {:else}
                                     {command.description }
                                 {/if}
-                            </button>
+                            </Button>
                         {/each}
                     </ToolbarGroup>
                 {/if}

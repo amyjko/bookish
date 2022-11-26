@@ -17,6 +17,7 @@
     import Toggle from "$lib/components/editor/Toggle.svelte";
     import { getBase, getEdition, isEditable } from "./Contexts";
     import Muted from "./Muted.svelte";
+    import Button from "../app/Button.svelte";
 
     let edition = getEdition();
 	let base = getBase();
@@ -103,7 +104,7 @@
         Write an informative description of what your book is about.
     </Instructions>
 
-    <h2 class="bookish-header" id="chapters">Chapters {#if editable}<button disabled={waitingForChapter} on:click={addChapter}>+</button>{/if}</h2>
+    <h2 class="bookish-header" id="chapters">Chapters {#if editable}<Button tooltip="Add a new chapter" disabled={waitingForChapter} command={addChapter}>+</Button>{/if}</h2>
 
     <Instructions>
         Add, remove, and reorder chapters here.

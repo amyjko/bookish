@@ -192,6 +192,8 @@
 
 <style global>
 
+    @import url('https://fonts.googleapis.com/css2?family=Noto+Serif:ital,wght@0,400;0,700;1,400;1,700&family=Outfit:wght@300;700&display=swap');
+
     :root {
         /* Background colors */
         --bookish-background-color: #FFFFFF;
@@ -205,15 +207,15 @@
         /* Foreground colors */
         --bookish-paragraph-color: #000000;
         --bookish-muted-color: #9AA1A7;
-        --bookish-highlight-color: #E8AF22;
+        --bookish-highlight-color: #1B499C;
         --bookish-comment-color: #257F31;
         --bookish-error-color: #721C24;
         --bookish-link-color: #1B499C;
         --bookish-bullet-color: #EB2C27;
 
         /* Fonts */
-        --bookish-paragraph-font-family: "Georgia", serif;
-        --bookish-header-font-family: "Verdana", serif;
+        --bookish-paragraph-font-family: "Noto Serif", serif;
+        --bookish-header-font-family: "Outfit", serif;
         --bookish-code-font-family: "Courier New", monospace;
         --bookish-bullet-font-family: "Verdana";
 
@@ -289,16 +291,6 @@
         width: 100%;
         z-index: 0;
         text-align: left;
-    }
-
-    a {
-        color: var(--bookish-link-color);
-        font-weight: var(--bookish-link-font-weight);
-        text-decoration: none;
-    }
-
-    a:hover {
-        text-decoration: underline;
     }
 
     table {

@@ -5,6 +5,7 @@
     import { afterUpdate } from 'svelte';
     import { getEdition, isEditable } from './Contexts';
     import Note from '../editor/Note.svelte';
+    import Button from '../app/Button.svelte';
 
     export let authors: string[];
     export let inheritedAuthors: string[] | undefined = undefined;
@@ -64,7 +65,7 @@
         {/each}
     {/if}
     {#if editable }
-        &nbsp;<button on:click={addAuthor}>+</button>
+        &nbsp;<Button tooltip="Add an author" command={addAuthor}>+</Button>
     {/if}
 </div>
 

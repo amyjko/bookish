@@ -11,6 +11,7 @@
     import { getEdition } from "./Contexts";
     import TextEditor from "../editor/TextEditor.svelte";
     import type Theme from "$lib/models/book/Theme";
+    import Button from "../app/Button.svelte";
 
     const themes: Record<string,Theme> = {
         Bookish: BookishTheme,
@@ -54,13 +55,14 @@
     </Instructions>
 
     {#each Object.entries(themes) as [ name, option ] }
-        <button on:click={() => $edition.setTheme(option)} disabled={theme === option}>{name}</button>
+        <Button tooltip="Choose the {name} theme" command={() => $edition.setTheme(option)} disabled={theme === option}>{name}</Button>
     {/each}
     <!-- If it's not one of the  -->
     {#if theme === null || Object.values(themes).includes(theme)}
-        <button on:click={() => $edition.setTheme({ ...(theme === null ? BookishTheme : theme ) })}>Customize</button>        
+        <Button tooltip="Create a custom theme" command={() => $edition.setTheme({ ...(theme === null ? BookishTheme : theme ) })}>Customize</Button>
     {:else}
         <ConfirmButton
+            tooltip="Change the theme to the default Bookish theme."
             commandLabel="Revert to default"
             confirmLabel="Delete your theme?"
             command={() => $edition.setTheme(null)}
@@ -81,13 +83,13 @@
                             <em>Add URLs to your own CSS to customize fonts and styles further.</em>
                         </td>
                         <td style='text-align:right;'>
-                            <button on:click={() => {
+                            <Button tooltip="Add a CSS import" command={() => {
                                 if(theme === null) return;
                                 if(theme.imports === undefined)
                                     theme.imports = [];
                                 theme.imports.push("");
                                 $edition.setTheme(theme);
-                            }}>+</button>
+                            }}>+</Button>
                         </td>
                     </tr>
                     {#each theme.imports ?? [] as url, index}
@@ -107,10 +109,10 @@
                                 />
                             </td>
                             <td style="text-align: right">
-                                <button on:click={() => {
+                                <Button tooltip="Remove this CSS import" command={() => {
                                     theme?.imports?.splice(index, 1);
                                     $edition.setTheme(theme);
-                                }}>–</button>
+                                }}>–</Button>
                             </td>
                         </tr>
                     {/each}

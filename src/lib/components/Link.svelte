@@ -1,6 +1,5 @@
 <script lang="ts">
     export let to: string;
-    export let before: Function | undefined = undefined; 
 
     let link: HTMLAnchorElement;
 
@@ -35,4 +34,17 @@
 
 </script>
 
-<a href={to} bind:this={link} on:click={event => before ? before() : scroll(event) }><slot></slot></a>
+<a href={to} bind:this={link} on:click={event => scroll(event) }><slot></slot></a>
+
+<style>
+    a {
+        color: var(--bookish-link-color);
+        font-weight: var(--bookish-link-font-weight);
+        text-decoration: none;
+    }
+
+    a:hover {
+        text-decoration: underline;
+    }
+
+</style>

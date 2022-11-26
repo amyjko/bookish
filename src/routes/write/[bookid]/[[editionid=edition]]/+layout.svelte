@@ -3,7 +3,7 @@
     import type Book from '$lib/models/book/Book'
     import Loading from "$lib/components/page/Loading.svelte";
     import Edition from "$lib/components/page/Edition.svelte";
-	import Alert from "$lib/components/page/Alert.svelte";
+	import Feedback from "$lib/components/app/Feedback.svelte";
 
     export let data: { book: Book, edition: EditionModel } | null | undefined = undefined;
 
@@ -12,9 +12,8 @@
 {#if data === undefined }
     <Loading/>
 {:else if data === null || data.book === undefined}
-    <Alert>Unable to load book.</Alert>
+    <Feedback error>Unable to load book. Maybe the link isn't correct?</Feedback>
 {:else}
-
     <Edition edition={data.edition} base={`/write/${data.book.getRefID()}/${data.edition.getEditionNumber()}/`} editable={true}>
         <slot></slot>
     </Edition>

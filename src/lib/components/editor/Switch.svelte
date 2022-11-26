@@ -15,10 +15,10 @@
 
 </script>
 
-<span class={`bookish-app-switch bookish-app-${position === "<" ? "left" : position === ">" ? "right" : "middle"}`}>
+<span class={`switch bookish-app-${position === "<" ? "left" : position === ">" ? "right" : "middle"}`}>
     {#each options as option }
         <button 
-            class={`bookish-app-switch-option ${value === option ? "bookish-app-switch-option-selected" : ""}`} 
+            class={`option ${value === option ? "selected" : ""}`} 
             data-value={option} 
             disabled={enabled === false}
             on:click|stopPropagation={handleClick}>
@@ -28,33 +28,57 @@
 </span>
 
 <style>
-    .bookish-app-switch {
+
+    button {
         font-family: var(--bookish-app-chrome-font-family);
         font-size: var(--bookish-app-chrome-font-size);
+        color: var(--bookish-app-chrome-color);
+        background-color: var(--bookish-app-chrome-background);
+        padding: var(--bookish-app-chrome-padding);
+        border: none;
+        border-radius: 0;
     }
 
-    .bookish-app-switch-option {
+    button:hover:enabled:not(.selected) {
+        cursor: pointer;
+        background-color: var(--bookish-app-chrome-hover-background);
+        color: var(--bookish-app-chrome-hover-color);
+    }
+
+    button.selected {
+        background-color: var(--bookish-app-chrome-border-color);
+        color: var(--bookish-app-chrome-hover-color);
+    }
+
+    button:disabled {
+        opacity: 0.3;
+        border-color: var(--bookish-app-chrome-muted);
+        cursor: auto;
+    }
+
+    .switch {
+        font-family: var(--bookish-app-chrome-font-family);
+        font-size: var(--bookish-app-chrome-font-size);
+        white-space: nowrap;
+    }
+
+    .option {
         display: inline-block;
         background-color: var(--bookish-app-chrome-background);
-        cursor: pointer;
         padding-left: var(--bookish-app-chrome-padding);
         padding-right: var(--bookish-app-chrome-padding);
-        border: var(--bookish-app-chrome-border-width) solid var(--bookish-app-chrome-border-color);
     }
 
-    .bookish-app-switch-option:first-child {
+    .option:first-child {
         border-top-left-radius: var(--bookish-app-chrome-roundedness);
         border-bottom-left-radius: var(--bookish-app-chrome-roundedness);
         margin-left: var(--bookish-app-chrome-padding);
     }
 
-    .bookish-app-switch-option:last-child {
+    .option:last-child {
         border-top-right-radius: var(--bookish-app-chrome-roundedness);
         border-bottom-right-radius: var(--bookish-app-chrome-roundedness);
         margin-right: var(--bookish-app-chrome-padding);
     }
 
-    .bookish-app-switch-option-selected {
-        background-color: var(--bookish-app-chrome-hover-background);
-    }
 </style>

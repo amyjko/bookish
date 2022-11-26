@@ -7,6 +7,8 @@
     import Instructions from "$lib/components/page/Instructions.svelte"
     import Note from "../editor/Note.svelte"
     import { getEdition, isEditable } from "./Contexts";
+    import Button from "../app/Button.svelte";
+    import Link from "../Link.svelte";
 
     let edition = getEdition();
     let editable = isEditable();
@@ -42,7 +44,7 @@
     </ul>
 {/if}
 {#if book && bookRevisions}
-    <h2 class="bookish-header" id="revisions">Editions {#if editable}<button on:click={handleDraftEdition}>+</button>{/if}</h2>
+    <h2 class="bookish-header" id="revisions">Editions {#if editable}<Button tooltip="Create a new edition" command={handleDraftEdition}>+</Button>{/if}</h2>
     <Instructions>
         Each book has one or more editions, allowing you to track revisions and ensure previous versions remain available.
         When you're ready to revise, make a new edition, then publish it when you're done.
@@ -51,36 +53,24 @@
     <table class="bookish-table">
         <colgroup>
             <col width="5%" />
-            <col width="5%" />
-            <col width="50%" />
-            <col width="35%" />
+            <col width="65%" />
+            <col width="30%" />
         </colgroup>
         <tbody>
             {#each bookRevisions as revision, index}
                 {@const editionNumber = bookRevisions === undefined ? -1 : bookRevisions.length - index }
+                {@const editionLabel = editionNumber + (editionNumber === 1 ? "st" : editionNumber === 2 ? "nd" : editionNumber === 3 ? "rd" : "th") }
                 {@const viewing = revision.ref.id === $edition.getRef()?.id }
 
                 {#if editable || revision.published}
-                    <tr 
-                        class={`${!revision.published ? "bookish-edition-hidden" : ""} ${viewing ? "bookish-edition-editing": ""} `}
-                    >
+                    <tr>
                         <td>
-                            <em>{ editionNumber + (editionNumber === 1 ? "st" : editionNumber === 2 ? "nd" : editionNumber === 3 ? "rd" : "th") }</em> <Note>{(new Date(revision.time).toLocaleDateString("en-us"))}</Note>
-                        </td>
-                        <td>
-                            {#if editable }
-                                {#if viewing }
-                                    Editing
-                                {:else}
-                                    <a href={`/write/${book.ref.id}/${bookRevisions.length - index}`}>Edit</a>
-                                {/if}
+                            {#if viewing}
+                                <strong class="viewing">{editionLabel}</strong>
                             {:else}
-                                {#if viewing }
-                                    Viewing
-                                {:else}
-                                    <a href={`/read/${book.ref.id}/${bookRevisions.length - index}`}>View</a>
-                                {/if}
+                                <Link to={`/write/${book.ref.id}/${bookRevisions.length - index}`}>{editionLabel}</Link>
                             {/if}
+                            <Note>{(new Date(revision.time).toLocaleDateString("en-us"))}</Note>
                         </td>
                         <td>
                             { #if editable }
@@ -118,14 +108,9 @@
     </table>
 {/if}
 
+
 <style>
-    .bookish-edition-hidden {
-        background: repeating-linear-gradient(
-            45deg,
-            var(--bookish-app-background),
-            var(--bookish-app-background) 10px,
-            var(--bookish-app-chrome-background) 10px,
-            var(--bookish-app-chrome-background) 20px
-        );
+    .viewing {
+        border-bottom: var(--bookish-app-chrome-border-width) solid var(--bookish-app-chrome-border-color);
     }
 </style>

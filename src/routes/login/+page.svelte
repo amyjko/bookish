@@ -1,19 +1,18 @@
 <script lang="ts">
     import { getAuth } from "$lib/components/page/Contexts";
-	import Alert from "$lib/components/page/Alert.svelte";
-    import Title from "$lib/components/page/Title.svelte";
+	import Feedback from "$lib/components/app/Feedback.svelte";
+	import Lead from '$lib/components/app/Lead.svelte';
+    import Large from "$lib/components/app/Large.svelte";
+    import Paragraph from "$lib/components/app/Paragraph.svelte";
+    import TextInput from "$lib/components/app/TextInput.svelte";
+    import Button from "$lib/components/app/Button.svelte";
 
-	let input: HTMLInputElement;
 	let user = getAuth()
 
-	// Not loading by default
+	let email: string = "";
 	let loading = false;
-
-	// Track feedback with state
 	let feedback = "";
-
-	// Recompute the email based on the latest input value.
-	let email = "";
+	let error = "";
 
 	async function handleSubmit() {
 
@@ -24,8 +23,7 @@
 			await $user.login(email);
 			feedback = "Check your email for a login link.";
 		} catch(err) {
-			feedback = "Couldn't connect to the server.";
-			console.error(err);
+			error = "Couldn't connect to the server.";
 		} finally {
 			loading = false;
 		}
@@ -34,14 +32,28 @@
 
 </script>
 
-<Title>Login to write</Title>
+<Lead><Large>Login</Large> to write.</Lead>
 
-<p>We'll send you an email each time to login, no password required.</p>
+<Paragraph>
+	We'll send you an email each time to login, no password required.
+</Paragraph>
 
 <form on:submit|preventDefault={handleSubmit} disabled={loading}>
-    <input autocomplete="username" type="email" placeholder="email" bind:this={input} required disabled={loading} on:input={() => email = input.value }/> <button type="submit" disabled={loading || !/^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/.test(email)}>Login</button>
+    <TextInput 
+		bind:text={email} 
+		autocomplete="username" 
+		type="email" 
+		placeholder="email" 
+		disabled={loading}
+	/> 
+	<Button tooltip="Login with your email" command={handleSubmit} type="submit" disabled={loading || !/^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/.test(email)}>
+		Login
+	</Button>
 </form>
 
 {#if feedback }
-    <Alert>{feedback}</Alert>
+    <Feedback>{feedback}</Feedback>
+{/if}
+{#if error }
+    <Feedback error>{error}</Feedback>
 {/if}

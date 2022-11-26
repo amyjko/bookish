@@ -6,6 +6,7 @@
     import DefinitionView from "./DefinitionView.svelte";
     import { getEdition, isEditable } from "./Contexts";
     import Instructions from "./Instructions.svelte";
+    import Button from "../app/Button.svelte";
 
     let edition = getEdition();
 	let editable = isEditable();
@@ -45,7 +46,7 @@
         <Instructions>
             Add definitions and then link to them in a chapter's text.
         </Instructions>
-        <p><button on:click={addEmptyDefinition}>+</button></p>
+        <p><Button tooltip="Add a glossary entry" command={addEmptyDefinition}>+</Button></p>
     {/if}
     {#if keys === null }
         <p>This book has no glossary.</p>

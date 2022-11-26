@@ -7,6 +7,7 @@
     import { getBase, getEdition, isEditable } from "./Contexts";
     import Muted from "./Muted.svelte";
     import ChapterNumber from "./ChapterNumber.svelte";
+    import Button from "../app/Button.svelte";
 
     export let chapterID: string;
     export let chapter: Chapter | undefined = undefined;
@@ -41,22 +42,25 @@
         {:else if number !== undefined }
             <div><ChapterNumber>{"Chapter " + number}</ChapterNumber></div>
         {/if}
-        {#if forthcoming && !editable}
-            <span>{title}</span>
-        {:else}
-            <Link to={`${base}${chapterID}`}>{title}</Link>
-        {/if}
+        <span class="chapter-title">
+            {#if forthcoming && !editable}
+                {title}
+            {:else}
+                <Link to={`${base}${chapterID}`}>{title}</Link>
+            {/if}
+        </span>
         <div><Muted><em><slot name="annotation"></slot></em></Muted></div>
     </td>
     <td><slot name="etc"></slot></td>
     {#if editable }
         <td>
             {#if chapter }
-                <button disabled={chapter.getPosition() === 0} on:click={moveUp}>{"↑"}</button>
+                <Button tooltip="Move chapter up" disabled={chapter.getPosition() === 0} command={moveUp}>{"↑"}</Button>
                 &nbsp;
-                <button disabled={chapter.getPosition() === chapter.getBook().getChapterCount() - 1} on:click={moveDown}>{"↓"}</button>
+                <Button tooltip="Move chapter down" disabled={chapter.getPosition() === chapter.getBook().getChapterCount() - 1} command={moveDown}>{"↓"}</Button>
                 &nbsp;
                 <ConfirmButton
+                    tooltip="Delete this chapter"
                     commandLabel="x"
                     confirmLabel="Confirm"
                     command={() => chapter && chapter.delete()}
@@ -69,5 +73,9 @@
 <style>
     .bookish-forthcoming {
         opacity: 0.5;
+    }
+
+    .chapter-title {
+        font-family: var(--bookish-header-font-family);
     }
 </style>

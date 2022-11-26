@@ -1,14 +1,19 @@
 <script lang="ts">
     import { updateEmail } from "firebase/auth";
     import { getAuth } from "../../lib/components/page/Contexts";
-	import Alert from "$lib/components/page/Alert.svelte";
-    import Title from "$lib/components/page/Title.svelte";
+	import Feedback from "$lib/components/app/Feedback.svelte";
+    import Button from "../../lib/components/app/Button.svelte";
+    import Lead from "../../lib/components/app/Lead.svelte";
+    import Large from "../../lib/components/app/Large.svelte";
+    import Paragraph from "../../lib/components/app/Paragraph.svelte";
+    import TextInput from "../../lib/components/app/TextInput.svelte";
     
     let email: string;
     let auth = getAuth();
 
     let loading  = false;
 	let feedback = "";
+	let error = "";
     let changed = false;
 
 	const errors: Record<string,string> = {
@@ -32,7 +37,7 @@
 				})
 				.catch((error: any) => {
 					if(typeof error.code === "string")
-						feedback = errors[error.code] ?? "Couldn't update email for an unknown reason."
+						error = errors[error.code] ?? "Couldn't update email for an unknown reason."
 				})
 				.finally(() => {
 					loading = false;
@@ -43,16 +48,19 @@
 
 </script>
 
-<Title>Change e-mail</Title>
+<Lead><Large>Change</Large> your e-mail.</Lead>
 
-<p>
+<Paragraph>
     To change your login email, type your new email address below.
-</p>
+</Paragraph>
 
 <form on:submit|preventDefault={handleSubmit}>
-    <input autocomplete="username" type="email" placeholder="email" bind:value={email} required disabled={loading}/> <button type="submit" disabled={loading || email == undefined || email.length === 0 || changed}>Update e-mail</button>
+    <TextInput autocomplete="username" type="email" placeholder="email" bind:text={email} disabled={loading}/> <Button tooltip="Submit your new email address" command={handleSubmit} type="submit" disabled={loading || email == undefined || email.length === 0 || changed}>Update email</Button>
 </form>
 
 {#if feedback }
-    <Alert>{feedback}</Alert>
+    <Feedback>{feedback}</Feedback>
+{/if}
+{#if error }
+    <Feedback error>{error}</Feedback>
 {/if}

@@ -3,6 +3,7 @@
     import URLEditor from "./URLEditor.svelte";
     import { getCaret, getChapter, getEdition } from "../page/Contexts";
     import ToolbarIcon from "./ToolbarIcon.svelte";
+    import Button from "../app/Button.svelte";
 
     export let link: LinkNode;
 
@@ -61,9 +62,9 @@
 </script>
 
 <span>
-    <button 
-        title="Remove link."
-        on:click={() => {
+    <Button 
+        tooltip="Remove link."
+        command={() => {
             if($caret?.context?.format) {
                 const newFormat = $caret.context.format.withSegmentReplaced(link, link.getText());
                 if(newFormat)
@@ -72,7 +73,7 @@
         }}
     >
         <ToolbarIcon name="unlink.svg"/>
-    </button>
+    </Button>
     <select name="chapterID" on:change={handleChapterChange} value={url}>
         <option value="">URL</option>
         {#if $chapter }

@@ -6,7 +6,7 @@
     import ChapterBody from "./chapter/ChapterBody.svelte";
     import Embed from "./chapter/Embed.svelte";
     import ErrorMessage from "./chapter/ErrorMessage.svelte";
-    import Link from "./Link.svelte";
+    import Link from "$lib/components/app/Link.svelte";
 
     export let book: Book;
     export let write: boolean;
@@ -22,69 +22,68 @@
 
 </script>
 
-<div class="bookish-app-book-preview">
-    <div class={`bookish-app-book-preview-cover ${cover === null ? "bookish-app-book-preview-nocover" : ""}`}>
+<tr class="book-preview">
+    <td class="cover">
         {#if embed instanceof EmbedNode }
             <Embed node={embed}/>
         {:else if embed instanceof ErrorNode }
             <ErrorMessage node={embed}/>
         {/if}
-    </div>
-    <div class="bookish-app-book-preview-title">
+    </td>
+    <td class="title">
         {#if subdomain === undefined || write }
             <Link to={refID === undefined ? "" : (write ? "/write/" : "/") + refID}>{title}</Link>
         {:else}
             <Link to={`/${subdomain}`}>{title}</Link>
         {/if}
-    </div>
-    <div class="bookish-app-book-preview-authors">
+    </td>
+    <td class="authors">
         {#each authors as author, index}
             <span>{author}{#if index !== authors.length - 1},&nbsp;{/if}</span>
         {:else}
             <em>No authors</em>
         {/each}
-    </div>
-    <div class="bookish-app-book-preview-description">
+    </td>
+    <td class="description">
         {#if description.length === 0}
             <em>No description</em>
         {:else}
             <ChapterBody node={Parser.parseChapter(undefined, description)}/>
         {/if}
-    </div>
-</div>
+    </td>
+</tr>
 
 <style>
-    .bookish-app-book-preview {
+
+    td {
+        vertical-align: top;
+        padding: var(--bookish-app-chrome-padding);
+    }
+
+    .book-preview {
         display: flex;
         width: 100%;
-        border: var(--bookish-app-chrome-border-width) solid var(--bookish-app-chrome-border-color);
         padding: var(--bookish-app-chrome-padding);
-        border-radius: var(--bookish-app-chrome-roundedness);
         text-align: left;
     }
 
-    .bookish-app-book-preview-cover {
+    .cover {
         width: 5em;
-        height: auto;
-        margin-right: var(--bookish-app-chrome-padding);
-    }
-
-    .bookish-app-book-preview-cover.bookish-app-book-preview-nocover {
-        background-color: var(--bookish-app-chrome-muted);
         height: 5em;
+        margin-right: var(--bookish-app-chrome-padding);
     }
 
-    .bookish-app-book-preview-title {
+    .title {
         flex: 1;
         margin-right: var(--bookish-app-chrome-padding);
     }
 
-    .bookish-app-book-preview-authors {
+    .authors {
         flex: 1;
         margin-right: var(--bookish-app-chrome-padding);
     }
 
-    .bookish-app-book-preview-description {
+    .description {
         flex: 2;
         overflow: hidden;
         max-height: 10em;

@@ -1,64 +1,47 @@
 <script lang="ts">
-    import External from "$lib/components/External.svelte";
-    import Title from "$lib/components/page/Title.svelte";
+    import Section from "$lib/components/app/Writing.svelte";
+    import Paragraph from "$lib/components/app/Paragraph.svelte";
+    import Lead from "$lib/components/app/Lead.svelte";
+    import Link from "$lib/components/app/Link.svelte";
+    import Large from "$lib/components/app/Large.svelte";
+    import Head from "$lib/components/app/Head.svelte";
 </script>
 
-<Title>Bookish</Title>
+<Section>
 
-<div class="bookish-app-callout">Bookish is a platform for reading and writing simple, accessible, beautiful online books.</div>
+    <Lead><Large>Bookish</Large> press is a platform for reading and writing simple, accessible, beautiful online books.</Lead>
 
-<div class="bookish-app-text">
+    <Head>Simple</Head>
+    <Paragraph>
+        Print is full gatekeeping and other digital platforms have complex tools.
+        Bookish strives to be a Google Docs for books: the workflow is as simple as write, share, read.
+    </Paragraph>
 
-    <p>
-        Why not use print publishers, e-book platforms, or innovative platforms like <External to="https://www.pubpub.org">PubPub</External>?
-    </p>
+    <Head>Accessible</Head>
+    <Paragraph>
+        Most platforms produce books that are incompatible with screen readers, excluding readers who are blind, low vision, dyslexic, and others who rely on them.
+        Bookish ensures that books are readable on any device by any person with a modern web browser.
+    </Paragraph>
 
-    <ol>
-        <li>
-            <strong>Simplicity</strong>. 
-            Other platforms are complicated!
-            Print is full gatekeeping and other digital platforms, despite being open, have complex tools and infrastructure. 
-            Bookish tries to offer the simplest possible way to write and share, like a Google Docs for books.
-        </li>
-        <li>
-            <strong>Accessibility</strong>.
-            Most platforms produce books that are incompatible with screen readers.
-            Bookish ensures that books are readable on any device by any person with a standard web browser.
-        </li>
-        <li>
-            <strong>Beauty</strong>.
-            Typography matters. 
-            Print books can be beautiful, but are complex to make and inaccessible.
-            Many e-book and web-based book platforms are … less than beautiful, focusing on navigation over reading.
-            Bookish tries to prioritizes content over structure.
-        </li>
-    </ol>
+    <Head>Beautiful</Head>
+    <Paragraph>
+        Typography matters. 
+        Print books can be beautiful, but are complex to make and inaccessible.
+        Many e-book and online book platforms prioritize navigation over content.
+        Bookish tries to prioritizes content over structure.
+    </Paragraph>
 
-    <p>
-        Bookish is is built and maintained by <External to="http://amyjko.com">Amy J. Ko</External>, a Professor at the <External to="https://www.washington.edu/">University of Washington</External> <External to="https://ischool.uw.edu">Information School</External>.
+    <Paragraph aside>
+        Bookish is built and maintained by <Link to="http://amyjko.com">Amy J. Ko</Link>, a Professor at the <Link to="https://www.washington.edu/">University of Washington</Link> <Link to="https://ischool.uw.edu">Information School</Link>.
         She originally built Bookish to write books to support her teaching.
-    </p>
-
-    <p>
-        Do you have feedback about Bookish, or want to contribute?
-        The project is free and open source <External to="https://github.com/amyjko/bookish">on GitHub</External>.
-        Write <a href="mailto:ajko@uw.edu">Amy</a> if you'd like to collaborate, or <External to="https://github.com/amyjko/bookish/issues">submit an issue</External> or <External to="https://github.com/amyjko/bookish/pulls">pull request</External> directly.
-    </p>
-</div>
+        Do you have feedback or want to contribute?
+        The project is free and open source <Link to="https://github.com/amyjko/bookish">on GitHub</Link>.
+        Write <Link to="mailto:ajko@uw.edu">Amy</Link> if you'd like to collaborate, or <Link to="https://github.com/amyjko/bookish/issues">submit an issue</Link> or <Link to="https://github.com/amyjko/bookish/pulls">pull request</Link> directly.
+    </Paragraph>
+</Section>
 
 <style>
-    .bookish-app-callout {
-        font-size: x-large;
-        margin: 1em;
-    }
 
-    .bookish-app-text, .bookish-app-text p {
-        text-align: left;
-        padding-left: 2rem;
-        padding-right: 2rem;
-        margin: auto;
-        margin-bottom: 2rem;
-        max-width: 40rem;
-    }
+
 
 </style>

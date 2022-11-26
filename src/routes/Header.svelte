@@ -1,6 +1,6 @@
 <script lang="ts">
-    import Link from "../lib/components/Link.svelte";
-    import { getAuth } from "../lib/components/page/Contexts";
+    import Link from "$lib/components/app/Link.svelte";
+    import { getAuth } from "$lib/components/page/Contexts";
     import { getSubdomain, pathWithoutSubdomain } from "../lib/util/getSubdomain";
 
     let subdomain = getSubdomain();
@@ -18,8 +18,7 @@
 
 </script>
 
-<div class="bookish-app-header">
-    <img src="/icons/icon.png" alt="A letter b in a black circle"/>&nbsp;
+<div class="header">
     <Link to={getLink("/")}>Home</Link>
     <Link to={getLink("/read")}>Read</Link>
     <Link to={getLink("/write")}>Write</Link>
@@ -32,19 +31,13 @@
 </div>
 
 <style>
-    .bookish-app-header {
+    .header {
         margin-top: var(--bookish-app-chrome-spacing); 
         margin-bottom: var(--bookish-app-chrome-spacing); 
     }
 
-    :global(.bookish-app-header a) {
+    .header > :global(a) {
         display: inline-block;
-        margin-left: var(--bookish-app-chrome-spacing);
-        margin-right: var(--bookish-app-chrome-spacing);
-    }
-
-    .bookish-app-header img {
-        height: 1em;
-        vertical-align: baseline;
+        margin-right: calc(2 * var(--bookish-app-chrome-spacing));
     }
 </style>

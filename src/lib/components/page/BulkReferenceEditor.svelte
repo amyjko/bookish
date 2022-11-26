@@ -3,6 +3,7 @@
     import { getUniqueReferenceID, mineReference } from "$lib/util/mineReference";
     import ReferenceNode from "$lib/models/chapter/ReferenceNode";
     import { getEdition } from "./Contexts";
+    import Button from "../app/Button.svelte";
 
     let edition = getEdition();
 	let text = "";
@@ -35,6 +36,24 @@
 </Instructions>
 <div>
     <textarea rows={5} bind:value={text} style="width: 100%"></textarea>
-    <button disabled={text.length === 0} on:click={handleBulkAdd}>Add bulk references</button>
-    <button on:click={handleEmptyAdd}>Add empty reference</button>
+    <Button tooltip="Attempt to convert the text above into references" disabled={text.length === 0} command={handleBulkAdd}>Add bulk references</Button>
+    <Button tooltip="Add an empty reference" command={handleEmptyAdd}>Add empty reference</Button>
 </div>
+
+<style>
+
+	textarea {
+		font-family: var(--bookish-app-font-family);
+		font-size: var(--bookish-app-font-size);
+        border: none;
+        border-top: var(--bookish-app-chrome-border-width) solid var(--bookish-app-chrome-border-color);
+        border-bottom: var(--bookish-app-chrome-border-width) solid var(--bookish-app-chrome-border-color);
+    }
+
+	textarea:focus {
+        border-bottom-color: var(--bookish-app-chrome-hover-background);
+        border-top-color: var(--bookish-app-chrome-hover-background);
+		outline: none;
+	}
+
+</style>

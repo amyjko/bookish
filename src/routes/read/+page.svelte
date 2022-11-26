@@ -3,8 +3,11 @@
     import BookPreview from '$lib/components/BookPreview.svelte'
     import type Book from "$lib/models/book/Book"
     import { onMount } from 'svelte';
-	import Alert from "$lib/components/page/Alert.svelte";
-    import Title from '$lib/components/page/Title.svelte';
+	import Feedback from "$lib/components/app/Feedback.svelte";
+    import Lead from '$lib/components/app/Lead.svelte';
+    import Paragraph from '$lib/components/app/Paragraph.svelte';
+    import Large from '$lib/components/app/Large.svelte';
+    import Table from '$lib/components/app/Table.svelte';
 
 	let books: Book[] = [];
 	let loading = true;
@@ -27,20 +30,18 @@
 	
 </script>
 
-<Title>Read</Title>
-
-<p>
-    Books you can read.
-</p>
+<Lead><Large>Books</Large> published.</Lead>
 
 {#if error }
-    <Alert>{error}</Alert>
+    <Feedback error>{error}</Feedback>
 {:else if loading }
-    <p>Loading books...</p>
+    <Feedback>Loading books...</Feedback>
+{:else if books.length === 0}
+	<Paragraph>You don't have have any books.</Paragraph>
 {:else}
-    {#each books as book }
-        <BookPreview book={book} write={false} />
-    {:else}
-        <p>No published books to read.</p>
-    {/each}
+	<Table>
+		{#each books as book }
+			<BookPreview book={book} write={true} />
+		{/each}
+	</Table>
 {/if}

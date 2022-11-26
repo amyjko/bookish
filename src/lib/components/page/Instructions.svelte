@@ -5,28 +5,29 @@
 </script>
 
 {#if editable }
-    <div class="bookish-instructions"><slot></slot></div>
+    <section class="instructions"><slot></slot></section>
 {/if}
 
 <style>
-    .bookish-instructions {
+    .instructions {
+        font-family: var(--bookish-app-font-family);
+        font-weight: 300;
         font-style: italic;
         margin-top: var(--bookish-app-margin);
         margin-bottom: var(--bookish-app-margin);
         line-height: 1.2;
-        padding: var(--bookish-app-margin);
-        border: 1px solid var(--bookish-app-chrome-border-color);
-        border-radius: var(--bookish-roundedness);
+        padding-left: var(--bookish-app-margin);
+        border-left: var(--bookish-app-chrome-border-width) solid var(--bookish-app-chrome-border-color);
     }
 
-    .bookish-instructions :global(p), .bookish-instructions :global(li) {
+    .instructions :global(p), .instructions :global(li) {
         font-family: var(--bookish-app-chrome-font-family);
         font-size: var(--bookish-app-chrome-font-size);
         line-height: var(--bookish-app-chrome-line-height);
         margin-bottom: 0;
     }
 
-    .bookish-instructions :global(p) {
+    .instructions :global(p) {
         margin-top: 0;
     }
 </style>

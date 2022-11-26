@@ -7,7 +7,7 @@ export { default as Media } from "./components/page/Media.svelte";
 export { default as Print } from "./components/page/Print.svelte";
 export { default as Glossary } from "./components/page/Glossary.svelte";
 export { default as Edition } from "./components/page/Edition.svelte";
-export { default as Alert } from "./components/page/Alert.svelte";
+export { default as Feedback } from "./components/app/Feedback.svelte";
 export { default as Loading } from "./components/page/Loading.svelte";
 export { default as EditionModel } from "./models/book/Edition";
 export { EDITION } from "./components/page/Contexts";

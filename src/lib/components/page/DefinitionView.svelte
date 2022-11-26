@@ -9,6 +9,7 @@
     import Note from '../editor/Note.svelte'
     import { afterUpdate } from 'svelte';
     import { getEdition, isEditable } from './Contexts';
+    import Button from '../app/Button.svelte';
 
     export let id: string;
     export let definition: Definition;
@@ -53,6 +54,7 @@
     <td>
         {#if editable && edition }
             <ConfirmButton
+                tooltip="Delete this glossary entry."
                 commandLabel="x"
                 confirmLabel="Confirm"
                 command={() => $edition.removeDefinition(id)}
@@ -101,7 +103,7 @@
         <br/>
         {#if edition && editable }
             <span bind:this={synonymsEditor}>
-                <button on:click={addSynonym}>+</button>&nbsp;
+                <Button tooltip="Add a synonym of this glossary entry" command={addSynonym}>+</Button>&nbsp;
                 {#if syns.length === 0 }
                     <em>No synonyms</em>
                 {:else}

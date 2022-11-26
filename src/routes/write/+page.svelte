@@ -5,8 +5,12 @@
     import { goto } from '$app/navigation';
     import { onMount } from 'svelte';
     import { getAuth } from '$lib/components/page/Contexts';
-	import Alert from "$lib/components/page/Alert.svelte";
-    import Title from '$lib/components/page/Title.svelte';
+	import Feedback from "$lib/components/app/Feedback.svelte";
+    import Lead from "$lib/components/app/Lead.svelte";
+    import Large from '$lib/components/app/Large.svelte';
+    import Paragraph from '$lib/components/app/Paragraph.svelte';
+    import Button from '$lib/components/app/Button.svelte';
+    import Table from '$lib/components/app/Table.svelte';
 
 	let books: Book[] = [];
 	let loading = true;
@@ -61,27 +65,24 @@
 	
 </script>
 
-<Title>Write</Title>
+<Lead><Large>Write</Large> something.</Lead>
 
-<p>
-    <button on:click={newBook} disabled={creating}>Create book</button>
-</p>
+<Button tooltip="Create a new book" command={newBook} disabled={creating}>Create book</Button>
+
 {#if creating}
-	<Alert>{creationFeedback}</Alert>
+	<Feedback>{creationFeedback}</Feedback>
 {/if}
 
-<p>
-    Books you can edit.
-</p>
-
 {#if error }
-    <Alert>{error}</Alert>
+	<Feedback error>{error}</Feedback>
 {:else if loading }
-    <p>Loading books...</p>
+	<Feedback>Loading books...</Feedback>
+{:else if books.length === 0}
+	<Paragraph>You don't have have any books.</Paragraph>
 {:else}
-    {#each books as book }
-        <BookPreview book={book} write={true} />
-    {:else}
-        <p>You don't have have any books.</p>
-    {/each}
+	<Table>
+		{#each books as book }
+			<BookPreview book={book} write={true} />
+		{/each}
+	</Table>
 {/if}

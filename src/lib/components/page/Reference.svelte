@@ -1,6 +1,7 @@
 <script lang="ts">
     import type ReferenceNode from "$lib/models/chapter/ReferenceNode";
     import { afterUpdate } from "svelte";
+    import Button from "../app/Button.svelte";
     import ConfirmButton from "../editor/ConfirmButton.svelte";
     import TextEditor from "../editor/TextEditor.svelte";
     import { getEdition, isEditable } from "./Contexts";
@@ -63,6 +64,7 @@
     </span>
     {#if editable}
         <ConfirmButton
+            tooltip="Delete this reference"
             commandLabel="x"
             confirmLabel="Confirm"
             command={() => $edition.removeReference(node.citationID)}
@@ -169,12 +171,12 @@
             </tr>
             <tr>
                 <td colspan=2>
-                    <button 
-                        on:click|stopPropagation={() => stopEditing()}
-                        on:keydown={event => { if(editing && (event.key === "Enter" || event.key === " ")) { stopEditing(); event.stopPropagation(); }}}
+                    <Button
+                        tooltip="Finish editing this reference." 
+                        command={() => stopEditing()}
                     >
                         done
-                    </button>
+                    </Button>
                 </td>
         </tbody>
     </table>

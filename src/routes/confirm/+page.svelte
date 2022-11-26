@@ -4,8 +4,9 @@
     import { auth } from "$lib/models/Firebase";
     import Link from "$lib/components/Link.svelte";
     import { goto } from "$app/navigation";
-    import Alert from "$lib/components/page/Alert.svelte";
-    import Title from "$lib/components/page/Title.svelte";
+    import Feedback from "$lib/components/app/Feedback.svelte";
+    import Lead from "$lib/components/app/Lead.svelte";
+    import Large from "$lib/components/app/Large.svelte";
 	
 	let error: string | undefined = undefined;
 
@@ -45,7 +46,7 @@
 					});
 			// Otherwise, give some feedback.
 			else 
-				error = "Can't log in without an email address. Refresh the page to try again.";
+				error = "Can't log in without an email address.";
 					
 		}
 		// GIve some feedback if the email link isn't valid.
@@ -56,10 +57,9 @@
 
 </script>
 
-<Title>Logging in…</Title>
+<Lead><Large>Logging</Large> in…</Lead>
 {#if error}
-    <Alert>{error}</Alert>
-    <Link to="/login">Try again?</Link>
+    <Feedback error>{error} <Link to="/login">Try again?</Link></Feedback>    
 {:else}
-    <p>Redirecting...</p>
+    <Feedback>Redirecting...</Feedback>
 {/if}

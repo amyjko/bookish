@@ -9,6 +9,7 @@
     import MediaPreview from "./MediaPreview.svelte";
     import { onMount } from "svelte";
     import { getEdition, isEditable } from "./Contexts";
+    import Button from "../app/Button.svelte";
 
     let edition = getEdition();
     let editable = isEditable();
@@ -77,7 +78,7 @@
                 url={image.url}
                 alt={""}
             >
-                <span>uploaded <button on:click={() => media?.remove(image).then(images => updateImages(images))}>x</button></span>
+                <span>uploaded <Button tooltip="Delete this unused image" command={() => media?.remove(image).then(images => updateImages(images))}>x</Button></span>
             </MediaPreview>
         {/each}
     {/if}

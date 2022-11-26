@@ -1,7 +1,9 @@
 <script lang="ts">
     import { onMount } from "svelte";
+    import Button from "../app/Button.svelte";
 
     export let commandLabel: string;
+    export let tooltip: string;
     export let confirmLabel: string;
     export let command: () => Promise<void> | undefined;
     
@@ -34,15 +36,16 @@
 
 </script>
 
-<button 
+<Button 
     disabled={executing} 
-    on:click={execute} 
+    {tooltip}
+    command={execute}
     class={confirming ? "bookish-editor-confirm" : ""}>
         { confirming ? confirmLabel : commandLabel }
-</button>
+</Button>
 
 <style>
-    button.bookish-editor-confirm {
+    :global(button.bookish-editor-confirm) {
         animation: failure 100ms infinite;
     }
 </style>
