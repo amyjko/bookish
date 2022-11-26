@@ -18,7 +18,6 @@ export default abstract class BlocksNode extends BlockNode {
 
     constructor(elements: BlockNode[]) {
         super();
-        // Always ensure there's an empty paragraph before and after non-paragraph nodes to allow for insertions.
         const adjustedElements = [];
         for(let i = 0; i < elements.length; i++) {
             const block = elements[i];
@@ -27,16 +26,17 @@ export default abstract class BlocksNode extends BlockNode {
             if(block instanceof ListNode && previousBlock instanceof ListNode && block.isNumbered() === previousBlock.isNumbered()) {
                 adjustedElements[adjustedElements.length - 1] = previousBlock.withListAppended(block);
             }
-            // If the block isn't a paragraph and the last one isn't either or this is the first one., put a paragraph between them to allow for insertion.
-            else {
-                if(!(block instanceof ParagraphNode) && (i === 0 || !(previousBlock instanceof ParagraphNode)))
-                    adjustedElements.push(new ParagraphNode());
-                adjustedElements.push(block);
-            }
+            // Always ensure there's an empty paragraph before and after non-paragraph nodes to allow for insertions.
+            // // If the block isn't a paragraph and the last one isn't either or this is the first one, put a paragraph between them to allow for insertion.
+            // else {
+            //     if(!(block instanceof ParagraphNode) && (i === 0 || !(previousBlock instanceof ParagraphNode)))
+            //         adjustedElements.push(new ParagraphNode());
+            // }
+            else adjustedElements.push(block);
         }
         // Check the last one.
-        if(!(adjustedElements[adjustedElements.length - 1] instanceof ParagraphNode))
-            adjustedElements.push(new ParagraphNode());
+        // if(!(adjustedElements[adjustedElements.length - 1] instanceof ParagraphNode))
+        //     adjustedElements.push(new ParagraphNode());
 
         this.#blocks = adjustedElements;
 

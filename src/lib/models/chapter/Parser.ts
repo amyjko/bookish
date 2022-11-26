@@ -307,7 +307,7 @@ export default class Parser {
         let trailingNewlines = 0;
         while(this.more()) {
             trailingNewlines = 0;
-            // Read a blocka add it to the list if we parsed something.
+            // Read a block and add it to the list if we parsed something.
             blocks.push(this.parseBlock());
             // Read whitespace until we find the next thing.
             while(this.peek() === " " || this.peek() === "\t" || this.peek() === "\n") {
