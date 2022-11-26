@@ -6,29 +6,29 @@ Prism.languages["python"] = {
 		lookbehind: true,
 		greedy: true
 	},
-	// 'string-interpolation': {
-	// 	pattern: /(?:f|fr|rf)(?:("""|''')[\s\S]*?\1|("|')(?:\\.|(?!\2)[^\\\r\n])*\2)/i,
-	// 	greedy: true,
-	// 	inside: {
-	// 		'interpolation': {
-	// 			// "{" <expression> <optional "!s", "!r", or "!a"> <optional ":" format specifier> "}"
-	// 			pattern: /((?:^|[^{])(?:\{\{)*)\{(?!\{)(?:[^{}]|\{(?!\{)(?:[^{}]|\{(?!\{)(?:[^{}])+\})+\})+\}/,
-	// 			lookbehind: true,
-	// 			inside: {
-	// 				'format-spec': {
-	// 					pattern: /(:)[^:(){}]+(?=\}$)/,
-	// 					lookbehind: true
-	// 				},
-	// 				'conversion-option': {
-	// 					pattern: /![sra](?=[:}]$)/,
-	// 					alias: 'punctuation'
-	// 				},
-	// 				rest: null
-	// 			}
-	// 		},
-	// 		'string': /[\s\S]+/
-	// 	}
-	// },
+	'string-interpolation': {
+		pattern: /(?:f|fr|rf)(?:("""|''')[\s\S]*?\1|("|')(?:\\.|(?!\2)[^\\\r\n])*\2)/i,
+		greedy: true,
+		inside: {
+			'interpolation': {
+				// "{" <expression> <optional "!s", "!r", or "!a"> <optional ":" format specifier> "}"
+				pattern: /((?:^|[^{])(?:\{\{)*)\{(?!\{)(?:[^{}]|\{(?!\{)(?:[^{}]|\{(?!\{)(?:[^{}])+\})+\})+\}/,
+				lookbehind: true,
+				inside: {
+					'format-spec': {
+						pattern: /(:)[^:(){}]+(?=\}$)/,
+						lookbehind: true
+					},
+					'conversion-option': {
+						pattern: /![sra](?=[:}]$)/,
+						alias: 'punctuation'
+					},
+					rest: undefined
+				}
+			},
+			'string': /[\s\S]+/
+		}
+	},
 	'triple-quoted-string': {
 		pattern: /(?:[rub]|br|rb)?("""|''')[\s\S]*?\1/i,
 		greedy: true,
@@ -60,26 +60,6 @@ Prism.languages["python"] = {
 	'number': /\b0(?:b(?:_?[01])+|o(?:_?[0-7])+|x(?:_?[a-f0-9])+)\b|(?:\b\d+(?:_\d+)*(?:\.(?:\d+(?:_\d+)*)?)?|\B\.\d+(?:_\d+)*)(?:e[+-]?\d+(?:_\d+)*)?j?(?!\w)/i,
 	'operator': /[-+%=]=?|!=|:=|\*\*?=?|\/\/?=?|<[<=>]?|>[=>]?|[&|^~]/,
 	'punctuation': /[{}[\];(),.:]/
-};
-
-var keywords = /\b(?:abstract|assert|boolean|break|byte|case|catch|char|class|const|continue|default|do|double|else|enum|exports|extends|final|finally|float|for|goto|if|implements|import|instanceof|int|interface|long|module|native|new|non-sealed|null|open|opens|package|permits|private|protected|provides|public|record(?!\s*[(){}[\]<>=%~.:,;?+\-*/&|^])|requires|return|sealed|short|static|strictfp|super|switch|synchronized|this|throw|throws|to|transient|transitive|try|uses|var|void|volatile|while|with|yield)\b/;
-
-// full package (optional) + parent classes (optional)
-var classNamePrefix = /(?:[a-z]\w*\s*\.\s*)*(?:[A-Z]\w*\s*\.\s*)*/.source;
-
-// based on the java naming conventions
-var className = {
-    pattern: RegExp(/(^|[^\w.])/.source + classNamePrefix + /[A-Z](?:[\d_A-Z]*[a-z]\w*)?\b/.source),
-    lookbehind: true,
-    inside: {
-        'namespace': {
-            pattern: /^[a-z]\w*(?:\s*\.\s*[a-z]\w*)*(?:\s*\.)?/,
-            inside: {
-                'punctuation': /\./
-            }
-        },
-        'punctuation': /\./
-    }
 };
 
 export default Prism;
