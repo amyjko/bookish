@@ -54,9 +54,10 @@
 
 <style>
     .bookish-image-chooser {
-        margin-top: var(--app-chrome-padding);
+        display: inline-block;
         height: 3em;
-        overflow-y: hidden;
+        overflow-x: scroll;
+        vertical-align: middle;
     }
 
     .bookish-image-chooser.expanded {

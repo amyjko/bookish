@@ -97,7 +97,9 @@
     />
 </code>
 <ToolbarSpacer/>
-{upload}
+{#if upload}
+    {upload}
+{/if}
 <ImageChooser select={handleImageSelection} selection={embed.getURL()} />
 
 <style>
@@ -120,7 +122,7 @@
     }
 
     .file-upload {
-        font-family: var(--bookish-app-chrome-font);
+        font-family: var(--bookish-app-font);
         font-size: var(--app-chrome-font-size);
     }
 

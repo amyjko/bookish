@@ -16,6 +16,7 @@
 <style>
     span {
         margin-right: var(--app-chrome-padding);
+        vertical-align: middle;
     }
 
     img {

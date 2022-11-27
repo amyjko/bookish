@@ -188,20 +188,20 @@
                 {/if}
             {/each}
         {/if}
-        {#if metaNode instanceof LinkNode}<ToolbarGroup icon="link.svg"><LinkEditor link={metaNode}/></ToolbarGroup>{/if}
-        {#if metaNode instanceof LabelNode}<ToolbarGroup icon="•"><LabelEditor label={metaNode}/></ToolbarGroup>{/if}
-        {#if metaNode instanceof InlineCodeNode}<ToolbarGroup icon="code.svg"><InlineCodeEditor code={metaNode}/></ToolbarGroup>{/if}
-        {#if metaNode instanceof CitationsNode}<ToolbarGroup icon="¹"><CitationsEditor citations={metaNode}/></ToolbarGroup>{/if}
-        {#if metaNode instanceof DefinitionNode}<ToolbarGroup icon="Aa"><DefinitionEditor definition={metaNode}/></ToolbarGroup>{/if}
-        {#if metaNode instanceof CodeNode && context}<ToolbarGroup icon="code.svg"><CaptionedCodeEditor code={metaNode}/></ToolbarGroup>{/if}
-        {#if calloutNode}<ToolbarGroup icon="🄰"><CalloutEditor callout={calloutNode} /></ToolbarGroup>{/if}
-        {#if quoteNode}<ToolbarGroup icon="quote.svg"><QuoteEditor quote={quoteNode} /></ToolbarGroup>{/if}
-        {#if embedNode}<ToolbarGroup linebreak icon="media.svg"><EmbedEditor embed={embedNode} /></ToolbarGroup>{/if}
+        {#if metaNode instanceof LinkNode}<ToolbarGroup icon="link.svg"><LinkEditor link={metaNode}/></ToolbarGroup>
+        {:else if metaNode instanceof LabelNode}<ToolbarGroup icon="•"><LabelEditor label={metaNode}/></ToolbarGroup>
+        {:else if metaNode instanceof InlineCodeNode}<ToolbarGroup icon="code.svg"><InlineCodeEditor code={metaNode}/></ToolbarGroup>
+        {:else if metaNode instanceof CitationsNode}<ToolbarGroup icon="¹"><CitationsEditor citations={metaNode}/></ToolbarGroup>
+        {:else if metaNode instanceof DefinitionNode}<ToolbarGroup icon="Aa"><DefinitionEditor definition={metaNode}/></ToolbarGroup>
+        {:else if metaNode instanceof CodeNode && context}<ToolbarGroup icon="code.svg"><CaptionedCodeEditor code={metaNode}/></ToolbarGroup>
+        {:else if calloutNode}<ToolbarGroup icon="🄰"><CalloutEditor callout={calloutNode} /></ToolbarGroup>
+        {:else if quoteNode}<ToolbarGroup icon="quote.svg"><QuoteEditor quote={quoteNode} /></ToolbarGroup>
+        {:else if embedNode}<ToolbarGroup linebreak icon="media.svg"><EmbedEditor embed={embedNode} /></ToolbarGroup>
+        {/if}
     </section>
 {/if}
 
 <style>
-
     .bookish-editor-toolbar {
         position: fixed;
         top: 0;
@@ -209,22 +209,10 @@
         right: 0;
         background: var(--bookish-background-color);
         border: var(--app-chrome-border-size) solid var(--app-border-color);
-        padding: var(--app-chrome-padding);
         font-family: var(--app-font);
         font-size: var(--app-chrome-font-size);
         z-index: 2;
         transition: top 1s;
-    }
-
-    .bookish-editor-toolbar :global(img) {
-        width: 1em;
-        height: 1em;
-    }
-
-    .bookish-editor-toolbar :global(hr) {
-        margin-top: var(--app-chrome-padding);
-        margin-bottom: var(--app-chrome-padding);
-        line-height: 1em;
     }
 
 </style>

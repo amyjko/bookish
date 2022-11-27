@@ -14,8 +14,8 @@
 <style>
     .bookish-editor-toolbar-group {
         display: inline-block;
+        padding: var(--app-chrome-padding);
         margin-right: calc(2 * var(--app-chrome-padding));
-        margin-bottom: var(--app-chrome-padding);
     }
 
     .bookish-editor-toolbar-group :global(button) {
