@@ -49,6 +49,9 @@ type Theme = {
 export default Theme;
 
 export const BookishTheme = {
+    imports: [
+        'https://fonts.googleapis.com/css2?family=Noto+Serif:ital,wght@0,400;0,700;1,400;1,700&family=Outfit:wght@300;700&display=swap'
+    ],
     // Background colors
     light: {
 		// Background colors;
@@ -91,10 +94,10 @@ export const BookishTheme = {
     
     // Fonts
     fonts: {
-        paragraphFontFamily: '"Georgia", serif',
-        headerFontFamily: '"Verdana", serif',
+        paragraphFontFamily: '"Noto Serif", serif',
+        headerFontFamily: '"Outfit", serif',
         codeFontFamily: '"Courier New", monospace',
-        bulletFontFamily: '"Verdana"'
+        bulletFontFamily: '"Outfit", serif'
     },
 
     // Font sizes
@@ -102,11 +105,11 @@ export const BookishTheme = {
         paragraphFontSize: "14pt",
         blockFontSize: "11pt",
         smallFontSize: "9pt",
-        titleFontSize: "2.4rem",
-        header1FontSize: "2rem",
-        header2FontSize: "1.5rem",
-        header3FontSize: "1rem",
-        codeFontSize: "11pt"
+        titleFontSize: "30pt",
+        header1FontSize: "24pt",
+        header2FontSize: "20pt",
+        header3FontSize: "14pt",
+        codeFontSize: "12pt"
     },
 
     // Font weights
@@ -191,11 +194,11 @@ export const SeriousTheme: Theme = {
         paragraphFontSize: "14pt",
         blockFontSize: "11pt",
         smallFontSize: "9pt",
-        titleFontSize: "2.4rem",
-        header1FontSize: "2rem",
-        header2FontSize: "1.5rem",
-        header3FontSize: "1rem",
-        codeFontSize: "11pt"
+        titleFontSize: "30pt",
+        header1FontSize: "24pt",
+        header2FontSize: "20pt",
+        header3FontSize: "14pt",
+        codeFontSize: "12pt"
     },
 
     // Font weights
@@ -279,11 +282,11 @@ export const TechTheme: Theme = {
         paragraphFontSize: "14pt",
         blockFontSize: "11pt",
         smallFontSize: "9pt",
-        titleFontSize: "2.4rem",
-        header1FontSize: "2rem",
-        header2FontSize: "1.5rem",
-        header3FontSize: "1rem",
-        codeFontSize: "11pt"
+        titleFontSize: "30pt",
+        header1FontSize: "24pt",
+        header2FontSize: "20pt",
+        header3FontSize: "14pt",
+        codeFontSize: "12pt"
     },
 
     // Font weights
@@ -368,10 +371,10 @@ export const HumanTheme: Theme = {
         paragraphFontSize: "14pt",
         blockFontSize: "11pt",
         smallFontSize: "10pt",
-        titleFontSize: "4rem",
-        header1FontSize: "3rem",
-        header2FontSize: "2rem",
-        header3FontSize: "1rem",
+        titleFontSize: "36pt",
+        header1FontSize: "30pt",
+        header2FontSize: "24pt",
+        header3FontSize: "20pt",
         codeFontSize: "11pt"
     },
 
@@ -457,11 +460,11 @@ export const SketchyTheme: Theme = {
         paragraphFontSize: "14pt",
         blockFontSize: "11pt",
         smallFontSize: "9pt",
-        titleFontSize: "2.4rem",
-        header1FontSize: "2rem",
-        header2FontSize: "1.5rem",
-        header3FontSize: "1rem",
-        codeFontSize: "11pt"
+        titleFontSize: "32pt",
+        header1FontSize: "26pt",
+        header2FontSize: "22pt",
+        header3FontSize: "16pt",
+        codeFontSize: "12pt"
     },
 
     // Font weights
@@ -550,11 +553,11 @@ export const CriticalTheme: Theme = {
         paragraphFontSize: "14pt",
         blockFontSize: "11pt",
         smallFontSize: "9pt",
-        titleFontSize: "2.4rem",
-        header1FontSize: "2rem",
-        header2FontSize: "1.5rem",
-        header3FontSize: "1rem",
-        codeFontSize: "11pt"
+        titleFontSize: "30pt",
+        header1FontSize: "24pt",
+        header2FontSize: "20pt",
+        header3FontSize: "14pt",
+        codeFontSize: "12pt"
     },
     
     // Font weights

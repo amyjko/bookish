@@ -8,6 +8,7 @@
     import { writable } from "svelte/store";
     import { BASE, BOOK, DARK_MODE, EDITABLE, EDITION, type DarkModeStore, type EditionStore } from "./Contexts";
     import type Book from "$lib/models/book/Book";
+    import { BookishTheme } from "$lib/models/book/Theme";
 
     // Poly fill smooth scrolling for Safari.
     smoothscroll.polyfill();
@@ -93,7 +94,7 @@
         goto(location.hash.replace('#', ''))    
 
     // Set the theme, whatever it is, and change it when the edition changes.
-    $: setTheme($currentEdition.getTheme());
+    $: setTheme($currentEdition.getTheme() ?? BookishTheme);
     
     /** Given a theme, sets the appropriate CSS rules in the browser to apply the theme.*/
     function setTheme(theme: Theme | null) {
@@ -175,7 +176,7 @@
         return Object.keys(set).map(name => {
             const value = set[name];
             if(value.length > 0) {
-                const cssVariable = "--bookish-" + name.replace(/([a-z])([A-Z])/g, "$1 $2").split(" ").map(s => s.toLowerCase()).join("-");
+                const cssVariable = "--bookish-" + name.replace(/([a-z])([A-Z])/g, "$1 $2").split(" ").map(s => s.toLowerCase()).join("-").replace(/([0-9])/g, "-$1-");
                 return `${cssVariable}: ${value};`
             }
         }).join("\n\t\t");
@@ -190,91 +191,14 @@
     {/if}
 </div>
 
-<style global>
-
-    @import url('https://fonts.googleapis.com/css2?family=Noto+Serif:ital,wght@0,400;0,700;1,400;1,700&family=Outfit:wght@300;700&display=swap');
-
-    :root {
-        /* Background colors */
-        --bookish-background-color: #FFFFFF;
-        --bookish-block-background-color: #FCFAFA;
-        --bookish-error-background-color: #F8D7DA;
-
-        /* Border colors */
-        --bookish-border-color-light: #E0E0E0;
-        --bookish-border-color-bold: #000000;
-
-        /* Foreground colors */
-        --bookish-paragraph-color: #000000;
-        --bookish-muted-color: #9AA1A7;
-        --bookish-highlight-color: #1B499C;
-        --bookish-comment-color: #257F31;
-        --bookish-error-color: #721C24;
-        --bookish-link-color: #1B499C;
-        --bookish-bullet-color: #EB2C27;
-
-        /* Fonts */
-        --bookish-paragraph-font-family: "Noto Serif", serif;
-        --bookish-header-font-family: "Outfit", serif;
-        --bookish-code-font-family: "Courier New", monospace;
-        --bookish-bullet-font-family: "Verdana";
-
-        /* Font sizes */
-        --bookish-paragraph-font-size: 14pt;
-        --bookish-block-font-size: 11pt;
-        --bookish-small-font-size: 9pt;
-        --bookish-title-font-size: 2.4rem;
-        --bookish-header-1-font-size: 2rem;
-        --bookish-header-2-font-size: 1.5rem;
-        --bookish-header-3-font-size: 1rem;
-        --bookish-code-font-size: 11pt;
-
-        /* Font weights */
-        --bookish-paragraph-font-weight: 400;
-        --bookish-bold-font-weight: 700;
-        --bookish-link-font-weight: 400;
-        --bookish-header-font-weight: 700;
-        --bookish-code-font-weight: 400;
-        --bookish-bullet-font-weight: 500;
-
-        /* Line heights */
-        --bookish-paragraph-line-height: 1.8em;
-        --bookish-paragraph-line-height-tight: 1.4em;
-        --bookish-header-line-height: 1.4em;
-
-        /* Spacing */
-        --bookish-paragraph-spacing: 1.8rem;
-        --bookish-header-spacing: 2rem;
-        --bookish-roundedness: 5px;
-        --bookish-indent: 10%;
-        --bookish-inline-padding: 0.25rem;
-        --bookish-block-padding: 1rem;
-        --bookish-outline-width: 12em;
-        --bookish-outline-padding: 1em;
-        --bookish-outline-offset: calc(-1 * (var(--bookish-outline-width) + 2 * var(--bookish-outline-padding)));
-    }
-
-    .dark {
-        --bookish-background-color: #1C1C1C;
-        --bookish-block-background-color: #333333;
-        --bookish-error-background-color: #721C24;
-        --bookish-border-color-light: #444444;
-        --bookish-border-color-bold: #DADADA;
-        --bookish-paragraph-color: #DADADA;
-        --bookish-muted-color: #666666;
-        --bookish-highlight-color: #c5a248;
-        --bookish-comment-color: #1c4722;
-        --bookish-error-color: #F8D7DA;
-        --bookish-link-color: #73a3fa;
-        --bookish-bullet-color: #721C24;
-    }
+<style>
 
     * {
         box-sizing: border-box;
     }
 
     /* WINDOW AND PAGES */
-    body {
+    :global(body) {
         margin: 0;
         padding: 0;
         background-color: var(--bookish-background-color);
@@ -291,20 +215,5 @@
         z-index: 0;
         text-align: left;
     }
-
-    table {
-        width: 100%;
-        line-height: var(--bookish-paragraph-line-height-tight);
-        margin-bottom: var(--bookish-paragraph-spacing);
-        border-collapse: collapse;
-        clear: both;
-        border-collapse: separate;
-        border-radius: var(--bookish-roundedness);
-        border-spacing: 0;
-    }
     
-    .dark .bookish-figure-image {
-        filter: brightness(50%);
-    }
-
 </style>

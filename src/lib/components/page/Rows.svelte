@@ -10,6 +10,11 @@
     .table {
         width: 100%;
         overflow-x: auto;
+        line-height: var(--bookish-paragraph-line-height-tight);
+        border-collapse: collapse;
+        clear: both;
+        border-radius: var(--bookish-roundedness);
+        border-spacing: 0;
     }
 
     table :global(tr:first-child th) {

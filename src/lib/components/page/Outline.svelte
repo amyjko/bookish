@@ -215,6 +215,9 @@
         font-weight: normal;
         font-size: var(--bookish-paragraph-font-size);
         color: var(--bookish-muted-color);
+        --bookish-outline-width: 12em;
+        --bookish-outline-padding: 1em;
+        --bookish-outline-offset: calc(-1 * (var(--bookish-outline-width) + 2 * var(--bookish-outline-padding)));
     }
 
     .bookish-outline-header-nav {
