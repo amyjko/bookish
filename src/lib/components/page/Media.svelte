@@ -10,6 +10,7 @@
     import { onMount } from "svelte";
     import { getEdition, isEditable } from "./Contexts";
     import Button from "../app/Button.svelte";
+    import PageHeader from "./PageHeader.svelte";
 
     let edition = getEdition();
     let editable = isEditable();
@@ -67,7 +68,7 @@
         </MediaPreview>
     {/each}
     {#if editable !== undefined && unused !== undefined && unused.length > 0 }
-        <h2>Unused</h2>
+        <PageHeader id="unused">Unused</PageHeader>
         <Instructions>
             These images are uploaded to this book, but not used.
             Delete them if you don't need them.

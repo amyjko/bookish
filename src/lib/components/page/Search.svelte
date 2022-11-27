@@ -10,6 +10,7 @@
     import TextInput from "../app/TextInput.svelte";
     import ChapterTitle from "./ChapterTitle.svelte";
     import ChapterNumber from "./ChapterNumber.svelte";
+    import PageHeader from "./PageHeader.svelte";
 
     let edition = getEdition();
     let base = getBase();
@@ -102,7 +103,7 @@
             <p>Found {results.filter(result => !(result instanceof Chapter)).length} occurrences of <em>{query}</em>...</p>
             {#each results as result }
                 {#if result instanceof Chapter }
-                    <h2 id={"header-" + result.getChapterID()}><ChapterNumber>Chapter{#if $edition.getChapterNumber(result.getChapterID()) !== undefined}&nbsp;{$edition.getChapterNumber(result.getChapterID())}{/if}</ChapterNumber> - <ChapterTitle>{result.getTitle()}</ChapterTitle></h2>
+                    <PageHeader id={"header-" + result.getChapterID()}><ChapterNumber>Chapter{#if $edition.getChapterNumber(result.getChapterID()) !== undefined}&nbsp;{$edition.getChapterNumber(result.getChapterID())}{/if}</ChapterNumber> - <ChapterTitle>{result.getTitle()}</ChapterTitle></PageHeader>
                 {:else}
                     <p><Link to={result.link}>...{result.left}<span class="bookish-content-highlight">{result.match}</span>{result.right}...</Link></p>
                 {/if}

@@ -1,5 +1,5 @@
 <script lang="ts">
-
+    import PageHeader from "./PageHeader.svelte";
     import ThemeVariableEditor from "./ThemeVariableEditor.svelte";
 
     export let header: string;
@@ -8,7 +8,7 @@
 
 </script>
 
-<h2>{header}</h2>
+<PageHeader>{header}</PageHeader>
 <div class="bookish-table">
     <table>
         <tbody>

@@ -4,6 +4,7 @@
     import Instructions from "$lib/components/page/Instructions.svelte";
     import Format from "$lib/components/chapter/Format.svelte";
     import { getEdition, isEditable } from "./Contexts";
+    import PageHeader from "./PageHeader.svelte";
 
     let edition = getEdition();
     let editable = isEditable();
@@ -12,7 +13,7 @@
 
 </script>
 
-<h2 class="bookish-header" id="license">License</h2>
+<PageHeader id="license">License</PageHeader>
 
 <Instructions>
     By default of U.S. Copyright Law, your content copyrighted and owned by all authors. 

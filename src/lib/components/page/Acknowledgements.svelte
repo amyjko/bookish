@@ -5,6 +5,7 @@
     import BookishEditor from "$lib/components/editor/BookishEditor.svelte";
     import Instructions from "$lib/components/page/Instructions.svelte";
     import { getEdition, isEditable } from "./Contexts";
+    import PageHeader from "./PageHeader.svelte";
 
     let edition = getEdition();
     let editable = isEditable();
@@ -29,6 +30,6 @@
         save={node => $edition.setAcknowledgements(node.toBookdown())}
     />
 {:else if acknowledgements.length > 0 }
-    <h2 class="bookish-header" id="acknowledgements">Acknowledgements</h2>
+    <PageHeader id="acknowledgements">Acknowledgements</PageHeader>
     <ChapterBody node={acksNode}/>
 {/if}

@@ -10,6 +10,7 @@
     import Muted from "./Muted.svelte";
     import ChapterTitle from "./ChapterTitle.svelte";
     import ChapterNumber from "./ChapterNumber.svelte";
+    import PageHeader from "./PageHeader.svelte";
 
     let edition = getEdition();
     let base = getBase();
@@ -95,7 +96,7 @@
                 <tbody>
                     {#each words as word, index }
                         {#if word === true}
-                            <tr><td colspan={2}><h2 class="bookish-header">{words[index + 1]}</h2></td></tr>
+                            <tr><td colspan={2}><PageHeader>{words[index + 1]}</PageHeader></td></tr>
                         {:else}
                             <tr>
                                 <td>{word}</td>

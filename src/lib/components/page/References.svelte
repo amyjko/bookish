@@ -41,10 +41,6 @@
 
         {#each Object.keys(references).sort() as citationID }
             {@const ref = Parser.parseReference(citationID, references === null ? "" : references[citationID], $edition) }
-            <!-- {#if letter === undefined || citationID.charAt(0) !== letter) {
-                letter = citationID.charAt(0);
-                renderedReferences.push(<h2 key={"letter-" + letter} className="bookish-header" id={"references-" + letter}>{letter.toUpperCase()}</h2>);
-            } -->
             <PossibleReference node={ref} />
         {/each}
 

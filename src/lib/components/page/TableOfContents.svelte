@@ -18,6 +18,7 @@
     import { getBase, getEdition, isEditable } from "./Contexts";
     import Muted from "./Muted.svelte";
     import Button from "../app/Button.svelte";
+    import PageHeader from "./PageHeader.svelte";
 
     let edition = getEdition();
 	let base = getBase();
@@ -104,7 +105,7 @@
         Write an informative description of what your book is about.
     </Instructions>
 
-    <h2 class="bookish-header" id="chapters">Chapters {#if editable}<Button tooltip="Add a new chapter" disabled={waitingForChapter} command={addChapter}>+</Button>{/if}</h2>
+    <PageHeader id="chapters">Chapters {#if editable}<Button tooltip="Add a new chapter" disabled={waitingForChapter} command={addChapter}>+</Button>{/if}</PageHeader>
 
     <Instructions>
         Add, remove, and reorder chapters here.
@@ -215,7 +216,7 @@
     <Acknowledgements />
     <License />
 
-    <h2 class="bookish-header" id="print">Print</h2>
+    <PageHeader id="print">Print</PageHeader>
 
     <Instructions>
         This offers a way for readers to print the entire book as a single page.
@@ -227,7 +228,7 @@
         Long books can take some time to render.
     </p>
 
-    <h2 class="bookish-header" id="citation">Citation</h2>
+    <PageHeader id="citation">Citation</PageHeader>
 
     <Instructions>
         This citation is dynamically created from the current authors, title, and date.

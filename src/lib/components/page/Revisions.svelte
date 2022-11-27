@@ -9,6 +9,7 @@
     import { getEdition, isEditable } from "./Contexts";
     import Button from "../app/Button.svelte";
     import Link from "../Link.svelte";
+    import PageHeader from "./PageHeader.svelte";
 
     let edition = getEdition();
     let editable = isEditable();
@@ -36,7 +37,7 @@
 </script>
 
 {#if editionRevisions.length > 0 }
-    <h2 class="bookish-header" id="revisions">Revisions</h2>
+    <PageHeader id="revisions">Revisions</PageHeader>
     <ul>
         {#each editionRevisions as revision }
             <li><em>{revision[0]}</em>. <Format node={Parser.parseFormat($edition, revision[1])} /></li>
@@ -44,7 +45,7 @@
     </ul>
 {/if}
 {#if book && bookRevisions}
-    <h2 class="bookish-header" id="revisions">Editions {#if editable}<Button tooltip="Create a new edition" command={handleDraftEdition}>+</Button>{/if}</h2>
+    <PageHeader id="revisions">Editions {#if editable}<Button tooltip="Create a new edition" command={handleDraftEdition}>+</Button>{/if}</PageHeader>
     <Instructions>
         Each book has one or more editions, allowing you to track revisions and ensure previous versions remain available.
         When you're ready to revise, make a new edition, then publish it when you're done.
