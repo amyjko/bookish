@@ -22,10 +22,41 @@
 
 <style> 
     p {
+        font-family: var(--bookish-paragraph-font-family);
+        font-size: var(--bookish-paragraph-font-size);
+        color: var(--bookish-paragraph-color);
+
+        margin-top: var(--bookish-paragraph-spacing);
+        margin-bottom: var(--bookish-paragraph-spacing);
+
         line-height: var(--bookish-paragraph-line-height);
+
+        /* Allow paragraphs to break on words to support small screens. */
+        word-break: break-word;
+
+        /* Empty paragraphs should have at least some height. */
+        min-height: var(--bookish-paragraph-line-height);
+
     }
 
-    h1, h2, h3 {
+    h2, h3, h4, h5, h6 {
+        font-family: var(--bookish-header-font-family);
+        font-weight: var(--bookish-header-font-weight);
+        margin-top: var(--bookish-header-spacing);
+        margin-bottom: var(--bookish-header-spacing);
         line-height: var(--bookish-header-line-height);
+    }
+
+    h2 {
+        font-size: var(--bookish-header-1-font-size);
+    }
+
+    h3 {
+        font-size: var(--bookish-header-2-font-size);
+    }
+
+    h4 {
+        font-size: var(--bookish-header-3-font-size);
+        font-style: italic;
     }
 </style>

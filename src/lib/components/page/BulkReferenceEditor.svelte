@@ -16,7 +16,8 @@
 		$edition.addReferences(references)
 			.catch(() => {
 				alert("Failed to save references.")
-			});
+			})
+			.finally(() => text = "");
 
 	}
 
@@ -34,20 +35,22 @@
     You can add one at a time, or try pasting them in bulk, and we'll do our best to pull out the relevant parts, looking for things that look like author lists, years, sources, and URLs.
     Be sure to verify it though &mdash; it's likely to get some things wrong!
 </Instructions>
-<div>
-    <textarea rows={5} bind:value={text} style="width: 100%"></textarea>
-    <Button tooltip="Attempt to convert the text above into references" disabled={text.length === 0} command={handleBulkAdd}>Add bulk references</Button>
-    <Button tooltip="Add an empty reference" command={handleEmptyAdd}>Add empty reference</Button>
-</div>
+
+<textarea rows={5} bind:value={text} style="width: 100%"></textarea>
+<Button tooltip="Attempt to convert the text above into references" disabled={text.length === 0} command={handleBulkAdd}>Add bulk references</Button>
+<Button tooltip="Add an empty reference" command={handleEmptyAdd}>Add empty reference</Button>
 
 <style>
 
 	textarea {
+		width: 100%;
+		padding: var(--bookish-app-chrome-padding);
 		font-family: var(--bookish-app-font-family);
 		font-size: var(--bookish-app-font-size);
         border: none;
         border-top: var(--bookish-app-chrome-border-width) solid var(--bookish-app-chrome-border-color);
         border-bottom: var(--bookish-app-chrome-border-width) solid var(--bookish-app-chrome-border-color);
+		margin-bottom: var(--bookish-app-chrome-padding);
     }
 
 	textarea:focus {

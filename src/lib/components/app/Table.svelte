@@ -22,4 +22,11 @@
         border-spacing: 0;
     }
 
+    table :global(td) {
+        padding: var(--bookish-app-chrome-padding);
+        vertical-align: top;
+        font-family: var(--bookish-app-font-family);
+        font-weight: 300;
+    }
+
 </style>

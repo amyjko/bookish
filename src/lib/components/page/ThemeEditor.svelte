@@ -7,12 +7,12 @@
     import Instructions from './Instructions.svelte'
     import ThemeSetEditor from './ThemeSetEditor.svelte'
     import ThemeEditorPreview from './ThemeEditorPreview.svelte'
-    import External from "../External.svelte";
     import { getEdition } from "./Contexts";
     import TextEditor from "../editor/TextEditor.svelte";
     import type Theme from "$lib/models/book/Theme";
     import Button from "../app/Button.svelte";
     import Switch from "../editor/Switch.svelte";
+    import Link from "../app/Link.svelte";
 
     const themes: Record<string,Theme> = {
         Bookish: BookishTheme,
@@ -53,7 +53,7 @@
     <Instructions>
         This is the theme editor. 
         You can use it to choose from existing themes or create a custom theme for your book's appearance.
-        To use it, you'll need to know a bit about how to format CSS <External to="https://developer.mozilla.org/en-US/docs/Web/CSS/color">colors</External>, <External to="https://developer.mozilla.org/en-US/docs/Web/CSS/font-size">fonts</External>, and <External to="https://developer.mozilla.org/en-US/docs/Learn/CSS/Building_blocks/Values_and_units">sizes</External>.
+        To use it, you'll need to know a bit about how to format CSS <Link to="https://developer.mozilla.org/en-US/docs/Web/CSS/color">colors</Link>, <Link to="https://developer.mozilla.org/en-US/docs/Web/CSS/font-size">fonts</Link>, and <Link to="https://developer.mozilla.org/en-US/docs/Learn/CSS/Building_blocks/Values_and_units">sizes</Link>.
     </Instructions>
 
 

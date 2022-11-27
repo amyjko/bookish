@@ -12,7 +12,6 @@
 </script>
 
 <Switch
-    position={value}
     options={["<", "|", ">"]}
     value={value}
     edit={editAsString} 

@@ -12,6 +12,7 @@
     export let saveOnExit: boolean = false;
     export let width: number | undefined = undefined;
     export let clip: boolean = false;
+    export let move: ((el: HTMLElement, direction: -1|1) => void) | undefined = undefined;
 
     let text = startText;
     let status = Status.Viewing;
@@ -91,6 +92,14 @@
     function handleKeyPress(event: KeyboardEvent) {
         if(event.key === "Enter")
             status = Status.Viewing;
+        else if(event.key === "ArrowUp" && move && field) {
+            event.preventDefault();
+            move(field, -1);
+        }
+        else if(event.key === "ArrowDown" && move && field) {
+            event.preventDefault();
+            move(field, 1);
+        }
     }
 
 </script>
@@ -107,7 +116,7 @@
         aria-label={label}
         placeholder={placeholder}
         on:change={edit}
-        on:keypress={handleKeyPress}
+        on:keydown={handleKeyPress}
         on:blur={stopEditing}
         on:focus={startEditing}
     />
@@ -126,7 +135,7 @@
         position: relative;
     }
 
-    .bookish-text-editor input[type="text"] {
+    input[type="text"] {
         cursor: pointer;
         position: absolute;
         left: 0;
@@ -136,7 +145,7 @@
     }
 
     /* Match the parent's styling as much as possible. */
-    .bookish-text-editor input[type="text"], .bookish-text-editor-sizer {
+    input[type="text"], .bookish-text-editor-sizer {
         background-color: inherit;
         font-family: inherit;
         font-size: inherit;
@@ -150,6 +159,11 @@
         margin: 0;
         display: inline;
         cursor: text;
+    }
+
+    input[type="text"]:focus {
+        outline: none;
+        border-bottom: var(--bookish-app-chrome-border-width) solid var(--bookish-app-chrome-hover-background);
     }
 
     /* This ensures the error message always appears below empty text editors */

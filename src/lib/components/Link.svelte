@@ -34,7 +34,7 @@
 
 </script>
 
-<a href={to} bind:this={link} on:click={event => scroll(event) }><slot></slot></a>
+<a href={to} bind:this={link} on:click={event => scroll(event) } target={to.startsWith("http") ? "_blank" : null}><slot></slot></a>
 
 <style>
     a {

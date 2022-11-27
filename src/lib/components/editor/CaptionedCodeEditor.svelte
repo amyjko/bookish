@@ -20,7 +20,6 @@
         <Switch
             options={["executable", "read only"]}
             value={code.isExecutable() ? "executable" : "read only"}
-            position=">"
             edit={value => $caret?.edit(code, code.withExecutable(value === "executable")) }
         />
     {/if}

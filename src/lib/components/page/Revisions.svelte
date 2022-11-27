@@ -92,7 +92,6 @@
                         <td style="whitespace: nowrap">
                             {#if editable}
                                 <Switch
-                                    position=">"
                                     options={["hidden", "published"]} 
                                     enabled={revision.published || revision.summary !== ""}
                                     value={revision.published ? "published" : "hidden"} 
