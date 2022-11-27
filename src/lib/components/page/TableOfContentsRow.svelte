@@ -8,6 +8,7 @@
     import Muted from "./Muted.svelte";
     import ChapterNumber from "./ChapterNumber.svelte";
     import Button from "../app/Button.svelte";
+    import ChapterTitle from "./ChapterTitle.svelte";
 
     export let chapterID: string;
     export let chapter: Chapter | undefined = undefined;
@@ -40,15 +41,9 @@
                 </div>
             </Toggle>
         {:else if number !== undefined }
-            <div><ChapterNumber>{"Chapter " + number}</ChapterNumber></div>
+            <ChapterNumber>{"Chapter " + number}</ChapterNumber>
         {/if}
-        <span class="chapter-title">
-            {#if forthcoming && !editable}
-                {title}
-            {:else}
-                <Link to={`${base}${chapterID}`}>{title}</Link>
-            {/if}
-        </span>
+        <ChapterTitle link={forthcoming && !editable ? undefined : `${base}${chapterID}`}>{title}</ChapterTitle>
         <div><Muted><em><slot name="annotation"></slot></em></Muted></div>
     </td>
     <td><slot name="etc"></slot></td>
@@ -73,9 +68,5 @@
 <style>
     .bookish-forthcoming {
         opacity: 0.5;
-    }
-
-    .chapter-title {
-        font-family: var(--bookish-header-font-family);
     }
 </style>

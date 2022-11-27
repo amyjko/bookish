@@ -8,22 +8,14 @@
     import ChapterIDs from '$lib/models/book/ChapterID';
     import { onMount } from "svelte";
     import { getBase, getEdition } from "./Contexts";
+    import TextInput from "../app/TextInput.svelte";
+    import ChapterTitle from "./ChapterTitle.svelte";
+    import ChapterNumber from "./ChapterNumber.svelte";
 
     let edition = getEdition();
     let base = getBase();
 
     let query = "";
-    let input: HTMLInputElement | null = null;
-
-    // Focus the query box when loaded
-    onMount(() => { if(input) input.focus(); });
-
-    // Don't allow spaces
-    function handleKeyDown(event: KeyboardEvent) {
-        if(event.key === " ") {
-            event.preventDefault();
-        }
-    }
 
     let results: (Chapter | { link: string, left: string, match: string, right: string })[] = [];
     $: {
@@ -31,6 +23,8 @@
         results = [];
 
         const lowerQuery = query.toLowerCase();
+
+        query = query.trim();
 
         // Go through all the chapter indexes and find matches.
         if(query.length > 2)
@@ -59,7 +53,7 @@
                             // Only highlight the part of the word that matches.
                             const start = match.match.toLowerCase().indexOf(lowerQuery);
                             results.push({ 
-                                link: `${base}/${chapter.getChapterID()}?word=${match.match.toLowerCase()}&number=${index}`,
+                                link: `${base}${chapter.getChapterID()}?word=${match.match.toLowerCase()}&number=${index}`,
                                 left: match.left + match.match.substring(0, start),
                                 match: match.match.substring(start, start + query.length),
                                 right: match.match.substring(start + query.length) + match.right
@@ -87,21 +81,21 @@
         />    
     </Header>
 
-    <p>Type a word—just a single word—and we'll show its occurrences in this book:</p>
+    <p>
+        Type a word—just a single word—and we'll show its occurrences in this book:
+    </p>
 
     <p>
-        <input 
+        <TextInput 
             type="text" 
-            name="query" 
             placeholder={"search for a word"} 
-            on:keydown={handleKeyDown}
-            bind:this={input} 
-            bind:value={query}
+            disabled={false}
+            bind:text={query}
         />
     </p>
 
-    {#if query !== "" }
-        {#if query.length < 3 }
+    {#if query.trim() !== "" }
+        {#if query.trim().length < 3 }
             <p>Keep typing...</p>
         {:else if results.length === 0 }
             <p>No occurrence of <em>{query}</em>.</p>
@@ -109,7 +103,7 @@
             <p>Found {results.filter(result => !(result instanceof Chapter)).length} occurrences of <em>{query}</em>...</p>
             {#each results as result }
                 {#if result instanceof Chapter }
-                    <h2 class="bookish-header" id={"header-" + result.getChapterID()}>Chapter{#if $edition.getChapterNumber(result.getChapterID()) !== undefined}&nbsp;{$edition.getChapterNumber(result.getChapterID())}{/if} - {result.getTitle()}</h2>
+                    <h2 id={"header-" + result.getChapterID()}><ChapterNumber>Chapter{#if $edition.getChapterNumber(result.getChapterID()) !== undefined}&nbsp;{$edition.getChapterNumber(result.getChapterID())}{/if}</ChapterNumber> - <ChapterTitle>{result.getTitle()}</ChapterTitle></h2>
                 {:else}
                     <p><Link to={result.link}>...{result.left}<span class="bookish-content-highlight">{result.match}</span>{result.right}...</Link></p>
                 {/if}

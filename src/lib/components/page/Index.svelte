@@ -8,6 +8,8 @@
     import { getBase, getEdition } from "./Contexts";
     import { page } from "$app/stores";
     import Muted from "./Muted.svelte";
+    import ChapterTitle from "./ChapterTitle.svelte";
+    import ChapterNumber from "./ChapterNumber.svelte";
 
     let edition = getEdition();
     let base = getBase();
@@ -109,7 +111,7 @@
                                         }) as chapterID, index }
                                         <!-- Map them to links to the first occurrence in the chapter. -->
                                         <span>
-                                            Chapter {#if $edition.getChapterNumber(chapterID) !== undefined}<span> {$edition.getChapterNumber(chapterID)}. </span>{/if}<Link to={`${base}${chapterID}?word=${word}`}>{$edition.getChapterName(chapterID)}</Link>
+                                            <ChapterNumber>Chapter {#if $edition.getChapterNumber(chapterID) !== undefined}{$edition.getChapterNumber(chapterID)}. {/if}</ChapterNumber> <ChapterTitle link={`${base}${chapterID}?word=${word}`}>{$edition.getChapterName(chapterID)}</ChapterTitle>
                                             {#if index < bookIndex[word].size - 1 }<br/>{/if}
                                         </span>
                                     {/each}
