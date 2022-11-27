@@ -19,7 +19,7 @@
 		This is how a sentence with _various_ *formatting* ^will^ look.
 
 		* How does it look?
-		* Would you change anything?	
+		* Would you change anything?
 	`);
 
 </script>

@@ -887,7 +887,7 @@ export default class Parser {
         let text = "";
 
         // Special case subscript, which has an extra delimeter.
-        if(this.peek() === "v") {
+        if(delimeter === "^" && this.peek() === "v") {
             this.read();
             subscript = true;
         }
