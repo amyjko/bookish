@@ -20,6 +20,7 @@
     import Button from "../app/Button.svelte";
     import PageHeader from "./PageHeader.svelte";
     import Rows from "./Rows.svelte";
+    import PageParagraph from "./PageParagraph.svelte";
 
     let edition = getEdition();
 	let base = getBase();
@@ -219,11 +220,11 @@
         This offers a way for readers to print the entire book as a single page.
     </Instructions>
 
-    <p>
+    <PageParagraph>
         Want to print this book or generate a PDF? 
         See <Link to={base + "print"}>all chapters on a single page</Link> and then print or export.
         Long books can take some time to render.
-    </p>
+    </PageParagraph>
 
     <PageHeader id="citation">Citation</PageHeader>
 
@@ -232,9 +233,9 @@
     </Instructions>
 
     <!-- Book citation -->
-    <p>
+    <PageParagraph>
         { $edition.getAuthors().map(author => Parser.parseFormat($edition, author).toText()).join(", ") } ({(new Date()).getFullYear() }). <em>{$edition.getTitle()}</em>. { location.protocol+'//'+location.host+location.pathname }, <em>retrieved { (new Date()).toLocaleDateString("en-US")}</em>.
-    </p>
+    </PageParagraph>
 
     <Revisions />
     

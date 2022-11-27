@@ -18,7 +18,7 @@
 
 </script>
 
-<div class="header">
+<nav class="header">
     <Link to={getLink("/")}>Home</Link>
     <Link to={getLink("/read")}>Read</Link>
     <Link to={getLink("/write")}>Write</Link>
@@ -28,16 +28,20 @@
     {:else}
         <Link to={getLink("/login")}>Login</Link>
     {/if}
-</div>
+</nav>
 
 <style>
     .header {
-        margin-top: var(--app-chrome-padding); 
-        margin-bottom: var(--app-chrome-padding); 
+        width: 100%;
+        padding: var(--app-chrome-padding); 
+        box-sizing: border-box;
+        white-space: nowrap;
+        overflow: clip;
+        text-align: center;
     }
 
     .header > :global(a) {
-        display: inline-block;
-        margin-right: calc(2 * var(--app-chrome-padding));
+        margin-right: var(--app-chrome-padding);
+        text-overflow: ellipsis;
     }
 </style>
