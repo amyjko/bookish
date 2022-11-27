@@ -117,7 +117,7 @@
     }
 
     function getShortcutDescription(command: Command) {
-        const macOS = navigator.platform.indexOf('Mac') > -1;
+        const macOS = navigator.userAgent.indexOf('Mac') >= 0;
         const controlSymbol = macOS ? "\u2318" : "Ctrl+";
         const altSymbol = macOS ? "\u2325" : "Alt+";
         const key = command.key ? (Array.isArray(command.key) ? command.key.join("/") : command.key) : command.code ? command.code : "any";
