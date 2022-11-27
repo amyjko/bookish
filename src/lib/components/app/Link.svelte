@@ -9,7 +9,6 @@
     a {        
         color: var(--app-interactive-color);
         font-family: var(--app-font);
-        font-size: var(--app-font-size);
         font-weight: 400;
         text-decoration: none;
     }

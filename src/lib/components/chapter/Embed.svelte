@@ -6,6 +6,7 @@
 
     export let node: EmbedNode;
     export let placeholder: string | undefined = undefined;
+    export let imageOnly: boolean = false;
 
     $: url = node.getURL();
 	$: description = node.getDescription();
@@ -81,7 +82,7 @@
 {#if imageError }
     <div class="bookish-figure-unspecified">{ editable ? "Unable to load image. Is the URL correct? Are you offline?" : "Unable to load image" }</div>
 {:else}
-    <Figure {node} caption={node.getCaption()}>
+    <Figure {node} caption={imageOnly ? undefined : node.getCaption()} credit={imageOnly ? undefined : node.getCredit()}>
         {#if url.trim().length === 0 }
             {#if editable }
                 <div 

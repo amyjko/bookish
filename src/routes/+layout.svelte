@@ -37,7 +37,7 @@
         --app-font: "Outfit", sans-serif;
         --app-line-height: 1.7;
         --app-font-size: 14pt;
-        --app-text-spacing: 2em;
+        --app-text-spacing: 2rem;
 
         --app-interactive-color: #1B499C;
         --app-background-color: white;

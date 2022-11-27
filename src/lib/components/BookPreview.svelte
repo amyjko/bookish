@@ -22,71 +22,74 @@
 
 </script>
 
-<tr class="book-preview">
-    <td class="cover">
+<div class="book-preview">
+    <div class="cover">
         {#if embed instanceof EmbedNode }
-            <Embed node={embed}/>
+            <Embed node={embed} imageOnly/>
         {:else if embed instanceof ErrorNode }
             <ErrorMessage node={embed}/>
         {/if}
-    </td>
-    <td class="title">
-        {#if subdomain === undefined || write }
-            <Link to={refID === undefined ? "" : (write ? "/write/" : "/") + refID}>{title}</Link>
-        {:else}
-            <Link to={`/${subdomain}`}>{title}</Link>
-        {/if}
-    </td>
-    <td class="authors">
-        {#each authors as author, index}
-            <span>{author}{#if index !== authors.length - 1},&nbsp;{/if}</span>
-        {:else}
-            <em>No authors</em>
-        {/each}
-    </td>
-    <td class="description">
-        {#if description.length === 0}
-            <em>No description</em>
-        {:else}
-            <ChapterBody node={Parser.parseChapter(undefined, description)}/>
-        {/if}
-    </td>
-</tr>
+    </div>
+    <div class="content">
+        <div class="title">
+            {#if subdomain === undefined || write }
+                <Link to={refID === undefined ? "" : (write ? "/write/" : "/") + refID}>{title}</Link>
+            {:else}
+                <Link to={`/${subdomain}`}>{title}</Link>
+            {/if}
+        </div>
+        <div class="authors">
+            {#each authors as author, index}
+                <span>{author}{#if index !== authors.length - 1},&nbsp;{/if}</span>
+            {:else}
+                <em>No authors</em>
+            {/each}
+        </div>
+        <div class="description">
+            {#if description.length === 0}
+                <em>No description</em>
+            {:else}
+                <ChapterBody node={Parser.parseChapter(undefined, description)}/>
+            {/if}
+        </div>
+    </div>
+</div>
 
 <style>
 
-    td {
-        vertical-align: top;
-        padding: var(--app-chrome-padding);
-    }
-
     .book-preview {
         display: flex;
-        width: 100%;
+        flex-direction: row;
+        align-content: top;
+        margin: var(--app-chrome-padding);
         padding: var(--app-chrome-padding);
         text-align: left;
     }
 
     .cover {
+        flex: 1;
         width: 5em;
-        height: 5em;
-        margin-right: var(--app-chrome-padding);
+        margin-right: var(--app-text-spacing);
+    }
+
+    .content {
+        flex: 4;
     }
 
     .title {
-        flex: 1;
-        margin-right: var(--app-chrome-padding);
+        font-size: 20pt;
+        margin-bottom: var(--app-chrome-padding);
     }
 
     .authors {
-        flex: 1;
-        margin-right: var(--app-chrome-padding);
+        margin-bottom: var(--app-chrome-padding);
+        font-style: italic;
     }
 
     .description {
-        flex: 2;
         overflow: hidden;
-        max-height: 10em;
+        text-overflow: ellipsis;
+        height: 5em;
     }
 
 </style>

@@ -7,7 +7,6 @@
     import Lead from '$lib/components/app/Lead.svelte';
     import Paragraph from '$lib/components/app/Paragraph.svelte';
     import Large from '$lib/components/app/Large.svelte';
-    import Table from '$lib/components/app/Table.svelte';
 
 	let books: Book[] = [];
 	let loading = true;
@@ -30,7 +29,7 @@
 	
 </script>
 
-<Lead><Large>Books</Large> published.</Lead>
+<Lead><Large>Read</Large> something.</Lead>
 
 {#if error }
     <Feedback error>{error}</Feedback>
@@ -39,9 +38,17 @@
 {:else if books.length === 0}
 	<Paragraph>You don't have have any books.</Paragraph>
 {:else}
-	<Table>
-		{#each books as book }
-			<BookPreview book={book} write={true} />
-		{/each}
-	</Table>
+    <div class="previews">
+        {#each books as book }
+            <BookPreview book={book} write={true} />
+        {/each}
+    </div>
 {/if}
+
+<style>
+	.previews {
+		margin-top: var(--app-text-spacing);
+		display: flex;
+		flex-direction: column;
+	}
+</style>

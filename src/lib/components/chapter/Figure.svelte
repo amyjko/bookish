@@ -8,7 +8,7 @@
     import type FormatNode from "$lib/models/chapter/FormatNode";
 
     export let node: TableNode | EmbedNode | CodeNode;
-    export let caption: FormatNode;
+    export let caption: FormatNode | undefined;
     export let credit: FormatNode | undefined = undefined;
 
 </script>
@@ -22,7 +22,9 @@
                     <Format node={credit} placeholder="credit" />
                 </div>
             {/if}
-            <Format node={caption} placeholder="caption"/>
+            {#if caption}
+                <Format node={caption} placeholder="caption"/>
+            {/if}
         </div>
     {/if}
 </div>

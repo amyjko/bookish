@@ -10,7 +10,6 @@
     import Large from '$lib/components/app/Large.svelte';
     import Paragraph from '$lib/components/app/Paragraph.svelte';
     import Button from '$lib/components/app/Button.svelte';
-    import Table from '$lib/components/app/Table.svelte';
 
 	let books: Book[] = [];
 	let loading = true;
@@ -80,9 +79,17 @@
 {:else if books.length === 0}
 	<Paragraph>You don't have have any books.</Paragraph>
 {:else}
-	<Table>
+	<div class="previews">
 		{#each books as book }
 			<BookPreview book={book} write={true} />
 		{/each}
-	</Table>
+	</div>
 {/if}
+
+<style>
+	.previews {
+		margin-top: var(--app-text-spacing);
+		display: flex;
+		flex-direction: column;
+	}
+</style>
