@@ -110,12 +110,3 @@
         {/if}
     {/if}
 </Page>
-
-<style>
-    input[type="text"] {
-        font-family: var(--bookish-paragraph-font-family);
-        font-size: var(--bookish-paragraph-font-size);
-        padding: var(--bookish-inline-padding) calc(2 * var(--bookish-inline-padding));
-        width: 100%;
-    }
-</style>
