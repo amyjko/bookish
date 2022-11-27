@@ -70,32 +70,28 @@
     Upload
 </label>
 <ToolbarSpacer/>
-<code>
-    {#if !embed.isHosted() }
-        <URLEditor 
-            url={embed.getURL()} 
-            validator={isValidURL}
-            edit={url => {
-                const revisedEmbed = embed.withURL(url);
-                const revisedURL = revisedEmbed.getURL();
-                $caret?.edit(embed, revisedEmbed);
-                return revisedURL;
-            }}
-        />
-    {/if}
-</code>
-<ToolbarSpacer/>
-<code>
-    <TextEditor
-        startText={description} 
-        label={'Image description'} 
-        placeholder={'description'} 
-        valid={ alt => alt.length === 0 ? "Image description required" : undefined }
-        save={ alt => { $caret?.edit(embed, embed.withDescription(alt)); } }
-        width={20}
-        clip={true}
+{#if !embed.isHosted() }
+    <URLEditor 
+        url={embed.getURL()} 
+        validator={isValidURL}
+        edit={url => {
+            const revisedEmbed = embed.withURL(url);
+            const revisedURL = revisedEmbed.getURL();
+            $caret?.edit(embed, revisedEmbed);
+            return revisedURL;
+        }}
     />
-</code>
+{/if}
+<ToolbarSpacer/>
+<TextEditor
+    startText={description} 
+    label={'Image description'} 
+    placeholder={'description'} 
+    valid={ alt => alt.length === 0 ? "Image description required" : undefined }
+    save={ alt => { $caret?.edit(embed, embed.withDescription(alt)); } }
+    width={20}
+    clip={true}
+/>
 <ToolbarSpacer/>
 {#if upload}
     {upload}
