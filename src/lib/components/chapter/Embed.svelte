@@ -5,7 +5,7 @@
     import Figure from "./Figure.svelte";
 
     export let node: EmbedNode;
-    export let placeholder: string | undefined = undefined;
+    export let placeholder: string = "";
     export let imageOnly: boolean = false;
 
     $: url = node.getURL();
@@ -92,7 +92,7 @@
                     on:dragleave={handleDragLeave}
                 >{
                     dragFeedback !== undefined ? dragFeedback :
-                    placeholder !== undefined ? placeholder :
+                    placeholder.length > 0 ? placeholder :
                         "Click or drag to choose or upload an image, or enter an image or video URL."
                 }
                 </div>
@@ -168,8 +168,8 @@
     .bookish-figure-unspecified {
         width: 100%;
         height: 8em;
-        background-color: var(--bookish-error-background-color);
-        color: var(--bookish-error-color);
+        background-color: var(--app-chrome-background);
+        color: var(--app-chrome-color);
         display: flex;
         flex-direction: column;
         justify-content: center;
@@ -177,7 +177,8 @@
     }
 
     .bookish-figure-dragging {
-        background-color: var(--bookish-highlight-color);
+        background-color: var(--app-interactive-color);
+        color: var(--app-font-color-inverted);
     }
 
     .bookish-figure-frame {
