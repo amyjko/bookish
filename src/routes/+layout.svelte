@@ -36,6 +36,7 @@
         /* Define some UI defaults not used in the Bookish theme. */
         --bookish-app-font-family: "Outfit", sans-serif;
         --bookish-app-header-font: "Outfit", sans-serif;
+        --bookish-app-line-height: 1.7;
         --bookish-app-font-size: 14pt;
         --bookish-app-link-color: #1B499C;
         --bookish-app-chrome-hover-background: #1B499C;

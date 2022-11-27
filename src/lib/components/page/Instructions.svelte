@@ -13,9 +13,9 @@
         font-family: var(--bookish-app-font-family);
         font-weight: 300;
         font-style: italic;
-        margin-top: var(--bookish-app-margin);
-        margin-bottom: var(--bookish-app-margin);
-        line-height: 1.2;
+        margin-top: var(--bookish-app-content-spacing);
+        margin-bottom: var(--bookish-app-content-spacing);
+        line-height: var(--bookish-app-line-height);
         padding-left: var(--bookish-app-margin);
         border-left: var(--bookish-app-chrome-border-width) solid var(--bookish-app-chrome-border-color);
     }
