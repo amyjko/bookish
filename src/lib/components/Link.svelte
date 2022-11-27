@@ -36,7 +36,7 @@
 
 </script>
 
-{#if $page.url.pathname === to}
+{#if $page.url.pathname === (to.charAt(to.length - 1) === "/" ? to.substring(0, to.length - 1) : to) }
     <slot></slot>
 {:else}
     <a href={to} bind:this={link} on:click={event => scroll(event) } target={to.startsWith("http") ? "_blank" : null}><slot></slot></a>
