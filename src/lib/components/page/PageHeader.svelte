@@ -7,5 +7,9 @@
 <style>
     h2 {
         margin-top: var(--bookish-header-spacing);
+        font-family: var(--bookish-header-font-family);
+        font-weight: var(--bookish-header-font-weight);
+        line-height: var(--bookish-header-line-height);
+        font-size: var(--bookish-header-1-font-size);
     }
 </style>
