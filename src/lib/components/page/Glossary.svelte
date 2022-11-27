@@ -7,6 +7,7 @@
     import { getEdition, isEditable } from "./Contexts";
     import Instructions from "./Instructions.svelte";
     import Button from "../app/Button.svelte";
+    import Rows from "./Rows.svelte";
 
     let edition = getEdition();
 	let editable = isEditable();
@@ -46,24 +47,15 @@
         <Instructions>
             Add definitions and then link to them in a chapter's text.
         </Instructions>
-        <p><Button tooltip="Add a glossary entry" command={addEmptyDefinition}>+</Button></p>
+        <Button tooltip="Add a glossary entry" command={addEmptyDefinition}>Add definition</Button>
     {/if}
     {#if keys === null }
         <p>This book has no glossary.</p>
     {:else}
-        <div>
-            <br/>
-            <div class="bookish-table">
-                <table>
-                    <colgroup>
-                        <col style="width: 40%" />
-                        <col style="width: 60%" />
-                    </colgroup>
-                    <tbody>
-                        {#each keys as id }<DefinitionView id={id} definition={glossary[id]} />{/each}
-                    </tbody>
-                </table>
-            </div>
-        </div>
+        <Rows>
+            {#each keys as id }
+                <DefinitionView id={id} definition={glossary[id]} />
+            {/each}
+        </Rows>
     {/if}
 </Page>

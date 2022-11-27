@@ -52,16 +52,8 @@
 
 <tr>
     <td>
-        {#if editable && edition }
-            <ConfirmButton
-                tooltip="Delete this glossary entry."
-                commandLabel="x"
-                confirmLabel="Confirm"
-                command={() => $edition.removeDefinition(id)}
-            />
-        {/if}
-        {#if editable && edition }
-            <strong>
+        <strong>
+            {#if editable}
                 <TextEditor
                     startText={definition.phrase} 
                     label={'Glossary phrase editor.'} 
@@ -75,10 +67,10 @@
                         synonyms: definition.synonyms
                     })}
                 />
-            </strong>
-        {:else}
-            <strong>{#if definition.phrase }{definition.phrase}{:else}<em>Phrase</em>{/if}</strong>
-        {/if}
+            {:else} 
+                {#if definition.phrase }{definition.phrase}{:else}<em>Phrase</em>{/if}
+            {/if}
+        </strong>
     </td>
     <td>
         {#if editable && edition }
@@ -103,7 +95,6 @@
         <br/>
         {#if edition && editable }
             <span bind:this={synonymsEditor}>
-                <Button tooltip="Add a synonym of this glossary entry" command={addSynonym}>+</Button>&nbsp;
                 {#if syns.length === 0 }
                     <em>No synonyms</em>
                 {:else}
@@ -139,4 +130,34 @@
             {/if}
         {/if}
     </td>
+    {#if editable }
+        <td>
+            <ConfirmButton
+                tooltip="Delete this glossary entry."
+                commandLabel="delete"
+                confirmLabel="confirm"
+                command={() => $edition.removeDefinition(id)}
+            />
+            <br/><Button tooltip="Add a synonym of this glossary entry" command={addSynonym}>+ synonym</Button>
+        </td>
+    {/if}
 </tr>
+
+<style>
+    td {
+        vertical-align: top;
+        font-family: var(--bookish-paragraph-font-family);
+        font-size: var(--bookish-paragraph-font-size);
+    }
+
+    td:nth-child(1) {
+        width: 10em;
+        text-align: left;
+    }
+
+    td:nth-child(3) {
+        width: 10em;
+        text-align: right;
+    }
+
+</style>
