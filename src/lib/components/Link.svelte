@@ -1,4 +1,6 @@
 <script lang="ts">
+    import { page } from "$app/stores";
+
     export let to: string;
 
     let link: HTMLAnchorElement;
@@ -34,7 +36,11 @@
 
 </script>
 
-<a href={to} bind:this={link} on:click={event => scroll(event) } target={to.startsWith("http") ? "_blank" : null}><slot></slot></a>
+{#if $page.url.pathname === to}
+    <slot></slot>
+{:else}
+    <a href={to} bind:this={link} on:click={event => scroll(event) } target={to.startsWith("http") ? "_blank" : null}><slot></slot></a>
+{/if}
 
 <style>
     a {

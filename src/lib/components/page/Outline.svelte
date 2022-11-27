@@ -362,7 +362,7 @@
         }
 
         .outline.outline-collapsed {
-            transform: translateY(-3em);
+            transform: translateY(-3rem);
         }
     }
 
