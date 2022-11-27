@@ -17,10 +17,15 @@
         border-spacing: 0;
     }
 
+    table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
     table :global(tr:first-child th) {
         font-weight: bold;
         border: 0;
-        border-bottom: 1px solid var(--bookish-border-color-light);
+        border-bottom: 1px solid var(--bookish-border-color);
     }
 
     table :global(tr:nth-child(even)) {
@@ -42,7 +47,7 @@
         border-top-right-radius: var(--bookish-roundedness);
     }
 
-    .table :global(td) {
+    .table :global(td), .table :global(th) {
         padding: var(--bookish-block-padding);
     }
 
