@@ -6,7 +6,6 @@
     import Chapter from '$lib/models/book/Chapter';
     import type { Match } from '$lib/models/book/Chapter';
     import ChapterIDs from '$lib/models/book/ChapterID';
-    import { onMount } from "svelte";
     import { getBase, getEdition } from "./Contexts";
     import TextInput from "../app/TextInput.svelte";
     import ChapterTitle from "./ChapterTitle.svelte";
