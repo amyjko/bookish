@@ -65,7 +65,7 @@
 {:else}
     Position <PositionEditor value={embed.getPosition()} edit={position => $caret?.edit(embed, embed.withPosition(position)) } />
 {/if}
-<label class="bookish-file-upload">
+<label class="file-upload">
     <input type="file" on:input={handleImageChange} accept=".jpg,.jpeg,.png,.gif,image/jpeg,image/png,image/gif"/>
     Upload
 </label>
@@ -99,3 +99,34 @@
 <ToolbarSpacer/>
 {upload}
 <ImageChooser select={handleImageSelection} selection={embed.getURL()} />
+
+<style>
+    .file-upload {
+        background-color: var(--bookish-app-chrome-background);
+        padding: var(--bookish-app-chrome-padding);
+        border-radius: var(--bookish-app-chrome-roundedness);
+        border: none;
+    }
+
+    .file-upload:hover {
+        background-color: var(--bookish-app-chrome-hover-background);
+        color: var(--bookish-app-chrome-hover-color);
+        cursor: pointer;
+    }
+
+    .file-upload input:disabled {
+        opacity: 0.3;
+        border-color: var(--bookish-app-chrome-muted);
+        cursor: auto;
+    }
+
+    .file-upload {
+        font-family: var(--bookish-app-chrome-font);
+        font-size: var(--bookish-app-chrome-font-size);
+    }
+
+    .file-upload input[type="file"] {
+        display: none;
+    }
+
+</style>

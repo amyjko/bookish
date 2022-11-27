@@ -31,7 +31,7 @@
     /* Custom fonts for app */
     @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;700&display=swap');
 
-    :global(:root) {
+    :global(.bookish-app) {
 
         /* Define some UI defaults not used in the Bookish theme. */
         --bookish-app-font-family: "Outfit", sans-serif;
@@ -75,37 +75,6 @@
         font-family: var(--bookish-app-font-family);
         font-size: 14pt;
         background-color: var(--bookish-app-background);
-    }
-
-    :global(.bookish-file-upload) {
-        background-color: var(--bookish-app-chrome-background);
-        padding: var(--bookish-app-chrome-padding);
-        border-top-right-radius: var(--bookish-app-chrome-roundedness);
-        border-top-left-radius: 0;
-        border-bottom-right-radius: 0;
-        border-bottom-left-radius: var(--bookish-app-chrome-roundedness);
-        border: none;
-    }
-
-    :global(.bookish-file-upload:hover) {
-        background-color: var(--bookish-app-chrome-hover-background);
-        color: var(--bookish-app-chrome-hover-color);
-        cursor: pointer;
-    }
-
-    :global(.bookish-file-upload input:disabled) {
-        opacity: 0.3;
-        border-color: var(--bookish-app-chrome-muted);
-        cursor: auto;
-    }
-
-    :global(.bookish-file-upload) {
-        font-family: var(--bookish-app-chrome-font);
-        font-size: var(--bookish-app-chrome-font-size);
-    }
-
-    :global(.bookish-file-upload input[type="file"]) {
-        display: none;
     }
 
     :global(.firebase-emulator-warning) {
