@@ -13,6 +13,7 @@
     import Button from "../app/Button.svelte";
     import Switch from "../editor/Switch.svelte";
     import Link from "../app/Link.svelte";
+    import Rows from "./Rows.svelte";
 
     const themes: Record<string,Theme> = {
         Bookish: BookishTheme,
@@ -85,50 +86,46 @@
         <ThemeSetEditor header={"Font weights"} group="weights" properties={theme.weights ?? getEmptyGroup(BookishTheme.weights)} />
         <ThemeSetEditor header={"Spacing"} group="spacing" properties={theme.spacing ?? getEmptyGroup(BookishTheme.spacing)} />
 
-        <div class="bookish-table">
-            <table >
-                <tbody>
-                    <tr>
-                        <td>
-                            <em>Add URLs to your own CSS to customize fonts and styles further.</em>
-                        </td>
-                        <td style='text-align:right;'>
-                            <Button tooltip="Add a CSS import" command={() => {
-                                if(theme === null) return;
-                                if(theme.imports === undefined)
-                                    theme.imports = [];
-                                theme.imports.push("");
+        <Rows>
+            <tr>
+                <td>
+                    <em>Add URLs to your own CSS to customize fonts and styles further.</em>
+                </td>
+                <td style='text-align:right;'>
+                    <Button tooltip="Add a CSS import" command={() => {
+                        if(theme === null) return;
+                        if(theme.imports === undefined)
+                            theme.imports = [];
+                        theme.imports.push("");
+                        $edition.setTheme(theme);
+                    }}>+</Button>
+                </td>
+            </tr>
+            {#each theme.imports ?? [] as url, index}
+                <tr>
+                    <td>
+                        <TextEditor 
+                            startText={url} 
+                            label={`CSS url`}
+                            placeholder={"CSS url"}
+                            valid={ () => undefined }
+                            save={text => {
+                                const newTheme = { ... theme };
+                                if(newTheme.imports === undefined) newTheme.imports = [];
+                                newTheme.imports[index] = text;
                                 $edition.setTheme(theme);
-                            }}>+</Button>
-                        </td>
-                    </tr>
-                    {#each theme.imports ?? [] as url, index}
-                        <tr>
-                            <td>
-                                <TextEditor 
-                                    startText={url} 
-                                    label={`CSS url`}
-                                    placeholder={"CSS url"}
-                                    valid={ () => undefined }
-                                    save={text => {
-                                        const newTheme = { ... theme };
-                                        if(newTheme.imports === undefined) newTheme.imports = [];
-                                        newTheme.imports[index] = text;
-                                        $edition.setTheme(theme);
-                                    }}
-                                />
-                            </td>
-                            <td style="text-align: right">
-                                <Button tooltip="Remove this CSS import" command={() => {
-                                    theme?.imports?.splice(index, 1);
-                                    $edition.setTheme(theme);
-                                }}>–</Button>
-                            </td>
-                        </tr>
-                    {/each}
-                </tbody>
-            </table>
-        </div>
+                            }}
+                        />
+                    </td>
+                    <td style="text-align: right">
+                        <Button tooltip="Remove this CSS import" command={() => {
+                            theme?.imports?.splice(index, 1);
+                            $edition.setTheme(theme);
+                        }}>–</Button>
+                    </td>
+                </tr>
+            {/each}
+        </Rows>
     {/if}
 
 </Page>

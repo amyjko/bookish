@@ -302,18 +302,6 @@
         border-radius: var(--bookish-roundedness);
         border-spacing: 0;
     }
-
-    .bookish-table {
-        display: block;
-        width: 100%;
-        overflow-x: auto;
-    }
-
-    .bookish-table td {
-        padding: var(--bookish-block-padding);
-        vertical-align: top;
-        border-top: 1px solid var(--bookish-border-color-light);
-    }
     
     .dark .bookish-figure-image {
         filter: brightness(50%);

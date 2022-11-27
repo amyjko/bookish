@@ -11,6 +11,7 @@
     import ChapterTitle from "./ChapterTitle.svelte";
     import ChapterNumber from "./ChapterNumber.svelte";
     import PageHeader from "./PageHeader.svelte";
+    import Rows from "./Rows.svelte";
 
     let edition = getEdition();
     let base = getBase();
@@ -91,37 +92,33 @@
             {/each}
         </p>
 
-        <div class="bookish-table">
-            <table>
-                <tbody>
-                    {#each words as word, index }
-                        {#if word === true}
-                            <tr><td colspan={2}><PageHeader>{words[index + 1]}</PageHeader></td></tr>
-                        {:else}
-                            <tr>
-                                <td>{word}</td>
-                                <td>
-                                    <!-- Sort the chapters by chapter number -->
-                                    {#each Array.from(bookIndex[word])
-                                        .sort((a, b) => {
-                                            let numberA = $edition.getChapterNumber(a);
-                                            let numberB = $edition.getChapterNumber(b);
-                                            if(numberA === undefined) return -1;
-                                            if(numberB === undefined) return 1;
-                                            return numberA - numberB;
-                                        }) as chapterID, index }
-                                        <!-- Map them to links to the first occurrence in the chapter. -->
-                                        <span>
-                                            <ChapterNumber>Chapter {#if $edition.getChapterNumber(chapterID) !== undefined}{$edition.getChapterNumber(chapterID)}. {/if}</ChapterNumber> <ChapterTitle link={`${base}${chapterID}?word=${word}`}>{$edition.getChapterName(chapterID)}</ChapterTitle>
-                                            {#if index < bookIndex[word].size - 1 }<br/>{/if}
-                                        </span>
-                                    {/each}
-                                </td>
-                            </tr>
-                        {/if}
-                    {/each}
-                </tbody>
-            </table>
-        </div>
+        <Rows>
+            {#each words as word, index }
+                {#if word === true}
+                    <tr><td colspan={2}><PageHeader>{words[index + 1]}</PageHeader></td></tr>
+                {:else}
+                    <tr>
+                        <td>{word}</td>
+                        <td>
+                            <!-- Sort the chapters by chapter number -->
+                            {#each Array.from(bookIndex[word])
+                                .sort((a, b) => {
+                                    let numberA = $edition.getChapterNumber(a);
+                                    let numberB = $edition.getChapterNumber(b);
+                                    if(numberA === undefined) return -1;
+                                    if(numberB === undefined) return 1;
+                                    return numberA - numberB;
+                                }) as chapterID, index }
+                                <!-- Map them to links to the first occurrence in the chapter. -->
+                                <span>
+                                    <ChapterNumber>Chapter {#if $edition.getChapterNumber(chapterID) !== undefined}{$edition.getChapterNumber(chapterID)}. {/if}</ChapterNumber> <ChapterTitle link={`${base}${chapterID}?word=${word}`}>{$edition.getChapterName(chapterID)}</ChapterTitle>
+                                    {#if index < bookIndex[word].size - 1 }<br/>{/if}
+                                </span>
+                            {/each}
+                        </td>
+                    </tr>
+                {/if}
+            {/each}
+        </Rows>
     {/if}
 </Page>

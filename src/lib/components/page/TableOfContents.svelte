@@ -19,6 +19,7 @@
     import Muted from "./Muted.svelte";
     import Button from "../app/Button.svelte";
     import PageHeader from "./PageHeader.svelte";
+    import Rows from "./Rows.svelte";
 
     let edition = getEdition();
 	let base = getBase();
@@ -105,113 +106,109 @@
         Write an informative description of what your book is about.
     </Instructions>
 
-    <PageHeader id="chapters">Chapters {#if editable}<Button tooltip="Add a new chapter" disabled={waitingForChapter} command={addChapter}>+</Button>{/if}</PageHeader>
-
     <Instructions>
         Add, remove, and reorder chapters here.
         You can add optional book sections to each chapter, toggle chapters as numbered/unnumbered or published/forthcoming.
         Click the title to edit the chapter.
     </Instructions>
 
-    <div class="bookish-table">
-        <table id="toc">
-            <tbody>
-                {#each $edition.getChapters() as chapter }
-                    {@const chapterID = chapter.getChapterID() }
-                    {@const readingTime = chapter.getReadingTime() }
-                    {@const readingEstimate =
-                            readingTime === undefined ? "Forthcoming" :
-                            readingTime < 5 ? "<5 min read" :
-                            readingTime < 60 ? "~" + Math.floor(readingTime / 5) * 5 + " min read" :
-                            "~" + Math.floor(readingTime / 60) + " hour read" }
-                    {@const section = chapter.getSection() }
-                    {@const etc = readingEstimate + (!chapter.isForthcoming() ? getProgressDescription(chapterID in progress ? progress[chapterID] : null) : "") }
+    <PageHeader id="chapters">Chapters {#if editable}<Button tooltip="Add a new chapter" disabled={waitingForChapter} command={addChapter}>+</Button>{/if}</PageHeader>
 
-                    <TableOfContentsRow
-                        chapter={chapter}
-                        chapterID={chapterID}
-                        number={$edition.getChapterNumber(chapterID)}
-                        title={chapter.getTitle()}
-                        forthcoming={chapter.isForthcoming()}
-                    >
-                        <span slot="annotation">
-                            {#if editable }
-                                <TextEditor
-                                    label={"Chapter section editor"}
-                                    startText={section ? section : ""}
-                                    placeholder="Section"
-                                    valid={ () => undefined }
-                                    save={text => chapter.setSection(text) }
-                                />
-                            {:else}
-                                {#if section }{section}{/if}
-                            {/if}
-                        </span>
-                        <span slot="etc">
-                            <Muted>
-                                {#if editable}
-                                    <Toggle on={chapter.isForthcoming()} save={on => chapter.setForthcoming(on)}>
-                                        {etc}
-                                    </Toggle>
-                                {:else}
-                                    { etc }
-                                {/if}
-                            </Muted>
-                        </span>
-                    </TableOfContentsRow>
-                {/each}
-                {#if $edition.hasReferences() || editable }
-                    <TableOfContentsRow
-                        chapterID={ChapterIDs.ReferencesID}
-                        title="References"
-                    >
-                        <span slot="annotation">Everything cited</span>
-                    </TableOfContentsRow>
-                {/if}
-                {#if $edition.getGlossary() && Object.keys($edition.getGlossary()).length > 0 || editable }
-                    <TableOfContentsRow
-                        chapterID={ChapterIDs.GlossaryID}
-                        title="Glossary"
-                    > 
-                        <span slot="annotation">Definitions</span>
-                    </TableOfContentsRow>
-                {/if}
-                <TableOfContentsRow
-                    chapterID={ChapterIDs.IndexID}
-                    title="Index"
-                > 
-                    <span slot="annotation">Common words and where they are</span>
-                </TableOfContentsRow>
-                <TableOfContentsRow
-                    chapterID={ChapterIDs.SearchID}
-                    title="Search"
-                > 
-                    <span slot="annotation">Find where words occur</span>
-                </TableOfContentsRow>
+    <Rows>
+        {#each $edition.getChapters() as chapter }
+            {@const chapterID = chapter.getChapterID() }
+            {@const readingTime = chapter.getReadingTime() }
+            {@const readingEstimate =
+                    readingTime === undefined ? "Forthcoming" :
+                    readingTime < 5 ? "<5 min read" :
+                    readingTime < 60 ? "~" + Math.floor(readingTime / 5) * 5 + " min read" :
+                    "~" + Math.floor(readingTime / 60) + " hour read" }
+            {@const section = chapter.getSection() }
+            {@const etc = readingEstimate + (!chapter.isForthcoming() ? getProgressDescription(chapterID in progress ? progress[chapterID] : null) : "") }
 
-                <TableOfContentsRow
-                    chapterID={ChapterIDs.MediaID}
-                    title="Media"
-                > 
-                    <span slot="annotation">Images and video in the book</span>
-                </TableOfContentsRow>
-                {#if editable }
-                    <TableOfContentsRow
-                        chapterID="theme"
-                        title="Theme"
-                    > 
-                        <span slot="annotation">Style the book</span>
-                    </TableOfContentsRow>
-                    <TableOfContentsRow
-                        chapterID="unknown"
-                        title="Unknown"
-                    > 
-                        <span slot="annotation">Customize bad links</span>
-                    </TableOfContentsRow>
-                {/if}
-            </tbody>
-        </table>
-    </div>
+            <TableOfContentsRow
+                chapter={chapter}
+                chapterID={chapterID}
+                number={$edition.getChapterNumber(chapterID)}
+                title={chapter.getTitle()}
+                forthcoming={chapter.isForthcoming()}
+            >
+                <span slot="annotation">
+                    {#if editable }
+                        <TextEditor
+                            label={"Chapter section editor"}
+                            startText={section ? section : ""}
+                            placeholder="Section"
+                            valid={ () => undefined }
+                            save={text => chapter.setSection(text) }
+                        />
+                    {:else}
+                        {#if section }{section}{/if}
+                    {/if}
+                </span>
+                <span slot="etc">
+                    <Muted>
+                        {#if editable}
+                            <Toggle on={chapter.isForthcoming()} save={on => chapter.setForthcoming(on)}>
+                                {etc}
+                            </Toggle>
+                        {:else}
+                            { etc }
+                        {/if}
+                    </Muted>
+                </span>
+            </TableOfContentsRow>
+        {/each}
+        {#if $edition.hasReferences() || editable }
+            <TableOfContentsRow
+                chapterID={ChapterIDs.ReferencesID}
+                title="References"
+            >
+                <span slot="annotation">Everything cited</span>
+            </TableOfContentsRow>
+        {/if}
+        {#if $edition.getGlossary() && Object.keys($edition.getGlossary()).length > 0 || editable }
+            <TableOfContentsRow
+                chapterID={ChapterIDs.GlossaryID}
+                title="Glossary"
+            > 
+                <span slot="annotation">Definitions</span>
+            </TableOfContentsRow>
+        {/if}
+        <TableOfContentsRow
+            chapterID={ChapterIDs.IndexID}
+            title="Index"
+        > 
+            <span slot="annotation">Common words and where they are</span>
+        </TableOfContentsRow>
+        <TableOfContentsRow
+            chapterID={ChapterIDs.SearchID}
+            title="Search"
+        > 
+            <span slot="annotation">Find where words occur</span>
+        </TableOfContentsRow>
+
+        <TableOfContentsRow
+            chapterID={ChapterIDs.MediaID}
+            title="Media"
+        > 
+            <span slot="annotation">Images and video in the book</span>
+        </TableOfContentsRow>
+        {#if editable }
+            <TableOfContentsRow
+                chapterID="theme"
+                title="Theme"
+            > 
+                <span slot="annotation">Style the book</span>
+            </TableOfContentsRow>
+            <TableOfContentsRow
+                chapterID="unknown"
+                title="Unknown"
+            > 
+                <span slot="annotation">Customize bad links</span>
+            </TableOfContentsRow>
+        {/if}
+    </Rows>
 
     <Acknowledgements />
     <License />

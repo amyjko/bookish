@@ -10,6 +10,7 @@
     import Button from "../app/Button.svelte";
     import Link from "../Link.svelte";
     import PageHeader from "./PageHeader.svelte";
+    import Rows from "./Rows.svelte";
 
     let edition = getEdition();
     let editable = isEditable();
@@ -51,61 +52,54 @@
         When you're ready to revise, make a new edition, then publish it when you're done.
         The edition with a * is the default edition readers will see, unless they explicitly choose to view a previous edition.
     </Instructions>
-    <table class="bookish-table">
-        <colgroup>
-            <col width="5%" />
-            <col width="65%" />
-            <col width="30%" />
-        </colgroup>
-        <tbody>
-            {#each bookRevisions as revision, index}
-                {@const editionNumber = bookRevisions === undefined ? -1 : bookRevisions.length - index }
-                {@const editionLabel = editionNumber + (editionNumber === 1 ? "st" : editionNumber === 2 ? "nd" : editionNumber === 3 ? "rd" : "th") }
-                {@const viewing = revision.ref.id === $edition.getRef()?.id }
+    <Rows>
+        {#each bookRevisions as revision, index}
+            {@const editionNumber = bookRevisions === undefined ? -1 : bookRevisions.length - index }
+            {@const editionLabel = editionNumber + (editionNumber === 1 ? "st" : editionNumber === 2 ? "nd" : editionNumber === 3 ? "rd" : "th") }
+            {@const viewing = revision.ref.id === $edition.getRef()?.id }
 
-                {#if editable || revision.published}
-                    <tr>
-                        <td>
-                            {#if viewing}
-                                <strong class="viewing">{editionLabel}</strong>
+            {#if editable || revision.published}
+                <tr>
+                    <td>
+                        {#if viewing}
+                            <strong class="viewing">{editionLabel}</strong>
+                        {:else}
+                            <Link to={`/write/${book.ref.id}/${bookRevisions.length - index}`}>{editionLabel}</Link>
+                        {/if}
+                        <Note>{(new Date(revision.time).toLocaleDateString("en-us"))}</Note>
+                    </td>
+                    <td>
+                        { #if editable }
+                            <BookishEditor 
+                                ast={Parser.parseFormat(undefined, revision.summary).withTextIfEmpty()}
+                                save={ newSummary => book ? book.setEditionChangeSummary(newSummary.toBookdown(), index) : undefined }
+                                chapter={false}
+                                component={Format}
+                                placeholder="Summarize this edition's changes."
+                            /> 
+                        {:else}
+                            {#if revision.summary === ""}
+                                <em>No summary of changes</em>
                             {:else}
-                                <Link to={`/write/${book.ref.id}/${bookRevisions.length - index}`}>{editionLabel}</Link>
+                                { revision.summary }
                             {/if}
-                            <Note>{(new Date(revision.time).toLocaleDateString("en-us"))}</Note>
-                        </td>
-                        <td>
-                            { #if editable }
-                                <BookishEditor 
-                                    ast={Parser.parseFormat(undefined, revision.summary).withTextIfEmpty()}
-                                    save={ newSummary => book ? book.setEditionChangeSummary(newSummary.toBookdown(), index) : undefined }
-                                    chapter={false}
-                                    component={Format}
-                                    placeholder="Summarize this edition's changes."
-                                /> 
-                            {:else}
-                                {#if revision.summary === ""}
-                                    <em>No summary of changes</em>
-                                {:else}
-                                    { revision.summary }
-                                {/if}
-                            {/if}
-                        </td>
-                        <td style="whitespace: nowrap">
-                            {#if editable}
-                                <Switch
-                                    options={["hidden", "published"]} 
-                                    enabled={revision.published || revision.summary !== ""}
-                                    value={revision.published ? "published" : "hidden"} 
-                                    edit={ published => handlePublish(index, published === "published") }
-                                />
-                                {#if revision === bookRevisions.find(e => e.published)}*{/if}
-                            {/if}
-                        </td>
-                    </tr>
-                {/if}
-            {/each}
-        </tbody>
-    </table>
+                        {/if}
+                    </td>
+                    <td style="whitespace: nowrap">
+                        {#if editable}
+                            <Switch
+                                options={["hidden", "published"]} 
+                                enabled={revision.published || revision.summary !== ""}
+                                value={revision.published ? "published" : "hidden"} 
+                                edit={ published => handlePublish(index, published === "published") }
+                            />
+                            {#if revision === bookRevisions.find(e => e.published)}*{/if}
+                        {/if}
+                    </td>
+                </tr>
+            {/if}
+        {/each}
+    </Rows>
 {/if}
 
 
@@ -113,4 +107,13 @@
     .viewing {
         border-bottom: var(--app-chrome-border-size) solid var(--app-border-color);
     }
+
+    td:first-child {
+        width: 5%;
+    }
+
+    td:last-child {
+        width: 30%;
+    }
+
 </style>

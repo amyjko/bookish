@@ -890,10 +890,6 @@
         font-weight: bold;
     }
 
-    :global(.bookish-editor .bookish-table table td) {
-        border: var(--app-chrome-border-size) dashed var(--app-border-color);
-    }
-
     .bookish-editor :global(hr) {
         margin-top: 1em;
         margin-bottom: 1em;   

@@ -38,7 +38,6 @@
     }
 
     .table :global(td) {
-        border: 0;
         padding: var(--bookish-block-padding);
     }
 
