@@ -93,7 +93,6 @@
                                 value={revision.published ? "published" : "hidden"} 
                                 edit={ published => handlePublish(index, published === "published") }
                             />
-                            {#if revision === bookRevisions.find(e => e.published)}*{/if}
                         {/if}
                     </td>
                 </tr>
