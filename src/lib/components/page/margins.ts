@@ -3,7 +3,7 @@
 export function hideOutlineIfObscured() {
 
 	// Get the outline's bounds.
-	let outline = document.getElementsByClassName("bookish-outline")[0] as HTMLElement;
+	let outline = document.getElementsByClassName("outline")[0] as HTMLElement;
 
 	// If there's no outline, don't bother.
 	if(!outline)

@@ -78,13 +78,13 @@
                 let titleY = title.getBoundingClientRect().top + window.scrollY;
                 // If the title is off screen, anchor it to the top of the window. (CSS is set to do this).
                 if(titleY - 50 < window.scrollY) {
-                    outline.classList.add("bookish-outline-fixed-left");
-                    outline.classList.remove("bookish-outline-title-left");
+                    outline.classList.add("outline-fixed-left");
+                    outline.classList.remove("outline-title-left");
                 }
                 // Otherwise, anchor it to the title position.
                 else {
-                    outline.classList.remove("bookish-outline-fixed-left");
-                    outline.classList.add("bookish-outline-title-left");
+                    outline.classList.remove("outline-fixed-left");
+                    outline.classList.add("outline-title-left");
                 }
 
                 // Tell any listeners about the repositioning.
@@ -151,11 +151,11 @@
 
 <div 
     bind:this={outline}
-    class={"bookish-outline " + (!expanded || collapse ? "bookish-outline-collapsed": "bookish-outline-expanded")}
+    class={"outline " + (!expanded || collapse ? "outline-collapsed": "outline-expanded")}
 >
     <!-- Dark mode toggle -->
     <div 
-        class="bookish-outline-reading-mode" 
+        class="outline-reading-mode" 
         role="button"
         aria-label={$dark === true ? "Switch to light mode" : "Switch to dark mode"}
         tabIndex=0
@@ -171,7 +171,7 @@
     </div>
     <!-- Visual cue of expandability, only visible in footer mode. -->
     <div 
-        class={"bookish-outline-collapse-cue" + (headers.length === 0 ? " bookish-outline-collapse-cue-disabled" : "") }
+        class={"outline-collapse-cue" + (headers.length === 0 ? " outline-collapse-cue-disabled" : "") }
         role="button" 
         aria-label={expanded ? "Collapse navigation menu" : "Expand navigation menu"}
         tabIndex=0
@@ -183,15 +183,15 @@
     >
         { expandLabel }
     </div>
-    <div class="bookish-outline-headers">
+    <div class="outline-headers">
 
         <!-- Book navigation links -->
-        <div class="bookish-outline-header-nav">
-            {#if previous !== null}<Link to={base + previous}>{previousLabel}</Link>{:else}<span class="bookish-outline-header-nav-disabled">{previousLabel}</span>{/if}
+        <div class="outline-header-nav">
+            {#if previous !== null}<Link to={base + previous}>{previousLabel}</Link>{:else}<span class="outline-header-nav-disabled">{previousLabel}</span>{/if}
             &nbsp;&middot;&nbsp;
             <Link to={base}>Home</Link>
             &nbsp;&middot;&nbsp;
-            {#if next !== null}<Link to={base + next}>{nextLabel}</Link>{:else}<span class="bookish-outline-header-nav-disabled">{nextLabel}</span>{/if}
+            {#if next !== null}<Link to={base + next}>{nextLabel}</Link>{:else}<span class="outline-header-nav-disabled">{nextLabel}</span>{/if}
         </div>
         <!--  Scan through the headers and add a properly formatted link for each. -->
         {#each headers as header, index }
@@ -200,7 +200,7 @@
             <!-- Only h1, h2, and h3 headers... -->
             {#if level <= 3 }
                 <Link to={"#" + header.id}>
-                    <div class={"bookish-outline-header bookish-outline-header-level-" + (level - 1) + (headerIndex === index ? " bookish-outline-header-active" : "")}>
+                    <div class={"outline-header outline-header-level-" + (level - 1) + (headerIndex === index ? " outline-header-active" : "")}>
                         {header.textContent}
                     </div>
                 </Link>
@@ -210,23 +210,23 @@
 </div>
 
 <style>
-    .bookish-outline {
+    .outline {
         font-family: var(--bookish-header-font-family);
         font-weight: normal;
         font-size: var(--bookish-paragraph-font-size);
         color: var(--bookish-muted-color);
-        --bookish-outline-width: 12em;
-        --bookish-outline-padding: 1em;
-        --bookish-outline-offset: calc(-1 * (var(--bookish-outline-width) + 3 * var(--bookish-outline-padding)));
+        --outline-width: 12em;
+        --outline-padding: 1em;
+        --outline-offset: calc(-1 * (var(--outline-width) + 3 * var(--outline-padding)));
     }
 
-    .bookish-outline-header-nav {
+    .outline-header-nav {
         display: inline-block;
         width: 100%;
-        padding-bottom: var(--bookish-outline-padding);
+        padding-bottom: var(--outline-padding);
     }
 
-    .bookish-outline-header {
+    .outline-header {
         display: block;
         line-height: var(--bookish-paragraph-line-height-tight);
         text-indent: 0;
@@ -235,52 +235,52 @@
         margin-bottom: 0.75rem;
     }
 
-    .bookish-outline-header-level-0 {
+    .outline-header-level-0 {
         font-size: 1rem;
     }
 
-    .bookish-outline-header-level-1 {
+    .outline-header-level-1 {
         font-size: 0.9rem;
     }
 
-    .bookish-outline-header-level-2 {
+    .outline-header-level-2 {
         font-size: 0.8rem;
         font-style: italic;
         margin-left: 1em;
     }
 
-    :global(a .bookish-outline-header), :global(.bookish-outline-header-nav a) {
+    :global(a .outline-header), :global(.outline-header-nav a) {
         color: var(--bookish-muted-color);
     }
 
-    :global(a .bookish-outline-header-active), :global(a:hover .bookish-outline-header) {
+    :global(a .outline-header-active), :global(a:hover .outline-header) {
         color: var(--bookish-paragraph-color);
     }
 
-    .bookish-outline-header-nav-disabled {
+    .outline-header-nav-disabled {
         opacity: 0.3;
     }
 
-    :global(.bookish-outline a:hover) {
+    :global(.outline a:hover) {
         text-decoration: none;
     }
 
     /* Only apply this on devices with hover abilities. */
     @media (hover: hover) {
-        :global(.bookish-outline a:hover) {
+        :global(.outline a:hover) {
             color: var(--bookish-paragraph-color);
         }
     }
 
-    :global(a .bookish-outline-header-active) {
+    :global(a .outline-header-active) {
         color: var(--bookish-paragraph-color);
     }
 
-    .bookish-outline-reading-mode {
+    .outline-reading-mode {
         transition: transform 0.2s ease-in;
     }
 
-    .bookish-outline-reading-mode:hover {
+    .outline-reading-mode:hover {
         cursor: pointer;
         transform: scale(1.25, 1.25);
         color: var(--bookish-paragraph-color);
@@ -289,7 +289,7 @@
     /* Mobile */
     @media screen and (max-width: 1200px) {
 
-        .bookish-outline {
+        .outline {
             position: fixed;
             top: 100%; /* Put it all the way off screen on the bottom, then let JS translate */
             left: 0;
@@ -309,12 +309,12 @@
         }
 
         /* Make a little centered box to store the outline to preserve its left aligned structure, while making it easier to click. */
-        .bookish-outline-headers {
+        .outline-headers {
             width: 20em;
             margin: auto;
         }
 
-        .bookish-outline-header-nav {
+        .outline-header-nav {
             text-align: center;
             padding-top: 0.5em; /* Add some spacing when in the footer */
             padding-bottom: 0.5em;
@@ -322,7 +322,7 @@
             font-size: 1.25rem !important;
         }
 
-        .bookish-outline-reading-mode {
+        .outline-reading-mode {
             position: absolute;
             top: 0.5em;
             left: 0;
@@ -332,7 +332,7 @@
             padding-right: 1em;
         }
 
-        .bookish-outline-collapse-cue {
+        .outline-collapse-cue {
             position: absolute;
             top: 0.5em;
             right: 0;
@@ -343,25 +343,25 @@
             transition: transform 0.2s ease-in;
         }
 
-        .bookish-outline-collapse-cue:hover {
+        .outline-collapse-cue:hover {
             cursor: pointer;
             transform: scale(1.25, 1.25);
             color: var(--bookish-paragraph-color);
         }
 
-        .bookish-outline-collapse-cue-disabled {
+        .outline-collapse-cue-disabled {
             display: none;
         }
 
-        .bookish-outline-expanded .bookish-outline-collapse-cue {
+        .outline-expanded .outline-collapse-cue {
             transform: rotate(90deg);
         }
 
-        .bookish-outline.bookish-outline-expanded {
+        .outline.outline-expanded {
             transform: translateY(-100%);
         }
 
-        .bookish-outline.bookish-outline-collapsed {
+        .outline.outline-collapsed {
             transform: translateY(-3em);
         }
     }
@@ -369,39 +369,39 @@
     /* Desktop */
     @media screen and (min-width: 1200px) {
 
-        .bookish-outline {
-            width: var(--bookish-outline-width);
+        .outline {
+            width: var(--outline-width);
             z-index: 0; /* Put it below everything when it's in the margin. */
             border-right: 1px solid var(--bookish-border-color-light);
-            padding: var(--bookish-outline-padding);
+            padding: var(--outline-padding);
             background-color: var(--bookish-background-color);
-            margin-right: var(--bookish-outline-padding);
+            margin-right: var(--outline-padding);
         }
 
         /* When the outline is fixed to the left, it's translated by it's width (with some padding). */
         /* It's left position is set outline.js. This class is set by outline.js. */
-        .bookish-outline.bookish-outline-fixed-left {
+        .outline.outline-fixed-left {
             position: fixed;
             display: inline-block;
             top: 50px;
-            transform: translateX(var(--bookish-outline-offset));
+            transform: translateX(var(--outline-offset));
         }
 
         /* When the outline is fixed to title, it's positioned absolutely relative to the book container. */
         /* We set a margin appropriate for it's width above. This class is set in Outline.tsx. */
-        .bookish-outline.bookish-outline-title-left {
+        .outline.outline-title-left {
             position: absolute;
-            margin-left: var(--bookish-outline-offset);
+            margin-left: var(--outline-offset);
         }
 
-        .bookish-outline-collapse-cue {
+        .outline-collapse-cue {
             display: none;
         }
 
-        .bookish-outline-reading-mode {
+        .outline-reading-mode {
             position: absolute;
-            top: calc(var(--bookish-outline-padding));
-            right: calc(var(--bookish-outline-padding));
+            top: calc(var(--outline-padding));
+            right: calc(var(--outline-padding));
         }        
         
     }
