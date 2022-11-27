@@ -1,5 +1,6 @@
 <script lang="ts">
-    import ToolbarIcon from "./ToolbarIcon.svelte";
+    import ToolbarIcon from "./Icon.svelte";
+    import ToolbarSpacer from "./ToolbarSpacer.svelte";
 
     export let linebreak: boolean = false;
     export let icon: string;
@@ -8,7 +9,7 @@
 
 {#if linebreak }<br/>{/if}
 <span class="bookish-editor-toolbar-group">
-    <ToolbarIcon name={icon}/><slot></slot>
+    <ToolbarIcon name={icon}/><ToolbarSpacer/><slot></slot>
 </span>
 
 <style>
@@ -16,11 +17,6 @@
         display: inline-block;
         padding: var(--app-chrome-padding);
         margin-right: calc(2 * var(--app-chrome-padding));
-    }
-
-    .bookish-editor-toolbar-group :global(button) {
-        vertical-align: middle;
-        height: 2.25em;
     }
 
     .bookish-editor-toolbar-group :global(button:first-of-type) {

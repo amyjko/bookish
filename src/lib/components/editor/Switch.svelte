@@ -1,6 +1,8 @@
 <script lang="ts">
+    import Icon from "./Icon.svelte";
 
     export let options: string[];
+    export let icons: Record<string,string> | undefined = undefined;
     export let value: string;
     export let enabled: boolean | undefined = undefined;
     export let edit : (newValue: string) => void;
@@ -21,7 +23,11 @@
             data-value={option} 
             disabled={enabled === false}
             on:click|stopPropagation={handleClick}>
-                {option}
+                {#if icons && option in icons}
+                    <Icon name={icons[option]}/>
+                {:else}
+                    {option}
+                {/if}
         </button>
     {/each}
 </span>

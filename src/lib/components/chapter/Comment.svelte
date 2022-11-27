@@ -6,7 +6,8 @@
     import { getChapter, isEditable } from '../page/Contexts';
     import { getCaret } from '../page/Contexts';
     import { afterUpdate } from 'svelte';
-    import ToolbarIcon from '../editor/ToolbarIcon.svelte';
+    import Icon from '../editor/Icon.svelte';
+    import CommentIcon from "../editor/icons/comment.svg?raw";
 
     export let node: CommentNode;
     
@@ -26,7 +27,7 @@
     {#if editable}
         <Marginal id={"comment-" + (chapterNode === undefined ? "?" : chapterNode.getComments().indexOf(node))}>
             <span slot="interactor" class="bookish-comment-symbol">
-                <ToolbarIcon name="comment.svg"/>
+                <Icon name={CommentIcon}/>
             </span>
             <span slot="content" class={`bookish-app-comment ${focused ? "bookish-app-comment-focused" : ""}`}>
                 <Format node={node.getMeta()} placeholder="comment"/>

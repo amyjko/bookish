@@ -2,8 +2,9 @@
     import type LinkNode from "$lib/models/chapter/LinkNode";
     import URLEditor from "./URLEditor.svelte";
     import { getCaret, getChapter, getEdition } from "../page/Contexts";
-    import ToolbarIcon from "./ToolbarIcon.svelte";
+    import Icon from "./Icon.svelte";
     import Button from "../app/Button.svelte";
+    import UnlinkIcon from "./icons/unlink.svg?raw";
 
     export let link: LinkNode;
 
@@ -72,7 +73,7 @@
             }
         }}
     >
-        <ToolbarIcon name="unlink.svg"/>
+        <Icon name={UnlinkIcon}/>
     </Button>
     <select name="chapterID" on:change={handleChapterChange} value={url}>
         <option value="">URL</option>

@@ -27,9 +27,27 @@
     import QuoteEditor from "$lib/components/editor/QuoteEditor.svelte";
     import EmbedEditor from "$lib/components/editor/EmbedEditor.svelte";
     import ToolbarGroup from "./ToolbarGroup.svelte";
-    import ToolbarIcon from "./ToolbarIcon.svelte";
+    import ToolbarIcon from "./Icon.svelte";
     import { onMount } from "svelte";
     import Button from "../app/Button.svelte";
+
+    import AnnotateIcon from "./icons/annotate.svg?raw";
+    import BlockIcon from "./icons/block.svg?raw";
+    import ClipboardIcon from "./icons/clipboard.svg?raw";
+    import LevelIcon from "./icons/level.svg?raw";
+    import ListIcon from "./icons/list.svg?raw";
+    import TextIcon from "./icons/text.svg?raw";
+    import TimeIcon from "./icons/time.svg?raw";
+    import TableIcon from "./icons/table.svg?raw";
+    import LinkIcon from "./icons/link.svg?raw";
+
+    import LabelIcon from "./icons/label.svg?raw";
+    import CitationIcon from "./icons/citation.svg?raw";
+    import DefineIcon from "./icons/define.svg?raw";
+    import CodeIcon from "./icons/code.svg?raw";
+    import CalloutIcon from "./icons/callout.svg?raw";
+    import QuoteIcon from "./icons/quote.svg?raw";
+    import MediaIcon from "./icons/media.svg?raw";
 
     const keyLabels: {[key: string]: string} = {
         "Digit0": "0",
@@ -56,15 +74,15 @@
         "block": 10,
     }
 
-    const categoryIcons: {[key:string]: string} = {
-        "text": "text.svg",
-        "clipboard": "scissors.svg",
-        "annotation": "hash.svg",
-        "level": "level.svg",
-        "block": "block.svg",
-        "list": "list.svg",
-        "table": "▦",
-        "history": "\u2026"
+    const categoryIcons: {[key:string]: string } = {
+        "text": TextIcon,
+        "clipboard": ClipboardIcon,
+        "annotation": AnnotateIcon,
+        "level": LevelIcon,
+        "block": BlockIcon,
+        "list": ListIcon,
+        "table": TableIcon,
+        "history": TimeIcon
     }
 
     export let context: CaretState | undefined = undefined;
@@ -188,15 +206,15 @@
                 {/if}
             {/each}
         {/if}
-        {#if metaNode instanceof LinkNode}<ToolbarGroup icon="link.svg"><LinkEditor link={metaNode}/></ToolbarGroup>
-        {:else if metaNode instanceof LabelNode}<ToolbarGroup icon="•"><LabelEditor label={metaNode}/></ToolbarGroup>
-        {:else if metaNode instanceof InlineCodeNode}<ToolbarGroup icon="code.svg"><InlineCodeEditor code={metaNode}/></ToolbarGroup>
-        {:else if metaNode instanceof CitationsNode}<ToolbarGroup icon="¹"><CitationsEditor citations={metaNode}/></ToolbarGroup>
-        {:else if metaNode instanceof DefinitionNode}<ToolbarGroup icon="Aa"><DefinitionEditor definition={metaNode}/></ToolbarGroup>
-        {:else if metaNode instanceof CodeNode && context}<ToolbarGroup icon="code.svg"><CaptionedCodeEditor code={metaNode}/></ToolbarGroup>
-        {:else if calloutNode}<ToolbarGroup icon="🄰"><CalloutEditor callout={calloutNode} /></ToolbarGroup>
-        {:else if quoteNode}<ToolbarGroup icon="quote.svg"><QuoteEditor quote={quoteNode} /></ToolbarGroup>
-        {:else if embedNode}<ToolbarGroup linebreak icon="media.svg"><EmbedEditor embed={embedNode} /></ToolbarGroup>
+        {#if metaNode instanceof LinkNode}<ToolbarGroup icon={LinkIcon}><LinkEditor link={metaNode}/></ToolbarGroup>
+        {:else if metaNode instanceof LabelNode}<ToolbarGroup icon={LabelIcon}><LabelEditor label={metaNode}/></ToolbarGroup>
+        {:else if metaNode instanceof InlineCodeNode}<ToolbarGroup icon={CodeIcon}><InlineCodeEditor code={metaNode}/></ToolbarGroup>
+        {:else if metaNode instanceof CitationsNode}<ToolbarGroup icon={CitationIcon}><CitationsEditor citations={metaNode}/></ToolbarGroup>
+        {:else if metaNode instanceof DefinitionNode}<ToolbarGroup icon={DefineIcon}><DefinitionEditor definition={metaNode}/></ToolbarGroup>
+        {:else if metaNode instanceof CodeNode && context}<ToolbarGroup icon={CodeIcon}><CaptionedCodeEditor code={metaNode}/></ToolbarGroup>
+        {:else if calloutNode}<ToolbarGroup icon={CalloutIcon}><CalloutEditor callout={calloutNode} /></ToolbarGroup>
+        {:else if quoteNode}<ToolbarGroup icon={QuoteIcon}><QuoteEditor quote={quoteNode} /></ToolbarGroup>
+        {:else if embedNode}<ToolbarGroup linebreak icon={MediaIcon}><EmbedEditor embed={embedNode} /></ToolbarGroup>
         {/if}
     </section>
 {/if}

@@ -25,7 +25,51 @@ import type Node from "$lib/models/chapter/Node";
 import type CaretState from "./CaretState";
 import type Command from "./Command";
 
-// SVG Icons from: https://thenounproject.com/browse/collection-icon/minio-text-editor-bold-13520/?p=1
+import BoldIcon from "./icons/bold.svg?raw";
+import BulletsIcon from "./icons/bullets.svg?raw";
+import CalloutIcon from "./icons/callout.svg?raw";
+import CitationIcon from "./icons/citation.svg?raw";
+import ClearIcon from "./icons/clear.svg?raw";
+import CodeIcon from "./icons/code.svg?raw";
+import ColumnAfterIcon from "./icons/columnafter.svg?raw";
+import ColumnBeforeIcon from "./icons/columnbefore.svg?raw";
+import CommentIcon from "./icons/comment.svg?raw";
+import CopyIcon from "./icons/copy.svg?raw";
+import CutIcon from "./icons/cut.svg?raw";
+import DefineIcon from "./icons/define.svg?raw";
+import DeleteColumnIcon from "./icons/deletecolumn.svg?raw";
+import DeleteRowIcon from "./icons/deleterow.svg?raw";
+import FootnoteIcon from "./icons/footnote.svg?raw";
+import Header1Icon from "./icons/header1.svg?raw";
+import Header2Icon from "./icons/header2.svg?raw";
+import Header3Icon from "./icons/header3.svg?raw";
+import IndentIcon from "./icons/indent.svg?raw";
+import ItalicIcon from "./icons/italic.svg?raw";
+import LabelIcon from "./icons/label.svg?raw";
+import LinkIcon from "./icons/link.svg?raw";
+import MediaIcon from "./icons/media.svg?raw";
+import NumbersIcon from "./icons/numbers.svg?raw";
+import ParagraphIcon from "./icons/paragraph.svg?raw";
+import PasteIcon from "./icons/paste.svg?raw";
+import QuoteIcon from "./icons/quote.svg?raw";
+import RedoIcon from "./icons/redo.svg?raw";
+import RowAboveIcon from "./icons/rowabove.svg?raw";
+import RowBelowIcon from "./icons/rowbelow.svg?raw";
+import RuleIcon from "./icons/rule.svg?raw";
+import SubscriptIcon from "./icons/sub.svg?raw";
+import SuperscriptIcon from "./icons/super.svg?raw";
+import TableIcon from "./icons/table.svg?raw";
+import UndoIcon from "./icons/undo.svg?raw";
+import UnindentIcon from "./icons/unindent.svg?raw";
+/**
+ * Icons:
+ *      From: https://www.streamlinehq.com/icons/streamline-mini-line
+ *      Css currentColor
+ *      No background
+ *      SVG
+ *      48 px
+ *      stroke width 1
+ *  */ 
 
 function insertTableRowColumn(context: CaretState, table: TableNode, format: FormatNode, row: boolean, before: boolean): Edit {
     const location = table.locate(format);
@@ -73,6 +117,7 @@ function rootWithNode<NodeType extends Node>(context: CaretState, original: Node
 const commands: Command[] = [
     {
         label: "—↑",
+        icon: RowAboveIcon,
         description: "insert row above",
         category: "table",
         control: false, alt: true, shift: false, key: "ArrowUp",
@@ -82,6 +127,7 @@ const commands: Command[] = [
     },
     {
         label: "—↓",
+        icon: RowBelowIcon,
         description: "insert row below",
         category: "table",
         control: false, alt: true, shift: false, key: "ArrowDown",
@@ -91,6 +137,7 @@ const commands: Command[] = [
     },
     {
         label: "→|",
+        icon: ColumnAfterIcon,
         description: "insert column after",
         category: "table",
         control: false, alt: true, shift: false, key: "ArrowRight",
@@ -100,6 +147,7 @@ const commands: Command[] = [
     },
     {
         label: "|←",
+        icon: ColumnBeforeIcon,
         description: "insert column before",
         category: "table",
         control: false, alt: true, shift: false, key: "ArrowLeft",
@@ -109,6 +157,7 @@ const commands: Command[] = [
     },
     {
         label: "\u232B—",
+        icon: DeleteRowIcon,
         description: "delete row",
         category: "table",
         control: false, alt: true, shift: false, key: "Backspace",
@@ -118,6 +167,7 @@ const commands: Command[] = [
     },
     {
         label: "\u232B|",
+        icon: DeleteColumnIcon,
         description: "delete column",
         category: "table",
         control: false, alt: true, shift: true, key: "Backspace",
@@ -465,7 +515,7 @@ const commands: Command[] = [
     },
     {
         description: "split paragraph",
-        category: "paragraph",
+        category: "text",
         control: false, alt: false, shift: false, key: "Enter",
         visible: false,
         active: context => context.atom === undefined && context.blocks !== undefined,
@@ -477,7 +527,7 @@ const commands: Command[] = [
     },
     {
         label: "indent",
-        icon: "indent.svg",
+        icon: IndentIcon,
         description: "indent list item",
         category: "list",
         control: false, alt: false, shift: false, key: "Tab",
@@ -487,7 +537,7 @@ const commands: Command[] = [
     },        
     {
         label: "unindent",
-        icon: 'unindent.svg',
+        icon: UnindentIcon,
         description: "unindent list item",
         category: "list",
         control: false, alt: false, shift: true, key: "Tab",
@@ -497,7 +547,7 @@ const commands: Command[] = [
     },
     {
         label: "plain",
-        icon: "clear.svg",
+        icon: ClearIcon,
         description: "clear formatting",
         category: "text",
         control: true, alt: false, shift: false, key: "0",
@@ -507,7 +557,7 @@ const commands: Command[] = [
     },
     {
         label: "bold",
-        icon: "bold.svg",
+        icon: BoldIcon,
         description: "bold",
         category: "text",
         control: true, alt: false, shift: false, key: "b",
@@ -517,7 +567,7 @@ const commands: Command[] = [
     },
     {
         description: "italic",
-        icon: "italic.svg",
+        icon: ItalicIcon,
         category: "text",
         control: true, alt: false, shift: false, key: "i",
         visible: true,
@@ -526,7 +576,7 @@ const commands: Command[] = [
     },
     {
         label: "sub\u2099",
-        icon: "sub.svg",
+        icon: SubscriptIcon,
         description: "subscript",
         category: "text",
         control: true, alt: false, shift: false, key: ",",
@@ -536,7 +586,7 @@ const commands: Command[] = [
     },
     {
         label: "super\u207F",
-        icon: "super.svg",
+        icon: SuperscriptIcon,
         description: "superscript",
         category: "text",
         control: true, alt: false, shift: false, key: ".",
@@ -546,7 +596,7 @@ const commands: Command[] = [
     },
     {
         label: "<code>",
-        icon: "code.svg",
+        icon: CodeIcon,
         description: "toggle code",
         category: "annotation",
         control: true, alt: false, shift: false, key: "j",
@@ -558,7 +608,7 @@ const commands: Command[] = [
     },
     {
         label: "link ⚭",
-        icon: "link.svg",
+        icon: LinkIcon,
         description: "toggle link",
         category: "annotation",
         control: true, alt: false, shift: false, key: "k",
@@ -570,6 +620,7 @@ const commands: Command[] = [
     },
     {
         label: "Aa",
+        icon: DefineIcon,
         description: "toggle definition",
         category: "annotation",
         control: true, alt: false, shift: false, key: "d",
@@ -581,6 +632,7 @@ const commands: Command[] = [
     },
     {
         label: "a\u1D43",
+        icon: FootnoteIcon,
         description: "insert footnote",
         category: "annotation",
         control: true, alt: false, shift: false, key: "f",
@@ -590,6 +642,7 @@ const commands: Command[] = [
     },
     {
         label: "a\u00b9",
+        icon: CitationIcon,
         description: "insert citations",
         category: "annotation",
         control: true, alt: false, shift: false, key: "t",
@@ -599,6 +652,7 @@ const commands: Command[] = [
     },
     {
         label: "•",
+        icon: LabelIcon,
         description: "insert label",
         category: "annotation",
         control: true, alt: false, shift: false, key: "l",
@@ -608,7 +662,7 @@ const commands: Command[] = [
     },
     {
         label: "comment",
-        icon: "comment.svg",
+        icon: CommentIcon,
         description: "insert comment",
         category: "annotation",
         control: true, alt: false, shift: false, key: "'",
@@ -618,7 +672,7 @@ const commands: Command[] = [
     },
     {
         label: "paragraph",
-        icon: "paragraph.svg",
+        icon: ParagraphIcon,
         description: "format as paragraph",
         category: "level",
         control: true, alt: true, shift: false, code: "Digit0",
@@ -631,6 +685,7 @@ const commands: Command[] = [
     },
     {
         label: "h1",
+        icon: Header1Icon,
         description: "format as 1st level header",
         category: "level",
         control: true, alt: true, shift: false, code: "Digit1",
@@ -640,6 +695,7 @@ const commands: Command[] = [
     },
     {
         label: "h2",
+        icon: Header2Icon,
         description: "format as 2nd level header",
         category: "level",
         control: true, alt: true, shift: false, code: "Digit2",
@@ -649,6 +705,7 @@ const commands: Command[] = [
     },
     {
         label: "h3",
+        icon: Header3Icon,
         description: "format as 3rd level header",
         category: "level",
         control: true, alt: true, shift: false, code: "Digit3",
@@ -658,6 +715,7 @@ const commands: Command[] = [
     },
     {
         label: "\u2014",
+        icon: RuleIcon,
         description: "insert horizontal rule",
         category: "block",
         control: true, alt: false, shift: true, key: "h",
@@ -667,6 +725,7 @@ const commands: Command[] = [
     },
     {
         label: "🄰",
+        icon: CalloutIcon,
         description: "insert callout",
         category: "block",
         control: true, alt: false, shift: true, key: "e",
@@ -688,7 +747,7 @@ const commands: Command[] = [
     },
     {
         label: "‟",
-        icon: "quote.svg",
+        icon: QuoteIcon,
         description: "insert quote",
         category: "block",
         control: true, alt: false, shift: true, key: "u",
@@ -709,7 +768,7 @@ const commands: Command[] = [
     },
     {
         label: "<code>",
-        icon: "code.svg",
+        icon: CodeIcon,
         description: "insert code",
         category: "block",
         control: true, alt: false, shift: true, key: "s",
@@ -729,7 +788,7 @@ const commands: Command[] = [
     },
     {
         label: "image/video",
-        icon: "media.svg",
+        icon: MediaIcon,
         description: "insert image or video",
         category: "block",
         control: true, alt: false, shift: true, key: "p",
@@ -750,6 +809,7 @@ const commands: Command[] = [
     },
     {
         label: "▦",
+        icon: TableIcon,
         description: "insert table",
         category: "block",
         control: true, alt: false, shift: true, key: "\\",
@@ -776,7 +836,7 @@ const commands: Command[] = [
     },
     {
         label: "bulleted",
-        icon: "bullets.svg",
+        icon: BulletsIcon,
         description: "convert paragraph to bulleted list item",
         category: "list",
         control: true, alt: false, shift: true, key: "7",
@@ -786,7 +846,7 @@ const commands: Command[] = [
     },
     {
         label: "numbered",
-        icon: "numbers.svg",
+        icon: NumbersIcon,
         description: "convert paragraph to numbered list item",
         category: "list",
         control: true, alt: false, shift: true, key: "8",
@@ -796,7 +856,7 @@ const commands: Command[] = [
     },
     {
         label: "bulleted",
-        icon: "bullets.svg",
+        icon: BulletsIcon,
         description: "convert numbered list item to bulleted",
         category: "list",
         control: true, alt: false, shift: true, key: "7",
@@ -806,7 +866,7 @@ const commands: Command[] = [
     },
     {
         label: "numbered",
-        icon: "numbers.svg",
+        icon: NumbersIcon,
         description: "convert bulleted list item to numbered",
         category: "list",
         control: true, alt: false, shift: true, key: "8",
@@ -816,7 +876,7 @@ const commands: Command[] = [
     },
     {
         label: "paragraph",
-        icon: "paragraph.svg",
+        icon: ParagraphIcon,
         description: "convert bulleted list item to paragraph",
         category: "list",
         control: true, alt: false, shift: true, key: ["7", "8"],
@@ -826,7 +886,7 @@ const commands: Command[] = [
     },
     {
         label: "undo",
-        icon: "undo.svg",
+        icon: UndoIcon,
         description: "undo the last command",
         category: "history",
         control: true, alt: false, shift: false, key: ["z"],
@@ -836,7 +896,7 @@ const commands: Command[] = [
     },
     {
         label: "redo",
-        icon: "redo.svg",
+        icon: RedoIcon,
         description: "redo the most recently undone command",
         category: "history",
         control: true, alt: false, shift: true, key: ["z"],
@@ -846,6 +906,7 @@ const commands: Command[] = [
     },
     {
         label: "✂",
+        icon: CutIcon,
         description: "delete the selected content and copy it to the clipboard",
         category: "clipboard",
         control: true, alt: false, shift: false, key: ["x"],
@@ -864,6 +925,7 @@ const commands: Command[] = [
     },
     {
         label: "🗎",
+        icon: CopyIcon,
         description: "copy the selected content to the clipboard",
         category: "clipboard",
         control: true, alt: false, shift: false, key: ["c"],
@@ -881,6 +943,7 @@ const commands: Command[] = [
     },
     {
         label: "⎘",
+        icon: PasteIcon,
         description: "paste the content from the clipboard",
         category: "clipboard",
         control: true, alt: false, shift: false, key: ["v"],

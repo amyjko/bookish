@@ -39,7 +39,7 @@
         --app-font-size: 14pt;
         --app-text-spacing: 2rem;
 
-        --app-interactive-color: #1B499C;
+        --app-interactive-color: #6a9cf8;
         --app-background-color: white;
         --app-font-color: black;
         --app-border-color: #444444;
