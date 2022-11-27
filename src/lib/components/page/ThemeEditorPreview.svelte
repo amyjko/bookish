@@ -4,13 +4,15 @@
     import Parser from "$lib/models/chapter/Parser";
     import { getDarkMode } from "./Contexts";
 
-    export let theme: Theme;
+    export let theme: Theme | null;
+
+	let position: number;
 
     let darkMode = getDarkMode();
-	$: backgroundColor = $darkMode ? theme.dark?.backgroundColor : theme.light?.backgroundColor
+	$: backgroundColor = theme === null ? null : $darkMode ? theme.dark?.backgroundColor : theme.light?.backgroundColor
 
-	$: preview = Parser.parseChapter(undefined, `
-		# Header 1
+	$: preview = Parser.parseChapter(undefined, 
+		`# Header 1
 		## Header 2
 		### Header 3
 		
@@ -22,22 +24,30 @@
 
 </script>
 
-<div class="bookish-theme-preview" style={backgroundColor ? `background-color: ${backgroundColor};` : ""}>
+<div class={`preview ${position > window.innerHeight / 2 ? "small" : ""}`} style={`${backgroundColor ? `background-color: ${backgroundColor};` : ""}`}>
     <ChapterBody node={preview}/>
 </div>
 
+<svelte:window bind:scrollY={position} />
+
 <style>
-	.bookish-theme-preview {
+	.preview {
 		padding: 1em;
 		border: var(--bookish-app-chrome-border-width) solid black;
-		transform: translate(-25%, -25%) scale(0.5);
 		position: sticky;
-		margin-top: 2em;
+		margin-top: var(--bookish-app-content-spacing);
+		margin-bottom: var(--bookish-app-content-spacing);
 		top: 2em;
 		z-index: 3;
+		transition: transform 0.5s;
 	}
 
-	:global(.bookish-dark .bookish-theme-preview) {
+	.preview.small {
+		transform: scale(0.5);
+		transform-origin: left top;
+	}
+
+	:global(.bookish-dark .preview) {
 		border-color: white;
 	}
 

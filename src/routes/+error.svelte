@@ -2,11 +2,12 @@
     import Feedback from "$lib/components/app/Feedback.svelte";
     import Lead from "$lib/components/app/Lead.svelte";
     import Link from "$lib/components/app/Link.svelte";
+    import Large from "../lib/components/app/Large.svelte";
 </script>
 
-<Lead>Oops.</Lead>
+<Lead><Large>Oops</Large>.</Lead>
 
-<Feedback>
+<Feedback error>
     This page doesn't exist.
     Want to go <Link to="/">home</Link>?
 </Feedback>

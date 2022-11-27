@@ -12,6 +12,7 @@
     import TextEditor from "../editor/TextEditor.svelte";
     import type Theme from "$lib/models/book/Theme";
     import Button from "../app/Button.svelte";
+    import Switch from "../editor/Switch.svelte";
 
     const themes: Record<string,Theme> = {
         Bookish: BookishTheme,
@@ -24,6 +25,7 @@
 
     let edition = getEdition();
     $: theme = $edition.getTheme();
+    $: isDefault = theme === null || Object.values(themes).includes(theme);
 
     function getEmptyGroup(group: Record<string,string>) {
         const empty: Record<string, string> = {};
@@ -54,11 +56,15 @@
         To use it, you'll need to know a bit about how to format CSS <External to="https://developer.mozilla.org/en-US/docs/Web/CSS/color">colors</External>, <External to="https://developer.mozilla.org/en-US/docs/Web/CSS/font-size">fonts</External>, and <External to="https://developer.mozilla.org/en-US/docs/Learn/CSS/Building_blocks/Values_and_units">sizes</External>.
     </Instructions>
 
-    {#each Object.entries(themes) as [ name, option ] }
-        <Button tooltip="Choose the {name} theme" command={() => $edition.setTheme(option)} disabled={theme === option}>{name}</Button>
-    {/each}
+
+    <Switch
+        options={Object.keys(themes)} 
+        edit={name => $edition.setTheme(themes[name])}
+        value={Object.keys(themes).find(key => themes[key] === theme) ?? ""}
+    />
+
     <!-- If it's not one of the  -->
-    {#if theme === null || Object.values(themes).includes(theme)}
+    {#if isDefault }
         <Button tooltip="Create a custom theme" command={() => $edition.setTheme({ ...(theme === null ? BookishTheme : theme ) })}>Customize</Button>
     {:else}
         <ConfirmButton
@@ -67,7 +73,11 @@
             confirmLabel="Delete your theme?"
             command={() => $edition.setTheme(null)}
         />
-        <ThemeEditorPreview theme={theme}/>
+    {/if}
+
+    <ThemeEditorPreview theme={theme}/>
+
+    {#if !isDefault && theme !== null}
         <ThemeSetEditor header={"Light mode colors"} group="light" properties={theme.light ?? getEmptyGroup(BookishTheme.light)} />
         <ThemeSetEditor header={"Dark mode colors"} group="dark" properties={theme.dark ?? getEmptyGroup(BookishTheme.dark)} />
         <ThemeSetEditor header={"Fonts"} group="fonts" properties={theme.fonts ?? getEmptyGroup(BookishTheme.fonts)} />

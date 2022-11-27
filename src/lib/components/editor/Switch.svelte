@@ -2,7 +2,6 @@
 
     export let options: string[];
     export let value: string;
-    export let position: string;
     export let enabled: boolean | undefined = undefined;
     export let edit : (newValue: string) => void;
 
@@ -15,7 +14,7 @@
 
 </script>
 
-<span class={`switch bookish-app-${position === "<" ? "left" : position === ">" ? "right" : "middle"}`}>
+<span class="switch">
     {#each options as option }
         <button 
             class={`option ${value === option ? "selected" : ""}`} 

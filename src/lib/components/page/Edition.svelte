@@ -78,13 +78,16 @@
 
     // When dark mode changes, update the body's class list.
     $: {
-        if($darkMode) {
-            document.body.classList.add("bookish-dark")
-        }
-        else {
-            document.body.classList.remove("bookish-dark")
-            if(typeof localStorage !== "undefined")
-                localStorage.setItem("bookish-dark", $darkMode ? "true" : "false")
+        let element = document.querySelector(".bookish");
+        if(element) {
+            if($darkMode) {
+                element.classList.add("bookish-dark")
+            }
+            else {
+                element.classList.remove("bookish-dark")
+                if(typeof localStorage !== "undefined")
+                    localStorage.setItem("bookish-dark", $darkMode ? "true" : "false")
+            }
         }
     }
 
@@ -145,7 +148,7 @@
                 // Insert any import statements, then any rules.
                 const css = `
                     ${(theme.imports ?? []).map(url => `@import url(${url});`).join("\n")}
-                    :root {
+                    .bookish {
                         ${theme.light ? toRules(theme.light) : ""}
                         ${theme.fonts ? toRules(theme.fonts) : ""}
                         ${theme.sizes ? toRules(theme.sizes) : ""}
