@@ -168,6 +168,7 @@
     .bookish-figure-unspecified {
         width: 100%;
         height: 8em;
+        font-family: var(--app-font);
         background-color: var(--app-chrome-background);
         color: var(--app-chrome-color);
         display: flex;
