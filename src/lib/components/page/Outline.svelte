@@ -217,7 +217,7 @@
         color: var(--bookish-muted-color);
         --bookish-outline-width: 12em;
         --bookish-outline-padding: 1em;
-        --bookish-outline-offset: calc(-1 * (var(--bookish-outline-width) + 2 * var(--bookish-outline-padding)));
+        --bookish-outline-offset: calc(-1 * (var(--bookish-outline-width) + 3 * var(--bookish-outline-padding)));
     }
 
     .bookish-outline-header-nav {
@@ -375,6 +375,7 @@
             border-right: 1px solid var(--bookish-border-color-light);
             padding: var(--bookish-outline-padding);
             background-color: var(--bookish-background-color);
+            margin-right: var(--bookish-outline-padding);
         }
 
         /* When the outline is fixed to the left, it's translated by it's width (with some padding). */
