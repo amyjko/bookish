@@ -15,13 +15,13 @@
 
 <style>
     input {
-        font-family: var(--bookish-app-chrome-font-family);
-        font-size: var(--bookish-app-chrome-font-size);
-        color: var(--bookish-app-chrome-color);
-        padding: var(--bookish-app-chrome-padding);
-        font-size: var(--bookish-app-chrome-font-size);
+        font-family: var(--app-font);
+        font-size: var(--app-chrome-font-size);
+        color: var(--app-font-color);
+        padding: var(--app-chrome-padding);
+        font-size: var(--app-chrome-font-size);
         border: none;
-        border-bottom: var(--bookish-app-chrome-border-width) solid var(--bookish-app-chrome-border-color);
+        border-bottom: var(--app-chrome-border-size) solid var(--app-border-color);
     }
 
     input:focus {

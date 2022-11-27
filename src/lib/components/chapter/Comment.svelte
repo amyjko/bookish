@@ -37,11 +37,11 @@
 
 <style>
     .bookish-app-comment {
-        background: var(--bookish-app-chrome-background);
-        border: var(--bookish-app-chrome-border-width) solid var(--bookish-app-chrome-border-color);
-        border-radius: 0 var(--bookish-app-chrome-padding) var(--bookish-app-chrome-padding) var(--bookish-app-chrome-padding);
-        padding: var(--bookish-app-chrome-padding);
-        font-size: var(--bookish-app-chrome-font-size);
+        background: var(--app-chrome-background);
+        border: var(--app-chrome-border-size) solid var(--app-border-color);
+        border-radius: 0 var(--app-chrome-padding) var(--app-chrome-padding) var(--app-chrome-padding);
+        padding: var(--app-chrome-padding);
+        font-size: var(--app-chrome-font-size);
         display: inline-block;
         line-height: 1.5em;
     }

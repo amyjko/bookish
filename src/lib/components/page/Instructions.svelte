@@ -10,20 +10,20 @@
 
 <style>
     .instructions {
-        font-family: var(--bookish-app-font-family);
+        font-family: var(--app-font);
         font-weight: 300;
         font-style: italic;
-        margin-top: var(--bookish-app-content-spacing);
-        margin-bottom: var(--bookish-app-content-spacing);
-        line-height: var(--bookish-app-line-height);
-        padding-left: var(--bookish-app-margin);
-        border-left: var(--bookish-app-chrome-border-width) solid var(--bookish-app-chrome-border-color);
+        margin-top: var(--app-text-spacing);
+        margin-bottom: var(--app-text-spacing);
+        line-height: var(--app-line-height);
+        padding-left: var(--app-chrome-padding);
+        border-left: var(--app-chrome-border-size) solid var(--app-border-color);
     }
 
     .instructions :global(p), .instructions :global(li) {
-        font-family: var(--bookish-app-chrome-font-family);
-        font-size: var(--bookish-app-chrome-font-size);
-        line-height: var(--bookish-app-chrome-line-height);
+        font-family: var(--app-font);
+        font-size: var(--app-chrome-font-size);
+        line-height: var(--app-line-height);
         margin-bottom: 0;
     }
 

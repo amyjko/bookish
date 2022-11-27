@@ -4,6 +4,6 @@
     span {
         font-size: small;
         font-style: italic;
-        color: var(--bookish-app-chrome-muted);
+        color: var(--app-muted-color);
     }
 </style>

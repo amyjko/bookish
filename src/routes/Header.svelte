@@ -32,12 +32,12 @@
 
 <style>
     .header {
-        margin-top: var(--bookish-app-chrome-spacing); 
-        margin-bottom: var(--bookish-app-chrome-spacing); 
+        margin-top: var(--app-chrome-padding); 
+        margin-bottom: var(--app-chrome-padding); 
     }
 
     .header > :global(a) {
         display: inline-block;
-        margin-right: calc(2 * var(--bookish-app-chrome-spacing));
+        margin-right: calc(2 * var(--app-chrome-padding));
     }
 </style>

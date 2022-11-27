@@ -67,8 +67,8 @@
     // respect user choice on the website despite the system theme
     let darkMode = writable<boolean>(
         typeof localStorage !== "undefined" &&
-        localStorage.getItem("bookish-dark") !== "false" && (
-            localStorage.getItem("bookish-dark") === "true" || // A previous setting
+        localStorage.getItem("dark") !== "false" && (
+            localStorage.getItem("dark") === "true" || // A previous setting
             window.matchMedia("(prefers-color-scheme: dark)").matches // Operating system is set to dark
         )
     );
@@ -78,16 +78,13 @@
 
     // When dark mode changes, update the body's class list.
     $: {
-        let element = document.querySelector(".bookish");
-        if(element) {
-            if($darkMode) {
-                element.classList.add("bookish-dark")
-            }
-            else {
-                element.classList.remove("bookish-dark")
-                if(typeof localStorage !== "undefined")
-                    localStorage.setItem("bookish-dark", $darkMode ? "true" : "false")
-            }
+        if($darkMode) {
+            document.body.classList.add("dark")
+        }
+        else {
+            document.body.classList.remove("dark")
+            if(typeof localStorage !== "undefined")
+                localStorage.setItem("dark", $darkMode ? "true" : "false")
         }
     }
 
@@ -155,7 +152,7 @@
                         ${theme.weights ? toRules(theme.weights) : ""}
                         ${theme.spacing ? toRules(theme.spacing) : ""}
                     }
-                    .bookish-dark {
+                    .dark {
                         ${theme.dark ? toRules(theme.dark) : ""}
                     }`
                 ;
@@ -186,7 +183,7 @@
 
 </script>
 
-<div class="bookish {$darkMode ? " bookish-dark" : ""}">
+<div class="bookish {$darkMode ? " dark" : ""}">
     <slot></slot>
     {#if editable}
         <Status book={edition.getBook()} edition={edition}/>
@@ -257,7 +254,7 @@
         --bookish-outline-offset: calc(-1 * (var(--bookish-outline-width) + 2 * var(--bookish-outline-padding)));
     }
 
-    .bookish-dark {
+    .dark {
         --bookish-background-color: #1C1C1C;
         --bookish-block-background-color: #333333;
         --bookish-error-background-color: #721C24;
@@ -280,7 +277,6 @@
     body {
         margin: 0;
         padding: 0;
-
         background-color: var(--bookish-background-color);
     }
 
@@ -319,7 +315,7 @@
         border-top: 1px solid var(--bookish-border-color-light);
     }
     
-    .bookish-dark .bookish-figure-image {
+    .dark .bookish-figure-image {
         filter: brightness(50%);
     }
 

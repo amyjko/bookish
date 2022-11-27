@@ -208,10 +208,10 @@
         left: 0;
         right: 0;
         background: var(--bookish-background-color);
-        border: var(--bookish-app-chrome-border-width) solid var(--bookish-app-chrome-border-color);
-        padding: var(--bookish-app-chrome-padding);
-        font-family: var(--bookish-app-chrome-font-family);
-        font-size: var(--bookish-app-chrome-font-size);
+        border: var(--app-chrome-border-size) solid var(--app-border-color);
+        padding: var(--app-chrome-padding);
+        font-family: var(--app-font);
+        font-size: var(--app-chrome-font-size);
         z-index: 2;
         transition: top 1s;
     }
@@ -222,8 +222,8 @@
     }
 
     .bookish-editor-toolbar :global(hr) {
-        margin-top: var(--bookish-app-chrome-padding);
-        margin-bottom: var(--bookish-app-chrome-padding);
+        margin-top: var(--app-chrome-padding);
+        margin-bottom: var(--app-chrome-padding);
         line-height: 1em;
     }
 

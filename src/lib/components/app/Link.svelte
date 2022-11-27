@@ -7,9 +7,9 @@
 
 <style>
     a {        
-        color: var(--bookish-app-link-color);
-        font-family: var(--bookish-app-font-family);
-        font-size: var(--bookish-app-font-size);
+        color: var(--app-interactive-color);
+        font-family: var(--app-font);
+        font-size: var(--app-font-size);
         font-weight: 400;
         text-decoration: none;
     }

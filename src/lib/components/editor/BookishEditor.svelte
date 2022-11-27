@@ -821,8 +821,8 @@
 <style>
     .bookish-editor:focus {
         outline: 2px solid var(--bookish-highlight-color);
-        outline-offset: var(--bookish-app-chrome-padding);
-        border-radius: var(--bookish-app-chrome-roundedness);
+        outline-offset: var(--app-chrome-padding);
+        border-radius: var(--app-chrome-roundedness);
     }
 
     .bookish-editor.bookish-editor-atom-focused:focus {
@@ -848,7 +848,7 @@
     }
 
     .bookish-editor-caret-disabled {
-        outline-color: var(--bookish-app-chrome-muted);
+        outline-color: var(--app-muted-color);
     }
 
     .bookish-editor-caret-blink {
@@ -891,7 +891,7 @@
     }
 
     :global(.bookish-editor .bookish-table table td) {
-        border: var(--bookish-app-chrome-border-width) dashed var(--bookish-app-chrome-border-color);
+        border: var(--app-chrome-border-size) dashed var(--app-border-color);
     }
 
     .bookish-editor :global(hr) {

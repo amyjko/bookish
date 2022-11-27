@@ -44,18 +44,18 @@
 
 	textarea {
 		width: 100%;
-		padding: var(--bookish-app-chrome-padding);
-		font-family: var(--bookish-app-font-family);
-		font-size: var(--bookish-app-font-size);
+		padding: var(--app-chrome-padding);
+		font-family: var(--app-font);
+		font-size: var(--app-font-size);
         border: none;
-        border-top: var(--bookish-app-chrome-border-width) solid var(--bookish-app-chrome-border-color);
-        border-bottom: var(--bookish-app-chrome-border-width) solid var(--bookish-app-chrome-border-color);
-		margin-bottom: var(--bookish-app-chrome-padding);
+        border-top: var(--app-chrome-border-size) solid var(--app-border-color);
+        border-bottom: var(--app-chrome-border-size) solid var(--app-border-color);
+		margin-bottom: var(--app-chrome-padding);
     }
 
 	textarea:focus {
-        border-bottom-color: var(--bookish-app-chrome-hover-background);
-        border-top-color: var(--bookish-app-chrome-hover-background);
+        border-bottom-color: var(--app-interactive-color);
+        border-top-color: var(--app-interactive-color);
 		outline: none;
 	}
 

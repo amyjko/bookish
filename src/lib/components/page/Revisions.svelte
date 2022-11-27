@@ -110,6 +110,6 @@
 
 <style>
     .viewing {
-        border-bottom: var(--bookish-app-chrome-border-width) solid var(--bookish-app-chrome-border-color);
+        border-bottom: var(--app-chrome-border-size) solid var(--app-border-color);
     }
 </style>

@@ -7,12 +7,12 @@
 
 <style>
     p {
-        font-family: var(--bookish-app-font-family);
-        font-size: var(--bookish-app-font-size);
+        font-family: var(--app-font);
+        font-size: var(--app-font-size);
         font-weight: 300;
-        line-height: 1.7;
+        line-height: var(--app-line-height);
         margin-top: 0;
-        margin-bottom: var(--bookish-app-content-spacing);
+        margin-bottom: var(--app-text-spacing);
     }
 
     .aside {

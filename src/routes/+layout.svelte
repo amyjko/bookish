@@ -34,37 +34,37 @@
     :global(.bookish-app) {
 
         /* Define some UI defaults not used in the Bookish theme. */
-        --bookish-app-font-family: "Outfit", sans-serif;
-        --bookish-app-header-font: "Outfit", sans-serif;
-        --bookish-app-line-height: 1.7;
-        --bookish-app-font-size: 14pt;
-        --bookish-app-link-color: #1B499C;
-        --bookish-app-chrome-hover-background: #1B499C;
-        --bookish-app-background: white;
-        --bookish-app-chrome-background: rgb(244, 244, 244);
-        --bookish-app-font-color: black;
-        --bookish-app-chrome-color: black;
-        --bookish-app-chrome-border-color: #444444;
-        --bookish-app-chrome-hover-color: #FFFFFF;
-        --bookish-app-chrome-muted: #AAAAAA;
-        --bookish-app-highlight-width: 3px;
+        --app-font: "Outfit", sans-serif;
+        --app-line-height: 1.7;
+        --app-font-size: 14pt;
+        --app-text-spacing: 2em;
 
-        --bookish-app-error-background: rgb(255, 231, 231);
-        --bookish-app-error-color: rgb(191, 15, 15);
-        --bookish-app-error-font-weight: 400;
+        --app-interactive-color: #1B499C;
+        --app-background-color: white;
+        --app-font-color: black;
+        --app-border-color: #444444;
+        --app-font-color-inverted: #FFFFFF;
+        --app-muted-color: #AAAAAA;
+        --app-error-color: rgb(191, 15, 15);
 
-        --bookish-app-content-spacing: 2em;
+        --app-chrome-background: rgb(244, 244, 244);
+        --app-chrome-font-size: 13pt;
+        --app-chrome-padding: 0.5em;
+        --app-chrome-border-size: 3px;
+        --app-chrome-roundedness: 5px;
+        --app-chrome-padding: 0.5em;
 
-        --bookish-app-chrome-font-family: "Outfit", sans-serif;
-        --bookish-app-chrome-font-size: 13pt;
-        --bookish-app-chrome-padding: 0.5em;
-        --bookish-app-chrome-border-width: 3px;
-        --bookish-app-chrome-roundedness: 5px;
-        --bookish-app-chrome-spacing: 0.5em;
-        --bookish-app-chrome-line-height: 1.5em;
+    }
 
-        --bookish-app-margin: 1em;
-
+    :global(.dark .bookish-app) {
+        --app-interactive-color: #1455ce;
+        --app-background-color: #050505;
+        --app-font-color: white;
+        --app-border-color: #353535;
+        --app-font-color-inverted: #000000;
+        --app-muted-color: #a9a9a9;
+        --app-error-color: rgb(80, 8, 8);
+        --app-chrome-background: rgb(46, 46, 46);
     }
 
     .bookish-app {
@@ -72,10 +72,10 @@
         flex-direction: column;
         align-items: center;
         font-weight: 300;
-        color: var(--bookish-app-font-color);
-        font-family: var(--bookish-app-font-family);
+        color: var(--app-font-color);
+        font-family: var(--app-font);
         font-size: 14pt;
-        background-color: var(--bookish-app-background);
+        background-color: var(--app-background-color);
     }
 
     :global(.firebase-emulator-warning) {

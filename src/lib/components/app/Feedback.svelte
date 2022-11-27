@@ -12,15 +12,15 @@
 
 <style>
     p {
-        font-family: var(--bookish-app-font-family);
-        margin-top: var(--bookish-app-content-spacing);
-        margin-bottom: var(--bookish-app-content-spacing);
-        padding: var(--bookish-app-chrome-padding);
+        font-family: var(--app-font);
+        margin-top: var(--app-text-spacing);
+        margin-bottom: var(--app-text-spacing);
+        padding: var(--app-chrome-padding);
         --bounce-height: 1em;
     }
 
     p[role="alert"] {
-        color: var(--bookish-app-error-color);
+        color: var(--app-error-color);
     }
 
     p[role="alert"]:before {
@@ -29,7 +29,7 @@
     }
 
     p[role="status"] {
-        color: var(--bookish-app-font-color);
+        color: var(--app-font-color);
         animation: waiting 1s infinite;
     }
 

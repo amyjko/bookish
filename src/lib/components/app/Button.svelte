@@ -19,24 +19,23 @@
 
 <style>
     button {
-        font-family: var(--bookish-app-chrome-font-family);
-        font-size: var(--bookish-app-chrome-font-size);
-        color: var(--bookish-app-chrome-color);
-        background-color: var(--bookish-app-chrome-background);
-        padding: var(--bookish-app-chrome-padding);
-        border-radius: var(--bookish-app-chrome-roundedness);
+        font-family: var(--app-font);
+        font-size: var(--app-chrome-font-size);
+        color: var(--app-font-color);
+        background-color: var(--app-chrome-background);
+        padding: var(--app-chrome-padding);
+        border-radius: var(--app-chrome-roundedness);
         border: none;
     }
 
     button:hover:enabled {
         cursor: pointer;
-        background-color: var(--bookish-app-chrome-hover-background);
-        color: var(--bookish-app-chrome-hover-color);
+        background-color: var(--app-interactive-color);
+        color: var(--app-font-color-inverted);
     }
 
     button:disabled {
         opacity: 0.3;
-        border-color: var(--bookish-app-chrome-muted);
         cursor: auto;
     }
 

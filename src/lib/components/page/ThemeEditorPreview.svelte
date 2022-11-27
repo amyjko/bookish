@@ -33,10 +33,10 @@
 <style>
 	.preview {
 		padding: 1em;
-		border: var(--bookish-app-chrome-border-width) solid black;
+		border: var(--app-chrome-border-size) solid black;
 		position: sticky;
-		margin-top: var(--bookish-app-content-spacing);
-		margin-bottom: var(--bookish-app-content-spacing);
+		margin-top: var(--app-text-spacing);
+		margin-bottom: var(--app-text-spacing);
 		top: 2em;
 		z-index: 3;
 		transition: transform 0.5s;
@@ -45,10 +45,6 @@
 	.preview.small {
 		transform: scale(0.5);
 		transform-origin: left top;
-	}
-
-	:global(.bookish-dark .preview) {
-		border-color: white;
 	}
 
 </style>

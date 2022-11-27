@@ -163,7 +163,7 @@
 
     input[type="text"]:focus {
         outline: none;
-        border-bottom: var(--bookish-app-chrome-border-width) solid var(--bookish-app-chrome-hover-background);
+        border-bottom: var(--app-chrome-border-size) solid var(--app-interactive-color);
     }
 
     /* This ensures the error message always appears below empty text editors */
@@ -183,7 +183,7 @@
 
     /* Override the inherited color of the text is a placeholder */
     .bookish-text-editor-placeholder .bookish-text-editor-sizer {
-        color: var(--bookish-app-chrome-muted);
+        color: var(--app-muted-color);
     }
 
     /* Hide the text field when its being viewed so we can let the sizer display the full value, in case it's long. */
@@ -208,11 +208,11 @@
     }
 
     .bookish-editor-error, .bookish-text-editor-error {
-        font-family: var(--bookish-app-chrome-font-family);
+        font-family: var(--app-font);
         font-size: var(--bookish-small-font-size);
         font-weight: normal;
         font-style: normal;
-        color: var(--bookish-app-error-color);
+        color: var(--app-error-color);
         background: var(--bookish-background-color);
         animation: failure 100ms 10;
     }

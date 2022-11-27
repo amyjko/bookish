@@ -29,55 +29,54 @@
 <style>
 
     button {
-        font-family: var(--bookish-app-chrome-font-family);
-        font-size: var(--bookish-app-chrome-font-size);
-        color: var(--bookish-app-chrome-color);
-        background-color: var(--bookish-app-chrome-background);
-        padding: var(--bookish-app-chrome-padding);
+        font-family: var(--app-font);
+        font-size: var(--app-chrome-font-size);
+        color: var(--app-font-color);
+        background-color: var(--app-chrome-background);
+        padding: var(--app-chrome-padding);
         border: none;
         border-radius: 0;
     }
 
     button:hover:enabled:not(.selected) {
         cursor: pointer;
-        background-color: var(--bookish-app-chrome-hover-background);
-        color: var(--bookish-app-chrome-hover-color);
+        background-color: var(--app-interactive-color);
+        color: var(--app-font-color-inverted);
     }
 
     button.selected {
-        background-color: var(--bookish-app-chrome-border-color);
-        color: var(--bookish-app-chrome-hover-color);
+        background-color: var(--app-border-color);
+        color: var(--app-font-color-inverted);
     }
 
     button:disabled {
         opacity: 0.3;
-        border-color: var(--bookish-app-chrome-muted);
         cursor: auto;
     }
 
     .switch {
-        font-family: var(--bookish-app-chrome-font-family);
-        font-size: var(--bookish-app-chrome-font-size);
+        font-family: var(--app-font);
+        font-size: var(--app-chrome-font-size);
         white-space: nowrap;
     }
 
     .option {
         display: inline-block;
-        background-color: var(--bookish-app-chrome-background);
-        padding-left: var(--bookish-app-chrome-padding);
-        padding-right: var(--bookish-app-chrome-padding);
+        background-color: var(--app-chrome-background);
+        padding-left: var(--app-chrome-padding);
+        padding-right: var(--app-chrome-padding);
     }
 
     .option:first-child {
-        border-top-left-radius: var(--bookish-app-chrome-roundedness);
-        border-bottom-left-radius: var(--bookish-app-chrome-roundedness);
-        margin-left: var(--bookish-app-chrome-padding);
+        border-top-left-radius: var(--app-chrome-roundedness);
+        border-bottom-left-radius: var(--app-chrome-roundedness);
+        margin-left: var(--app-chrome-padding);
     }
 
     .option:last-child {
-        border-top-right-radius: var(--bookish-app-chrome-roundedness);
-        border-bottom-right-radius: var(--bookish-app-chrome-roundedness);
-        margin-right: var(--bookish-app-chrome-padding);
+        border-top-right-radius: var(--app-chrome-roundedness);
+        border-bottom-right-radius: var(--app-chrome-roundedness);
+        margin-right: var(--app-chrome-padding);
     }
 
 </style>

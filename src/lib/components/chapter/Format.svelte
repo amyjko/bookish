@@ -59,7 +59,7 @@
 
 <style>
     .bookish-editor-placeholder {
-        color: var(--bookish-app-chrome-muted);
+        color: var(--app-muted-color);
         font-style: italic;
     }    
 

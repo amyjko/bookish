@@ -57,30 +57,30 @@
 
     td {
         vertical-align: top;
-        padding: var(--bookish-app-chrome-padding);
+        padding: var(--app-chrome-padding);
     }
 
     .book-preview {
         display: flex;
         width: 100%;
-        padding: var(--bookish-app-chrome-padding);
+        padding: var(--app-chrome-padding);
         text-align: left;
     }
 
     .cover {
         width: 5em;
         height: 5em;
-        margin-right: var(--bookish-app-chrome-padding);
+        margin-right: var(--app-chrome-padding);
     }
 
     .title {
         flex: 1;
-        margin-right: var(--bookish-app-chrome-padding);
+        margin-right: var(--app-chrome-padding);
     }
 
     .authors {
         flex: 1;
-        margin-right: var(--bookish-app-chrome-padding);
+        margin-right: var(--app-chrome-padding);
     }
 
     .description {

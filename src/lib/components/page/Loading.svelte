@@ -1,4 +1,4 @@
-<div class={"bookish bookish-loading" + (typeof localStorage !== "undefined" && localStorage.getItem("bookish-dark") === "true" ? " bookish-dark" : "")}>
+<div class={"bookish bookish-loading" + (typeof localStorage !== "undefined" && localStorage.getItem("dark") === "true" ? " dark" : "")}>
         <div class="bookish-loading-animation">
         <div></div>
         <div></div>

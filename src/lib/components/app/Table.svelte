@@ -8,10 +8,10 @@
     section {
         width: 100%;
         overflow-x: auto;
-        margin-top: var(--bookish-app-content-spacing);
-        margin-bottom: var(--bookish-app-content-spacing);
-        border-top: var(--bookish-app-chrome-border-width) solid var(--bookish-app-chrome-border-color);
-        border-bottom: var(--bookish-app-chrome-border-width) solid var(--bookish-app-chrome-border-color);
+        margin-top: var(--app-text-spacing);
+        margin-bottom: var(--app-text-spacing);
+        border-top: var(--app-chrome-border-size) solid var(--app-border-color);
+        border-bottom: var(--app-chrome-border-size) solid var(--app-border-color);
     }
 
     table {
@@ -23,9 +23,9 @@
     }
 
     table :global(td) {
-        padding: var(--bookish-app-chrome-padding);
+        padding: var(--app-chrome-padding);
         vertical-align: top;
-        font-family: var(--bookish-app-font-family);
+        font-family: var(--app-font);
         font-weight: 300;
     }
 

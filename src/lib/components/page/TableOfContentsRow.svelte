@@ -1,5 +1,4 @@
 <script lang="ts">
-    import Link from "$lib/components/Link.svelte";
     import TableOfContentsImage from "./TableOfContentsImage.svelte";
     import type Chapter from "$lib/models/book/Chapter";
     import Toggle from "$lib/components/editor/Toggle.svelte";

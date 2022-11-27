@@ -15,7 +15,7 @@
 
 <style>
     span {
-        margin-right: var(--bookish-app-chrome-padding);
+        margin-right: var(--app-chrome-padding);
     }
 
     img {

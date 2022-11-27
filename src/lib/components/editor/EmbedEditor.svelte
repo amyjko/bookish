@@ -102,27 +102,26 @@
 
 <style>
     .file-upload {
-        background-color: var(--bookish-app-chrome-background);
-        padding: var(--bookish-app-chrome-padding);
-        border-radius: var(--bookish-app-chrome-roundedness);
+        background-color: var(--app-chrome-background);
+        padding: var(--app-chrome-padding);
+        border-radius: var(--app-chrome-roundedness);
         border: none;
     }
 
     .file-upload:hover {
-        background-color: var(--bookish-app-chrome-hover-background);
-        color: var(--bookish-app-chrome-hover-color);
+        background-color: var(--app-interactive-color);
+        color: var(--app-font-color-inverted);
         cursor: pointer;
     }
 
     .file-upload input:disabled {
         opacity: 0.3;
-        border-color: var(--bookish-app-chrome-muted);
         cursor: auto;
     }
 
     .file-upload {
         font-family: var(--bookish-app-chrome-font);
-        font-size: var(--bookish-app-chrome-font-size);
+        font-size: var(--app-chrome-font-size);
     }
 
     .file-upload input[type="file"] {

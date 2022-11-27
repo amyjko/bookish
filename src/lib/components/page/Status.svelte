@@ -39,8 +39,8 @@
 <style>
     .bookish-editor-status {
         position: fixed;
-        top: var(--bookish-app-chrome-spacing);
-        right: var(--bookish-app-chrome-spacing);
+        top: var(--app-chrome-padding);
+        right: var(--app-chrome-padding);
         z-index: 3;
         color: var(--bookish-muted-color);
         font-family: var(--bookish-header-font-family);
@@ -48,7 +48,7 @@
     }
 
     .bookish-editor-status-error {
-        color: var(--bookish-app-error-color);
+        color: var(--app-error-color);
         animation: failure 100ms infinite;
     }
 
