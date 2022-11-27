@@ -104,8 +104,13 @@
 
 </script>
 
-<span class={`bookish-text-editor ${showPlaceholder() ? "bookish-text-editor-placeholder" : ""} ${status === Status.Viewing ? "bookish-text-editor-viewing" : ""}`}>
-    <span class="bookish-text-editor-sizer" aria-hidden={true} bind:this={sizer} on:click={startEditing}></span>
+<span class={`text-editor ${showPlaceholder() ? "placeholder" : ""} ${status === Status.Viewing ? "viewing" : ""}`}>
+    <span 
+        class={`sizer ${error ? "error" : ""}`} 
+        aria-hidden={true} 
+        bind:this={sizer} 
+        on:click={startEditing}>
+    </span>
     <input
         type="text" 
         bind:this={field}
@@ -120,32 +125,30 @@
         on:blur={stopEditing}
         on:focus={startEditing}
     />
-    {#if error }
+    {#if error && status === Status.Editing }
         <span
             aria-live="polite"
-            class={`bookish-text-editor-error ${status === Status.Editing ? "bookish-text-editor-error-focused" : ""}`}
-        >
-            {status === Status.Viewing ? "\u2715" : error}
-        </span>
+            class={`text-editor-error ${status === Status.Editing ? "editing" : ""}`}
+        >{error}</span>
     {/if}
 </span>
 
 <style>
-    .bookish-text-editor {
+    .text-editor {
         position: relative;
     }
 
     input[type="text"] {
         cursor: pointer;
         position: absolute;
+        top: 0;
         left: 0;
-        margin-top: -2px; /* Matches the outline offset */
         width: 100%;
         min-width: 0.5em;
     }
 
     /* Match the parent's styling as much as possible. */
-    input[type="text"], .bookish-text-editor-sizer {
+    input[type="text"], .sizer {
         background-color: inherit;
         font-family: inherit;
         font-size: inherit;
@@ -159,6 +162,7 @@
         margin: 0;
         display: inline;
         cursor: text;
+        vertical-align: inherit;
     }
 
     input[type="text"]:focus {
@@ -167,31 +171,40 @@
     }
 
     /* This ensures the error message always appears below empty text editors */
-    .bookish-text-editor-sizer {
+    .sizer {
         min-height: 1em;
         opacity: 0;
     }
 
-    .bookish-text-editor-viewing .bookish-text-editor-sizer {
+    .sizer.error {
+        border-bottom: var(--app-chrome-border-size) solid var(--app-error-color) !important;
+    }
+
+    .viewing .sizer {
         opacity: 1;
     }
 
     /* This ensures that the sizer doesn't end up with zero width and height. */
-    .bookish-text-editor-sizer:empty:before {
+    .sizer:empty:before {
         content: "\200b";
     }
 
     /* Override the inherited color of the text is a placeholder */
-    .bookish-text-editor-placeholder .bookish-text-editor-sizer {
+    .placeholder .sizer {
         color: var(--app-muted-color);
     }
 
     /* Hide the text field when its being viewed so we can let the sizer display the full value, in case it's long. */
-    .bookish-text-editor.bookish-text-editor-viewing input {
+    .text-editor.viewing input {
         opacity: 0;
     }
 
-    .bookish-text-editor .bookish-text-editor-error {
+    .editing {
+        /* Put this above other errors nearby. */
+        z-index: 4;
+    }
+
+    .text-editor-error {
         position: absolute;
         left: 0;
         top: 100%;
@@ -200,20 +213,13 @@
         line-height: 1em;
         margin-left: -0.5em;
         padding: 0.5em 0.5em;
-    }
-
-    .bookish-text-editor .bookish-text-editor-error.bookish-text-editor-error-focused {
-        /* Put this above other errors nearby. */
-        z-index: 4;
-    }
-
-    .bookish-editor-error, .bookish-text-editor-error {
         font-family: var(--app-font);
-        font-size: var(--bookish-small-font-size);
+        font-size: 80%;
         font-weight: normal;
         font-style: normal;
         color: var(--app-error-color);
-        background: var(--bookish-background-color);
+        border-radius: var(--app-chrome-roundedness);
+        background: var(--app-chrome-background);
         animation: failure 100ms 10;
     }
 

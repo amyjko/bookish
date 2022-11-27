@@ -820,7 +820,7 @@
 
 <style>
     .bookish-editor:focus {
-        outline: 2px solid var(--bookish-highlight-color);
+        outline: var(--app-chrome-border-size) solid var(--app-interactive-color);
         outline-offset: var(--app-chrome-padding);
         border-radius: var(--app-chrome-roundedness);
     }

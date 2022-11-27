@@ -1,6 +1,7 @@
 <script lang="ts">
     import type DefinitionNode from "$lib/models/chapter/DefinitionNode";
     import { getCaret, getEdition } from "../page/Contexts";
+    import Muted from "../page/Muted.svelte";
 
     export let definition: DefinitionNode;
 
@@ -31,6 +32,6 @@
         {#each entries as entry}<option value={entry.glossaryID}>{entry.phrase}</option>{/each}
     </select>
     {#if !(definition.getMeta() in glossary)}
-        <span class="bookish-editor-error">Choose a <a href={glossaryLink}>glossary</a> entry.</span>
+        <Muted>Choose a <a href={glossaryLink}>glossary</a> entry.</Muted>
     {/if}
 </span>
