@@ -18,13 +18,13 @@
         <slot></slot>
         {#if caption !== undefined}
             <figcaption class="bookish-figure-caption">
+                {#if caption}
+                    <Format node={caption} placeholder="caption"/>
+                {/if}
                 {#if credit}
                     <div class="bookish-figure-credit">
                         <Format node={credit} placeholder="credit" />
                     </div>
-                {/if}
-                {#if caption}
-                    <Format node={caption} placeholder="caption"/>
                 {/if}
             </figcaption>
         {/if}
@@ -34,20 +34,21 @@
 <style>
     .bookish-figure-caption {
         text-align: center;
+        position: relative;
         color: var(--bookish-muted-color);
         line-height: var(--bookish-paragraph-line-height-tight);
         font-size: var(--bookish-block-font-size);
-        margin-top: 0;
-        margin-bottom: var(--bookish-paragraph-spacing);
-        margin-left: var(--bookish-paragraph-spacing);
-        margin-right: var(--bookish-paragraph-spacing);
+        margin-top: var(--bookish-block-padding);
+        margin-bottom: var(--bookish-block-padding);
     }
 
     .bookish-figure-credit {
         display: block;
+        position: absolute;
+        top: -1em;
+        right: 0;
         text-align: right;
         font-style: italic;
         font-size: var(--bookish-small-font-size);
     }
-
 </style>
