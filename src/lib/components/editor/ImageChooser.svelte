@@ -55,7 +55,6 @@
 <style>
     .bookish-image-chooser {
         display: inline-block;
-        height: 3em;
         overflow-x: scroll;
         vertical-align: middle;
     }
