@@ -40,7 +40,7 @@
 {:else}
     <div class="previews">
         {#each books as book }
-            <BookPreview book={book} write={true} />
+            <BookPreview book={book} />
         {/each}
     </div>
 {/if}

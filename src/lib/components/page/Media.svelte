@@ -67,7 +67,7 @@
             <span>{#if editable}{images && images.find(i => i.url === embed.getURL()) === undefined ? "linked" : "uploaded"}{embed.getCredit().isEmptyText() ? "" : " • "}{/if}<Format node={embed.getCredit()}/></span>
         </MediaPreview>
     {/each}
-    {#if editable !== undefined && unused !== undefined && unused.length > 0 }
+    {#if editable && unused !== undefined && unused.length > 0 }
         <PageHeader id="unused">Unused</PageHeader>
         <Instructions>
             These images are uploaded to this book, but not used.

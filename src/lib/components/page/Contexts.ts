@@ -32,7 +32,7 @@ export const CHAPTER = Symbol("chapter");
 export function getChapter() { return getContext<ChapterStore>(CHAPTER); }
 
 export const EDITABLE = Symbol("editable");
-export function isEditable() { return getContext(EDITABLE); }
+export function isEditable(): boolean { return getContext(EDITABLE); }
 
 export const BASE = Symbol("base");
 export function getBase() { return getContext<string>(BASE); }

@@ -9,7 +9,7 @@
     import Link from "$lib/components/app/Link.svelte";
 
     export let book: Book;
-    export let write: boolean;
+    export let write: boolean = false;
 
     $: refID = book.getRefID();
     $: cover = book.getCover();
