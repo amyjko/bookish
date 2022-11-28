@@ -49,7 +49,7 @@
 
         // When the outline updates (due to the page its on updating), generate a unique string for the current header outline.
         // If it's different from the last rendered state, refresh.
-        headers = Array.from(document.getElementsByClassName("bookish-header"));
+        headers = Array.from(document.getElementsByClassName("page-header"));
         let newHeaderString = headers.reduce((sum, el) => sum + el.outerHTML, "");
 
         // If the headers change, update the outline.
