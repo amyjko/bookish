@@ -28,7 +28,7 @@
     import EmbedEditor from "$lib/components/editor/EmbedEditor.svelte";
     import TableEditor from "$lib/components/editor/TableEditor.svelte";
     import ToolbarGroup from "./ToolbarGroup.svelte";
-    import ToolbarIcon from "./Icon.svelte";
+    import Icon from "./Icon.svelte";
     import { onMount } from "svelte";
     import Button from "../app/Button.svelte";
 
@@ -198,7 +198,7 @@
                                 tabIndex=0
                                 command={() => executor?.call(undefined, command, "")}
                             >
-                                <ToolbarIcon icon={command.icon}/>
+                                <Icon icon={command.icon}/>
                             </Button>
                         {/each}
                         {#if cat === "table" && tableNode}
@@ -229,6 +229,7 @@
         right: 0;
         background: var(--bookish-background-color);
         border-bottom: var(--app-chrome-border-size) solid var(--app-border-color);
+        padding-top: var(--app-chrome-padding);
         padding-bottom: var(--app-chrome-padding);
         font-family: var(--app-font);
         font-size: var(--app-chrome-font-size);

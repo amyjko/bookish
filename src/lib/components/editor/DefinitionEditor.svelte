@@ -1,8 +1,8 @@
 <script lang="ts">
     import type DefinitionNode from "$lib/models/chapter/DefinitionNode";
     import { getCaret, getEdition } from "../page/Contexts";
-    import Muted from "../page/Muted.svelte";
     import Options from "../app/Options.svelte";
+    import Note from "./Note.svelte";
 
     export let definition: DefinitionNode;
 
@@ -20,11 +20,15 @@
 
 </script>
 
-<Options 
-    options={entries.map(entry => [ entry.phrase, entry.glossaryID ])}
-    value={definition.getMeta()} 
-    changed={handleChange}
-/>
-{#if !(definition.getMeta() in glossary)}
-    <Muted>Choose a glossary entry.</Muted>
+{#if entries.length === 0}
+    <Note>No glossary entries to add</Note>
+{:else}
+    <Options 
+        options={entries.map(entry => [ entry.phrase, entry.glossaryID ])}
+        value={definition.getMeta()} 
+        changed={handleChange}
+    />
+    {#if !(definition.getMeta() in glossary)}
+        <Note>Choose a glossary entry.</Note>
+    {/if}
 {/if}

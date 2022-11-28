@@ -608,7 +608,7 @@ const commands: Command[] = [
         icon: CodeIcon,
         description: "toggle code",
         category: "annotation",
-        control: true, alt: false, shift: false, key: "j",
+        control: true, alt: false, shift: false, key: "e",
         visible: true,
         active: context => context.startIsText || context.endIsText,
         handler: context => context.meta instanceof InlineCodeNode ?
@@ -650,7 +650,7 @@ const commands: Command[] = [
         icon: CitationIcon,
         description: "insert citations",
         category: "annotation",
-        control: true, alt: false, shift: false, key: "t",
+        control: true, alt: false, shift: false, key: "o",
         visible: context => context.chapter && context.atom === undefined && context.meta === undefined,
         active: context => context.chapter && context.atom === undefined && context.meta === undefined,
         handler: context => context.root.withSegmentAtSelection(context.range, () => new CitationsNode([]))
@@ -659,7 +659,7 @@ const commands: Command[] = [
         icon: LabelIcon,
         description: "insert label",
         category: "annotation",
-        control: true, alt: false, shift: false, key: "l",
+        control: true, alt: false, shift: false, key: "b",
         visible: context => context.chapter && context.atom === undefined && context.meta === undefined,
         active: context => context.chapter && context.atom === undefined && context.meta === undefined,
         handler: context => context.root.withSegmentAtSelection(context.range, () => new LabelNode(""))
@@ -716,7 +716,7 @@ const commands: Command[] = [
         icon: RuleIcon,
         description: "insert horizontal rule",
         category: "block",
-        control: true, alt: false, shift: true, key: "h",
+        control: true, alt: false, shift: false, key: "u",
         visible: context => context.paragraph !== undefined,
         active: context => context.paragraph !== undefined && context.atParagraphStart,
         handler: context => context.paragraph ? rootWithNode(context, context.blocks, context.blocks?.withBlockInsertedBefore(context.paragraph, new RuleNode())) : undefined
@@ -725,7 +725,7 @@ const commands: Command[] = [
         icon: CalloutIcon,
         description: "insert callout",
         category: "block",
-        control: true, alt: false, shift: true, key: "e",
+        control: true, alt: false, shift: true, key: "-",
         visible: context => context.paragraph !== undefined,
         active: context => context.paragraph !== undefined && context.atParagraphStart,
         handler: context => {
@@ -746,7 +746,7 @@ const commands: Command[] = [
         icon: QuoteIcon,
         description: "insert quote",
         category: "block",
-        control: true, alt: false, shift: true, key: "u",
+        control: true, alt: false, shift: true, key: "'",
         visible: context => context.paragraph !== undefined,
         active: context => context.paragraph !== undefined && context.atParagraphStart,
         handler: context => {
@@ -785,7 +785,7 @@ const commands: Command[] = [
         icon: MediaIcon,
         description: "insert image or video",
         category: "block",
-        control: true, alt: false, shift: true, key: "p",
+        control: true, alt: false, shift: true, key: "i",
         visible: context => context.paragraph !== undefined,
         active: context => context.paragraph !== undefined && context.atParagraphStart,
         handler: context => {
@@ -805,7 +805,7 @@ const commands: Command[] = [
         icon: TableIcon,
         description: "insert table",
         category: "block",
-        control: true, alt: false, shift: true, key: "\\",
+        control: true, alt: false, shift: false, key: "[",
         visible: context => context.paragraph !== undefined,
         active: context => context.paragraph !== undefined && context.atParagraphStart,
         handler: context => {
@@ -876,7 +876,7 @@ const commands: Command[] = [
         icon: UndoIcon,
         description: "undo the last command",
         category: "history",
-        control: true, alt: false, shift: false, key: ["z"],
+        control: true, alt: false, shift: false, key: "z",
         visible: true,
         active: context => context.undoStack.length > 0 && context.undoPosition < context.undoStack.length - 1,
         handler: context => context.undo()
@@ -885,7 +885,7 @@ const commands: Command[] = [
         icon: RedoIcon,
         description: "redo the most recently undone command",
         category: "history",
-        control: true, alt: false, shift: true, key: ["z"],
+        control: true, alt: false, shift: false, key: "y",
         visible: true,
         active: context => context.undoPosition > 0,
         handler: context => context.redo()
@@ -894,7 +894,7 @@ const commands: Command[] = [
         icon: CutIcon,
         description: "delete the selected content and copy it to the clipboard",
         category: "clipboard",
-        control: true, alt: false, shift: false, key: ["x"],
+        control: true, alt: false, shift: false, key: "x",
         visible: true,
         active: context => context.root !== undefined && context.isSelection,
         handler: context => { 
@@ -912,7 +912,7 @@ const commands: Command[] = [
         icon: CopyIcon,
         description: "copy the selected content to the clipboard",
         category: "clipboard",
-        control: true, alt: false, shift: false, key: ["c"],
+        control: true, alt: false, shift: false, key: "c",
         visible: true,
         active: context => context.isSelection,
         handler: context => { 
@@ -929,7 +929,7 @@ const commands: Command[] = [
         icon: PasteIcon,
         description: "paste the content from the clipboard",
         category: "clipboard",
-        control: true, alt: false, shift: false, key: ["v"],
+        control: true, alt: false, shift: false, key: "v",
         visible: true,
         active: () => true,
         handler: context => {
