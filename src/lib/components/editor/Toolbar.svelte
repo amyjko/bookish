@@ -26,6 +26,7 @@
     import CalloutEditor from "$lib/components/editor/CalloutEditor.svelte";
     import QuoteEditor from "$lib/components/editor/QuoteEditor.svelte";
     import EmbedEditor from "$lib/components/editor/EmbedEditor.svelte";
+    import TableEditor from "$lib/components/editor/TableEditor.svelte";
     import ToolbarGroup from "./ToolbarGroup.svelte";
     import ToolbarIcon from "./Icon.svelte";
     import { onMount } from "svelte";
@@ -48,6 +49,7 @@
     import CalloutIcon from "./icons/callout.svg?raw";
     import QuoteIcon from "./icons/quote.svg?raw";
     import MediaIcon from "./icons/media.svg?raw";
+    import TableNode from "../../models/chapter/TableNode";
 
     const keyLabels: {[key: string]: string} = {
         "Digit0": "0",
@@ -98,6 +100,8 @@
     let calloutNode: CalloutNode | undefined = undefined;
     let quoteNode: QuoteNode | undefined = undefined;
     let embedNode: EmbedNode | undefined = undefined;
+    let tableNode: TableNode | undefined = undefined;
+
     $: isVisible = visible || containsFocus();
 
     // Listen to focus changes to decide whether the toolbar is visible.
@@ -155,6 +159,7 @@
             calloutNode = caretNode.getClosestParentMatching(chapter, p => p instanceof CalloutNode) as CalloutNode;
             quoteNode = caretNode.getClosestParentMatching(chapter, p => p instanceof QuoteNode) as QuoteNode;
             embedNode = caretNode.getClosestParentMatching(chapter, p => p instanceof EmbedNode) as EmbedNode;
+            tableNode = caretNode.getClosestParentMatching(chapter, p => p instanceof TableNode) as TableNode;
 
         }
     }
@@ -202,6 +207,9 @@
                                 {/if}
                             </Button>
                         {/each}
+                        {#if cat === "table" && tableNode}
+                            <TableEditor table={tableNode} />
+                        {/if}
                     </ToolbarGroup>
                 {/if}
             {/each}

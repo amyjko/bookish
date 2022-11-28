@@ -218,4 +218,6 @@ export default class TableNode extends BlockNode {
         return new TableNode(newRows, this.#position, newCaption) as this;
     }
 
+    withPosition(position: Position) { return new TableNode(this.#rows, position, this.#caption); }
+
 }
