@@ -12,6 +12,4 @@
     label="URL editor"
     valid={ url => validator(url) }
     save={ url => edit(url) }
-    width={20}
-    clip={true}
 />

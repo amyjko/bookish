@@ -5,6 +5,7 @@
     import Icon from "./Icon.svelte";
     import Button from "../app/Button.svelte";
     import UnlinkIcon from "./icons/unlink.svg?raw";
+    import Options from "../app/Options.svelte";
 
     export let link: LinkNode;
 
@@ -51,13 +52,26 @@
             return;
 
         // The chapter ID is optional; if it's missing, it refers to this chapter.
-        const correspondingChapter = chapterID === "" && $chapter? $chapter.chapter.getAST() : $edition.getChapter(chapterID)?.getAST();
+        const correspondingChapter = chapterID === "" && $chapter ? $chapter.chapter.getAST() : $edition.getChapter(chapterID)?.getAST();
         if(correspondingChapter === undefined)
             return "Not a valid URL or chapter.";
         
         if(!correspondingChapter.hasLabel(labelID))
             return "Not a valid chapter label."
 
+    }
+
+    let options: [string, string][] = [];
+    $: {
+        options = [];
+        // Add an empty option.
+        options.push([ "External link", "" ]);
+        // Add an option for each chapter and it's labels.
+        for(const chap of $edition.getChapters()) {
+            options.push([ `Chapter: ${chap.getTitle()}`, chap.getChapterID() ])
+            for(const label of chap.getAST()?.getLabels() ?? [])
+                options.push([ chap.getTitle() + ": " + label.getMeta(), `${chap.getChapterID()}:${label.getMeta()}` ]);
+        }
     }
 
 </script>
@@ -75,19 +89,6 @@
     >
         <Icon name={UnlinkIcon}/>
     </Button>
-    <select name="chapterID" on:change={handleChapterChange} value={url}>
-        <option value="">URL</option>
-        {#if $chapter }
-            <option value={$chapter.chapter.getChapterID()}>{$chapter.chapter.getTitle()}</option>
-            <!-- Build the list of options (chapters and then any of the chapter's labels.) -->
-            {#each $edition.getChapters() as chapter }     
-                {#each chapter.getAST()?.getLabels() ?? [] as label }
-                    <option value={`${chapter.getChapterID()}:${label.getMeta()}`}>{chapter.getTitle() + ": " + label.getMeta()}</option>
-                {/each}
-            {/each}
-        {/if}
-    </select>
-    <code>
-        <URLEditor url={url} validator={getURLError} edit={ url => { saveEdit(url); return undefined; }} />
-    </code>
+    <Options {options} changed={value => { saveEdit(value); url = value; } } value={url}/>
+    <URLEditor url={url} validator={getURLError} edit={ url => { saveEdit(url); return undefined; }} />
 </span>

@@ -2,18 +2,18 @@
     import type CitationsNode from "$lib/models/chapter/CitationsNode";
     import { getCaret, getEdition } from "../page/Contexts";
     import Note from "./Note.svelte";
+    import Options from "../app/Options.svelte";
+    import Button from "../app/Button.svelte";
 
     export let citations: CitationsNode;
 
     let edition = getEdition();
     let caret = getCaret();
-    let selection: string | undefined;
+    let value = "";
 
-    function handleSelection() {
-        if(selection) {
+    function handleSelection(selection: string) {
+        if(selection.length > 0)
             update(new Set([ ...citations.getMeta(), selection ]));
-            selection = undefined;
-        }
     }
 
     function removeSelection(citationID: string) {
@@ -27,24 +27,19 @@
     }
 
     $: uncited = Object.keys($edition.getReferences()).filter(citationID => !citations.getMeta().includes(citationID)).sort();
+    let options: [string, string][] = [];
+    $: {
+        options = [];
+        options.push([ uncited.length > 0 ? "Choose references" : "No uncited references", "" ]);
+        for(const citationID of uncited)
+            options.push([ citationID, citationID ]);
+    }
 </script>
 
-<select bind:value={selection} on:change={handleSelection}>
-    <option value={undefined}><em>{uncited.length > 0 ? "Choose references" : "No uncited references"}</em></option>
-    {#each uncited as citationID}
-        <option value={citationID}>{citationID}</option>
-    {/each}
-
-</select>
+<Options options={options} bind:value={value} changed={handleSelection} />
 {#each citations.getMeta() as citationID}
-    <sup>
-        {citationID}
-        <span tabIndex=0
-            style="cursor:pointer"
-            on:click={() => removeSelection(citationID) }
-            on:keydown={ event => { if(event.key === "Enter" || event.key === " ") removeSelection(citationID); }}
-        >&times;</span>
-    </sup>
+    {citationID}
+    <Button tooltip="Remove citation" command={() => removeSelection(citationID) }>&times;</Button>
 {:else}
     <Note>&mdash;</Note>
 {/each}
