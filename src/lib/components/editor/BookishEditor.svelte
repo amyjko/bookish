@@ -819,6 +819,10 @@
 </div>
 
 <style>
+    .bookish-editor {
+        min-height: 4em;
+    }
+
     .bookish-editor:focus {
         outline: var(--app-chrome-border-size) solid var(--app-interactive-color);
         outline-offset: var(--app-chrome-padding);
