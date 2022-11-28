@@ -29,7 +29,7 @@
         return false;
     }
 
-    function getURLError(urlOrChapter: string): string | undefined {
+    function validate(urlOrChapter: string): string | undefined {
 
         if(urlOrChapter.length === 0) 
             return "Can't be empty.";
@@ -85,5 +85,5 @@
         <Icon name={UnlinkIcon}/>
     </Button>
     <Options {options} changed={value => { saveEdit(value); url = value; } } value={url}/>
-    <URLEditor url={url} validator={getURLError} edit={ url => { saveEdit(url); return undefined; }} />
+    <URLEditor url={url} validator={validate} edit={ url => { saveEdit(url); return undefined; }} />
 </span>

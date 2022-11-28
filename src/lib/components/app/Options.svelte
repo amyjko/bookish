@@ -7,7 +7,7 @@
 
 <select bind:value={value} on:change={() => changed(value)}>
     {#each options as option}
-        <option value={option[1]}>{option[0]}</option>
+        <option value={option[1]} selected={value === option[1]}>{option[0]}</option>
     {/each}
 </select>
 
