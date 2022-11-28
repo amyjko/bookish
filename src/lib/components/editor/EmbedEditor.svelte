@@ -8,6 +8,7 @@
     import ToolbarSpacer from './ToolbarSpacer.svelte';
     import ImageChooser from './ImageChooser.svelte';
     import URLEditor from './URLEditor.svelte';
+    import Note from './Note.svelte';
 
     export let embed: EmbedNode;
 
@@ -81,6 +82,8 @@
             return revisedURL;
         }}
     />
+{:else}
+    <Note>(Hosted)</Note>
 {/if}
 <ToolbarSpacer/>
 <TextEditor
