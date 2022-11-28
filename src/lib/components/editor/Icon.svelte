@@ -1,10 +1,9 @@
 <script lang="ts">
-    // Assumed to be SVG text.
-    export let name: string;
+    export let icon: string;
 </script>
 
 <span>
-    {@html name}
+    {@html icon}
 </span>
 
 <style>

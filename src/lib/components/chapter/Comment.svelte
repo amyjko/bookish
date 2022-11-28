@@ -27,7 +27,7 @@
     {#if editable}
         <Marginal id={"comment-" + (chapterNode === undefined ? "?" : chapterNode.getComments().indexOf(node))}>
             <span slot="interactor" class="bookish-comment-symbol">
-                <Icon name={CommentIcon}/>
+                <Icon icon={CommentIcon}/>
             </span>
             <span slot="content" class={`bookish-app-comment ${focused ? "bookish-app-comment-focused" : ""}`}>
                 <Format node={node.getMeta()} placeholder="comment"/>

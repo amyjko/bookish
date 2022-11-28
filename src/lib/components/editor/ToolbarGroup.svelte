@@ -9,7 +9,7 @@
 
 {#if linebreak }<br/>{/if}
 <span class="bookish-editor-toolbar-group">
-    <ToolbarIcon name={icon}/><ToolbarSpacer/><slot></slot>
+    <ToolbarIcon icon={icon}/><ToolbarSpacer/><slot></slot>
 </span>
 
 <style>

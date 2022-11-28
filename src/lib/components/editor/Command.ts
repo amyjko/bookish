@@ -3,8 +3,7 @@ import type CaretUtilities from "./CaretUtilities";
 import type CaretState from "./CaretState";
 
 type Command = {
-    label?: string;
-    icon?: string;
+    icon: string;
     description: string;
     category: string;
     control: boolean;

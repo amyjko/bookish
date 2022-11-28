@@ -64,7 +64,7 @@ import UnindentIcon from "./icons/unindent.svg?raw";
 /**
  * Icons:
  *      From: https://www.streamlinehq.com/icons/streamline-mini-line
- *      Css currentColor
+ *      All use CSS currentColor
  *      No background
  *      SVG
  *      48 px
@@ -116,7 +116,6 @@ function rootWithNode<NodeType extends Node>(context: CaretState, original: Node
 // An ordered list of command specifications for keyboard and mouse input.
 const commands: Command[] = [
     {
-        label: "—↑",
         icon: RowAboveIcon,
         description: "insert row above",
         category: "table",
@@ -126,7 +125,6 @@ const commands: Command[] = [
         handler: context => context.table !== undefined && context.format !== undefined ? insertTableRowColumn(context, context.table, context.format, true, true) : undefined
     },
     {
-        label: "—↓",
         icon: RowBelowIcon,
         description: "insert row below",
         category: "table",
@@ -136,7 +134,6 @@ const commands: Command[] = [
         handler: context => context.table !== undefined && context.format !== undefined ? insertTableRowColumn(context, context.table, context.format, true, false) : undefined
     },
     {
-        label: "→|",
         icon: ColumnAfterIcon,
         description: "insert column after",
         category: "table",
@@ -146,7 +143,6 @@ const commands: Command[] = [
         handler: context => context.table !== undefined && context.format !== undefined ? insertTableRowColumn(context, context.table, context.format, false, false) : undefined
     },
     {
-        label: "|←",
         icon: ColumnBeforeIcon,
         description: "insert column before",
         category: "table",
@@ -156,7 +152,6 @@ const commands: Command[] = [
         handler: context => context.table !== undefined && context.format !== undefined ? insertTableRowColumn(context, context.table, context.format, false, true) : undefined
     },
     {
-        label: "\u232B—",
         icon: DeleteRowIcon,
         description: "delete row",
         category: "table",
@@ -166,7 +161,6 @@ const commands: Command[] = [
         handler: context => context.format !== undefined && context.table !== undefined ? deleteTableRowColumn(context, context.table, context.format, true) : undefined
     },
     {
-        label: "\u232B|",
         icon: DeleteColumnIcon,
         description: "delete column",
         category: "table",
@@ -176,6 +170,7 @@ const commands: Command[] = [
         handler: context => context.format !== undefined && context.table !== undefined ? deleteTableRowColumn(context, context.table, context.format, false) : undefined
     },
     {
+        icon: "←",
         description: "move to previous character",
         category: "navigation",
         control: false, alt: false, shift: false, key: "ArrowLeft",
@@ -190,6 +185,7 @@ const commands: Command[] = [
         }
     },
     {
+        icon: "← word",
         description: "move to previous word",
         category: "navigation",
         control: false, alt: true, shift: false, key: "ArrowLeft",
@@ -203,6 +199,7 @@ const commands: Command[] = [
         }
     },
     {
+        icon: "← paragraph",
         description: "move to paragraph start",
         category: "navigation",
         control: true, alt: false, shift: false, key: "ArrowLeft",
@@ -216,6 +213,7 @@ const commands: Command[] = [
         }
     },
     {
+        icon: "← select",
         description: "expand selection to previous character",
         category: "selection",
         control: false, alt: false, shift: true, key: "ArrowLeft",
@@ -230,6 +228,7 @@ const commands: Command[] = [
         }
     },
     {
+        icon: "select ← word",
         description: "expand selection to previous word",
         category: "selection",
         control: false, alt: true, shift: true, key: "ArrowLeft",
@@ -243,6 +242,7 @@ const commands: Command[] = [
         }
     },
     {
+        icon: "select start",
         description: "expand selection to start",
         category: "selection",
         control: true, alt: false, shift: true, key: "ArrowLeft",
@@ -256,6 +256,7 @@ const commands: Command[] = [
         }
     },
     {
+        icon: "→",
         description: "move to next character",
         category: "navigation",
         control: false, alt: false, shift: false, key: "ArrowRight",
@@ -271,6 +272,7 @@ const commands: Command[] = [
         }
     },
     {
+        icon: "→ word",
         description: "move to next word",
         category: "navigation",
         control: false, alt: true, shift: false, key: "ArrowRight",
@@ -284,6 +286,7 @@ const commands: Command[] = [
         }
     },
     {
+        icon: "→ end",
         description: "move to paragraph end",
         category: "navigation",
         control: true, alt: false, shift: false, key: "ArrowRight",
@@ -298,6 +301,7 @@ const commands: Command[] = [
         }
     },
     {
+        icon: "select →",
         description: "expand selection to next character",
         category: "selection",
         control: false, alt: false, shift: true, key: "ArrowRight",
@@ -312,6 +316,7 @@ const commands: Command[] = [
         }
     },
     {
+        icon: "select → word",
         description: "expand selection to next word",
         category: "selection",
         control: false, alt: true, shift: true, key: "ArrowRight",
@@ -325,6 +330,7 @@ const commands: Command[] = [
         }
     },
     {
+        icon: "select → end",
         description: "expand selection to end",
         category: "selection",
         control: true, alt: false, shift: true, key: "ArrowRight",
@@ -338,6 +344,7 @@ const commands: Command[] = [
         }
     },
     {
+        icon: "select all",
         description: "expand selection to all",
         category: "selection",
         control: true, alt: false, shift: false, key: "a",
@@ -371,6 +378,7 @@ const commands: Command[] = [
         }
     },
     {
+        icon: "↑ line",
         description: "move up one line",
         category: "navigation",
         control: false, alt: false, shift: false, key: "ArrowUp",
@@ -382,6 +390,7 @@ const commands: Command[] = [
         }
     },
     {
+        icon: "select ↑ line",
         description: "move selection up one line",
         category: "selection",
         control: false, alt: false, shift: true, key: "ArrowUp",
@@ -393,6 +402,7 @@ const commands: Command[] = [
         }
     },
     {
+        icon: "select ↓ line",
         description: "move up down line",
         category: "navigation",
         control: false, alt: false, shift: false, key: "ArrowDown",
@@ -404,6 +414,7 @@ const commands: Command[] = [
         }
     },
     {
+        icon: "select ↓ line",
         description: "move selection down one line",
         category: "selection",
         control: false, alt: false, shift: true, key: "ArrowDown",
@@ -415,6 +426,7 @@ const commands: Command[] = [
         }
     },
     {
+        icon: "delete ←",
         description: "delete previous character",
         category: "text",
         control: false, alt: false, shift: false, key: "Backspace",
@@ -435,6 +447,7 @@ const commands: Command[] = [
         }
     },
     {
+        icon: "delete →",
         description: "delete next character",
         category: "text",
         control: false, alt: false, shift: false, key: "Delete",
@@ -455,6 +468,7 @@ const commands: Command[] = [
         }
     },
     {
+        icon: "new line",
         description: "insert code newline",
         category: "text",
         control: false, alt: false, shift: false, key: "Enter",
@@ -474,6 +488,7 @@ const commands: Command[] = [
         }
     },
     {
+        icon: "split list",
         description: "split list item",
         category: "list",
         control: false, alt: false, shift: false, key: "Enter",
@@ -514,6 +529,7 @@ const commands: Command[] = [
         }
     },
     {
+        icon: "split paragraph",
         description: "split paragraph",
         category: "text",
         control: false, alt: false, shift: false, key: "Enter",
@@ -526,7 +542,6 @@ const commands: Command[] = [
         }
     },
     {
-        label: "indent",
         icon: IndentIcon,
         description: "indent list item",
         category: "list",
@@ -536,7 +551,6 @@ const commands: Command[] = [
         handler: context => rootWithNode(context, context.blocks, context.blocks?.withListsIndented(context.range, true))
     },        
     {
-        label: "unindent",
         icon: UnindentIcon,
         description: "unindent list item",
         category: "list",
@@ -546,7 +560,6 @@ const commands: Command[] = [
         handler: context => rootWithNode(context, context.blocks, context.blocks?.withListsIndented(context.range, false))
     },
     {
-        label: "plain",
         icon: ClearIcon,
         description: "clear formatting",
         category: "text",
@@ -556,7 +569,6 @@ const commands: Command[] = [
         handler: context => context.root.withRangeFormatted(context.range, "")
     },
     {
-        label: "bold",
         icon: BoldIcon,
         description: "bold",
         category: "text",
@@ -575,7 +587,6 @@ const commands: Command[] = [
         handler: context => context.root.withRangeFormatted(context.range, "_")
     },
     {
-        label: "sub\u2099",
         icon: SubscriptIcon,
         description: "subscript",
         category: "text",
@@ -585,7 +596,6 @@ const commands: Command[] = [
         handler: context => context.root.withRangeFormatted(context.range, "v")
     },
     {
-        label: "super\u207F",
         icon: SuperscriptIcon,
         description: "superscript",
         category: "text",
@@ -595,7 +605,6 @@ const commands: Command[] = [
         handler: context => context.root.withRangeFormatted(context.range, "^")
     },
     {
-        label: "<code>",
         icon: CodeIcon,
         description: "toggle code",
         category: "annotation",
@@ -607,7 +616,6 @@ const commands: Command[] = [
             context.root.withSegmentAtSelection(context.range, text => new InlineCodeNode(new TextNode(text)))
     },
     {
-        label: "link ⚭",
         icon: LinkIcon,
         description: "toggle link",
         category: "annotation",
@@ -619,7 +627,6 @@ const commands: Command[] = [
             context.root.withSegmentAtSelection(context.range, text => new LinkNode(new TextNode(text)))
     },
     {
-        label: "Aa",
         icon: DefineIcon,
         description: "toggle definition",
         category: "annotation",
@@ -631,7 +638,6 @@ const commands: Command[] = [
             context.root.withSegmentAtSelection(context.range, text => new DefinitionNode(new TextNode(text)))
     },
     {
-        label: "a\u1D43",
         icon: FootnoteIcon,
         description: "insert footnote",
         category: "annotation",
@@ -641,7 +647,6 @@ const commands: Command[] = [
         handler: context => context.root.withSegmentAtSelection(context.range, text => new FootnoteNode(new FormatNode("", [ new TextNode(text) ])))
     },
     {
-        label: "a\u00b9",
         icon: CitationIcon,
         description: "insert citations",
         category: "annotation",
@@ -651,7 +656,6 @@ const commands: Command[] = [
         handler: context => context.root.withSegmentAtSelection(context.range, () => new CitationsNode([]))
     },
     {
-        label: "•",
         icon: LabelIcon,
         description: "insert label",
         category: "annotation",
@@ -661,7 +665,6 @@ const commands: Command[] = [
         handler: context => context.root.withSegmentAtSelection(context.range, () => new LabelNode(""))
     },
     {
-        label: "comment",
         icon: CommentIcon,
         description: "insert comment",
         category: "annotation",
@@ -671,7 +674,6 @@ const commands: Command[] = [
         handler: context => context.root.withSegmentAtSelection(context.range, text => new CommentNode(new FormatNode("", [ new TextNode(text) ])))
     },
     {
-        label: "paragraph",
         icon: ParagraphIcon,
         description: "format as paragraph",
         category: "level",
@@ -684,7 +686,6 @@ const commands: Command[] = [
         }
     },
     {
-        label: "h1",
         icon: Header1Icon,
         description: "format as 1st level header",
         category: "level",
@@ -694,7 +695,6 @@ const commands: Command[] = [
         handler: context => rootWithNode(context, context.paragraph, context.paragraph?.withLevel(1))
     },
     {
-        label: "h2",
         icon: Header2Icon,
         description: "format as 2nd level header",
         category: "level",
@@ -704,7 +704,6 @@ const commands: Command[] = [
         handler: context => rootWithNode(context, context.paragraph, context.paragraph?.withLevel(2))
     },
     {
-        label: "h3",
         icon: Header3Icon,
         description: "format as 3rd level header",
         category: "level",
@@ -714,7 +713,6 @@ const commands: Command[] = [
         handler: context => rootWithNode(context, context.paragraph, context.paragraph?.withLevel(3))
     },
     {
-        label: "\u2014",
         icon: RuleIcon,
         description: "insert horizontal rule",
         category: "block",
@@ -724,7 +722,6 @@ const commands: Command[] = [
         handler: context => context.paragraph ? rootWithNode(context, context.blocks, context.blocks?.withBlockInsertedBefore(context.paragraph, new RuleNode())) : undefined
     },
     {
-        label: "🄰",
         icon: CalloutIcon,
         description: "insert callout",
         category: "block",
@@ -746,7 +743,6 @@ const commands: Command[] = [
         } 
     },
     {
-        label: "‟",
         icon: QuoteIcon,
         description: "insert quote",
         category: "block",
@@ -767,7 +763,6 @@ const commands: Command[] = [
         } 
     },
     {
-        label: "<code>",
         icon: CodeIcon,
         description: "insert code",
         category: "block",
@@ -787,7 +782,6 @@ const commands: Command[] = [
         } 
     },
     {
-        label: "image/video",
         icon: MediaIcon,
         description: "insert image or video",
         category: "block",
@@ -808,7 +802,6 @@ const commands: Command[] = [
         } 
     },
     {
-        label: "▦",
         icon: TableIcon,
         description: "insert table",
         category: "block",
@@ -835,7 +828,6 @@ const commands: Command[] = [
         } 
     },
     {
-        label: "bulleted",
         icon: BulletsIcon,
         description: "convert paragraph to bulleted list item",
         category: "list",
@@ -845,7 +837,6 @@ const commands: Command[] = [
         handler: context => rootWithNode(context, context.blocks, context.blocks?.withParagraphsAsLists(context.range, false))
     },
     {
-        label: "numbered",
         icon: NumbersIcon,
         description: "convert paragraph to numbered list item",
         category: "list",
@@ -855,7 +846,6 @@ const commands: Command[] = [
         handler: context => rootWithNode(context, context.blocks, context.blocks?.withParagraphsAsLists(context.range, true))
     },
     {
-        label: "bulleted",
         icon: BulletsIcon,
         description: "convert numbered list item to bulleted",
         category: "list",
@@ -865,7 +855,6 @@ const commands: Command[] = [
         handler: context => context.list ? rootWithNode(context, context.blocks, context.blocks?.withListAsStyle(context.list, false)) : undefined
     },
     {
-        label: "numbered",
         icon: NumbersIcon,
         description: "convert bulleted list item to numbered",
         category: "list",
@@ -875,7 +864,6 @@ const commands: Command[] = [
         handler: context => context.list ? rootWithNode(context, context.blocks, context.blocks?.withListAsStyle(context.list, true)) : undefined
     },
     {
-        label: "paragraph",
         icon: ParagraphIcon,
         description: "convert bulleted list item to paragraph",
         category: "list",
@@ -885,7 +873,6 @@ const commands: Command[] = [
         handler: context => rootWithNode(context, context.blocks, context.blocks?.withListsAsParagraphs(context.range))
     },
     {
-        label: "undo",
         icon: UndoIcon,
         description: "undo the last command",
         category: "history",
@@ -895,7 +882,6 @@ const commands: Command[] = [
         handler: context => context.undo()
     },
     {
-        label: "redo",
         icon: RedoIcon,
         description: "redo the most recently undone command",
         category: "history",
@@ -905,7 +891,6 @@ const commands: Command[] = [
         handler: context => context.redo()
     },
     {
-        label: "✂",
         icon: CutIcon,
         description: "delete the selected content and copy it to the clipboard",
         category: "clipboard",
@@ -924,7 +909,6 @@ const commands: Command[] = [
         }
     },
     {
-        label: "🗎",
         icon: CopyIcon,
         description: "copy the selected content to the clipboard",
         category: "clipboard",
@@ -942,7 +926,6 @@ const commands: Command[] = [
         }
     },
     {
-        label: "⎘",
         icon: PasteIcon,
         description: "paste the content from the clipboard",
         category: "clipboard",
@@ -983,7 +966,7 @@ const commands: Command[] = [
         }
     },
     {
-        label: "insert",
+        icon: "insert symbol",
         description: "insert character",
         category: "text",
         control: false, alt: false, shift: undefined, key: undefined,

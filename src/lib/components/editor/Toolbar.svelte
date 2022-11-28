@@ -198,13 +198,7 @@
                                 tabIndex=0
                                 command={() => executor?.call(undefined, command, "")}
                             >
-                                {#if command.icon }
-                                    <ToolbarIcon name={command.icon}/>
-                                {:else if command.label }
-                                    {command.label}
-                                {:else}
-                                    {command.description }
-                                {/if}
+                                <ToolbarIcon icon={command.icon}/>
                             </Button>
                         {/each}
                         {#if cat === "table" && tableNode}

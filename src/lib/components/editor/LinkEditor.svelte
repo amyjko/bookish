@@ -82,7 +82,7 @@
             }
         }}
     >
-        <Icon name={UnlinkIcon}/>
+        <Icon icon={UnlinkIcon}/>
     </Button>
     <Options {options} changed={value => { saveEdit(value); url = value; } } value={url}/>
     <URLEditor url={url} validator={validate} edit={ url => { saveEdit(url); return undefined; }} />

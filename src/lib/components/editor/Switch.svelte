@@ -24,7 +24,7 @@
             disabled={enabled === false}
             on:click|stopPropagation={handleClick}>
                 {#if icons && option in icons}
-                    <Icon name={icons[option]}/>
+                    <Icon icon={icons[option]}/>
                 {:else}
                     {option}
                 {/if}
