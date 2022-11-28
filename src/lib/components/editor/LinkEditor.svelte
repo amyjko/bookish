@@ -19,11 +19,6 @@
         $caret?.edit(link, link.withMeta(value));
     }
 
-    function handleChapterChange(e: Event) {
-        const target = e.target as HTMLSelectElement;
-        saveEdit(target.value);
-    }
-
     function isValidURL(url: string) {
         // Is it a valid URL?
         try {

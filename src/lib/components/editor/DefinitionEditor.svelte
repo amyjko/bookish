@@ -3,7 +3,6 @@
     import { getCaret, getEdition } from "../page/Contexts";
     import Muted from "../page/Muted.svelte";
     import Options from "../app/Options.svelte";
-    import Link from "../app/Link.svelte";
 
     export let definition: DefinitionNode;
 
