@@ -25,7 +25,7 @@
     }
 
     input:focus {
-        border-bottom-color: var(--bookish-highlight-color);
+        border-bottom-color: var(--app-interactive-color);
         outline: none;
     }
 </style>

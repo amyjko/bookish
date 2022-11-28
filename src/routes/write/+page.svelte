@@ -66,7 +66,9 @@
 
 <Lead><Large>Write</Large> something.</Lead>
 
-<Button tooltip="Create a new book" command={newBook} disabled={creating}>Create book</Button>
+<Paragraph>
+	<Button tooltip="Create a new book" command={newBook} disabled={creating}>Create book</Button>
+</Paragraph>
 
 {#if creating}
 	<Feedback>{creationFeedback}</Feedback>
