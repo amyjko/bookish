@@ -229,8 +229,8 @@
         right: 0;
         background: var(--bookish-background-color);
         border-bottom: var(--app-chrome-border-size) solid var(--app-border-color);
-        padding-top: var(--app-chrome-padding);
-        padding-bottom: var(--app-chrome-padding);
+        padding: var(--app-chrome-padding);
+        padding-bottom: 0;
         font-family: var(--app-font);
         font-size: var(--app-chrome-font-size);
         z-index: 2;
