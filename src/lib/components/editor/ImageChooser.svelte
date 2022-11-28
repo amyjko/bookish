@@ -67,6 +67,7 @@
     .bookish-image-chooser-image {
         display: inline-block;
         height: 3em;
+        margin-top: var(--app-chrome-padding);
         margin-right: var(--app-chrome-padding);
         cursor: pointer;
     }
