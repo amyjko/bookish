@@ -111,22 +111,6 @@
 	/* Desktop */
 	@media screen and (min-width: 1200px) {
 
-		.bookish-marginal-left-inset {
-			float: left;
-			clear: both;
-			width: 75%;
-			margin-left: -30% !important;
-			margin-right: 2em;
-		}
-
-		.bookish-marginal-right-inset {
-			float: right;
-			clear: both;
-			width: 75%;
-			margin-right: -30% !important;
-			margin-left: 2em;
-		}
-
 		/* On larger screens, put marginal right things in the right margin. */
 		.bookish-marginal {
 			float: right;

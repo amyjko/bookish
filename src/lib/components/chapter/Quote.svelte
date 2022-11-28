@@ -2,7 +2,7 @@
     import type QuoteNode from "$lib/models/chapter/QuoteNode"
     import Block from "./Block.svelte";
     import Format from './Format.svelte';
-    import renderPosition from "./renderPosition";
+    import Positioned from "./Positioned.svelte";
 
     export let node: QuoteNode;
 
@@ -11,14 +11,16 @@
 
 </script>
 
-<blockquote class={"bookish-blockquote " + renderPosition(position)} data-nodeid={node.nodeID}>
-    {#each node.getBlocks() as element}
-        <Block node={element}/>
-    {/each}
-    {#if credit}
-        <div class="bookish-blockquote-caption"><span><Format node={credit} placeholder="credit"/></span></div>
-    {/if}
-</blockquote>
+<Positioned position={node.getPosition()}>
+    <blockquote class={"bookish-blockquote"} data-nodeid={node.nodeID}>
+        {#each node.getBlocks() as element}
+            <Block node={element}/>
+        {/each}
+        {#if credit}
+            <div class="bookish-blockquote-caption"><span><Format node={credit} placeholder="credit"/></span></div>
+        {/if}
+    </blockquote>
+</Positioned>
 
 <style>
 

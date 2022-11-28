@@ -19,7 +19,7 @@ export function hideOutlineIfObscured() {
 		let overlapRect: DOMRect | undefined = undefined;
 
 		// Find the bottom-most left inset marginal within threshold of the outline.
-		Array.from(document.getElementsByClassName("bookish-marginal-left-inset")).forEach(el => {
+		Array.from(document.getElementsByClassName("inset-left")).forEach(el => {
 			let insetRect: DOMRect = el.getBoundingClientRect();
 			if(!(outlineRect.bottom < insetRect.top - threshold || 
 				outlineRect.top > insetRect.bottom + threshold))
@@ -76,7 +76,7 @@ export function layoutMarginals() {
 	let currentBottom: number | null = null;
 
 	// Are there any marginal right inset images that might overlap?
-	let rightInsets = document.getElementsByClassName("bookish-marginal-right-inset");
+	let rightInsets = document.getElementsByClassName("inset-right");
 
 	const marginals = document.getElementsByClassName("bookish-marginal")
 

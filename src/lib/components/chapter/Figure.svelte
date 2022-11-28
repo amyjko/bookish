@@ -3,9 +3,9 @@
     import type TableNode from "$lib/models/chapter/TableNode";
     import type EmbedNode from "$lib/models/chapter/EmbedNode";
     import Format from "./Format.svelte";
-    import renderPosition from "./renderPosition";
     import type CodeNode from "$lib/models/chapter/CodeNode";
     import type FormatNode from "$lib/models/chapter/FormatNode";
+    import Positioned from "./Positioned.svelte";
 
     export let node: TableNode | EmbedNode | CodeNode;
     export let caption: FormatNode | undefined;
@@ -13,21 +13,23 @@
 
 </script>
 
-<div class="bookish-figure {renderPosition(node.getPosition())}" data-nodeid={node.nodeID}>
-    <slot></slot>
-    {#if caption !== undefined}
-        <div class="bookish-figure-caption">
-            {#if credit}
-                <div class="bookish-figure-credit">
-                    <Format node={credit} placeholder="credit" />
-                </div>
-            {/if}
-            {#if caption}
-                <Format node={caption} placeholder="caption"/>
-            {/if}
-        </div>
-    {/if}
-</div>
+<Positioned position={node.getPosition()}>
+    <figure class="bookish-figure" data-nodeid={node.nodeID}>
+        <slot></slot>
+        {#if caption !== undefined}
+            <figcaption class="bookish-figure-caption">
+                {#if credit}
+                    <div class="bookish-figure-credit">
+                        <Format node={credit} placeholder="credit" />
+                    </div>
+                {/if}
+                {#if caption}
+                    <Format node={caption} placeholder="caption"/>
+                {/if}
+            </figcaption>
+        {/if}
+    </figure>
+</Positioned>
 
 <style>
     .bookish-figure-caption {
