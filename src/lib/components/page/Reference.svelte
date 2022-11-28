@@ -37,7 +37,7 @@
 
 </script>
 
-{#if editable}
+{#if editable && !node.short }
     <ConfirmButton
         tooltip="Delete this reference"
         commandLabel="x"
