@@ -291,8 +291,8 @@
                 {:else if chapterNumber !== undefined }
                     <ChapterNumber>Chapter {chapterNumber}</ChapterNumber> 
                 {/if}
-                {#if chapterSection !== undefined }
-                    <span class="bookish-section-name">&nbsp;&nbsp;{chapterSection}</span>
+                {#if chapterSection !== undefined && chapterSection.length > 0 }
+                    <span class="section-name">{chapterSection}</span>
                 {/if}
             </svelte:fragment>						
             <!-- If there are chapter authors, render those, otherwise use the book authors -->
@@ -350,7 +350,7 @@
 </Page>
 
 <style>
-    .bookish-section-name {
+    .section-name {
         display: inline-block;
         font-family: var(--bookish-paragraph-font-family);
         font-size: var(--bookish-small-font-size);
