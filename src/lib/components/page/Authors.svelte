@@ -52,7 +52,7 @@
         {#each authors as author, index }
             {#if editable }
                 <TextEditor
-                    startText={author} 
+                    text={author} 
                     label={'Author name editor'} 
                     placeholder="Author"
                     valid={ () => undefined }

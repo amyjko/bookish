@@ -8,7 +8,7 @@
 
 <TextEditor
     placeholder="url" 
-    startText={url} 
+    text={url} 
     label="URL editor"
     valid={ url => validator(url) }
     save={ url => edit(url) }

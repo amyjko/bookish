@@ -105,7 +105,7 @@
                 <tr>
                     <td>
                         <TextEditor 
-                            startText={url} 
+                            text={url} 
                             label={`CSS url`}
                             placeholder={"CSS url"}
                             valid={ () => undefined }

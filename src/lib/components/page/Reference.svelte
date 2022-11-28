@@ -80,7 +80,7 @@
             <td>Authors</td>
             <td>
                 <TextEditor
-                    startText={node.authors} 
+                    text={node.authors} 
                     label={'Author list editor.'}
                     placeholder="Authors"
                     valid={ text => {
@@ -96,7 +96,7 @@
             <td>Year</td>
             <td>
                 <TextEditor
-                    startText={node.year} 
+                    text={node.year} 
                     label={'Year editor.'} 
                     placeholder="Year"
                     valid={ text => {
@@ -113,7 +113,7 @@
             <td>Title</td>
             <td>
                 <TextEditor
-                    startText={node.title} 
+                    text={node.title} 
                     label={'Title editor.'} 
                     placeholder="Title"
                     valid={ text => {
@@ -130,7 +130,7 @@
             <td>
                 <em>
                     <TextEditor
-                        startText={node.source}
+                        text={node.source}
                         label={'Source editor.'} 
                         placeholder="Source"
                         valid={ text => {
@@ -147,7 +147,7 @@
             <td>URL</td>
             <td>
                 <TextEditor
-                    startText={node.url} 
+                    text={node.url} 
                     label={'URL editor.'} 
                     placeholder="URL"
                     valid={ () => undefined }
@@ -161,7 +161,7 @@
             <td>Summary</td>
             <td>
                 <TextEditor
-                    startText={node.summary} 
+                    text={node.summary} 
                     label={'Summary editor.'} 
                     placeholder="Summary"
                     valid={ () => undefined }

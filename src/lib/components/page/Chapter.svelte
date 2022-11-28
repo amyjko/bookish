@@ -259,7 +259,7 @@
                 {#if editable }
                     <Muted>
                         <TextEditor 
-                            startText={chapter.getChapterID()} 
+                            text={chapter.getChapterID()} 
                             label="Chapter URL ID editor"
                             save={ 
                                 // After the ID is edited, reload the page with the new URL.

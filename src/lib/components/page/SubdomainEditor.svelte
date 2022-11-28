@@ -12,7 +12,7 @@
 
 <Muted>
     <TextEditor 
-        startText={book.getSubdomain() ?? ""} 
+        text={book.getSubdomain() ?? ""} 
         label="Book domain editor"
         save={
             // Save the new domain

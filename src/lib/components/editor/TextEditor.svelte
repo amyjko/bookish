@@ -4,7 +4,7 @@
         Editing
     }
 
-    export let startText: string;
+    export let text: string;
     export let label: string;
     export let placeholder: string;
     export let valid: (text: string) => string | undefined;
@@ -14,11 +14,11 @@
     export let clip: boolean = false;
     export let move: ((el: HTMLElement, direction: -1|1) => void) | undefined = undefined;
 
-    let text = startText;
     let status = Status.Viewing;
-    let error: undefined | string = valid(text);
     let field:  HTMLInputElement | null = null;
     let sizer: HTMLSpanElement | null = null;
+
+    $: error = valid(text);
 
     // Grow the sizer when text or status changes.
     $: {

@@ -84,7 +84,7 @@
 {/if}
 <ToolbarSpacer/>
 <TextEditor
-    startText={description} 
+    text={description} 
     label={'Image description'} 
     placeholder={'description'} 
     valid={ alt => alt.length === 0 ? "Image description required" : undefined }

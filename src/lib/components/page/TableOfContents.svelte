@@ -138,7 +138,7 @@
                     {#if editable }
                         <TextEditor
                             label={"Chapter section editor"}
-                            startText={section ? section : ""}
+                            text={section ? section : ""}
                             placeholder="Section"
                             valid={ () => undefined }
                             save={text => chapter.setSection(text) }

@@ -23,7 +23,7 @@
     <td>{name.replace(/([a-z])([A-Z])/g, "$1 $2").split(" ").map(s => s.charAt(0).toUpperCase() + s.substring(1)).join(" ")}</td>
     <td style="text-align: right">
         <TextEditor 
-            startText={value} 
+            text={value} 
             label={`${name} editor`}
             placeholder={group in placeholders ? placeholders[group] : "value"}
             valid={ () => undefined }

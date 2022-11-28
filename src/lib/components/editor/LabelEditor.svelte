@@ -14,7 +14,7 @@
 
 <code>
     <TextEditor 
-        startText={label.getMeta()} 
+        text={label.getMeta()} 
         label="Chapter label ID"
         placeholder="label ID"
         valid={ id => {

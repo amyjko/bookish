@@ -60,7 +60,7 @@
     $: {
         options = [];
         // Add an empty option.
-        options.push([ "External link", "" ]);
+        options.push([ "External link", url.startsWith("http") ? url : "" ]);
         // Add an option for each chapter and it's labels.
         for(const chap of $edition.getChapters()) {
             options.push([ `Chapter: ${chap.getTitle()}`, chap.getChapterID() ])
