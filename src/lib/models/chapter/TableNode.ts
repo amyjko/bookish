@@ -33,6 +33,26 @@ export default class TableNode extends BlockNode {
         return [ ...formats, this.#caption ];
     }
 
+    getNextCell(format: FormatNode, direction: -1 | 1 = 1) {
+        let previous: FormatNode | undefined = undefined;
+        let found: boolean = false;
+        for(const row of this.#rows) {
+            for(const cell of row) {
+                if(found)
+                    return cell;
+                if(cell === format) {
+                    if(direction > 0)
+                        found = true;
+                    else
+                        return previous;
+                }
+                previous = cell;
+            }
+        }
+        return undefined;
+
+    }
+
     toText() {
         return this.#rows.map(row => row.map(cell => cell.toText()).join(", ")).join(", ");
     }

@@ -59,6 +59,30 @@ export default abstract class Node {
         return nodes;
     }
 
+    getNodeBefore<Kind extends Node>(node: Node, matcher: (node: Kind) => boolean): Kind | undefined {
+        const nodes = this.getNodes();
+        let previous: Kind | undefined = undefined;
+        for(const currentNode of nodes) {
+            if(currentNode === node)
+                return previous;
+            if(matcher(currentNode as Kind))
+                previous = currentNode as Kind;
+        }
+        return undefined;
+    }
+
+    getNodeAfter<Kind extends Node>(node: Node, matcher: (node: Kind) => boolean): Kind | undefined {
+        const nodes = this.getNodes();
+        let found: boolean = false;
+        for(const currentNode of nodes) {
+            if(found && matcher(currentNode as Kind))
+                return currentNode as Kind;
+            if(currentNode === node)
+                found = true;
+        }
+        return undefined;
+    }
+
     // Swap them order if this is two text nodes that are reversed.
     sortRange(range: CaretRange): CaretRange {
 
