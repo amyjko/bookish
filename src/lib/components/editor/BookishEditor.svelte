@@ -532,7 +532,7 @@
 
         if(unmatched) {
             // Toolbar navigation
-            if(event.key === "Tab") {
+            if(event.key === "Escape") {
 
                 // If we've selected a FootnoteNode or Comment, navigate to the footnote or comment text.
                 if(caretRange.start.node instanceof AtomNode && caretRange.start.node.getMeta() instanceof FormatNode) {

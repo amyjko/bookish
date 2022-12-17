@@ -166,7 +166,7 @@
 
     function handleKeyPress(event: KeyboardEvent) {
         // Return focus to the editor if someone presses an unhandled enter
-        if(event.key === "Enter" && element) {
+        if((event.key === "Escape" || event.key === "Enter") && element) {
             const editor = element.closest(".bookish-editor");
             if(editor instanceof HTMLElement) {
                 event.stopPropagation();
@@ -181,8 +181,9 @@
 {#if chapter}
     <section 
         class="bookish-editor-toolbar" 
-        on:keypress={handleKeyPress} 
-        style={`margin: ${isVisible ? "0px" : "-20em"};`} 
+        on:keypress={handleKeyPress}
+        on:keydown={handleKeyPress}
+        style={`visibility: ${isVisible ? "visible" : "hidden"};`} 
         bind:this={element}
         on:mousedown|stopPropagation={ () => element?.focus() }
         tabIndex=0
