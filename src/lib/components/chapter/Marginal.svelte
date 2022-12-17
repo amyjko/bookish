@@ -1,19 +1,25 @@
 <script lang="ts">
     import { isMobile, watchMobile } from '$lib/util/isMobile';
     import { onMount } from 'svelte';
-    import { get } from 'svelte/store';
-    import { getChapter } from '../page/Contexts';
+    import { getCaret, getChapter } from '../page/Contexts';
 	import { isEditable } from '../page/Contexts';
+	import type Node from '../../models/chapter/Node';
 
+	export let node: Node;
     export let id: string;
 
 	let hovered = false;
 	let chapter = getChapter();
 	$: editable = isEditable();
+	$: caret = getCaret();
 
 	// If there's no marginal selected or this is different from the current selection, this is hidden.
 	$: selectedMarginal = $chapter?.marginal;
-	$: isHidden = $selectedMarginal !== id
+	$: isHidden = editable ? 
+		// If editable, it's hidden if the caret is not inside the marginal content.
+		!($caret?.range?.start.node === node || $caret?.range?.start.node.getAncestors($caret.root).some(ancestor => ancestor === node)) : 
+		// If not editable, it's hidden if it's not selected.
+		$selectedMarginal !== id
 
 	function toggle() {
 		if(editable) 

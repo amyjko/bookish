@@ -25,7 +25,7 @@
 
 <Atom {node}>
     {#if editable}
-        <Marginal id={"comment-" + (chapterNode === undefined ? "?" : chapterNode.getComments().indexOf(node))}>
+        <Marginal {node} id={"comment-" + (chapterNode === undefined ? "?" : chapterNode.getComments().indexOf(node))}>
             <span slot="interactor" class="bookish-comment-symbol">
                 <Icon icon={CommentIcon}/>
             </span>

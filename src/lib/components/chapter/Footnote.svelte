@@ -25,9 +25,9 @@
     
 </script>
 
-<Atom node={node}>
+<Atom {node}>
     <span class={`bookish-footnote-link`} data-nodeid={node.nodeID}>
-        <Marginal id={"footnote-" + number}>
+        <Marginal {node} id={"footnote-" + number}>
             <sup slot="interactor" class="bookish-footnote-symbol">{letter}</sup>
             <!-- We prevent default on the span to prevent mouse events from bubbling up to the footnote symbol. This is key for two reasons:
                  1) clicks on the footnote select the footnote atom node itself
