@@ -11,6 +11,7 @@ type Command = {
     shift: boolean | undefined;
     key?: string | string[];
     code?: string;
+    mutates: boolean;
     visible: boolean | ((context: CaretState) => boolean);
     active: boolean | ((context: CaretState, key?: string) => boolean);
     handler: (

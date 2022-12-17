@@ -595,7 +595,7 @@
                 const { root, range } = results;
                 const newRange = { start: range.start, end: range.end };
 
-                if(root === editedNode && command.category !== "navigation" && command.category !== "selection")
+                if(root === editedNode && command.mutates)
                     console.error(`Warning: immutability violation on ${command.description}`);
         
                 // Set the range to force a rerender, assuming something in the document changed.
