@@ -81,7 +81,7 @@
     >
         <svelte:fragment slot="before">
             {#if editable}
-                <SubdomainEditor slot="before"/>
+                <SubdomainEditor/>
             {/if}
         </svelte:fragment>
         <Outline slot="outline"
