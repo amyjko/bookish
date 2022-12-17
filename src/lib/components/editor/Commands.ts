@@ -171,44 +171,33 @@ const commands: Command[] = [
     },
     {
         icon: "➡️",
-        description: "next cell",
+        description: "next paragraph",
         category: "navigation",
         control: false, alt: false, shift: false, key: "Tab",
         visible: () => false,
-        active: context => context.table !== undefined,
-        // If we're in a table, find the cell after the current one, or the next format after the table.
+        active: context => context.format !== undefined,
         handler: context => {
-            let root = context.root;
-            let caret: Caret | undefined = undefined;
-            if(context.table !== undefined && context.format) {
-                const next = context.table.getNextCell(context.format, 1);
-                caret = next?.getFirstCaret();
-                if(caret === undefined)
-                    caret = context.root.getNodeAfter<FormatNode>(context.format, (node): node is FormatNode => node instanceof FormatNode)?.getFirstCaret();
+            if(context.format) {
+                let caret = context.root.getNodeAfter<FormatNode>(context.format, (node): node is FormatNode => node instanceof FormatNode)?.getFirstCaret();
+                if(caret)
+                    return { root: context.root, range: { start: caret, end: caret }}
             }
-            if(caret)
-                return { root, range: { start: caret, end: caret }}
         }
     },
     {
         icon: "←",
-        description: "previous cell",
+        description: "previous paragraph",
         category: "navigation",
         control: false, alt: false, shift: true, key: "Tab",
         visible: () => false,
-        active: context => context.table !== undefined,
+        active: context => context.format !== undefined,
         // If we're in a table, find the previous cell.
         handler: context => {
-            let root = context.root;
-            let caret: Caret | undefined = undefined;
-            if(context.table !== undefined && context.format) {
-                const previous = context.table.getNextCell(context.format, -1);
-                caret = previous?.getFirstCaret();
-                if(caret === undefined)
-                    caret = context.root.getNodeBefore<FormatNode>(context.format, (node): node is FormatNode => node instanceof FormatNode)?.getLastCaret();
+            if(context.format) {
+                let caret = context.root.getNodeBefore<FormatNode>(context.format, (node): node is FormatNode => node instanceof FormatNode)?.getFirstCaret();
+                if(caret)
+                    return { root: context.root, range: { start: caret, end: caret }}
             }
-            if(caret)
-                return { root, range: { start: caret, end: caret }}
         }
     },
     {
