@@ -9,7 +9,6 @@
 
     let context = getChapter();
     let editable = isEditable();
-    let caret = getCaret();
 
     function replaceMultipleSpacesWithNonBreakingSpaces(original: string) {
         let revisedText = ""
@@ -23,24 +22,26 @@
         return revisedText;
     }
 
+    // Manipulate text for rendering.
+    $: {
+        // Replace any spaces at the beginning or end of the string with explicit non-breaking spaces to ensure that they render.
+        text = replaceMultipleSpacesWithNonBreakingSpaces(text);
+
+        // If the text ends with a newline, render a non-breaking space at the end.
+        if(text.length > 0 && text.charAt(text.length - 1) === "\n")
+            text = text + "\ufeff";
+
+        // If there's no text, render a non-breaking space, or a placeholder if provided.
+        if(text.length === 0)
+            text = placeholder ?? "\ufeff";
+
+    }
+
     // Compute highlights, if highlighted
     let segments: [string, boolean][] | undefined = undefined;
     $: {   
-
         segments = undefined;
-
-        if(!editable || ($caret?.range?.start.node !== node)) {
-
-            // Replace any spaces at the beginning or end of the string with explicit non-breaking spaces to ensure that they render.
-            text = replaceMultipleSpacesWithNonBreakingSpaces(text);
-
-            // If the text ends with a newline, render a non-breaking space at the end.
-            if(text.length > 0 && text.charAt(text.length - 1) === "\n")
-                text = text + "\ufeff";
-            
-            // If there's no text, render a non-breaking space, or a placeholder if provided.
-            if(text.length === 0)
-                text = placeholder ?? "\ufeff";
+        if(!editable) {
 
             // Is there a query we're supposed to highlight? If so, highlight it.
             if($context && $context.highlightedWord) {
@@ -72,7 +73,6 @@
         }
     }
 </script>
-
 
 {#if segments }
     {#each segments as segment }

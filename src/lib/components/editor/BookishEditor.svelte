@@ -214,7 +214,7 @@
             const toolbar = element?.querySelector(".bookish-editor-toolbar");
             const toolbarHeight = toolbar ? toolbar.clientHeight : 0;
 
-            const buffer = newCaretPosition.height * 5;
+            const buffer = 0; //newCaretPosition.height * 5;
             if(caretTop < window.scrollY + buffer + toolbarHeight) {
                 window.scrollTo({ top: caretTop - buffer, behavior: 'smooth'  });
             }
