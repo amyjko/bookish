@@ -563,7 +563,6 @@
                     ];
                     const match = controls.find(control => control && control instanceof HTMLElement);
                     if(match && match instanceof HTMLElement) {
-                        console.log(match);
                         match.focus();
                         event.preventDefault();
                         event.stopPropagation();
