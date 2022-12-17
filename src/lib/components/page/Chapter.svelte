@@ -42,7 +42,7 @@
 	function handleResize() { layoutMarginals(); }
 	
 	// The currently selected marginal; we only do one at a time.
-	let marginal: string | undefined = undefined;
+	let marginal = writable<string | undefined>(undefined);
 
 	// Keep track of which hash mark is scrolled to
 	let highlightedID: string | undefined = undefined;
@@ -221,8 +221,7 @@
         chapter: chapter,
         highlightedWord: getHighlightedWord(),
         highlightedID: highlightedID,
-        marginalID: marginal,
-        setMarginal: (id: string | undefined) => marginal = id,
+        marginal: marginal,
         layoutMarginals: layoutMarginals
     });
 
@@ -248,7 +247,7 @@
                 listener={ expanded => {
                     // If the outline is being expanded, hide the marginal, otherwise leave it alone.
                     if(expanded)
-                        marginal = undefined;
+                        marginal.set(undefined);
 
                     // Check if we need to hide the outline after positioning.
                     hideOutlineIfObscured();

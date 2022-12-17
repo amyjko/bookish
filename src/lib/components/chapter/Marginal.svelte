@@ -1,6 +1,7 @@
 <script lang="ts">
     import { isMobile, watchMobile } from '$lib/util/isMobile';
     import { onMount } from 'svelte';
+    import { get } from 'svelte/store';
     import { getChapter } from '../page/Contexts';
 	import { isEditable } from '../page/Contexts';
 
@@ -11,20 +12,19 @@
 	$: editable = isEditable();
 
 	// If there's no marginal selected or this is different from the current selection, this is hidden.
-	function isHidden() { 
-		return $chapter?.marginalID === null || $chapter?.marginalID !== id
-	}
+	$: selectedMarginal = $chapter?.marginal;
+	$: isHidden = $selectedMarginal !== id
 
 	function toggle() {
 		if(editable) 
 			return;
 
 		if($chapter) {
-			if(isMobile() && isHidden())
-				$chapter.setMarginal(id);
+			if(isMobile() && isHidden)
+				$chapter.marginal.set(id);
 			// Otherwise, deselect.
 			else
-				$chapter.setMarginal(undefined);
+				$chapter.marginal.set(undefined);
 		}
 
 	}
@@ -46,14 +46,14 @@
 </script>
 
 <span 
-    class={`bookish-marginal-interactor ${hovered ? " bookish-marginal-hovered" : ""} ${isHidden() ? "" : "bookish-marginal-selected"} ${editable ? "" : "interactive" }`}
+    class={`bookish-marginal-interactor ${hovered ? " bookish-marginal-hovered" : ""} ${isHidden ? "" : "bookish-marginal-selected"} ${editable ? "" : "interactive" }`}
 	tabIndex={editable ? null : 0}
     on:mousedown={toggle}
 	on:keydown={event => event.key === "Enter" || event.key === " " ? toggle() : undefined }
     on:mouseenter={handleEnter} 
     on:mouseleave={handleExit}
 ><slot name="interactor"></slot></span><span 
-    class={"bookish-marginal" + (isHidden() ? " bookish-marginal-hidden" : "") + (hovered ? " bookish-marginal-hovered" : "")} 
+    class={"bookish-marginal" + (isHidden ? " bookish-marginal-hidden" : "") + (hovered ? " bookish-marginal-hovered" : "")} 
 	tabIndex={editable ? null : 0}
     on:mousedown={toggle} 
 	on:keydown={event => event.key === "Enter" || event.key === " " ? toggle() : undefined }
@@ -64,6 +64,12 @@
 </span>
 
 <style>
+
+	:global(.bookish-definition) .bookish-marginal-interactor.bookish-marginal-hovered {
+			border-bottom-color: var(--bookish-link-color) !important;
+			border-bottom-width: 3px;
+	}
+
 	/* Mobile */
 	@media screen and (max-width: 1200px) {
 
@@ -99,7 +105,7 @@
 			font-weight: normal;
 		}
 
-		.bookish-definition:hover {
+		:global(.bookish-definition:hover) {
 			border-bottom-color: var(--bookish-border-color-bold) !important;
 		}
 
@@ -122,11 +128,6 @@
 			display: block;
 			padding-bottom: 0.5rem;
 			position: absolute;
-		}
-
-		:global(.bookish-definition) .bookish-marginal-interactor.bookish-marginal-hovered {
-			border-bottom-color: var(--bookish-link-color) !important;
-			border-bottom-width: 3px;
 		}
 
 		:global(.bookish-definition .bookish-marginal.bookish-marginal-hovered .bookish-definition-entry) {
