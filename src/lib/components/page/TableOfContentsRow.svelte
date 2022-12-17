@@ -27,21 +27,21 @@
 <tr class={forthcoming ? "bookish-forthcoming" : ""}>
     <td><TableOfContentsImage embed={chapter ? chapter.getImage() : $edition.getImage(chapterID)} /></td>
     <td>
-        {#if editable && chapter}
-            <Toggle on={number !== undefined} save={ on => chapter && chapter.setNumbered(on) }>
-                <div>
-                    <ChapterNumber>
-                        {#if number !== undefined}
-                            Chapter {number}
-                        {:else}
-                            <Muted>Unnumbered</Muted>
-                        {/if}
-                    </ChapterNumber>
-                </div>
-            </Toggle>
-        {:else if number !== undefined }
-            <ChapterNumber>{"Chapter " + number}</ChapterNumber>
-        {/if}
+        <div>
+            {#if editable && chapter}
+                <Toggle on={number !== undefined} save={ on => chapter && chapter.setNumbered(on) }>
+                        <ChapterNumber>
+                            {#if number !== undefined}
+                                Chapter {number}
+                            {:else}
+                                <Muted>Unnumbered</Muted>
+                            {/if}
+                        </ChapterNumber>
+                </Toggle>
+            {:else if number !== undefined }
+                <ChapterNumber>{"Chapter " + number}</ChapterNumber>
+            {/if}
+        </div>
         <ChapterTitle link={forthcoming && !editable ? undefined : `${base}${chapterID}`}>{title}</ChapterTitle>
         <div><Muted><em><slot name="annotation"></slot></em></Muted></div>
     </td>
