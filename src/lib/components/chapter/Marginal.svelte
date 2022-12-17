@@ -2,11 +2,13 @@
     import { isMobile, watchMobile } from '$lib/util/isMobile';
     import { onMount } from 'svelte';
     import { getChapter } from '../page/Contexts';
+	import { isEditable } from '../page/Contexts';
 
     export let id: string;
 
 	let hovered = false;
 	let chapter = getChapter();
+	$: editable = isEditable();
 
 	// If there's no marginal selected or this is different from the current selection, this is hidden.
 	function isHidden() { 
@@ -14,6 +16,8 @@
 	}
 
 	function toggle() {
+		if(editable) 
+			return;
 
 		if($chapter) {
 			if(isMobile() && isHidden())
@@ -25,8 +29,12 @@
 
 	}
 
-	function handleEnter() { hovered = true }
-	function handleExit() { hovered = false }
+	function handleEnter() { 
+		hovered = true
+	}
+	function handleExit() { 
+		hovered = false
+	}
 
     onMount(() => {
 		const mediaWatch = watchMobile();
@@ -38,8 +46,8 @@
 </script>
 
 <span 
-    class={"bookish-marginal-interactor" + (hovered ? " bookish-marginal-hovered" : "") + (isHidden() ? "" : " bookish-marginal-selected")} 
-	tabIndex=0
+    class={`bookish-marginal-interactor ${hovered ? " bookish-marginal-hovered" : ""} ${isHidden() ? "" : "bookish-marginal-selected"} ${editable ? "" : "interactive" }`}
+	tabIndex={editable ? null : 0}
     on:mousedown={toggle}
 	on:keydown={event => event.key === "Enter" || event.key === " " ? toggle() : undefined }
     on:mouseenter={handleEnter} 
@@ -49,10 +57,10 @@
 </span>
 <span 
     class={"bookish-marginal" + (isHidden() ? " bookish-marginal-hidden" : "") + (hovered ? " bookish-marginal-hovered" : "")} 
-	tabIndex=0
-    on:mousedown|stopPropagation={toggle} 
+	tabIndex={editable ? null : 0}
+    on:mousedown={toggle} 
 	on:keydown={event => event.key === "Enter" || event.key === " " ? toggle() : undefined }
-    on:mouseenter={handleEnter} 
+    on:mouseenter={handleEnter}
     on:mouseleave={handleExit}
 >
     <slot name="content"></slot>
@@ -73,18 +81,17 @@
 			right: 0;
 			bottom: 0;
 			z-index: 2;
-			cursor: pointer;
 			transform: translateY(0);
 			transition: transform 0.2s ease-in;
+		}
+
+		.interactive {
+			cursor: pointer;
 		}
 
 		/* Handle nested marginals by just not showing them. */
 		.bookish-marginal :global(.bookish-marginal) {
 			display: none;
-		}
-
-		.bookish-marginal-interactor {
-			cursor: pointer;
 		}
 
 		.bookish-marginal-interactor:hover {
