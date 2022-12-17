@@ -84,7 +84,7 @@
 
     onMount(() => {
         // When input happens, set a timer and then see if idle time has elapsed. If it has, track time since last keystroke to control caret blinking behavior.
-        const keystrokeTimer = setTimeout(() => { 
+        const keystrokeTimer = setInterval(() => { 
             // Remember that we're idle so we can render things accordingly.
             const isIdle = Date.now() - lastInputTime > IDLE_TIME;
             if(isIdle) {
