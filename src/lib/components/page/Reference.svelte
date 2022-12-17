@@ -77,7 +77,7 @@
     <Table>
         <!-- Authors -->
         <tr>
-            <td>Authors</td>
+            <td width="25%">Authors</td>
             <td>
                 <TextEditor
                     text={node.authors} 
