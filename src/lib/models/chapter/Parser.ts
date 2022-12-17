@@ -144,6 +144,14 @@ export default class Parser {
         return this.index < this.text.length; 
     }
 
+    nextIsEmptyParagraph() { 
+        return this.text.charAt(this.index) === "\n" && this.text.charAt(this.index + 1) === "\n" && this.text.charAt(this.index + 2) === "\n";
+    }
+
+    nextIsWhitespace() {
+        return (this.peek() === " " || this.peek() === "\t" || this.peek() === "\n") && !this.nextIsEmptyParagraph();
+    }
+
     // Return the current character--if there is one-- and increment the index.
 	read(smarten=true): string | null { 
 		if(!this.more())
@@ -310,7 +318,7 @@ export default class Parser {
             // Read a block and add it to the list if we parsed something.
             blocks.push(this.parseBlock());
             // Read whitespace until we find the next thing.
-            while(this.peek() === " " || this.peek() === "\t" || this.peek() === "\n") {
+            while(this.nextIsWhitespace()) {
                 if(this.peek() === "\n")
                     trailingNewlines++;
                 this.read();
@@ -376,7 +384,7 @@ export default class Parser {
             this.metadata.symbols[name] = this.text.substring(startIndex, this.index).trim();
 
             // Read whitespace until we find the next non-whitespace thing.
-            while(this.peek() === " " || this.peek() === "\t" || this.peek() === "\n")
+            while(this.nextIsWhitespace())
                 this.read();
         
         }
@@ -384,9 +392,6 @@ export default class Parser {
     }
 
     parseBlock(): BlockNode {
-
-        // Read whitespace before the block.
-        this.readWhitespace();
 
         // Read comment lines
         while(this.nextIs("%")) {
@@ -424,8 +429,14 @@ export default class Parser {
     }
 
     parseParagraph(): ParagraphNode {
-        return new ParagraphNode(0, this.parseFormat());
+        if(this.nextIsEmptyParagraph()) {
+            this.read();
+            this.read();
+            return new ParagraphNode(0, new FormatNode("", [ new TextNode() ]));
+        }
+        else return new ParagraphNode(0, this.parseFormat());
     }
+    
 
     parseHeader(): ParagraphNode {
 
@@ -534,12 +545,16 @@ export default class Parser {
 
             // Read trailing whitespace and newlines.            
             this.readWhitespace();
-            while(this.peek() === "\n") {
+            while(this.nextIsWhitespace()) {
                 // Read the newline
                 this.read();
                 // Read whitespace before the next block.
                 this.readWhitespace();
             }
+
+            // Stop if we reach an empty paragraph.
+            if(this.nextIsEmptyParagraph())
+                break;
 
         }
         return new ListNode(items, numbered);
@@ -624,7 +639,7 @@ export default class Parser {
             if(block !== null)
                 blocks.push(block);
             // Read whitespace until we find the next thing.
-            while(this.peek() === " " || this.peek() === "\t" || this.peek() === "\n")
+            while(this.nextIsWhitespace())
                 this.read();
         }
 
