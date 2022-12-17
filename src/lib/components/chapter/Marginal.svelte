@@ -52,10 +52,7 @@
 	on:keydown={event => event.key === "Enter" || event.key === " " ? toggle() : undefined }
     on:mouseenter={handleEnter} 
     on:mouseleave={handleExit}
->
-    <slot name="interactor"></slot>
-</span>
-<span 
+><slot name="interactor"></slot></span><span 
     class={"bookish-marginal" + (isHidden() ? " bookish-marginal-hidden" : "") + (hovered ? " bookish-marginal-hovered" : "")} 
 	tabIndex={editable ? null : 0}
     on:mousedown={toggle} 
