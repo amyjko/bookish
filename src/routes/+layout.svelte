@@ -48,7 +48,7 @@
         --app-error-color: rgb(191, 15, 15);
 
         --app-chrome-background: rgb(244, 244, 244);
-        --app-chrome-font-size: 13pt;
+        --app-chrome-font-size: 12pt;
         --app-chrome-padding: 0.5em;
         --app-chrome-border-size: 3px;
         --app-chrome-roundedness: 5px;

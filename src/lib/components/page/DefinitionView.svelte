@@ -71,6 +71,14 @@
                 {#if definition.phrase }{definition.phrase}{:else}<em>Phrase</em>{/if}
             {/if}
         </strong>
+        {#if editable}
+            <br/><ConfirmButton
+                tooltip="Delete this glossary entry."
+                commandLabel="x delete"
+                confirmLabel="confirm"
+                command={() => $edition.removeDefinition(id)}
+            />
+        {/if}
     </td>
     <td>
         {#if editable && edition }
@@ -96,7 +104,7 @@
         {#if edition && editable }
             <span bind:this={synonymsEditor}>
                 {#if syns.length === 0 }
-                    <em>No synonyms</em>
+                    <Note>No synonyms</Note>
                 {:else}
                     {#each syns as syn, index }
                         <Note>
@@ -123,24 +131,13 @@
                         {#if syns.length > 1 && index < syns.length - 1 },&nbsp;{/if}
                     {/each}
                 {/if}
-            </span>
+            </span>&nbsp;<Button tooltip="Add a synonym of this glossary entry" command={addSynonym}>+</Button>
         {:else}
             {#if definition.synonyms !== undefined && definition.synonyms.length > 0 }
                 <Note>{definition.synonyms.join(", ")}</Note>
             {/if}
         {/if}
     </td>
-    {#if editable }
-        <td>
-            <ConfirmButton
-                tooltip="Delete this glossary entry."
-                commandLabel="delete"
-                confirmLabel="confirm"
-                command={() => $edition.removeDefinition(id)}
-            />
-            <br/><Button tooltip="Add a synonym of this glossary entry" command={addSynonym}>+ synonym</Button>
-        </td>
-    {/if}
 </tr>
 
 <style>

@@ -109,8 +109,8 @@
         class={`sizer ${error ? "error" : ""}`} 
         aria-hidden={true} 
         bind:this={sizer} 
-        on:click={startEditing}>
-    </span>
+        on:click={startEditing}
+    />
     <input
         type="text" 
         bind:this={field}
@@ -129,7 +129,9 @@
         <span
             aria-live="polite"
             class={`text-editor-error ${status === Status.Editing ? "editing" : ""}`}
-        >{error}</span>
+        >
+            {error}
+        </span>
     {/if}
 </span>
 
@@ -143,7 +145,8 @@
         position: absolute;
         top: 0;
         left: 0;
-        width: 100%;
+        width: 100%; /* Fill the entire space so that alignment with sizer is correct.*/
+        height: 100%;
         min-width: 0.5em;
     }
 
@@ -156,7 +159,6 @@
         font-style: inherit;
         line-height: inherit;
         color: inherit;
-        border: none;
         box-sizing: content-box;
         padding: 0;
         margin: 0;
@@ -167,6 +169,7 @@
 
     input[type="text"]:focus {
         outline: none;
+        border: none;
         border-bottom: var(--app-chrome-border-size) solid var(--app-interactive-color);
     }
 
@@ -174,6 +177,8 @@
     .sizer {
         min-height: 1em;
         opacity: 0;
+        border: none;
+        outline: none;
     }
 
     .sizer.error {

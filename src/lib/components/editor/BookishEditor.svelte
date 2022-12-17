@@ -822,7 +822,7 @@
 
 <style>
     .bookish-editor {
-        min-height: 4em;
+        min-height: 2em;
     }
 
     .bookish-editor:focus {
