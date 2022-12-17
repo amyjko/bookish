@@ -66,7 +66,7 @@
 {:else}
     Position <PositionEditor value={embed.getPosition()} edit={position => $caret?.edit(embed, embed.withPosition(position)) } />
 {/if}
-<label class="file-upload">
+<label class="file-upload" tabIndex="0">
     <input type="file" on:input={handleImageChange} accept=".jpg,.jpeg,.png,.gif,image/jpeg,image/png,image/gif"/>
     Upload
 </label>
@@ -127,6 +127,12 @@
 
     .file-upload input[type="file"] {
         display: none;
+    }
+
+    .file-upload:focus-within {
+        position: relative;
+        z-index: 2;
+        outline: var(--app-chrome-border-size) solid var(--app-interactive-color);
     }
 
 </style>

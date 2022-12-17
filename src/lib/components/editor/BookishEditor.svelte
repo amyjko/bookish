@@ -534,7 +534,7 @@
             // Toolbar navigation
             if(event.key === "Escape") {
 
-                // If we've selected a FootnoteNode or Comment, navigate to the footnote or comment text.
+                // If we've selected a FootnoteNode or Comment, navigate to the footnote or comment text to edit it.
                 if(caretRange.start.node instanceof AtomNode && caretRange.start.node.getMeta() instanceof FormatNode) {
                     const firstCaret = caretRange.start.node.getMeta().getFirstCaret();
                     caretRange = { start: firstCaret, end: firstCaret };
@@ -542,6 +542,7 @@
                     event.stopPropagation();
                     return true;
                 }
+                // If we're inside an atom node, select the atom itself.
                 else if(caretRange.start.node.isInside(editedNode, AtomNode)) {
                     const atom = caretRange.start.node.getClosestParentOfType<AtomNode<any>>(editedNode, AtomNode);
                     if(atom) {
@@ -552,15 +553,17 @@
                         return true;
                     }
                 }
-
+                // Otherwise, if we have a reference to this editor's DOM element, find the nearest focusable element in it's toolbar and focus on that.
                 if(element) {
                     const controls = [
+                        element.querySelector('.bookish-editor-toolbar [tabindex="0"]'),
                         element.querySelector(".bookish-editor-toolbar input"),
                         element.querySelector(".bookish-editor-toolbar select"),
                         element.querySelector(".bookish-editor-toolbar button")
                     ];
                     const match = controls.find(control => control && control instanceof HTMLElement);
                     if(match && match instanceof HTMLElement) {
+                        console.log(match);
                         match.focus();
                         event.preventDefault();
                         event.stopPropagation();
