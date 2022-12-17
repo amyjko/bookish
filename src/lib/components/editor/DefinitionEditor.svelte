@@ -23,8 +23,8 @@
 {#if entries.length === 0}
     <Note>No glossary entries to add</Note>
 {:else}
-    <Options 
-        options={entries.map(entry => [ entry.phrase, entry.glossaryID ])}
+    <Options
+        options={ entries.map(entry => [ entry.phrase, entry.glossaryID ]) }
         value={definition.getMeta()} 
         changed={handleChange}
     />

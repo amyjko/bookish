@@ -6,6 +6,7 @@
 </script>
 
 <select bind:value={value} on:change={() => changed(value)}>
+    <option value="" selected={value === ""}></option>
     {#each options as option}
         <option value={option[1]} selected={value === option[1]}>{option[0]}</option>
     {/each}
