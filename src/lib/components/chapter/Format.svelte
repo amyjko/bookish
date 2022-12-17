@@ -40,7 +40,7 @@
 
 <svelte:element this={tag} data-nodeid={node.nodeID} class={showPlaceholder ? "bookish-editor-placeholder" : ""}>
     {#each node.getSegments() as segment}
-        {#if segment instanceof TextNode}<Text node={segment} />
+        {#if segment instanceof TextNode}<Text node={segment} {placeholder} />
         {:else if segment instanceof InlineCodeNode}<InlineCode node={segment} />
         {:else if segment instanceof LinkNode}<Link node={segment} />
         {:else if segment instanceof CitationsNode}<Citations node={segment} />
@@ -52,9 +52,6 @@
         {:else}<Problem>Unknown segment type node={segment}</Problem>
         {/if}
     {/each}
-    {#if showPlaceholder }
-        { placeholder }
-    {/if}
 </svelte:element>
 
 <style>

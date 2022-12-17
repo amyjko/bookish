@@ -3,6 +3,7 @@
     import { getChapter } from "../page/Contexts";
 
     export let node: TextNode;
+    export let placeholder: string | undefined = undefined; 
 
     $: text = node.getText();
 
@@ -30,9 +31,9 @@
         if(text.length > 0 && text.charAt(text.length - 1) === "\n")
             text = text + "\ufeff";
         
-        // If there's no text, render a non-breaking space.
+        // If there's no text, render a non-breaking space, or a placeholder if provided.
         if(text.length === 0)
-            text = "\ufeff";
+            text = placeholder ?? "\ufeff";
 
         // Is there a query we're supposed to highlight? If so, highlight it.
         if($context && $context.highlightedWord) {
