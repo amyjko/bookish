@@ -37,9 +37,9 @@ const afterBold = new TextNode(" word.");
 const boldChapter = new ChapterNode([new ParagraphNode(0, new FormatNode("", [ beforeBold, new FormatNode("*", [ bold ]), afterBold ]))])
 
 test("Insert a block", () => {
-    expect(paragraphChapter.withBlockInserted(firstParagraph, new RuleNode(), true)?.toBookdown()).toBe(`\n\n-\n\n${firstText}\n\n${lastText}`)
+    expect(paragraphChapter.withBlockInserted(firstParagraph, new RuleNode(), true)?.toBookdown()).toBe(`-\n\n${firstText}\n\n${lastText}`)
     expect(paragraphChapter.withBlockInserted(firstParagraph, new RuleNode(), false)?.toBookdown()).toBe(`${firstText}\n\n-\n\n${lastText}`)
-    expect(paragraphChapter.withBlockInserted(lastParagraph, new RuleNode(), false)?.toBookdown()).toBe(`${firstText}\n\n${lastText}\n\n-\n\n`)
+    expect(paragraphChapter.withBlockInserted(lastParagraph, new RuleNode(), false)?.toBookdown()).toBe(`${firstText}\n\n${lastText}\n\n-`)
 })
 
 test("Remove a block", () => {
@@ -47,9 +47,9 @@ test("Remove a block", () => {
 })
 
 test("Merge adjascent lists", () => {
-    expect(new ChapterNode([ numberedList, bulletedList ]).toBookdown()).toBe(`\n\n1. ${firstText}\n2. ${lastText}\n\n\n\n* ${firstText}\n* ${lastText}\n\n`)
-    expect(new ChapterNode([ numberedList, numberedList ]).toBookdown()).toBe(`\n\n1. ${firstText}\n2. ${lastText}\n3. ${firstText}\n4. ${lastText}\n\n`)
-    expect(new ChapterNode([ bulletedList, bulletedList ]).toBookdown()).toBe(`\n\n* ${firstText}\n* ${lastText}\n* ${firstText}\n* ${lastText}\n\n`)
+    expect(new ChapterNode([ numberedList, bulletedList ]).toBookdown()).toBe(`1. ${firstText}\n2. ${lastText}\n\n* ${firstText}\n* ${lastText}`)
+    expect(new ChapterNode([ numberedList, numberedList ]).toBookdown()).toBe(`1. ${firstText}\n2. ${lastText}\n3. ${firstText}\n4. ${lastText}`)
+    expect(new ChapterNode([ bulletedList, bulletedList ]).toBookdown()).toBe(`* ${firstText}\n* ${lastText}\n* ${firstText}\n* ${lastText}`)
 })
 
 test("Format range", () => {
@@ -139,15 +139,15 @@ test("Convert paragraphs to lists", () => {
 
     // Convert a single paragraph to a list item.
     expect(paragraphChapter.withParagraphsAsLists({ start: { node: firstTextNode, index: 0}, end: { node: firstTextNode, index: 0 }}, false)?.toBookdown())
-        .toBe(`\n\n* ${firstText}\n\n${lastText}`)
+        .toBe(`* ${firstText}\n\n${lastText}`)
 
     // Convert two paragraphs to a single list
     expect(paragraphChapter.withParagraphsAsLists({ start: { node: firstTextNode, index: 0}, end: { node: lastTextNode, index: 0 }}, true)?.toBookdown())
-        .toBe(`\n\n1. ${firstText}\n2. ${lastText}\n\n`)
+        .toBe(`1. ${firstText}\n2. ${lastText}`)
 
     // Convert paragraphs that span a blocks boundary to separate lists.
     expect(new ChapterNode([ firstParagraph, new CalloutNode([ lastParagraph ]) ]).withParagraphsAsLists({ start: { node: firstTextNode, index: 0 }, end: { node: lastTextNode, index: 0 }}, true)?.toBookdown())
-        .toBe(`\n\n1. ${firstText}\n\n\n\n=\n\n\n1. ${lastText}\n\n\n=\n\n`)
+        .toBe(`1. ${firstText}\n\n=\n1. ${lastText}\n=`)
 
     // Convert non-paragraphs to lists
     expect(new ChapterNode([ numberedList ]).withParagraphsAsLists({ start: { node: firstTextNode, index: 0 }, end: { node: lastTextNode, index: 0 }}, true))
@@ -159,11 +159,11 @@ test("Convert lists to paragraphs", () => {
 
     // Convert lists to paragraphs
     expect(new ChapterNode([ numberedList ]).withListsAsParagraphs({ start: { node: firstTextNode, index: 0 }, end: { node: firstTextNode, index: 5 }})?.toBookdown())
-        .toBe(`\n\n${firstText}\n\n${lastText}\n\n`)
+        .toBe(`${firstText}\n\n${lastText}`)
 
     // Convert both items to paragraphs.
     expect(new ChapterNode([ numberedList ]).withListsAsParagraphs({ start: { node: firstTextNode, index: 0 }, end: { node: lastTextNode, index: 5 }})?.toBookdown())
-        .toBe(`\n\n${firstText}\n\n${lastText}\n\n`)
+        .toBe(`${firstText}\n\n${lastText}`)
 
     // Convert non-list to paragraphs.
     expect(paragraphChapter.withListsAsParagraphs({ start: { node: firstTextNode, index: 0 }, end: { node: lastTextNode, index: 5 }})?.toBookdown())
@@ -171,11 +171,11 @@ test("Convert lists to paragraphs", () => {
 
     // Convert two contiguous lists to paragraphs.
     expect(new ChapterNode([ numberedList, bulletedList ]).withListsAsParagraphs({ start: { node: firstTextNode, index: 0 }, end: { node: bulletedList.getFirstItem()?.getFirstTextNode() as TextNode, index: 0 }})?.toBookdown())
-        .toBe(`\n\n${firstText}\n\n${lastText}\n\n\n\n${firstText}\n\n${lastText}\n\n`)
+        .toBe(`${firstText}\n\n${lastText}\n\n${firstText}\n\n${lastText}`)
 
     // Convert two non-contiguous lists to paragraphs.
     expect(new ChapterNode([ numberedList, new ParagraphNode(0, new FormatNode("", [ new TextNode("Intruder!") ])), bulletedList ]).withListsAsParagraphs({ start: { node: firstTextNode, index: 0 }, end: { node: bulletedList.getFirstItem()?.getFirstTextNode() as TextNode, index: 0 }})?.toBookdown())
-        .toBe(`\n\n${firstText}\n\n${lastText}\n\nIntruder!\n\n${firstText}\n\n${lastText}\n\n`)
+        .toBe(`${firstText}\n\n${lastText}\n\nIntruder!\n\n${firstText}\n\n${lastText}`)
 
     // Convert various subparts of a nested list into paragraphs.
     const oneText = new TextNode("one");
@@ -185,13 +185,13 @@ test("Convert lists to paragraphs", () => {
     const list = new ListNode([ new FormatNode("", [ oneText] ), new ListNode([ new FormatNode("", [ twoText ]), new FormatNode("", [ threeText ])], true), new FormatNode("", [ fourText ])], true)
 
     expect(new ChapterNode([ list ] ).withListsAsParagraphs({ start: { node: oneText, index: 0 }, end: { node: fourText, index: 0 }})?.toBookdown())
-        .toBe(`\n\n${oneText.getText()}\n\n${twoText.getText()}\n\n${threeText.getText()}\n\n${fourText.getText()}\n\n`)
+        .toBe(`${oneText.getText()}\n\n${twoText.getText()}\n\n${threeText.getText()}\n\n${fourText.getText()}`)
 
     expect(new ChapterNode([ list ] ).withListsAsParagraphs({ start: { node: oneText, index: 0 }, end: { node: twoText, index: 0 }})?.toBookdown())
-        .toBe(`\n\n${oneText.getText()}\n\n${twoText.getText()}\n\n${threeText.getText()}\n\n${fourText.getText()}\n\n`)
+        .toBe(`${oneText.getText()}\n\n${twoText.getText()}\n\n${threeText.getText()}\n\n${fourText.getText()}`)
 
     expect(new ChapterNode([ list ] ).withListsAsParagraphs({ start: { node: twoText, index: 0 }, end: { node: threeText, index: 0 }})?.toBookdown())
-        .toBe(`\n\n${oneText.getText()}\n\n${twoText.getText()}\n\n${threeText.getText()}\n\n${fourText.getText()}\n\n`)
+        .toBe(`${oneText.getText()}\n\n${twoText.getText()}\n\n${threeText.getText()}\n\n${fourText.getText()}`)
 
 })
 
@@ -200,25 +200,25 @@ test("Indent/unindent list items", () => {
     expect(new ChapterNode([ numberedList ]).withListsIndented(
         { start: { node: firstTextNode, index: 0 }, end: { node: firstTextNode, index: 0 }},
         true
-    )?.toBookdown()).toBe("\n\n1.. First paragraph.\n2. Last paragraph.\n\n")
+    )?.toBookdown()).toBe("1.. First paragraph.\n2. Last paragraph.")
 
     const indented = new ChapterNode([ numberedList ]).withListsIndented(
         { start: { node: firstTextNode, index: 0 }, end: { node: lastTextNode, index: 0 }},
         true
     )
-    expect(indented?.toBookdown()).toBe("\n\n1.. First paragraph.\n2.. Last paragraph.\n\n")
+    expect(indented?.toBookdown()).toBe("1.. First paragraph.\n2.. Last paragraph.")
 
     expect(indented?.withListsIndented(
         { start: { node: firstTextNode, index: 0 }, end: { node: lastTextNode, index: 0 }},
         false
-    )?.toBookdown()).toBe("\n\n1. First paragraph.\n2. Last paragraph.\n\n")
+    )?.toBookdown()).toBe("1. First paragraph.\n2. Last paragraph.")
 
 })
 
 test("Style lists", () => {
 
     expect(new ChapterNode([ numberedList ]).withListAsStyle(numberedList, false)?.toBookdown())
-        .toBe(`\n\n* ${firstText}\n* ${lastText}\n\n`)
+        .toBe(`* ${firstText}\n* ${lastText}`)
 
 })
 
@@ -252,9 +252,10 @@ test("Backspace/delete", () => {
     // Can't forward delete into a list
     expect(listChapter.withoutAdjacentContent({ node: beforeText, index: beforeText.getLength() }, true)?.root.toBookdown())
         .toBe(`Before${firstText}\n\n1. ${lastText}\n\nAfter`)
+    
     // Backspace a paragraph into the last list item
     expect(listChapter.withoutAdjacentContent({ node: afterText, index: 0 }, false)?.root.toBookdown())
-        .toBe(`Before\n\n1. ${firstText}\n2. ${lastText}After\n\n`)
+        .toBe(`Before\n\n1. ${firstText}\n2. ${lastText}After`)
 
     // Select two list items for deletion.
     expect(listChapter.withoutRange({ start: { node: firstTextNode, index: 0}, end: { node: lastTextNode, index: 5 }})?.root.toBookdown())
@@ -263,7 +264,7 @@ test("Backspace/delete", () => {
     // Backspace over a block
     const quoteChapter = new ChapterNode([ new QuoteNode([]), firstParagraph ]);
     expect(quoteChapter.withoutAdjacentContent({ node: firstTextNode, index: 0}, false)?.root.toBookdown())
-        .toBe(`\n\n${firstText}`)
+        .toBe(`${firstText}`)
 
 })
 
@@ -349,13 +350,13 @@ test("Copy/paste", () => {
     expect(imageCaptionAndCredit?.toBookdown())
         .toBe(`|nope|nothing|no |my|`)
     expect(paragraphAndImage?.toBookdown())
-        .toBe(`last.\n\n|nope|nothing|no|Amy|\n\n`)
+        .toBe(`last.\n\n|nope|nothing|no|Amy|`)
 
     const imageAndCode = chapter.copyRange({ start: { node: imageCredit, index: 0}, end: { node: js, index: 3 }})
     
     // Code
     expect(imageAndCode?.toBookdown())
-        .toBe(`\n\n|nope|nothing|no image|Amy|\n\n\n\n\`js\nlet\n\`\n\n`)
+        .toBe(`|nope|nothing|no image|Amy|\n\n\`js\nlet\n\``)
 
     const partialList = chapter.copyRange({ start: { node: item1a, index: 4}, end: { node: item2, index: 1 }})
     const partialListAndParagraph = chapter.copyRange({ start: { node: item2, index: 0}, end: { node: afterList, index: 4 }})
@@ -364,7 +365,7 @@ test("Copy/paste", () => {
     expect(partialList?.toBookdown())
         .toBe(`1.. a\n2. t`)
     expect(partialListAndParagraph?.toBookdown())
-        .toBe(`\n\n1. two\n2. three\n\nPost`)
+        .toBe(`1. two\n2. three\n\nPost`)
 
     // Tables
     const partialTable = chapter.copyRange({ start: { node: cellr2c2, index: 0 }, end: { node: cellr3c2, index: 1 }})
@@ -373,7 +374,7 @@ test("Copy/paste", () => {
     expect(partialTable?.toBookdown())
         .toBe(`,|e|f\n,g|h|\n`)
     expect(partialTableAndParagraph?.toBookdown())
-        .toBe(`Post-list\n\n,a|b|\n\n\n`)
+        .toBe(`Post-list\n\n,a|b|\n`)
 
     // Callouts
     const partialCallout = chapter.copyRange({ start: { node: calloutOne, index: 0 }, end: { node: calloutTwo, index: 1 }})
@@ -382,21 +383,21 @@ test("Copy/paste", () => {
     expect(partialCallout?.toBookdown())
         .toBe(`=\none\n\nt\n=`)
     expect(partialTableAndCallout?.toBookdown())
-        .toBe(`\n\n,||i\n\n\n\n\n=\none\n\ntwo\n=\n\n`)
+        .toBe(`,||i\n\n\n=\none\n\ntwo\n=`)
 
     // Quote
     const partialCalloutAndQuote = chapter.copyRange({ start: { node: calloutThree, index: 0 }, end: { node: quoteOne, index: 9 }})
 
     expect(partialCalloutAndQuote?.toBookdown())
-        .toBe(`\n\n=\nthree\n=\n\n\n\n"\nI'm tired\n"\n\n`)
+        .toBe(`=\nthree\n=\n\n"\nI'm tired\n"`)
 
 })
 
-test("to HTML", () => {
-
-    expect(Parser.parseChapter(undefined, "Hi.\n\nI am paragraphs.").toHTML()).toBe("<p>Hi.</p><p>I am paragraphs.</p>")
-    expect(Parser.parseChapter(undefined, "* I am one\n\n* I am two\n\n* I am three").toHTML()).toBe("<p></p><ul><li>I am one</li><li>I am two</li><li>I am three</li></ul><p></p>")
-    expect(Parser.parseChapter(undefined, "1. I am one\n\n2. I am two\n\n3. I am three").toHTML()).toBe("<p></p><ol><li>I am one</li><li>I am two</li><li>I am three</li></ol><p></p>")
-    expect(Parser.parseChapter(undefined, "|image.jpg|A picture|A caption|A credit|").toHTML()).toBe('<p></p><img src="image.jpg" alt="A picture" /><p></p>')
-
+test.each([
+    [ "Hi.\n\nI am paragraphs.", "<p>Hi.</p><p>I am paragraphs.</p>" ],
+    [ "* I am one\n\n* I am two\n\n* I am three", "<ul><li>I am one</li><li>I am two</li><li>I am three</li></ul>" ],
+    [ "1. I am one\n\n2. I am two\n\n3. I am three", "<ol><li>I am one</li><li>I am two</li><li>I am three</li></ol>" ],
+    [ "|image.jpg|A picture|A caption|A credit|", '<img src="image.jpg" alt="A picture" />' ]
+])("%s to HTML", (input: string, output: string) => {
+    expect(Parser.parseChapter(undefined, input).toHTML()).toBe(output);
 })
