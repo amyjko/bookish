@@ -659,7 +659,7 @@ const commands: Command[] = [
         icon: LabelIcon,
         description: "insert label",
         category: "annotation",
-        control: true, alt: false, shift: false, key: "b",
+        control: true, alt: false, shift: false, key: "l",
         visible: context => context.chapter && context.atom === undefined && context.meta === undefined,
         active: context => context.chapter && context.atom === undefined && context.meta === undefined,
         handler: context => context.root.withSegmentAtSelection(context.range, () => new LabelNode(""))
