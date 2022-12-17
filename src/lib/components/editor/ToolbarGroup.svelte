@@ -21,13 +21,15 @@
 
     .bookish-editor-toolbar-group :global(button:first-of-type) {
         border-top-right-radius: 0;
+        border-bottom-right-radius: 0;
     }
 
-    .bookish-editor-toolbar-group :global(button:last-child) {
+    .bookish-editor-toolbar-group :global(button:last-of-type) {
         border-bottom-left-radius: 0;
+        border-top-left-radius: 0;
     }
 
-    .bookish-editor-toolbar-group :global(button:not(:first-of-type):not(:last-child)) {
+    .bookish-editor-toolbar-group :global(button:not(:first-of-type):not(:last-of-type)) {
         border-radius: 0;
     }
 

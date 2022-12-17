@@ -35,7 +35,7 @@
     tabIndex=0
     role="switch"
     aria-checked={on}
-    on:keydown|preventDefault={event => event.key === "Enter" || event.key === "Space" ? toggle() : undefined }
+    on:keydown={event => event.key === "Enter" || event.key === "Space" ? toggle() : undefined }
     on:click={toggle}
 >
     <slot></slot>

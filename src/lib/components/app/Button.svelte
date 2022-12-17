@@ -19,6 +19,7 @@
 
 <style>
     button {
+        display: inline-block;
         font-family: var(--app-font);
         font-size: var(--app-chrome-font-size);
         color: var(--app-font-color);
@@ -37,6 +38,12 @@
     button:disabled {
         opacity: 0.3;
         cursor: auto;
+    }
+
+    button:focus {
+        position: relative;
+        z-index: 2;
+        outline: var(--app-chrome-border-size) solid var(--app-interactive-color);
     }
 
 </style>
