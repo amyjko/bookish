@@ -993,7 +993,8 @@ const commands: Command[] = [
                 return context.handlePaste(context, context.clipboard, false);
             }
 
-            return undefined;
+            // Return the current caret to avoid unhandled command feedback.
+            return { root: context.root, range: context.range};
         }
     },
     {
