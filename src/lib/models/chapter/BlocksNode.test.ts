@@ -46,6 +46,10 @@ test("Remove a block", () => {
     expect(paragraphChapter.withoutBlock(firstParagraph)?.toBookdown()).toBe(lastText)
 })
 
+test("Remove all blocks", () => {
+    expect(paragraphChapter.withoutRange({ start: { node: firstTextNode, index: 0 }, end: { node: lastTextNode, index: lastText.length }})?.root.toBookdown()).toBe("")
+})
+
 test("Merge adjascent lists", () => {
     expect(new ChapterNode([ numberedList, bulletedList ]).toBookdown()).toBe(`1. ${firstText}\n2. ${lastText}\n\n* ${firstText}\n* ${lastText}`)
     expect(new ChapterNode([ numberedList, numberedList ]).toBookdown()).toBe(`1. ${firstText}\n2. ${lastText}\n3. ${firstText}\n4. ${lastText}`)
