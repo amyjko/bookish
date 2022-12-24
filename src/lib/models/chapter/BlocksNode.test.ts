@@ -36,6 +36,13 @@ const bold = new TextNode("bold");
 const afterBold = new TextNode(" word.");
 const boldChapter = new ChapterNode([new ParagraphNode(0, new FormatNode("", [ beforeBold, new FormatNode("*", [ bold ]), afterBold ]))])
 
+const itemOneTextNode = new TextNode("one");
+const itemOneFormat = new FormatNode("", [ itemOneTextNode ]);
+const itemTwoTextNode = new TextNode("two");
+const itemTwoFormat = new FormatNode("", [ itemTwoTextNode ]);
+
+const paragraphListChapter = new ChapterNode( [ firstParagraph, new ListNode([ itemOneFormat, itemTwoFormat ], true), lastParagraph]);
+
 test("Insert a block", () => {
     expect(paragraphChapter.withBlockInserted(firstParagraph, new RuleNode(), true)?.toBookdown()).toBe(`-\n\n${firstText}\n\n${lastText}`)
     expect(paragraphChapter.withBlockInserted(firstParagraph, new RuleNode(), false)?.toBookdown()).toBe(`${firstText}\n\n-\n\n${lastText}`)
@@ -54,6 +61,14 @@ test("Merge adjascent lists", () => {
     expect(new ChapterNode([ numberedList, bulletedList ]).toBookdown()).toBe(`1. ${firstText}\n2. ${lastText}\n\n* ${firstText}\n* ${lastText}`)
     expect(new ChapterNode([ numberedList, numberedList ]).toBookdown()).toBe(`1. ${firstText}\n2. ${lastText}\n3. ${firstText}\n4. ${lastText}`)
     expect(new ChapterNode([ bulletedList, bulletedList ]).toBookdown()).toBe(`* ${firstText}\n* ${lastText}\n* ${firstText}\n* ${lastText}`)
+})
+
+test("Delete across start of paragraph/list boundary", () => {
+    expect(paragraphListChapter.withoutRange({ start: { node: firstTextNode, index: 1 }, end: { node: itemOneTextNode, index: 1 }})?.root.toBookdown()).toBe("F\n\nne\n\n1. two\n\nLast paragraph.")
+})
+
+test("Delete across end of paragraph/list boundary", () => {
+    expect(paragraphListChapter.withoutRange({ start: { node: itemOneTextNode, index: 1 }, end: { node: lastTextNode, index: 1 }})?.root.toBookdown()).toBe("First paragraph.\n\n1. o\n\nast paragraph.")
 })
 
 test("Format range", () => {

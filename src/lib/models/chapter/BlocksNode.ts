@@ -409,18 +409,48 @@ export default abstract class BlocksNode extends BlockNode {
                 // Otherwise, format it.
                 else {
                     const edit = block.withRangeFormatted({ start: blockStart, end: blockEnd }, format);
+                    
                     // If we failed to format it, remove it.
                     if(edit === undefined) return;
+
                     // If we succeeded in formatting it, replace it, otherwise skip it.
+                    let newBlock = edit.root as BlockNode;
+
+                    // Finally, if the selection started before a list node, and we were deleting in the middle of some item, 
+                    // convert that item (which should now be the first item in the list) into a paragraph, since it's bullet was deleted, conceptually.
+                    if(!newBlock.isEmpty() && newBlock instanceof ListNode && !containsStart && containsEnd) {
+                        const firstItem = newBlock.getItem(0);
+                        if(firstItem instanceof FormatNode) {
+                            // Remove the item from the list.
+                            const newListWithoutItem = newBlock.withoutItem(firstItem);
+                            if(newListWithoutItem === undefined) return;
+                            newBlock = newListWithoutItem; 
+
+                            // Replace the revised list
+                            const blocksWithList: BlocksNode | undefined = newBlocks
+                                .withChildReplaced(block, newBlock)
+                                ?.withBlockInsertedBefore(newBlock, new ParagraphNode(0, firstItem))
+
+                            if(blocksWithList === undefined) return;
+                            newBlocks = blocksWithList as this;
+
+                        }
+                    }
+                    // Otherwise, just handle the new block in isolation.
                     else {
-                        const newBlock = edit.root as BlockNode;
+
                         // Remember non-empty revised blocks so we can merge things after.
                         if(!newBlock.isEmpty())
                             formattedBlocks.push(newBlock);
+                        
                         // Replace the block, or delete it if it's empty.
-                        newBlocks = newBlocks.withChildReplaced(block, newBlock.isEmpty() ? undefined: newBlock);
-                        if(newBlocks === undefined) return;
+                        newBlocks = newBlocks.withChildReplaced(block, newBlock.isEmpty() ? undefined : newBlock);
+
                     }
+                    
+                    // If we failed to replace it, bail.
+                    if(newBlocks === undefined) return;                
+
                 }
             }
             if(block.contains(sortedRange.end.node))

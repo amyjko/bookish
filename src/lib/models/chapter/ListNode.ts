@@ -377,6 +377,9 @@ export default class ListNode extends BlockNode {
         const sortedRange = this.sortRange(range);
         const itemStart = this.getItemContaining(sortedRange.start);
         const itemEnd = this.getItemContaining(sortedRange.end);
+
+        // This edits all of the formats contained in the range in the list, since the BlockNode class doesn't care about 
+        // what formats are stored in.
         const edit = super.withRangeFormatted(sortedRange, format);
 
         // If we were deleting and two list items were involved, merge them.
