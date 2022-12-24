@@ -40,6 +40,10 @@ export default abstract class BlocksNode extends BlockNode {
 
         this.#blocks = adjustedElements;
 
+        // After all that, always ensure there's at least one empty paragraph block.
+        if(this.#blocks.length === 0)
+            this.#blocks.push(new ParagraphNode());
+
     }
 
     getBlocks() { return this.#blocks; }
