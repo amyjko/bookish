@@ -408,11 +408,14 @@ const commands: Command[] = [
                 const format = context.atom.getMeta();
                 return { root: context.root, range: { start: format.getFirstCaret(), end: format.getLastCaret() } };
             }
-            // If not in a paragraph, expand to all of the formats of the block.
-            else if(context.paragraph === undefined && context.block) {
-                const formats = context.block.getFormats();
-                if(formats.length > 0)
-                    return { root: context.root, range: { start: formats[0].getFirstCaret(), end: formats[formats.length - 1].getLastCaret() }}
+            // If in a code node, expand to the code.
+            else if(context.block instanceof CodeNode && context.range.start.node === context.block.getCodeNode()) {
+                const code = context.block.getCodeNode();
+                return { root: context.root, range: { start: { node: code, index: 0}, end: { node: code, index: code.getLength()}}};
+            }
+            // If in a non paragraph block, expand to the format of whatever format we're in.
+            else if(context.paragraph === undefined && context.block && context.format) {
+                return { root: context.root, range: { start: context.format.getFirstCaret(), end: context.format.getLastCaret() }}
             }
             else {
                 // Find the first and last caret of the entire chapter.
