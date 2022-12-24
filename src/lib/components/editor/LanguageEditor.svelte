@@ -10,5 +10,5 @@
 
 </script>
 
-<Options options={languages.map(lang => [ lang === "" ? "plaintext" : lang, lang ])} value={language} changed={() => edit(value) }/>
+<Options options={languages.map(lang => [ lang === "" ? "plaintext" : lang, lang ])} value={language} changed={lang => edit(lang) }/>
 <Note>Choose a programming language to enable syntax highlighting.</Note>

@@ -36,7 +36,7 @@
 {:else if loading }
     <Feedback>Loading books...</Feedback>
 {:else if books.length === 0}
-	<Paragraph>You don't have have any books.</Paragraph>
+	<Paragraph>You don't have any published books.</Paragraph>
 {:else}
     <div class="previews">
         {#each books as book }
