@@ -647,6 +647,9 @@
         // Set the undo position to the last index.
         undoPosition = 0;
 
+        // Focus the editor on the new caret location.
+        element?.focus();
+
     }
 
     function editNode(previous: BookishNode, edited: BookishNode) {
