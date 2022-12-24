@@ -15,7 +15,7 @@
 </script>
 
 {#if level === 0}
-    <p data-nodeid={node.nodeID}><Format node={node.getFormat()} placeholder={placeholder ?? "¶"}/></p>
+    <p data-nodeid={node.nodeID} class:placeholder><Format node={node.getFormat()} placeholder={placeholder ?? "¶"}/></p>
 {:else}
     <svelte:element this={`h${level + 1}`} class={classes} id={id} data-nodeid={node.nodeID}><Format node={node.getFormat()} /></svelte:element>
 {/if}

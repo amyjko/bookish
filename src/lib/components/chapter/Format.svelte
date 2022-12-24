@@ -38,7 +38,7 @@
 
 </script>
 
-<svelte:element this={tag} data-nodeid={node.nodeID} class={showPlaceholder ? "bookish-editor-placeholder" : ""}>
+<svelte:element this={tag} data-nodeid={node.nodeID} class={`format ${showPlaceholder ? "bookish-editor-placeholder" : ""}`}>
     {#each node.getSegments() as segment}
         {#if segment instanceof TextNode}<Text node={segment} placeholder={node.getSegments().length === 1 ? placeholder : undefined} />
         {:else if segment instanceof InlineCodeNode}<InlineCode node={segment} />

@@ -1,6 +1,6 @@
 <script lang="ts">
     import type TextNode from "$lib/models/chapter/TextNode";
-    import { getCaret, getChapter, isEditable } from "../page/Contexts";
+    import { getChapter, isEditable } from "../page/Contexts";
 
     export let node: TextNode;
     export let placeholder: string | undefined = undefined; 

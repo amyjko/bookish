@@ -1,5 +1,5 @@
 <script lang="ts">
-    export let aside:boolean = false;
+    export let aside: boolean = false;
 
 </script>
 

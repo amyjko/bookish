@@ -36,8 +36,8 @@
         min-width: 100%;
     }
 
-    /* This implements a drop cap in the first letter of the first paragraph of a chapter (but only chapters). */
-    :global(.bookish-chapter) .bookish-chapter-body > :global(p:first-of-type::first-letter) {
+    /* This implements a drop cap in the first letter of the first text in the first format of the first paragraph of a chapter (but only chapters). */
+    :global(.bookish-chapter .bookish-chapter-body p:first-of-type:not(.placeholder)::first-letter) {
         padding: 0 .25rem;
         margin: 0 .25rem 0 0;
         font-size: 4rem;
