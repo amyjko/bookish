@@ -21,15 +21,16 @@
 
 <Figure {node} caption={node.getCaption()}>
     {#if editable }
-        {#if inside}
+        <div class="container">
             <code 
-                class={`bookish-code bookish-code-block language-${language}`}
+                class={`bookish-code bookish-code-block language-${language} ${!inside ? "hidden" : ""}`}
             >
                 <Text node={node.getCodeNode()}/>
             </code>
-        {:else}
-            <Code editable={false} inline={false} language={node.getLanguage()} nodeID={node.getCodeNode().nodeID}>{node.getCode()}</Code>
-        {/if}
+            <div class="code" class:inside>
+                <Code editable={false} inline={false} language={node.getLanguage()} nodeID={node.getCodeNode().nodeID}>{node.getCode()}</Code>
+            </div>
+        </div>
     {:else}
         {#if node.getLanguage() === "python" && node.isExecutable() }
             <Python node={node} startCode={node.getCode()}></Python>
@@ -48,4 +49,21 @@
         color: gray;
         margin-right: 0.5em;
     }
+
+    .bookish-code.hidden {
+        opacity: 0;
+    }
+
+    .container {
+        position: relative;
+    }
+    .code {
+        position: absolute;
+        top: 0;
+        width: 100%;
+    }
+    .code.inside {
+        display: none;
+    }
+
 </style>
