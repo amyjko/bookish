@@ -61,7 +61,6 @@ import SuperscriptIcon from "./icons/super.svg?raw";
 import TableIcon from "./icons/table.svg?raw";
 import UndoIcon from "./icons/undo.svg?raw";
 import UnindentIcon from "./icons/unindent.svg?raw";
-import Parser from "../../models/chapter/Parser";
 import type { PasteContent } from "./CaretState";
 /**
  * Icons:

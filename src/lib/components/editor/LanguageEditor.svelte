@@ -5,7 +5,6 @@
     export let language: string;
     export let edit: (newValue: string) => void
 
-    let value: string = language;
     const languages = [ "", "html", "css", "javascript", "python" ];
 
 </script>
