@@ -15,6 +15,8 @@ import type Clipboard from "./Clipboard";
 import type UndoState from "./UndoState";
 import type Node from "$lib/models/chapter/Node";
 
+export type PasteContent = { plain: string | undefined };
+
 type CaretState = {
     chapter: boolean;
     range: CaretRange;
@@ -43,7 +45,7 @@ type CaretState = {
     redo: () => Edit;
     clipboard: Clipboard;
     handleCopy: (node: Node) => void;
-    handlePaste: (context: CaretState, node: Node, save: boolean) => Edit;
+    handlePaste: (context: CaretState, text: PasteContent | Node , save: boolean) => Edit;
 };
 
 export default CaretState;

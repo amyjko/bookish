@@ -1,5 +1,5 @@
 <script lang="ts">
-    import type BookishNode from "$lib/models/chapter/Node";
+    import BookishNode from "$lib/models/chapter/Node";
     import ChapterNode from "$lib/models/chapter/ChapterNode";
     import Parser from "$lib/models/chapter/Parser";
     import LinkNode from "$lib/models/chapter/LinkNode";
@@ -35,6 +35,7 @@
     import { CARET, getEdition, type CaretStore } from "../page/Contexts";
     import { afterUpdate, onMount, setContext } from "svelte";
     import { writable } from "svelte/store";
+    import type { PasteContent } from "./CaretState";
 
     const IDLE_TIME = 500;
 
@@ -709,7 +710,7 @@
 
             navigator.clipboard.write([
                 new ClipboardItem({
-                    "text/plain": new Blob([ node.toBookdown() ], { type: "text/plain" }),
+                    "text/plain": new Blob([ node.toText() ], { type: "text/plain" }),
                     "text/html": new Blob([ node.toHTML() ], { type: "text/html" })
                 })
             ]);
@@ -719,7 +720,22 @@
 
     }
 
-    function handlePaste(context: CaretState, node: BookishNode, save: boolean) {
+    function handlePaste(context: CaretState, text: PasteContent | BookishNode, save: boolean) {
+
+        if(text instanceof BookishNode)
+            return handlePasteNode(context, text, save);
+
+        const plain = text.plain === undefined ? undefined : new TextNode(text.plain);
+
+        if(plain) {
+            const edit = handlePasteNode(context, plain, save);
+            if(edit) return edit;
+        }        
+        return undefined;
+        
+    }
+
+    function handlePasteNode(context: CaretState, node: BookishNode, save: boolean) {
 
         // Track revisions in these two variables.
         let newRoot = context.root;
@@ -764,7 +780,7 @@
                 return { root: newChapter, range: edit.range};
 
         }
-        
+
     }
 
     $: isAtom = caretRange && caretRange.start.node instanceof AtomNode;

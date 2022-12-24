@@ -61,6 +61,8 @@ import SuperscriptIcon from "./icons/super.svg?raw";
 import TableIcon from "./icons/table.svg?raw";
 import UndoIcon from "./icons/undo.svg?raw";
 import UnindentIcon from "./icons/unindent.svg?raw";
+import Parser from "../../models/chapter/Parser";
+import type { PasteContent } from "./CaretState";
 /**
  * Icons:
  *      From: https://www.streamlinehq.com/icons/streamline-mini-line
@@ -1032,7 +1034,7 @@ const commands: Command[] = [
         active: () => true,
         handler: context => {
             if(context.root === undefined) return undefined;
-
+            
             // See if there's something on the clipboard.
             if(navigator.clipboard) {
                 navigator.clipboard.read()
@@ -1041,23 +1043,30 @@ const commands: Command[] = [
                         if(items.length === 0 && context.clipboard !== undefined)
                             context.handlePaste(context, context.clipboard, true);
                         else {
-                            for(const item of items) {
-                                for(const type of item.types) {
-                                    if(type === "text/plain")
-                                        item.getType(type)
-                                            .then((blob: Blob) => {
-                                                blob.text().then(text => {
-                                                    context.handlePaste(context, new TextNode(text), true);
-                                                })
-                                            })
+                            // See if there's data we can handle. Just look at the first.
+                            const item = items[0]
+                            // If there's something, try pasting that.
+                            if(item) {
+                                async function gatherClipboard() { 
+                                    // Eventually we should add HTML support.
+                                    const contents: PasteContent = { plain: undefined };
+                                    try {
+                                        {
+                                            const blob = await item.getType("text/plain")
+                                            const text = await blob.text();
+                                            contents.plain = text;
+                                        }
+                                        context.handlePaste(context, contents, true);
+                                    }
+                                    catch(err) {}
                                 }
-                            }  
+                                gatherClipboard();
+                            }
+                            // Otherwise, try pasting what's on the app clipboard.
+                            else if(context.clipboard !== undefined)
+                                return context.handlePaste(context, context.clipboard, false);
                         }
                     })
-            }
-            // If there is no OS clipboard access, but there is something in the editor clipboard, copy it.
-            else if(context.clipboard !== undefined) {
-                return context.handlePaste(context, context.clipboard, false);
             }
 
             // Return the current caret to avoid unhandled command feedback.

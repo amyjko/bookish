@@ -5,6 +5,7 @@ import TextNode from "./TextNode";
 import BlockNode from "./BlockNode";
 import type { CaretRange } from "./Caret";
 import type Edit from "./Edit";
+import type Caret from "./Caret";
 
 export default class CodeNode extends BlockNode {
 
@@ -119,6 +120,27 @@ export default class CodeNode extends BlockNode {
         else {
             return captionEdit;
         }
+
+    }
+
+    withNodeInserted(caret: Caret, node: Node): Edit {
+
+        // Only insert if the caret is in the code node.
+        if(caret.node !== this.#code) return undefined;
+
+        // Convert the node to text, then insert it at the position.
+        const text = node
+            .getNodes()
+            .filter((n): n is TextNode => n instanceof TextNode)
+            .map(t => t.getText())
+            .join("");
+
+        const newCode = this.#code.withCharacterAt(text, caret.index);
+        if(newCode === undefined) return undefined;
+        const newNode = this.withChildReplaced(this.#code, newCode);
+        if(newNode === undefined) return;
+        const newCaret = { node: newCode, index: caret.index + text.length };
+        return { root: newNode, range: { start: newCaret, end: newCaret }};
 
     }
 
