@@ -3,7 +3,7 @@
     import Code from './Code.svelte'
     import Python from './Python.svelte'
     import Text from './Text.svelte'
-    import { isEditable } from "../page/Contexts";
+    import { getCaret, isEditable } from "../page/Contexts";
     import Figure from "./Figure.svelte";
 
     export let node: CodeNode;
@@ -14,22 +14,27 @@
 
     // const languages = [ "C", "C++", "CSS", "Go", "HTML", "Java", "JavaScript", "Markdown", "Plaintext", "Python", "TypeScript" ];
 
+    let caret = getCaret();
+    $: inside = $caret?.range?.start.node === node.getCodeNode() || $caret?.range?.end.node === node.getCodeNode();
+
 </script>
 
 <Figure {node} caption={node.getCaption()}>
     {#if editable }
-        <code 
-            class={`bookish-code bookish-code-block language-${language}`}
-        >
-            <Text node={node.getCodeNode()}/>
-        </code>
+        {#if inside}
+            <code 
+                class={`bookish-code bookish-code-block language-${language}`}
+            >
+                <Text node={node.getCodeNode()}/>
+            </code>
+        {:else}
+            <Code editable={false} inline={false} language={node.getLanguage()} nodeID={node.getCodeNode().nodeID}>{node.getCode()}</Code>
+        {/if}
     {:else}
         {#if node.getLanguage() === "python" && node.isExecutable() }
             <Python node={node} startCode={node.getCode()}></Python>
         {:else}
-            <div>
-                <Code editable={false} inline={false} language={node.getLanguage()} nodeID={node.getCodeNode().nodeID}>{node.getCode()}</Code>
-            </div>
+            <Code editable={false} inline={false} language={node.getLanguage()} nodeID={node.getCodeNode().nodeID}>{node.getCode()}</Code>
         {/if}
     {/if}
     {#if node.getLanguage() !== "plaintext"}<div class="bookish-code-language">{node.getLanguage()}</div>{/if}
