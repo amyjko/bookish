@@ -634,6 +634,8 @@ export default abstract class BlocksNode extends BlockNode {
 
         // Find the parents of the node.
         const parents = this.getParentsOf(caret.node);
+
+        // Iterate through the ancestors, seeing if they'd like to handle the request for a deletion.
         while(parents && parents.length > 0) {
             const parent = parents.pop();
             // Ask the format node it's in to edit it, and return if successful.
@@ -645,6 +647,16 @@ export default abstract class BlocksNode extends BlockNode {
                     if(newBlocks === undefined) return;
                     return { root: newBlocks, range: editedFormat.range }
                 }
+            }
+            // See if the CodeNode would like to handle it.
+            else if(parent instanceof CodeNode) {
+                const revisedCode = parent.getCodeNode().withoutRange({ start: caret, end: { node: caret.node, index: caret.index + (next ? 1 : -1 )}});
+                if(revisedCode === undefined) return;
+                const revisedCodeNode = parent.withChildReplaced(parent.getCodeNode(), revisedCode);
+                if(revisedCodeNode === undefined) return;
+                const newBlocks = this.withNodeReplaced(parent, revisedCodeNode);
+                const newCaret = { node: revisedCode, index: Math.max(0, caret.index + (next ? 0 : -1)) };
+                return newBlocks === undefined ? undefined : { root: newBlocks, range: { start: newCaret, end: newCaret } };
             }
             // If it's a format in the list node, merge with the previous list item
             else if(parent instanceof ListNode) {

@@ -161,7 +161,9 @@ export default class TextNode extends Node {
 
     withoutRange(range: CaretRange): TextNode | undefined {
         if(range.start.node !== this && range.end.node !== this) return;
-        return new TextNode(this.#text.substring(0, range.start.index) + this.#text.substring(range.end.index));
+        const min = Math.max(0, Math.min(range.start.index, range.end.index));
+        const max = Math.min(this.#text.length, Math.max(range.start.index, range.end.index));
+        return new TextNode(this.#text.substring(0, min) + this.#text.substring(max));
     }
     
     withContentInRange(range: CaretRange): this | undefined { 
