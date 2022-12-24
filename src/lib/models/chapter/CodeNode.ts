@@ -1,9 +1,10 @@
 import type Node from "./Node";
 import type Position from "./Position";
-import FormatNode from "./FormatNode";
+import FormatNode, { type Format } from "./FormatNode";
 import TextNode from "./TextNode";
 import BlockNode from "./BlockNode";
 import type { CaretRange } from "./Caret";
+import type Edit from "./Edit";
 
 export default class CodeNode extends BlockNode {
 
@@ -82,6 +83,43 @@ export default class CodeNode extends BlockNode {
         const newCaption = range.end.node === this.#code ? new FormatNode("", [ new TextNode() ] ) : this.#caption.withContentInRange(range);
         if(newCode === undefined || newCaption === undefined) return;
         return new CodeNode(newCode, this.#language, this.#position, newCaption) as this;
+    }
+
+    /** Overrides super, special casing TextNode, since super only handles formats. */
+    withRangeFormatted(range: CaretRange, format: Format | undefined): Edit {
+
+        let editedNode: Node | undefined = this;
+
+        // First, handle the caption, if necessary.
+        let captionEdit = super.withRangeFormatted(range, format);
+
+        // If we're asking for format, skip it, code can't be formatted. Just return the caption edit.
+        if(format !== undefined) return captionEdit;
+
+        // Grab the new CodeNode if the caption was edited.
+        if(captionEdit)
+            editedNode = captionEdit.root as this;
+
+        // Next, see if part of the range included this text node.
+        const sortedRange = this.sortRange(range);
+        const containsStart = sortedRange.start.node === this.#code;
+        const containsEnd = sortedRange.end.node === this.#code;
+        if(containsStart) {
+
+            const revisedCode = this.#code.withoutRange({ 
+                start: { node: this.#code, index: sortedRange.start.index }, 
+                end: { node: this.#code, index: containsEnd ? sortedRange.end.index : this.#code.getLength()} }
+            );
+            if(revisedCode === undefined) return;
+            editedNode = editedNode.withChildReplaced(this.#code, revisedCode);
+            if(editedNode === undefined) return;
+            const revisedCaret = { node: revisedCode, index: sortedRange.start.index };            
+            return { root: editedNode, range: { start: revisedCaret, end: revisedCaret } };
+        }
+        else {
+            return captionEdit;
+        }
+
     }
 
 }
