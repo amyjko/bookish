@@ -1,6 +1,6 @@
 <script lang="ts">
-    import { afterUpdate } from 'svelte'
-    import Prism from "./ExtendedPrism";
+    import { afterUpdate } from 'svelte';
+    import Prism from './ExtendedPrism';
 
     export let editable: boolean;
     export let inline: boolean;
@@ -9,29 +9,29 @@
     export let language: string | undefined = undefined;
 
     let element: HTMLElement | null = null;
-    
+
     // When the component mounts or updates, highlight the code inside.
     afterUpdate(() => {
-        if(element) {
-            Prism.highlightElement(element)
+        if (element) {
+            Prism.highlightElement(element);
         }
     });
 
     function handleChange() {
-        if(element && edited)
-            edited(element.innerText);
+        if (element && edited) edited(element.innerText);
     }
-
 </script>
 
-<code 
+<code
     data-nodeid={nodeID}
     bind:this={element}
     contenteditable={editable}
-    class={`bookish-code ${inline ? "bookish-code-inline" : "bookish-code-block"} ${language ? `language-${language}` : ""}`} 
+    class={`bookish-code ${
+        inline ? 'bookish-code-inline' : 'bookish-code-block'
+    } ${language ? `language-${language}` : ''}`}
     on:blur={handleChange}
 >
-        <slot></slot>
+    <slot />
 </code>
 
 <style global>
@@ -49,7 +49,7 @@
     code {
         font-family: var(--bookish-code-font-family);
         font-weight: var(--bookish-code-font-weight);
-        font-size: var(--bookish-code-font-size);	
+        font-size: var(--bookish-code-font-size);
     }
 
     .bookish-code-block {
@@ -61,11 +61,12 @@
 
     .bookish-code-inline {
         display: inline;
-        padding: calc(1.5 * var(--bookish-inline-padding)) var(--bookish-inline-padding);
+        padding: calc(1.5 * var(--bookish-inline-padding))
+            var(--bookish-inline-padding);
     }
 
     .bookish-code-inline :global(code) {
-        display: inline;	
+        display: inline;
         padding: 0em;
     }
 
@@ -77,7 +78,7 @@
     * @author Lea Verou
     */
 
-    code[class*="language-"] {
+    code[class*='language-'] {
         color: black;
         background: none;
         font-family: var(--bookish-code-font-family);
@@ -111,7 +112,7 @@
     }
 
     .token.namespace {
-        opacity: .7;
+        opacity: 0.7;
     }
 
     .token.property,
@@ -164,5 +165,4 @@
     .token.entity {
         cursor: help;
     }
-
 </style>

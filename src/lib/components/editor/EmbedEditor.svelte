@@ -14,7 +14,7 @@
 
     let book = getBook();
     let caret = getCaret();
-    let upload: undefined|number|string = undefined;
+    let upload: undefined | number | string = undefined;
 
     $: description = embed.getDescription();
     $: book.getMedia();
@@ -23,28 +23,30 @@
         // Is it a valid URL?
         try {
             let test = new URL(url);
-            if(test.protocol === "http:" || test.protocol === "https:")
-                return;
+            if (test.protocol === 'http:' || test.protocol === 'https:') return;
         } catch (_) {}
         return "URL doesn't seem valid";
     }
 
     function handleImageChange(event: Event) {
-
         const target = event.target as HTMLInputElement;
         const file = target.files === null ? undefined : target.files[0];
         const media = book.getMedia();
 
-        if(file === undefined) return;
-        if(storage === undefined) return;
-        if(media === undefined) return;
+        if (file === undefined) return;
+        if (storage === undefined) return;
+        if (media === undefined) return;
 
-        media.upload(file, 
-            (progress: number) => upload = `${progress}% done`,
-            (error: string) => upload = error,
+        media.upload(
+            file,
+            (progress: number) => (upload = `${progress}% done`),
+            (error: string) => (upload = error),
             (url: string, thumbnail: string) => {
                 // Upload completed successfully, now we can get the download URL
-                $caret?.edit(embed, embed.withURLs(url, thumbnail).withDescription(""));
+                $caret?.edit(
+                    embed,
+                    embed.withURLs(url, thumbnail).withDescription('')
+                );
                 upload = undefined;
             }
         );
@@ -52,30 +54,37 @@
 
     function handleImageSelection(image: Image) {
         // Toggle the embed
-        $caret?.edit(embed, 
-            embed.getURL() === image.url ?
-                embed.withURL("").withDescription("") :
-                embed.withURL(image.url)
+        $caret?.edit(
+            embed,
+            embed.getURL() === image.url
+                ? embed.withURL('').withDescription('')
+                : embed.withURL(image.url)
         );
     }
-
 </script>
 
 {#if $caret?.root instanceof EmbedNode}
-    <ToolbarSpacer/>
+    <ToolbarSpacer />
 {:else}
-    Position <PositionEditor value={embed.getPosition()} edit={position => $caret?.edit(embed, embed.withPosition(position)) } />
+    Position <PositionEditor
+        value={embed.getPosition()}
+        edit={(position) => $caret?.edit(embed, embed.withPosition(position))}
+    />
 {/if}
 <label class="file-upload" tabIndex="0">
-    <input type="file" on:input={handleImageChange} accept=".jpg,.jpeg,.png,.gif,image/jpeg,image/png,image/gif"/>
+    <input
+        type="file"
+        on:input={handleImageChange}
+        accept=".jpg,.jpeg,.png,.gif,image/jpeg,image/png,image/gif"
+    />
     Upload
 </label>
-<ToolbarSpacer/>
-{#if !embed.isHosted() }
-    <URLEditor 
-        url={embed.getURL()} 
+<ToolbarSpacer />
+{#if !embed.isHosted()}
+    <URLEditor
+        url={embed.getURL()}
         validator={isValidURL}
-        edit={url => {
+        edit={(url) => {
             const revisedEmbed = embed.withURL(url);
             const revisedURL = revisedEmbed.getURL();
             $caret?.edit(embed, revisedEmbed);
@@ -85,17 +94,20 @@
 {:else}
     <Note>(Hosted)</Note>
 {/if}
-<ToolbarSpacer/>
+<ToolbarSpacer />
 <TextEditor
-    text={description} 
-    label={'Image description'} 
-    placeholder={'description'} 
-    valid={ alt => alt.length === 0 ? "Image description required" : undefined }
-    save={ alt => { $caret?.edit(embed, embed.withDescription(alt)); } }
+    text={description}
+    label={'Image description'}
+    placeholder={'description'}
+    valid={(alt) =>
+        alt.length === 0 ? 'Image description required' : undefined}
+    save={(alt) => {
+        $caret?.edit(embed, embed.withDescription(alt));
+    }}
     width={20}
     clip={true}
 />
-<ToolbarSpacer/>
+<ToolbarSpacer />
 {#if upload}
     {upload}
 {/if}
@@ -125,14 +137,14 @@
         font-size: var(--app-chrome-font-size);
     }
 
-    .file-upload input[type="file"] {
+    .file-upload input[type='file'] {
         display: none;
     }
 
     .file-upload:focus-within {
         position: relative;
         z-index: 2;
-        outline: var(--app-chrome-border-size) solid var(--app-interactive-color);
+        outline: var(--app-chrome-border-size) solid
+            var(--app-interactive-color);
     }
-
 </style>

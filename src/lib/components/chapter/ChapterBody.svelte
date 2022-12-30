@@ -1,29 +1,33 @@
 <script lang="ts">
-
-    import type ChapterNode from "$lib/models/chapter/ChapterNode"
-    import ParagraphNode from '$lib/models/chapter/ParagraphNode'
-    import Block from "./Block.svelte"
-    import Paragraph from './Paragraph.svelte'
-    import Problem from "./Problem.svelte";
+    import type ChapterNode from '$lib/models/chapter/ChapterNode';
+    import ParagraphNode from '$lib/models/chapter/ParagraphNode';
+    import Block from './Block.svelte';
+    import Paragraph from './Paragraph.svelte';
+    import Problem from './Problem.svelte';
 
     export let node: ChapterNode;
-    export let placeholder: string = "";
+    export let placeholder: string = '';
 
     $: errors = node.getErrors();
     $: blocks = node.getBlocks();
-
 </script>
 
 <div class="bookish-chapter-body" data-nodeid={node.nodeID}>
-    {#if errors.length > 0 }
+    {#if errors.length > 0}
         <p>
-            <Problem>{errors.length + " " + (errors.length > 1 ? "errors" : "error")} below</Problem>
+            <Problem
+                >{errors.length +
+                    ' ' +
+                    (errors.length > 1 ? 'errors' : 'error')} below</Problem
+            >
         </p>
     {/if}
-    {#if blocks.length === 1 && blocks[0] instanceof ParagraphNode && blocks[0].getFormat().isEmptyText() }
-        <Paragraph node={blocks[0]} placeholder={placeholder} />
+    {#if blocks.length === 1 && blocks[0] instanceof ParagraphNode && blocks[0]
+            .getFormat()
+            .isEmptyText()}
+        <Paragraph node={blocks[0]} {placeholder} />
     {:else}
-        {#each node.getBlocks() as block }
+        {#each node.getBlocks() as block}
             <Block node={block} />
         {/each}
     {/if}
@@ -37,9 +41,13 @@
     }
 
     /* This implements a drop cap in the first letter of the first text in the first format of the first paragraph of a chapter (but only chapters). */
-    :global(.bookish-chapter .bookish-chapter-body p:first-of-type:not(.placeholder)::first-letter) {
-        padding: 0 .25rem;
-        margin: 0 .25rem 0 0;
+    :global(
+            .bookish-chapter
+                .bookish-chapter-body
+                p:first-of-type:not(.placeholder)::first-letter
+        ) {
+        padding: 0 0.25rem;
+        margin: 0 0.25rem 0 0;
         font-size: 4rem;
         font-weight: 700;
         float: left;
@@ -53,7 +61,7 @@
 
     /* A rectangular highlight like a highlighter marker over highlighted text */
     :global(.bookish-content-highlight:before) {
-        content: "";
+        content: '';
         z-index: -1;
         left: -0.25em;
         top: -0.5em;

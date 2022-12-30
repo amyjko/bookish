@@ -1,50 +1,45 @@
 <script lang="ts">
-    import Footer from "./Footer.svelte";
-    import Header from "./Header.svelte";
-    import Auth from "$lib/components/Auth.svelte";
-    import Large from "$lib/components/app/Large.svelte";
-    import Lead from "$lib/components/app/Lead.svelte";
-    import Writing from "$lib/components/app/Writing.svelte";
-    import Paragraph from "$lib/components/app/Paragraph.svelte";
+    import Footer from './Footer.svelte';
+    import Header from './Header.svelte';
+    import Auth from '$lib/components/Auth.svelte';
+    import Large from '$lib/components/app/Large.svelte';
+    import Lead from '$lib/components/app/Lead.svelte';
+    import Writing from '$lib/components/app/Writing.svelte';
+    import Paragraph from '$lib/components/app/Paragraph.svelte';
 </script>
 
-
-{#if import.meta.env.PROD }
+{#if import.meta.env.PROD}
     <Writing>
         <Lead><Large>Bookish</Large> is coming.</Lead>
-        <Paragraph>
-            A new way to write books online.
-        </Paragraph>
+        <Paragraph>A new way to write books online.</Paragraph>
     </Writing>
 {:else}
     <div class="bookish-app">
         <Auth>
-            <Header/>
-            <slot></slot>
-            <Footer/>
+            <Header />
+            <slot />
+            <Footer />
         </Auth>
     </div>
 {/if}
 
 <style>
-
     /* Custom fonts for app */
     @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;700&display=swap');
 
     :global(.bookish-app) {
-
         /* Define some UI defaults not used in the Bookish theme. */
-        --app-font: "Outfit", sans-serif;
+        --app-font: 'Outfit', sans-serif;
         --app-line-height: 1.7;
         --app-font-size: 14pt;
         --app-text-spacing: 2rem;
 
-        --app-interactive-color: #1B499C;
+        --app-interactive-color: #1b499c;
         --app-background-color: white;
         --app-font-color: black;
         --app-border-color: #444444;
-        --app-font-color-inverted: #FFFFFF;
-        --app-muted-color: #AAAAAA;
+        --app-font-color-inverted: #ffffff;
+        --app-muted-color: #aaaaaa;
         --app-error-color: rgb(191, 15, 15);
 
         --app-chrome-background: rgb(244, 244, 244);
@@ -53,7 +48,6 @@
         --app-chrome-border-size: 3px;
         --app-chrome-roundedness: 5px;
         --app-chrome-padding: 0.5em;
-
     }
 
     :global(.dark .bookish-app) {

@@ -1,19 +1,24 @@
-<div class={"bookish bookish-loading" + (typeof localStorage !== "undefined" && localStorage.getItem("dark") === "true" ? " dark" : "")}>
-        <div class="bookish-loading-animation">
-        <div></div>
-        <div></div>
-        <div></div>
-        <div></div>
-        <div></div>
-        <div></div>
-        <div></div>
-        <div></div>
-        <div></div>
+<div
+    class={'bookish bookish-loading' +
+        (typeof localStorage !== 'undefined' &&
+        localStorage.getItem('dark') === 'true'
+            ? ' dark'
+            : '')}
+>
+    <div class="bookish-loading-animation">
+        <div />
+        <div />
+        <div />
+        <div />
+        <div />
+        <div />
+        <div />
+        <div />
+        <div />
     </div>
 </div>
 
 <style>
-
     .bookish-loading {
         width: 100vw;
         height: 100vh;
@@ -86,13 +91,12 @@
     }
 
     @keyframes bookish-loading {
-        0%, 100% {
+        0%,
+        100% {
             opacity: 1;
         }
         50% {
             opacity: 0.5;
         }
     }
-
-
 </style>

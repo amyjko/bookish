@@ -16,6 +16,6 @@ type ThemeColors = {
     errorColor: string;
     linkColor: string;
     bulletColor: string;
-}
+};
 
 export default ThemeColors;

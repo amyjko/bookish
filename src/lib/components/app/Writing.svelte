@@ -1,5 +1,5 @@
 <section>
-    <slot></slot>
+    <slot />
 </section>
 
 <style>

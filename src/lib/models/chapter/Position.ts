@@ -1,2 +1,2 @@
-type Position = "|" | "<" | ">";
+type Position = '|' | '<' | '>';
 export default Position;

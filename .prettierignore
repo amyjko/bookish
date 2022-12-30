@@ -1,0 +1,8 @@
+build
+static
+.svelte-kit
+.vscode
+.firebase
+coverage
+dist
+package

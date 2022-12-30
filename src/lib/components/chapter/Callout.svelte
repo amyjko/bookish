@@ -1,15 +1,14 @@
 <script lang="ts">
-    import type CalloutNode from "$lib/models/chapter/CalloutNode"
-    import Block from "./Block.svelte";
-    import Positioned from "./Positioned.svelte";
+    import type CalloutNode from '$lib/models/chapter/CalloutNode';
+    import Block from './Block.svelte';
+    import Positioned from './Positioned.svelte';
 
     export let node: CalloutNode;
-
 </script>
 
 <Positioned position={node.getPosition()}>
-    <section class={"bookish-callout"} data-nodeid={node.nodeID}>
-        {#each node.getBlocks() as element }
+    <section class={'bookish-callout'} data-nodeid={node.nodeID}>
+        {#each node.getBlocks() as element}
             <Block node={element} />
         {/each}
     </section>
@@ -30,12 +29,14 @@
         position: relative;
     }
 
-    .bookish-callout :global(h2), .bookish-callout :global(h3), .bookish-callout :global(h4) {
+    .bookish-callout :global(h2),
+    .bookish-callout :global(h3),
+    .bookish-callout :global(h4) {
         margin-top: 0;
     }
 
-    .bookish-callout :global(ol), .bookish-callout :global(ul) {
+    .bookish-callout :global(ol),
+    .bookish-callout :global(ul) {
         padding-left: 1rem;
     }
-
 </style>

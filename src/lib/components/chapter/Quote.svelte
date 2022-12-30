@@ -1,8 +1,8 @@
 <script lang="ts">
-    import type QuoteNode from "$lib/models/chapter/QuoteNode"
-    import Block from "./Block.svelte";
+    import type QuoteNode from '$lib/models/chapter/QuoteNode';
+    import Block from './Block.svelte';
     import Format from './Format.svelte';
-    import Positioned from "./Positioned.svelte";
+    import Positioned from './Positioned.svelte';
 
     export let node: QuoteNode;
 
@@ -10,18 +10,19 @@
 </script>
 
 <Positioned position={node.getPosition()}>
-    <blockquote class={"bookish-blockquote"} data-nodeid={node.nodeID}>
+    <blockquote class={'bookish-blockquote'} data-nodeid={node.nodeID}>
         {#each node.getBlocks() as element}
-            <Block node={element}/>
+            <Block node={element} />
         {/each}
         {#if credit}
-            <div class="bookish-blockquote-caption"><span><Format node={credit} placeholder="credit"/></span></div>
+            <div class="bookish-blockquote-caption"
+                ><span><Format node={credit} placeholder="credit" /></span></div
+            >
         {/if}
     </blockquote>
 </Positioned>
 
 <style>
-
     .bookish-blockquote {
         clear: both;
         border: none;
@@ -50,11 +51,11 @@
     }
 
     .bookish-blockquote:before {
-        content: "\201C";
+        content: '\201C';
         position: relative;
         top: 80pt;
         left: -40pt;
-        font-family: "Modum Extra";
+        font-family: 'Modum Extra';
         font-size: 120pt;
         font-weight: bold;
         color: var(--bookish-highlight-color);
@@ -62,8 +63,7 @@
     }
 
     .bookish-blockquote-caption:before {
-        content: "--";
+        content: '--';
         margin-right: 0.25em;
     }
-
 </style>

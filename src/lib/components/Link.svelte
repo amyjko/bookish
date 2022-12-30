@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { page } from "$app/stores";
+    import { page } from '$app/stores';
 
     export let to: string;
 
@@ -7,39 +7,42 @@
 
     function scroll(event: MouseEvent) {
         // No element? Bail.
-        if(link === undefined) return;
+        if (link === undefined) return;
 
         // No hash? No scroll.
         const hash = new URL(link.href).hash;
-        if(hash === "") return;
+        if (hash === '') return;
 
         // Prevent the browser from scrolling.
         event.preventDefault();
 
         // Get the anchor
-        const anchorId = new URL(link.href).hash.replace('#', '')
+        const anchorId = new URL(link.href).hash.replace('#', '');
         const anchor = document.getElementById(anchorId);
 
         // No anchor? Bail.
-        if(anchor === null) return;
+        if (anchor === null) return;
 
         // Scroll to the anchor.
         window.scrollTo({
             top: anchor.offsetTop,
-            behavior: 'smooth'
-        })
+            behavior: 'smooth',
+        });
 
         // Update the hash (without scrolling)
-        history.pushState({}, "", hash);
-
-	}
-
+        history.pushState({}, '', hash);
+    }
 </script>
 
-{#if $page.url.pathname === (to.charAt(to.length - 1) === "/" ? to.substring(0, to.length - 1) : to) }
-    <slot></slot>
+{#if $page.url.pathname === (to.charAt(to.length - 1) === '/' ? to.substring(0, to.length - 1) : to)}
+    <slot />
 {:else}
-    <a href={to} bind:this={link} on:click={event => scroll(event) } target={to.startsWith("http") ? "_blank" : null}><slot></slot></a>
+    <a
+        href={to}
+        bind:this={link}
+        on:click={(event) => scroll(event)}
+        target={to.startsWith('http') ? '_blank' : null}><slot /></a
+    >
 {/if}
 
 <style>
@@ -52,5 +55,4 @@
     a:hover {
         text-decoration: underline;
     }
-
 </style>

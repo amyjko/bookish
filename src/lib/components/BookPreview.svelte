@@ -1,12 +1,12 @@
 <script lang="ts">
-    import type Book from "$lib/models/book/Book"
-    import EmbedNode from "$lib/models/chapter/EmbedNode";
-    import Parser from "$lib/models/chapter/Parser";
-    import ErrorNode from "../models/chapter/ErrorNode";
-    import ChapterBody from "./chapter/ChapterBody.svelte";
-    import Embed from "./chapter/Embed.svelte";
-    import ErrorMessage from "./chapter/ErrorMessage.svelte";
-    import Link from "$lib/components/app/Link.svelte";
+    import type Book from '$lib/models/book/Book';
+    import EmbedNode from '$lib/models/chapter/EmbedNode';
+    import Parser from '$lib/models/chapter/Parser';
+    import ErrorNode from '../models/chapter/ErrorNode';
+    import ChapterBody from './chapter/ChapterBody.svelte';
+    import Embed from './chapter/Embed.svelte';
+    import ErrorMessage from './chapter/ErrorMessage.svelte';
+    import Link from '$lib/components/app/Link.svelte';
 
     export let book: Book;
     export let write: boolean = false;
@@ -16,31 +16,36 @@
     $: authors = book.getAuthors();
     $: description = book.getDescription();
     $: subdomain = book.getSubdomain();
-    $: title = book.getTitle() === "" ? "Untitled" : book.getTitle();
+    $: title = book.getTitle() === '' ? 'Untitled' : book.getTitle();
 
-	$:  embed = cover === null ? null : Parser.parseEmbed(undefined, cover);
-
+    $: embed = cover === null ? null : Parser.parseEmbed(undefined, cover);
 </script>
 
 <div class="book-preview">
     <div class="cover">
-        {#if embed instanceof EmbedNode }
-            <Embed node={embed} imageOnly/>
-        {:else if embed instanceof ErrorNode }
-            <ErrorMessage node={embed}/>
+        {#if embed instanceof EmbedNode}
+            <Embed node={embed} imageOnly />
+        {:else if embed instanceof ErrorNode}
+            <ErrorMessage node={embed} />
         {/if}
     </div>
     <div class="content">
         <div class="title">
-            {#if subdomain === undefined || write }
-                <Link to={refID === undefined ? "" : (write ? "/write/" : "/") + refID}>{title}</Link>
+            {#if subdomain === undefined || write}
+                <Link
+                    to={refID === undefined
+                        ? ''
+                        : (write ? '/write/' : '/') + refID}>{title}</Link
+                >
             {:else}
                 <Link to={`/${subdomain}`}>{title}</Link>
             {/if}
         </div>
         <div class="authors">
             {#each authors as author, index}
-                <span>{author}{#if index !== authors.length - 1},&nbsp;{/if}</span>
+                <span
+                    >{author}{#if index !== authors.length - 1},&nbsp;{/if}</span
+                >
             {:else}
                 <em>No authors</em>
             {/each}
@@ -49,14 +54,15 @@
             {#if description.length === 0}
                 <em>No description</em>
             {:else}
-                <ChapterBody node={Parser.parseChapter(undefined, description)}/>
+                <ChapterBody
+                    node={Parser.parseChapter(undefined, description)}
+                />
             {/if}
         </div>
     </div>
 </div>
 
 <style>
-
     .book-preview {
         display: flex;
         flex-direction: row;
@@ -91,5 +97,4 @@
         text-overflow: ellipsis;
         height: 5em;
     }
-
 </style>

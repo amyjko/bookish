@@ -1,7 +1,6 @@
-import Node from "./Node";
+import Node from './Node';
 
 export default class ReferenceNode extends Node {
-
     readonly citationID: string;
     readonly authors: string;
     readonly year: string;
@@ -11,7 +10,16 @@ export default class ReferenceNode extends Node {
     readonly summary: string;
     readonly short: boolean;
 
-    constructor(citationID: string, authors: string="", year: string="", title: string="", source: string="", url: string="", summary: string="", short: boolean=false) {
+    constructor(
+        citationID: string,
+        authors: string = '',
+        year: string = '',
+        title: string = '',
+        source: string = '',
+        url: string = '',
+        summary: string = '',
+        short: boolean = false
+    ) {
         super();
 
         this.citationID = citationID;
@@ -22,34 +30,152 @@ export default class ReferenceNode extends Node {
         this.url = url;
         this.summary = summary;
         this.short = short;
-
     }
 
-    getType() { return "reference"; }
+    getType() {
+        return 'reference';
+    }
 
-    getChildren() { return [] }
- 
-    getParentOf(): Node | undefined { return undefined; }
-    
-    toText() { return this.authors + " "  + this.year + " " + this.title + " " + this.source + (this.summary ? this.summary : ""); }
-    toBookdown(): string { return ""; }
-    toHTML() { return ""; }
-    toList() { return [ this.authors, this.year, this.title, this.source, this.url, this.summary ]; }
+    getChildren() {
+        return [];
+    }
+
+    getParentOf(): Node | undefined {
+        return undefined;
+    }
+
+    toText() {
+        return (
+            this.authors +
+            ' ' +
+            this.year +
+            ' ' +
+            this.title +
+            ' ' +
+            this.source +
+            (this.summary ? this.summary : '')
+        );
+    }
+    toBookdown(): string {
+        return '';
+    }
+    toHTML() {
+        return '';
+    }
+    toList() {
+        return [
+            this.authors,
+            this.year,
+            this.title,
+            this.source,
+            this.url,
+            this.summary,
+        ];
+    }
 
     copy() {
-        return new ReferenceNode(this.citationID, this.authors, this.year, this.title, this.source, this.url, this.summary, this.short) as this;
+        return new ReferenceNode(
+            this.citationID,
+            this.authors,
+            this.year,
+            this.title,
+            this.source,
+            this.url,
+            this.summary,
+            this.short
+        ) as this;
     }
 
-    withChildReplaced() { return undefined; }
+    withChildReplaced() {
+        return undefined;
+    }
 
-    withContentInRange(): this | undefined { return this.copy(); }
+    withContentInRange(): this | undefined {
+        return this.copy();
+    }
 
-    withCitationID(id: string) { return new ReferenceNode(id, this.authors, this.year, this.title, this.source, this.url, this.summary, this.short); }
-    withAuthors(authors: string) { return new ReferenceNode(this.citationID, authors, this.year, this.title, this.source, this.url, this.summary, this.short); }
-    withYear(year: string) { return new ReferenceNode(this.citationID, this.authors, year, this.title, this.source, this.url, this.summary, this.short); }
-    withTitle(title: string) { return new ReferenceNode(this.citationID, this.authors, this.year, title, this.source, this.url, this.summary, this.short); }
-    withSource(source: string) { return new ReferenceNode(this.citationID, this.authors, this.year, this.title, source, this.url, this.summary, this.short); }
-    withURL(url: string) { return new ReferenceNode(this.citationID, this.authors, this.year, this.title, this.source, url, this.summary, this.short); }
-    withSummary(summary: string) { return new ReferenceNode(this.citationID, this.authors, this.year, this.title, this.source, this.url, summary, this.short); }
-
+    withCitationID(id: string) {
+        return new ReferenceNode(
+            id,
+            this.authors,
+            this.year,
+            this.title,
+            this.source,
+            this.url,
+            this.summary,
+            this.short
+        );
+    }
+    withAuthors(authors: string) {
+        return new ReferenceNode(
+            this.citationID,
+            authors,
+            this.year,
+            this.title,
+            this.source,
+            this.url,
+            this.summary,
+            this.short
+        );
+    }
+    withYear(year: string) {
+        return new ReferenceNode(
+            this.citationID,
+            this.authors,
+            year,
+            this.title,
+            this.source,
+            this.url,
+            this.summary,
+            this.short
+        );
+    }
+    withTitle(title: string) {
+        return new ReferenceNode(
+            this.citationID,
+            this.authors,
+            this.year,
+            title,
+            this.source,
+            this.url,
+            this.summary,
+            this.short
+        );
+    }
+    withSource(source: string) {
+        return new ReferenceNode(
+            this.citationID,
+            this.authors,
+            this.year,
+            this.title,
+            source,
+            this.url,
+            this.summary,
+            this.short
+        );
+    }
+    withURL(url: string) {
+        return new ReferenceNode(
+            this.citationID,
+            this.authors,
+            this.year,
+            this.title,
+            this.source,
+            url,
+            this.summary,
+            this.short
+        );
+    }
+    withSummary(summary: string) {
+        return new ReferenceNode(
+            this.citationID,
+            this.authors,
+            this.year,
+            this.title,
+            this.source,
+            this.url,
+            summary,
+            this.short
+        );
+    }
 }

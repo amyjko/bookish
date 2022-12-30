@@ -1,6 +1,6 @@
 <section>
     <table>
-        <slot></slot>
+        <slot />
     </table>
 </section>
 
@@ -11,7 +11,8 @@
         margin-top: var(--app-text-spacing);
         margin-bottom: var(--app-text-spacing);
         border-top: var(--app-chrome-border-size) solid var(--app-border-color);
-        border-bottom: var(--app-chrome-border-size) solid var(--app-border-color);
+        border-bottom: var(--app-chrome-border-size) solid
+            var(--app-border-color);
     }
 
     table {
@@ -28,5 +29,4 @@
         font-family: var(--app-font);
         font-weight: 300;
     }
-
 </style>

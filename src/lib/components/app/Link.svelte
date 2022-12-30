@@ -1,12 +1,16 @@
 <script lang="ts">
     export let to: string;
-    export let before: Function | undefined = undefined; 
+    export let before: Function | undefined = undefined;
 </script>
 
-<a href={to} on:click={() => before ? before() : undefined } target={to.startsWith("http") ? "_blank" : null}><slot></slot></a>
+<a
+    href={to}
+    on:click={() => (before ? before() : undefined)}
+    target={to.startsWith('http') ? '_blank' : null}><slot /></a
+>
 
 <style>
-    a {        
+    a {
         color: var(--app-interactive-color);
         font-family: var(--app-font);
         font-weight: 400;

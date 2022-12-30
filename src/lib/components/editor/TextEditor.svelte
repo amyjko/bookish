@@ -1,46 +1,55 @@
 <script lang="ts">
     enum Status {
         Viewing,
-        Editing
+        Editing,
     }
 
     export let text: string;
     export let label: string;
     export let placeholder: string;
     export let valid: (text: string) => string | undefined;
-    export let save: (text: string) => Promise<void> | undefined | void | string;
+    export let save: (
+        text: string
+    ) => Promise<void> | undefined | void | string;
     export let saveOnExit: boolean = false;
     export let width: number | undefined = undefined;
     export let clip: boolean = false;
-    export let move: ((el: HTMLElement, direction: -1|1) => void) | undefined = undefined;
+    export let move:
+        | ((el: HTMLElement, direction: -1 | 1) => void)
+        | undefined = undefined;
 
     let status = Status.Viewing;
-    let field:  HTMLInputElement | null = null;
+    let field: HTMLInputElement | null = null;
     let sizer: HTMLSpanElement | null = null;
 
     $: error = valid(text);
 
     // Grow the sizer when text or status changes.
     $: {
-        if(sizer) {
+        if (sizer) {
             // Set the invisible sizer to the text to set the container's width.
             // The browser strips trailing spaces, causing jitter after a space, so we replace
             // them with non-breaking spaces.
-            const sizedText = showPlaceholder() ? placeholder : text.replace(/\s/g, "\u00a0");
+            const sizedText = showPlaceholder()
+                ? placeholder
+                : text.replace(/\s/g, '\u00a0');
             // Clip the text to prevent this editor from getting too long when editing or when asked to.. If it goes past one line,
             // the measurements and layout are way off.
-            const trimmedText = width !== undefined && (clip === true || status === Status.Editing) ? sizedText.substring(0, width) + "…" : sizedText;
+            const trimmedText =
+                width !== undefined &&
+                (clip === true || status === Status.Editing)
+                    ? sizedText.substring(0, width) + '…'
+                    : sizedText;
             sizer.innerHTML = trimmedText;
         }
     }
 
     // When status changes, focus or blur.
     $: {
-        if(field) {
-            if(status === Status.Editing) {
+        if (field) {
+            if (status === Status.Editing) {
                 field.focus();
-            }
-            else {
+            } else {
                 field.blur();
             }
         }
@@ -48,12 +57,11 @@
 
     // When text changes, save, unless we only save on exit.
     $: {
-        if(!saveOnExit)
-            saveText(text);
+        if (!saveOnExit) saveText(text);
     }
 
     function showPlaceholder() {
-        return text === "";
+        return text === '';
     }
 
     function startEditing() {
@@ -62,26 +70,24 @@
 
     function stopEditing() {
         status = Status.Viewing;
-        if(saveOnExit)
-            saveText(text)
+        if (saveOnExit) saveText(text);
     }
 
     function edit() {
-        if(field) {
+        if (field) {
             text = field.value;
-            if(saveOnExit === false)
-                saveText(text);
+            if (saveOnExit === false) saveText(text);
         }
     }
 
     function saveText(newText: string) {
-        if(validate(newText) === undefined) {
+        if (validate(newText) === undefined) {
             const revisedText = save(newText);
-            if(typeof revisedText === "string") {
+            if (typeof revisedText === 'string') {
                 text = revisedText;
             }
-            if(revisedText instanceof Promise)
-                revisedText.catch((err: Error) => error = err.message)
+            if (revisedText instanceof Promise)
+                revisedText.catch((err: Error) => (error = err.message));
         }
     }
 
@@ -90,45 +96,48 @@
     }
 
     function handleKeyPress(event: KeyboardEvent) {
-        if(event.key === "Enter")
-            status = Status.Viewing;
-        else if(event.key === "ArrowUp" && move && field) {
+        if (event.key === 'Enter') status = Status.Viewing;
+        else if (event.key === 'ArrowUp' && move && field) {
             event.preventDefault();
             move(field, -1);
-        }
-        else if(event.key === "ArrowDown" && move && field) {
+        } else if (event.key === 'ArrowDown' && move && field) {
             event.preventDefault();
             move(field, 1);
         }
     }
-
 </script>
 
-<span class={`text-editor ${showPlaceholder() ? "placeholder" : ""} ${status === Status.Viewing ? "viewing" : ""}`}>
-    <span 
-        class={`sizer ${error ? "error" : ""}`} 
-        aria-hidden={true} 
-        bind:this={sizer} 
+<span
+    class={`text-editor ${showPlaceholder() ? 'placeholder' : ''} ${
+        status === Status.Viewing ? 'viewing' : ''
+    }`}
+>
+    <span
+        class={`sizer ${error ? 'error' : ''}`}
+        aria-hidden={true}
+        bind:this={sizer}
         on:click={startEditing}
     />
     <input
-        type="text" 
+        type="text"
         bind:this={field}
         bind:value={text}
         required
         role="textbox"
         aria-invalid={error !== undefined}
         aria-label={label}
-        placeholder={placeholder}
+        {placeholder}
         on:change={edit}
         on:keydown={handleKeyPress}
         on:blur={stopEditing}
         on:focus={startEditing}
     />
-    {#if error && status === Status.Editing }
+    {#if error && status === Status.Editing}
         <span
             aria-live="polite"
-            class={`text-editor-error ${status === Status.Editing ? "editing" : ""}`}
+            class={`text-editor-error ${
+                status === Status.Editing ? 'editing' : ''
+            }`}
         >
             {error}
         </span>
@@ -140,7 +149,7 @@
         position: relative;
     }
 
-    input[type="text"] {
+    input[type='text'] {
         cursor: pointer;
         position: absolute;
         top: 0;
@@ -151,7 +160,8 @@
     }
 
     /* Match the parent's styling as much as possible. */
-    input[type="text"], .sizer {
+    input[type='text'],
+    .sizer {
         background-color: inherit;
         font-family: inherit;
         font-size: inherit;
@@ -167,10 +177,11 @@
         vertical-align: inherit;
     }
 
-    input[type="text"]:focus {
+    input[type='text']:focus {
         outline: none;
         border: none;
-        border-bottom: var(--app-chrome-border-size) solid var(--app-interactive-color);
+        border-bottom: var(--app-chrome-border-size) solid
+            var(--app-interactive-color);
     }
 
     /* This ensures the error message always appears below empty text editors */
@@ -182,7 +193,8 @@
     }
 
     .sizer.error {
-        border-bottom: var(--app-chrome-border-size) solid var(--app-error-color) !important;
+        border-bottom: var(--app-chrome-border-size) solid
+            var(--app-error-color) !important;
     }
 
     .viewing .sizer {
@@ -191,7 +203,7 @@
 
     /* This ensures that the sizer doesn't end up with zero width and height. */
     .sizer:empty:before {
-        content: "\200b";
+        content: '\200b';
     }
 
     /* Override the inherited color of the text is a placeholder */
@@ -227,5 +239,4 @@
         background: var(--app-chrome-background);
         animation: failure 100ms 10;
     }
-
 </style>

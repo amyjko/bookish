@@ -1,4 +1,5 @@
-<span><slot></slot></span>
+<span><slot /></span>
+
 <style>
     span {
         display: inline-block;
@@ -6,6 +7,7 @@
         color: var(--bookish-error-color);
         border-radius: var(--bookish-roundedness);
         font-weight: 400;
-        padding: var(--bookish-inline-padding) calc(2 * var(--bookish-inline-padding));
+        padding: var(--bookish-inline-padding)
+            calc(2 * var(--bookish-inline-padding));
     }
 </style>

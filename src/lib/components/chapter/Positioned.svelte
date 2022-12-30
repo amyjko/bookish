@@ -1,15 +1,20 @@
 <script lang="ts">
-    import type Position from "$lib/models/chapter/Position";
+    import type Position from '$lib/models/chapter/Position';
 
     export let position: Position;
-
 </script>
 
-<div class={position === "<" ? "inset-left" : position === ">" ? "inset-right" : ""}><slot></slot></div>
+<div
+    class={position === '<'
+        ? 'inset-left'
+        : position === '>'
+        ? 'inset-right'
+        : ''}><slot /></div
+>
 
 <style>
-	/* Desktop */
-	@media screen and (min-width: 1200px) {
+    /* Desktop */
+    @media screen and (min-width: 1200px) {
         .inset-left {
             float: left;
             clear: both;
@@ -26,6 +31,4 @@
             margin-left: 2em;
         }
     }
-
-
 </style>

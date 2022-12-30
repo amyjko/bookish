@@ -26,45 +26,52 @@
 
     // When there's a new author, focus on it.
     afterUpdate(() => {
-        if(authors.length > 0 && authorList && newAuthor) {
-            const editors = authorList.querySelectorAll("input");
-            if(editors.length > 0) {
+        if (authors.length > 0 && authorList && newAuthor) {
+            const editors = authorList.querySelectorAll('input');
+            if (editors.length > 0) {
                 const lastAuthor = editors[editors.length - 1];
-                if(lastAuthor instanceof HTMLElement) {
+                if (lastAuthor instanceof HTMLElement) {
                     lastAuthor.focus();
                 }
             }
             newAuthor = false;
         }
     });
-
 </script>
 
 <div class="bookish-authors" bind:this={authorList}>
-    {#if authors.length === 0 }
-        {#if editable && inheritedAuthors !== undefined && inheritedAuthors.length > 0 }
+    {#if authors.length === 0}
+        {#if editable && inheritedAuthors !== undefined && inheritedAuthors.length > 0}
             <Note>&nbsp;(book authors)&nbsp;</Note>
         {:else}
             No authors
         {/if}
     {:else}
         <em>by </em>
-        {#each authors as author, index }
-            {#if editable }
+        {#each authors as author, index}
+            {#if editable}
                 <TextEditor
-                    text={author} 
-                    label={'Author name editor'} 
+                    text={author}
+                    label={'Author name editor'}
                     placeholder="Author"
-                    valid={ () => undefined }
-                    save={ text => /* If text is already empty, remove */ author.length > 0 && text === "" ? remove(index) : edit(index, text) }
+                    valid={() => undefined}
+                    save={(text) =>
+                        /* If text is already empty, remove */ author.length >
+                            0 && text === ''
+                            ? remove(index)
+                            : edit(index, text)}
                 />
             {:else}
-                <span><Format node={Parser.parseFormat($edition, author)} /></span>
+                <span
+                    ><Format
+                        node={Parser.parseFormat($edition, author)}
+                    /></span
+                >
             {/if}
             {#if index < authors.length - 1},&nbsp{/if}
         {/each}
     {/if}
-    {#if editable }
+    {#if editable}
         &nbsp;<Button tooltip="Add an author" command={addAuthor}>+</Button>
     {/if}
 </div>

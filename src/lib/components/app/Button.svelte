@@ -3,18 +3,18 @@
     export let tooltip: string;
     export let disabled: boolean = false;
     export let command: () => void;
-
 </script>
 
-<button 
-    class={$$props.class} 
-    title={tooltip} 
-    {type} 
-    {disabled} 
+<button
+    class={$$props.class}
+    title={tooltip}
+    {type}
+    {disabled}
     on:click={command}
-    on:keypress={event => event.key === " " || event.key === "Enter" ? command() : undefined }
+    on:keypress={(event) =>
+        event.key === ' ' || event.key === 'Enter' ? command() : undefined}
 >
-    <slot></slot>
+    <slot />
 </button>
 
 <style>
@@ -43,7 +43,7 @@
     button:focus {
         position: relative;
         z-index: 2;
-        outline: var(--app-chrome-border-size) solid var(--app-interactive-color);
+        outline: var(--app-chrome-border-size) solid
+            var(--app-interactive-color);
     }
-
 </style>

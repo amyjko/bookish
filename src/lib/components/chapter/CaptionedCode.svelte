@@ -1,10 +1,10 @@
 <script lang="ts">
-    import type CodeNode from "$lib/models/chapter/CodeNode"
-    import Code from './Code.svelte'
-    import Python from './Python.svelte'
-    import Text from './Text.svelte'
-    import { getCaret, isEditable } from "../page/Contexts";
-    import Figure from "./Figure.svelte";
+    import type CodeNode from '$lib/models/chapter/CodeNode';
+    import Code from './Code.svelte';
+    import Python from './Python.svelte';
+    import Text from './Text.svelte';
+    import { getCaret, isEditable } from '../page/Contexts';
+    import Figure from './Figure.svelte';
 
     export let node: CodeNode;
 
@@ -15,30 +15,43 @@
     // const languages = [ "C", "C++", "CSS", "Go", "HTML", "Java", "JavaScript", "Markdown", "Plaintext", "Python", "TypeScript" ];
 
     let caret = getCaret();
-    $: inside = $caret?.range?.start.node === node.getCodeNode() || $caret?.range?.end.node === node.getCodeNode();
-
+    $: inside =
+        $caret?.range?.start.node === node.getCodeNode() ||
+        $caret?.range?.end.node === node.getCodeNode();
 </script>
 
 <Figure {node} caption={node.getCaption()}>
-    {#if editable }
+    {#if editable}
         <div class="container">
-            <code 
-                class={`bookish-code bookish-code-block language-${language} ${!inside ? "hidden" : ""}`}
+            <code
+                class={`bookish-code bookish-code-block language-${language} ${
+                    !inside ? 'hidden' : ''
+                }`}
             >
-                <Text node={node.getCodeNode()}/>
+                <Text node={node.getCodeNode()} />
             </code>
             <div class="code" class:inside>
-                <Code editable={false} inline={false} language={node.getLanguage()} nodeID={node.getCodeNode().nodeID}>{node.getCode()}</Code>
+                <Code
+                    editable={false}
+                    inline={false}
+                    language={node.getLanguage()}
+                    nodeID={node.getCodeNode().nodeID}>{node.getCode()}</Code
+                >
             </div>
         </div>
+    {:else if node.getLanguage() === 'python' && node.isExecutable()}
+        <Python {node} startCode={node.getCode()} />
     {:else}
-        {#if node.getLanguage() === "python" && node.isExecutable() }
-            <Python node={node} startCode={node.getCode()}></Python>
-        {:else}
-            <Code editable={false} inline={false} language={node.getLanguage()} nodeID={node.getCodeNode().nodeID}>{node.getCode()}</Code>
-        {/if}
+        <Code
+            editable={false}
+            inline={false}
+            language={node.getLanguage()}
+            nodeID={node.getCodeNode().nodeID}>{node.getCode()}</Code
+        >
     {/if}
-    {#if node.getLanguage() !== "plaintext"}<div class="bookish-code-language">{node.getLanguage()}</div>{/if}
+    {#if node.getLanguage() !== 'plaintext'}<div class="bookish-code-language"
+            >{node.getLanguage()}</div
+        >{/if}
 </Figure>
 
 <style>
@@ -65,5 +78,4 @@
     .code.inside {
         display: none;
     }
-
 </style>

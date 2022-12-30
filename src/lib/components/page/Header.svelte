@@ -1,6 +1,6 @@
 <script lang="ts">
     import EmbedNode from '$lib/models/chapter/EmbedNode';
-    import Parser from "$lib/models/chapter/Parser";
+    import Parser from '$lib/models/chapter/Parser';
     import Embed from '$lib/components/chapter/Embed.svelte';
     import ErrorMessage from '$lib/components/chapter/ErrorMessage.svelte';
     import BookishEditor from '$lib/components/editor/BookishEditor.svelte';
@@ -11,67 +11,78 @@
     import type ErrorNode from '../../models/chapter/ErrorNode';
     import Button from '../app/Button.svelte';
 
-	export let label: string;
-	export let header: string;
-	export let subtitle: string | undefined = undefined;
-	export let print: boolean = false;
-	export let tags: string[] | undefined = undefined;
-	export let getImage: (() => string | null);
-	export let setImage: (embed: string | null) => Promise<void> | undefined;
-	export let save: ((text: string) => Promise<void> | undefined) | null = null;
+    export let label: string;
+    export let header: string;
+    export let subtitle: string | undefined = undefined;
+    export let print: boolean = false;
+    export let tags: string[] | undefined = undefined;
+    export let getImage: () => string | null;
+    export let setImage: (embed: string | null) => Promise<void> | undefined;
+    export let save: ((text: string) => Promise<void> | undefined) | null =
+        null;
 
-	let title: HTMLHeadingElement | null = null;
+    let title: HTMLHeadingElement | null = null;
     let showReminder: boolean = true;
 
     let edition = getEdition();
     let editable = isEditable();
 
-	function updateScrollReminder() {
+    function updateScrollReminder() {
         // If the bottom of the window is below the top of the title, hide the reminder.
-        if(title)
-			showReminder = window.scrollY + window.innerHeight <= title.getBoundingClientRect().top + window.scrollY;
-	}
+        if (title)
+            showReminder =
+                window.scrollY + window.innerHeight <=
+                title.getBoundingClientRect().top + window.scrollY;
+    }
 
-	function addCover() { if(setImage) setImage("|||||") ; }
-	function removeCover() { if(setImage) setImage(null); }
+    function addCover() {
+        if (setImage) setImage('|||||');
+    }
+    function removeCover() {
+        if (setImage) setImage(null);
+    }
 
     // When the title becomes visible or hidden, update the scroll reminder.
     onMount(() => {
-		const intersectionObserver = new IntersectionObserver(() => updateScrollReminder());
-		if(title) intersectionObserver.observe(title);
-		updateScrollReminder();
+        const intersectionObserver = new IntersectionObserver(() =>
+            updateScrollReminder()
+        );
+        if (title) intersectionObserver.observe(title);
+        updateScrollReminder();
 
         // Stop observing when unmounted.
-		return () => { if(title) intersectionObserver.unobserve(title) }
-	});
+        return () => {
+            if (title) intersectionObserver.unobserve(title);
+        };
+    });
 
     // Get the embed, update when getImage function prop changes.
     let embedNode: EmbedNode | ErrorNode | undefined = undefined;
-	$: {
+    $: {
         let embed = getImage();
         embedNode = embed ? Parser.parseEmbed($edition, embed) : undefined;
     }
-
 </script>
 
 <div class="bookish-chapter-header">
-    {#if embedNode }
+    {#if embedNode}
         <div class="bookish-figure-full">
             {#if edition && editable && embedNode instanceof EmbedNode}
-                <BookishEditor 
-                    ast={embedNode} 
-                    save={node => setImage ? setImage(node.toBookdown()) : undefined }
+                <BookishEditor
+                    ast={embedNode}
+                    save={(node) =>
+                        setImage ? setImage(node.toBookdown()) : undefined}
                     chapter={false}
                     component={Embed}
                     placeholder=""
                 />
-            {:else if embedNode instanceof EmbedNode }
-                <Embed node={embedNode}/>
+            {:else if embedNode instanceof EmbedNode}
+                <Embed node={embedNode} />
             {:else}
                 <ErrorMessage node={embedNode} />
             {/if}
             {#if !print && showReminder}
-                <div class="bookish-scroll-reminder"></div>
+                <div class="bookish-scroll-reminder" />
             {/if}
         </div>
     {:else}
@@ -79,34 +90,46 @@
         <p>&nbsp;</p>
     {/if}
     {#if !print}
-        <slot name="outline"></slot>
+        <slot name="outline" />
     {/if}
-    {#if editable }
-        {#if embedNode === undefined }
-            <Button tooltip="Add a header image to this page" command={addCover}>+ cover image</Button> 
+    {#if editable}
+        {#if embedNode === undefined}
+            <Button tooltip="Add a header image to this page" command={addCover}
+                >+ cover image</Button
+            >
         {:else}
-            <Button tooltip="Remove the header image from this page" command={removeCover}>x cover image</Button>
+            <Button
+                tooltip="Remove the header image from this page"
+                command={removeCover}>x cover image</Button
+            >
         {/if}
     {/if}
     <div bind:this={title} class="bookish-chapter-header-text">
-        <slot name="before"></slot>
+        <slot name="before" />
         <Title>
-            {#if editable && save }
-                <TextEditor 
-                    label={label}
-                    text={header + (subtitle ? ": " + subtitle : "")}
+            {#if editable && save}
+                <TextEditor
+                    {label}
+                    text={header + (subtitle ? ': ' + subtitle : '')}
                     placeholder="Title"
-                    valid={text => text.length === 0 ? "Titles have to be at least one character long." : undefined }
-                    save={save}
+                    valid={(text) =>
+                        text.length === 0
+                            ? 'Titles have to be at least one character long.'
+                            : undefined}
+                    {save}
                 />
             {:else}
-                { header }
-                {#if subtitle }<div class="bookish-subtitle">{subtitle}</div>{/if}
+                {header}
+                {#if subtitle}<div class="bookish-subtitle">{subtitle}</div
+                    >{/if}
             {/if}
         </Title>
-        <slot name="after"></slot>
-        {#if tags }
-            <div>{#each tags as tag}<span class="bookish-tag">{tag}</span>{/each}</div>
+        <slot name="after" />
+        {#if tags}
+            <div
+                >{#each tags as tag}<span class="bookish-tag">{tag}</span
+                    >{/each}</div
+            >
         {/if}
     </div>
 </div>
@@ -153,19 +176,25 @@
     }
 
     @keyframes bookish-bounce {
-        0% { bottom: 4em; }
-        50% { bottom: 5em; }
-        100% { bottom: 4em; }
+        0% {
+            bottom: 4em;
+        }
+        50% {
+            bottom: 5em;
+        }
+        100% {
+            bottom: 4em;
+        }
     }
 
     .bookish-tag {
         font-size: var(--bookish-small-font-size);
         display: inline-block;
-        padding: var(--bookish-inline-padding) calc(2 * var(--bookish-inline-padding));
+        padding: var(--bookish-inline-padding)
+            calc(2 * var(--bookish-inline-padding));
         border-radius: var(--bookish-roundedness);
         background-color: var(--bookish-border-color-light);
         font-weight: bold;
         text-transform: uppercase;
     }
-
 </style>

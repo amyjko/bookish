@@ -1,12 +1,12 @@
 <script lang="ts">
-    import { onMount } from "svelte";
-    import Button from "../app/Button.svelte";
+    import { onMount } from 'svelte';
+    import Button from '../app/Button.svelte';
 
     export let commandLabel: string;
     export let tooltip: string;
     export let confirmLabel: string;
     export let command: () => Promise<void> | undefined;
-    
+
     let confirming = false;
     let executing = false;
     let timeoutID: NodeJS.Timer | undefined = undefined;
@@ -14,34 +14,34 @@
 
     onMount(() => {
         isMounted = true;
-        return () => isMounted = false;
+        return () => (isMounted = false);
     });
 
     function execute() {
-    
-        if(!confirming && !executing) {
+        if (!confirming && !executing) {
             confirming = true;
-            timeoutID = setTimeout(() => { if(isMounted) confirming = false; }, 2000);
-        } else if(confirming) {
+            timeoutID = setTimeout(() => {
+                if (isMounted) confirming = false;
+            }, 2000);
+        } else if (confirming) {
             command()?.finally(() => {
-                    if(isMounted) {
-                        if(timeoutID) clearTimeout(timeoutID)
-                        confirming = false;
-                        executing = false;
-                    }
-                })
+                if (isMounted) {
+                    if (timeoutID) clearTimeout(timeoutID);
+                    confirming = false;
+                    executing = false;
+                }
+            });
         }
-
     }
-
 </script>
 
-<Button 
-    disabled={executing} 
+<Button
+    disabled={executing}
     {tooltip}
     command={execute}
-    class={confirming ? "bookish-editor-confirm" : ""}>
-        { confirming ? confirmLabel : commandLabel }
+    class={confirming ? 'bookish-editor-confirm' : ''}
+>
+    {confirming ? confirmLabel : commandLabel}
 </Button>
 
 <style>

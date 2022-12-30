@@ -1,6 +1,6 @@
-import type Edit from "$lib/models/chapter/Edit";
-import type CaretUtilities from "./CaretUtilities";
-import type CaretState from "./CaretState";
+import type Edit from '$lib/models/chapter/Edit';
+import type CaretUtilities from './CaretUtilities';
+import type CaretState from './CaretState';
 
 type Command = {
     icon: string;
@@ -17,7 +17,8 @@ type Command = {
     handler: (
         context: CaretState,
         utilities: CaretUtilities,
-        key: string) => Edit;
+        key: string
+    ) => Edit;
 };
 
 export default Command;

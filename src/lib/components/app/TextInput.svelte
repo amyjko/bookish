@@ -1,5 +1,5 @@
 <script lang="ts">
-    export let text = "";
+    export let text = '';
     export let autocomplete: string | null = null;
     export let type: string;
     export let placeholder: string;
@@ -7,11 +7,19 @@
 
     let input: HTMLInputElement;
 
-    export function value() { return text; }
-
+    export function value() {
+        return text;
+    }
 </script>
 
-<input {autocomplete} {type} {placeholder} {disabled} bind:this={input} on:input={() => text = input.value } />
+<input
+    {autocomplete}
+    {type}
+    {placeholder}
+    {disabled}
+    bind:this={input}
+    on:input={() => (text = input.value)}
+/>
 
 <style>
     input {
@@ -21,7 +29,8 @@
         padding: var(--app-chrome-padding);
         font-size: var(--app-chrome-font-size);
         border: none;
-        border-bottom: var(--app-chrome-border-size) solid var(--app-border-color);
+        border-bottom: var(--app-chrome-border-size) solid
+            var(--app-border-color);
     }
 
     input:focus {

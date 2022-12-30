@@ -1,15 +1,14 @@
 <script lang="ts">
-    import Link from "../Link.svelte";
+    import Link from '../Link.svelte';
 
     export let link: string | undefined = undefined;
-
 </script>
 
 <span>
     {#if link}
-        <Link to={link}><slot></slot></Link>
+        <Link to={link}><slot /></Link>
     {:else}
-        <slot></slot>
+        <slot />
     {/if}
 </span>
 

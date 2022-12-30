@@ -2,13 +2,10 @@
     export let url: string;
     export let alt: string;
 </script>
-    
-<span class={"bookish-figure-preview"}>
-    <img 
-        src={url} 
-        alt={alt}
-    />
-    <div class="bookish-figure-credit"><slot></slot></div>
+
+<span class={'bookish-figure-preview'}>
+    <img src={url} {alt} />
+    <div class="bookish-figure-credit"><slot /></div>
 </span>
 
 <style>
@@ -30,5 +27,4 @@
         font-style: italic;
         font-size: var(--bookish-small-font-size);
     }
-
 </style>

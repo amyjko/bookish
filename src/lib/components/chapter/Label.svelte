@@ -1,8 +1,8 @@
 <script lang="ts">
-    import type LabelNode from "$lib/models/chapter/LabelNode"
+    import type LabelNode from '$lib/models/chapter/LabelNode';
     import Atom from '$lib/components/chapter/Atom.svelte';
-    import { getChapter, isEditable } from "../page/Contexts";
-    import Problem from "./Problem.svelte";
+    import { getChapter, isEditable } from '../page/Contexts';
+    import Problem from './Problem.svelte';
 
     export let node: LabelNode;
 
@@ -10,13 +10,19 @@
     let chapter = getChapter();
 
     $: ast = $chapter?.chapter.getAST();
-    $: duplicate = ast === undefined ? false : ast.getLabels().filter(l => l.getMeta() === node.getMeta()).length > 1;
-
+    $: duplicate =
+        ast === undefined
+            ? false
+            : ast.getLabels().filter((l) => l.getMeta() === node.getMeta())
+                  .length > 1;
 </script>
 
-<Atom node={node}>
-    <span 
-        class={"bookish-label" + ($chapter?.highlightedID === node.getMeta() ? " bookish-content-highlight" : "")} 
+<Atom {node}>
+    <span
+        class={'bookish-label' +
+            ($chapter?.highlightedID === node.getMeta()
+                ? ' bookish-content-highlight'
+                : '')}
         id={node.getMeta()}
         data-nodeid={node.nodeID}
     >

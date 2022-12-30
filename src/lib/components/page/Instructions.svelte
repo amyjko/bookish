@@ -1,11 +1,11 @@
 <script lang="ts">
-    import { isEditable } from "./Contexts";
+    import { isEditable } from './Contexts';
 
     let editable = isEditable();
 </script>
 
-{#if editable }
-    <section class="instructions"><slot></slot></section>
+{#if editable}
+    <section class="instructions"><slot /></section>
 {/if}
 
 <style>
@@ -20,7 +20,8 @@
         border-left: var(--app-chrome-border-size) solid var(--app-border-color);
     }
 
-    .instructions :global(p), .instructions :global(li) {
+    .instructions :global(p),
+    .instructions :global(li) {
         font-family: var(--app-font);
         font-size: var(--app-chrome-font-size);
         line-height: var(--app-line-height);

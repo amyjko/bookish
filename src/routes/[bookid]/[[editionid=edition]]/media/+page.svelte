@@ -1,5 +1,5 @@
 <script lang="ts">
-    import Media from "$lib/components/page/Media.svelte";
+    import Media from '$lib/components/page/Media.svelte';
 </script>
 
-<Media/>
+<Media />

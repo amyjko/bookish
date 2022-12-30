@@ -1,60 +1,53 @@
 <script lang="ts">
-    import Instructions from "$lib/components/page/Instructions.svelte";
-    import Parser from "$lib/models/chapter/Parser";
-    import TableOfContentsRow from "./TableOfContentsRow.svelte";
-    import ChapterIDs from "$lib/models/book/ChapterID";
-    import Page from "$lib/components/page/Page.svelte";
-    import Header from "$lib/components/page/Header.svelte";
-    import Outline from "$lib/components/page/Outline.svelte";
-    import Link from "$lib/components/Link.svelte";
-    import SubdomainEditor from "$lib/components/page/SubdomainEditor.svelte";
-    import Description from "./Description.svelte";
-    import Acknowledgements from "./Acknowledgements.svelte";
-    import License from "$lib/components/page/License.svelte";
-    import Revisions from "./Revisions.svelte";
-    import Authors from "$lib/components/page/Authors.svelte";
-    import TextEditor from "$lib/components/editor/TextEditor.svelte";
-    import Toggle from "$lib/components/editor/Toggle.svelte";
-    import { getBase, getEdition, isEditable } from "./Contexts";
-    import Muted from "./Muted.svelte";
-    import Button from "../app/Button.svelte";
-    import PageHeader from "./PageHeader.svelte";
-    import Rows from "./Rows.svelte";
-    import PageParagraph from "./PageParagraph.svelte";
+    import Instructions from '$lib/components/page/Instructions.svelte';
+    import Parser from '$lib/models/chapter/Parser';
+    import TableOfContentsRow from './TableOfContentsRow.svelte';
+    import ChapterIDs from '$lib/models/book/ChapterID';
+    import Page from '$lib/components/page/Page.svelte';
+    import Header from '$lib/components/page/Header.svelte';
+    import Outline from '$lib/components/page/Outline.svelte';
+    import Link from '$lib/components/Link.svelte';
+    import SubdomainEditor from '$lib/components/page/SubdomainEditor.svelte';
+    import Description from './Description.svelte';
+    import Acknowledgements from './Acknowledgements.svelte';
+    import License from '$lib/components/page/License.svelte';
+    import Revisions from './Revisions.svelte';
+    import Authors from '$lib/components/page/Authors.svelte';
+    import TextEditor from '$lib/components/editor/TextEditor.svelte';
+    import Toggle from '$lib/components/editor/Toggle.svelte';
+    import { getBase, getEdition, isEditable } from './Contexts';
+    import Muted from './Muted.svelte';
+    import Button from '../app/Button.svelte';
+    import PageHeader from './PageHeader.svelte';
+    import Rows from './Rows.svelte';
+    import PageParagraph from './PageParagraph.svelte';
 
     let edition = getEdition();
-	let base = getBase();
-	let editable = isEditable();
+    let base = getBase();
+    let editable = isEditable();
 
-	function getProgressDescription(progress: null | number) {
+    function getProgressDescription(progress: null | number) {
+        if (progress === null) return '';
+        else if (progress === 0) return '';
+        else if (progress < 30) return '; just started';
+        else if (progress < 70) return '; halfway';
+        else if (progress < 95) return '; almost done';
+        else return '; done';
+    }
 
-		if(progress === null)
-			return "";
-		else if(progress === 0)
-			return "";
-		else if(progress < 30)
-			return "; just started";
-		else if(progress < 70)
-			return "; halfway";
-		else if(progress < 95)
-			return "; almost done";
-		else
-			return "; done";
+    // Get the chapter progress
+    let progressStorage =
+        typeof localStorage !== 'undefined'
+            ? localStorage.getItem('chapterProgress')
+            : null;
+    let progress = progressStorage === null ? {} : JSON.parse(progressStorage);
 
-	}
-
-	// Get the chapter progress
-	let progressStorage = typeof localStorage !== "undefined" ? localStorage.getItem("chapterProgress") : null;
-	let progress = progressStorage === null ?
-		{} :
-		JSON.parse(progressStorage)
-
-	// Is there a colon? Let's make a subtitle
+    // Is there a colon? Let's make a subtitle
     $: title = $edition.getTitle();
-	let subtitle: string | undefined = undefined;
-	$: {
-    	let colon = title.indexOf(":");
-        if(colon >= 0) {
+    let subtitle: string | undefined = undefined;
+    $: {
+        let colon = title.indexOf(':');
+        if (colon >= 0) {
             subtitle = title.substring(colon + 1).trim();
             title = title.substring(0, colon).trim();
         }
@@ -64,35 +57,36 @@
 
     function addChapter() {
         waitingForChapter = true;
-        $edition.addChapter().then(() => waitingForChapter = false);
-	}
-
+        $edition.addChapter().then(() => (waitingForChapter = false));
+    }
 </script>
 
 <Page title={$edition.getTitle()}>
-    <Header 
+    <Header
         label="Book title"
-        getImage={() => $edition.getImage("cover")}
-        setImage={embed => $edition.setImage("cover", embed)}
+        getImage={() => $edition.getImage('cover')}
+        setImage={(embed) => $edition.setImage('cover', embed)}
         header={title}
-        subtitle={subtitle}
+        {subtitle}
         tags={$edition.getTags()}
-        save={text => $edition.setTitle(text)}
+        save={(text) => $edition.setTitle(text)}
     >
         <svelte:fragment slot="before">
             {#if editable}
-                <SubdomainEditor/>
+                <SubdomainEditor />
             {/if}
         </svelte:fragment>
-        <Outline slot="outline"
+        <Outline
+            slot="outline"
             previous={null}
-            next={$edition.getNextChapterID("")}
+            next={$edition.getNextChapterID('')}
         />
-        <Authors slot="after" 
+        <Authors
+            slot="after"
             authors={$edition.getAuthors()}
-            add={ () => $edition.addAuthor("")}
-            edit={(index, text) => $edition.setAuthor(index, text) } 
-            remove={index => $edition.removeAuthor(index)}
+            add={() => $edition.addAuthor('')}
+            edit={(index, text) => $edition.setAuthor(index, text)}
+            remove={(index) => $edition.removeAuthor(index)}
         />
     </Header>
 
@@ -100,67 +94,84 @@
         Above you can edit your book's authors, title, and cover image.
     </Instructions>
 
-    <Description/>
+    <Description />
 
     <Instructions>
-        This will appear on the <Link to={base + "read"}>book browsing</Link> page and in your table of contents.
-        Write an informative description of what your book is about.
+        This will appear on the <Link to={base + 'read'}>book browsing</Link> page
+        and in your table of contents. Write an informative description of what your
+        book is about.
     </Instructions>
 
     <Instructions>
-        Add, remove, and reorder chapters here.
-        You can add optional book sections to each chapter, toggle chapters as numbered/unnumbered or published/forthcoming.
-        Click the title to edit the chapter.
+        Add, remove, and reorder chapters here. You can add optional book
+        sections to each chapter, toggle chapters as numbered/unnumbered or
+        published/forthcoming. Click the title to edit the chapter.
     </Instructions>
 
-    <PageHeader id="chapters">Chapters {#if editable}<Button tooltip="Add a new chapter" disabled={waitingForChapter} command={addChapter}>+</Button>{/if}</PageHeader>
+    <PageHeader id="chapters"
+        >Chapters {#if editable}<Button
+                tooltip="Add a new chapter"
+                disabled={waitingForChapter}
+                command={addChapter}>+</Button
+            >{/if}</PageHeader
+    >
 
     <Rows>
-        {#each $edition.getChapters() as chapter }
-            {@const chapterID = chapter.getChapterID() }
-            {@const readingTime = chapter.getReadingTime() }
+        {#each $edition.getChapters() as chapter}
+            {@const chapterID = chapter.getChapterID()}
+            {@const readingTime = chapter.getReadingTime()}
             {@const readingEstimate =
-                    readingTime === undefined ? "Forthcoming" :
-                    readingTime < 5 ? "<5 min read" :
-                    readingTime < 60 ? "~" + Math.floor(readingTime / 5) * 5 + " min read" :
-                    "~" + Math.floor(readingTime / 60) + " hour read" }
-            {@const section = chapter.getSection() }
-            {@const etc = readingEstimate + (!chapter.isForthcoming() ? getProgressDescription(chapterID in progress ? progress[chapterID] : null) : "") }
+                readingTime === undefined
+                    ? 'Forthcoming'
+                    : readingTime < 5
+                    ? '<5 min read'
+                    : readingTime < 60
+                    ? '~' + Math.floor(readingTime / 5) * 5 + ' min read'
+                    : '~' + Math.floor(readingTime / 60) + ' hour read'}
+            {@const section = chapter.getSection()}
+            {@const etc =
+                readingEstimate +
+                (!chapter.isForthcoming()
+                    ? getProgressDescription(
+                          chapterID in progress ? progress[chapterID] : null
+                      )
+                    : '')}
 
             <TableOfContentsRow
-                chapter={chapter}
-                chapterID={chapterID}
+                {chapter}
+                {chapterID}
                 number={$edition.getChapterNumber(chapterID)}
                 title={chapter.getTitle()}
                 forthcoming={chapter.isForthcoming()}
             >
                 <span slot="annotation">
-                    {#if editable }
+                    {#if editable}
                         <TextEditor
-                            label={"Chapter section editor"}
-                            text={section ? section : ""}
+                            label={'Chapter section editor'}
+                            text={section ? section : ''}
                             placeholder="Section"
-                            valid={ () => undefined }
-                            save={text => chapter.setSection(text) }
+                            valid={() => undefined}
+                            save={(text) => chapter.setSection(text)}
                         />
-                    {:else}
-                        {#if section }{section}{/if}
-                    {/if}
+                    {:else if section}{section}{/if}
                 </span>
                 <span slot="etc">
                     <Muted>
                         {#if editable}
-                            <Toggle on={chapter.isForthcoming()} save={on => chapter.setForthcoming(on)}>
+                            <Toggle
+                                on={chapter.isForthcoming()}
+                                save={(on) => chapter.setForthcoming(on)}
+                            >
                                 {etc}
                             </Toggle>
                         {:else}
-                            { etc }
+                            {etc}
                         {/if}
                     </Muted>
                 </span>
             </TableOfContentsRow>
         {/each}
-        {#if $edition.hasReferences() || editable }
+        {#if $edition.hasReferences() || editable}
             <TableOfContentsRow
                 chapterID={ChapterIDs.ReferencesID}
                 title="References"
@@ -168,44 +179,29 @@
                 <span slot="annotation">Everything cited</span>
             </TableOfContentsRow>
         {/if}
-        {#if $edition.getGlossary() && Object.keys($edition.getGlossary()).length > 0 || editable }
+        {#if ($edition.getGlossary() && Object.keys($edition.getGlossary()).length > 0) || editable}
             <TableOfContentsRow
                 chapterID={ChapterIDs.GlossaryID}
                 title="Glossary"
-            > 
+            >
                 <span slot="annotation">Definitions</span>
             </TableOfContentsRow>
         {/if}
-        <TableOfContentsRow
-            chapterID={ChapterIDs.IndexID}
-            title="Index"
-        > 
+        <TableOfContentsRow chapterID={ChapterIDs.IndexID} title="Index">
             <span slot="annotation">Common words and where they are</span>
         </TableOfContentsRow>
-        <TableOfContentsRow
-            chapterID={ChapterIDs.SearchID}
-            title="Search"
-        > 
+        <TableOfContentsRow chapterID={ChapterIDs.SearchID} title="Search">
             <span slot="annotation">Find where words occur</span>
         </TableOfContentsRow>
 
-        <TableOfContentsRow
-            chapterID={ChapterIDs.MediaID}
-            title="Media"
-        > 
+        <TableOfContentsRow chapterID={ChapterIDs.MediaID} title="Media">
             <span slot="annotation">Images and video in the book</span>
         </TableOfContentsRow>
-        {#if editable }
-            <TableOfContentsRow
-                chapterID="theme"
-                title="Theme"
-            > 
+        {#if editable}
+            <TableOfContentsRow chapterID="theme" title="Theme">
                 <span slot="annotation">Style the book</span>
             </TableOfContentsRow>
-            <TableOfContentsRow
-                chapterID="unknown"
-                title="Unknown"
-            > 
+            <TableOfContentsRow chapterID="unknown" title="Unknown">
                 <span slot="annotation">Customize bad links</span>
             </TableOfContentsRow>
         {/if}
@@ -221,22 +217,30 @@
     </Instructions>
 
     <PageParagraph>
-        Want to print this book or generate a PDF? 
-        See <Link to={base + "print"}>all chapters on a single page</Link> and then print or export.
-        Long books can take some time to render.
+        Want to print this book or generate a PDF? See <Link to={base + 'print'}
+            >all chapters on a single page</Link
+        > and then print or export. Long books can take some time to render.
     </PageParagraph>
 
     <PageHeader id="citation">Citation</PageHeader>
 
     <Instructions>
-        This citation is dynamically created from the current authors, title, and date.
+        This citation is dynamically created from the current authors, title,
+        and date.
     </Instructions>
 
     <!-- Book citation -->
     <PageParagraph>
-        { $edition.getAuthors().map(author => Parser.parseFormat($edition, author).toText()).join(", ") } ({(new Date()).getFullYear() }). <em>{$edition.getTitle()}</em>. { location.protocol+'//'+location.host+location.pathname }, <em>retrieved { (new Date()).toLocaleDateString("en-US")}</em>.
+        {$edition
+            .getAuthors()
+            .map((author) => Parser.parseFormat($edition, author).toText())
+            .join(', ')} ({new Date().getFullYear()}).
+        <em>{$edition.getTitle()}</em>. {location.protocol +
+            '//' +
+            location.host +
+            location.pathname},
+        <em>retrieved {new Date().toLocaleDateString('en-US')}</em>.
     </PageParagraph>
 
     <Revisions />
-    
 </Page>

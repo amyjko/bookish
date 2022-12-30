@@ -3,16 +3,16 @@
     import { getEdition } from './Contexts';
 
     let edition = getEdition();
-
 </script>
 
-{#each $edition.getChapters().filter(chapter => !chapter.isForthcoming()) as chapter }
-    <Chapter chapter={chapter} print />
+{#each $edition
+    .getChapters()
+    .filter((chapter) => !chapter.isForthcoming()) as chapter}
+    <Chapter {chapter} print />
 {/each}
 
 <style>
     @media print {
-
         :global(.bookish-chapter-header) {
             break-before: page;
         }
@@ -28,6 +28,5 @@
         :global(h1, h2, h3, h4, h5, h6) {
             break-after: avoid !important;
         }
-
     }
 </style>

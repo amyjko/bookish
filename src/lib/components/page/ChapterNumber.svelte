@@ -1,4 +1,4 @@
-<span class="bookish-chapter-number"><slot></slot></span>
+<span class="bookish-chapter-number"><slot /></span>
 
 <style>
     .bookish-chapter-number {

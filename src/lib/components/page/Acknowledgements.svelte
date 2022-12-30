@@ -1,35 +1,32 @@
 <script lang="ts">
-
-    import Parser from "$lib/models/chapter/Parser"
-    import ChapterBody from "$lib/components/chapter/ChapterBody.svelte";
-    import BookishEditor from "$lib/components/editor/BookishEditor.svelte";
-    import Instructions from "$lib/components/page/Instructions.svelte";
-    import { getEdition, isEditable } from "./Contexts";
-    import PageHeader from "./PageHeader.svelte";
+    import Parser from '$lib/models/chapter/Parser';
+    import ChapterBody from '$lib/components/chapter/ChapterBody.svelte';
+    import BookishEditor from '$lib/components/editor/BookishEditor.svelte';
+    import Instructions from '$lib/components/page/Instructions.svelte';
+    import { getEdition, isEditable } from './Contexts';
+    import PageHeader from './PageHeader.svelte';
 
     let edition = getEdition();
     let editable = isEditable();
 
     $: acknowledgements = $edition.getAcknowledgements();
-	$: acksNode = Parser.parseChapter($edition, acknowledgements);
-
+    $: acksNode = Parser.parseChapter($edition, acknowledgements);
 </script>
 
 <Instructions>
-    This section is not shown if empty.
-    But surely you have someone to thank!
+    This section is not shown if empty. But surely you have someone to thank!
 </Instructions>
 
- <!-- If editable, show acknowledgements even if they're empty, otherwise hide -->
-{#if editable }
+<!-- If editable, show acknowledgements even if they're empty, otherwise hide -->
+{#if editable}
     <BookishEditor
-        ast={acksNode} 
+        ast={acksNode}
         chapter={false}
         component={ChapterBody}
         placeholder="Who would you like to thank?"
-        save={node => $edition.setAcknowledgements(node.toBookdown())}
+        save={(node) => $edition.setAcknowledgements(node.toBookdown())}
     />
-{:else if acknowledgements.length > 0 }
+{:else if acknowledgements.length > 0}
     <PageHeader id="acknowledgements">Acknowledgements</PageHeader>
-    <ChapterBody node={acksNode}/>
+    <ChapterBody node={acksNode} />
 {/if}

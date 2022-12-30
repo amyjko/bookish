@@ -1,28 +1,25 @@
 <script lang="ts">
-    import Header from "./Header.svelte";
+    import Header from './Header.svelte';
     import Outline from './Outline.svelte';
     import Page from './Page.svelte';
-    import Parser from "$lib/models/chapter/Parser";
+    import Parser from '$lib/models/chapter/Parser';
     import ChapterIDs from '$lib/models/book/ChapterID';
-    import BulkReferenceEditor from "./BulkReferenceEditor.svelte"
-    import PossibleReference from "./PossibleReference.svelte";
-    import { getEdition, isEditable } from "./Contexts";
+    import BulkReferenceEditor from './BulkReferenceEditor.svelte';
+    import PossibleReference from './PossibleReference.svelte';
+    import { getEdition, isEditable } from './Contexts';
 
     let edition = getEdition();
     let editable = isEditable();
-    
+
     $: references = $edition.hasReferences() ? $edition.getReferences() : null;
 
-	// Otherwise, map references to a list with letter headers.
-	if(references !== null) {
-
-
-	}
-
+    // Otherwise, map references to a list with letter headers.
+    if (references !== null) {
+    }
 </script>
 
 <Page title={`${$edition.getTitle()} - References`}>
-    <Header 
+    <Header
         label="References title"
         getImage={() => $edition.getImage(ChapterIDs.ReferencesID)}
         setImage={(embed) => $edition.setImage(ChapterIDs.ReferencesID, embed)}
@@ -35,15 +32,18 @@
             next={$edition.getNextChapterID(ChapterIDs.ReferencesID)}
         />
     </Header>
-    {#if editable }<BulkReferenceEditor />{/if}
-    {#if references !== null }
+    {#if editable}<BulkReferenceEditor />{/if}
+    {#if references !== null}
         <p><em>Sorted by last name of first author.</em></p>
 
-        {#each Object.keys(references).sort() as citationID }
-            {@const ref = Parser.parseReference(citationID, references === null ? "" : references[citationID], $edition) }
+        {#each Object.keys(references).sort() as citationID}
+            {@const ref = Parser.parseReference(
+                citationID,
+                references === null ? '' : references[citationID],
+                $edition
+            )}
             <PossibleReference node={ref} />
         {/each}
-
     {:else}
         <p>This book has no references.</p>
     {/if}

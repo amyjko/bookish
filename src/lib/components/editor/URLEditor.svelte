@@ -1,5 +1,5 @@
 <script lang="ts">
-    import TextEditor from "./TextEditor.svelte";
+    import TextEditor from './TextEditor.svelte';
 
     export let url: string;
     export let validator: (text: string) => undefined | string;
@@ -7,9 +7,9 @@
 </script>
 
 <TextEditor
-    placeholder="url" 
-    text={url} 
+    placeholder="url"
+    text={url}
     label="URL editor"
-    valid={ url => validator(url) }
-    save={ url => edit(url) }
+    valid={(url) => validator(url)}
+    save={(url) => edit(url)}
 />

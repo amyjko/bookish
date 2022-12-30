@@ -1,9 +1,8 @@
 <script lang="ts">
     export let aside: boolean = false;
-
 </script>
 
-<p class={aside ? "aside" : ""}><slot></slot></p>
+<p class={aside ? 'aside' : ''}><slot /></p>
 
 <style>
     p {

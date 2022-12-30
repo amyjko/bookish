@@ -1,5 +1,5 @@
-import BlockNode from "./BlockNode";
-import type Node from "./Node";
+import BlockNode from './BlockNode';
+import type Node from './Node';
 
 export default class ErrorNode extends BlockNode {
     #text: string | undefined;
@@ -10,20 +10,41 @@ export default class ErrorNode extends BlockNode {
         this.#error = error;
     }
 
-    getType() { return "error"; }
-    getError() { return this.#error; }
-    getFormats() { return []; }
+    getType() {
+        return 'error';
+    }
+    getError() {
+        return this.#error;
+    }
+    getFormats() {
+        return [];
+    }
 
-    toText(): string { return ""; }
-    toBookdown(): string { return this.#text ?? ""; }
-    toHTML() { return this.#text ?? ""; }
+    toText(): string {
+        return '';
+    }
+    toBookdown(): string {
+        return this.#text ?? '';
+    }
+    toHTML() {
+        return this.#text ?? '';
+    }
 
-    getChildren() { return []; }
-    getParentOf(): Node | undefined { return undefined; }
+    getChildren() {
+        return [];
+    }
+    getParentOf(): Node | undefined {
+        return undefined;
+    }
 
-    copy() { return new ErrorNode(this.#text, this.#error) as this; }
+    copy() {
+        return new ErrorNode(this.#text, this.#error) as this;
+    }
 
-    withChildReplaced(){ return undefined; }
-    withContentInRange(): this | undefined { return this.copy(); }
-
+    withChildReplaced() {
+        return undefined;
+    }
+    withContentInRange(): this | undefined {
+        return this.copy();
+    }
 }

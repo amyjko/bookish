@@ -1,38 +1,32 @@
-import { test, expect } from 'vitest'
+import { test, expect } from 'vitest';
 
-import Parser from "./Parser"
+import Parser from './Parser';
 
-test("Empty chapter", () => {
-    expect(Parser.parseChapter(undefined, "").toBookdown()).toBe("")
-})
+test('Empty chapter', () => {
+    expect(Parser.parseChapter(undefined, '').toBookdown()).toBe('');
+});
 
-test("Single paragraph", () => {
-    expect(Parser.parseChapter(undefined, "hello").toBookdown()).toBe("hello")
-})
+test('Single paragraph', () => {
+    expect(Parser.parseChapter(undefined, 'hello').toBookdown()).toBe('hello');
+});
 
-test("Peek", () => {
+test('Peek', () => {
+    const p = new Parser(undefined, '# hello');
+    expect(p.peek()).toBe('#');
+    expect(p.read()).toBe('#');
+    expect(p.peek()).toBe(' ');
+});
 
-    const p = new Parser(undefined, "# hello")
-    expect(p.peek()).toBe("#")
-    expect(p.read()).toBe("#")
-    expect(p.peek()).toBe(" ")
-    
-})
+test('More', () => {
+    const p = new Parser(undefined, '#');
+    expect(p.more()).toBe(true);
 
-test("More", () => {
+    const p2 = new Parser(undefined, '');
+    expect(p2.more()).toBe(false);
+});
 
-    const p = new Parser(undefined, "#")
-    expect(p.more()).toBe(true)
-
-    const p2 = new Parser(undefined, "")
-    expect(p2.more()).toBe(false)
-    
-})
-
-test("Whitespace", () => {
-
-    const p = new Parser(undefined, "    Hi")
-    p.readWhitespace()
-    expect(p.peek()).toBe("H")
-    
-})
+test('Whitespace', () => {
+    const p = new Parser(undefined, '    Hi');
+    p.readWhitespace();
+    expect(p.peek()).toBe('H');
+});

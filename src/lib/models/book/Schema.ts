@@ -1,108 +1,114 @@
 export const Schema = {
-	"$schema": "http://json-schema.org/draft-07/schema#",
-	"title": "Bookish book schema",
-    "type": "object",
-    "definitions": {
-        "embed": {
-            "type": ["string", "null"],
-            "pattern": "^\\|.+\\|.+\\|.+\\|.+\\|$"
-        }
+    $schema: 'http://json-schema.org/draft-07/schema#',
+    title: 'Bookish book schema',
+    type: 'object',
+    definitions: {
+        embed: {
+            type: ['string', 'null'],
+            pattern: '^\\|.+\\|.+\\|.+\\|.+\\|$',
+        },
     },
-	"required": [
-        "title", "authors", "description",
-        "chapters", "revisions", "license", "sources", "references",
-        "images"
+    required: [
+        'title',
+        'authors',
+        'description',
+        'chapters',
+        'revisions',
+        'license',
+        'sources',
+        'references',
+        'images',
     ],
-    "additionalProperties": false,
-	"properties": {
-        "title": { "type": "string" },
-        "authors": {
-            "type": "array",
-            "items": { "type": "string" }
+    additionalProperties: false,
+    properties: {
+        title: { type: 'string' },
+        authors: {
+            type: 'array',
+            items: { type: 'string' },
         },
-        "images": {
-            "type": "object",
-            "properties": {
-                "cover": { "$ref": "#/definitions/embed" },
-                "unknown": { "$ref": "#/definitions/embed" },
-                "index": { "$ref": "#/definitions/embed" },
-                "references": { "$ref": "#/definitions/embed" },
-                "glossary": { "$ref": "#/definitions/embed" },
-                "search": { "$ref": "#/definitions/embed" }
-            }    
+        images: {
+            type: 'object',
+            properties: {
+                cover: { $ref: '#/definitions/embed' },
+                unknown: { $ref: '#/definitions/embed' },
+                index: { $ref: '#/definitions/embed' },
+                references: { $ref: '#/definitions/embed' },
+                glossary: { $ref: '#/definitions/embed' },
+                search: { $ref: '#/definitions/embed' },
+            },
         },
-        "description": { "type": "string" },
-        "acknowledgements": { "type": "string" },
-        "chapters": {
-            "type": "array",
-            "items": {
-                "type": "object",
-                "required": ["id", "title", "image"],
-                "properties": {
-                    "id": { "type": "string", "pattern": "^[a-zA-Z0-9]+$"},
-                    "title": { "type": "string" },
-                    "image": { "$ref": "#/definitions/embed" },
-                    "numbered": { "type": "boolean", "default": "True by default" },
-                    "section": { "type": "string" },
-                    "authors": { "type": "array", "items": { "type": "string" }},
-                    "forthcoming": { "type": "boolean" }
-                }
-            }
-        },
-        "revisions": {
-            "type": "array",
-            "items": {
-                "type": "array",
-                "minItems": 2,
-                "maxItems": 2,
-                "items": { "type": "string" }
-            }
-        },
-        "tags": { 
-            "type": "array",
-            "items": { "type": "string" }
-        },
-        "license": { "type": "string" },
-        "sources": { "type": "object", "additionalProperties": { "type": "string" } },
-        "references": {
-            "type": "object",
-            "additionalProperties": {
-                "oneOf": [
-                    { "type": "string" },
-                    {
-                        "type": "array",
-                        "maxItems": 6,
-                        "items": [
-                            { "type": "string" },
-                            { "type": "integer"},
-                            { "type": "string" },
-                            { "type": "string" },
-                            { "type": ["string", "null"], "format": "uri" }
-                        ],
-                        "additionalItems": { "type": "string" }
-                    }
-                ]
-            }
-        },
-        "symbols": {
-            "type": "object",
-            "additionalProperties": { "type": "string" }
-        },
-        "glossary": {
-            "type": "object",
-            "additionalProperties": {
-                "type": "object",
-                "properties": {
-                    "phrase": { "type": "string" },
-                    "definition": { "type": "string" },
-                    "synonyms": { "type": "array", "items": { "type": "string" }}
+        description: { type: 'string' },
+        acknowledgements: { type: 'string' },
+        chapters: {
+            type: 'array',
+            items: {
+                type: 'object',
+                required: ['id', 'title', 'image'],
+                properties: {
+                    id: { type: 'string', pattern: '^[a-zA-Z0-9]+$' },
+                    title: { type: 'string' },
+                    image: { $ref: '#/definitions/embed' },
+                    numbered: { type: 'boolean', default: 'True by default' },
+                    section: { type: 'string' },
+                    authors: { type: 'array', items: { type: 'string' } },
+                    forthcoming: { type: 'boolean' },
                 },
-                "additionalProperties": false,
-                "required": ["phrase", "definition"]
-            }
+            },
         },
-        "theme": {
-            "type": "object"
-        }
-    }
-}
+        revisions: {
+            type: 'array',
+            items: {
+                type: 'array',
+                minItems: 2,
+                maxItems: 2,
+                items: { type: 'string' },
+            },
+        },
+        tags: {
+            type: 'array',
+            items: { type: 'string' },
+        },
+        license: { type: 'string' },
+        sources: { type: 'object', additionalProperties: { type: 'string' } },
+        references: {
+            type: 'object',
+            additionalProperties: {
+                oneOf: [
+                    { type: 'string' },
+                    {
+                        type: 'array',
+                        maxItems: 6,
+                        items: [
+                            { type: 'string' },
+                            { type: 'integer' },
+                            { type: 'string' },
+                            { type: 'string' },
+                            { type: ['string', 'null'], format: 'uri' },
+                        ],
+                        additionalItems: { type: 'string' },
+                    },
+                ],
+            },
+        },
+        symbols: {
+            type: 'object',
+            additionalProperties: { type: 'string' },
+        },
+        glossary: {
+            type: 'object',
+            additionalProperties: {
+                type: 'object',
+                properties: {
+                    phrase: { type: 'string' },
+                    definition: { type: 'string' },
+                    synonyms: { type: 'array', items: { type: 'string' } },
+                },
+                additionalProperties: false,
+                required: ['phrase', 'definition'],
+            },
+        },
+        theme: {
+            type: 'object',
+        },
+    },
+};

@@ -1,5 +1,5 @@
 <script lang="ts">
-    import Search from "$lib/components/page/Search.svelte";
+    import Search from '$lib/components/page/Search.svelte';
 </script>
 
-<Search/>
+<Search />

@@ -1,8 +1,8 @@
-<span></span>
+<span />
 
 <style>
-     span {
-        display: inline-block; 
+    span {
+        display: inline-block;
         width: var(--app-chrome-padding);
-     }
+    }
 </style>

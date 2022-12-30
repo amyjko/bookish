@@ -1,28 +1,27 @@
 <script lang="ts">
-    import type BlockNode from "$lib/models/chapter/BlockNode";
-    import CalloutNode from "$lib/models/chapter/CalloutNode";
-    import CodeNode from "$lib/models/chapter/CodeNode";
-    import EmbedNode from "$lib/models/chapter/EmbedNode";
-    import ErrorNode from "$lib/models/chapter/ErrorNode";
-    import ListNode from "$lib/models/chapter/ListNode";
-    import ParagraphNode from "$lib/models/chapter/ParagraphNode";
-    import QuoteNode from "$lib/models/chapter/QuoteNode";
-    import RuleNode from "$lib/models/chapter/RuleNode";
-    import TableNode from "$lib/models/chapter/TableNode";
+    import type BlockNode from '$lib/models/chapter/BlockNode';
+    import CalloutNode from '$lib/models/chapter/CalloutNode';
+    import CodeNode from '$lib/models/chapter/CodeNode';
+    import EmbedNode from '$lib/models/chapter/EmbedNode';
+    import ErrorNode from '$lib/models/chapter/ErrorNode';
+    import ListNode from '$lib/models/chapter/ListNode';
+    import ParagraphNode from '$lib/models/chapter/ParagraphNode';
+    import QuoteNode from '$lib/models/chapter/QuoteNode';
+    import RuleNode from '$lib/models/chapter/RuleNode';
+    import TableNode from '$lib/models/chapter/TableNode';
 
-    import Callout from "./Callout.svelte";
-    import CaptionedCode from "./CaptionedCode.svelte";
-    import Embed from "./Embed.svelte";
-    import ErrorMessage from "./ErrorMessage.svelte";
-    import List from "./List.svelte";
-    import Paragraph from "./Paragraph.svelte";
-    import Quote from "./Quote.svelte";
-    import Rule from "./Rule.svelte";
-    import Table from "./Table.svelte";
-    import Problem from "./Problem.svelte";
+    import Callout from './Callout.svelte';
+    import CaptionedCode from './CaptionedCode.svelte';
+    import Embed from './Embed.svelte';
+    import ErrorMessage from './ErrorMessage.svelte';
+    import List from './List.svelte';
+    import Paragraph from './Paragraph.svelte';
+    import Quote from './Quote.svelte';
+    import Rule from './Rule.svelte';
+    import Table from './Table.svelte';
+    import Problem from './Problem.svelte';
 
     export let node: BlockNode;
-
 </script>
 
 {#if node instanceof ParagraphNode}<Paragraph {node} />

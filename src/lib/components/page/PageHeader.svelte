@@ -2,7 +2,7 @@
     export let id: string | null = null;
 </script>
 
-<h2 class="page-header" {id}><slot></slot></h2>
+<h2 class="page-header" {id}><slot /></h2>
 
 <style>
     h2 {

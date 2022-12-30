@@ -1,4 +1,4 @@
-<span class="muted"><slot></slot></span>
+<span class="muted"><slot /></span>
 
 <style>
     /* TYPOGRAPHY */
@@ -7,5 +7,4 @@
         font-weight: normal;
         font-size: var(--bookish-block-font-size);
     }
-
 </style>

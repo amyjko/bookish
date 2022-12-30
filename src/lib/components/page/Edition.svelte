@@ -1,14 +1,22 @@
 <script lang="ts">
-    import type Theme from "$lib/models/book/Theme";
-    import type EditionModel from "$lib/models/book/Edition";
+    import type Theme from '$lib/models/book/Theme';
+    import type EditionModel from '$lib/models/book/Edition';
     import smoothscroll from 'smoothscroll-polyfill';
     import { goto } from '$app/navigation';
-    import Status from "./Status.svelte";
+    import Status from './Status.svelte';
     import { onMount, setContext } from 'svelte';
-    import { writable } from "svelte/store";
-    import { BASE, BOOK, DARK_MODE, EDITABLE, EDITION, type DarkModeStore, type EditionStore } from "./Contexts";
-    import type Book from "$lib/models/book/Book";
-    import { BookishTheme } from "$lib/models/book/Theme";
+    import { writable } from 'svelte/store';
+    import {
+        BASE,
+        BOOK,
+        DARK_MODE,
+        EDITABLE,
+        EDITION,
+        type DarkModeStore,
+        type EditionStore,
+    } from './Contexts';
+    import type Book from '$lib/models/book/Book';
+    import { BookishTheme } from '$lib/models/book/Theme';
 
     // Poly fill smooth scrolling for Safari.
     smoothscroll.polyfill();
@@ -20,10 +28,10 @@
     $: setContext<boolean>(EDITABLE, editable);
 
     // The base path allows links to adjust to different routing contexts in which a book is placed.
-    // For example, when the book is hosted alone, all routes might start with the bare root "/", 
+    // For example, when the book is hosted alone, all routes might start with the bare root "/",
     // but when the book is being viewed or edited in the Bookish app, it needs a prefix for the
     // route in the app.
-    export let base: string = "/";
+    export let base: string = '/';
 
     // When the base changes, update the context.
     $: setContext<string>(BASE, base);
@@ -36,7 +44,7 @@
     setContext<EditionStore>(EDITION, currentEdition);
 
     // Expose the book to descendents in a store and update the context when the edition changes.
-    $: setContext<Book|undefined>(BOOK, edition.getBook());
+    $: setContext<Book | undefined>(BOOK, edition.getBook());
 
     // When edition changes, unsubscribe to the previous edition and subscribe to the new one.
     // We use a simple assignment to tell Svelte about the change.
@@ -51,7 +59,7 @@
 
         // Listen to the new edition
         $currentEdition.getBook()?.addListener(editionChanged);
-        $currentEdition.addListener(editionChanged)
+        $currentEdition.addListener(editionChanged);
     }
 
     // Create a timer that saves the current edition periodically and stops when unmounted.
@@ -67,11 +75,10 @@
     // Default dark mode to whatever's stored in local storage, if anything.
     // respect user choice on the website despite the system theme
     let darkMode = writable<boolean>(
-        typeof localStorage !== "undefined" &&
-        localStorage.getItem("dark") !== "false" && (
-            localStorage.getItem("dark") === "true" || // A previous setting
-            window.matchMedia("(prefers-color-scheme: dark)").matches // Operating system is set to dark
-        )
+        typeof localStorage !== 'undefined' &&
+            localStorage.getItem('dark') !== 'false' &&
+            (localStorage.getItem('dark') === 'true' || // A previous setting
+                window.matchMedia('(prefers-color-scheme: dark)').matches) // Operating system is set to dark
     );
 
     // Expose dark mode to descendants
@@ -79,30 +86,28 @@
 
     // When dark mode changes, update the body's class list.
     $: {
-        if($darkMode) {
-            document.body.classList.add("dark")
-        }
-        else {
-            document.body.classList.remove("dark")
-            if(typeof localStorage !== "undefined")
-                localStorage.setItem("dark", $darkMode ? "true" : "false")
+        if ($darkMode) {
+            document.body.classList.add('dark');
+        } else {
+            document.body.classList.remove('dark');
+            if (typeof localStorage !== 'undefined')
+                localStorage.setItem('dark', $darkMode ? 'true' : 'false');
         }
     }
 
     // Redirect old hash routes by simply replacing their hash before routing.
-    if(typeof window !== "undefined" && window.location.hash.startsWith('#/'))
-        goto(location.hash.replace('#', ''))    
+    if (typeof window !== 'undefined' && window.location.hash.startsWith('#/'))
+        goto(location.hash.replace('#', ''));
 
     // Set the theme, whatever it is, and change it when the edition changes.
     $: setTheme($currentEdition.getTheme() ?? BookishTheme);
-    
+
     /** Given a theme, sets the appropriate CSS rules in the browser to apply the theme.*/
     function setTheme(theme: Theme | null) {
-
         // If the theme is being unset, make sure we've removed any overrding style declaration.
         // This let's the default theme kick in.
-        let themeTagImports = document.getElementById("bookish-theme-imports");
-        let themeTagCSS = document.getElementById("bookish-theme");
+        let themeTagImports = document.getElementById('bookish-theme-imports');
+        let themeTagCSS = document.getElementById('bookish-theme');
 
         // We only want to set it if it's actually different than what's currently set.
         // Otherwise during editing we get lots of jittery changes on each edit, because the
@@ -114,18 +119,20 @@
         const newThemeTagCSSValue = JSON.stringify(theme);
         const newThemeTagImportsValue = JSON.stringify(theme?.imports);
 
-        if(theme !== null) {
+        if (theme !== null) {
             // If the imports changed, update theme.
-            if(themeTagImportsValue !== newThemeTagImportsValue) {
+            if (themeTagImportsValue !== newThemeTagImportsValue) {
                 // If it's being set, create a new style tag.
-                const newThemeImportsTag = document.createElement("style");
+                const newThemeImportsTag = document.createElement('style');
 
                 // Give it an ID so we can remove it later.
-                newThemeImportsTag.setAttribute("id", "bookish-theme-imports");
+                newThemeImportsTag.setAttribute('id', 'bookish-theme-imports');
                 newThemeImportsTag.dataset.imports = newThemeTagImportsValue;
 
                 // Insert any import statements, then any rules.
-                const css = `${(theme.imports ?? []).map(url => `@import url(${url});`).join("\n")}`;
+                const css = `${(theme.imports ?? [])
+                    .map((url) => `@import url(${url});`)
+                    .join('\n')}`;
                 newThemeImportsTag.appendChild(document.createTextNode(css));
                 document.head.appendChild(newThemeImportsTag);
 
@@ -134,65 +141,70 @@
             }
 
             // If the rules changed, update them.
-            if(themeTagCSSValue !== newThemeTagCSSValue) {
-
+            if (themeTagCSSValue !== newThemeTagCSSValue) {
                 // If it's being set, create a new style tag.
-                const newThemeCSSTag = document.createElement("style");
+                const newThemeCSSTag = document.createElement('style');
 
                 // Give it an ID so we can remove it later.
-                newThemeCSSTag.setAttribute("id", "bookish-theme");
+                newThemeCSSTag.setAttribute('id', 'bookish-theme');
                 newThemeCSSTag.dataset.css = newThemeTagCSSValue;
 
                 // Insert any import statements, then any rules.
                 const css = `
-                    ${(theme.imports ?? []).map(url => `@import url(${url});`).join("\n")}
+                    ${(theme.imports ?? [])
+                        .map((url) => `@import url(${url});`)
+                        .join('\n')}
                     .bookish {
-                        ${theme.light ? toRules(theme.light) : ""}
-                        ${theme.fonts ? toRules(theme.fonts) : ""}
-                        ${theme.sizes ? toRules(theme.sizes) : ""}
-                        ${theme.weights ? toRules(theme.weights) : ""}
-                        ${theme.spacing ? toRules(theme.spacing) : ""}
+                        ${theme.light ? toRules(theme.light) : ''}
+                        ${theme.fonts ? toRules(theme.fonts) : ''}
+                        ${theme.sizes ? toRules(theme.sizes) : ''}
+                        ${theme.weights ? toRules(theme.weights) : ''}
+                        ${theme.spacing ? toRules(theme.spacing) : ''}
                     }
                     .dark {
-                        ${theme.dark ? toRules(theme.dark) : ""}
-                    }`
-                ;
+                        ${theme.dark ? toRules(theme.dark) : ''}
+                    }`;
                 newThemeCSSTag.appendChild(document.createTextNode(css));
                 document.head.appendChild(newThemeCSSTag);
 
                 // Remove the old tag
                 themeTagCSS?.remove();
-
             }
         } else {
             // Remove the old tags, unsetting the theme.
             themeTagImports?.remove();
             themeTagCSS?.remove();
         }
-
     }
 
     function toRules(set: Record<string, string>) {
-        return Object.keys(set).map(name => {
-            const value = set[name];
-            if(value.length > 0) {
-                const cssVariable = "--bookish-" + name.replace(/([a-z])([A-Z])/g, "$1 $2").split(" ").map(s => s.toLowerCase()).join("-").replace(/([0-9])/g, "-$1-");
-                return `${cssVariable}: ${value};`
-            }
-        }).join("\n\t\t");
+        return Object.keys(set)
+            .map((name) => {
+                const value = set[name];
+                if (value.length > 0) {
+                    const cssVariable =
+                        '--bookish-' +
+                        name
+                            .replace(/([a-z])([A-Z])/g, '$1 $2')
+                            .split(' ')
+                            .map((s) => s.toLowerCase())
+                            .join('-')
+                            .replace(/([0-9])/g, '-$1-');
+                    return `${cssVariable}: ${value};`;
+                }
+            })
+            .join('\n\t\t');
     }
-
 </script>
 
-<div class="bookish {$darkMode ? " dark" : ""}">
-    <slot></slot>
+<div class="bookish {$darkMode ? ' dark' : ''}">
+    <slot />
     {#if editable}
-        <Status book={edition.getBook()} edition={edition}/>
+        <Status book={edition.getBook()} {edition} />
     {/if}
 </div>
 
 <style>
-
     * {
         box-sizing: border-box;
     }
@@ -215,5 +227,4 @@
         z-index: 0;
         text-align: left;
     }
-    
 </style>

@@ -1,6 +1,5 @@
-import type { IndexRange } from "$lib/models/chapter/Caret";
-import type Command from "$lib/components/editor/Command";
-
+import type { IndexRange } from '$lib/models/chapter/Caret';
+import type Command from '$lib/components/editor/Command';
 
 type UndoState = {
     command: Command | undefined;

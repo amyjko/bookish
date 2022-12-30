@@ -1,39 +1,38 @@
 <script lang="ts">
-    import Icon from "./Icon.svelte";
+    import Icon from './Icon.svelte';
 
     export let options: string[];
-    export let icons: Record<string,string> | undefined = undefined;
+    export let icons: Record<string, string> | undefined = undefined;
     export let value: string;
     export let enabled: boolean | undefined = undefined;
-    export let edit : (newValue: string) => void;
+    export let edit: (newValue: string) => void;
 
     function handleClick(event: MouseEvent) {
         const newValue = (event.currentTarget as HTMLElement).dataset.value;
-        if(newValue && options.includes(newValue)) {
+        if (newValue && options.includes(newValue)) {
             edit(newValue);
         }
     }
-
 </script>
 
 <span class="switch">
-    {#each options as option }
-        <button 
-            class={`option ${value === option ? "selected" : ""}`} 
-            data-value={option} 
+    {#each options as option}
+        <button
+            class={`option ${value === option ? 'selected' : ''}`}
+            data-value={option}
             disabled={enabled === false}
-            on:click|stopPropagation={handleClick}>
-                {#if icons && option in icons}
-                    <Icon icon={icons[option]}/>
-                {:else}
-                    {option}
-                {/if}
+            on:click|stopPropagation={handleClick}
+        >
+            {#if icons && option in icons}
+                <Icon icon={icons[option]} />
+            {:else}
+                {option}
+            {/if}
         </button>
     {/each}
 </span>
 
 <style>
-
     button {
         font-family: var(--app-font);
         font-size: var(--app-chrome-font-size);
@@ -84,5 +83,4 @@
         border-bottom-right-radius: var(--app-chrome-roundedness);
         margin-right: var(--app-chrome-padding);
     }
-
 </style>
