@@ -30,6 +30,10 @@
 </Positioned>
 
 <style>
+    figure {
+        margin: 0;
+    }
+
     .bookish-figure-caption {
         text-align: center;
         position: relative;

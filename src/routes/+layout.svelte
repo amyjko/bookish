@@ -47,7 +47,6 @@
         --app-chrome-padding: 0.5em;
         --app-chrome-border-size: 3px;
         --app-chrome-roundedness: 5px;
-        --app-chrome-padding: 0.5em;
     }
 
     :global(.dark .bookish-app) {

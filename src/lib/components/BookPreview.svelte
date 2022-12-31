@@ -17,7 +17,6 @@
     $: description = book.getDescription();
     $: subdomain = book.getSubdomain();
     $: title = book.getTitle() === '' ? 'Untitled' : book.getTitle();
-
     $: embed = cover === null ? null : Parser.parseEmbed(undefined, cover);
 </script>
 
@@ -71,7 +70,6 @@
         padding: var(--app-chrome-padding);
         text-align: left;
         flex-wrap: wrap;
-        width: 100%;
         height: 12em;
     }
 
@@ -80,6 +78,7 @@
         width: 10em;
         height: 100%;
         margin-right: var(--app-chrome-padding);
+        padding: var(--app-chrome-padding);
     }
 
     .cover.empty {
