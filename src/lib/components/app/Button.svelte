@@ -1,5 +1,5 @@
 <script lang="ts">
-    export let type: string | null = null;
+    export let type: 'submit' | 'button' | null = null;
     export let tooltip: string;
     export let disabled: boolean = false;
     export let command: () => void;

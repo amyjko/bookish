@@ -35,7 +35,7 @@
     We'll send you an email each time to login, no password required.
 </Paragraph>
 
-<form on:submit|preventDefault={handleSubmit} disabled={loading}>
+<form on:submit|preventDefault={handleSubmit}>
     <TextInput
         bind:text={email}
         autocomplete="username"
