@@ -5,4 +5,6 @@
     export let node: ErrorNode;
 </script>
 
-<Problem data-nodeid={node.nodeID}>Error: {node.getError()}</Problem>
+<Problem
+    ><span data-nodeid={node.nodeID}>Error: {node.getError()}</span></Problem
+>
