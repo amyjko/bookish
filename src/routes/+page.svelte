@@ -54,6 +54,3 @@
         > directly.
     </Paragraph>
 </Section>
-
-<style>
-</style>
