@@ -203,9 +203,9 @@ export const updateEditionInFirestore = async (
     // Update the edition's document.
     await setDoc(doc(db, 'editions', editionRef.id), spec);
 
-    // Get the book of the editiion, and if the edition updated is the latest edition,
-    // update the book's cache of title, cover, authors, and description.
-    if (edition.book !== undefined && edition.isLatestPublishedEdition())
+    // Get the book of the edition, and if the edition updated is the latest edition,
+    // update the book's cache of title, cover, authors, and description to keep it fresh.
+    if (edition.book !== undefined && edition.isLatestEdition())
         edition.book.updateMetadataFromEdition(edition);
 };
 
@@ -227,7 +227,7 @@ export const deleteEditionInFirestore = async (
 };
 
 export const updateBookInFirestore = async (book: Book): Promise<void> => {
-    if (!db) throw Error("Can't update boo, not connected to Firebase.");
+    if (!db) throw Error("Can't update book, not connected to Firebase.");
 
     await setDoc(doc(db, 'books', book.getRefID()), book.toObject());
 };

@@ -183,6 +183,10 @@ export default class Book {
         return this.spec.revisions.find((e) => e.published)?.ref.id;
     }
 
+    getLatestEditionID(): string | undefined {
+        return this.spec.revisions[0]?.ref.id;
+    }
+
     getRevisions() {
         return this.spec.revisions.slice();
     }

@@ -699,6 +699,14 @@ export default class Edition {
         return embeds;
     }
 
+    isLatestEdition(): boolean {
+        const latestEditionID = this.book?.getLatestEditionID();
+        return (
+            latestEditionID !== undefined &&
+            latestEditionID === this.editionRef?.id
+        );
+    }
+
     isLatestPublishedEdition(): boolean {
         const latestEditionID = this.book?.getLatestPublishedEditionID();
         return (
