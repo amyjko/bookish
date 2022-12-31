@@ -1822,7 +1822,7 @@ const commands: Command[] = [
         control: undefined,
         alt: undefined,
         shift: undefined,
-        key: undefined,
+        key: (key) => key.length === 1,
         visible: false,
         active: (context, key) =>
             context && key !== undefined && key.length === 1,

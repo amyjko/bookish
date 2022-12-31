@@ -135,7 +135,11 @@
             ? command.code
             : 'any';
         const keyLabel = (
-            key in keyLabels ? keyLabels[key] : key
+            typeof key === 'string'
+                ? key in keyLabels
+                    ? keyLabels[key]
+                    : key
+                : '—'
         ).toLocaleUpperCase();
         return `${command.control ? controlSymbol : ''}${
             command.alt ? altSymbol : ''

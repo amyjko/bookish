@@ -9,7 +9,7 @@ type Command = {
     control: boolean | undefined;
     alt: boolean | undefined;
     shift: boolean | undefined;
-    key?: string | string[];
+    key?: string | string[] | ((key: string) => boolean);
     code?: string;
     mutates: boolean;
     visible: boolean | ((context: CaretState) => boolean);

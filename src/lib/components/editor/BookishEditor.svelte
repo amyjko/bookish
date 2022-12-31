@@ -631,7 +631,7 @@
         };
     }
 
-    function handleKeyDown(event: KeyboardEvent) {
+    function handleKey(event: KeyboardEvent) {
         // Only handle keystrokes when this is focused.
         // Otherwise, we let any focusable elements in this editor handle them.
         if (!editorFocused) return;
@@ -657,9 +657,11 @@
                 (command.control === undefined ||
                     command.control === (event.ctrlKey || event.metaKey)) &&
                 (command.key === undefined ||
-                    command.key === event.key ||
                     (Array.isArray(command.key) &&
-                        command.key.includes(event.key))) &&
+                        command.key.includes(event.key)) ||
+                    (command.key instanceof Function &&
+                        command.key(event.key)) ||
+                    command.key === event.key) &&
                 (command.code === undefined || command.code === event.code) &&
                 (command.active === true ||
                     (command.active instanceof Function &&
@@ -857,10 +859,6 @@
         }
     }
 
-    function handleKeyUp(event: KeyboardEvent) {
-        event.preventDefault();
-    }
-
     function forceUpdate() {
         if (caretRange !== undefined) {
             caretRange = { start: caretRange.start, end: caretRange.end };
@@ -1014,8 +1012,8 @@
 <div
     class={`bookish-editor ${inAtom ? 'bookish-editor-atom-focused' : ''}`}
     bind:this={element}
-    on:keydown={handleKeyDown}
-    on:keyup={handleKeyUp}
+    on:keydown={handleKey}
+    on:keypress={handleKey}
     on:mousedown|stopPropagation={handleMouseDown}
     on:focus={updateFocus}
     on:blur={updateFocus}
