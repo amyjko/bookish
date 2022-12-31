@@ -653,8 +653,9 @@
             if (
                 (command.shift === undefined ||
                     command.shift === event.shiftKey) &&
-                command.alt === event.altKey &&
-                command.control === (event.ctrlKey || event.metaKey) &&
+                (command.alt === undefined || command.alt === event.altKey) &&
+                (command.control === undefined ||
+                    command.control === (event.ctrlKey || event.metaKey)) &&
                 (command.key === undefined ||
                     command.key === event.key ||
                     (Array.isArray(command.key) &&
@@ -669,6 +670,8 @@
 
                 // Execute the command
                 executeCommand(command, event.key);
+
+                console.log(command);
 
                 // Stop searching for a matching command.
                 return false;

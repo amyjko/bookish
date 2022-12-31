@@ -6,8 +6,8 @@ type Command = {
     icon: string;
     description: string;
     category: string;
-    control: boolean;
-    alt: boolean;
+    control: boolean | undefined;
+    alt: boolean | undefined;
     shift: boolean | undefined;
     key?: string | string[];
     code?: string;
