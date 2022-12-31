@@ -1,12 +1,12 @@
 <script lang="ts">
     import { loadPublishedBooksFromFirestore } from '$lib/models/Firestore';
-    import BookPreview from '$lib/components/BookPreview.svelte';
     import type Book from '$lib/models/book/Book';
     import { onMount } from 'svelte';
     import Feedback from '$lib/components/app/Feedback.svelte';
     import Lead from '$lib/components/app/Lead.svelte';
     import Paragraph from '$lib/components/app/Paragraph.svelte';
     import Large from '$lib/components/app/Large.svelte';
+    import BookList from '$lib/components/app/BookList.svelte';
 
     let books: Book[] = [];
     let loading = true;
@@ -33,19 +33,7 @@
 {:else if loading}
     <Feedback>Loading books...</Feedback>
 {:else if books.length === 0}
-    <Paragraph>You don't have any published books.</Paragraph>
+    <Paragraph>There are no published books.</Paragraph>
 {:else}
-    <div class="previews">
-        {#each books as book}
-            <BookPreview {book} />
-        {/each}
-    </div>
+    <BookList {books} write={false} />
 {/if}
-
-<style>
-    .previews {
-        margin-top: var(--app-text-spacing);
-        display: flex;
-        flex-direction: column;
-    }
-</style>

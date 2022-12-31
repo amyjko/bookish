@@ -3,7 +3,6 @@
         createBookInFirestore,
         loadUsersBooksFromFirestore,
     } from '$lib/models/Firestore';
-    import BookPreview from '$lib/components/BookPreview.svelte';
     import type Book from '$lib/models/book/Book';
     import { goto } from '$app/navigation';
     import { onMount } from 'svelte';
@@ -13,6 +12,7 @@
     import Large from '$lib/components/app/Large.svelte';
     import Paragraph from '$lib/components/app/Paragraph.svelte';
     import Button from '$lib/components/app/Button.svelte';
+    import BookList from '$lib/components/app/BookList.svelte';
 
     let books: Book[] = [];
     let loading = true;
@@ -84,17 +84,5 @@
 {:else if books.length === 0}
     <Paragraph>You don't have have any books.</Paragraph>
 {:else}
-    <div class="previews">
-        {#each books as book}
-            <BookPreview {book} write />
-        {/each}
-    </div>
+    <BookList {books} write />
 {/if}
-
-<style>
-    .previews {
-        margin-top: var(--app-text-spacing);
-        display: flex;
-        flex-direction: column;
-    }
-</style>

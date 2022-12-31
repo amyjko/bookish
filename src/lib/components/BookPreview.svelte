@@ -22,7 +22,7 @@
 </script>
 
 <div class="book-preview">
-    <div class="cover">
+    <div class="cover" class:empty={embed === null}>
         {#if embed instanceof EmbedNode}
             <Embed node={embed} imageOnly />
         {:else if embed instanceof ErrorNode}
@@ -66,16 +66,24 @@
     .book-preview {
         display: flex;
         flex-direction: row;
-        align-content: top;
+        align-content: start;
         margin: var(--app-chrome-padding);
         padding: var(--app-chrome-padding);
         text-align: left;
+        flex-wrap: wrap;
+        width: 100%;
+        height: 12em;
     }
 
     .cover {
         flex: 1;
-        width: 5em;
-        margin-right: var(--app-text-spacing);
+        width: 10em;
+        height: 100%;
+        margin-right: var(--app-chrome-padding);
+    }
+
+    .cover.empty {
+        background-color: var(--app-chrome-background);
     }
 
     .content {

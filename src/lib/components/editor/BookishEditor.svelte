@@ -671,8 +671,6 @@
                 // Execute the command
                 executeCommand(command, event.key);
 
-                console.log(command);
-
                 // Stop searching for a matching command.
                 return false;
             }
