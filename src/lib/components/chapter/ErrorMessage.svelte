@@ -1,3 +1,5 @@
+<svelte:options immutable={true} />
+
 <script lang="ts">
     import type ErrorNode from '$lib/models/chapter/ErrorNode';
     import Problem from './Problem.svelte';

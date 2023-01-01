@@ -1,3 +1,5 @@
+<svelte:options immutable />
+
 <script lang="ts">
     import type ChapterNode from '$lib/models/chapter/ChapterNode';
     import ParagraphNode from '$lib/models/chapter/ParagraphNode';
@@ -27,7 +29,7 @@
             .isEmptyText()}
         <Paragraph node={blocks[0]} {placeholder} />
     {:else}
-        {#each node.getBlocks() as block}
+        {#each node.getBlocks() as block (block.nodeID)}
             <Block node={block} />
         {/each}
     {/if}

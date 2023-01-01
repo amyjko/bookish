@@ -1,3 +1,5 @@
+<svelte:options immutable={true} />
+
 <script lang="ts">
     import type InlineCodeNode from '$lib/models/chapter/InlineCodeNode';
     import { isEditable } from '../page/Contexts';

@@ -1,3 +1,5 @@
+<svelte:options immutable={true} />
+
 <script lang="ts">
     import type ReferenceNode from '$lib/models/chapter/ReferenceNode';
     import Button from '../app/Button.svelte';

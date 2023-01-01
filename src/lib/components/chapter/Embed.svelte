@@ -1,3 +1,5 @@
+<svelte:options immutable={true} />
+
 <script lang="ts">
     import type EmbedNode from '$lib/models/chapter/EmbedNode';
     import { storage } from '$lib/models/Firebase';

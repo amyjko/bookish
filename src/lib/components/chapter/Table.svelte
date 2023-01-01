@@ -1,3 +1,5 @@
+<svelte:options immutable={true} />
+
 <script lang="ts">
     import type TableNode from '$lib/models/chapter/TableNode';
     import Figure from './Figure.svelte';

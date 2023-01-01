@@ -37,7 +37,6 @@
     import { afterUpdate, onMount } from 'svelte';
     import type { PasteContent } from './CaretContext';
     import { getCaret } from '../page/Contexts';
-    import { tick } from 'svelte';
 
     const IDLE_TIME = 500;
 
@@ -710,24 +709,22 @@
                     }
                 }
                 // Otherwise, if we have a reference to this editor's DOM element, find the nearest focusable element in it's toolbar and focus on that.
-                if (element) {
-                    const controls = [
-                        element.querySelector(
-                            '.bookish-editor-toolbar [tabindex="0"]'
-                        ),
-                        element.querySelector('.bookish-editor-toolbar input'),
-                        element.querySelector('.bookish-editor-toolbar select'),
-                        element.querySelector('.bookish-editor-toolbar button'),
-                    ];
-                    const match = controls.find(
-                        (control) => control && control instanceof HTMLElement
-                    );
-                    if (match && match instanceof HTMLElement) {
-                        match.focus();
-                        event.preventDefault();
-                        event.stopPropagation();
-                        return true;
-                    }
+                const controls = [
+                    document.querySelector(
+                        '.bookish-editor-toolbar [tabindex="0"]'
+                    ),
+                    document.querySelector('.bookish-editor-toolbar input'),
+                    document.querySelector('.bookish-editor-toolbar select'),
+                    document.querySelector('.bookish-editor-toolbar button'),
+                ];
+                const match = controls.find(
+                    (control) => control && control instanceof HTMLElement
+                );
+                if (match && match instanceof HTMLElement) {
+                    match.focus();
+                    event.preventDefault();
+                    event.stopPropagation();
+                    return true;
                 }
             }
         }
@@ -813,8 +810,6 @@
 
         // Set the undo position to the last index.
         undoPosition = 0;
-
-        await tick();
 
         // Focus the editor on the new caret location, unless the toolbar is focused.
         if (!toolbarIsFocused()) element?.focus();
@@ -987,27 +982,25 @@
 
     // When the caret context or editor focus changes, update the active editor.
     $: {
-        if ($edition && activeEditor) {
-            const editorOrToolbarFocused =
-                document.activeElement === element || toolbarIsFocused();
-            activeEditor.set(
-                editorOrToolbarFocused
-                    ? {
-                          range: caretRange,
-                          coordinate: caretCoordinate,
-                          setCaret: (range: CaretRange | undefined) => {
-                              caretRange = range;
-                              element?.focus();
-                          },
-                          edit: editNode,
-                          executor: executeCommand,
-                          context: getCaretContext(),
-                          root: editedNode,
-                          focused: editorFocused,
-                      }
-                    : undefined
-            );
-        }
+        const isActive =
+            document.activeElement === element || toolbarIsFocused();
+        activeEditor.set(
+            isActive
+                ? {
+                      range: caretRange,
+                      coordinate: caretCoordinate,
+                      setCaret: (range: CaretRange | undefined) => {
+                          caretRange = range;
+                          element?.focus();
+                      },
+                      edit: editNode,
+                      executor: executeCommand,
+                      context: getCaretContext(),
+                      root: editedNode,
+                      focused: editorFocused,
+                  }
+                : undefined
+        );
     }
 </script>
 

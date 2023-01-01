@@ -1,3 +1,5 @@
+<svelte:options immutable={true} />
+
 <script lang="ts">
     import type LinkNode from '$lib/models/chapter/LinkNode';
     import { getBase, getEdition, isEditable } from '../page/Contexts';

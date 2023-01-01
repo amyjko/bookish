@@ -1,3 +1,5 @@
+<svelte:options immutable={true} />
+
 <script lang="ts">
     import Parser from '$lib/models/chapter/Parser';
     import type DefinitionNode from '$lib/models/chapter/DefinitionNode';

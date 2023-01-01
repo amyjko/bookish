@@ -1,3 +1,5 @@
+<svelte:options immutable={true} />
+
 <script lang="ts">
     import type ParagraphNode from '$lib/models/chapter/ParagraphNode';
     import Format from './Format.svelte';

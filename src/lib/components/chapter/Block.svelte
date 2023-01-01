@@ -1,3 +1,5 @@
+<svelte:options immutable={true} />
+
 <script lang="ts">
     import type BlockNode from '$lib/models/chapter/BlockNode';
     import CalloutNode from '$lib/models/chapter/CalloutNode';

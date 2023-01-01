@@ -1,3 +1,5 @@
+<svelte:options immutable={true} />
+
 <script lang="ts">
     import type CalloutNode from '$lib/models/chapter/CalloutNode';
     import Block from './Block.svelte';
@@ -8,7 +10,7 @@
 
 <Positioned position={node.getPosition()}>
     <section class={'bookish-callout'} data-nodeid={node.nodeID}>
-        {#each node.getBlocks() as element}
+        {#each node.getBlocks() as element (element.nodeID)}
             <Block node={element} />
         {/each}
     </section>

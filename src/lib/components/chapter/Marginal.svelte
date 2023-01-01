@@ -1,3 +1,5 @@
+<svelte:options immutable={true} />
+
 <script lang="ts">
     import { isMobile, watchMobile } from '$lib/util/isMobile';
     import { onMount } from 'svelte';

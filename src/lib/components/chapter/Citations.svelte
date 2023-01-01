@@ -1,3 +1,5 @@
+<svelte:options immutable={true} />
+
 <script lang="ts">
     import Marginal from './Marginal.svelte';
     import Parser from '$lib/models/chapter/Parser';

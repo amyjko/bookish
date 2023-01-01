@@ -1,3 +1,5 @@
+<svelte:options immutable={true} />
+
 <script lang="ts">
     import type FootnoteNode from '$lib/models/chapter/FootnoteNode';
     import Atom from '$lib/components/chapter/Atom.svelte';

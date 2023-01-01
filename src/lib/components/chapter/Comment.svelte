@@ -1,3 +1,5 @@
+<svelte:options immutable={true} />
+
 <script lang="ts">
     import type CommentNode from '$lib/models/chapter/CommentNode';
     import Atom from './Atom.svelte';

@@ -1,3 +1,5 @@
+<svelte:options immutable={true} />
+
 <script lang="ts">
     import type TableNode from '$lib/models/chapter/TableNode';
     import type EmbedNode from '$lib/models/chapter/EmbedNode';

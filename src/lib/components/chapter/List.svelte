@@ -1,3 +1,5 @@
+<svelte:options immutable={true} />
+
 <script lang="ts">
     import ListNode from '$lib/models/chapter/ListNode';
     import Format from './Format.svelte';

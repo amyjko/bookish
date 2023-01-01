@@ -1,3 +1,5 @@
+<svelte:options immutable={true} />
+
 <script lang="ts">
     import type TextNode from '$lib/models/chapter/TextNode';
     import { getChapter, isEditable } from '../page/Contexts';

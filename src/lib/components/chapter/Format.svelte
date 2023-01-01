@@ -1,3 +1,5 @@
+<svelte:options immutable={true} />
+
 <script lang="ts">
     import FormatNode from '$lib/models/chapter/FormatNode';
     import CitationsNode from '$lib/models/chapter/CitationsNode';

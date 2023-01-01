@@ -1,3 +1,5 @@
+<svelte:options immutable={true} />
+
 <script lang="ts">
     import type AtomNode from '$lib/models/chapter/AtomNode';
     import { getCaret } from '$lib/components/page/Contexts';

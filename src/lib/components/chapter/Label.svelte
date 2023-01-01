@@ -1,3 +1,5 @@
+<svelte:options immutable={true} />
+
 <script lang="ts">
     import type LabelNode from '$lib/models/chapter/LabelNode';
     import Atom from '$lib/components/chapter/Atom.svelte';

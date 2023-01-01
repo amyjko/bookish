@@ -1,3 +1,5 @@
+<svelte:options immutable={true} />
+
 <script lang="ts">
     import type QuoteNode from '$lib/models/chapter/QuoteNode';
     import Block from './Block.svelte';
@@ -11,7 +13,7 @@
 
 <Positioned position={node.getPosition()}>
     <blockquote class={'bookish-blockquote'} data-nodeid={node.nodeID}>
-        {#each node.getBlocks() as element}
+        {#each node.getBlocks() as element (element.nodeID)}
             <Block node={element} />
         {/each}
         {#if credit}

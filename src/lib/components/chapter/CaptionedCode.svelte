@@ -1,3 +1,5 @@
+<svelte:options immutable={true} />
+
 <script lang="ts">
     import type CodeNode from '$lib/models/chapter/CodeNode';
     import Code from './Code.svelte';
