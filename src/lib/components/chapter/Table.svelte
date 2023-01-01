@@ -25,7 +25,7 @@
                         )}><Format node={row[0]} /></svelte:element
                     >
                 {:else}
-                    {#each row as cell}
+                    {#each row as cell (cell.nodeID)}
                         <svelte:element this={index === 0 ? 'th' : 'td'}
                             ><Format node={cell} /></svelte:element
                         >

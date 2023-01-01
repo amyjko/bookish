@@ -49,7 +49,7 @@
     data-nodeid={node.nodeID}
     class={`format ${showPlaceholder ? 'bookish-editor-placeholder' : ''}`}
 >
-    {#each node.getSegments() as segment}
+    {#each node.getSegments() as segment (segment.nodeID)}
         {#if segment instanceof TextNode}<Text
                 node={segment}
                 placeholder={node.getSegments().length === 1

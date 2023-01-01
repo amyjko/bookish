@@ -11,7 +11,7 @@
     this={node.isNumbered() ? 'ol' : 'ul'}
     data-nodeid={node.nodeID}
 >
-    {#each node.getItems() as item}
+    {#each node.getItems() as item (item.nodeID)}
         {#if item instanceof ListNode}
             <svelte:self node={item} />
         {:else}
