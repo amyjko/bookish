@@ -1,7 +1,7 @@
 <script lang="ts">
     import type InlineCodeNode from '$lib/models/chapter/InlineCodeNode';
     import LanguageEditor from './LanguageEditor.svelte';
-    import { getCaret } from '../page/Contexts';
+    import { getCaret } from '$lib/components/page/Contexts';
 
     export let code: InlineCodeNode;
 

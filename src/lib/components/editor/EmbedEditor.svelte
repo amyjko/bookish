@@ -4,20 +4,20 @@
     import TextEditor from './TextEditor.svelte';
     import { storage } from '$lib/models/Firebase';
     import type { Image } from '$lib/models/book/BookMedia';
-    import { getBook, getCaret } from '../page/Contexts';
     import ToolbarSpacer from './ToolbarSpacer.svelte';
     import ImageChooser from './ImageChooser.svelte';
     import URLEditor from './URLEditor.svelte';
     import Note from './Note.svelte';
+    import { getBook, getCaret } from '$lib/components/page/Contexts';
 
     export let embed: EmbedNode;
 
-    let book = getBook();
-    let caret = getCaret();
+    let activeEditor = getCaret();
     let upload: undefined | number | string = undefined;
 
     $: description = embed.getDescription();
-    $: book.getMedia();
+    let book = getBook();
+    let caret = getCaret();
 
     function isValidURL(url: string): string | undefined {
         // Is it a valid URL?
@@ -29,9 +29,12 @@
     }
 
     function handleImageChange(event: Event) {
+        if ($book === undefined) return;
+        if ($activeEditor === undefined) return;
+
         const target = event.target as HTMLInputElement;
         const file = target.files === null ? undefined : target.files[0];
-        const media = book.getMedia();
+        const media = $book.getMedia();
 
         if (file === undefined) return;
         if (storage === undefined) return;

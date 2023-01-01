@@ -21,6 +21,7 @@
     import Switch from '../editor/Switch.svelte';
     import Link from '../app/Link.svelte';
     import Rows from './Rows.svelte';
+    import type Edition from '../../models/book/Edition';
 
     const themes: Record<string, Theme> = {
         Bookish: BookishTheme,
@@ -31,8 +32,9 @@
         Critical: CriticalTheme,
     };
 
-    let edition = getEdition();
-    $: theme = $edition.getTheme();
+    let activeEdition = getEdition();
+    $: edition = $activeEdition as Edition;
+    $: theme = edition?.getTheme();
     $: isDefault = theme === null || Object.values(themes).includes(theme);
 
     function getEmptyGroup(group: Record<string, string>) {
@@ -42,7 +44,7 @@
     }
 </script>
 
-<Page title={`${$edition.getTitle()} - Theme`}>
+<Page title={`${edition.getTitle()} - Theme`}>
     <Header
         label="Theme"
         getImage={() => null}
@@ -68,7 +70,7 @@
 
     <Switch
         options={Object.keys(themes)}
-        edit={(name) => $edition.setTheme(themes[name])}
+        edit={(name) => edition.setTheme(themes[name])}
         value={Object.keys(themes).find((key) => themes[key] === theme) ?? ''}
     />
 
@@ -77,7 +79,7 @@
         <Button
             tooltip="Create a custom theme"
             command={() =>
-                $edition.setTheme({
+                edition.setTheme({
                     ...(theme === null ? BookishTheme : theme),
                 })}>Customize</Button
         >
@@ -86,7 +88,7 @@
             tooltip="Change the theme to the default Bookish theme."
             commandLabel="Revert to default"
             confirmLabel="Delete your theme?"
-            command={() => $edition.setTheme(null)}
+            command={() => edition.setTheme(null)}
         />
     {/if}
 
@@ -139,7 +141,7 @@
                             if (theme === null) return;
                             if (theme.imports === undefined) theme.imports = [];
                             theme.imports.push('');
-                            $edition.setTheme(theme);
+                            edition.setTheme(theme);
                         }}>+</Button
                     >
                 </td>
@@ -157,7 +159,7 @@
                                 if (newTheme.imports === undefined)
                                     newTheme.imports = [];
                                 newTheme.imports[index] = text;
-                                $edition.setTheme(theme);
+                                edition.setTheme(theme);
                             }}
                         />
                     </td>
@@ -166,7 +168,7 @@
                             tooltip="Remove this CSS import"
                             command={() => {
                                 theme?.imports?.splice(index, 1);
-                                $edition.setTheme(theme);
+                                edition.setTheme(theme);
                             }}>–</Button
                         >
                     </td>

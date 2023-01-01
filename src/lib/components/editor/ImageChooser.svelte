@@ -1,11 +1,12 @@
 <script lang="ts">
     import type { Image } from '$lib/models/book/BookMedia';
     import { onMount } from 'svelte';
-    import { getBook } from '../page/Contexts';
+    import { getBook, getCaret } from '$lib/components/page/Contexts';
 
     export let select: (image: Image) => void;
     export let selection: string;
 
+    let editor = getCaret();
     let book = getBook();
     let images: Image[] | undefined = undefined;
     let expanded = false;
@@ -16,7 +17,8 @@
 
     // Load the latest images in the book, and keep them updated as they change.
     onMount(() => {
-        const media = book.getMedia();
+        if ($book === undefined) return;
+        const media = $book.getMedia();
         media.notify(updateImages);
         return () => media.stopNotifying(updateImages);
     });
@@ -33,36 +35,44 @@
     on:mouseenter={() => (expanded = true)}
     on:mouseleave={() => (expanded = false)}
 >
-    {#if images === undefined}
-        Loading images
-    {:else}
-        <!-- Sort the images by their URL. There's probably a more meaningful sort,
-                such as placing unused images at the front of the list. -->
-        {#each images.sort((a, b) => a.url.localeCompare(b.url)) as image}
-            <img
-                class={`bookish-image-chooser-image ${
-                    image.url === selection ? 'selected' : ''
-                }`}
-                src={image.url}
-                alt={`Image named ${image.url}`}
-                tabIndex="0"
-                on:click|stopPropagation={() => select(image)}
-                on:keydown={(event) =>
-                    event.key === 'Enter' || event.key === ' '
-                        ? select(image)
-                        : undefined}
-            />
+    <div class="images">
+        {#if images === undefined}
+            Loading images
         {:else}
-            No images uploaded
-        {/each}
-    {/if}
+            <!-- Sort the images by their URL. There's probably a more meaningful sort,
+                    such as placing unused images at the front of the list. -->
+            {#each images.sort((a, b) => a.url.localeCompare(b.url)) as image}
+                <img
+                    class={`bookish-image-chooser-image ${
+                        image.url === selection ? 'selected' : ''
+                    }`}
+                    src={image.url}
+                    alt={`Image named ${image.url}`}
+                    tabIndex="0"
+                    on:click|stopPropagation={() => select(image)}
+                    on:keydown={(event) =>
+                        event.key === 'Enter' || event.key === ' '
+                            ? select(image)
+                            : undefined}
+                />
+            {:else}
+                No images uploaded
+            {/each}
+        {/if}
+    </div>
 </div>
 
 <style>
     .bookish-image-chooser {
         display: inline-block;
-        overflow-x: scroll;
         vertical-align: middle;
+    }
+
+    .images {
+        display: flex;
+        flex-direction: row;
+        flex-wrap: nowrap;
+        overflow-x: scroll;
     }
 
     .bookish-image-chooser.expanded {
@@ -72,9 +82,7 @@
 
     .bookish-image-chooser-image {
         display: inline-block;
-        height: 3em;
-        margin-top: var(--app-chrome-padding);
-        margin-right: var(--app-chrome-padding);
+        height: 2em;
         cursor: pointer;
     }
 

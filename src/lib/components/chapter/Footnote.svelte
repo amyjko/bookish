@@ -3,13 +3,18 @@
     import Atom from '$lib/components/chapter/Atom.svelte';
     import Marginal from '$lib/components/chapter/Marginal.svelte';
     import Format from './Format.svelte';
-    import { getCaret, getChapter, getEdition } from '../page/Contexts';
+    import {
+        getChapter,
+        getEdition,
+        getCaret,
+    } from '$lib/components/page/Contexts';
     import { afterUpdate } from 'svelte';
 
     export let node: FootnoteNode;
 
     $: content = node.getMeta();
     let caret = getCaret();
+
     let chapter = getChapter();
     let edition = getEdition();
 
@@ -17,7 +22,7 @@
     $: chapterNode = $chapter?.chapter?.getAST();
     $: number = chapterNode?.getFootnotes().indexOf(node);
     $: letter =
-        number === undefined ? undefined : $edition.getFootnoteSymbol(number);
+        number === undefined ? undefined : $edition?.getFootnoteSymbol(number);
 
     $: focused =
         chapterNode &&

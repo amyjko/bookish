@@ -21,7 +21,7 @@
     let auth = getAuth();
 
     function updateBooks() {
-        if ($auth.user)
+        if ($auth?.user)
             loadUsersBooksFromFirestore($auth.user.uid).then((loadedBooks) => {
                 loading = false;
                 if (loadedBooks === null) error = 'Unable to load books';
@@ -54,7 +54,7 @@
                     : 'Sorry this is taking so long! If the internet connection comes back, we will create the book.';
         }, 1000);
         // Make the book, then go to its page
-        if ($auth.user)
+        if ($auth?.user)
             createBookInFirestore($auth.user.uid)
                 .then((bookID) => goto('/write/' + bookID))
                 .catch((error) => {

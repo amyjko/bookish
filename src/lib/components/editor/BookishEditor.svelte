@@ -24,21 +24,20 @@
         caretRangeToIndexRange,
         indexRangeToCaretRange,
     } from '$lib/models/chapter/Caret';
-    import type CaretState from './CaretState';
+    import type WhatsAroundTheCaret from './CaretContext';
 
     import type Command from './Command';
     import type Clipboard from './Clipboard';
     import type UndoState from './UndoState';
     import type CaretUtilities from './CaretUtilities';
-    import type CaretContext from './CaretContext';
 
     import commands from './Commands';
-    import Toolbar from './Toolbar.svelte';
 
-    import { CARET, getEdition, type CaretStore } from '../page/Contexts';
-    import { afterUpdate, onMount, setContext } from 'svelte';
-    import { writable } from 'svelte/store';
-    import type { PasteContent } from './CaretState';
+    import { getEdition } from '../page/Contexts';
+    import { afterUpdate, onMount } from 'svelte';
+    import type { PasteContent } from './CaretContext';
+    import { getCaret } from '../page/Contexts';
+    import { tick } from 'svelte';
 
     const IDLE_TIME = 500;
 
@@ -65,6 +64,7 @@
     let ignoredInput = false;
 
     let edition = getEdition();
+    let activeEditor = getCaret();
 
     onMount(() => {
         const caret = editedNode.getFirstCaret();
@@ -553,7 +553,7 @@
         return { root: node, range: range };
     }
 
-    function getCaretContext(): CaretState | undefined {
+    function getCaretContext(): WhatsAroundTheCaret | undefined {
         if (caretRange === undefined) return undefined;
 
         // Determine whether the range contains a list
@@ -771,7 +771,7 @@
         }
     }
 
-    function saveEdit(
+    async function saveEdit(
         newRoot: RootNode,
         newRange: CaretRange,
         command?: Command
@@ -814,8 +814,10 @@
         // Set the undo position to the last index.
         undoPosition = 0;
 
-        // Focus the editor on the new caret location.
-        element?.focus();
+        await tick();
+
+        // Focus the editor on the new caret location, unless the toolbar is focused.
+        if (!toolbarIsFocused()) element?.focus();
     }
 
     function editNode(previous: BookishNode, edited: BookishNode) {
@@ -859,16 +861,10 @@
         }
     }
 
-    function forceUpdate() {
-        if (caretRange !== undefined) {
-            caretRange = { start: caretRange.start, end: caretRange.end };
-        }
-    }
-
     function updateFocus() {
         editorFocused =
             document.activeElement === element ||
-            (element !== null && element.contains(document.activeElement));
+            (element !== null && element?.contains(document.activeElement));
     }
 
     function handleCopy(node: BookishNode) {
@@ -894,7 +890,7 @@
     }
 
     function handlePaste(
-        context: CaretState,
+        context: WhatsAroundTheCaret,
         text: PasteContent | BookishNode,
         save: boolean
     ) {
@@ -912,7 +908,7 @@
     }
 
     function handlePasteNode(
-        context: CaretState,
+        context: WhatsAroundTheCaret,
         node: BookishNode,
         save: boolean
     ) {
@@ -959,6 +955,11 @@
         }
     }
 
+    function toolbarIsFocused() {
+        const toolbar = document.querySelector('.bookish-editor-toolbar');
+        return toolbar && toolbar.contains(document.activeElement);
+    }
+
     $: isAtom = caretRange && caretRange.start.node instanceof AtomNode;
     $: inAtom =
         caretRange && caretRange.start.node.isInside(editedNode, AtomNode);
@@ -983,30 +984,31 @@
             editedNode,
             (p) => p instanceof LinkNode
         ) !== undefined;
-    let context: CaretState | undefined = undefined;
+
+    // When the caret context or editor focus changes, update the active editor.
     $: {
-        caretRange = caretRange;
-        editedNode = editedNode;
-        context = getCaretContext();
+        if ($edition && activeEditor) {
+            const editorOrToolbarFocused =
+                document.activeElement === element || toolbarIsFocused();
+            activeEditor.set(
+                editorOrToolbarFocused
+                    ? {
+                          range: caretRange,
+                          coordinate: caretCoordinate,
+                          setCaret: (range: CaretRange | undefined) => {
+                              caretRange = range;
+                              element?.focus();
+                          },
+                          edit: editNode,
+                          executor: executeCommand,
+                          context: getCaretContext(),
+                          root: editedNode,
+                          focused: editorFocused,
+                      }
+                    : undefined
+            );
+        }
     }
-
-    // Create a caret store for the editor and make it available to children.
-    let caretStore = setContext<CaretStore>(CARET, writable<CaretContext>());
-
-    // Update the caret store it whenever any of the below change.
-    $: caretStore.set({
-        range: caretRange,
-        coordinate: caretCoordinate,
-        forceUpdate: forceUpdate,
-        setCaret: (range) => {
-            caretRange = range;
-            element?.focus();
-        },
-        edit: editNode,
-        context: context,
-        root: editedNode,
-        focused: editorFocused,
-    });
 </script>
 
 <div
@@ -1020,9 +1022,6 @@
     role="textbox"
     tabIndex="0"
 >
-    {#if context && caretCoordinate}
-        <Toolbar {context} executor={executeCommand} visible={editorFocused} />
-    {/if}
     <!-- Draw a caret. We draw our own since this view isn't contentEditable and we can't show a caret.
          Customize the rendering based on the formatting applied to the text node. -->
     {#if caretCoordinate && caretRange && !isAtom && !isSelection && editorFocused}

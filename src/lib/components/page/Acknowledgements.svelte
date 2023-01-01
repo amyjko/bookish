@@ -9,8 +9,10 @@
     let edition = getEdition();
     let editable = isEditable();
 
-    $: acknowledgements = $edition.getAcknowledgements();
-    $: acksNode = Parser.parseChapter($edition, acknowledgements);
+    $: acknowledgements = $edition?.getAcknowledgements();
+    $: acksNode = acknowledgements
+        ? Parser.parseChapter($edition, acknowledgements)
+        : undefined;
 </script>
 
 <Instructions>
@@ -18,15 +20,17 @@
 </Instructions>
 
 <!-- If editable, show acknowledgements even if they're empty, otherwise hide -->
-{#if editable}
-    <BookishEditor
-        ast={acksNode}
-        chapter={false}
-        component={ChapterBody}
-        placeholder="Who would you like to thank?"
-        save={(node) => $edition.setAcknowledgements(node.toBookdown())}
-    />
-{:else if acknowledgements.length > 0}
-    <PageHeader id="acknowledgements">Acknowledgements</PageHeader>
-    <ChapterBody node={acksNode} />
+{#if $edition && acknowledgements && acksNode}
+    {#if editable}
+        <BookishEditor
+            ast={acksNode}
+            chapter={false}
+            component={ChapterBody}
+            placeholder="Who would you like to thank?"
+            save={(node) => $edition?.setAcknowledgements(node.toBookdown())}
+        />
+    {:else if acknowledgements.length > 0}
+        <PageHeader id="acknowledgements">Acknowledgements</PageHeader>
+        <ChapterBody node={acksNode} />
+    {/if}
 {/if}

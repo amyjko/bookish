@@ -1,7 +1,7 @@
 <script lang="ts">
     import type CalloutNode from '$lib/models/chapter/CalloutNode';
     import PositionEditor from './PositionEditor.svelte';
-    import { getCaret } from '../page/Contexts';
+    import { getCaret } from '$lib/components/page/Contexts';
 
     export let callout: CalloutNode;
 

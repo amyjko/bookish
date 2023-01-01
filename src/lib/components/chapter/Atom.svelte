@@ -1,6 +1,6 @@
 <script lang="ts">
     import type AtomNode from '$lib/models/chapter/AtomNode';
-    import { getCaret } from '../page/Contexts';
+    import { getCaret } from '$lib/components/page/Contexts';
 
     export let node: AtomNode<any>;
 

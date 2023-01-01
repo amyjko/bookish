@@ -1,9 +1,12 @@
 <script lang="ts">
     import { isMobile, watchMobile } from '$lib/util/isMobile';
     import { onMount } from 'svelte';
-    import { getCaret, getChapter } from '../page/Contexts';
-    import { isEditable } from '../page/Contexts';
     import type Node from '../../models/chapter/Node';
+    import {
+        getCaret,
+        getChapter,
+        isEditable,
+    } from '$lib/components/page/Contexts';
 
     export let node: Node;
     export let id: string;
@@ -11,7 +14,7 @@
     let hovered = false;
     let chapter = getChapter();
     $: editable = isEditable();
-    $: caret = getCaret();
+    let caret = getCaret();
 
     // If there's no marginal selected or this is different from the current selection, this is hidden.
     $: selectedMarginal = $chapter?.marginal;

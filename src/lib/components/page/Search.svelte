@@ -31,7 +31,7 @@
 
         // Go through all the chapter indexes and find matches.
         if (query.length > 2)
-            for (const chapter of $edition.getChapters()) {
+            for (const chapter of $edition?.getChapters() ?? []) {
                 let index = chapter.getIndex();
                 // No index yet? Skip this chapter.
                 if (index) {
@@ -78,66 +78,69 @@
     }
 </script>
 
-<Page title={`${$edition.getTitle()} - Search`}>
-    <Header
-        label="Search title"
-        getImage={() => $edition.getImage(ChapterIDs.SearchID)}
-        setImage={(embed) => $edition.setImage(ChapterIDs.SearchID, embed)}
-        header="Search"
-        tags={$edition.getTags()}
-    >
-        <Outline
-            slot="outline"
-            previous={$edition.getPreviousChapterID(ChapterIDs.SearchID)}
-            next={$edition.getNextChapterID(ChapterIDs.SearchID)}
-        />
-    </Header>
+{#if $edition}
+    <Page title={`${$edition.getTitle()} - Search`}>
+        <Header
+            label="Search title"
+            getImage={() => $edition?.getImage(ChapterIDs.SearchID) ?? null}
+            setImage={(embed) => $edition?.setImage(ChapterIDs.SearchID, embed)}
+            header="Search"
+            tags={$edition.getTags()}
+        >
+            <Outline
+                slot="outline"
+                previous={$edition.getPreviousChapterID(ChapterIDs.SearchID)}
+                next={$edition.getNextChapterID(ChapterIDs.SearchID)}
+            />
+        </Header>
 
-    <p>
-        Type a word—just a single word—and we'll show its occurrences in this
-        book:
-    </p>
+        <p>
+            Type a word—just a single word—and we'll show its occurrences in
+            this book:
+        </p>
 
-    <p>
-        <TextInput
-            type="text"
-            placeholder={'search for a word'}
-            disabled={false}
-            bind:text={query}
-        />
-    </p>
+        <p>
+            <TextInput
+                type="text"
+                placeholder={'search for a word'}
+                disabled={false}
+                bind:text={query}
+            />
+        </p>
 
-    {#if query.trim() !== ''}
-        {#if query.trim().length < 3}
-            <p>Keep typing...</p>
-        {:else if results.length === 0}
-            <p>No occurrence of <em>{query}</em>.</p>
-        {:else}
-            <p
-                >Found {results.filter((result) => !(result instanceof Chapter))
-                    .length} occurrences of <em>{query}</em>...</p
-            >
-            {#each results as result}
-                {#if result instanceof Chapter}
-                    <PageHeader id={'header-' + result.getChapterID()}
-                        ><ChapterNumber
-                            >Chapter{#if $edition.getChapterNumber(result.getChapterID()) !== undefined}&nbsp;{$edition.getChapterNumber(
-                                    result.getChapterID()
-                                )}{/if}</ChapterNumber
-                        > - <ChapterTitle>{result.getTitle()}</ChapterTitle
-                        ></PageHeader
-                    >
-                {:else}
-                    <p
-                        ><Link to={result.link}
-                            >...{result.left}<span
-                                class="bookish-content-highlight"
-                                >{result.match}</span
-                            >{result.right}...</Link
-                        ></p
-                    >
-                {/if}
-            {/each}
+        {#if query.trim() !== ''}
+            {#if query.trim().length < 3}
+                <p>Keep typing...</p>
+            {:else if results.length === 0}
+                <p>No occurrence of <em>{query}</em>.</p>
+            {:else}
+                <p
+                    >Found {results.filter(
+                        (result) => !(result instanceof Chapter)
+                    ).length} occurrences of <em>{query}</em>...</p
+                >
+                {#each results as result}
+                    {#if result instanceof Chapter}
+                        <PageHeader id={'header-' + result.getChapterID()}
+                            ><ChapterNumber
+                                >Chapter{#if $edition.getChapterNumber(result.getChapterID()) !== undefined}&nbsp;{$edition.getChapterNumber(
+                                        result.getChapterID()
+                                    )}{/if}</ChapterNumber
+                            > - <ChapterTitle>{result.getTitle()}</ChapterTitle
+                            ></PageHeader
+                        >
+                    {:else}
+                        <p
+                            ><Link to={result.link}
+                                >...{result.left}<span
+                                    class="bookish-content-highlight"
+                                    >{result.match}</span
+                                >{result.right}...</Link
+                            ></p
+                        >
+                    {/if}
+                {/each}
+            {/if}
         {/if}
-    {/if}
-</Page>
+    </Page>
+{/if}

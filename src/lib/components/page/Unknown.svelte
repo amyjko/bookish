@@ -9,20 +9,23 @@
     let edition = getEdition();
 </script>
 
-<Page title={`${$edition.getTitle()} - Unknown Page`}>
-    <Header
-        label="Unknown page title"
-        getImage={() => $edition.getImage(ChapterIDs.UnknownID)}
-        setImage={(embed) => $edition.setImage(ChapterIDs.UnknownID, embed)}
-        header="Oops."
-    >
-        <Outline slot="outline" previous={null} next={null} />
-    </Header>
+{#if $edition}
+    <Page title={`${$edition.getTitle()} - Unknown Page`}>
+        <Header
+            label="Unknown page title"
+            getImage={() => $edition?.getImage(ChapterIDs.UnknownID) ?? null}
+            setImage={(embed) =>
+                $edition?.setImage(ChapterIDs.UnknownID, embed)}
+            header="Oops."
+        >
+            <Outline slot="outline" previous={null} next={null} />
+        </Header>
 
-    <Instructions>
-        This page will be shown if the reader somehow ends up on a page that
-        doesn't exist. You can customize the image shown.
-    </Instructions>
+        <Instructions>
+            This page will be shown if the reader somehow ends up on a page that
+            doesn't exist. You can customize the image shown.
+        </Instructions>
 
-    <slot />
-</Page>
+        <slot />
+    </Page>
+{/if}

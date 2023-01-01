@@ -3,8 +3,9 @@
     import Code from './Code.svelte';
     import Python from './Python.svelte';
     import Text from './Text.svelte';
-    import { getCaret, isEditable } from '../page/Contexts';
+    import { isEditable } from '../page/Contexts';
     import Figure from './Figure.svelte';
+    import { getCaret } from '$lib/components/page/Contexts';
 
     export let node: CodeNode;
 
@@ -15,6 +16,7 @@
     // const languages = [ "C", "C++", "CSS", "Go", "HTML", "Java", "JavaScript", "Markdown", "Plaintext", "Python", "TypeScript" ];
 
     let caret = getCaret();
+
     $: inside =
         $caret?.range?.start.node === node.getCodeNode() ||
         $caret?.range?.end.node === node.getCodeNode();

@@ -7,7 +7,7 @@
     import TextInput from '$lib/components/app/TextInput.svelte';
     import Button from '$lib/components/app/Button.svelte';
 
-    let user = getAuth();
+    let auth = getAuth();
 
     let email: string = '';
     let loading = false;
@@ -15,11 +15,12 @@
     let error = '';
 
     async function handleSubmit() {
+        if ($auth === undefined) return;
         // Enter loading state, try to login and wait for it to complete, and then leave loading state.
         try {
             // Give some feedback when loading.
             loading = true;
-            await $user.login(email);
+            await $auth.login(email);
             feedback = 'Check your email for a login link.';
         } catch (err) {
             error = "Couldn't connect to the server.";
@@ -41,13 +42,15 @@
         autocomplete="username"
         type="email"
         placeholder="email"
-        disabled={loading}
+        disabled={auth === undefined || loading}
     />
     <Button
         tooltip="Login with your email"
         command={handleSubmit}
         type="submit"
-        disabled={loading || !/^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/.test(email)}
+        disabled={auth === undefined ||
+            loading ||
+            !/^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/.test(email)}
     >
         Login
     </Button>

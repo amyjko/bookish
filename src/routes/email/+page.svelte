@@ -7,6 +7,7 @@
     import Large from '../../lib/components/app/Large.svelte';
     import Paragraph from '../../lib/components/app/Paragraph.svelte';
     import TextInput from '../../lib/components/app/TextInput.svelte';
+    import { goto } from '$app/navigation';
 
     let email: string;
     let auth = getAuth();
@@ -25,6 +26,8 @@
     };
 
     async function handleSubmit() {
+        if ($auth === undefined) return;
+
         // Enter loading state, try to login and wait for it to complete, and then leave loading state.
         if ($auth.user !== null && email) {
             // Give some feedback when loading.
@@ -47,32 +50,46 @@
                 });
         }
     }
+
+    // Ask the auth context to logout, and provided an error if it fails.
+    function handleLogout() {
+        $auth?.logout();
+        goto('/login');
+    }
 </script>
 
-<Lead><Large>Change</Large> your e-mail.</Lead>
+<Lead><Large>You</Large>.</Lead>
 
 <Paragraph>
     To change your login email, type your new email address below.
 </Paragraph>
 
-<form on:submit|preventDefault={handleSubmit}>
-    <TextInput
-        autocomplete="username"
-        type="email"
-        placeholder="email"
-        bind:text={email}
-        disabled={loading}
-    />
-    <Button
-        tooltip="Submit your new email address"
-        command={handleSubmit}
-        type="submit"
-        disabled={loading ||
-            email == undefined ||
-            email.length === 0 ||
-            changed}>Update email</Button
-    >
-</form>
+<Paragraph>
+    <form on:submit|preventDefault={handleSubmit}>
+        <TextInput
+            autocomplete="username"
+            type="email"
+            placeholder="email"
+            bind:text={email}
+            disabled={loading}
+        />
+        <Button
+            tooltip="Submit your new email address"
+            command={handleSubmit}
+            type="submit"
+            disabled={loading ||
+                email == undefined ||
+                email.length === 0 ||
+                changed}>Update email</Button
+        >
+    </form>
+</Paragraph>
+
+<Paragraph>
+    Or, <Button tooltip="Logout of your account" command={handleLogout}
+        >logout</Button
+    >.
+</Paragraph>
 
 {#if feedback}
     <Feedback>{feedback}</Feedback>

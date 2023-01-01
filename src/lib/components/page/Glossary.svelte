@@ -12,16 +12,19 @@
     let edition = getEdition();
     let editable = isEditable();
 
-    $: glossary = $edition.getGlossary();
+    $: glossary = $edition?.getGlossary() ?? {};
     // Sort by canonical phrases
     $: keys =
-        glossary === undefined || Object.keys(glossary).length === 0
+        $edition === undefined
+            ? []
+            : glossary === undefined || Object.keys(glossary).length === 0
             ? null
             : Object.keys(glossary).sort((a, b) =>
                   glossary[a].phrase.localeCompare(glossary[b].phrase)
               );
 
     function addEmptyDefinition() {
+        if ($edition === undefined) return;
         // Generate an ID.
         const letters = 'abcdefghijklmnopqrstuvwxyz'.split('');
         let id = '';
@@ -31,35 +34,38 @@
     }
 </script>
 
-<Page title={`${$edition.getTitle()} - Glossary`}>
-    <Header
-        label="Glossary title"
-        getImage={() => $edition.getImage(ChapterIDs.GlossaryID)}
-        setImage={(embed) => $edition.setImage(ChapterIDs.GlossaryID, embed)}
-        header="Glossary"
-        tags={$edition.getTags()}
-    >
-        <Outline
-            slot="outline"
-            previous={$edition.getPreviousChapterID(ChapterIDs.GlossaryID)}
-            next={$edition.getNextChapterID(ChapterIDs.GlossaryID)}
-        />
-    </Header>
-    {#if editable}
-        <Instructions>
-            Add definitions and then link to them in a chapter's text.
-        </Instructions>
-        <Button tooltip="Add a glossary entry" command={addEmptyDefinition}
-            >Add definition</Button
+{#if $edition}
+    <Page title={`${$edition.getTitle()} - Glossary`}>
+        <Header
+            label="Glossary title"
+            getImage={() => $edition?.getImage(ChapterIDs.GlossaryID) ?? null}
+            setImage={(embed) =>
+                $edition?.setImage(ChapterIDs.GlossaryID, embed)}
+            header="Glossary"
+            tags={$edition.getTags()}
         >
-    {/if}
-    {#if keys === null}
-        <p>This book has no glossary.</p>
-    {:else}
-        <Rows>
-            {#each keys as id}
-                <DefinitionView {id} definition={glossary[id]} />
-            {/each}
-        </Rows>
-    {/if}
-</Page>
+            <Outline
+                slot="outline"
+                previous={$edition.getPreviousChapterID(ChapterIDs.GlossaryID)}
+                next={$edition.getNextChapterID(ChapterIDs.GlossaryID)}
+            />
+        </Header>
+        {#if editable}
+            <Instructions>
+                Add definitions and then link to them in a chapter's text.
+            </Instructions>
+            <Button tooltip="Add a glossary entry" command={addEmptyDefinition}
+                >Add definition</Button
+            >
+        {/if}
+        {#if keys === null}
+            <p>This book has no glossary.</p>
+        {:else}
+            <Rows>
+                {#each keys as id}
+                    <DefinitionView {id} definition={glossary[id]} />
+                {/each}
+            </Rows>
+        {/if}
+    </Page>
+{/if}

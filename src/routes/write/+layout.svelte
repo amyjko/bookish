@@ -5,7 +5,7 @@
     let auth = getAuth();
 
     // Redirect to the login page if not authenticated.
-    if ($auth.user === null) goto('/login');
+    if ($auth === undefined || $auth.user === null) goto('/login');
 </script>
 
 <slot />

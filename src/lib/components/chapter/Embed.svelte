@@ -1,7 +1,11 @@
 <script lang="ts">
     import type EmbedNode from '$lib/models/chapter/EmbedNode';
     import { storage } from '$lib/models/Firebase';
-    import { getCaret, getEdition, isEditable } from '../page/Contexts';
+    import {
+        getEdition,
+        isEditable,
+        getCaret,
+    } from '$lib/components/page/Contexts';
     import Figure from './Figure.svelte';
 
     export let node: EmbedNode;
@@ -38,7 +42,7 @@
                 dragFeedback = 'Uploading…';
 
                 const file = imageFiles[0];
-                const media = $edition.getBook()?.getMedia();
+                const media = $edition?.getBook()?.getMedia();
 
                 if (file === null) return;
                 if (storage === undefined) return;

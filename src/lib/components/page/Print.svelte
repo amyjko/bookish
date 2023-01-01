@@ -5,11 +5,13 @@
     let edition = getEdition();
 </script>
 
-{#each $edition
-    .getChapters()
-    .filter((chapter) => !chapter.isForthcoming()) as chapter}
-    <Chapter {chapter} print />
-{/each}
+{#if $edition}
+    {#each $edition
+        .getChapters()
+        .filter((chapter) => !chapter.isForthcoming()) as chapter}
+        <Chapter {chapter} print />
+    {/each}
+{/if}
 
 <style>
     @media print {

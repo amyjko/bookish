@@ -30,7 +30,9 @@
 <tr class={forthcoming ? 'bookish-forthcoming' : ''}>
     <td
         ><TableOfContentsImage
-            embed={chapter ? chapter.getImage() : $edition.getImage(chapterID)}
+            embed={chapter
+                ? chapter.getImage()
+                : $edition?.getImage(chapterID) ?? null}
         /></td
     >
     <td>

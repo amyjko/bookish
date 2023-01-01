@@ -11,40 +11,45 @@
     let edition = getEdition();
     let editable = isEditable();
 
-    $: references = $edition.hasReferences() ? $edition.getReferences() : null;
+    $: references = $edition?.hasReferences() ? $edition.getReferences() : null;
 
     // Otherwise, map references to a list with letter headers.
     if (references !== null) {
     }
 </script>
 
-<Page title={`${$edition.getTitle()} - References`}>
-    <Header
-        label="References title"
-        getImage={() => $edition.getImage(ChapterIDs.ReferencesID)}
-        setImage={(embed) => $edition.setImage(ChapterIDs.ReferencesID, embed)}
-        header="References"
-        tags={$edition.getTags()}
-    >
-        <Outline
-            slot="outline"
-            previous={$edition.getPreviousChapterID(ChapterIDs.ReferencesID)}
-            next={$edition.getNextChapterID(ChapterIDs.ReferencesID)}
-        />
-    </Header>
-    {#if editable}<BulkReferenceEditor />{/if}
-    {#if references !== null}
-        <p><em>Sorted by last name of first author.</em></p>
+{#if $edition}
+    <Page title={`${$edition.getTitle()} - References`}>
+        <Header
+            label="References title"
+            getImage={() => $edition?.getImage(ChapterIDs.ReferencesID) ?? null}
+            setImage={(embed) =>
+                $edition?.setImage(ChapterIDs.ReferencesID, embed)}
+            header="References"
+            tags={$edition.getTags()}
+        >
+            <Outline
+                slot="outline"
+                previous={$edition.getPreviousChapterID(
+                    ChapterIDs.ReferencesID
+                )}
+                next={$edition.getNextChapterID(ChapterIDs.ReferencesID)}
+            />
+        </Header>
+        {#if editable}<BulkReferenceEditor />{/if}
+        {#if references !== null}
+            <p><em>Sorted by last name of first author.</em></p>
 
-        {#each Object.keys(references).sort() as citationID}
-            {@const ref = Parser.parseReference(
-                citationID,
-                references === null ? '' : references[citationID],
-                $edition
-            )}
-            <PossibleReference node={ref} />
-        {/each}
-    {:else}
-        <p>This book has no references.</p>
-    {/if}
-</Page>
+            {#each Object.keys(references).sort() as citationID}
+                {@const ref = Parser.parseReference(
+                    citationID,
+                    references === null ? '' : references[citationID],
+                    $edition
+                )}
+                <PossibleReference node={ref} />
+            {/each}
+        {:else}
+            <p>This book has no references.</p>
+        {/if}
+    </Page>
+{/if}

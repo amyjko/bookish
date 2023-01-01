@@ -24,7 +24,7 @@
     });
 </script>
 
-<div
+<span
     class={`bookish-editor-status ${
         status === BookSaveStatus.Saving
             ? 'bookish-editor-status-saving'
@@ -42,17 +42,13 @@
         : status === BookSaveStatus.Error
         ? "\u2715 Couldn't save."
         : ''}
-</div>
+</span>
 
 <style>
     .bookish-editor-status {
-        position: fixed;
-        top: var(--app-chrome-padding);
-        right: var(--app-chrome-padding);
-        z-index: 3;
-        color: var(--bookish-muted-color);
-        font-family: var(--bookish-header-font-family);
-        font-size: var(--bookish-small-font-size);
+        color: var(--app-muted-color);
+        font-family: var(--app-font);
+        white-space: nowrap;
     }
 
     .bookish-editor-status-error {

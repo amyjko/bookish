@@ -1,7 +1,6 @@
 <script lang="ts">
     import commands from './Commands';
     import type Command from './Command';
-    import type CaretState from './CaretState';
 
     import TextNode from '$lib/models/chapter/TextNode';
     import AtomNode from '$lib/models/chapter/AtomNode';
@@ -29,7 +28,6 @@
     import TableEditor from '$lib/components/editor/TableEditor.svelte';
     import ToolbarGroup from './ToolbarGroup.svelte';
     import Icon from './Icon.svelte';
-    import { onMount } from 'svelte';
     import Button from '../app/Button.svelte';
 
     import AnnotateIcon from './icons/annotate.svg?raw';
@@ -50,6 +48,8 @@
     import QuoteIcon from './icons/quote.svg?raw';
     import MediaIcon from './icons/media.svg?raw';
     import TableNode from '../../models/chapter/TableNode';
+    import { slide } from 'svelte/transition';
+    import type CaretState from './CaretState';
 
     const keyLabels: { [key: string]: string } = {
         Digit0: '0',
@@ -87,11 +87,9 @@
         history: TimeIcon,
     };
 
-    export let context: CaretState | undefined = undefined;
-    export let executor: ((command: Command, key: string) => void) | undefined =
-        undefined;
-    export let visible: boolean = false;
+    export let caret: CaretState;
 
+    $: context = caret.context;
     $: chapter = context?.root;
 
     let element: HTMLElement | null = null;
@@ -102,26 +100,6 @@
     let quoteNode: QuoteNode | undefined = undefined;
     let embedNode: EmbedNode | undefined = undefined;
     let tableNode: TableNode | undefined = undefined;
-
-    $: isVisible = visible || containsFocus();
-
-    // Listen to focus changes to decide whether the toolbar is visible.
-    onMount(() => {
-        window.addEventListener('focus', updateVisible);
-        window.addEventListener('blur', updateVisible);
-
-        return () => {
-            window.removeEventListener('focus', updateVisible);
-            window.removeEventListener('blur', updateVisible);
-        };
-    });
-
-    function containsFocus() {
-        return element !== null && element.contains(document.activeElement);
-    }
-    function updateVisible() {
-        isVisible = visible || containsFocus();
-    }
 
     function getShortcutDescription(command: Command) {
         const macOS = navigator.userAgent.indexOf('Mac') >= 0;
@@ -220,14 +198,14 @@
 {#if chapter}
     <section
         class="bookish-editor-toolbar"
+        bind:this={element}
         on:keypress={handleKeyPress}
         on:keydown={handleKeyPress}
-        style={`visibility: ${isVisible ? 'visible' : 'hidden'};`}
-        bind:this={element}
         on:mousedown|stopPropagation={() => element?.focus()}
         tabIndex="0"
+        transition:slide={{ duration: 200 }}
     >
-        {#if context && categories && executor}
+        {#if context && categories}
             {#each categories as cat}
                 {#if commandsByCategory[cat].length > 0}
                     <ToolbarGroup
@@ -249,7 +227,11 @@
                                     getShortcutDescription(command)}
                                 tabIndex="0"
                                 command={() =>
-                                    executor?.call(undefined, command, '')}
+                                    caret?.executor.call(
+                                        undefined,
+                                        command,
+                                        ''
+                                    )}
                             >
                                 <Icon icon={command.icon} />
                             </Button>
@@ -298,18 +280,16 @@
 
 <style>
     .bookish-editor-toolbar {
-        position: fixed;
-        top: 0;
-        left: 0;
-        right: 0;
+        display: flex;
+        flex-direction: row;
+        flex-wrap: wrap;
         background: var(--bookish-background-color);
-        border-bottom: var(--app-chrome-border-size) solid
-            var(--app-border-color);
         padding: var(--app-chrome-padding);
-        padding-bottom: 0;
         font-family: var(--app-font);
         font-size: var(--app-chrome-font-size);
-        z-index: 2;
-        transition: top 1s;
+    }
+
+    .bookish-editor-toolbar:focus {
+        outline: 2px solid var(--app-interactive-color);
     }
 </style>

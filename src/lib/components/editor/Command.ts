@@ -1,6 +1,6 @@
 import type Edit from '$lib/models/chapter/Edit';
 import type CaretUtilities from './CaretUtilities';
-import type CaretState from './CaretState';
+import type CaretContext from './CaretContext';
 
 type Command = {
     icon: string;
@@ -12,10 +12,10 @@ type Command = {
     key?: string | string[] | ((key: string) => boolean);
     code?: string;
     mutates: boolean;
-    visible: boolean | ((context: CaretState) => boolean);
-    active: boolean | ((context: CaretState, key?: string) => boolean);
+    visible: boolean | ((context: CaretContext) => boolean);
+    active: boolean | ((context: CaretContext, key?: string) => boolean);
     handler: (
-        context: CaretState,
+        context: CaretContext,
         utilities: CaretUtilities,
         key: string
     ) => Edit;

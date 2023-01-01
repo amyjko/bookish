@@ -1,14 +1,15 @@
 <script lang="ts">
     import type CitationsNode from '$lib/models/chapter/CitationsNode';
-    import { getCaret, getEdition } from '../page/Contexts';
     import Note from './Note.svelte';
     import Options from '../app/Options.svelte';
     import Button from '../app/Button.svelte';
+    import { getCaret, getEdition } from '$lib/components/page/Contexts';
 
     export let citations: CitationsNode;
 
-    let edition = getEdition();
     let caret = getCaret();
+    let edition = getEdition();
+
     let value = '';
 
     function handleSelection(selection: string) {
@@ -26,9 +27,14 @@
         $caret?.edit(citations, citations.withMeta(Array.from(set)));
     }
 
-    $: uncited = Object.keys($edition.getReferences())
-        .filter((citationID) => !citations.getMeta().includes(citationID))
-        .sort();
+    $: uncited =
+        $edition === undefined
+            ? []
+            : Object.keys($edition.getReferences())
+                  .filter(
+                      (citationID) => !citations.getMeta().includes(citationID)
+                  )
+                  .sort();
     let options: [string, string][] = [];
     $: {
         options = [];

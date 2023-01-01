@@ -1,16 +1,18 @@
 <script lang="ts">
     import type LinkNode from '$lib/models/chapter/LinkNode';
     import URLEditor from './URLEditor.svelte';
-    import { getCaret, getChapter, getEdition } from '../page/Contexts';
+    import { getChapter, getEdition } from '../page/Contexts';
     import Icon from './Icon.svelte';
     import Button from '../app/Button.svelte';
     import UnlinkIcon from './icons/unlink.svg?raw';
     import Options from '../app/Options.svelte';
+    import { getCaret } from '$lib/components/page/Contexts';
 
     export let link: LinkNode;
 
     let caret = getCaret();
     let edition = getEdition();
+
     let chapter = getChapter();
 
     $: url = link.getMeta();
@@ -31,11 +33,12 @@
 
     function validate(urlOrChapter: string): string | undefined {
         if (urlOrChapter.length === 0) return "Can't be empty.";
+        if (edition === undefined) return;
 
         if (isValidURL(urlOrChapter)) return;
 
         // If not, is it a valid chapterID?
-        if ($edition.hasChapter(urlOrChapter)) return;
+        if ($edition?.hasChapter(urlOrChapter)) return;
 
         // If not, is it a valid chapterID:label?
         const [chapterID, labelID] = urlOrChapter.split(':');
@@ -45,7 +48,7 @@
         const correspondingChapter =
             chapterID === '' && $chapter
                 ? $chapter.chapter.getAST()
-                : $edition.getChapter(chapterID)?.getAST();
+                : $edition?.getChapter(chapterID)?.getAST();
         if (correspondingChapter === undefined)
             return 'Not a valid URL or chapter.';
 
@@ -59,13 +62,18 @@
         // Add an empty option.
         options.push(['External link', url.startsWith('http') ? url : '']);
         // Add an option for each chapter and it's labels.
-        for (const chap of $edition.getChapters()) {
-            options.push([`Chapter: ${chap.getTitle()}`, chap.getChapterID()]);
-            for (const label of chap.getAST()?.getLabels() ?? [])
+        if (edition) {
+            for (const chap of $edition?.getChapters() ?? []) {
                 options.push([
-                    chap.getTitle() + ': ' + label.getMeta(),
-                    `${chap.getChapterID()}:${label.getMeta()}`,
+                    `Chapter: ${chap.getTitle()}`,
+                    chap.getChapterID(),
                 ]);
+                for (const label of chap.getAST()?.getLabels() ?? [])
+                    options.push([
+                        chap.getTitle() + ': ' + label.getMeta(),
+                        `${chap.getChapterID()}:${label.getMeta()}`,
+                    ]);
+            }
         }
     }
 </script>

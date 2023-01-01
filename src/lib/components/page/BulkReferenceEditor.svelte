@@ -16,11 +16,14 @@
         const references = text
             .split(/\n+/)
             .map((line) =>
-                mineReference(Object.keys($edition.getReferences()), line)
+                mineReference(
+                    Object.keys($edition?.getReferences() ?? []),
+                    line
+                )
             );
 
         $edition
-            .addReferences(references)
+            ?.addReferences(references)
             .catch(() => {
                 alert('Failed to save references.');
             })
@@ -29,7 +32,7 @@
 
     function handleEmptyAdd() {
         $edition
-            .addReferences([
+            ?.addReferences([
                 new ReferenceNode(
                     getUniqueReferenceID(Object.keys($edition.getReferences()))
                 ),

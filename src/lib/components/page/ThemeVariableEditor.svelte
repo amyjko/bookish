@@ -32,7 +32,7 @@
             label={`${name} editor`}
             placeholder={group in placeholders ? placeholders[group] : 'value'}
             valid={() => undefined}
-            save={(text) => $edition.setThemeValue(group, name, text)}
+            save={(text) => $edition?.setThemeValue(group, name, text)}
         />
     </td>
 </tr>

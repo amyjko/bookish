@@ -3,17 +3,18 @@
     import type EditionModel from '$lib/models/book/Edition';
     import smoothscroll from 'smoothscroll-polyfill';
     import { goto } from '$app/navigation';
-    import Status from './Status.svelte';
     import { onMount, setContext } from 'svelte';
-    import { writable } from 'svelte/store';
+    import { writable, type Writable } from 'svelte/store';
     import {
         BASE,
         BOOK,
         DARK_MODE,
         EDITABLE,
         EDITION,
+        getBook,
+        getEdition,
         type DarkModeStore,
-        type EditionStore,
+        type EditionContext,
     } from './Contexts';
     import type Book from '$lib/models/book/Book';
     import { BookishTheme } from '$lib/models/book/Theme';
@@ -39,37 +40,39 @@
     // The book edition to render.
     export let edition: EditionModel;
 
-    // Expose the edition to descendents in a store and update the context when the edition changes.
-    let currentEdition = writable<EditionModel>(edition);
-    setContext<EditionStore>(EDITION, currentEdition);
-
     // Expose the book to descendents in a store and update the context when the edition changes.
-    $: setContext<Book | undefined>(BOOK, edition.getBook());
+    let activeBook = getBook();
+    $: activeBook.set(edition.getBook());
 
-    // When edition changes, unsubscribe to the previous edition and subscribe to the new one.
-    // We use a simple assignment to tell Svelte about the change.
-    let editionChanged = () => currentEdition.set(edition);
+    // Keep the global active edition set to the edition being viewed.
+    let activeEdition = getEdition();
+    // Change the global edition context.
+    $: activeEdition.set(edition);
+
+    // When the edition changes, unsubscribe to the old edition and subscribe to the new one.
+    let previousEdition: EditionModel | undefined = undefined;
+    let previousListener: (() => void) | undefined;
     $: {
-        // Remove the listeners from the old edition
-        $currentEdition.removeListener(editionChanged);
-        $currentEdition.getBook()?.removeListener(editionChanged);
-
-        // Update the current edition.
-        currentEdition.set(edition);
-
-        // Listen to the new edition
-        $currentEdition.getBook()?.addListener(editionChanged);
-        $currentEdition.addListener(editionChanged);
+        if (previousEdition && previousListener)
+            previousEdition.removeListener(previousListener);
+        previousEdition = edition;
+        previousListener = () => (edition = edition);
+        edition.addListener(previousListener);
     }
 
     // Create a timer that saves the current edition periodically and stops when unmounted.
     onMount(() => {
         const saveListener = setInterval(() => {
-            $currentEdition.saveEdits();
-            $currentEdition.getBook()?.saveEdits();
+            edition.saveEdits();
+            edition.getBook()?.saveEdits();
         }, 500);
-        // On unmount, stop listening.
-        return () => clearInterval(saveListener);
+        // On unmount, stop listening, and unset the contexts.
+        return () => {
+            clearInterval(saveListener);
+
+            activeEdition.set(undefined);
+            activeBook.set(undefined);
+        };
     });
 
     // Default dark mode to whatever's stored in local storage, if anything.
@@ -100,7 +103,7 @@
         goto(location.hash.replace('#', ''));
 
     // Set the theme, whatever it is, and change it when the edition changes.
-    $: setTheme($currentEdition.getTheme() ?? BookishTheme);
+    $: setTheme(edition.getTheme() ?? BookishTheme);
 
     /** Given a theme, sets the appropriate CSS rules in the browser to apply the theme.*/
     function setTheme(theme: Theme | null) {
@@ -199,9 +202,6 @@
 
 <div class="bookish {$darkMode ? ' dark' : ''}">
     <slot />
-    {#if editable}
-        <Status book={edition.getBook()} {edition} />
-    {/if}
 </div>
 
 <style>

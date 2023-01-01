@@ -724,4 +724,11 @@ export default class Edition {
                 return revisions.length - i;
         return undefined;
     }
+
+    getEditionLabel() {
+        const num = this.getEditionNumber();
+        return `${num}${
+            num === 1 ? 'st' : num === 2 ? 'nd' : num === 3 ? 'rd' : 'th'
+        }`;
+    }
 }

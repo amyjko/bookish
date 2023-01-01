@@ -44,7 +44,7 @@
         tooltip="Delete this reference"
         commandLabel="x"
         confirmLabel="Confirm"
-        command={() => $edition.removeReference(node.citationID)}
+        command={() => $edition?.removeReference(node.citationID)}
     />
     <Button
         tooltip="Finish editing this reference."
@@ -100,7 +100,7 @@
                         if (text.length === 0) return "Authors can't be empty.";
                     }}
                     save={(text) =>
-                        $edition.editReference(node.withAuthors(text))}
+                        $edition?.editReference(node.withAuthors(text))}
                     {move}
                 />
             </td>
@@ -118,7 +118,8 @@
                         if (!/1?[0-9)[0-9]{2}/.test(text))
                             return 'Not a valid year';
                     }}
-                    save={(text) => $edition.editReference(node.withYear(text))}
+                    save={(text) =>
+                        $edition?.editReference(node.withYear(text))}
                     {move}
                 />
             </td>
@@ -135,7 +136,7 @@
                         if (text.length === 0) return "Title can't be empty.";
                     }}
                     save={(text) =>
-                        $edition.editReference(node.withTitle(text))}
+                        $edition?.editReference(node.withTitle(text))}
                     {move}
                 />
             </td>
@@ -154,7 +155,7 @@
                                 return "Source can't be empty";
                         }}
                         save={(text) =>
-                            $edition.editReference(node.withSource(text))}
+                            $edition?.editReference(node.withSource(text))}
                         {move}
                     />
                 </em>
@@ -169,7 +170,7 @@
                     label={'URL editor.'}
                     placeholder="URL"
                     valid={() => undefined}
-                    save={(text) => $edition.editReference(node.withURL(text))}
+                    save={(text) => $edition?.editReference(node.withURL(text))}
                     {move}
                 />
             </td>
@@ -183,7 +184,7 @@
                     placeholder="Summary"
                     valid={() => undefined}
                     save={(text) =>
-                        $edition.editReference(node.withSummary(text))}
+                        $edition?.editReference(node.withSummary(text))}
                     {move}
                 />
             </td>

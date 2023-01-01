@@ -1,6 +1,6 @@
 <script lang="ts">
     import type QuoteNode from '$lib/models/chapter/QuoteNode';
-    import { getCaret } from '../page/Contexts';
+    import { getCaret } from '$lib/components/page/Contexts';
     import PositionEditor from './PositionEditor.svelte';
 
     export let quote: QuoteNode;

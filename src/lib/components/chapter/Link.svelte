@@ -23,7 +23,7 @@
                 chapter = parts[0];
             }
 
-            if (chapter !== '' && !$edition.hasChapter(chapter)) return true;
+            if (chapter !== '' && !$edition?.hasChapter(chapter)) return true;
         }
         return false;
     }

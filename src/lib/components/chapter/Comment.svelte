@@ -3,8 +3,11 @@
     import Atom from './Atom.svelte';
     import Marginal from './Marginal.svelte';
     import Format from './Format.svelte';
-    import { getChapter, isEditable } from '../page/Contexts';
-    import { getCaret } from '../page/Contexts';
+    import {
+        getChapter,
+        isEditable,
+        getCaret,
+    } from '$lib/components/page/Contexts';
     import { afterUpdate } from 'svelte';
     import Icon from '../editor/Icon.svelte';
     import CommentIcon from '../editor/icons/comment.svg?raw';
@@ -13,6 +16,7 @@
 
     let chapter = getChapter();
     let editable = isEditable();
+
     let caret = getCaret();
 
     $: chapterNode = $chapter?.chapter.getAST();

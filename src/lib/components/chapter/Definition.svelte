@@ -16,7 +16,7 @@
     // Find the definition.
     $: glossaryID = node.getMeta();
     $: phrase = node.getText();
-    $: glossary = $edition.getGlossary();
+    $: glossary = $edition?.getGlossary() ?? {};
     $: entry = glossary[glossaryID];
 
     // Position the marginals on every render.

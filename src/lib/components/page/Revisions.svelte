@@ -17,10 +17,10 @@
 
     let edition = getEdition();
     let editable = isEditable();
-    $: book = $edition.getBook();
+    $: book = $edition?.getBook();
 
     // Legacy revisions
-    $: editionRevisions = $edition.getRevisions();
+    $: editionRevisions = $edition?.getRevisions() ?? [];
 
     // Book revisions
     $: bookRevisions = book?.getRevisions();
@@ -37,110 +37,114 @@
     }
 </script>
 
-{#if editionRevisions.length > 0}
-    <PageHeader id="revisions">Revisions</PageHeader>
-    <ul>
-        {#each editionRevisions as revision}
-            <li
-                ><em>{revision[0]}</em>. <Format
-                    node={Parser.parseFormat($edition, revision[1])}
-                /></li
-            >
-        {/each}
-    </ul>
-{/if}
-{#if book && bookRevisions}
-    <PageHeader id="revisions"
-        >Editions {#if editable}<Button
-                tooltip="Create a new edition"
-                command={handleDraftEdition}>+</Button
-            >{/if}</PageHeader
-    >
-    <Instructions>
-        Each book has one or more editions, allowing you to track revisions and
-        ensure previous versions remain available. When you're ready to revise,
-        make a new edition, then publish it when you're done. The edition with a
-        * is the default edition readers will see, unless they explicitly choose
-        to view a previous edition.
-    </Instructions>
-    <Rows>
-        {#each bookRevisions as revision, index}
-            {@const editionNumber =
-                bookRevisions === undefined ? -1 : bookRevisions.length - index}
-            {@const editionLabel =
-                editionNumber +
-                (editionNumber === 1
-                    ? 'st'
-                    : editionNumber === 2
-                    ? 'nd'
-                    : editionNumber === 3
-                    ? 'rd'
-                    : 'th')}
-            {@const viewing = revision.ref.id === $edition.getRef()?.id}
+{#if $edition}
+    {#if editionRevisions.length > 0}
+        <PageHeader id="revisions">Revisions</PageHeader>
+        <ul>
+            {#each editionRevisions as revision}
+                <li
+                    ><em>{revision[0]}</em>. <Format
+                        node={Parser.parseFormat($edition, revision[1])}
+                    /></li
+                >
+            {/each}
+        </ul>
+    {/if}
+    {#if book && bookRevisions}
+        <PageHeader id="revisions"
+            >Editions {#if editable}<Button
+                    tooltip="Create a new edition"
+                    command={handleDraftEdition}>+</Button
+                >{/if}</PageHeader
+        >
+        <Instructions>
+            Each book has one or more editions, allowing you to track revisions
+            and ensure previous versions remain available. When you're ready to
+            revise, make a new edition, then publish it when you're done. The
+            edition with a * is the default edition readers will see, unless
+            they explicitly choose to view a previous edition.
+        </Instructions>
+        <Rows>
+            {#each bookRevisions as revision, index}
+                {@const editionNumber =
+                    bookRevisions === undefined
+                        ? -1
+                        : bookRevisions.length - index}
+                {@const editionLabel =
+                    editionNumber +
+                    (editionNumber === 1
+                        ? 'st'
+                        : editionNumber === 2
+                        ? 'nd'
+                        : editionNumber === 3
+                        ? 'rd'
+                        : 'th')}
+                {@const viewing = revision.ref.id === $edition.getRef()?.id}
 
-            {#if editable || revision.published}
-                <tr>
-                    <td>
-                        {#if viewing}
-                            <strong class="viewing">{editionLabel}</strong>
-                        {:else}
-                            <Link
-                                to={`/write/${book.ref.id}/${
-                                    bookRevisions.length - index
-                                }`}>{editionLabel}</Link
+                {#if editable || revision.published}
+                    <tr>
+                        <td>
+                            {#if viewing}
+                                <strong class="viewing">{editionLabel}</strong>
+                            {:else}
+                                <Link
+                                    to={`/write/${book.ref.id}/${
+                                        bookRevisions.length - index
+                                    }`}>{editionLabel}</Link
+                                >
+                            {/if}
+                            <Note
+                                >{new Date(revision.time).toLocaleDateString(
+                                    'en-us'
+                                )}</Note
                             >
-                        {/if}
-                        <Note
-                            >{new Date(revision.time).toLocaleDateString(
-                                'en-us'
-                            )}</Note
-                        >
-                    </td>
-                    <td>
-                        {#if editable}
-                            <BookishEditor
-                                ast={Parser.parseFormat(
-                                    undefined,
-                                    revision.summary
-                                ).withTextIfEmpty()}
-                                save={(newSummary) =>
-                                    book
-                                        ? book.setEditionChangeSummary(
-                                              newSummary.toBookdown(),
-                                              index
-                                          )
-                                        : undefined}
-                                chapter={false}
-                                component={Format}
-                                placeholder="Summarize this edition's changes."
-                            />
-                        {:else if revision.summary === ''}
-                            <em>No summary of changes</em>
-                        {:else}
-                            {revision.summary}
-                        {/if}
-                    </td>
-                    <td style="whitespace: nowrap">
-                        {#if editable}
-                            <Switch
-                                options={['hidden', 'published']}
-                                enabled={revision.published ||
-                                    revision.summary !== ''}
-                                value={revision.published
-                                    ? 'published'
-                                    : 'hidden'}
-                                edit={(published) =>
-                                    handlePublish(
-                                        index,
-                                        published === 'published'
-                                    )}
-                            />
-                        {/if}
-                    </td>
-                </tr>
-            {/if}
-        {/each}
-    </Rows>
+                        </td>
+                        <td>
+                            {#if editable}
+                                <BookishEditor
+                                    ast={Parser.parseFormat(
+                                        undefined,
+                                        revision.summary
+                                    ).withTextIfEmpty()}
+                                    save={(newSummary) =>
+                                        book
+                                            ? book.setEditionChangeSummary(
+                                                  newSummary.toBookdown(),
+                                                  index
+                                              )
+                                            : undefined}
+                                    chapter={false}
+                                    component={Format}
+                                    placeholder="Summarize this edition's changes."
+                                />
+                            {:else if revision.summary === ''}
+                                <em>No summary of changes</em>
+                            {:else}
+                                {revision.summary}
+                            {/if}
+                        </td>
+                        <td style="whitespace: nowrap">
+                            {#if editable}
+                                <Switch
+                                    options={['hidden', 'published']}
+                                    enabled={revision.published ||
+                                        revision.summary !== ''}
+                                    value={revision.published
+                                        ? 'published'
+                                        : 'hidden'}
+                                    edit={(published) =>
+                                        handlePublish(
+                                            index,
+                                            published === 'published'
+                                        )}
+                                />
+                            {/if}
+                        </td>
+                    </tr>
+                {/if}
+            {/each}
+        </Rows>
+    {/if}
 {/if}
 
 <style>

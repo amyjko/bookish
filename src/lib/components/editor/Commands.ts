@@ -22,7 +22,7 @@ import BlocksNode from '$lib/models/chapter/BlocksNode';
 import type RootNode from '$lib/models/chapter/RootNode';
 import type Edit from '$lib/models/chapter/Edit';
 import type Node from '$lib/models/chapter/Node';
-import type CaretState from './CaretState';
+import type CaretContext from './CaretContext';
 import type Command from './Command';
 
 import BoldIcon from './icons/bold.svg?raw';
@@ -61,7 +61,7 @@ import SuperscriptIcon from './icons/super.svg?raw';
 import TableIcon from './icons/table.svg?raw';
 import UndoIcon from './icons/undo.svg?raw';
 import UnindentIcon from './icons/unindent.svg?raw';
-import type { PasteContent } from './CaretState';
+import type { PasteContent } from './CaretContext';
 /**
  * Icons:
  *      From: https://www.streamlinehq.com/icons/streamline-mini-line
@@ -73,7 +73,7 @@ import type { PasteContent } from './CaretState';
  *  */
 
 function insertTableRowColumn(
-    context: CaretState,
+    context: CaretContext,
     table: TableNode,
     format: FormatNode,
     row: boolean,
@@ -98,7 +98,7 @@ function insertTableRowColumn(
 }
 
 function deleteTableRowColumn(
-    context: CaretState,
+    context: CaretContext,
     table: TableNode,
     format: FormatNode,
     row: boolean
@@ -133,7 +133,7 @@ function deleteTableRowColumn(
 
 // A helper function that encapsulates boilerplate for replacing a node in a root and updating a caret.
 function rootWithNode<NodeType extends Node>(
-    context: CaretState,
+    context: CaretContext,
     original: NodeType | undefined,
     replacement: NodeType | undefined,
     caret?: (node: NodeType) => Caret | undefined

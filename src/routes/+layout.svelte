@@ -6,6 +6,29 @@
     import Lead from '$lib/components/app/Lead.svelte';
     import Writing from '$lib/components/app/Writing.svelte';
     import Paragraph from '$lib/components/app/Paragraph.svelte';
+    import { writable, type Writable } from 'svelte/store';
+    import { setContext } from 'svelte';
+    import {
+        ActiveEditorSymbol,
+        BOOK,
+        EDITION,
+        type EditionContext,
+    } from '$lib/components/page/Contexts';
+    import type Book from '$lib/models/book/Book';
+    import type Edition from '../lib/models/book/Edition';
+    import type CaretState from '../lib/components/editor/CaretState';
+
+    // A global store context for the focused editor, used to display toolbar.
+    let activeEditor = writable<CaretState | undefined>(undefined);
+    setContext(ActiveEditorSymbol, activeEditor);
+
+    // A global store for the current book. It's at the root so the header can do breadcrumbs.
+    let activeBook = writable<Book | undefined>(undefined);
+    setContext<Writable<Book | undefined>>(BOOK, activeBook);
+
+    // A global store for the current edition. It's at the root so the header can do breacrumbs.
+    let activeEdition = writable<Edition>(undefined);
+    setContext<EditionContext>(EDITION, activeEdition);
 </script>
 
 {#if import.meta.env.PROD}

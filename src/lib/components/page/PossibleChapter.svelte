@@ -6,7 +6,7 @@
 
     $: edition = getEdition();
     $: chapterID = $page.params.chapterid;
-    $: chapter = $edition.getChapter(chapterID);
+    $: chapter = $edition?.getChapter(chapterID);
 </script>
 
 {#if chapter}

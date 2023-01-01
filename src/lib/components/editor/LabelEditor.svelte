@@ -1,7 +1,8 @@
 <script lang="ts">
     import type LabelNode from '$lib/models/chapter/LabelNode';
     import TextEditor from './TextEditor.svelte';
-    import { getCaret, getChapter } from '../page/Contexts';
+    import { getChapter } from '../page/Contexts';
+    import { getCaret } from '$lib/components/page/Contexts';
 
     export let label: LabelNode;
 

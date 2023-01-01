@@ -41,7 +41,7 @@
                     {#each citations as citationID, index}
                         {@const citationNumber =
                             chapterNode?.getCitationNumber(citationID)}
-                        {#if citationNumber && citationID in $edition.getReferences()}
+                        {#if citationNumber && citationID in ($edition?.getReferences() ?? {})}
                             <sup class="bookish-citation-symbol"
                                 >{citationNumber}</sup
                             >
@@ -62,8 +62,8 @@
                     {#each citations as citationID}
                         {@const citationNumber =
                             chapterNode?.getCitationNumber(citationID)}
-                        {@const ref = $edition.getReference(citationID)}
-                        {#if citationNumber && ref}
+                        {@const ref = $edition?.getReference(citationID)}
+                        {#if citationNumber && ref && $edition}
                             <span class="bookish-reference">
                                 <sup class="bookish-citation-symbol"
                                     >{citationNumber}</sup

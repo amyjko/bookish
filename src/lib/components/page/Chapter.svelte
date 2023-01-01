@@ -234,11 +234,11 @@
 
     // Prepare to render the chapter by getting some data from the chapter and book.
     $: chapterID = $currentChapter.getChapterID();
-    $: chapterNumber = $edition.getChapterNumber(chapterID);
-    $: chapterSection = $edition.getChapterSection(chapterID);
+    $: chapterNumber = $edition?.getChapterNumber(chapterID);
+    $: chapterSection = $edition?.getChapterSection(chapterID);
     $: chapterAST = $currentChapter.getAST();
     $: citations = chapterAST ? chapterAST.getCitations() : undefined;
-    $: editionNumber = $edition.getEditionNumber();
+    $: editionNumber = $edition?.getEditionNumber();
 
     let chapterStore = writable<ChapterContext>();
     setContext<ChapterStore>(CHAPTER, chapterStore);
@@ -251,153 +251,159 @@
     });
 </script>
 
-<Page
-    afterLoaded={scrollToLastLocation}
-    title={`${$edition.getTitle()} - ${chapter.getTitle()}`}
->
-    <div class="bookish-chapter">
-        <Header
-            header={chapter.getTitle()}
-            label="Chapter title"
-            tags={$edition.getTags()}
-            save={(text) => chapter.setTitle(text)}
-            getImage={() => chapter.getImage()}
-            setImage={(embed) => chapter.setImage(embed)}
-            {print}
-        >
-            <!-- Collapse the outline if a marginal is selected. -->
-            <Outline
-                slot="outline"
-                collapse={marginal !== undefined}
-                previous={$edition.getPreviousChapterID(chapterID)}
-                next={$edition.getNextChapterID(chapterID)}
-                listener={(expanded) => {
-                    // If the outline is being expanded, hide the marginal, otherwise leave it alone.
-                    if (expanded) marginal.set(undefined);
+{#if $edition}
+    <Page
+        afterLoaded={scrollToLastLocation}
+        title={`${$edition.getTitle()} - ${chapter.getTitle()}`}
+    >
+        <div class="bookish-chapter">
+            <Header
+                header={chapter.getTitle()}
+                label="Chapter title"
+                tags={$edition.getTags()}
+                save={(text) => chapter.setTitle(text)}
+                getImage={() => chapter.getImage()}
+                setImage={(embed) => chapter.setImage(embed)}
+                {print}
+            >
+                <!-- Collapse the outline if a marginal is selected. -->
+                <Outline
+                    slot="outline"
+                    collapse={marginal !== undefined}
+                    previous={$edition.getPreviousChapterID(chapterID)}
+                    next={$edition.getNextChapterID(chapterID)}
+                    listener={(expanded) => {
+                        // If the outline is being expanded, hide the marginal, otherwise leave it alone.
+                        if (expanded) marginal.set(undefined);
 
-                    // Check if we need to hide the outline after positioning.
-                    hideOutlineIfObscured();
-                }}
-            />
-            <!-- Add an editable chapter ID if in editor mode -->
-            <svelte:fragment slot="before">
-                {#if editable}
-                    <Muted>
-                        <TextEditor
-                            text={chapter.getChapterID()}
-                            label="Chapter URL ID editor"
-                            save={// After the ID is edited, reload the page with the new URL.
-                            (newChapterID) => {
-                                chapter.setChapterID(newChapterID);
-                                // Navigate to the new ID
-                                goto(
-                                    `/write/${book.ref.id}/${editionNumber}/${newChapterID}`
-                                );
-                            }}
-                            placeholder="chapter ID"
-                            valid={(newChapterID) =>
-                                !/^[a-zA-Z0-9]+$/.test(newChapterID)
-                                    ? 'Chapter IDs must be one or more letters or numbers'
-                                    : chapter.getChapterID() !== newChapterID &&
-                                      $edition.hasChapter(newChapterID)
-                                    ? "There's already a chapter that has this ID."
-                                    : undefined}
-                            saveOnExit={true}
-                        />
-                        <br />
-                    </Muted>
-                {/if}
-                {#if editable}
-                    <Toggle
-                        on={chapter.isNumbered()}
-                        save={(on) => chapter.setNumbered(on)}
-                    >
-                        {#if chapterNumber !== undefined}
-                            <ChapterNumber
-                                >Chapter {chapterNumber}</ChapterNumber
-                            >
-                        {:else}
-                            <Muted>Unnumbered</Muted>
-                        {/if}
-                    </Toggle>
-                {:else if chapterNumber !== undefined}
-                    <ChapterNumber>Chapter {chapterNumber}</ChapterNumber>
-                {/if}
-                {#if chapterSection !== undefined && chapterSection.length > 0}
-                    <span class="section-name">{chapterSection}</span>
-                {/if}
-            </svelte:fragment>
-            <!-- If there are chapter authors, render those, otherwise use the book authors -->
-            <Authors
-                slot="after"
-                authors={chapter.getAuthors()}
-                inheritedAuthors={$edition.getAuthors()}
-                add={() => chapter.addAuthor('')}
-                edit={(index, text) => chapter.setAuthor(index, text)}
-                remove={(index) => chapter.removeAuthor(index)}
-            />
-        </Header>
-
-        <Instructions>
-            Edit your chapter's title, authors, and cover image above. You can
-            also change the ID of the chapter, which appears in it's URL. Write
-            your chapter text below, using the many formatting options in the
-            toolbar above to format text, add headers, lists, tables, comments,
-            citations, footnotes, and more. It's okay to try things, you can
-            always undo! Saves are automatic, each time you stop typing.
-        </Instructions>
-
-        <!-- Render the chapter body, passing some context -->
-        {#if chapterAST}
-            {#if editable}
-                <BookishEditor
-                    ast={chapterAST}
-                    save={(node) =>
-                        node instanceof ChapterNode
-                            ? chapter.setAST(node)
-                            : undefined}
-                    chapter={true}
-                    autofocus
-                    component={ChapterBody}
-                    placeholder="Type here"
+                        // Check if we need to hide the outline after positioning.
+                        hideOutlineIfObscured();
+                    }}
                 />
-            {:else}
-                <ChapterBody node={chapterAST} />
-            {/if}
-        {:else}
-            <span>Loading...</span>
-        {/if}
-        {#if citations && citations.size > 0}
-            {@const refs = $edition.getReferences()}
-            <Title>References</Title>
-            <ol>
-                {#each [...citations].sort() as citationID}
-                    {#if citationID in refs}
-                        <li
-                            class={'bookish-reference'}
-                            id={'ref-' + citationID}
-                        >
-                            <PossibleReference
-                                node={Parser.parseReference(
-                                    citationID,
-                                    refs[citationID],
-                                    $edition
-                                )}
+                <!-- Add an editable chapter ID if in editor mode -->
+                <svelte:fragment slot="before">
+                    {#if editable && $book}
+                        <Muted>
+                            <TextEditor
+                                text={chapter.getChapterID()}
+                                label="Chapter URL ID editor"
+                                save={// After the ID is edited, reload the page with the new URL.
+                                (newChapterID) => {
+                                    if ($book) {
+                                        chapter.setChapterID(newChapterID);
+                                        // Navigate to the new ID
+                                        goto(
+                                            `/write/${$book.ref.id}/${editionNumber}/${newChapterID}`
+                                        );
+                                    }
+                                }}
+                                placeholder="chapter ID"
+                                valid={(newChapterID) =>
+                                    !/^[a-zA-Z0-9]+$/.test(newChapterID)
+                                        ? 'Chapter IDs must be one or more letters or numbers'
+                                        : chapter.getChapterID() !==
+                                              newChapterID &&
+                                          $edition?.hasChapter(newChapterID)
+                                        ? "There's already a chapter that has this ID."
+                                        : undefined}
+                                saveOnExit={true}
                             />
-                        </li>
-                    {:else}
-                        <li
-                            ><Problem
-                                >Unknown reference: <code>{citationID}</code
-                                ></Problem
-                            ></li
-                        >
+                            <br />
+                        </Muted>
                     {/if}
-                {/each}
-            </ol>
-        {/if}
-    </div>
-</Page>
+                    {#if editable}
+                        <Toggle
+                            on={chapter.isNumbered()}
+                            save={(on) => chapter.setNumbered(on)}
+                        >
+                            {#if chapterNumber !== undefined}
+                                <ChapterNumber
+                                    >Chapter {chapterNumber}</ChapterNumber
+                                >
+                            {:else}
+                                <Muted>Unnumbered</Muted>
+                            {/if}
+                        </Toggle>
+                    {:else if chapterNumber !== undefined}
+                        <ChapterNumber>Chapter {chapterNumber}</ChapterNumber>
+                    {/if}
+                    {#if chapterSection !== undefined && chapterSection.length > 0}
+                        <span class="section-name">{chapterSection}</span>
+                    {/if}
+                </svelte:fragment>
+                <!-- If there are chapter authors, render those, otherwise use the book authors -->
+                <Authors
+                    slot="after"
+                    authors={chapter.getAuthors()}
+                    inheritedAuthors={$edition.getAuthors()}
+                    add={() => chapter.addAuthor('')}
+                    edit={(index, text) => chapter.setAuthor(index, text)}
+                    remove={(index) => chapter.removeAuthor(index)}
+                />
+            </Header>
+
+            <Instructions>
+                Edit your chapter's title, authors, and cover image above. You
+                can also change the ID of the chapter, which appears in it's
+                URL. Write your chapter text below, using the many formatting
+                options in the toolbar above to format text, add headers, lists,
+                tables, comments, citations, footnotes, and more. It's okay to
+                try things, you can always undo! Saves are automatic, each time
+                you stop typing.
+            </Instructions>
+
+            <!-- Render the chapter body, passing some context -->
+            {#if chapterAST}
+                {#if editable}
+                    <BookishEditor
+                        ast={chapterAST}
+                        save={(node) =>
+                            node instanceof ChapterNode
+                                ? chapter.setAST(node)
+                                : undefined}
+                        chapter={true}
+                        autofocus
+                        component={ChapterBody}
+                        placeholder="Type here"
+                    />
+                {:else}
+                    <ChapterBody node={chapterAST} />
+                {/if}
+            {:else}
+                <span>Loading...</span>
+            {/if}
+            {#if citations && citations.size > 0}
+                {@const refs = $edition.getReferences()}
+                <Title>References</Title>
+                <ol>
+                    {#each [...citations].sort() as citationID}
+                        {#if citationID in refs}
+                            <li
+                                class={'bookish-reference'}
+                                id={'ref-' + citationID}
+                            >
+                                <PossibleReference
+                                    node={Parser.parseReference(
+                                        citationID,
+                                        refs[citationID],
+                                        $edition
+                                    )}
+                                />
+                            </li>
+                        {:else}
+                            <li
+                                ><Problem
+                                    >Unknown reference: <code>{citationID}</code
+                                    ></Problem
+                                ></li
+                            >
+                        {/if}
+                    {/each}
+                </ol>
+            {/if}
+        </div>
+    </Page>
+{/if}
 
 <style>
     .section-name {

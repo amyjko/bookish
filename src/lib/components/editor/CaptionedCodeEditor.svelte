@@ -3,7 +3,7 @@
     import LanguageEditor from './LanguageEditor.svelte';
     import PositionEditor from './PositionEditor.svelte';
     import Switch from '$lib/components/editor/Switch.svelte';
-    import { getCaret } from '../page/Contexts';
+    import { getCaret } from '$lib/components/page/Contexts';
 
     export let code: CodeNode;
 

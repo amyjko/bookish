@@ -16,8 +16,8 @@
     let editable = isEditable();
     let images: Image[] | undefined = [];
 
-    $: embeds = $edition.getEmbeds();
-    $: media = $edition.getBook()?.getMedia();
+    $: embeds = $edition?.getEmbeds() ?? [];
+    $: media = $edition?.getBook()?.getMedia();
 
     function updateImages(newImages: Image[] | undefined) {
         images = newImages;
@@ -35,64 +35,72 @@
     );
 </script>
 
-<Page title={`${$edition.getTitle()} - Media`}>
-    <Header
-        label="Media title"
-        getImage={() => $edition.getImage(ChapterIDs.MediaID)}
-        setImage={(embed) => $edition.setImage(ChapterIDs.MediaID, embed)}
-        header="Media"
-        tags={$edition.getTags()}
-    >
-        <Outline
-            slot="outline"
-            previous={$edition.getPreviousChapterID(ChapterIDs.MediaID)}
-            next={$edition.getNextChapterID(ChapterIDs.MediaID)}
-        />
-    </Header>
-    <Instructions>
-        This page shows readers an index of the media in the book. Writers can
-        use this page to manage any images that are linked or uploaded for this
-        book. Note: images are shared between all editions, so if you delete one
-        not used in this edition, it might be used in others.
-    </Instructions>
-
-    {#if embeds.length === 0}
-        <p>No images or videos appear in the book.</p>
-    {:else}
-        <p>These are the images and videos in the book:</p>
-    {/if}
-    {#each embeds as embed}
-        <MediaPreview url={embed.getSmallURL()} alt={embed.getDescription()}>
-            <span
-                >{#if editable}{images &&
-                    images.find((i) => i.url === embed.getURL()) === undefined
-                        ? 'linked'
-                        : 'uploaded'}{embed.getCredit().isEmptyText()
-                        ? ''
-                        : ' • '}{/if}<Format node={embed.getCredit()} /></span
-            >
-        </MediaPreview>
-    {/each}
-    {#if editable && unused !== undefined && unused.length > 0}
-        <PageHeader id="unused">Unused</PageHeader>
+{#if $edition}
+    <Page title={`${$edition.getTitle()} - Media`}>
+        <Header
+            label="Media title"
+            getImage={() => $edition?.getImage(ChapterIDs.MediaID) ?? null}
+            setImage={(embed) => $edition?.setImage(ChapterIDs.MediaID, embed)}
+            header="Media"
+            tags={$edition.getTags()}
+        >
+            <Outline
+                slot="outline"
+                previous={$edition.getPreviousChapterID(ChapterIDs.MediaID)}
+                next={$edition.getNextChapterID(ChapterIDs.MediaID)}
+            />
+        </Header>
         <Instructions>
-            These images are uploaded to this book, but not used. Delete them if
-            you don't need them. Note, however, that these images may be used in
-            other editions of this book.
+            This page shows readers an index of the media in the book. Writers
+            can use this page to manage any images that are linked or uploaded
+            for this book. Note: images are shared between all editions, so if
+            you delete one not used in this edition, it might be used in others.
         </Instructions>
-        {#each unused as image}
-            <MediaPreview url={image.url} alt={''}>
+
+        {#if embeds.length === 0}
+            <p>No images or videos appear in the book.</p>
+        {:else}
+            <p>These are the images and videos in the book:</p>
+        {/if}
+        {#each embeds as embed}
+            <MediaPreview
+                url={embed.getSmallURL()}
+                alt={embed.getDescription()}
+            >
                 <span
-                    >uploaded <Button
-                        tooltip="Delete this unused image"
-                        command={() =>
-                            media
-                                ?.remove(image)
-                                .then((images) => updateImages(images))}
-                        >x</Button
-                    ></span
+                    >{#if editable}{images &&
+                        images.find((i) => i.url === embed.getURL()) ===
+                            undefined
+                            ? 'linked'
+                            : 'uploaded'}{embed.getCredit().isEmptyText()
+                            ? ''
+                            : ' • '}{/if}<Format
+                        node={embed.getCredit()}
+                    /></span
                 >
             </MediaPreview>
         {/each}
-    {/if}
-</Page>
+        {#if editable && unused !== undefined && unused.length > 0}
+            <PageHeader id="unused">Unused</PageHeader>
+            <Instructions>
+                These images are uploaded to this book, but not used. Delete
+                them if you don't need them. Note, however, that these images
+                may be used in other editions of this book.
+            </Instructions>
+            {#each unused as image}
+                <MediaPreview url={image.url} alt={''}>
+                    <span
+                        >uploaded <Button
+                            tooltip="Delete this unused image"
+                            command={() =>
+                                media
+                                    ?.remove(image)
+                                    .then((images) => updateImages(images))}
+                            >x</Button
+                        ></span
+                    >
+                </MediaPreview>
+            {/each}
+        {/if}
+    </Page>
+{/if}

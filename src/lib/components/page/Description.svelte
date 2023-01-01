@@ -7,22 +7,23 @@
     let editable = isEditable();
     let edition = getEdition();
 
-    $: descriptionNode = Parser.parseChapter(
-        $edition,
-        $edition.getDescription()
-    );
+    $: descriptionNode = $edition
+        ? Parser.parseChapter($edition, $edition.getDescription())
+        : undefined;
 </script>
 
-<div class="bookish-description">
-    {#if editable}
-        <BookishEditor
-            ast={descriptionNode}
-            save={(node) => $edition.setDescription(node.toBookdown())}
-            chapter={false}
-            component={ChapterBody}
-            placeholder="What this book about?"
-        />
-    {:else}
-        <ChapterBody node={descriptionNode} />
-    {/if}
-</div>
+{#if descriptionNode}
+    <div class="bookish-description">
+        {#if editable}
+            <BookishEditor
+                ast={descriptionNode}
+                save={(node) => $edition?.setDescription(node.toBookdown())}
+                chapter={false}
+                component={ChapterBody}
+                placeholder="What this book about?"
+            />
+        {:else}
+            <ChapterBody node={descriptionNode} />
+        {/if}
+    </div>
+{/if}
