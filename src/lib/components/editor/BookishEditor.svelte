@@ -183,9 +183,7 @@
                             );
                         } catch (e) {
                             console.error(e);
-                            throw Error(
-                                `Error setting caret range was set to ${startNode.childNodes[0]}:${sortedRange.start.index} - ${endNode.childNodes[0]}:${sortedRange.end.index}`
-                            );
+                            console.error(`Error setting caret range, trying to set to ${startNode.childNodes[0]}:${sortedRange.start.index} - ${endNode.childNodes[0]}:${sortedRange.end.index}`);
                         }
                         currentRange = docSelection.getRangeAt(0);
                     }
