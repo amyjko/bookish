@@ -37,6 +37,7 @@
     import { afterUpdate, onMount } from 'svelte';
     import type { PasteContent } from './CaretContext';
     import { getCaret } from '../page/Contexts';
+    import CaretView from './CaretView.svelte';
 
     const IDLE_TIME = 500;
 
@@ -183,7 +184,9 @@
                             );
                         } catch (e) {
                             console.error(e);
-                            console.error(`Error setting caret range, trying to set to ${startNode.childNodes[0]}:${sortedRange.start.index} - ${endNode.childNodes[0]}:${sortedRange.end.index}`);
+                            console.error(
+                                `Error setting caret range, trying to set to ${startNode.childNodes[0]}:${sortedRange.start.index} - ${endNode.childNodes[0]}:${sortedRange.end.index}`
+                            );
                         }
                         currentRange = docSelection.getRangeAt(0);
                     }
@@ -243,25 +246,6 @@
 
         // Save the new caret position so we render it.
         caretCoordinate = newCaretPosition;
-
-        // If the caret position is outside the window, and the editor is focused, scroll to make the caret visible.
-        if (newCaretPosition && editorFocused) {
-            const caretTop = newCaretPosition.y;
-            const caretBottom = caretTop + newCaretPosition.height;
-            const windowHeight = window.innerHeight;
-            const toolbar = element?.querySelector('.bookish-editor-toolbar');
-            const toolbarHeight = toolbar ? toolbar.clientHeight : 0;
-
-            const buffer = 0; //newCaretPosition.height * 5;
-            if (caretTop < window.scrollY + buffer + toolbarHeight) {
-                window.scrollTo({ top: caretTop - buffer, behavior: 'smooth' });
-            } else if (caretBottom > window.scrollY + windowHeight - buffer) {
-                window.scrollTo({
-                    top: caretBottom - (windowHeight - buffer),
-                    behavior: 'smooth',
-                });
-            }
-        }
     });
 
     function rangeToCaret(domNode: Node, rangeIndex: number) {
@@ -961,18 +945,18 @@
         (caretRange.start.node !== caretRange.end.node ||
             caretRange.start.index !== caretRange.end.index);
     $: isItalic =
-        caretRange &&
-        !isSelection &&
+        caretRange !== undefined &&
+        isSelection === false &&
         caretRange.start.node instanceof TextNode &&
         caretRange.start.node.isItalic(editedNode);
     $: isBold =
-        caretRange &&
-        !isSelection &&
+        caretRange !== undefined &&
+        isSelection === false &&
         caretRange.start.node instanceof TextNode &&
         caretRange.start.node.isBold(editedNode);
     $: isLink =
-        caretRange &&
-        !isSelection &&
+        caretRange !== undefined &&
+        isSelection === false &&
         caretRange.start.node.getClosestParentMatching(
             editedNode,
             (p) => p instanceof LinkNode
@@ -1013,27 +997,23 @@
     role="textbox"
     tabIndex="0"
 >
-    <!-- Draw a caret. We draw our own since this view isn't contentEditable and we can't show a caret.
+    <!-- The chapter content -->
+    <svelte:component this={component} node={editedNode} {placeholder} />
+    <!-- The caret. We render our own since this view isn't contentEditable and we can't show a caret.
          Customize the rendering based on the formatting applied to the text node. -->
-    {#if caretCoordinate && caretRange && !isAtom && !isSelection && editorFocused}
-        <div
-            class={`bookish-editor-caret ${
-                isLink
-                    ? 'bookish-editor-caret-linked'
-                    : isItalic
-                    ? 'bookish-editor-caret-italic'
-                    : ''
-            } ${isBold ? 'bookish-editor-caret-bold' : ''} ${
-                editorFocused && keyboardIdle
-                    ? 'bookish-editor-caret-blink'
-                    : ''
-            } ${!editorFocused ? 'bookish-editor-caret-disabled' : ''} ${
-                ignoredInput ? 'bookish-editor-caret-ignored' : ''
-            }`}
-            style={`left: ${caretCoordinate.x}px; top: ${caretCoordinate.y}px; height: ${caretCoordinate.height}px;`}
+    {#if caretCoordinate && caretRange && !isAtom && isSelection === false && editorFocused}
+        <CaretView
+            left={caretCoordinate.x}
+            top={caretCoordinate.y}
+            height={caretCoordinate.height}
+            blink={editorFocused && keyboardIdle}
+            ignored={ignoredInput}
+            linked={isLink}
+            bold={isBold}
+            italic={isItalic}
+            disabled={!editorFocused}
         />
     {/if}
-    <svelte:component this={component} node={editedNode} {placeholder} />
 </div>
 
 <style>
@@ -1050,49 +1030,6 @@
 
     .bookish-editor.bookish-editor-atom-focused:focus {
         outline: none;
-    }
-
-    .bookish-editor-caret {
-        left: 0;
-        top: 0;
-        width: 0px;
-        background: none;
-        outline: 1px solid var(--bookish-paragraph-color);
-        display: inline-block;
-        box-sizing: border-box;
-        position: absolute;
-        z-index: 1;
-    }
-
-    @keyframes bookish-editor-caret-blink {
-        100% {
-            outline: none;
-        }
-    }
-
-    .bookish-editor-caret-disabled {
-        outline-color: var(--app-muted-color);
-    }
-
-    .bookish-editor-caret-blink {
-        animation: bookish-editor-caret-blink 1s steps(2) infinite;
-    }
-
-    .bookish-editor-caret-italic {
-        transform: skew(-10deg);
-    }
-
-    .bookish-editor-caret-bold {
-        outline-width: 2px;
-    }
-
-    .bookish-editor-caret-ignored {
-        animation: failure 100ms 10;
-    }
-
-    .bookish-editor-caret-linked {
-        outline-width: 1px;
-        outline-color: var(--bookish-link-color);
     }
 
     .bookish-editor-inline-editor {
