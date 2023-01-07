@@ -13,9 +13,14 @@
 
     let element: HTMLElement;
 
+    let headerHeight = 0;
+
     // When the caret updates, make sure it's in view.
     afterUpdate(() => {
-        element?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        element?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        headerHeight =
+            (document.querySelector('.bookish-app > .header') as HTMLElement)
+                ?.offsetHeight ?? 0;
     });
 </script>
 
@@ -30,6 +35,7 @@
     style:left="{left}px"
     style:top="{top}px"
     style:height="{height}px"
+    style:scroll-margin-top="{headerHeight}px"
     bind:this={element}
 />
 
