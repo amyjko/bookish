@@ -9,6 +9,7 @@
         getBook,
     } from '$lib/components/page/Contexts';
     import Figure from './Figure.svelte';
+    import { getContext } from 'svelte';
 
     export let node: EmbedNode;
     export let placeholder: string = '';
@@ -20,6 +21,9 @@
     let caret = getCaret();
     let book = getBook();
     let editable = isEditable();
+
+    // Bookish editor should have passed down a way to set the active editor.
+    let claimCaret = getContext<Function>('claimeditor');
 
     let dragging = false;
     let dragFeedback: undefined | string = undefined;
@@ -76,6 +80,8 @@
         event?.preventDefault();
         dragging = true;
         dragFeedback = 'Drop to upload…';
+        // If we have a way to claim the caret, claim it, since we want to be able to make an edit with the active caret.
+        if (claimCaret) claimCaret();
     }
 
     function handleDragLeave(event: DragEvent) {

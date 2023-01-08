@@ -34,7 +34,7 @@
     import commands from './Commands';
 
     import { getEdition } from '../page/Contexts';
-    import { afterUpdate, onMount } from 'svelte';
+    import { afterUpdate, onMount, setContext } from 'svelte';
     import type { PasteContent } from './CaretContext';
     import { getCaret } from '../page/Contexts';
     import CaretView from './CaretView.svelte';
@@ -969,26 +969,36 @@
 
     // When the caret context or editor focus changes, update the active editor.
     $: {
-        const isActive =
-            document.activeElement === element || toolbarIsFocused();
-        activeEditor.set(
-            isActive
-                ? {
-                      range: caretRange,
-                      coordinate: caretCoordinate,
-                      setCaret: (range: CaretRange | undefined) => {
-                          caretRange = range;
-                          element?.focus();
-                      },
-                      edit: editNode,
-                      executor: executeCommand,
-                      context: getCaretContext(),
-                      root: editedNode,
-                      focused: editorFocused,
-                  }
-                : undefined
-        );
+        if (caretRange || editorFocused) updateActiveEditor();
     }
+
+    function updateActiveEditor() {
+        // If focused, claim it.
+        if (document.activeElement === element || toolbarIsFocused())
+            claimActiveEditor();
+        // Otherwise, unset it.
+        else activeEditor.set(undefined);
+    }
+
+    function claimActiveEditor() {
+        activeEditor.set({
+            range: caretRange,
+            coordinate: caretCoordinate,
+            setCaret: (range: CaretRange | undefined) => {
+                caretRange = range;
+                element?.focus();
+            },
+            edit: editNode,
+            executor: executeCommand,
+            context: getCaretContext(),
+            root: editedNode,
+            focused: editorFocused,
+        });
+    }
+
+    // Pass the function above to all children so they can claim the active editor for non-focus reasons.
+    // (Drag and drop, for example.)
+    setContext('claimeditor', claimActiveEditor);
 </script>
 
 <div
