@@ -1,13 +1,15 @@
 <svelte:options immutable={true} />
 
 <script lang="ts">
-    import type Reference from '$lib/models/book/Reference';
+    import Reference from '$lib/models/book/Reference';
     import Button from '../app/Button.svelte';
     import Table from '../app/Table.svelte';
     import ConfirmButton from '../editor/ConfirmButton.svelte';
     import TextEditor from '../editor/TextEditor.svelte';
     import { getEdition, isEditable } from './Contexts';
     import Link from '../Link.svelte';
+    import Note from '../editor/Note.svelte';
+    import Parser from '../../models/chapter/Parser';
 
     export let reference: Reference;
 
@@ -95,9 +97,48 @@
 {:else}
     <!-- If editable, place in rows to make room for text editors to not have to wrap. -->
     <Table>
+        <!-- CitationID -->
+        <tr>
+            <td width="25%">id</td>
+            <td>
+                <TextEditor
+                    text={reference.citationID}
+                    label={'Citation ID'}
+                    placeholder="Citation ID"
+                    saveOnExit
+                    valid={(text) => {
+                        if (text.length === 0) return "ID can't be empty.";
+                        if ($edition && text in $edition.references) {
+                            const existing = $edition.references[text];
+                            const parsed = Parser.parseReference(
+                                text,
+                                existing,
+                                $edition
+                            );
+                            if (
+                                parsed instanceof Reference &&
+                                !reference.equals(parsed)
+                            )
+                                return 'ID already taken';
+                        }
+                    }}
+                    save={(text) =>
+                        $edition
+                            ? edition.set(
+                                  $edition.withEditedReferenceID(
+                                      text,
+                                      reference
+                                  )
+                              )
+                            : undefined}
+                    {move}
+                />
+                <br /><Note>determines order, a-z</Note>
+            </td>
+        </tr>
         <!-- Authors -->
         <tr>
-            <td width="25%">Authors</td>
+            <td width="25%">authors</td>
             <td>
                 <TextEditor
                     text={reference.authors}
@@ -120,7 +161,7 @@
         </tr>
         <!-- Year -->
         <tr>
-            <td>Year</td>
+            <td>year</td>
             <td>
                 <TextEditor
                     text={reference.year}
@@ -145,7 +186,7 @@
         </tr>
         <!-- Title -->
         <tr>
-            <td>Title</td>
+            <td>title</td>
             <td>
                 <TextEditor
                     text={reference.title}
@@ -168,7 +209,7 @@
         </tr>
         <!-- Source -->
         <tr>
-            <td>Source</td>
+            <td>source</td>
             <td>
                 <em>
                     <TextEditor
@@ -194,7 +235,7 @@
         </tr>
         <!-- URL -->
         <tr>
-            <td>URL</td>
+            <td>url</td>
             <td>
                 <TextEditor
                     text={reference.url}
@@ -214,7 +255,7 @@
             </td>
         </tr>
         <tr>
-            <td>Summary</td>
+            <td>summary</td>
             <td>
                 <TextEditor
                     text={reference.summary}
@@ -253,5 +294,9 @@
 
     td:first-child {
         font-style: italic;
+    }
+
+    td {
+        line-height: 1;
     }
 </style>

@@ -157,4 +157,15 @@ export default class Reference {
             this.short
         );
     }
+
+    equals(ref: Reference) {
+        return (
+            this.authors === ref.authors &&
+            this.year === ref.year &&
+            this.title === ref.title &&
+            this.source === ref.source &&
+            this.summary == ref.summary &&
+            this.short === ref.short
+        );
+    }
 }
