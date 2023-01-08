@@ -1,7 +1,7 @@
 <svelte:options immutable={true} />
 
 <script lang="ts">
-    import type ReferenceNode from '$lib/models/chapter/ReferenceNode';
+    import type Reference from '$lib/models/book/Reference';
     import Button from '../app/Button.svelte';
     import Table from '../app/Table.svelte';
     import ConfirmButton from '../editor/ConfirmButton.svelte';
@@ -9,7 +9,7 @@
     import { getEdition, isEditable } from './Contexts';
     import Link from '../Link.svelte';
 
-    export let node: ReferenceNode;
+    export let reference: Reference;
 
     let editable = isEditable();
     let edition = getEdition();
@@ -41,14 +41,14 @@
     }
 </script>
 
-{#if editable && !node.short}
+{#if editable && !reference.short}
     <ConfirmButton
         tooltip="Delete this reference"
         commandLabel="x"
         confirmLabel="Confirm"
         command={() =>
             $edition
-                ? edition.set($edition.withoutReference(node.citationID))
+                ? edition.set($edition.withoutReference(reference.citationID))
                 : undefined}
     />
     <Button
@@ -58,37 +58,39 @@
     >
 {/if}
 <!-- If a short version was requested, try to abbreviate the authors. -->
-{#if node.short}
-    {@const authorList = node.authors.split(',')}
+{#if reference.short}
+    {@const authorList = reference.authors.split(',')}
     {@const authors =
         authorList.length === 1
             ? authorList[0]
             : authorList.length === 2
             ? authorList[0].trim() + ' & ' + authorList[1].trim()
             : authorList[0].trim() + ', et al.'}
-    <p data-nodeid={node.nodeID} class="reference">
+    <p class="reference">
         {authors}
-        ({node.year}).
-        {#if node.url === null}
-            {node.title}
+        ({reference.year}).
+        {#if reference.url === null}
+            {reference.title}
         {:else}
-            <Link to={node.url}>{node.title}</Link>
+            <Link to={reference.url}>{reference.title}</Link>
         {/if}
-        {node.title.charAt(node.title.length - 1) === '?' ? '' : '.'}
-        <em>{node.source}</em>
+        {reference.title.charAt(reference.title.length - 1) === '?' ? '' : '.'}
+        <em>{reference.source}</em>
     </p>
 {:else if !editable || !editing}
     <!-- If not editable, just render the reference. -->
-    <p data-nodeid={node.nodeID} class="reference">
-        {#if node.authors}{node.authors}{:else}<em>Authors</em>{/if}
-        {#if node.year}({node.year}){:else}<em>Year</em>{/if}. {#if node.url === null || node.url.length === 0}{#if node.title}{node.title}{:else}<em
+    <p class="reference">
+        {#if reference.authors}{reference.authors}{:else}<em>Authors</em>{/if}
+        {#if reference.year}({reference.year}){:else}<em>Year</em>{/if}. {#if reference.url === null || reference.url.length === 0}{#if reference.title}{reference.title}{:else}<em
                     >Title</em
-                >{/if}{:else}<Link to={node.url}
-                >{#if node.title}{node.title}{:else}<em>Title</em>{/if}</Link
-            >{/if}.<em>
-            {#if node.source}{node.source}{:else}Source{/if}</em
+                >{/if}{:else}<Link to={reference.url}
+                >{#if reference.title}{reference.title}{:else}<em>Title</em
+                    >{/if}</Link
+            >{/if}.<em
+            >&nbsp;{#if reference.source}{reference.source}{:else}Source{/if}</em
         >.
-        {#if node.summary}<div class="summary">{node.summary}</div>{/if}
+        {#if reference.summary}<div class="summary">{reference.summary}</div
+            >{/if}
     </p>
 {:else}
     <!-- If editable, place in rows to make room for text editors to not have to wrap. -->
@@ -98,7 +100,7 @@
             <td width="25%">Authors</td>
             <td>
                 <TextEditor
-                    text={node.authors}
+                    text={reference.authors}
                     label={'Author list editor.'}
                     placeholder="Authors"
                     valid={(text) => {
@@ -108,7 +110,7 @@
                         $edition
                             ? edition.set(
                                   $edition.withEditedReference(
-                                      node.withAuthors(text)
+                                      reference.withAuthors(text)
                                   )
                               )
                             : undefined}
@@ -121,7 +123,7 @@
             <td>Year</td>
             <td>
                 <TextEditor
-                    text={node.year}
+                    text={reference.year}
                     label={'Year editor.'}
                     placeholder="Year"
                     valid={(text) => {
@@ -133,7 +135,7 @@
                         $edition
                             ? edition.set(
                                   $edition.withEditedReference(
-                                      node.withYear(text)
+                                      reference.withYear(text)
                                   )
                               )
                             : undefined}
@@ -146,7 +148,7 @@
             <td>Title</td>
             <td>
                 <TextEditor
-                    text={node.title}
+                    text={reference.title}
                     label={'Title editor.'}
                     placeholder="Title"
                     valid={(text) => {
@@ -156,7 +158,7 @@
                         $edition
                             ? edition.set(
                                   $edition.withEditedReference(
-                                      node.withTitle(text)
+                                      reference.withTitle(text)
                                   )
                               )
                             : undefined}
@@ -170,7 +172,7 @@
             <td>
                 <em>
                     <TextEditor
-                        text={node.source}
+                        text={reference.source}
                         label={'Source editor.'}
                         placeholder="Source"
                         valid={(text) => {
@@ -181,7 +183,7 @@
                             $edition
                                 ? edition.set(
                                       $edition.withEditedReference(
-                                          node.withSource(text)
+                                          reference.withSource(text)
                                       )
                                   )
                                 : undefined}
@@ -195,7 +197,7 @@
             <td>URL</td>
             <td>
                 <TextEditor
-                    text={node.url}
+                    text={reference.url}
                     label={'URL editor.'}
                     placeholder="URL"
                     valid={() => undefined}
@@ -203,7 +205,7 @@
                         $edition
                             ? edition.set(
                                   $edition.withEditedReference(
-                                      node.withURL(text)
+                                      reference.withURL(text)
                                   )
                               )
                             : undefined}
@@ -215,7 +217,7 @@
             <td>Summary</td>
             <td>
                 <TextEditor
-                    text={node.summary}
+                    text={reference.summary}
                     label={'Summary editor.'}
                     placeholder="Summary"
                     valid={() => undefined}
@@ -223,7 +225,7 @@
                         $edition
                             ? edition.set(
                                   $edition.withEditedReference(
-                                      node.withSummary(text)
+                                      reference.withSummary(text)
                                   )
                               )
                             : undefined}

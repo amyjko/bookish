@@ -1,6 +1,6 @@
-import ReferenceNode from '../models/chapter/ReferenceNode';
+import Reference from '../models/book/Reference';
 
-export function mineReference(ids: string[], text: string): ReferenceNode {
+export function mineReference(ids: string[], text: string): Reference {
     // First find the year, since it's the most easily detected. Optional parens.
     let yearMatches = text.match(/(\(?[0-9]{4}\)?)/);
     let year =
@@ -44,8 +44,8 @@ export function mineReference(ids: string[], text: string): ReferenceNode {
 
     // If there's anything left, fall back to just a string.
     return chunks.length > 0
-        ? new ReferenceNode(getUniqueReferenceID(ids), text)
-        : new ReferenceNode(
+        ? new Reference(getUniqueReferenceID(ids), text)
+        : new Reference(
               getUniqueReferenceID(ids, authors, year),
               authors || '',
               year || '',

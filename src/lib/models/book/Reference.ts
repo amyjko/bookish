@@ -1,6 +1,4 @@
-import Node from './Node';
-
-export default class ReferenceNode extends Node {
+export default class Reference {
     readonly citationID: string;
     readonly authors: string;
     readonly year: string;
@@ -20,8 +18,6 @@ export default class ReferenceNode extends Node {
         summary: string = '',
         short: boolean = false
     ) {
-        super();
-
         this.citationID = citationID;
         this.authors = authors;
         this.year = year;
@@ -74,7 +70,7 @@ export default class ReferenceNode extends Node {
     }
 
     copy() {
-        return new ReferenceNode(
+        return new Reference(
             this.citationID,
             this.authors,
             this.year,
@@ -95,7 +91,7 @@ export default class ReferenceNode extends Node {
     }
 
     withCitationID(id: string) {
-        return new ReferenceNode(
+        return new Reference(
             id,
             this.authors,
             this.year,
@@ -107,7 +103,7 @@ export default class ReferenceNode extends Node {
         );
     }
     withAuthors(authors: string) {
-        return new ReferenceNode(
+        return new Reference(
             this.citationID,
             authors,
             this.year,
@@ -119,7 +115,7 @@ export default class ReferenceNode extends Node {
         );
     }
     withYear(year: string) {
-        return new ReferenceNode(
+        return new Reference(
             this.citationID,
             this.authors,
             year,
@@ -131,7 +127,7 @@ export default class ReferenceNode extends Node {
         );
     }
     withTitle(title: string) {
-        return new ReferenceNode(
+        return new Reference(
             this.citationID,
             this.authors,
             this.year,
@@ -143,7 +139,7 @@ export default class ReferenceNode extends Node {
         );
     }
     withSource(source: string) {
-        return new ReferenceNode(
+        return new Reference(
             this.citationID,
             this.authors,
             this.year,
@@ -155,7 +151,7 @@ export default class ReferenceNode extends Node {
         );
     }
     withURL(url: string) {
-        return new ReferenceNode(
+        return new Reference(
             this.citationID,
             this.authors,
             this.year,
@@ -167,7 +163,7 @@ export default class ReferenceNode extends Node {
         );
     }
     withSummary(summary: string) {
-        return new ReferenceNode(
+        return new Reference(
             this.citationID,
             this.authors,
             this.year,

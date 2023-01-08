@@ -4,7 +4,7 @@
         getUniqueReferenceID,
         mineReference,
     } from '$lib/util/mineReference';
-    import ReferenceNode from '$lib/models/chapter/ReferenceNode';
+    import Reference from '$lib/models/book/Reference';
     import { getEdition } from './Contexts';
     import Button from '../app/Button.svelte';
 
@@ -32,7 +32,7 @@
         if ($edition) {
             edition.set(
                 $edition.withNewReferences([
-                    new ReferenceNode(
+                    new Reference(
                         getUniqueReferenceID(
                             Object.keys($edition.getReferences())
                         )

@@ -1,12 +1,12 @@
 <script lang="ts">
     import ErrorNode from '$lib/models/chapter/ErrorNode';
     import FormatNode from '$lib/models/chapter/FormatNode';
-    import type ReferenceNode from '$lib/models/chapter/ReferenceNode';
+    import type Ref from '$lib/models/book/Reference';
     import ErrorMessage from '../chapter/ErrorMessage.svelte';
     import Format from '../chapter/Format.svelte';
     import Reference from './Reference.svelte';
 
-    export let node: FormatNode | ErrorNode | ReferenceNode;
+    export let node: FormatNode | ErrorNode | Ref;
 </script>
 
 {#if node instanceof FormatNode}
@@ -14,5 +14,5 @@
 {:else if node instanceof ErrorNode}
     <ErrorMessage {node} />
 {:else}
-    <Reference {node} />
+    <Reference reference={node} />
 {/if}

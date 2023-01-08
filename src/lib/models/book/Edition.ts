@@ -2,7 +2,7 @@ import Chapter from './Chapter';
 import type { ChapterSpecification } from './Chapter';
 import Parser from '../chapter/Parser';
 import EmbedNode from '../chapter/EmbedNode';
-import type ReferenceNode from '../chapter/ReferenceNode';
+import type Reference from './Reference';
 import type Theme from './Theme';
 import type Definition from './Definition.js';
 import ChapterIDs from './ChapterID.js';
@@ -429,7 +429,7 @@ export default class Edition {
         );
     }
 
-    withNewReferences(references: ReferenceNode[]): Edition {
+    withNewReferences(references: Reference[]): Edition {
         const newReferences = Object.assign({}, this.references);
         // Generate a unique ID for the reference.
         for (const newRef of references)
@@ -437,14 +437,14 @@ export default class Edition {
         return this.withReferences(newReferences);
     }
 
-    withEditedReference(ref: ReferenceNode) {
+    withEditedReference(ref: Reference) {
         if (!(ref.citationID in this.references)) return this;
         const newReferences = Object.assign({}, this.references);
         newReferences[ref.citationID] = ref.toList();
         return this.withReferences(newReferences);
     }
 
-    withEditedReferenceID(newCitationID: string, ref: ReferenceNode) {
+    withEditedReferenceID(newCitationID: string, ref: Reference) {
         if (!(ref.citationID in this.references)) return;
         const newReferences = Object.assign({}, this.references);
         delete newReferences[ref.citationID];

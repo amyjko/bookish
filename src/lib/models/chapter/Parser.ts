@@ -16,7 +16,7 @@ import LinkNode from './LinkNode';
 import ListNode from './ListNode';
 import ParagraphNode from './ParagraphNode';
 import QuoteNode from './QuoteNode';
-import ReferenceNode from './ReferenceNode';
+import Reference from '../book/Reference';
 import RuleNode from './RuleNode';
 import TableNode from './TableNode';
 import TextNode from './TextNode';
@@ -139,7 +139,7 @@ export default class Parser {
                     else source = src;
                 }
 
-                return new ReferenceNode(
+                return new Reference(
                     citationID,
                     authors,
                     year,
