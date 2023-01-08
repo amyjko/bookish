@@ -7,14 +7,34 @@
     import type CodeNode from '$lib/models/chapter/CodeNode';
     import type FormatNode from '$lib/models/chapter/FormatNode';
     import Positioned from './Positioned.svelte';
+    import { getCaret, isEditable } from '../page/Contexts';
 
     export let node: TableNode | EmbedNode | CodeNode;
     export let caption: FormatNode | undefined;
     export let credit: FormatNode | undefined = undefined;
+
+    let editable = isEditable();
+    let caret = getCaret();
+
+    function focusFigure() {
+        const firstCaret = node.getFirstCaret();
+        if (editable && firstCaret && $caret)
+            $caret.setCaret({
+                start: firstCaret,
+                end: firstCaret,
+            });
+    }
 </script>
 
 <Positioned position={node.getPosition()}>
-    <figure class="bookish-figure" data-nodeid={node.nodeID}>
+    <figure
+        class="bookish-figure"
+        data-nodeid={node.nodeID}
+        tabIndex="0"
+        on:click={focusFigure}
+        on:keydown={(event) =>
+            event.key === ' ' || event.key === 'Enter' ? focusFigure() : null}
+    >
         <slot />
         {#if caption !== undefined}
             <figcaption class="bookish-figure-caption">
