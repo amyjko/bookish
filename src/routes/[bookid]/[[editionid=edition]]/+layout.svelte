@@ -5,6 +5,7 @@
     import Edition from '$lib/components/page/Edition.svelte';
     import Feedback from '$lib/components/app/Feedback.svelte';
     import { getBook, getEdition } from '$lib/components/page/Contexts';
+    import { onDestroy } from 'svelte';
 
     export let data:
         | { book: Book; edition: EditionModel; latest: boolean }
@@ -17,6 +18,11 @@
     // Update the global stores to the book and edition received.
     $: edition.set(data ? data.edition : undefined);
     $: book.set(data ? data.book : undefined);
+    // When unmounted, unset the stores — no longer viewing a book.
+    onDestroy(() => {
+        edition.set(undefined);
+        book.set(undefined);
+    });
 </script>
 
 {#if data === undefined}
