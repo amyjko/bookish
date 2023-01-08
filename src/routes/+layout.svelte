@@ -48,7 +48,7 @@
     }
 
     /** Save whatever edition is stored. */
-    let previousSave: Edition | undefined = undefined;
+    let previousSavedEdition: Edition | undefined = undefined;
     /**
      * Note whether the update was due to us storing the revised edition from the
      * database so that we don't get in an infinite loop of saving.
@@ -59,9 +59,11 @@
             reflection = false;
             return;
         }
-        const previousDocID = previousSave?.getRef()?.id;
+
+        const previousDocID = previousSavedEdition?.getRef()?.id;
         const newDocID = $edition.getRef()?.id;
 
+        console.log('Saving');
         if (
             ($book && $edition && previousDocID === undefined) ||
             (newDocID !== undefined &&
@@ -72,13 +74,15 @@
             try {
                 // Set the edition after we save it, since things like chapter refs can change for new chapters.
                 reflection = true;
-                edition.set(await updateEdition(previousSave, $edition));
+                edition.set(
+                    await updateEdition(previousSavedEdition, $edition)
+                );
                 status.set(BookSaveStatus.Saved);
             } catch (error) {
                 console.error(error);
                 status.set(BookSaveStatus.Error);
             } finally {
-                previousSave = $edition;
+                previousSavedEdition = $edition;
             }
         }
     }
@@ -98,21 +102,35 @@
 
     // When the edition changes, update the book and debounce a save.
     $: {
-        if ($edition && $book) {
-            // If this is the latest edition, update the book's metadata to reflect the changes.
-            if ($edition.isLatestEdition($book)) {
-                book.set(
-                    $book
-                        .withTitle($edition.getTitle())
-                        .withCover($edition.getImage('cover') ?? null)
-                        .withAuthors($edition.getAuthors())
-                        .withDescription($edition.getDescription())
-                );
-            }
+        if ($edition) scheduleSave();
+    }
 
-            status.set(BookSaveStatus.Changed);
-            editionTimer = debounce(editionTimer, saveEdition);
+    function scheduleSave() {
+        // If this is the latest edition, update the book's metadata to reflect the changes.
+        if (
+            $book &&
+            $edition.isLatestEdition($book) &&
+            previousSavedEdition &&
+            previousSavedEdition.getRef()?.id === $edition.getRef()?.id &&
+            (previousSavedEdition.getTitle() !== $edition.getTitle() ||
+                previousSavedEdition.getImage('cover') !==
+                    $edition.getImage('cover') ||
+                previousSavedEdition.getAuthors().join() !==
+                    $edition.getAuthors().join() ||
+                previousSavedEdition.getDescription() !==
+                    $edition.getDescription())
+        ) {
+            book.set(
+                $book
+                    .withTitle($edition.getTitle())
+                    .withCover($edition.getImage('cover') ?? null)
+                    .withAuthors($edition.getAuthors())
+                    .withDescription($edition.getDescription())
+            );
         }
+
+        if (!reflection) status.set(BookSaveStatus.Changed);
+        editionTimer = debounce(editionTimer, saveEdition);
     }
 
     // When the book changes, debounce a save.
