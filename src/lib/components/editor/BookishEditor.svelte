@@ -843,7 +843,8 @@
     function isFocused() {
         return (
             document.activeElement === element ||
-            (element !== null && element?.contains(document.activeElement))
+            (element !== null && element?.contains(document.activeElement)) ||
+            toolbarIsFocused()
         );
     }
 
@@ -941,7 +942,7 @@
 
     function toolbarIsFocused() {
         const toolbar = document.querySelector('.bookish-editor-toolbar');
-        return toolbar && toolbar.contains(document.activeElement);
+        return toolbar !== null && toolbar.contains(document.activeElement);
     }
 
     $: isAtom = caretRange && caretRange.start.node instanceof AtomNode;
@@ -976,7 +977,7 @@
 
     function updateActiveEditor() {
         // If focused, claim it.
-        if (isFocused() || toolbarIsFocused()) claimActiveEditor();
+        if (isFocused()) claimActiveEditor();
         // Otherwise, unset it.
         else activeEditor.set(undefined);
     }

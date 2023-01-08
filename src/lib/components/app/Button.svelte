@@ -10,7 +10,7 @@
     title={tooltip}
     {type}
     {disabled}
-    on:click={command}
+    on:mousedown={command}
     on:keypress={(event) =>
         event.key === ' ' || event.key === 'Enter' ? command() : undefined}
 >
