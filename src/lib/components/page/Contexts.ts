@@ -4,8 +4,10 @@
 // as the resulting value is coerced to Type even if it's not that value.
 
 import { getContext } from 'svelte';
-import type { Writable } from 'svelte/store';
+import { get, type Writable } from 'svelte/store';
 import type Book from '../../models/book/Book';
+import type Chapter from '../../models/book/Chapter';
+import type BookSaveStatus from '../../models/book/BookSaveStatus';
 import type Edition from '../../models/book/Edition';
 import type Authentication from '../Authentication';
 import type CaretState from '../editor/CaretState';
@@ -41,17 +43,37 @@ export function getChapter() {
     return getContext<ChapterStore>(CHAPTER);
 }
 
+/**
+ * Update the edition that contains the chapter, then update the
+ * global edition store with the new edition, propogating the changes everywhere.
+ */
+export function setChapter(
+    store: EditionContext,
+    previous: Chapter,
+    chapter: Chapter
+) {
+    const edition = get(store);
+    if (edition) store.set(edition.withRevisedChapter(previous, chapter));
+}
+
 export const EDITABLE = Symbol('editable');
 export function isEditable(): boolean {
     return getContext(EDITABLE);
 }
 
 export const BASE = Symbol('base');
+export type BaseStore = Writable<string>;
 export function getBase() {
-    return getContext<string>(BASE);
+    return getContext<BaseStore>(BASE);
 }
 
 export const ActiveEditorSymbol = Symbol('caret');
 export function getCaret() {
     return getContext<Writable<CaretState | undefined>>(ActiveEditorSymbol);
+}
+
+export const STATUS = Symbol('status');
+export type StatusContext = Writable<BookSaveStatus>;
+export function getStatus() {
+    return getContext<StatusContext>(STATUS);
 }

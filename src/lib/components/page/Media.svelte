@@ -8,16 +8,17 @@
     import Format from '$lib/components/chapter/Format.svelte';
     import MediaPreview from './MediaPreview.svelte';
     import { onMount } from 'svelte';
-    import { getEdition, isEditable } from './Contexts';
+    import { getBook, getEdition, isEditable } from './Contexts';
     import Button from '../app/Button.svelte';
     import PageHeader from './PageHeader.svelte';
 
+    let book = getBook();
     let edition = getEdition();
     let editable = isEditable();
     let images: Image[] | undefined = [];
 
     $: embeds = $edition?.getEmbeds() ?? [];
-    $: media = $edition?.getBook()?.getMedia();
+    $: media = $book?.getMedia();
 
     function updateImages(newImages: Image[] | undefined) {
         images = newImages;
@@ -40,7 +41,10 @@
         <Header
             label="Media title"
             getImage={() => $edition?.getImage(ChapterIDs.MediaID) ?? null}
-            setImage={(embed) => $edition?.setImage(ChapterIDs.MediaID, embed)}
+            setImage={(embed) =>
+                $edition
+                    ? edition.set($edition.withImage(ChapterIDs.MediaID, embed))
+                    : undefined}
             header="Media"
             tags={$edition.getTags()}
         >

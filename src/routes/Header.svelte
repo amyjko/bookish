@@ -40,14 +40,15 @@
         {#if $book}
             <span class="elided">&mdash; {$book.getTitle()}</span>
         {/if}
-        {#if $edition}
+        {#if $edition && $book}
             <span class="elided"
-                >&mdash; {$edition.getEditionLabel()} edition</span
+                >&mdash; {$edition.getEditionLabel($book)} edition</span
             >
         {/if}
-        {#if $edition && book}
+        <!-- Show status if there's a book and edition currently being viewed -->
+        {#if $book && $edition}
             <span class="status">
-                <Status edition={$edition} book={$book} />
+                <Status />
             </span>
         {/if}
     </nav>

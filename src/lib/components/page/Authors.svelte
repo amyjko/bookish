@@ -9,9 +9,9 @@
 
     export let authors: string[];
     export let inheritedAuthors: string[] | undefined = undefined;
-    export let add: () => Promise<void> | undefined;
-    export let edit: (index: number, text: string) => Promise<void> | undefined;
-    export let remove: (index: number) => Promise<void> | undefined;
+    export let add: () => Promise<void> | void;
+    export let edit: (index: number, text: string) => Promise<void> | void;
+    export let remove: (index: number) => Promise<void> | void;
 
     let editable = isEditable();
     let edition = getEdition();

@@ -11,11 +11,11 @@
     import Description from './Description.svelte';
     import Acknowledgements from './Acknowledgements.svelte';
     import License from '$lib/components/page/License.svelte';
-    import Revisions from './Revisions.svelte';
+    import Revisions from './Editions.svelte';
     import Authors from '$lib/components/page/Authors.svelte';
     import TextEditor from '$lib/components/editor/TextEditor.svelte';
     import Toggle from '$lib/components/editor/Toggle.svelte';
-    import { getBase, getEdition, isEditable } from './Contexts';
+    import { getBase, getEdition, isEditable, setChapter } from './Contexts';
     import Muted from './Muted.svelte';
     import Button from '../app/Button.svelte';
     import PageHeader from './PageHeader.svelte';
@@ -56,8 +56,7 @@
     let waitingForChapter = false;
 
     function addChapter() {
-        waitingForChapter = true;
-        $edition?.addChapter().then(() => (waitingForChapter = false));
+        if ($edition) edition.set($edition.withNewChapter());
     }
 </script>
 
@@ -66,11 +65,15 @@
         <Header
             label="Book title"
             getImage={() => $edition?.getImage('cover') ?? null}
-            setImage={(embed) => $edition?.setImage('cover', embed)}
+            setImage={(embed) =>
+                $edition
+                    ? edition.set($edition.withImage('cover', embed))
+                    : undefined}
             header={title}
             {subtitle}
             tags={$edition.getTags()}
-            save={(text) => $edition?.setTitle(text)}
+            save={(text) =>
+                $edition ? edition.set($edition.withTitle(text)) : undefined}
         >
             <svelte:fragment slot="before">
                 {#if editable}
@@ -85,9 +88,16 @@
             <Authors
                 slot="after"
                 authors={$edition.getAuthors()}
-                add={() => $edition?.addAuthor('')}
-                edit={(index, text) => $edition?.setAuthor(index, text)}
-                remove={(index) => $edition?.removeAuthor(index)}
+                add={() =>
+                    $edition ? edition.set($edition.withAuthor('')) : undefined}
+                edit={(index, text) =>
+                    $edition
+                        ? edition.set($edition.withAuthorName(index, text))
+                        : undefined}
+                remove={(index) =>
+                    $edition
+                        ? edition.set($edition.withoutAuthor(index))
+                        : undefined}
             />
         </Header>
 
@@ -98,7 +108,8 @@
         <Description />
 
         <Instructions>
-            This will appear on the <Link to={base + 'read'}>book browsing</Link
+            This will appear on the <Link to={$base + 'read'}
+                >book browsing</Link
             > page and in your table of contents. Write an informative description
             of what your book is about.
         </Instructions>
@@ -119,8 +130,8 @@
 
         <Rows>
             {#each $edition.getChapters() as chapter}
-                {@const chapterID = chapter.getChapterID()}
-                {@const readingTime = chapter.getReadingTime()}
+                {@const chapterID = chapter.getID()}
+                {@const readingTime = chapter.getReadingTime($edition)}
                 {@const readingEstimate =
                     readingTime === undefined
                         ? 'Forthcoming'
@@ -152,7 +163,12 @@
                                 text={section ? section : ''}
                                 placeholder="Section"
                                 valid={() => undefined}
-                                save={(text) => chapter.setSection(text)}
+                                save={(text) =>
+                                    setChapter(
+                                        edition,
+                                        chapter,
+                                        chapter.withSection(text)
+                                    )}
                             />
                         {:else if section}{section}{/if}
                     </span>
@@ -161,7 +177,12 @@
                             {#if editable}
                                 <Toggle
                                     on={chapter.isForthcoming()}
-                                    save={(on) => chapter.setForthcoming(on)}
+                                    save={(on) =>
+                                        setChapter(
+                                            edition,
+                                            chapter,
+                                            chapter.asForthcoming(on)
+                                        )}
                                 >
                                     {etc}
                                 </Toggle>
@@ -220,7 +241,7 @@
 
         <PageParagraph>
             Want to print this book or generate a PDF? See <Link
-                to={base + 'print'}>all chapters on a single page</Link
+                to={$base + 'print'}>all chapters on a single page</Link
             > and then print or export. Long books can take some time to render.
         </PageParagraph>
 

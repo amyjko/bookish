@@ -24,7 +24,11 @@
             label="References title"
             getImage={() => $edition?.getImage(ChapterIDs.ReferencesID) ?? null}
             setImage={(embed) =>
-                $edition?.setImage(ChapterIDs.ReferencesID, embed)}
+                $edition
+                    ? edition.set(
+                          $edition.withImage(ChapterIDs.ReferencesID, embed)
+                      )
+                    : undefined}
             header="References"
             tags={$edition.getTags()}
         >

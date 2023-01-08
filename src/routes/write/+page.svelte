@@ -1,8 +1,5 @@
 <script lang="ts">
-    import {
-        createBookInFirestore,
-        loadUsersBooksFromFirestore,
-    } from '$lib/models/Firestore';
+    import { createBook, getUserBooks } from '$lib/models/CRUD';
     import type Book from '$lib/models/book/Book';
     import { goto } from '$app/navigation';
     import { onMount } from 'svelte';
@@ -22,7 +19,7 @@
 
     function updateBooks() {
         if ($auth?.user)
-            loadUsersBooksFromFirestore($auth.user.uid).then((loadedBooks) => {
+            getUserBooks($auth.user.uid).then((loadedBooks) => {
                 loading = false;
                 if (loadedBooks === null) error = 'Unable to load books';
                 else books = loadedBooks;
@@ -55,10 +52,11 @@
         }, 1000);
         // Make the book, then go to its page
         if ($auth?.user)
-            createBookInFirestore($auth.user.uid)
+            createBook($auth.user.uid)
                 .then((bookID) => goto('/write/' + bookID))
-                .catch((error) => {
+                .catch((err) => {
                     creating = false;
+                    console.log(err);
                     error = "Couldn't create a book: " + error;
                 })
                 .finally(() => clearInterval(timerID));

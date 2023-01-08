@@ -12,23 +12,116 @@
         ActiveEditorSymbol,
         BOOK,
         EDITION,
+        STATUS,
         type EditionContext,
+        type StatusContext,
     } from '$lib/components/page/Contexts';
     import type Book from '$lib/models/book/Book';
     import type Edition from '../lib/models/book/Edition';
     import type CaretState from '../lib/components/editor/CaretState';
+    import BookSaveStatus from '../lib/models/book/BookSaveStatus';
+    import { updateBook, updateEdition } from '../lib/models/CRUD';
 
     // A global store context for the focused editor, used to display toolbar.
-    let activeEditor = writable<CaretState | undefined>(undefined);
-    setContext(ActiveEditorSymbol, activeEditor);
+    let editor = writable<CaretState | undefined>(undefined);
+    setContext(ActiveEditorSymbol, editor);
 
     // A global store for the current book. It's at the root so the header can do breadcrumbs.
-    let activeBook = writable<Book | undefined>(undefined);
-    setContext<Writable<Book | undefined>>(BOOK, activeBook);
+    let book = writable<Book | undefined>(undefined);
+    setContext<Writable<Book | undefined>>(BOOK, book);
 
-    // A global store for the current edition. It's at the root so the header can do breacrumbs.
-    let activeEdition = writable<Edition>(undefined);
-    setContext<EditionContext>(EDITION, activeEdition);
+    // A global store for the current edition. It's at the root so the header can do breadcrumbs.
+    let edition = writable<Edition>(undefined);
+    setContext<EditionContext>(EDITION, edition);
+
+    // A global store for save feedback.
+    let status = writable<BookSaveStatus>(BookSaveStatus.Saved);
+    setContext<StatusContext>(STATUS, status);
+
+    let bookTimer: NodeJS.Timeout | undefined = undefined;
+    let editionTimer: NodeJS.Timeout | undefined = undefined;
+    function debounce(timer: NodeJS.Timeout | undefined, fun: Function) {
+        clearTimeout(timer);
+        return setTimeout(() => {
+            fun();
+        }, 250);
+    }
+
+    /** Save whatever edition is stored. */
+    let previousSave: Edition | undefined = undefined;
+    /**
+     * Note whether the update was due to us storing the revised edition from the
+     * database so that we don't get in an infinite loop of saving.
+     */
+    let reflection = false;
+    async function saveEdition() {
+        if (reflection) {
+            reflection = false;
+            return;
+        }
+        const previousDocID = previousSave?.getRef()?.id;
+        const newDocID = $edition.getRef()?.id;
+
+        if (
+            ($book && $edition && previousDocID === undefined) ||
+            (newDocID !== undefined &&
+                previousDocID !== undefined &&
+                newDocID === previousDocID)
+        ) {
+            status.set(BookSaveStatus.Saving);
+            try {
+                // Set the edition after we save it, since things like chapter refs can change for new chapters.
+                reflection = true;
+                edition.set(await updateEdition(previousSave, $edition));
+                status.set(BookSaveStatus.Saved);
+            } catch (error) {
+                console.error(error);
+                status.set(BookSaveStatus.Error);
+            } finally {
+                previousSave = $edition;
+            }
+        }
+    }
+
+    async function saveBook() {
+        if ($book) {
+            status.set(BookSaveStatus.Saving);
+            try {
+                updateBook($book);
+                status.set(BookSaveStatus.Saved);
+            } catch (error) {
+                console.log(error);
+                status.set(BookSaveStatus.Error);
+            }
+        }
+    }
+
+    // When the edition changes, update the book and debounce a save.
+    $: {
+        if ($edition && $book) {
+            // If this is the latest edition, update the book's metadata to reflect the changes.
+            if ($edition.isLatestEdition($book)) {
+                book.set(
+                    $book
+                        .withTitle($edition.getTitle())
+                        .withCover($edition.getImage('cover') ?? null)
+                        .withAuthors($edition.getAuthors())
+                        .withDescription($edition.getDescription())
+                );
+            }
+
+            status.set(BookSaveStatus.Changed);
+            editionTimer = debounce(editionTimer, saveEdition);
+        }
+    }
+
+    // When the book changes, debounce a save.
+    $: {
+        if ($book) {
+            status.set(BookSaveStatus.Changed);
+            bookTimer = debounce(bookTimer, saveBook);
+        }
+    }
 </script>
 
 {#if import.meta.env.PROD}

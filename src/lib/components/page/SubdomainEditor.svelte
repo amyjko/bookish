@@ -1,6 +1,6 @@
 <script lang="ts">
     import TextEditor from '$lib/components/editor/TextEditor.svelte';
-    import { subdomainIsAvailable } from '$lib/models/Firestore';
+    import { isSubdomainAvailable } from '$lib/models/CRUD';
     import { getBook } from './Contexts';
     import Muted from './Muted.svelte';
 
@@ -23,8 +23,8 @@
             save={// Save the new domain
             async (domain) => {
                 if ($book) {
-                    const available = await subdomainIsAvailable(domain, $book);
-                    if (available) $book.setSubdomain(domain);
+                    const available = await isSubdomainAvailable(domain, $book);
+                    if (available) book.set($book.withSubdomain(domain));
                     else throw Error("Domain isn't available");
                 }
             }}

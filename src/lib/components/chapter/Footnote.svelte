@@ -21,16 +21,17 @@
     let edition = getEdition();
 
     // What footnote number is this?
-    $: chapterNode = $chapter?.chapter?.getAST();
-    $: number = chapterNode?.getFootnotes().indexOf(node);
+    $: ast =
+        $edition && $chapter ? $chapter.chapter.getAST($edition) : undefined;
+    $: number = ast?.getFootnotes().indexOf(node);
     $: letter =
         number === undefined ? undefined : $edition?.getFootnoteSymbol(number);
 
     $: focused =
-        chapterNode &&
+        ast &&
         $caret &&
         $caret.range &&
-        $caret.range.start.node.hasAncestor(chapterNode, node);
+        $caret.range.start.node.hasAncestor(ast, node);
 
     // Position the marginals on every render.
     afterUpdate(() => $chapter?.layoutMarginals());

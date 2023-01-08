@@ -15,7 +15,11 @@
             label="Unknown page title"
             getImage={() => $edition?.getImage(ChapterIDs.UnknownID) ?? null}
             setImage={(embed) =>
-                $edition?.setImage(ChapterIDs.UnknownID, embed)}
+                $edition
+                    ? edition.set(
+                          $edition.withImage(ChapterIDs.UnknownID, embed)
+                      )
+                    : undefined}
             header="Oops."
         >
             <Outline slot="outline" previous={null} next={null} />

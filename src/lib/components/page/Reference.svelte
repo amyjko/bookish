@@ -46,7 +46,10 @@
         tooltip="Delete this reference"
         commandLabel="x"
         confirmLabel="Confirm"
-        command={() => $edition?.removeReference(node.citationID)}
+        command={() =>
+            $edition
+                ? edition.set($edition.withoutReference(node.citationID))
+                : undefined}
     />
     <Button
         tooltip="Finish editing this reference."
@@ -102,7 +105,13 @@
                         if (text.length === 0) return "Authors can't be empty.";
                     }}
                     save={(text) =>
-                        $edition?.editReference(node.withAuthors(text))}
+                        $edition
+                            ? edition.set(
+                                  $edition.withEditedReference(
+                                      node.withAuthors(text)
+                                  )
+                              )
+                            : undefined}
                     {move}
                 />
             </td>
@@ -121,7 +130,13 @@
                             return 'Not a valid year';
                     }}
                     save={(text) =>
-                        $edition?.editReference(node.withYear(text))}
+                        $edition
+                            ? edition.set(
+                                  $edition.withEditedReference(
+                                      node.withYear(text)
+                                  )
+                              )
+                            : undefined}
                     {move}
                 />
             </td>
@@ -138,7 +153,13 @@
                         if (text.length === 0) return "Title can't be empty.";
                     }}
                     save={(text) =>
-                        $edition?.editReference(node.withTitle(text))}
+                        $edition
+                            ? edition.set(
+                                  $edition.withEditedReference(
+                                      node.withTitle(text)
+                                  )
+                              )
+                            : undefined}
                     {move}
                 />
             </td>
@@ -157,7 +178,13 @@
                                 return "Source can't be empty";
                         }}
                         save={(text) =>
-                            $edition?.editReference(node.withSource(text))}
+                            $edition
+                                ? edition.set(
+                                      $edition.withEditedReference(
+                                          node.withSource(text)
+                                      )
+                                  )
+                                : undefined}
                         {move}
                     />
                 </em>
@@ -172,7 +199,14 @@
                     label={'URL editor.'}
                     placeholder="URL"
                     valid={() => undefined}
-                    save={(text) => $edition?.editReference(node.withURL(text))}
+                    save={(text) =>
+                        $edition
+                            ? edition.set(
+                                  $edition.withEditedReference(
+                                      node.withURL(text)
+                                  )
+                              )
+                            : undefined}
                     {move}
                 />
             </td>
@@ -186,7 +220,13 @@
                     placeholder="Summary"
                     valid={() => undefined}
                     save={(text) =>
-                        $edition?.editReference(node.withSummary(text))}
+                        $edition
+                            ? edition.set(
+                                  $edition.withEditedReference(
+                                      node.withSummary(text)
+                                  )
+                              )
+                            : undefined}
                     {move}
                 />
             </td>

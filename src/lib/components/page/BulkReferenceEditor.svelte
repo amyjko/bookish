@@ -22,24 +22,24 @@
                 )
             );
 
-        $edition
-            ?.addReferences(references)
-            .catch(() => {
-                alert('Failed to save references.');
-            })
-            .finally(() => (text = ''));
+        if ($edition) {
+            edition.set($edition.withNewReferences(references));
+            text = '';
+        }
     }
 
     function handleEmptyAdd() {
-        $edition
-            ?.addReferences([
-                new ReferenceNode(
-                    getUniqueReferenceID(Object.keys($edition.getReferences()))
-                ),
-            ])
-            .catch(() => {
-                alert('Failed to save empty reference.');
-            });
+        if ($edition) {
+            edition.set(
+                $edition.withNewReferences([
+                    new ReferenceNode(
+                        getUniqueReferenceID(
+                            Object.keys($edition.getReferences())
+                        )
+                    ),
+                ])
+            );
+        }
     }
 </script>
 

@@ -32,10 +32,10 @@
         Critical: CriticalTheme,
     };
 
-    let activeEdition = getEdition();
-    $: edition = $activeEdition as Edition;
-    $: theme = edition?.getTheme();
-    $: isDefault = theme === null || Object.values(themes).includes(theme);
+    let edition = getEdition();
+    $: theme = $edition ? $edition.getTheme() : null;
+    $: isDefault =
+        theme === null || Object.values(themes).includes(theme as Theme);
 
     function getEmptyGroup(group: Record<string, string>) {
         const empty: Record<string, string> = {};
@@ -44,136 +44,156 @@
     }
 </script>
 
-<Page title={`${edition.getTitle()} - Theme`}>
-    <Header
-        label="Theme"
-        getImage={() => null}
-        setImage={() => undefined}
-        header="Theme"
-    >
-        <Outline slot="outline" previous={null} next={null} />
-    </Header>
-
-    <Instructions>
-        This is the theme editor. You can use it to choose from existing themes
-        or create a custom theme for your book's appearance. To use it, you'll
-        need to know a bit about how to format CSS <Link
-            to="https://developer.mozilla.org/en-US/docs/Web/CSS/color"
-            >colors</Link
-        >, <Link to="https://developer.mozilla.org/en-US/docs/Web/CSS/font-size"
-            >fonts</Link
-        >, and <Link
-            to="https://developer.mozilla.org/en-US/docs/Learn/CSS/Building_blocks/Values_and_units"
-            >sizes</Link
-        >.
-    </Instructions>
-
-    <Switch
-        options={Object.keys(themes)}
-        edit={(name) => edition.setTheme(themes[name])}
-        value={Object.keys(themes).find((key) => themes[key] === theme) ?? ''}
-    />
-
-    <!-- If it's not one of the  -->
-    {#if isDefault}
-        <Button
-            tooltip="Create a custom theme"
-            command={() =>
-                edition.setTheme({
-                    ...(theme === null ? BookishTheme : theme),
-                })}>Customize</Button
+{#if theme && $edition}
+    <Page title={`${$edition?.getTitle()} - Theme`}>
+        <Header
+            label="Theme"
+            getImage={() => null}
+            setImage={() => undefined}
+            header="Theme"
         >
-    {:else}
-        <ConfirmButton
-            tooltip="Change the theme to the default Bookish theme."
-            commandLabel="Revert to default"
-            confirmLabel="Delete your theme?"
-            command={() => edition.setTheme(null)}
-        />
-    {/if}
+            <Outline slot="outline" previous={null} next={null} />
+        </Header>
 
-    <ThemeEditorPreview {theme} />
+        <Instructions>
+            This is the theme editor. You can use it to choose from existing
+            themes or create a custom theme for your book's appearance. To use
+            it, you'll need to know a bit about how to format CSS <Link
+                to="https://developer.mozilla.org/en-US/docs/Web/CSS/color"
+                >colors</Link
+            >, <Link
+                to="https://developer.mozilla.org/en-US/docs/Web/CSS/font-size"
+                >fonts</Link
+            >, and <Link
+                to="https://developer.mozilla.org/en-US/docs/Learn/CSS/Building_blocks/Values_and_units"
+                >sizes</Link
+            >.
+        </Instructions>
 
-    {#if !isDefault && theme !== null}
-        <ThemeSetEditor
-            header={'Light mode colors'}
-            group="light"
-            properties={theme.light ?? getEmptyGroup(BookishTheme.light)}
-        />
-        <ThemeSetEditor
-            header={'Dark mode colors'}
-            group="dark"
-            properties={theme.dark ?? getEmptyGroup(BookishTheme.dark)}
-        />
-        <ThemeSetEditor
-            header={'Fonts'}
-            group="fonts"
-            properties={theme.fonts ?? getEmptyGroup(BookishTheme.fonts)}
-        />
-        <ThemeSetEditor
-            header={'Font sizes'}
-            group="sizes"
-            properties={theme.sizes ?? getEmptyGroup(BookishTheme.sizes)}
-        />
-        <ThemeSetEditor
-            header={'Font weights'}
-            group="weights"
-            properties={theme.weights ?? getEmptyGroup(BookishTheme.weights)}
-        />
-        <ThemeSetEditor
-            header={'Spacing'}
-            group="spacing"
-            properties={theme.spacing ?? getEmptyGroup(BookishTheme.spacing)}
+        <Switch
+            options={Object.keys(themes)}
+            edit={(name) =>
+                $edition
+                    ? edition.set($edition.withTheme(themes[name]))
+                    : undefined}
+            value={Object.keys(themes).find((key) => themes[key] === theme) ??
+                ''}
         />
 
-        <Rows>
-            <tr>
-                <td>
-                    <em
-                        >Add URLs to your own CSS to customize fonts and styles
-                        further.</em
-                    >
-                </td>
-                <td style="text-align:right;">
-                    <Button
-                        tooltip="Add a CSS import"
-                        command={() => {
-                            if (theme === null) return;
-                            if (theme.imports === undefined) theme.imports = [];
-                            theme.imports.push('');
-                            edition.setTheme(theme);
-                        }}>+</Button
-                    >
-                </td>
-            </tr>
-            {#each theme.imports ?? [] as url, index}
+        <!-- If it's not one of the  -->
+        {#if isDefault}
+            <Button
+                tooltip="Create a custom theme"
+                command={() =>
+                    $edition
+                        ? edition.set(
+                              $edition.withTheme({
+                                  ...(theme === null ? BookishTheme : theme),
+                              })
+                          )
+                        : undefined}>Customize</Button
+            >
+        {:else}
+            <ConfirmButton
+                tooltip="Change the theme to the default Bookish theme."
+                commandLabel="Revert to default"
+                confirmLabel="Delete your theme?"
+                command={() =>
+                    $edition
+                        ? edition.set($edition.withTheme(null))
+                        : undefined}
+            />
+        {/if}
+
+        <ThemeEditorPreview {theme} />
+
+        {#if !isDefault && theme !== null}
+            <ThemeSetEditor
+                header={'Light mode colors'}
+                group="light"
+                properties={theme.light ?? getEmptyGroup(BookishTheme.light)}
+            />
+            <ThemeSetEditor
+                header={'Dark mode colors'}
+                group="dark"
+                properties={theme.dark ?? getEmptyGroup(BookishTheme.dark)}
+            />
+            <ThemeSetEditor
+                header={'Fonts'}
+                group="fonts"
+                properties={theme.fonts ?? getEmptyGroup(BookishTheme.fonts)}
+            />
+            <ThemeSetEditor
+                header={'Font sizes'}
+                group="sizes"
+                properties={theme.sizes ?? getEmptyGroup(BookishTheme.sizes)}
+            />
+            <ThemeSetEditor
+                header={'Font weights'}
+                group="weights"
+                properties={theme.weights ??
+                    getEmptyGroup(BookishTheme.weights)}
+            />
+            <ThemeSetEditor
+                header={'Spacing'}
+                group="spacing"
+                properties={theme.spacing ??
+                    getEmptyGroup(BookishTheme.spacing)}
+            />
+
+            <Rows>
                 <tr>
                     <td>
-                        <TextEditor
-                            text={url}
-                            label={`CSS url`}
-                            placeholder={'CSS url'}
-                            valid={() => undefined}
-                            save={(text) => {
-                                const newTheme = { ...theme };
-                                if (newTheme.imports === undefined)
-                                    newTheme.imports = [];
-                                newTheme.imports[index] = text;
-                                edition.setTheme(theme);
-                            }}
-                        />
+                        <em
+                            >Add URLs to your own CSS to customize fonts and
+                            styles further.</em
+                        >
                     </td>
-                    <td style="text-align: right">
+                    <td style="text-align:right;">
                         <Button
-                            tooltip="Remove this CSS import"
+                            tooltip="Add a CSS import"
                             command={() => {
-                                theme?.imports?.splice(index, 1);
-                                edition.setTheme(theme);
-                            }}>–</Button
+                                if (theme === null) return;
+                                if (theme.imports === undefined)
+                                    theme.imports = [];
+                                theme.imports.push('');
+                                if ($edition)
+                                    edition.set($edition.withTheme(theme));
+                            }}>+</Button
                         >
                     </td>
                 </tr>
-            {/each}
-        </Rows>
-    {/if}
-</Page>
+                {#each theme.imports ?? [] as url, index}
+                    <tr>
+                        <td>
+                            <TextEditor
+                                text={url}
+                                label={`CSS url`}
+                                placeholder={'CSS url'}
+                                valid={() => undefined}
+                                save={(text) => {
+                                    const newTheme = { ...theme };
+                                    if (newTheme.imports === undefined)
+                                        newTheme.imports = [];
+                                    newTheme.imports[index] = text;
+                                    if ($edition)
+                                        edition.set($edition.withTheme(theme));
+                                }}
+                            />
+                        </td>
+                        <td style="text-align: right">
+                            <Button
+                                tooltip="Remove this CSS import"
+                                command={() => {
+                                    theme?.imports?.splice(index, 1);
+                                    if ($edition)
+                                        edition.set($edition.withTheme(theme));
+                                }}>–</Button
+                            >
+                        </td>
+                    </tr>
+                {/each}
+            </Rows>
+        {/if}
+    </Page>
+{/if}

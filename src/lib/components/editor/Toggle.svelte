@@ -6,7 +6,7 @@
     }
 
     export let on: boolean;
-    export let save: (set: boolean) => Promise<void> | undefined;
+    export let save: (set: boolean) => Promise<void> | void;
 
     let saving = Status.Viewing;
 

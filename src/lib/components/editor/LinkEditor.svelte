@@ -33,12 +33,12 @@
 
     function validate(urlOrChapter: string): string | undefined {
         if (urlOrChapter.length === 0) return "Can't be empty.";
-        if (edition === undefined) return;
+        if ($edition === undefined) return;
 
         if (isValidURL(urlOrChapter)) return;
 
         // If not, is it a valid chapterID?
-        if ($edition?.hasChapter(urlOrChapter)) return;
+        if ($edition.hasChapter(urlOrChapter)) return;
 
         // If not, is it a valid chapterID:label?
         const [chapterID, labelID] = urlOrChapter.split(':');
@@ -47,8 +47,8 @@
         // The chapter ID is optional; if it's missing, it refers to this chapter.
         const correspondingChapter =
             chapterID === '' && $chapter
-                ? $chapter.chapter.getAST()
-                : $edition?.getChapter(chapterID)?.getAST();
+                ? $chapter.chapter.getAST($edition)
+                : $edition?.getChapter(chapterID)?.getAST($edition);
         if (correspondingChapter === undefined)
             return 'Not a valid URL or chapter.';
 
@@ -62,16 +62,13 @@
         // Add an empty option.
         options.push(['External link', url.startsWith('http') ? url : '']);
         // Add an option for each chapter and it's labels.
-        if (edition) {
+        if ($edition) {
             for (const chap of $edition?.getChapters() ?? []) {
-                options.push([
-                    `Chapter: ${chap.getTitle()}`,
-                    chap.getChapterID(),
-                ]);
-                for (const label of chap.getAST()?.getLabels() ?? [])
+                options.push([`Chapter: ${chap.getTitle()}`, chap.getID()]);
+                for (const label of chap.getAST($edition)?.getLabels() ?? [])
                     options.push([
                         chap.getTitle() + ': ' + label.getMeta(),
-                        `${chap.getChapterID()}:${label.getMeta()}`,
+                        `${chap.getID()}:${label.getMeta()}`,
                     ]);
             }
         }

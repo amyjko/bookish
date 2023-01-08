@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { loadPublishedBooksFromFirestore } from '$lib/models/Firestore';
+    import { getPublishedBooks } from '$lib/models/CRUD';
     import type Book from '$lib/models/book/Book';
     import { onMount } from 'svelte';
     import Feedback from '$lib/components/app/Feedback.svelte';
@@ -13,7 +13,7 @@
     let error = '';
 
     function updateBooks() {
-        loadPublishedBooksFromFirestore().then((loadedBooks) => {
+        getPublishedBooks().then((loadedBooks) => {
             loading = false;
             if (loadedBooks === null) error = 'Unable to load books';
             else books = loadedBooks;

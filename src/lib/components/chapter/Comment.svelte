@@ -9,6 +9,7 @@
         getChapter,
         isEditable,
         getCaret,
+        getEdition,
     } from '$lib/components/page/Contexts';
     import { afterUpdate } from 'svelte';
     import Icon from '../editor/Icon.svelte';
@@ -17,11 +18,13 @@
     export let node: CommentNode;
 
     let chapter = getChapter();
+    let edition = getEdition();
     let editable = isEditable();
 
     let caret = getCaret();
 
-    $: chapterNode = $chapter?.chapter.getAST();
+    $: chapterNode =
+        $edition && $chapter ? $chapter.chapter.getAST($edition) : undefined;
     $: focused =
         $caret && $caret.range && node.contains($caret.range.start.node);
 

@@ -3,18 +3,14 @@ import type { ChapterSpecification } from './Chapter';
 import Parser from '../chapter/Parser';
 import EmbedNode from '../chapter/EmbedNode';
 import type ReferenceNode from '../chapter/ReferenceNode';
-import {
-    addChapterInFirestore,
-    removeChapterFromEditionInFirestore,
-    updateEditionInFirestore,
-} from '../Firestore';
 import type Theme from './Theme';
 import type Definition from './Definition.js';
-import type Book from './Book.js';
 import ChapterIDs from './ChapterID.js';
 import type { DocumentReference } from 'firebase/firestore';
+import type Book from './Book';
 
 export type EditionSpecification = {
+    bookRef?: DocumentReference;
     title: string;
     authors: string[];
     images: Record<string, string | null>;
@@ -23,237 +19,244 @@ export type EditionSpecification = {
     license: string;
     acknowledgements: string;
     tags: string[];
-    revisions: [string, string][];
     sources: Record<string, string>;
     references: Record<string, string | string[]>;
     symbols: Record<string, string>;
     glossary: Record<string, Definition>;
     theme: Theme | null;
-    uids: Array<string>;
-    bookRef?: DocumentReference;
+    uids: string[];
 };
 
-export enum BookSaveStatus {
-    Changed,
-    Saving,
-    Saved,
-    Error,
-}
-
 export default class Edition {
-    readonly specification: EditionSpecification;
-    readonly book: Book | undefined;
-    editionRef: DocumentReference | undefined;
-
-    chapters: Chapter[];
-
-    listeners: Set<Function>;
-
-    // A list of requested edits, stored as promises, resolved
-    // when the book is ready to save.
-    edits: { resolve: Function; reject: Function }[] = [];
-
-    lastEdit: number = 0;
+    readonly bookRef: DocumentReference | undefined;
+    readonly editionRef: DocumentReference | undefined;
+    readonly uids: string[];
+    readonly title: string;
+    readonly authors: string[];
+    readonly images: Record<string, string | null>;
+    readonly description: string;
+    readonly chapters: Chapter[];
+    readonly license: string;
+    readonly acknowledgements: string;
+    readonly tags: string[];
+    readonly sources: Record<string, string>;
+    readonly references: Record<string, string | string[]>;
+    readonly symbols: Record<string, string>;
+    readonly glossary: Record<string, Definition>;
+    readonly theme: Theme | null;
 
     // Given an object with a valid specification and an object mapping chapter IDs to chapter text,
     // construct an object representing a book.
     constructor(
-        book?: Book,
-        editionRef?: DocumentReference,
-        specification?: EditionSpecification
+        bookRef: DocumentReference | undefined,
+        editionRef: DocumentReference | undefined,
+        uids: string[],
+        title: string,
+        authors: string[],
+        images: Record<string, string | null>,
+        description: string,
+        chapters: Chapter[],
+        license: string,
+        acknowledgements: string,
+        tags: string[],
+        sources: Record<string, string>,
+        references: Record<string, string | string[]>,
+        symbols: Record<string, string>,
+        glossary: Record<string, Definition>,
+        theme: Theme | null
     ) {
-        if (typeof specification !== 'object' && specification !== undefined)
-            throw Error(
-                'Expected a book specification object, but received ' +
-                    specification
-            );
-
-        this.book = book;
+        this.bookRef = bookRef;
         this.editionRef = editionRef;
+        this.uids = uids;
+        this.title = title;
+        this.authors = authors;
+        this.images = images;
+        this.description = description;
+        this.chapters = chapters.slice();
+        this.license = license;
+        this.acknowledgements = acknowledgements;
+        this.tags = tags.slice();
+        this.sources = Object.assign({}, sources);
+        this.references = Object.assign({}, references);
+        this.symbols = Object.assign({}, symbols);
+        this.glossary = Object.assign({}, glossary);
+        this.theme = theme;
+    }
 
+    static async fromJSON(
+        editionRef: DocumentReference | undefined,
+        spec: EditionSpecification
+    ) {
         // Copy all of the specification metadata to fields.
         // Choose suitable defaults if the spec is lacking a field.
-        this.specification = {
-            title: specification ? specification.title : 'Untitled',
-            symbols:
-                specification && specification.symbols
-                    ? specification.symbols
-                    : {},
-            tags: specification && specification.tags ? specification.tags : [],
-            license: specification
-                ? specification.license
-                : 'All rights reserved.',
-            references:
-                specification && specification.references
-                    ? specification.references
-                    : {},
-            glossary:
-                specification && specification.glossary
-                    ? specification.glossary
-                    : {},
-            authors:
-                specification && specification.authors
-                    ? specification.authors
-                    : [],
-            description: specification ? specification.description : '',
-            acknowledgements:
-                specification && specification.acknowledgements
-                    ? specification.acknowledgements
-                    : '',
-            revisions:
-                specification && specification.revisions
-                    ? specification.revisions
-                    : [],
-            images:
-                specification && specification.revisions
-                    ? specification.images
-                    : {},
-            sources:
-                specification && specification.revisions
-                    ? specification.sources
-                    : {},
-            theme:
-                specification && specification.theme
-                    ? specification.theme
-                    : null,
-            uids: specification && specification.uids ? specification.uids : [],
-            chapters:
-                specification && specification.chapters
-                    ? specification.chapters
-                    : [],
-        };
-
-        // No listeners yet
-        this.listeners = new Set();
-
-        // Create a list and dictionary of Chapter objects.
-        this.chapters = [];
-
-        // If there's a spec and it has chapters, process them.
-        if (this.specification.chapters.length > 0) {
-            // Initialize the chapters dictionary since parsing depends this index to detect whether a chapter exists.
-            this.specification.chapters.forEach((chapterSpec) => {
-                const chap = new Chapter(this, chapterSpec);
-                this.chapters.push(chap);
-            });
-        }
-    }
-
-    setRef(ref: DocumentReference) {
-        if (this.editionRef)
-            throw Error('Can only set a ref of an edition when not yet set.');
-        this.editionRef = ref;
-    }
-
-    async saveEdits() {
-        // If it's been more than a second since our last edit and there
-        // are edits that haven't been saved, try updating the book,
-        // and if we succeed, resolve all of the edits, and if we fail,
-        // then reject them.
-        if (Date.now() - this.lastEdit > 1000 && this.edits.length > 0) {
-            // Tell listeners that this book model changed.
-            this.notifyListeners(BookSaveStatus.Saving);
-            return updateEditionInFirestore(this)
-                .then(() => {
-                    // Approve the edits.
-                    this.edits.forEach((edit) => edit.resolve());
-                    this.notifyListeners(BookSaveStatus.Saved);
-                })
-                .catch(() => {
-                    // Reject the edits.
-                    this.edits.forEach((edit) => edit.reject());
-                    this.notifyListeners(BookSaveStatus.Error);
-                })
-                .finally(() => {
-                    // Reset the edit queue.
-                    this.edits = [];
-                });
-        }
-    }
-
-    getBook() {
-        return this.book;
-    }
-
-    addListener(listener: (status: BookSaveStatus) => void) {
-        this.listeners.add(listener);
-    }
-    removeListener(listener: Function) {
-        this.listeners.delete(listener);
-    }
-    notifyListeners(status: BookSaveStatus) {
-        this.listeners.forEach((listener) => listener.call(undefined, status));
-    }
-
-    // Adds a save request to the queue, to be resolved later after a period of
-    // inactivity. Returns a promise that will eventually be resolved.
-    requestSave() {
-        // Tell listeners that this book model changed.
-        this.notifyListeners(BookSaveStatus.Changed);
-
-        // Return a promise that will resolve or reject later after this model saves the edits to the database.
-        this.lastEdit = Date.now();
-        const promise = new Promise<void>((resolve, reject) => {
-            this.edits.push({ resolve: resolve, reject: reject });
-        });
-        return promise;
+        return new Edition(
+            spec.bookRef,
+            editionRef,
+            spec.uids,
+            spec.title,
+            spec.authors,
+            spec.images,
+            spec.description,
+            spec.chapters.map((chap) => Chapter.fromJSON(chap, '')),
+            spec.license,
+            spec.acknowledgements,
+            spec.tags,
+            spec.sources,
+            spec.references,
+            spec.symbols,
+            spec.glossary,
+            spec.theme
+        );
     }
 
     // Convert the book to an object for storage.
-    toObject() {
-        // Deep copy, then let the chapter models handle the chapters.
-        const spec = JSON.parse(JSON.stringify(this.specification));
-        spec.chapters = this.chapters.map((chapter) => chapter.toObject());
-        return spec;
+    toObject(): EditionSpecification {
+        const editionJSON: EditionSpecification = {
+            title: this.title,
+            authors: this.authors,
+            images: Object.assign({}, this.images),
+            description: this.description,
+            chapters: this.chapters.map((chap) => chap.toJSON()),
+            license: this.license,
+            acknowledgements: this.acknowledgements,
+            tags: this.tags.slice(),
+            sources: Object.assign({}, this.sources),
+            references: Object.assign({}, this.references),
+            symbols: Object.assign({}, this.symbols),
+            glossary: Object.assign({}, this.glossary),
+            theme: this.theme,
+            uids: this.uids.slice(),
+        };
+        if (this.bookRef) editionJSON.bookRef = this.bookRef;
+        return editionJSON;
     }
 
     getRef() {
         return this.editionRef;
     }
 
-    addUserID(uid: string) {
-        this.specification.uids.push(uid);
+    withRef(editionRef: DocumentReference | undefined) {
+        return new Edition(
+            this.bookRef,
+            editionRef,
+            this.uids,
+            this.title,
+            this.authors,
+            this.images,
+            this.description,
+            this.chapters,
+            this.license,
+            this.acknowledgements,
+            this.tags,
+            this.sources,
+            this.references,
+            this.symbols,
+            this.glossary,
+            this.theme
+        );
     }
 
     getTitle() {
-        return this.specification.title;
+        return this.title;
     }
-    setTitle(title: string): Promise<void> {
-        // Update locally, then update on the server.
-        this.specification.title = title;
-        return this.requestSave();
+
+    withTitle(title: string): Edition {
+        return new Edition(
+            this.bookRef,
+            this.editionRef,
+            this.uids,
+            title,
+            this.authors,
+            this.images,
+            this.description,
+            this.chapters,
+            this.license,
+            this.acknowledgements,
+            this.tags,
+            this.sources,
+            this.references,
+            this.symbols,
+            this.glossary,
+            this.theme
+        );
     }
 
     getDescription() {
-        return this.specification.description;
+        return this.description;
     }
-    setDescription(text: string) {
-        // Update locally, then update on the server.
-        this.specification.description = text;
-        return this.requestSave();
+    setDescription(description: string): Edition {
+        return new Edition(
+            this.bookRef,
+            this.editionRef,
+            this.uids,
+            this.title,
+            this.authors,
+            this.images,
+            description,
+            this.chapters,
+            this.license,
+            this.acknowledgements,
+            this.tags,
+            this.sources,
+            this.references,
+            this.symbols,
+            this.glossary,
+            this.theme
+        );
     }
 
     getAcknowledgements() {
-        return this.specification.acknowledgements;
+        return this.acknowledgements;
     }
-    setAcknowledgements(text: string) {
-        // Update locally, then update on the server.
-        this.specification.acknowledgements = text;
-        return this.requestSave();
+    setAcknowledgements(acks: string) {
+        return new Edition(
+            this.bookRef,
+            this.editionRef,
+            this.uids,
+            this.title,
+            this.authors,
+            this.images,
+            this.description,
+            this.chapters,
+            this.license,
+            acks,
+            this.tags,
+            this.sources,
+            this.references,
+            this.symbols,
+            this.glossary,
+            this.theme
+        );
     }
 
     getLicense() {
-        return this.specification.license;
+        return this.license;
     }
-    setLicense(text: string) {
-        // Update locally, then update on the server.
-        this.specification.license = text;
-        return this.requestSave();
+    setLicense(license: string) {
+        return new Edition(
+            this.bookRef,
+            this.editionRef,
+            this.uids,
+            this.title,
+            this.authors,
+            this.images,
+            this.description,
+            this.chapters,
+            license,
+            this.acknowledgements,
+            this.tags,
+            this.sources,
+            this.references,
+            this.symbols,
+            this.glossary,
+            this.theme
+        );
     }
 
     getChapters() {
-        return this.chapters;
+        return this.chapters.slice();
     }
+
     hasChapter(chapterID: string): boolean {
         return (
             this.getChapter(chapterID) !== undefined ||
@@ -262,249 +265,397 @@ export default class Edition {
             )
         );
     }
+
     getChapter(chapterID: string): Chapter | undefined {
+        return this.chapters.find((chapter) => chapter.getID() === chapterID);
+    }
+
+    getChapterByRef(ref: DocumentReference): Chapter | undefined {
         return this.chapters.find(
-            (chapter) => chapter.getChapterID() === chapterID
+            (chap) => chap.ref !== undefined && chap.ref.id === ref.id
         );
     }
+
     getChapterPosition(chapterID: string): number | undefined {
         var position = 0;
         for (; position < this.chapters.length; position++)
-            if (this.chapters[position].getChapterID() === chapterID)
-                return position;
+            if (this.chapters[position].getID() === chapterID) return position;
 
         return undefined;
     }
+
     getChapterCount() {
         return this.chapters.length;
     }
 
-    async addChapter() {
-        if (!this.editionRef) throw Error("No edition ID, can't add chapter");
+    withChapters(chapters: Chapter[]) {
+        return new Edition(
+            this.bookRef,
+            this.editionRef,
+            this.uids,
+            this.title,
+            this.authors,
+            this.images,
+            this.description,
+            chapters,
+            this.license,
+            this.acknowledgements,
+            this.tags,
+            this.sources,
+            this.references,
+            this.symbols,
+            this.glossary,
+            this.theme
+        );
+    }
 
-        const editionID = this.editionRef;
+    withRevisedChapter(previous: Chapter, edited: Chapter) {
+        const index = this.chapters.indexOf(previous);
+        if (index < 0) return this;
+        return this.withChapters([
+            ...this.chapters.slice(0, index),
+            edited,
+            ...this.chapters.slice(index + 1),
+        ]);
+    }
 
+    withoutRefs() {
+        return this.withRef(undefined).withChapters(
+            this.chapters.map((chap) => chap.withoutRef())
+        );
+    }
+
+    withNewChapter() {
         // Synthesize a chapter ID placeholder that doesn't overlap with existing chapter names
         let number = 1;
         while (this.hasChapter('chapter' + number)) number++;
 
-        const chapterRef = await addChapterInFirestore(editionID, { text: '' });
-
         // Create a default chapter on this model. Remember the document reference so we can modify it later.
-        const emptyChapter = {
-            ref: chapterRef,
-            id: `chapter${number}`,
-            title: 'Untitled Chapter',
-            authors: [],
-            numbered: true,
-            forthcoming: true,
-            image: null,
-        };
-
-        const chap = new Chapter(this, emptyChapter);
-        this.chapters.push(chap);
-
-        // Ask the database to create the chapter, returning the promise
-        this.requestSave();
+        const newChapter = new Chapter(
+            undefined,
+            `chapter${number}`,
+            'Untitled Chapter',
+            [],
+            null,
+            true,
+            false,
+            undefined,
+            ''
+        );
+        return this.withChapters([...this.chapters, newChapter]);
     }
 
-    moveChapter(chapterID: string, increment: number): Promise<void> {
+    withoutChapter(chapterID: string): Edition {
+        let index = this.chapters.findIndex(
+            (chapter) => chapter.getID() === chapterID
+        );
+        if (index < 0) return this;
+
+        return this.withChapters([
+            ...this.chapters.slice(0, index),
+            ...this.chapters.slice(index + 1),
+        ]);
+    }
+
+    withMovedChapter(chapterID: string, increment: number): Edition {
         // Get the index of the chapter.
         let index = this.chapters.findIndex(
-            (chapter) => chapter.getChapterID() === chapterID
+            (chapter) => chapter.getID() === chapterID
         );
-        if (index < 0)
-            throw Error(
-                `Chapter with ID ${chapterID} doesn't exist, can't move it.`
-            );
-        else if (index + increment < 0)
-            throw Error(
-                `Can't move this chapter ${increment} chapters earlier.`
-            );
-        else if (index + increment >= this.chapters.length)
-            throw Error(`Can't move this chapter ${increment} chapters later.`);
+        if (index + increment < 0 || index + increment >= this.chapters.length)
+            return this;
 
-        const temp = this.chapters[index + increment];
-        this.chapters[index + increment] = this.chapters[index];
-        this.chapters[index] = temp;
+        const newChapters = this.chapters.slice();
+        const temp = newChapters[index + increment];
+        newChapters[index + increment] = newChapters[index];
+        newChapters[index] = temp;
 
-        // Ask the database to update with this new order.
-        return this.requestSave();
-    }
-
-    async deleteChapter(chapterID: string): Promise<void> {
-        let index = this.chapters.findIndex(
-            (chapter) => chapter.getChapterID() === chapterID
-        );
-        if (index < 0)
-            throw Error(
-                `Chapter with ID ${chapterID} doesn't exist, can't delete it.`
-            );
-
-        const chapter = this.chapters[index];
-        this.chapters.splice(index, 1);
-
-        // Ask the database to update the new book metadata then delete the chapter.
-        return this.requestSave().then(() =>
-            removeChapterFromEditionInFirestore(chapter)
+        return new Edition(
+            this.bookRef,
+            this.editionRef,
+            this.uids,
+            this.title,
+            this.authors,
+            this.images,
+            this.description,
+            newChapters,
+            this.license,
+            this.acknowledgements,
+            this.tags,
+            this.sources,
+            this.references,
+            this.symbols,
+            this.glossary,
+            this.theme
         );
     }
 
     getSymbols() {
-        return this.specification.symbols;
+        return this.symbols;
     }
 
     hasReferences() {
-        return (
-            this.specification.references &&
-            Object.keys(this.specification.references).length > 0
-        );
+        return Object.keys(this.references).length > 0;
     }
+
     getReferences() {
-        return this.specification.references;
+        return Object.assign({}, this.references);
     }
+
     getReference(citationID: string) {
-        return citationID in this.specification.references
-            ? this.specification.references[citationID]
+        return citationID in this.references
+            ? this.references[citationID]
             : undefined;
     }
-    addReferences(references: ReferenceNode[]) {
-        // Generate a unique ID for the reference.
-        references.forEach(
-            (ref) =>
-                (this.specification.references[ref.citationID] = ref.toList())
+
+    withReferences(newReferences: Record<string, string | string[]>) {
+        return new Edition(
+            this.bookRef,
+            this.editionRef,
+            this.uids,
+            this.title,
+            this.authors,
+            this.images,
+            this.description,
+            this.chapters,
+            this.license,
+            this.acknowledgements,
+            this.tags,
+            this.sources,
+            newReferences,
+            this.symbols,
+            this.glossary,
+            this.theme
         );
-        return this.requestSave();
     }
-    editReference(ref: ReferenceNode) {
-        if (!(ref.citationID in this.specification.references)) return;
-        this.specification.references[ref.citationID] = ref.toList();
-        return this.requestSave();
+
+    withNewReferences(references: ReferenceNode[]): Edition {
+        const newReferences = Object.assign({}, this.references);
+        // Generate a unique ID for the reference.
+        for (const newRef of references)
+            newReferences[newRef.citationID] = newRef.toList();
+        return this.withReferences(newReferences);
     }
-    editReferenceID(newCitationID: string, ref: ReferenceNode) {
-        if (!(ref.citationID in this.specification.references)) return;
-        delete this.specification.references[ref.citationID];
-        this.specification.references[newCitationID] = ref
+
+    withEditedReference(ref: ReferenceNode) {
+        if (!(ref.citationID in this.references)) return this;
+        const newReferences = Object.assign({}, this.references);
+        newReferences[ref.citationID] = ref.toList();
+        return this.withReferences(newReferences);
+    }
+
+    withEditedReferenceID(newCitationID: string, ref: ReferenceNode) {
+        if (!(ref.citationID in this.references)) return;
+        const newReferences = Object.assign({}, this.references);
+        delete newReferences[ref.citationID];
+        newReferences[newCitationID] = ref
             .withCitationID(newCitationID)
             .toList();
-        return this.requestSave();
+        return this.withReferences(newReferences);
     }
-    removeReference(citationID: string) {
-        if (!(citationID in this.specification.references)) return;
-        delete this.specification.references[citationID];
-        return this.requestSave();
+
+    withoutReference(citationID: string) {
+        if (!(citationID in this.references)) return this;
+        const newReferences = Object.assign({}, this.references);
+        delete newReferences[citationID];
+        return this.withReferences(newReferences);
     }
 
     hasGlossary() {
-        return (
-            this.specification.glossary &&
-            Object.keys(this.specification.glossary).length > 0
+        return Object.keys(this.glossary).length > 0;
+    }
+
+    getGlossary() {
+        return Object.assign({}, this.glossary);
+    }
+
+    hasDefinition(id: string) {
+        return id in this.glossary;
+    }
+
+    withGlossary(glossary: Record<string, Definition>) {
+        return new Edition(
+            this.bookRef,
+            this.editionRef,
+            this.uids,
+            this.title,
+            this.authors,
+            this.images,
+            this.description,
+            this.chapters,
+            this.license,
+            this.acknowledgements,
+            this.tags,
+            this.sources,
+            this.references,
+            this.symbols,
+            glossary,
+            this.theme
         );
     }
-    getGlossary() {
-        return this.specification.glossary;
-    }
-    hasDefinition(id: string) {
-        return id in this.specification.glossary;
-    }
-    addDefinition(
+
+    withDefinition(
         id: string,
         phrase: string,
         definition: string,
         synonyms: string[]
-    ) {
-        this.specification.glossary[id] = {
+    ): Edition {
+        const newGlossary = Object.assign({}, this.glossary);
+        newGlossary[id] = {
             phrase: phrase,
             definition: definition,
             synonyms: synonyms,
         };
-        return this.requestSave();
+        return this.withGlossary(newGlossary);
     }
-    removeDefinition(id: string) {
-        delete this.specification.glossary[id];
-        return this.requestSave();
+
+    withoutDefinition(id: string): Edition {
+        const newGlossary = Object.assign({}, this.glossary);
+        delete newGlossary[id];
+        return this.withGlossary(newGlossary);
     }
-    editDefinition(id: string, definition: Definition) {
-        this.specification.glossary[id] = definition;
-        return this.requestSave();
+
+    withEditedDefinition(id: string, definition: Definition): Edition {
+        const newGlossary = Object.assign({}, this.glossary);
+        newGlossary[id] = definition;
+        return this.withGlossary(newGlossary);
     }
-    editDefinitionID(id: string, newID: string) {
-        if (!(id in this.specification.glossary)) return;
-        const definition = this.specification.glossary[id];
-        delete this.specification.glossary[id];
-        this.specification.glossary[newID] = definition;
-        return this.requestSave();
+
+    withEditedDefinitionID(id: string, newID: string) {
+        if (!(id in this.glossary)) return;
+        const newGlossary = Object.assign({}, this.glossary);
+        const definition = newGlossary[id];
+        delete newGlossary[id];
+        newGlossary[newID] = definition;
+        return this.withGlossary(newGlossary);
     }
 
     getTags() {
-        return this.specification.tags;
+        return this.tags;
     }
 
     getTheme() {
-        return this.specification.theme;
+        return this.theme;
     }
-    setTheme(theme: Theme | null) {
-        this.specification.theme = theme;
-        return this.requestSave();
+
+    withTheme(theme: Theme | null) {
+        return new Edition(
+            this.bookRef,
+            this.editionRef,
+            this.uids,
+            this.title,
+            this.authors,
+            this.images,
+            this.description,
+            this.chapters,
+            this.license,
+            this.acknowledgements,
+            this.tags,
+            this.sources,
+            this.references,
+            this.symbols,
+            this.glossary,
+            theme
+        );
     }
-    setThemeValue(group: string, name: string, value: string) {
-        if (
-            (
-                this.specification.theme as Record<
-                    string,
-                    Record<string, string>
-                >
-            )[group][name] === value
-        )
-            return;
-        (this.specification.theme as Record<string, Record<string, string>>)[
-            group
-        ][name] = value;
-        return this.requestSave();
+
+    withThemeValue(group: string, name: string, value: string) {
+        if (this.theme === null) return this;
+        if (group === 'imports') return this;
+        const newTheme: Record<string, Record<string, string>> = Object.assign(
+            {},
+            this.theme as Record<string, Record<string, string>>
+        );
+        const newGroup: Record<string, string> = Object.assign(
+            {},
+            (this.theme as Record<string, Record<string, string>>)[group]
+        );
+        newGroup[name] = value;
+        newTheme[group] = newGroup;
+        return this.withTheme(newTheme);
     }
 
     // Don't let callers get their sneaky hands on this mutable array...
     getAuthors() {
-        return [...this.specification.authors];
-    }
-    addAuthor(name: string) {
-        this.specification.authors.push(name);
-        return this.requestSave();
-    }
-    setAuthor(index: number, name: string) {
-        if (index >= 0 && index < this.specification.authors.length)
-            this.specification.authors[index] = name;
-
-        return this.requestSave();
-    }
-    removeAuthor(index: number) {
-        if (index >= 0 && index < this.specification.authors.length)
-            this.specification.authors.splice(index, 1);
-        return this.requestSave();
+        return [...this.authors];
     }
 
-    getRevisions() {
-        return [...this.specification.revisions];
+    withAuthors(authors: string[]) {
+        return new Edition(
+            this.bookRef,
+            this.editionRef,
+            this.uids,
+            this.title,
+            authors,
+            this.images,
+            this.description,
+            this.chapters,
+            this.license,
+            this.acknowledgements,
+            this.tags,
+            this.sources,
+            this.references,
+            this.symbols,
+            this.glossary,
+            this.theme
+        );
+    }
+
+    withAuthor(name: string) {
+        return this.withAuthors([...this.authors, name]);
+    }
+
+    withAuthorName(index: number, name: string) {
+        if (index < 0 || index >= this.authors.length) return this;
+        return this.withAuthors([
+            ...this.authors.slice(0, index),
+            name,
+            ...this.authors.slice(index + 1),
+        ]);
+    }
+
+    withoutAuthor(index: number) {
+        if (index < 0 || index >= this.authors.length) return this;
+        return this.withAuthors([
+            ...this.authors.slice(0, index),
+            ...this.authors.slice(index + 1),
+        ]);
     }
 
     hasImage(id: string) {
-        return (
-            id in this.specification.images &&
-            this.specification.images[id] !== null
-        );
+        return this.images[id] !== null;
     }
+
     getImage(id: string) {
-        return this.specification.images[id] ?? null;
+        return this.images[id] ?? null;
     }
-    setImage(id: string, embed: string | null) {
-        if (this.specification.images[id] === embed) return;
-        this.specification.images[id] = embed ?? null;
-        return this.requestSave();
+
+    withImage(id: string, embed: string | null) {
+        const newImages = Object.assign({}, this.images);
+        newImages[id] = embed;
+        return new Edition(
+            this.bookRef,
+            this.editionRef,
+            this.uids,
+            this.title,
+            this.authors,
+            newImages,
+            this.description,
+            this.chapters,
+            this.license,
+            this.acknowledgements,
+            this.tags,
+            this.sources,
+            this.references,
+            this.symbols,
+            this.glossary,
+            this.theme
+        );
     }
 
     getBookReadingTime() {
         return this.chapters
-            .map((chapter) => chapter.getReadingTime())
+            .map((chapter) => chapter.getReadingTime(this))
             .reduce(
                 (total, time) =>
                     total === undefined
@@ -521,7 +672,7 @@ export default class Edition {
         let match = null;
         this.chapters.forEach((chapter) => {
             // If we found a match...
-            if (chapter.getChapterID() === chapterID) {
+            if (chapter.getID() === chapterID) {
                 match = chapterNumber;
                 // And it's an unnumbered chapter, set to null.
                 if (!chapter.isNumbered()) match = null;
@@ -536,8 +687,8 @@ export default class Edition {
 
     getSource(sourceID: string) {
         return sourceID.charAt(0) === '#' &&
-            sourceID.substring(1) in this.specification.sources
-            ? this.specification.sources[sourceID.substring(1)]
+            sourceID.substring(1) in this.sources
+            ? this.sources[sourceID.substring(1)]
             : null;
     }
 
@@ -566,12 +717,12 @@ export default class Edition {
 
         // Construct the index by building a dictionary of chapters in which each word appears.
         this.chapters.forEach((chapter) => {
-            let index = chapter.getIndex();
+            let index = chapter.getIndex(this);
             if (index)
                 Object.keys(index).forEach((word) => {
                     if (word !== '' && word.length > 2) {
                         if (!(word in bookIndex)) bookIndex[word] = new Set();
-                        bookIndex[word].add(chapter.getChapterID());
+                        bookIndex[word].add(chapter.getID());
                     }
                 });
         });
@@ -597,16 +748,16 @@ export default class Edition {
                 return ChapterIDs.TableOfContentsID;
             case ChapterIDs.TableOfContentsID:
                 return this.chapters.length > 0
-                    ? this.chapters[0].getChapterID()
+                    ? this.chapters[0].getID()
                     : null;
             default:
                 let after = false;
                 for (let i = 0; i < this.chapters.length; i++) {
                     let chapter = this.chapters[i];
-                    if (chapter.getChapterID() === chapterID) after = true;
+                    if (chapter.getID() === chapterID) after = true;
                     // If we're after the given chapter and it's not forthcoming.
                     else if (after && !chapter.isForthcoming())
-                        return chapter.getChapterID();
+                        return chapter.getID();
                 }
                 // If the given ID was the last chapter, go to the next back matter chapter.
                 if (after)
@@ -626,13 +777,13 @@ export default class Edition {
             // Handle back matter chapters.
             case ChapterIDs.ReferencesID:
                 return this.chapters.length > 0
-                    ? this.chapters[this.chapters.length - 1].getChapterID()
+                    ? this.chapters[this.chapters.length - 1].getID()
                     : null; // Last chapter of the book
             case ChapterIDs.GlossaryID:
                 return this.hasReferences()
                     ? ChapterIDs.ReferencesID
                     : this.chapters.length > 0
-                    ? this.chapters[this.chapters.length - 1].getChapterID()
+                    ? this.chapters[this.chapters.length - 1].getID()
                     : ChapterIDs.TableOfContentsID;
             case ChapterIDs.IndexID:
                 return this.hasGlossary()
@@ -640,7 +791,7 @@ export default class Edition {
                     : this.hasReferences()
                     ? ChapterIDs.ReferencesID
                     : this.chapters.length > 0
-                    ? this.chapters[this.chapters.length - 1].getChapterID()
+                    ? this.chapters[this.chapters.length - 1].getID()
                     : ChapterIDs.TableOfContentsID;
             case ChapterIDs.SearchID:
                 return ChapterIDs.IndexID;
@@ -650,10 +801,10 @@ export default class Edition {
                 let before = false;
                 for (let i = this.chapters.length - 1; i >= 0; i--) {
                     let chapter = this.chapters[i];
-                    if (chapter.getChapterID() === chapterID) before = true;
+                    if (chapter.getID() === chapterID) before = true;
                     // If we're before the given chapter and it's not forthcoming.
                     else if (before && !chapter.isForthcoming())
-                        return chapter.getChapterID();
+                        return chapter.getID();
                 }
                 // If the given ID was the last chapter, go to the next back matter chapter.
                 if (before) return ChapterIDs.TableOfContentsID;
@@ -681,7 +832,7 @@ export default class Edition {
             if (cover && cover instanceof EmbedNode) embeds.push(cover);
 
             // Get the chapter body's embeds
-            let bodyEmbeds = c?.getAST()?.getEmbeds();
+            let bodyEmbeds = c?.getAST(this)?.getEmbeds();
             if (bodyEmbeds)
                 bodyEmbeds.forEach((embed: EmbedNode) => embeds.push(embed));
         });
@@ -699,16 +850,16 @@ export default class Edition {
         return embeds;
     }
 
-    isLatestEdition(): boolean {
-        const latestEditionID = this.book?.getLatestEditionID();
+    isLatestEdition(book: Book): boolean {
+        const latestEditionID = book.getLatestEditionID();
         return (
             latestEditionID !== undefined &&
             latestEditionID === this.editionRef?.id
         );
     }
 
-    isLatestPublishedEdition(): boolean {
-        const latestEditionID = this.book?.getLatestPublishedEditionID();
+    isLatestPublishedEdition(book: Book): boolean {
+        const latestEditionID = book.getLatestPublishedEditionID();
         return (
             latestEditionID !== undefined &&
             latestEditionID === this.editionRef?.id
@@ -716,8 +867,8 @@ export default class Edition {
     }
 
     /* Edition numbers are 1 to N */
-    getEditionNumber() {
-        const revisions = this.book?.getRevisions();
+    getEditionNumber(book: Book) {
+        const revisions = book.getRevisions();
         if (revisions === undefined) return undefined;
         for (let i = 0; i < revisions.length; i++)
             if (revisions[i].ref.id === this.editionRef?.id)
@@ -725,8 +876,8 @@ export default class Edition {
         return undefined;
     }
 
-    getEditionLabel() {
-        const num = this.getEditionNumber();
+    getEditionLabel(book: Book) {
+        const num = this.getEditionNumber(book);
         return `${num}${
             num === 1 ? 'st' : num === 2 ? 'nd' : num === 3 ? 'rd' : 'th'
         }`;

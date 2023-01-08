@@ -52,7 +52,10 @@
         <Header
             label="Index title"
             getImage={() => $edition?.getImage(ChapterIDs.IndexID) ?? null}
-            setImage={(embed) => $edition?.setImage(ChapterIDs.IndexID, embed)}
+            setImage={(embed) =>
+                $edition
+                    ? edition.set($edition.withImage(ChapterIDs.IndexID, embed))
+                    : undefined}
             header="Index"
             tags={$edition.getTags()}
         >
@@ -84,7 +87,7 @@
                 {#each 'abcdefghijklmnopqrstuvwxyz'.split('') as symbol, index}
                     <span style="display: inline-block">
                         {#if symbol in letters && letter !== symbol}
-                            <Link to={base + 'index/' + symbol}>{symbol}</Link>
+                            <Link to={$base + 'index/' + symbol}>{symbol}</Link>
                         {:else}
                             <span>
                                 {#if letter === symbol}
@@ -134,7 +137,7 @@
                                             {/if}</ChapterNumber
                                         >
                                         <ChapterTitle
-                                            link={`${base}${chapterID}?word=${word}`}
+                                            link={`${$base}${chapterID}?word=${word}`}
                                             >{$edition.getChapterName(
                                                 chapterID
                                             )}</ChapterTitle

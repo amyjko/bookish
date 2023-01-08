@@ -1,7 +1,6 @@
 <script lang="ts">
     import Parser from '$lib/models/chapter/Parser';
     import type ChapterModel from '$lib/models/book/Chapter';
-
     import Header from '$lib/components/page/Header.svelte';
     import Authors from '$lib/components/page/Authors.svelte';
     import Outline from '$lib/components/page/Outline.svelte';
@@ -14,12 +13,12 @@
     import PossibleReference from './PossibleReference.svelte';
     import ChapterNumber from './ChapterNumber.svelte';
     import Problem from '../chapter/Problem.svelte';
-
     import {
         CHAPTER,
         getBook,
         getEdition,
         isEditable,
+        setChapter,
         type ChapterStore,
     } from './Contexts';
     import { writable } from 'svelte/store';
@@ -28,7 +27,6 @@
     import scrollToEyeLevel from '../../util/scrollToEyeLevel';
     import type ChapterContext from '$lib/components/page/ChapterContext';
     import { goto } from '$app/navigation';
-    import type Chapter from '$lib/models/book/Chapter';
     import ChapterNode from '$lib/models/chapter/ChapterNode';
     import Muted from './Muted.svelte';
     import Title from './Title.svelte';
@@ -131,11 +129,6 @@
         // Position the marginals, since there's new content.
         layoutMarginals();
 
-        // Periodically save the chapter's edits.
-        const chapterSaverID = setInterval(() => {
-            $currentChapter.saveEdits();
-        }, 500);
-
         // On cleanup, unsubscribe from everything above.
         return () => {
             window.removeEventListener('scroll', handleScroll);
@@ -156,26 +149,11 @@
 
             // Stop observing everything on unmount
             observer.disconnect();
-
-            // Stop saving.
-            clearInterval(chapterSaverID);
         };
     });
 
     // Position the marginals on mount.
     onMount(() => layoutMarginals());
-
-    // Keep track of the current chapter in a store to manage listeners on the chapter.
-    let currentChapter = writable<Chapter>(chapter);
-    let chapterChanged = () => currentChapter.set(chapter);
-    $: {
-        // Listen to the new edition
-        $currentChapter.removeListener(chapterChanged);
-        // Update the current edition.
-        currentChapter.set(chapter);
-        // Listen to changes on the book and chapter.
-        $currentChapter.addListener(chapterChanged);
-    }
 
     // This gets called after the page is done loading. There are various things we scroll to.
     function scrollToLastLocation() {
@@ -233,12 +211,13 @@
     }
 
     // Prepare to render the chapter by getting some data from the chapter and book.
-    $: chapterID = $currentChapter.getChapterID();
+    $: chapterID = chapter.getID();
     $: chapterNumber = $edition?.getChapterNumber(chapterID);
     $: chapterSection = $edition?.getChapterSection(chapterID);
-    $: chapterAST = $currentChapter.getAST();
+    $: chapterAST = $edition ? chapter.getAST($edition) : undefined;
     $: citations = chapterAST ? chapterAST.getCitations() : undefined;
-    $: editionNumber = $edition?.getEditionNumber();
+    $: editionNumber =
+        $book && $edition ? $edition.getEditionNumber($book) : undefined;
 
     let chapterStore = writable<ChapterContext>();
     setContext<ChapterStore>(CHAPTER, chapterStore);
@@ -261,9 +240,11 @@
                 header={chapter.getTitle()}
                 label="Chapter title"
                 tags={$edition.getTags()}
-                save={(text) => chapter.setTitle(text)}
+                save={(text) =>
+                    setChapter(edition, chapter, chapter.withTitle(text))}
                 getImage={() => chapter.getImage()}
-                setImage={(embed) => chapter.setImage(embed)}
+                setImage={(embed) =>
+                    setChapter(edition, chapter, chapter.withImage(embed))}
                 {print}
             >
                 <!-- Collapse the outline if a marginal is selected. -->
@@ -285,12 +266,12 @@
                     {#if editable && $book}
                         <Muted>
                             <TextEditor
-                                text={chapter.getChapterID()}
+                                text={chapter.getID()}
                                 label="Chapter URL ID editor"
                                 save={// After the ID is edited, reload the page with the new URL.
                                 (newChapterID) => {
                                     if ($book) {
-                                        chapter.setChapterID(newChapterID);
+                                        chapter.withChapterID(newChapterID);
                                         // Navigate to the new ID
                                         goto(
                                             `/write/${$book.ref.id}/${editionNumber}/${newChapterID}`
@@ -301,8 +282,7 @@
                                 valid={(newChapterID) =>
                                     !/^[a-zA-Z0-9]+$/.test(newChapterID)
                                         ? 'Chapter IDs must be one or more letters or numbers'
-                                        : chapter.getChapterID() !==
-                                              newChapterID &&
+                                        : chapter.getID() !== newChapterID &&
                                           $edition?.hasChapter(newChapterID)
                                         ? "There's already a chapter that has this ID."
                                         : undefined}
@@ -314,7 +294,12 @@
                     {#if editable}
                         <Toggle
                             on={chapter.isNumbered()}
-                            save={(on) => chapter.setNumbered(on)}
+                            save={(on) =>
+                                setChapter(
+                                    edition,
+                                    chapter,
+                                    chapter.asNumbered(on)
+                                )}
                         >
                             {#if chapterNumber !== undefined}
                                 <ChapterNumber
@@ -336,9 +321,20 @@
                     slot="after"
                     authors={chapter.getAuthors()}
                     inheritedAuthors={$edition.getAuthors()}
-                    add={() => chapter.addAuthor('')}
-                    edit={(index, text) => chapter.setAuthor(index, text)}
-                    remove={(index) => chapter.removeAuthor(index)}
+                    add={() =>
+                        setChapter(edition, chapter, chapter.withAuthor(''))}
+                    edit={(index, text) =>
+                        setChapter(
+                            edition,
+                            chapter,
+                            chapter.withRenamedAuthor(index, text)
+                        )}
+                    remove={(index) =>
+                        setChapter(
+                            edition,
+                            chapter,
+                            chapter.withoutAuthor(index)
+                        )}
                 />
             </Header>
 
@@ -357,9 +353,13 @@
                 {#if editable}
                     <BookishEditor
                         ast={chapterAST}
-                        save={(node) =>
-                            node instanceof ChapterNode
-                                ? chapter.setAST(node)
+                        save={(ast) =>
+                            ast instanceof ChapterNode
+                                ? setChapter(
+                                      edition,
+                                      chapter,
+                                      chapter.withAST(ast)
+                                  )
                                 : undefined}
                         chapter={true}
                         autofocus

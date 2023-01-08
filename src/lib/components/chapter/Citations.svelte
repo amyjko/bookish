@@ -15,13 +15,14 @@
     let chapter = getChapter();
     let edition = getEdition();
 
-    $: chapterNode = $chapter?.chapter.getAST();
+    $: ast =
+        $edition && $chapter ? $chapter.chapter.getAST($edition) : undefined;
 
     // Sort citations numerically, however they're numbered.
     $: citations = node.getMeta().sort((a, b) => {
-        if (chapterNode === undefined) return 0;
-        let aNumber = chapterNode.getCitationNumber(a);
-        let bNumber = chapterNode.getCitationNumber(b);
+        if (ast === undefined) return 0;
+        let aNumber = ast.getCitationNumber(a);
+        let bNumber = ast.getCitationNumber(b);
         if (aNumber === null) {
             if (bNumber === null) return 0;
             else return 1;
@@ -36,13 +37,13 @@
 </script>
 
 <Atom {node}>
-    {#if chapterNode}
+    {#if ast}
         <span class="bookish-citation" data-nodeid={node.nodeID}>
             <Marginal {node} id={'citation-' + citations.join('-')}>
                 <svelte:fragment slot="interactor">
                     {#each citations as citationID, index}
                         {@const citationNumber =
-                            chapterNode?.getCitationNumber(citationID)}
+                            ast?.getCitationNumber(citationID)}
                         {#if citationNumber && citationID in ($edition?.getReferences() ?? {})}
                             <sup class="bookish-citation-symbol"
                                 >{citationNumber}</sup
@@ -63,7 +64,7 @@
                 <span slot="content" class="bookish-references">
                     {#each citations as citationID}
                         {@const citationNumber =
-                            chapterNode?.getCitationNumber(citationID)}
+                            ast?.getCitationNumber(citationID)}
                         {@const ref = $edition?.getReference(citationID)}
                         {#if citationNumber && ref && $edition}
                             <span class="bookish-reference">

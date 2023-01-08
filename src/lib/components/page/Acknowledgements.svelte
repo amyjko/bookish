@@ -27,7 +27,12 @@
             chapter={false}
             component={ChapterBody}
             placeholder="Who would you like to thank?"
-            save={(node) => $edition?.setAcknowledgements(node.toBookdown())}
+            save={(node) =>
+                $edition
+                    ? edition.set(
+                          $edition.setAcknowledgements(node.toBookdown())
+                      )
+                    : undefined}
         />
     {:else if acknowledgements.length > 0}
         <PageHeader id="acknowledgements">Acknowledgements</PageHeader>

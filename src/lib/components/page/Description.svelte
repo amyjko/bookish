@@ -17,7 +17,12 @@
         {#if editable}
             <BookishEditor
                 ast={descriptionNode}
-                save={(node) => $edition?.setDescription(node.toBookdown())}
+                save={(node) =>
+                    $edition
+                        ? edition.set(
+                              $edition?.setDescription(node.toBookdown())
+                          )
+                        : undefined}
                 chapter={false}
                 component={ChapterBody}
                 placeholder="What this book about?"

@@ -5,7 +5,7 @@
     export let commandLabel: string;
     export let tooltip: string;
     export let confirmLabel: string;
-    export let command: () => Promise<void> | undefined;
+    export let command: () => Promise<void> | void;
 
     let confirming = false;
     let executing = false;

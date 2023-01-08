@@ -4,20 +4,28 @@
     import Loading from '$lib/components/page/Loading.svelte';
     import Edition from '$lib/components/page/Edition.svelte';
     import Feedback from '$lib/components/app/Feedback.svelte';
+    import { getBook, getEdition } from '$lib/components/page/Contexts';
 
     export let data: { book: Book; edition: EditionModel } | null | undefined =
         undefined;
+
+    let book = getBook();
+    let edition = getEdition();
+
+    // Update the global stores to the book and edition received.
+    $: edition.set(data ? data.edition : undefined);
+    $: book.set(data ? data.book : undefined);
 </script>
 
 {#if data === undefined}
     <Loading />
-{:else if data === null || data.book === undefined}
+{:else if $edition === undefined || $book === undefined}
     <Feedback error>Unable to load book. Maybe the link isn't correct?</Feedback
     >
 {:else}
     <Edition
-        edition={data.edition}
-        base={`/write/${data.book.getRefID()}/${data.edition.getEditionNumber()}/`}
+        edition={$edition}
+        base={`/write/${$book.getRefID()}/${$edition.getEditionNumber($book)}/`}
         editable={true}
     >
         <slot />

@@ -1,4 +1,4 @@
-import { getBookFromIDOrName } from './Firestore';
+import { getBookFromIDOrName } from './CRUD';
 
 export default async function loadEdition(
     bookIDOrName: string,

@@ -17,9 +17,8 @@
     export let print: boolean = false;
     export let tags: string[] | undefined = undefined;
     export let getImage: () => string | null;
-    export let setImage: (embed: string | null) => Promise<void> | undefined;
-    export let save: ((text: string) => Promise<void> | undefined) | null =
-        null;
+    export let setImage: (embed: string | null) => Promise<void> | void;
+    export let save: ((text: string) => Promise<void> | void) | null = null;
 
     let title: HTMLHeadingElement | null = null;
     let showReminder: boolean = true;

@@ -30,7 +30,7 @@
         let id = '';
         while (id.length < 4 || $edition.hasDefinition(id))
             id = id + letters[Math.round(Math.random() * 26)];
-        $edition.addDefinition(id, '', '', []);
+        edition.set($edition.withDefinition(id, '', '', []));
     }
 </script>
 
@@ -40,7 +40,11 @@
             label="Glossary title"
             getImage={() => $edition?.getImage(ChapterIDs.GlossaryID) ?? null}
             setImage={(embed) =>
-                $edition?.setImage(ChapterIDs.GlossaryID, embed)}
+                $edition
+                    ? edition.set(
+                          $edition.withImage(ChapterIDs.GlossaryID, embed)
+                      )
+                    : undefined}
             header="Glossary"
             tags={$edition.getTags()}
         >

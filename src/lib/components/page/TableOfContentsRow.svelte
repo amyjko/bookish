@@ -3,7 +3,7 @@
     import type Chapter from '$lib/models/book/Chapter';
     import Toggle from '$lib/components/editor/Toggle.svelte';
     import ConfirmButton from '$lib/components/editor/ConfirmButton.svelte';
-    import { getBase, getEdition, isEditable } from './Contexts';
+    import { getBase, getEdition, isEditable, setChapter } from './Contexts';
     import Muted from './Muted.svelte';
     import ChapterNumber from './ChapterNumber.svelte';
     import Button from '../app/Button.svelte';
@@ -20,10 +20,12 @@
     let editable = isEditable();
 
     function moveUp() {
-        chapter?.move(-1);
+        if ($edition && chapter)
+            edition.set($edition.withMovedChapter(chapter.getID(), -1));
     }
     function moveDown() {
-        chapter?.move(1);
+        if ($edition && chapter)
+            edition.set($edition.withMovedChapter(chapter.getID(), 1));
     }
 </script>
 
@@ -40,7 +42,14 @@
             {#if editable && chapter}
                 <Toggle
                     on={number !== undefined}
-                    save={(on) => chapter && chapter.setNumbered(on)}
+                    save={(on) =>
+                        chapter
+                            ? setChapter(
+                                  edition,
+                                  chapter,
+                                  chapter.asNumbered(on)
+                              )
+                            : undefined}
                 >
                     <ChapterNumber>
                         {#if number !== undefined}
@@ -55,25 +64,26 @@
             {/if}
         </div>
         <ChapterTitle
-            link={forthcoming && !editable ? undefined : `${base}${chapterID}`}
+            link={forthcoming && !editable ? undefined : `${$base}${chapterID}`}
             >{title}</ChapterTitle
         >
         <div><Muted><em><slot name="annotation" /></em></Muted></div>
     </td>
     <td><slot name="etc" /></td>
-    {#if editable}
+    {#if editable && $edition}
         <td>
             {#if chapter}
                 <Button
                     tooltip="Move chapter up"
-                    disabled={chapter.getPosition() === 0}
+                    disabled={$edition.getChapterPosition(chapter.getID()) ===
+                        0}
                     command={moveUp}>{'↑'}</Button
                 >
                 &nbsp;
                 <Button
                     tooltip="Move chapter down"
-                    disabled={chapter.getPosition() ===
-                        chapter.getBook().getChapterCount() - 1}
+                    disabled={$edition.getChapterPosition(chapter.getID()) ===
+                        $edition.getChapterCount() - 1}
                     command={moveDown}>{'↓'}</Button
                 >
                 &nbsp;
@@ -81,7 +91,12 @@
                     tooltip="Delete this chapter"
                     commandLabel="x"
                     confirmLabel="Confirm"
-                    command={() => chapter && chapter.delete()}
+                    command={() =>
+                        chapter && $edition
+                            ? edition.set(
+                                  $edition.withoutChapter(chapter.getID())
+                              )
+                            : undefined}
                 />
             {/if}
         </td>

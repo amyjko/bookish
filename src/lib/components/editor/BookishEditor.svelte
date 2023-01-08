@@ -43,7 +43,7 @@
 
     export let ast: RootNode;
 
-    export let save: (node: RootNode) => Promise<void> | undefined;
+    export let save: (node: RootNode) => Promise<void> | void;
     export let chapter: boolean;
     export let autofocus: boolean = false;
     export let component: ConstructorOfATypedSvelteComponent;

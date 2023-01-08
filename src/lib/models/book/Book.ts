@@ -1,7 +1,7 @@
 import type { DocumentReference } from 'firebase/firestore';
-import { loadEditionFromFirestore, updateBookInFirestore } from '../Firestore';
+import { readEdition, updateBook } from '../CRUD';
 import BookMedia from './BookMedia';
-import Edition, { BookSaveStatus } from './Edition';
+import type Edition from './Edition';
 
 export type Revision = {
     ref: DocumentReference;
@@ -26,135 +26,165 @@ export type BookSpecification = {
 
 export default class Book {
     readonly ref: DocumentReference;
-    readonly spec: BookSpecification;
-
-    // A list of requested edits, stored as promises, resolved
-    // when the book is ready to save.
-    edits: { resolve: Function; reject: Function }[] = [];
-
-    lastEdit: number = 0;
-
-    listeners: Set<Function> = new Set();
+    readonly title: string;
+    readonly authors: string[];
+    readonly description: string;
+    readonly cover: string | null;
+    readonly revisions: Revision[];
+    readonly domain: string | undefined;
+    readonly uids: string[];
 
     media: BookMedia;
 
-    constructor(ref: DocumentReference, spec: BookSpecification) {
+    constructor(
+        ref: DocumentReference,
+        title: string,
+        authors: string[],
+        description: string,
+        cover: string | null,
+        revisions: Revision[],
+        domain: string | undefined,
+        uids: string[]
+    ) {
         this.ref = ref;
-        this.spec = spec;
+        this.title = title;
+        this.authors = authors;
+        this.description = description;
+        this.cover = cover;
+        this.revisions = revisions;
+        this.domain = domain;
+        this.uids = uids;
 
         this.media = new BookMedia(this);
-    }
-
-    saveEdits() {
-        // If it's been more than a second since our last edit and there
-        // are edits that haven't been saved, try updating the book,
-        // and if we succeed, resolve all of the edits, and if we fail,
-        // then reject them.
-        if (Date.now() - this.lastEdit > 1000 && this.edits.length > 0) {
-            // Tell listeners that this book model changed.
-            this.notifyListeners(BookSaveStatus.Saving);
-            updateBookInFirestore(this)
-                .then(() => {
-                    // Approve the edits.
-                    this.edits.forEach((edit) => edit.resolve());
-                    this.notifyListeners(BookSaveStatus.Saved);
-                })
-                .catch(() => {
-                    // Reject the edits.
-                    this.edits.forEach((edit) => edit.reject());
-                    this.notifyListeners(BookSaveStatus.Error);
-                })
-                .finally(() => {
-                    // Reset the edit queue.
-                    this.edits = [];
-                });
-        }
     }
 
     getMedia() {
         return this.media;
     }
 
-    // Adds a save request to the queue, to be resolved later after a period of
-    // inactivity. Returns a promise that will eventually be resolved.
-    requestSave() {
-        // Tell listeners that this book model changed.
-        this.notifyListeners(BookSaveStatus.Changed);
-
-        // Return a promise that will resolve or reject later after this model saves the edits to the database.
-        this.lastEdit = Date.now();
-        const promise = new Promise<void>((resolve, reject) => {
-            this.edits.push({ resolve: resolve, reject: reject });
-        });
-        return promise;
+    static fromJSON(ref: DocumentReference, book: BookSpecification): Book {
+        return new Book(
+            ref,
+            book.title,
+            book.authors,
+            book.description,
+            book.cover,
+            book.revisions,
+            book.domain,
+            book.uids
+        );
     }
 
-    addListener(listener: (status: BookSaveStatus) => void) {
-        this.listeners.add(listener);
-    }
-    removeListener(listener: Function) {
-        this.listeners.delete(listener);
-    }
-    notifyListeners(status: BookSaveStatus) {
-        this.listeners.forEach((listener) => listener.call(undefined, status));
-    }
-
-    toObject() {
-        return this.spec;
+    toJSON() {
+        const json: BookSpecification = {
+            title: this.title,
+            authors: this.authors,
+            description: this.description,
+            cover: this.cover,
+            revisions: this.revisions,
+            uids: this.uids,
+        };
+        if (this.domain !== undefined) json.domain = this.domain;
+        return json;
     }
 
     getSubdomain() {
-        return this.spec.domain;
+        return this.domain;
     }
-    setSubdomain(domain: string) {
-        if (domain.length === 0) delete this.spec.domain;
-        else this.spec.domain = domain;
-        return this.requestSave();
+
+    withSubdomain(domain: string) {
+        return new Book(
+            this.ref,
+            this.title,
+            this.authors,
+            this.description,
+            this.cover,
+            this.revisions,
+            domain.length === 0 ? undefined : domain,
+            this.uids
+        );
     }
 
     getTitle() {
-        return this.spec.title;
+        return this.title;
     }
-    setTitle(title: string) {
-        this.spec.title = title;
-        return this.requestSave();
+
+    withTitle(title: string) {
+        return new Book(
+            this.ref,
+            title,
+            this.authors,
+            this.description,
+            this.cover,
+            this.revisions,
+            this.domain,
+            this.uids
+        );
     }
 
     getDescription() {
-        return this.spec.description;
+        return this.description;
     }
-    setDescription(description: string) {
-        this.spec.description = description;
-        return this.requestSave();
+
+    withDescription(description: string) {
+        return new Book(
+            this.ref,
+            this.title,
+            this.authors,
+            description,
+            this.cover,
+            this.revisions,
+            this.domain,
+            this.uids
+        );
     }
 
     getCover() {
-        return this.spec.cover;
+        return this.cover;
     }
-    setCover(cover: string | null) {
-        this.spec.cover = cover;
-        return this.requestSave();
+
+    withCover(cover: string | null) {
+        return new Book(
+            this.ref,
+            this.title,
+            this.authors,
+            this.description,
+            cover,
+            this.revisions,
+            this.domain,
+            this.uids
+        );
     }
 
     getAuthors() {
-        return this.spec.authors;
+        return this.authors;
     }
-    setAuthors(authors: string[]) {
-        this.spec.authors = authors;
-        return this.requestSave();
+
+    withAuthors(authors: string[]) {
+        return new Book(
+            this.ref,
+            this.title,
+            authors,
+            this.description,
+            this.cover,
+            this.revisions,
+            this.domain,
+            this.uids
+        );
     }
 
     getRef() {
         return this.ref;
     }
+
     getRefID() {
         return this.ref.id;
     }
 
     getDraftEdition(): undefined | Promise<Edition> {
-        return this.spec.revisions.length === 0
+        return this.revisions.length === 0
             ? undefined
-            : loadEditionFromFirestore(this, this.spec.revisions[0].ref.id);
+            : readEdition(this.revisions[0].ref.id);
     }
 
     isValidEditionNumber(edition: number) {
@@ -163,66 +193,76 @@ export default class Book {
 
     /* Note: editions are numbered 1-n, but stored in reverse chronological order. */
     getEditionNumber(number: number) {
-        return number < 1 || number > this.spec.revisions.length
+        return number < 1 || number > this.revisions.length
             ? undefined
-            : loadEditionFromFirestore(
-                  this,
-                  this.spec.revisions[this.spec.revisions.length - number].ref
-                      .id
+            : readEdition(
+                  this.revisions[this.revisions.length - number].ref.id
               );
     }
 
     getLatestPublishedEdition(): undefined | Promise<Edition> {
         const latest = this.getLatestPublishedEditionID();
-        return latest === undefined
-            ? undefined
-            : loadEditionFromFirestore(this, latest);
+        return latest === undefined ? undefined : readEdition(latest);
     }
 
     getLatestPublishedEditionID() {
-        return this.spec.revisions.find((e) => e.published)?.ref.id;
+        return this.revisions.find((e) => e.published)?.ref.id;
     }
 
     getLatestEditionID(): string | undefined {
-        return this.spec.revisions[0]?.ref.id;
+        return this.revisions[0]?.ref.id;
     }
 
     getRevisions() {
-        return this.spec.revisions.slice();
-    }
-    setRevisions(revisions: Revision[]) {
-        this.spec.revisions = revisions.slice();
-        return this.requestSave();
+        return this.revisions.slice();
     }
 
-    setEditionChangeSummary(summary: string, index: number) {
-        if (index >= 0 && index < this.spec.revisions.length) {
-            this.spec.revisions[index].summary = summary;
-            return this.requestSave();
-        }
+    withRevisions(revisions: Revision[]) {
+        return new Book(
+            this.ref,
+            this.title,
+            this.authors,
+            this.description,
+            this.cover,
+            revisions,
+            this.domain,
+            this.uids
+        );
     }
 
-    setPublished(published: boolean, revisionNumber: number) {
-        if (
-            revisionNumber >= 0 &&
-            revisionNumber < this.spec.revisions.length
-        ) {
-            this.spec.revisions[revisionNumber].published = published;
-            return this.requestSave();
-        }
+    withEditionSummary(summary: string, index: number) {
+        if (index < 0 || index >= this.revisions.length) return this;
+        const revision = this.revisions[index];
+        return this.withRevisions([
+            ...this.revisions.slice(0, index),
+            {
+                ref: revision.ref,
+                time: revision.time,
+                summary,
+                published: revision.published,
+            },
+            ...this.revisions.slice(index + 1),
+        ]);
+    }
+
+    asPublished(published: boolean, index: number) {
+        if (index < 0 || index >= this.revisions.length) return this;
+        const revision = this.revisions[index];
+        return this.withRevisions([
+            ...this.revisions.slice(0, index),
+            {
+                ref: revision.ref,
+                time: revision.time,
+                summary: revision.summary,
+                published,
+            },
+            ...this.revisions.slice(index + 1),
+        ]);
     }
 
     hasPublishedEdition() {
         return (
-            this.spec.revisions.find((revision) => revision.published) !==
-            undefined
+            this.revisions.find((revision) => revision.published) !== undefined
         );
-    }
-
-    updateMetadataFromEdition(edition: Edition) {
-        this.setTitle(edition.getTitle());
-        this.setCover(edition.getImage('cover') ?? null);
-        this.setAuthors(edition.getAuthors());
-        this.setDescription(edition.getDescription());
     }
 }

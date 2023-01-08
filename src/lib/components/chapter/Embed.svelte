@@ -7,6 +7,7 @@
         getEdition,
         isEditable,
         getCaret,
+        getBook,
     } from '$lib/components/page/Contexts';
     import Figure from './Figure.svelte';
 
@@ -18,8 +19,8 @@
     $: description = node.getDescription();
 
     let caret = getCaret();
+    let book = getBook();
     let editable = isEditable();
-    let edition = getEdition();
 
     let dragging = false;
     let dragFeedback: undefined | string = undefined;
@@ -44,7 +45,7 @@
                 dragFeedback = 'Uploading…';
 
                 const file = imageFiles[0];
-                const media = $edition?.getBook()?.getMedia();
+                const media = $book?.getMedia();
 
                 if (file === null) return;
                 if (storage === undefined) return;

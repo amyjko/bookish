@@ -30,9 +30,9 @@
         query = query.trim();
 
         // Go through all the chapter indexes and find matches.
-        if (query.length > 2)
+        if ($edition && query.length > 2)
             for (const chapter of $edition?.getChapters() ?? []) {
-                let index = chapter.getIndex();
+                let index = chapter.getIndex($edition);
                 // No index yet? Skip this chapter.
                 if (index) {
                     // Build a DOM to render matches.
@@ -58,7 +58,7 @@
                                 .toLowerCase()
                                 .indexOf(lowerQuery);
                             results.push({
-                                link: `${base}${chapter.getChapterID()}?word=${match.match.toLowerCase()}&number=${index}`,
+                                link: `${$base}${chapter.getID()}?word=${match.match.toLowerCase()}&number=${index}`,
                                 left:
                                     match.left +
                                     match.match.substring(0, start),
@@ -83,7 +83,12 @@
         <Header
             label="Search title"
             getImage={() => $edition?.getImage(ChapterIDs.SearchID) ?? null}
-            setImage={(embed) => $edition?.setImage(ChapterIDs.SearchID, embed)}
+            setImage={(embed) =>
+                $edition
+                    ? edition.set(
+                          $edition.withImage(ChapterIDs.SearchID, embed)
+                      )
+                    : undefined}
             header="Search"
             tags={$edition.getTags()}
         >
@@ -121,10 +126,10 @@
                 >
                 {#each results as result}
                     {#if result instanceof Chapter}
-                        <PageHeader id={'header-' + result.getChapterID()}
+                        <PageHeader id={'header-' + result.getID()}
                             ><ChapterNumber
-                                >Chapter{#if $edition.getChapterNumber(result.getChapterID()) !== undefined}&nbsp;{$edition.getChapterNumber(
-                                        result.getChapterID()
+                                >Chapter{#if $edition.getChapterNumber(result.getID()) !== undefined}&nbsp;{$edition.getChapterNumber(
+                                        result.getID()
                                     )}{/if}</ChapterNumber
                             > - <ChapterTitle>{result.getTitle()}</ChapterTitle
                             ></PageHeader

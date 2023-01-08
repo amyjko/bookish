@@ -26,7 +26,10 @@
     {#if editable}
         <BookishEditor
             ast={formatNode}
-            save={(node) => $edition?.setLicense(node.toBookdown())}
+            save={(node) =>
+                $edition
+                    ? edition.set($edition.setLicense(node.toBookdown()))
+                    : undefined}
             chapter={false}
             component={Format}
             placeholder="In the U.S., all rights reserved by default. Want to offer different rights to readers?"

@@ -3,19 +3,23 @@
 <script lang="ts">
     import type ParagraphNode from '$lib/models/chapter/ParagraphNode';
     import Format from './Format.svelte';
-    import { getChapter } from '../page/Contexts';
+    import { getChapter, getEdition } from '../page/Contexts';
 
     export let node: ParagraphNode;
     export let placeholder: string | undefined = undefined;
 
     $: level = node.getLevel();
     $: chapter = getChapter();
+    $: edition = getEdition();
 
     $: id =
-        node.getLevel() === 0 || $chapter === undefined
+        node.getLevel() === 0 ||
+        $chapter === undefined ||
+        $edition === undefined
             ? undefined
             : 'header-' +
-              ($chapter.chapter.getAST()?.getHeaders().indexOf(node) ?? '');
+              ($chapter.chapter.getAST($edition)?.getHeaders().indexOf(node) ??
+                  '');
     $: classes =
         node.getLevel() === 0
             ? undefined

@@ -1,15 +1,17 @@
 <script lang="ts">
     import type LabelNode from '$lib/models/chapter/LabelNode';
     import TextEditor from './TextEditor.svelte';
-    import { getChapter } from '../page/Contexts';
+    import { getChapter, getEdition } from '../page/Contexts';
     import { getCaret } from '$lib/components/page/Contexts';
 
     export let label: LabelNode;
 
+    let edition = getEdition();
     let chapter = getChapter();
     let caret = getCaret();
 
-    $: ast = $chapter?.chapter.getAST();
+    $: ast =
+        $edition && $chapter ? $chapter.chapter.getAST($edition) : undefined;
 </script>
 
 <code>

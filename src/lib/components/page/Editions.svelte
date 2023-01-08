@@ -1,15 +1,12 @@
 <script lang="ts">
     import Parser from '$lib/models/chapter/Parser';
-    import {
-        addDraftInFirestore,
-        publishDraftInFirestore,
-    } from '$lib/models/Firestore';
+    import { createNewEdition, publishEdition } from '$lib/models/CRUD';
     import Format from '$lib/components/chapter/Format.svelte';
     import BookishEditor from '$lib/components/editor/BookishEditor.svelte';
     import Switch from '$lib/components/editor/Switch.svelte';
     import Instructions from '$lib/components/page/Instructions.svelte';
     import Note from '../editor/Note.svelte';
-    import { getEdition, isEditable } from './Contexts';
+    import { getBook, getEdition, isEditable } from './Contexts';
     import Button from '../app/Button.svelte';
     import Link from '../Link.svelte';
     import PageHeader from './PageHeader.svelte';
@@ -17,40 +14,25 @@
 
     let edition = getEdition();
     let editable = isEditable();
-    $: book = $edition?.getBook();
-
-    // Legacy revisions
-    $: editionRevisions = $edition?.getRevisions() ?? [];
+    let book = getBook();
 
     // Book revisions
-    $: bookRevisions = book?.getRevisions();
+    $: bookRevisions = $book?.getRevisions();
 
     // Copy the current draft to create a new draft.
     function handlePublish(index: number, published: boolean) {
-        if (book === undefined) return;
-        publishDraftInFirestore(book, index, published);
+        if ($book === undefined) return;
+        book.set($book.asPublished(published, index));
     }
 
-    function handleDraftEdition() {
-        if (book === undefined) return;
-        addDraftInFirestore(book);
+    async function handleDraftEdition() {
+        if ($book === undefined) return;
+        book.set(await createNewEdition($book));
     }
 </script>
 
 {#if $edition}
-    {#if editionRevisions.length > 0}
-        <PageHeader id="revisions">Revisions</PageHeader>
-        <ul>
-            {#each editionRevisions as revision}
-                <li
-                    ><em>{revision[0]}</em>. <Format
-                        node={Parser.parseFormat($edition, revision[1])}
-                    /></li
-                >
-            {/each}
-        </ul>
-    {/if}
-    {#if book && bookRevisions}
+    {#if $book && bookRevisions}
         <PageHeader id="revisions"
             >Editions {#if editable}<Button
                     tooltip="Create a new edition"
@@ -65,7 +47,7 @@
             they explicitly choose to view a previous edition.
         </Instructions>
         <Rows>
-            {#each bookRevisions as revision, index}
+            {#each bookRevisions as revision, index (revision.ref)}
                 {@const editionNumber =
                     bookRevisions === undefined
                         ? -1
@@ -81,14 +63,14 @@
                         : 'th')}
                 {@const viewing = revision.ref.id === $edition.getRef()?.id}
 
-                {#if editable || revision.published}
+                {#if $book && (editable || revision.published)}
                     <tr>
                         <td>
                             {#if viewing}
                                 <strong class="viewing">{editionLabel}</strong>
                             {:else}
                                 <Link
-                                    to={`/write/${book.ref.id}/${
+                                    to={`/write/${$book.ref.id}/${
                                         bookRevisions.length - index
                                     }`}>{editionLabel}</Link
                                 >
@@ -107,10 +89,12 @@
                                         revision.summary
                                     ).withTextIfEmpty()}
                                     save={(newSummary) =>
-                                        book
-                                            ? book.setEditionChangeSummary(
-                                                  newSummary.toBookdown(),
-                                                  index
+                                        $book
+                                            ? book.set(
+                                                  $book.withEditionSummary(
+                                                      newSummary.toBookdown(),
+                                                      index
+                                                  )
                                               )
                                             : undefined}
                                     chapter={false}

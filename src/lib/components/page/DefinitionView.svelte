@@ -38,7 +38,7 @@
 
     function addSynonym() {
         if ($edition && definition.synonyms) {
-            $edition.editDefinition(id, {
+            $edition.withEditedDefinition(id, {
                 phrase: definition.phrase,
                 definition: definition.definition,
                 synonyms: [...definition.synonyms, ''],
@@ -64,11 +64,15 @@
                                 return "Phrase can't be empty";
                         }}
                         save={(text) =>
-                            $edition?.editDefinition(id, {
-                                phrase: text,
-                                definition: definition.definition,
-                                synonyms: definition.synonyms,
-                            })}
+                            $edition
+                                ? edition.set(
+                                      $edition.withEditedDefinition(id, {
+                                          phrase: text,
+                                          definition: definition.definition,
+                                          synonyms: definition.synonyms,
+                                      })
+                                  )
+                                : undefined}
                     />
                 {:else if definition.phrase}{definition.phrase}{:else}<em
                         >Phrase</em
@@ -79,7 +83,10 @@
                     tooltip="Delete this glossary entry."
                     commandLabel="x delete"
                     confirmLabel="confirm"
-                    command={() => $edition?.removeDefinition(id)}
+                    command={() =>
+                        $edition
+                            ? edition.set($edition.withoutDefinition(id))
+                            : undefined}
                 />
             {/if}
         </td>
@@ -88,11 +95,15 @@
                 <BookishEditor
                     ast={format}
                     save={(node) =>
-                        $edition?.editDefinition(id, {
-                            phrase: definition.phrase,
-                            definition: node.toBookdown(),
-                            synonyms: definition.synonyms,
-                        })}
+                        $edition
+                            ? edition.set(
+                                  $edition.withEditedDefinition(id, {
+                                      phrase: definition.phrase,
+                                      definition: node.toBookdown(),
+                                      synonyms: definition.synonyms,
+                                  })
+                              )
+                            : undefined}
                     chapter={false}
                     component={Format}
                     placeholder="How would you define this?"
@@ -121,11 +132,18 @@
                                         if (syn.length > 0 && text.length === 0)
                                             newSyns.splice(index, 1);
                                         else newSyns[index] = text;
-                                        return $edition?.editDefinition(id, {
-                                            phrase: definition.phrase,
-                                            definition: definition.definition,
-                                            synonyms: newSyns,
-                                        });
+                                        if ($edition)
+                                            edition.set(
+                                                $edition.withEditedDefinition(
+                                                    id,
+                                                    {
+                                                        phrase: definition.phrase,
+                                                        definition:
+                                                            definition.definition,
+                                                        synonyms: newSyns,
+                                                    }
+                                                )
+                                            );
                                     }}
                                 />
                             </Note>

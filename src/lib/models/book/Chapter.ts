@@ -1,12 +1,8 @@
 import Parser from '../chapter/Parser';
 import type ChapterNode from '../chapter/ChapterNode';
 import type Edition from './Edition';
-import { BookSaveStatus } from './Edition';
-import {
-    loadChapterTextFromFirestore,
-    updateChapterTextInFirestore,
-} from '../Firestore';
 import type { DocumentReference } from 'firebase/firestore';
+import CommonWords from './Words';
 
 export type ChapterSpecification = {
     ref?: DocumentReference;
@@ -31,15 +27,21 @@ export type Match = {
 };
 
 export default class Chapter {
-    // The metadata from the database.
-    readonly spec: ChapterSpecification;
+    // Inputs
+    readonly ref: DocumentReference | undefined;
+    readonly id: string;
+    readonly title: string;
+    readonly authors: string[];
+    readonly image: string | null;
+    readonly numbered: boolean;
+    readonly forthcoming: boolean;
+    readonly section: string | undefined;
+    readonly text: string;
 
-    edition: Edition;
-
-    // Caches
-    ast: ChapterNode | undefined;
-    index: Record<string, Array<Match>> | undefined;
-    wordCount: number | undefined;
+    // Derived values
+    _ast: ChapterNode | undefined = undefined;
+    _index: Record<string, Array<Match>> | undefined = undefined;
+    _wordCount: number | undefined = undefined;
 
     // A list of requested edits, stored as promises, resolved
     // when the book is ready to save.
@@ -50,414 +52,373 @@ export default class Chapter {
     // A set of listeners that are notified when the chapter text changes.
     listeners = new Set<(text: string) => void>();
 
-    constructor(edition: Edition, spec: ChapterSpecification) {
-        this.edition = edition;
+    constructor(
+        ref: DocumentReference | undefined,
+        id: string,
+        title: string,
+        authors: string[],
+        image: string | null,
+        numbered: boolean,
+        forthcoming: boolean,
+        section: string | undefined,
+        text: string
+    ) {
+        this.ref = ref;
+        this.id = id;
+        this.title = title;
+        this.authors = authors.slice();
+        this.image = image;
+        this.numbered = numbered;
+        this.forthcoming = forthcoming;
+        this.section = section;
+        this.text = text;
+    }
 
+    /**
+     * Convert a chapter spec and it's text into a chapter object.
+     * The spec may contain the text itself, but it may not, so we require it to be
+     * repeated here to guarantee its provided.
+     */
+    static fromJSON(spec: ChapterSpecification, text: string) {
         // Copy the spec, filling in defaults as necessary.
-        this.spec = {
-            ref: spec.ref,
-            id: spec.id,
-            title: spec.title,
-            authors: spec.authors ?? [],
-            image: spec.image ?? null,
-            numbered: spec.numbered === true || spec.numbered === undefined,
-            forthcoming: spec.forthcoming === true,
-            text: spec.text,
-        };
-
-        // If the chapter has text, then parse it, count searchable words, and compute an index.
-        if (this.spec.text !== undefined) this.setText(this.spec.text);
-        else if (this.spec.ref) {
-            loadChapterTextFromFirestore(this.spec.ref).then((text) =>
-                this.setText(text.text)
-            );
-        }
-        // Otherwise, set them all to undefined.
-        else {
-            this.ast = undefined;
-            this.wordCount = 0;
-            this.index = undefined;
-        }
-    }
-
-    saveEdits() {
-        if (
-            this.edition.editionRef &&
-            this.spec.ref &&
-            this.spec.text !== undefined
-        ) {
-            // If it's been more than a second since our last edit and there
-            // are edits that haven't been saved, try updating the book,
-            // and if we succeed, resolve all of the edits, and if we fail,
-            // then reject them.
-            if (Date.now() - this.lastEdit > 1000 && this.edits.length > 0) {
-                // Tell listeners that this book model changed.
-                this.edition.notifyListeners(BookSaveStatus.Saving);
-                updateChapterTextInFirestore(
-                    this.edition.editionRef,
-                    this.spec.ref,
-                    this.spec.text
-                )
-                    .then(() => {
-                        // Approve the edits.
-                        this.edits.forEach((edit) => edit.resolve());
-                        this.edition.notifyListeners(BookSaveStatus.Saved);
-                    })
-                    .catch(() => {
-                        // Reject the edits.
-                        this.edits.forEach((edit) => edit.reject());
-                        this.edition.notifyListeners(BookSaveStatus.Error);
-                    })
-                    .finally(() => {
-                        // Reset the edit queue.
-                        this.edits = [];
-                    });
-            }
-        }
-    }
-
-    addListener(listener: (text: string) => void) {
-        this.listeners.add(listener);
-    }
-    removeListener(listener: (text: string) => void) {
-        this.listeners.delete(listener);
-    }
-    notifyListeners() {
-        this.listeners.forEach((listener) =>
-            this.spec.text !== undefined
-                ? listener.call(undefined, this.spec.text)
-                : undefined
+        return new Chapter(
+            spec.ref,
+            spec.id,
+            spec.title,
+            spec.authors ?? [],
+            spec.image ?? null,
+            spec.numbered === true || spec.numbered === undefined,
+            spec.forthcoming === true,
+            spec.section,
+            spec.text ?? text
         );
     }
 
-    // Adds a save request to the queue, to be resolved later after a period of
-    // inactivity. Returns a promise that will eventually be resolved.
-    requestSave() {
-        // Tell listeners that this chapter model changed.
-        this.edition.notifyListeners(BookSaveStatus.Changed);
-
-        // Return a promise that will resolve or reject later after this model saves the edits to the database.
-        this.lastEdit = Date.now();
-        const promise = new Promise<void>((resolve, reject) => {
-            this.edits.push({ resolve: resolve, reject: reject });
-        });
-        return promise;
-    }
-
-    toObject() {
-        // Deep copy to prevent external mutations.
-        const payload = JSON.parse(JSON.stringify(this.spec));
-
-        // Reassign a copy of the Firebase ref, since the deep copy doesn't work for it.
-        payload.ref = this.spec.ref;
-
+    toJSON(): ChapterSpecification {
         // Note that we don't include the chapter text in the payload; that's stored in the chapters subcollection.
         // We just return the chapter metadata here, which is stored in the book collection.
-        delete payload.text;
-
-        return payload;
-    }
-
-    getBook() {
-        return this.edition;
+        const json: ChapterSpecification = {
+            id: this.id,
+            title: this.title,
+            authors: this.authors.slice(),
+            image: this.image,
+            numbered: this.numbered,
+            forthcoming: this.forthcoming,
+        };
+        if (this.ref) json.ref = this.ref;
+        if (this.section) json.section = this.section;
+        return json;
     }
 
     getRef() {
-        return this.spec.ref;
+        return this.ref;
     }
 
-    getChapterID() {
-        return this.spec.id;
+    withRef(ref: DocumentReference) {
+        return new Chapter(
+            ref,
+            this.id,
+            this.title,
+            this.authors,
+            this.image,
+            this.numbered,
+            this.forthcoming,
+            this.section,
+            this.text
+        );
     }
-    setChapterID(id: string) {
-        if (this.spec.id !== id) {
-            this.spec.id = id;
-            return this.edition.requestSave();
-        }
+
+    withoutRef() {
+        return new Chapter(
+            undefined,
+            this.id,
+            this.title,
+            this.authors,
+            this.image,
+            this.numbered,
+            this.forthcoming,
+            this.section,
+            this.text
+        );
+    }
+
+    getID() {
+        return this.id;
+    }
+
+    withChapterID(id: string) {
+        return new Chapter(
+            this.ref,
+            id,
+            this.title,
+            this.authors,
+            this.image,
+            this.numbered,
+            this.forthcoming,
+            this.section,
+            this.text
+        );
     }
 
     getSection(): string | undefined {
-        return this.spec.section;
+        return this.section;
     }
-    setSection(section: string) {
-        if (this.spec.section !== section) {
-            this.spec.section = section;
-            return this.edition.requestSave();
-        }
+
+    withSection(section: string) {
+        return new Chapter(
+            this.ref,
+            this.id,
+            this.title,
+            this.authors,
+            this.image,
+            this.numbered,
+            this.forthcoming,
+            section,
+            this.text
+        );
     }
 
     isForthcoming() {
-        return this.spec.forthcoming;
+        return this.forthcoming;
     }
-    setForthcoming(forthcoming: boolean) {
-        if (this.spec.forthcoming !== forthcoming) {
-            this.spec.forthcoming = forthcoming;
-            return this.edition.requestSave();
-        }
+
+    asForthcoming(forthcoming: boolean) {
+        return new Chapter(
+            this.ref,
+            this.id,
+            this.title,
+            this.authors,
+            this.image,
+            this.numbered,
+            forthcoming,
+            this.section,
+            this.text
+        );
     }
 
     isNumbered() {
-        return this.spec.numbered;
+        return this.numbered;
     }
-    setNumbered(numbered: boolean) {
-        if (numbered !== this.spec.numbered) {
-            this.spec.numbered = numbered;
-            return this.edition.requestSave();
-        }
+
+    asNumbered(numbered: boolean) {
+        return new Chapter(
+            this.ref,
+            this.id,
+            this.title,
+            this.authors,
+            this.image,
+            numbered,
+            this.forthcoming,
+            this.section,
+            this.text
+        );
     }
 
     getText() {
-        return this.spec.text;
-    }
-    setText(text: string) {
-        this.setAST(Parser.parseChapter(this.edition, text));
+        return this.text;
     }
 
-    setAST(node: ChapterNode) {
-        this.ast = node;
-        const newText = this.ast.toBookdown();
-        const changed = this.spec.text !== newText;
-        this.spec.text = newText;
-        this.wordCount = this.ast.toText().split(/\s+/).length;
-        this.index = this.computeIndex();
-
-        // Don't save if its the same. This is just an optimization.
-        if (changed) {
-            this.notifyListeners();
-            if (this.edition.editionRef && this.spec.ref)
-                return this.requestSave();
-        }
+    withText(text: string) {
+        return new Chapter(
+            this.ref,
+            this.id,
+            this.title,
+            this.authors,
+            this.image,
+            this.numbered,
+            this.forthcoming,
+            this.section,
+            text
+        );
     }
 
-    addAuthor(name: string) {
-        this.spec.authors.push(name);
-        return this.edition.requestSave();
+    withAST(ast: ChapterNode) {
+        const newChapter = new Chapter(
+            this.ref,
+            this.id,
+            this.title,
+            this.authors,
+            this.image,
+            this.numbered,
+            this.forthcoming,
+            this.section,
+            ast.toBookdown()
+        );
+        newChapter._ast = ast;
+        return newChapter;
     }
 
     getAuthors() {
-        return this.spec.authors;
-    }
-    setAuthor(index: number, name: string) {
-        if (index >= 0 && index < this.spec.authors.length) {
-            this.spec.authors[index] = name;
-            return this.edition.requestSave();
-        }
+        return this.authors;
     }
 
-    removeAuthor(index: number) {
-        if (index >= 0 && index < this.spec.authors.length) {
-            this.spec.authors.splice(index, 1);
-            return this.edition.requestSave();
-        }
+    withAuthor(name: string) {
+        return new Chapter(
+            this.ref,
+            this.id,
+            this.title,
+            [...this.authors, name],
+            this.image,
+            this.numbered,
+            this.forthcoming,
+            this.section,
+            this.text
+        );
+    }
+
+    withRenamedAuthor(index: number, name: string) {
+        if (index < 0 || index >= this.authors.length) return this;
+        return new Chapter(
+            this.ref,
+            this.id,
+            this.title,
+            [
+                ...this.authors.slice(0, index),
+                name,
+                ...this.authors.slice(index + 1),
+            ],
+            this.image,
+            this.numbered,
+            this.forthcoming,
+            this.section,
+            this.text
+        );
+    }
+
+    withoutAuthor(index: number) {
+        if (index < 0 || index >= this.authors.length) return this;
+        return new Chapter(
+            this.ref,
+            this.id,
+            this.title,
+            [...this.authors.slice(0, index), ...this.authors.slice(index + 1)],
+            this.image,
+            this.numbered,
+            this.forthcoming,
+            this.section,
+            this.text
+        );
     }
 
     getTitle() {
-        return this.spec.title;
+        return this.title;
     }
-    setTitle(title: string) {
-        if (title !== this.spec.title) {
-            this.spec.title = title;
-            return this.edition.requestSave();
-        }
-    }
-
-    getPosition() {
-        return this.edition.getChapterPosition(this.getChapterID());
-    }
-    move(increment: number) {
-        return this.edition.moveChapter(this.getChapterID(), increment);
-    }
-
-    delete() {
-        return this.edition.deleteChapter(this.getChapterID());
+    withTitle(title: string) {
+        return new Chapter(
+            this.ref,
+            this.id,
+            title,
+            this.authors,
+            this.image,
+            this.numbered,
+            this.forthcoming,
+            this.section,
+            this.text
+        );
     }
 
     getImage() {
-        return this.spec.image;
-    }
-    setImage(embed: string | null) {
-        if (this.spec.image === embed) return;
-        this.spec.image = embed;
-        return this.edition.requestSave();
+        return this.image;
     }
 
-    getIndex() {
-        return this.index;
+    withImage(image: string | null) {
+        return new Chapter(
+            this.ref,
+            this.id,
+            this.title,
+            this.authors,
+            image,
+            this.numbered,
+            this.forthcoming,
+            this.section,
+            this.text
+        );
     }
-    getAST() {
-        return this.ast;
+
+    getAST(edition: Edition): ChapterNode {
+        // Compute the cache if necessary
+        if (this._ast === undefined)
+            this._ast = Parser.parseChapter(edition, this.text);
+        return this._ast;
+    }
+
+    getWordCount(edition: Edition): number {
+        if (this._wordCount === undefined)
+            this._wordCount = this.getAST(edition).toText().split(/\s+/).length;
+        return this._wordCount;
     }
 
     // Utility function
-    getReadingTime() {
-        return this.isForthcoming() || !this.wordCount
+    getReadingTime(edition: Edition) {
+        return this.isForthcoming()
             ? undefined
-            : Math.max(1, Math.round(this.wordCount / 150));
+            : Math.max(1, Math.round(this.getWordCount(edition) / 150));
     }
 
-    computeIndex(): Record<string, Match[]> | undefined {
-        if (!this.ast) return;
+    getIndex(edition: Edition): Record<string, Match[]> {
+        if (this._index === undefined) {
+            const ast = this.getAST(edition);
 
-        // Build a list of common words
-        let commonWords: Set<string> = new Set();
-        [
-            'a',
-            'about',
-            'all',
-            'also',
-            'and',
-            'are',
-            'as',
-            'at',
-            'be',
-            'because',
-            'but',
-            'by',
-            'can',
-            'come',
-            'could',
-            'day',
-            'do',
-            'does',
-            'even',
-            'find',
-            'first',
-            'for',
-            'from',
-            'get',
-            'give',
-            'go',
-            'has',
-            'have',
-            'he',
-            'her',
-            'here',
-            'him',
-            'his',
-            'how',
-            'I',
-            'if',
-            'in',
-            'into',
-            'is',
-            'it',
-            'its',
-            'just',
-            'know',
-            'like',
-            'look',
-            'make',
-            'man',
-            'many',
-            'me',
-            'more',
-            'my',
-            'new',
-            'no',
-            'not',
-            'now',
-            'of',
-            'on',
-            'one',
-            'only',
-            'or',
-            'other',
-            'our',
-            'out',
-            'people',
-            'say',
-            'see',
-            'she',
-            'so',
-            'some',
-            'take',
-            'tell',
-            'than',
-            'that',
-            'the',
-            'their',
-            'them',
-            'then',
-            'there',
-            'these',
-            'they',
-            'thing',
-            'think',
-            'this',
-            'those',
-            'time',
-            'to',
-            'two',
-            'up',
-            'use',
-            'very',
-            'want',
-            'was',
-            'way',
-            'we',
-            'well',
-            'went',
-            'what',
-            'when',
-            'which',
-            'who',
-            'will',
-            'with',
-            'would',
-            'year',
-            'yes',
-            'you',
-            'your',
-        ].forEach((word) => commonWords.add(word));
+            // Build a list of common words
+            let commonWords: Set<string> = new Set();
+            CommonWords.forEach((word) => commonWords.add(word));
 
-        // Get all the text in the chapter.
-        let text = this.ast.toText();
+            // Get all the text in the chapter.
+            let text = ast.toText();
 
-        // Split by word boundaries.
-        const words = text.split(/\b/);
+            // Split by word boundaries.
+            const words = text.split(/\b/);
 
-        // Index the words
-        const index: Record<string, Array<Match>> = {};
-        words.forEach((word, wordNumber) => {
-            // Skip non words. We keep them for search results.
-            if (!/[a-zA-Z\u2019]+/.test(word)) return;
+            // Index the words
+            const index: Record<string, Array<Match>> = {};
+            words.forEach((word, wordNumber) => {
+                // Skip non words. We keep them for search results.
+                if (!/[a-zA-Z\u2019]+/.test(word)) return;
 
-            word = word.toLowerCase();
+                word = word.toLowerCase();
 
-            // Should we include?
-            // • It shouldn't be a common word
-            // • It shouldn't have an apostrophe
-            // • It should be longer than two letters
-            // • It shouldn't end in 'ly'
-            if (
-                !commonWords.has(word) &&
-                word.indexOf('\u2019') < 0 &&
-                word.length > 2 &&
-                word.substring(word.length - 2, word.length) !== 'ly'
-            ) {
-                // If we haven't started a list of occurrences, start one.
-                if (!(word in index)) index[word] = [];
+                // Should we include?
+                // • It shouldn't be a common word
+                // • It shouldn't have an apostrophe
+                // • It should be longer than two letters
+                // • It shouldn't end in 'ly'
+                if (
+                    !commonWords.has(word) &&
+                    word.indexOf('\u2019') < 0 &&
+                    word.length > 2 &&
+                    word.substring(word.length - 2, word.length) !== 'ly'
+                ) {
+                    // If we haven't started a list of occurrences, start one.
+                    if (!(word in index)) index[word] = [];
 
-                let match = {
-                    left: words
-                        .slice(
-                            Math.max(0, wordNumber - 10),
-                            Math.max(0, wordNumber - 1) + 1
-                        )
-                        .join(''),
-                    match: words[wordNumber],
-                    right: words
-                        .slice(
-                            Math.min(words.length - 1, wordNumber + 1),
-                            Math.min(words.length - 1, wordNumber + 10) + 1
-                        )
-                        .join(''),
-                };
-                // Add the occurrence, but a lower case canonical version.
-                index[word.toLowerCase()].push(match);
-            }
-        });
+                    let match = {
+                        left: words
+                            .slice(
+                                Math.max(0, wordNumber - 10),
+                                Math.max(0, wordNumber - 1) + 1
+                            )
+                            .join(''),
+                        match: words[wordNumber],
+                        right: words
+                            .slice(
+                                Math.min(words.length - 1, wordNumber + 1),
+                                Math.min(words.length - 1, wordNumber + 10) + 1
+                            )
+                            .join(''),
+                    };
+                    // Add the occurrence, but a lower case canonical version.
+                    index[word.toLowerCase()].push(match);
+                }
+            });
 
-        return index;
+            this._index = index;
+        }
+        return this._index;
+    }
+
+    toString() {
+        return `${this.title} by ${this.authors.join(
+            ', '
+        )}: ${this.text.substring(0, 32)}}`;
     }
 }

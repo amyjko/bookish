@@ -3,20 +3,15 @@
     import type EditionModel from '$lib/models/book/Edition';
     import smoothscroll from 'smoothscroll-polyfill';
     import { goto } from '$app/navigation';
-    import { onMount, setContext } from 'svelte';
-    import { writable, type Writable } from 'svelte/store';
+    import { setContext } from 'svelte';
+    import { writable } from 'svelte/store';
     import {
         BASE,
-        BOOK,
         DARK_MODE,
         EDITABLE,
-        EDITION,
-        getBook,
-        getEdition,
+        type BaseStore,
         type DarkModeStore,
-        type EditionContext,
     } from './Contexts';
-    import type Book from '$lib/models/book/Book';
     import { BookishTheme } from '$lib/models/book/Theme';
 
     // Poly fill smooth scrolling for Safari.
@@ -35,45 +30,12 @@
     export let base: string = '/';
 
     // When the base changes, update the context.
-    $: setContext<string>(BASE, base);
+    let baseStore = writable<string>(base);
+    $: setContext<BaseStore>(BASE, baseStore);
+    $: baseStore.set(base);
 
     // The book edition to render.
     export let edition: EditionModel;
-
-    // Expose the book to descendents in a store and update the context when the edition changes.
-    let activeBook = getBook();
-    $: activeBook.set(edition.getBook());
-
-    // Keep the global active edition set to the edition being viewed.
-    let activeEdition = getEdition();
-    // Change the global edition context.
-    $: activeEdition.set(edition);
-
-    // When the edition changes, unsubscribe to the old edition and subscribe to the new one.
-    let previousEdition: EditionModel | undefined = undefined;
-    let previousListener: (() => void) | undefined;
-    $: {
-        if (previousEdition && previousListener)
-            previousEdition.removeListener(previousListener);
-        previousEdition = edition;
-        previousListener = () => (edition = edition);
-        edition.addListener(previousListener);
-    }
-
-    // Create a timer that saves the current edition periodically and stops when unmounted.
-    onMount(() => {
-        const saveListener = setInterval(() => {
-            edition.saveEdits();
-            edition.getBook()?.saveEdits();
-        }, 500);
-        // On unmount, stop listening, and unset the contexts.
-        return () => {
-            clearInterval(saveListener);
-
-            activeEdition.set(undefined);
-            activeBook.set(undefined);
-        };
-    });
 
     // Default dark mode to whatever's stored in local storage, if anything.
     // respect user choice on the website despite the system theme
