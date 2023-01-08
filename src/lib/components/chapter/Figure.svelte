@@ -2,7 +2,7 @@
 
 <script lang="ts">
     import type TableNode from '$lib/models/chapter/TableNode';
-    import EmbedNode from '$lib/models/chapter/EmbedNode';
+    import type EmbedNode from '$lib/models/chapter/EmbedNode';
     import Format from './Format.svelte';
     import type CodeNode from '$lib/models/chapter/CodeNode';
     import type FormatNode from '$lib/models/chapter/FormatNode';
@@ -20,19 +20,19 @@
 
     function focusFigure() {
         if (!editable || $caret === undefined) return;
-        if (node instanceof EmbedNode) {
-            return $caret.setCaret({
-                start: { node, index: 0 },
-                end: { node, index: 0 },
+        // if (node instanceof EmbedNode) {
+        //     return $caret.setCaret({
+        //         start: { node, index: 0 },
+        //         end: { node, index: 0 },
+        //     });
+        // } else {
+        const firstCaret = node.getFirstCaret();
+        if (firstCaret)
+            $caret.setCaret({
+                start: firstCaret,
+                end: firstCaret,
             });
-        } else {
-            const firstCaret = node.getFirstCaret();
-            if (firstCaret)
-                $caret.setCaret({
-                    start: firstCaret,
-                    end: firstCaret,
-                });
-        }
+        // }
     }
 </script>
 

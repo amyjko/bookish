@@ -81,10 +81,10 @@ export default class EmbedNode extends BlockNode {
         return this.#position;
     }
     getFormats() {
-        return [this.#credit, this.#caption];
+        return [this.#caption, this.#credit];
     }
     getChildren() {
-        return [this.#credit, this.#caption];
+        return [this.#caption, this.#credit];
     }
     getParentOf(node: Node): Node | undefined {
         if (node === this.#caption || node === this.#credit) return this;
