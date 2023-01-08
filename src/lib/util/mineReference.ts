@@ -9,17 +9,19 @@ export function mineReference(ids: string[], text: string): Reference {
             : undefined;
     if (year && yearMatches) text = text.replace(yearMatches[1], '');
 
-    // Split the remaining text by period-space sequences, assuming chunks of information are segmented by sentences.
-    // let chunks = text.split(/(?<![A-Z])[?.]\s/);
-    // Grrr, Safari doesn't support negative lookbehind. I'm going to break this until I have time for a fix.
-    let chunks = text.split(/[?.]\s/);
-
-    // First find the URL. If we find it, remove it from the chunks.
-    let url = chunks.find((t) => t.indexOf('http') >= 0);
-    if (url) {
-        chunks = chunks.filter((t) => t !== url);
-        url = url.trim();
+    // Next, find the URL
+    let url: string | null = null;
+    let urlMatches = text.match(
+        /https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()!@:%_\+.~#?&\/\/=]*)/
+    );
+    if (urlMatches !== null && urlMatches.length > 0) {
+        url = urlMatches[0];
+        const index = text.indexOf(url);
+        text = text.substring(0, index) + text.substring(index + url.length);
     }
+
+    // Split the remaining portion into sentences.
+    let chunks = splitIntoSentences(text);
 
     // Authors are usually lists of roman characters and periods optionally followed by commas or semicolons
     let authors = chunks.find((t) => /[a-zA-Z\.]+[,;]?/.test(t));
@@ -34,12 +36,14 @@ export function mineReference(ids: string[], text: string): Reference {
         chunks = chunks.filter((t) => t !== title);
         if (text.charAt(text.indexOf(title) + title.length) === '?')
             title = title + '?';
+        title = title.trim();
     }
 
     // Source is whatever is left.
     let source = chunks.length > 0 ? chunks[0] : undefined;
     if (source) {
         chunks = chunks.filter((t) => t !== source);
+        source = source.trim();
     }
 
     // If there's anything left, fall back to just a string.
@@ -55,6 +59,33 @@ export function mineReference(ids: string[], text: string): Reference {
               '',
               false
           );
+}
+
+export function splitIntoSentences(text: string): string[] {
+    // Split the remaining text by period-space sequences, assuming chunks of information are segmented by sentences
+    // unless they are single initials followed by a period.
+    let sentences: string[] = [];
+    let priorLetterSequence = '';
+    let accumulator = '';
+    for (let i = 0; i < text.length; i++) {
+        let char = text.charAt(i);
+        if (/[a-zA-Z]/.test(char)) {
+            priorLetterSequence += char;
+            accumulator += char;
+        } else {
+            if (char === '.' && priorLetterSequence.length !== 1) {
+                sentences.push(accumulator);
+                accumulator = '';
+                priorLetterSequence = '';
+            } else {
+                priorLetterSequence = '';
+                accumulator += char;
+            }
+        }
+    }
+    if (accumulator.length > 0) sentences.push(accumulator);
+
+    return sentences;
 }
 
 export function getUniqueReferenceID(
