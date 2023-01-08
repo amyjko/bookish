@@ -45,12 +45,7 @@
             <p><em>Sorted by last name of first author.</em></p>
 
             {#each Object.keys(references).sort() as citationID (citationID)}
-                {@const ref = Parser.parseReference(
-                    citationID,
-                    references === null ? '' : references[citationID],
-                    $edition
-                )}
-                <PossibleReference node={ref} />
+                <PossibleReference node={references[citationID]} />
             {/each}
         {:else}
             <p>This book has no references.</p>

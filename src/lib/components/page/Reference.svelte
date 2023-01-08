@@ -110,14 +110,9 @@
                         if (text.length === 0) return "ID can't be empty.";
                         if ($edition && text in $edition.references) {
                             const existing = $edition.references[text];
-                            const parsed = Parser.parseReference(
-                                text,
-                                existing,
-                                $edition
-                            );
                             if (
-                                parsed instanceof Reference &&
-                                !reference.equals(parsed)
+                                existing instanceof Reference &&
+                                !reference.equals(existing)
                             )
                                 return 'ID already taken';
                         }

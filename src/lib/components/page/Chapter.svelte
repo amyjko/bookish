@@ -382,13 +382,7 @@
                                 class={'bookish-reference'}
                                 id={'ref-' + citationID}
                             >
-                                <PossibleReference
-                                    node={Parser.parseReference(
-                                        citationID,
-                                        refs[citationID],
-                                        $edition
-                                    )}
-                                />
+                                <PossibleReference node={refs[citationID]} />
                             </li>
                         {:else}
                             <li

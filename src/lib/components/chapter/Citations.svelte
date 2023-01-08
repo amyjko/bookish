@@ -71,14 +71,7 @@
                                 <sup class="bookish-citation-symbol"
                                     >{citationNumber}</sup
                                 >
-                                <PossibleReference
-                                    node={Parser.parseReference(
-                                        citationID,
-                                        ref,
-                                        $edition,
-                                        true
-                                    )}
-                                />
+                                <PossibleReference node={ref} />
                             </span>
                         {/if}
                     {/each}

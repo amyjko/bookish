@@ -112,54 +112,6 @@ export default class Parser {
         ).parseEmbed();
     }
 
-    static parseReference(
-        citationID: string,
-        ref: string | Array<string>,
-        edition: Edition,
-        short = false
-    ) {
-        if (typeof ref === 'string') return Parser.parseFormat(edition, ref);
-        else if (Array.isArray(ref)) {
-            // APA Format. Could eventually support multiple formats.
-            if (ref.length >= 4) {
-                let authors = ref[0];
-                let year = ref[1];
-                let title = ref[2];
-                let source = ref[3];
-                let url = ref.length >= 5 ? ref[4] : '';
-                let summary = ref.length >= 6 ? ref[5] : '';
-
-                if (source.charAt(0) === '#') {
-                    let src = edition.getSource(source);
-                    if (src === null)
-                        return new ErrorNode(
-                            undefined,
-                            'Unknown source ' + source
-                        );
-                    else source = src;
-                }
-
-                return new Reference(
-                    citationID,
-                    authors,
-                    year,
-                    title,
-                    source,
-                    url,
-                    summary,
-                    short
-                );
-            } else
-                return new ErrorNode(
-                    undefined,
-                    'Expected at least 4 items in the reference array, but found ' +
-                        ref.length +
-                        ': ' +
-                        ref.toString()
-                );
-        } else return new ErrorNode(undefined, 'Invalid reference: ' + ref);
-    }
-
     // Get the next character, if there is one, null otherwise.
     peek(): string | null {
         return this.more() ? this.text.charAt(this.index) : null;

@@ -2,12 +2,13 @@ import Chapter from './Chapter';
 import type { ChapterSpecification } from './Chapter';
 import Parser from '../chapter/Parser';
 import EmbedNode from '../chapter/EmbedNode';
-import type Reference from './Reference';
+import Reference from './Reference';
 import type Theme from './Theme';
 import type Definition from './Definition.js';
 import ChapterIDs from './ChapterID.js';
 import type { DocumentReference } from 'firebase/firestore';
 import type Book from './Book';
+import type FormatNode from '../chapter/FormatNode';
 
 export type EditionSpecification = {
     bookRef?: DocumentReference;
@@ -40,7 +41,7 @@ export default class Edition {
     readonly acknowledgements: string;
     readonly tags: string[];
     readonly sources: Record<string, string>;
-    readonly references: Record<string, string | string[]>;
+    readonly references: Record<string, Reference | FormatNode>;
     readonly symbols: Record<string, string>;
     readonly glossary: Record<string, Definition>;
     readonly theme: Theme | null;
@@ -60,7 +61,9 @@ export default class Edition {
         acknowledgements: string,
         tags: string[],
         sources: Record<string, string>,
-        references: Record<string, string | string[]>,
+        references:
+            | Record<string, string | string[]>
+            | Record<string, FormatNode | Reference>,
         symbols: Record<string, string>,
         glossary: Record<string, Definition>,
         theme: Theme | null
@@ -77,7 +80,13 @@ export default class Edition {
         this.acknowledgements = acknowledgements;
         this.tags = tags.slice();
         this.sources = Object.assign({}, sources);
-        this.references = Object.assign({}, references);
+        this.references = {};
+        for (const [citationID, ref] of Object.entries(references)) {
+            this.references[citationID] =
+                ref instanceof Reference
+                    ? ref
+                    : Edition.parseReference(citationID, ref, this);
+        }
         this.symbols = Object.assign({}, symbols);
         this.glossary = Object.assign({}, glossary);
         this.theme = theme;
@@ -109,8 +118,42 @@ export default class Edition {
         );
     }
 
+    static parseReference(
+        citationID: string,
+        ref: string | string[],
+        edition: Edition,
+        short = false
+    ) {
+        if (typeof ref === 'string') return Parser.parseFormat(edition, ref);
+        else {
+            // APA Format. Could eventually support multiple formats.
+            let [authors, year, title, source, url, summary] = ref;
+
+            if (source.charAt(0) === '#') {
+                let src = edition.getSource(source);
+                if (src !== null) source = src;
+            }
+
+            return new Reference(
+                citationID,
+                authors ?? '',
+                year ?? '',
+                title ?? '',
+                source ?? '',
+                url ?? '',
+                summary ?? '',
+                short
+            );
+        }
+    }
+
     // Convert the book to an object for storage.
     toObject(): EditionSpecification {
+        const references: Record<string, string | string[]> = {};
+        for (const [citationID, ref] of Object.entries(this.references))
+            references[citationID] =
+                ref instanceof Reference ? ref.toList() : ref.toBookdown();
+
         const editionJSON: EditionSpecification = {
             title: this.title,
             authors: this.authors,
@@ -121,7 +164,7 @@ export default class Edition {
             acknowledgements: this.acknowledgements,
             tags: this.tags.slice(),
             sources: Object.assign({}, this.sources),
-            references: Object.assign({}, this.references),
+            references: references,
             symbols: Object.assign({}, this.symbols),
             glossary: Object.assign({}, this.glossary),
             theme: this.theme,
@@ -408,7 +451,7 @@ export default class Edition {
             : undefined;
     }
 
-    withReferences(newReferences: Record<string, string | string[]>) {
+    withReferences(newReferences: Record<string, FormatNode | Reference>) {
         return new Edition(
             this.bookRef,
             this.editionRef,
@@ -433,14 +476,14 @@ export default class Edition {
         const newReferences = Object.assign({}, this.references);
         // Generate a unique ID for the reference.
         for (const newRef of references)
-            newReferences[newRef.citationID] = newRef.toList();
+            newReferences[newRef.citationID] = newRef;
         return this.withReferences(newReferences);
     }
 
     withEditedReference(ref: Reference) {
         if (!(ref.citationID in this.references)) return this;
         const newReferences = Object.assign({}, this.references);
-        newReferences[ref.citationID] = ref.toList();
+        newReferences[ref.citationID] = ref;
         return this.withReferences(newReferences);
     }
 
@@ -448,9 +491,7 @@ export default class Edition {
         if (!(ref.citationID in this.references)) return;
         const newReferences = Object.assign({}, this.references);
         delete newReferences[ref.citationID];
-        newReferences[newCitationID] = ref
-            .withCitationID(newCitationID)
-            .toList();
+        newReferences[newCitationID] = ref.withCitationID(newCitationID);
         return this.withReferences(newReferences);
     }
 
