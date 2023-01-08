@@ -51,13 +51,10 @@
 
     // When dark mode changes, update the body's class list.
     $: {
-        if ($darkMode) {
-            document.body.classList.add('dark');
-        } else {
-            document.body.classList.remove('dark');
-            if (typeof localStorage !== 'undefined')
-                localStorage.setItem('dark', $darkMode ? 'true' : 'false');
-        }
+        if ($darkMode) document.body.classList.add('dark');
+        else document.body.classList.remove('dark');
+        if (typeof localStorage !== 'undefined')
+            localStorage.setItem('dark', $darkMode ? 'true' : 'false');
     }
 
     // Redirect old hash routes by simply replacing their hash before routing.
