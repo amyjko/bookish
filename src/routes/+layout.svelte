@@ -63,7 +63,6 @@
         const previousDocID = previousSavedEdition?.getRef()?.id;
         const newDocID = $edition.getRef()?.id;
 
-        console.log('Saving');
         if (
             ($book && $edition && previousDocID === undefined) ||
             (newDocID !== undefined &&

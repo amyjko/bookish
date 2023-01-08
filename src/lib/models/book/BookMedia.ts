@@ -97,8 +97,8 @@ export default class BookMedia {
             .then((thumbnail) => finished(url, thumbnail))
             // Try again in a bit.
             .catch(() =>
-                attempt > 10
-                    ? error("Couldn't upload image")
+                attempt > 25
+                    ? error("Couldn't get the image URL. Connection issues?")
                     : setTimeout(
                           () =>
                               this.getThumbnailURL(
