@@ -1818,6 +1818,7 @@ const commands: Command[] = [
         icon: 'insert symbol',
         description: 'insert character',
         category: 'text',
+        press: true,
         mutates: true,
         control: undefined,
         alt: undefined,

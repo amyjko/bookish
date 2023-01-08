@@ -7,6 +7,7 @@ type Command = {
     description: string;
     category: string;
     control: boolean | undefined;
+    press?: boolean | undefined;
     alt: boolean | undefined;
     shift: boolean | undefined;
     key?: string | string[] | ((key: string) => boolean);

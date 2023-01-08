@@ -612,7 +612,11 @@
         };
     }
 
-    function handleKey(event: KeyboardEvent) {
+    function handlePress(event: KeyboardEvent) {
+        handleKey(event, true);
+    }
+
+    function handleKey(event: KeyboardEvent, press: boolean = false) {
         // Only handle keystrokes when this is focused.
         // Otherwise, we let any focusable elements in this editor handle them.
         if (!editorFocused) return;
@@ -632,6 +636,7 @@
         const unmatched = commands.every((command) => {
             // If the keystroke and caret position matches the command signature, execute the command and update the caret range.
             if (
+                (command.press === undefined || command.press === press) &&
                 (command.shift === undefined ||
                     command.shift === event.shiftKey) &&
                 (command.alt === undefined || command.alt === event.altKey) &&
@@ -990,7 +995,7 @@
     class={`bookish-editor ${inAtom ? 'bookish-editor-atom-focused' : ''}`}
     bind:this={element}
     on:keydown={handleKey}
-    on:keypress={handleKey}
+    on:keypress={handlePress}
     on:mousedown|stopPropagation={handleMouseDown}
     on:focus={updateFocus}
     on:blur={updateFocus}
