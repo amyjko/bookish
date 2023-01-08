@@ -2,8 +2,10 @@ import type Node from './Node';
 import AtomNode from './AtomNode';
 import TextNode from './TextNode';
 import FormatNode from './FormatNode';
+import type EmbedNode from './EmbedNode';
 
-type Caret = { node: TextNode | AtomNode<any>; index: number };
+export type SelectableNode = TextNode | AtomNode<any> | EmbedNode;
+type Caret = { node: SelectableNode; index: number };
 export default Caret;
 
 export type CaretRange = { start: Caret; end: Caret };

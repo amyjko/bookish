@@ -23,8 +23,8 @@
     import { updateBook, updateEdition } from '../lib/models/CRUD';
 
     // A global store context for the focused editor, used to display toolbar.
-    let editor = writable<CaretState | undefined>(undefined);
-    setContext(CARET, editor);
+    let caret = writable<CaretState | undefined>(undefined);
+    setContext(CARET, caret);
 
     // A global store for the current book. It's at the root so the header can do breadcrumbs.
     let book = writable<Book | undefined>(undefined);

@@ -585,10 +585,12 @@
             endIsText: caretRange.end.node instanceof TextNode,
             startIsTextOrAtom:
                 caretRange.start.node instanceof TextNode ||
-                caretRange.start.node instanceof AtomNode,
+                caretRange.start.node instanceof AtomNode ||
+                caretRange.start.node instanceof EmbedNode,
             endIsTextOrAtom:
                 caretRange.end.node instanceof TextNode ||
-                caretRange.end.node instanceof AtomNode,
+                caretRange.end.node instanceof AtomNode ||
+                caretRange.start.node instanceof EmbedNode,
             atParagraphStart: atParagraphStart(),
             undoStack: undoStack,
             undoPosition: undoPosition,
@@ -830,17 +832,23 @@
             caretRange &&
             !(
                 caretRange.start.node instanceof TextNode ||
-                caretRange.start.node instanceof AtomNode
+                caretRange.start.node instanceof AtomNode ||
+                caretRange.start.node instanceof EmbedNode
             )
         ) {
             caretRange = undefined;
         }
     }
 
-    function updateFocus() {
-        editorFocused =
+    function isFocused() {
+        return (
             document.activeElement === element ||
-            (element !== null && element?.contains(document.activeElement));
+            (element !== null && element?.contains(document.activeElement))
+        );
+    }
+
+    function updateFocus() {
+        editorFocused = isFocused();
     }
 
     function handleCopy(node: BookishNode) {
@@ -968,8 +976,7 @@
 
     function updateActiveEditor() {
         // If focused, claim it.
-        if (document.activeElement === element || toolbarIsFocused())
-            claimActiveEditor();
+        if (isFocused() || toolbarIsFocused()) claimActiveEditor();
         // Otherwise, unset it.
         else activeEditor.set(undefined);
     }

@@ -11,6 +11,7 @@ import TextNode from './TextNode';
 import AtomNode from './AtomNode';
 import type Edit from './Edit';
 import CodeNode from './CodeNode';
+import EmbedNode from './EmbedNode';
 
 export default abstract class BlocksNode extends BlockNode {
     readonly #blocks: BlockNode[];
@@ -819,15 +820,13 @@ export default abstract class BlocksNode extends BlockNode {
             }
             // See if the CodeNode would like to handle it.
             else if (parent instanceof CodeNode) {
-                const revisedCode = parent
-                    .getCodeNode()
-                    .withoutRange({
-                        start: caret,
-                        end: {
-                            node: caret.node,
-                            index: caret.index + (next ? 1 : -1),
-                        },
-                    });
+                const revisedCode = parent.getCodeNode().withoutRange({
+                    start: caret,
+                    end: {
+                        node: caret.node,
+                        index: caret.index + (next ? 1 : -1),
+                    },
+                });
                 if (revisedCode === undefined) return;
                 const revisedCodeNode = parent.withChildReplaced(
                     parent.getCodeNode(),

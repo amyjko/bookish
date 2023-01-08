@@ -1,11 +1,17 @@
 import Node from './Node';
 import type Caret from './Caret';
-import { type CaretRange, indexToCaret, caretToIndex } from './Caret';
+import {
+    type CaretRange,
+    indexToCaret,
+    caretToIndex,
+    type SelectableNode,
+} from './Caret';
 import type Edit from './Edit';
 import FormatNode from './FormatNode';
 import type { Format, FormatNodeSegmentType } from './FormatNode';
 import TextNode from './TextNode';
 import AtomNode from './AtomNode';
+import type EmbedNode from './EmbedNode';
 
 export default abstract class BlockNode extends Node {
     abstract getFormats(): FormatNode[];
@@ -46,20 +52,16 @@ export default abstract class BlockNode extends Node {
         }
     }
 
-    getNextTextOrAtom(
-        node: TextNode | AtomNode<any>
-    ): TextNode | AtomNode<any> | undefined {
+    getNextTextOrAtom(node: SelectableNode): SelectableNode | undefined {
         return this.getAdjacentCaret(
             {
                 node: node,
-                index: node instanceof AtomNode ? 0 : node.getLength(),
+                index: node instanceof TextNode ? node.getLength() : 0,
             },
             true
         )?.node;
     }
-    getPreviousTextOrAtom(
-        node: TextNode | AtomNode<any>
-    ): TextNode | AtomNode<any> | undefined {
+    getPreviousTextOrAtom(node: SelectableNode): SelectableNode | undefined {
         return this.getAdjacentCaret({ node: node, index: 0 }, true)?.node;
     }
 

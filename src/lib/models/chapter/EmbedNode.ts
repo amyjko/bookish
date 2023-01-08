@@ -4,6 +4,8 @@ import FormatNode from './FormatNode';
 import TextNode from './TextNode';
 import BlockNode from './BlockNode';
 import type { CaretRange } from './Caret';
+import type RootNode from './RootNode';
+import type Caret from './Caret';
 
 // This is what we use to encode URLs in the URL field of the embed node.
 const URL_SEPARATOR = '*';
@@ -221,5 +223,22 @@ export default class EmbedNode extends BlockNode {
             newCredit,
             this.#position
         ) as this;
+    }
+
+    nextWord(): Caret {
+        return this.#caption.getFirstCaret() as Caret;
+    }
+
+    previousWord(root: RootNode): Caret {
+        const previous = root.getPreviousTextOrAtom(
+            this.#caption.getFirstTextNode()
+        );
+        return previous
+            ? {
+                  node: previous,
+                  index:
+                      previous instanceof TextNode ? previous.getLength() : 0,
+              }
+            : { node: this, index: 0 };
     }
 }

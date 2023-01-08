@@ -367,7 +367,8 @@ const commands: Command[] = [
         handler: (context) => {
             if (
                 context.end.node instanceof TextNode ||
-                context.end.node instanceof AtomNode
+                context.end.node instanceof AtomNode ||
+                context.end.node instanceof EmbedNode
             ) {
                 const nextCaret = context.root.getAdjacentCaret(
                     context.end,
@@ -401,7 +402,8 @@ const commands: Command[] = [
         handler: (context) => {
             if (
                 context.end.node instanceof TextNode ||
-                context.end.node instanceof AtomNode
+                context.end.node instanceof AtomNode ||
+                context.end.node instanceof EmbedNode
             ) {
                 const previous = context.end.node.previousWord(
                     context.root,
@@ -452,7 +454,8 @@ const commands: Command[] = [
         handler: (context) => {
             if (
                 context.end.node instanceof TextNode ||
-                context.end.node instanceof AtomNode
+                context.end.node instanceof AtomNode ||
+                context.end.node instanceof EmbedNode
             ) {
                 const previous = context.root.getAdjacentCaret(
                     context.end,
@@ -480,7 +483,8 @@ const commands: Command[] = [
         handler: (context) => {
             if (
                 context.end.node instanceof TextNode ||
-                context.end.node instanceof AtomNode
+                context.end.node instanceof AtomNode ||
+                context.end.node instanceof EmbedNode
             ) {
                 const previous = context.end.node.previousWord(
                     context.root,
@@ -531,7 +535,8 @@ const commands: Command[] = [
         handler: (context) => {
             if (
                 context.end.node instanceof TextNode ||
-                context.end.node instanceof AtomNode
+                context.end.node instanceof AtomNode ||
+                context.end.node instanceof EmbedNode
             ) {
                 const nextCaret = context.root.getAdjacentCaret(
                     context.end,
@@ -563,7 +568,8 @@ const commands: Command[] = [
         handler: (context) => {
             if (
                 context.end.node instanceof TextNode ||
-                context.end.node instanceof AtomNode
+                context.end.node instanceof AtomNode ||
+                context.end.node instanceof EmbedNode
             ) {
                 const next = context.end.node.nextWord(
                     context.root,
@@ -612,7 +618,8 @@ const commands: Command[] = [
         handler: (context) => {
             if (
                 context.end.node instanceof TextNode ||
-                context.end.node instanceof AtomNode
+                context.end.node instanceof AtomNode ||
+                context.end.node instanceof EmbedNode
             ) {
                 const next = context.root.getAdjacentCaret(context.end, true);
                 if (next === undefined) return;
@@ -637,7 +644,8 @@ const commands: Command[] = [
         handler: (context) => {
             if (
                 context.end.node instanceof TextNode ||
-                context.end.node instanceof AtomNode
+                context.end.node instanceof AtomNode ||
+                context.end.node instanceof EmbedNode
             ) {
                 const previous = context.end.node.nextWord(
                     context.root,

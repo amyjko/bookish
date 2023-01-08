@@ -2,7 +2,7 @@
 
 <script lang="ts">
     import type TableNode from '$lib/models/chapter/TableNode';
-    import type EmbedNode from '$lib/models/chapter/EmbedNode';
+    import EmbedNode from '$lib/models/chapter/EmbedNode';
     import Format from './Format.svelte';
     import type CodeNode from '$lib/models/chapter/CodeNode';
     import type FormatNode from '$lib/models/chapter/FormatNode';
@@ -16,26 +16,38 @@
     let editable = isEditable();
     let caret = getCaret();
 
+    $: selected = $caret?.range?.start.node === node;
+
     function focusFigure() {
-        const firstCaret = node.getFirstCaret();
-        if (editable && firstCaret && $caret)
-            $caret.setCaret({
-                start: firstCaret,
-                end: firstCaret,
+        if (!editable || $caret === undefined) return;
+        if (node instanceof EmbedNode) {
+            return $caret.setCaret({
+                start: { node, index: 0 },
+                end: { node, index: 0 },
             });
+        } else {
+            const firstCaret = node.getFirstCaret();
+            if (firstCaret)
+                $caret.setCaret({
+                    start: firstCaret,
+                    end: firstCaret,
+                });
+        }
     }
 </script>
 
 <Positioned position={node.getPosition()}>
-    <figure
-        class="bookish-figure"
-        data-nodeid={node.nodeID}
-        tabIndex="0"
-        on:click={focusFigure}
-        on:keydown={(event) =>
-            event.key === ' ' || event.key === 'Enter' ? focusFigure() : null}
-    >
-        <slot />
+    <figure class="bookish-figure" data-nodeid={node.nodeID}>
+        <div
+            class:selected
+            on:mousedown={focusFigure}
+            on:keydown={(event) =>
+                event.key === ' ' || event.key === 'Enter'
+                    ? focusFigure()
+                    : null}
+        >
+            <slot />
+        </div>
         {#if caption !== undefined}
             <figcaption class="bookish-figure-caption">
                 {#if caption}
@@ -54,6 +66,14 @@
 <style>
     figure {
         margin: 0;
+        margin-block-start: 0;
+        margin-block-end: 0;
+        margin-inline-start: 0;
+        margin-inline-end: 0;
+    }
+
+    .selected {
+        filter: opacity(50%);
     }
 
     .bookish-figure-caption {

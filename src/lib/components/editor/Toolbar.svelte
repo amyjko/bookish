@@ -171,10 +171,13 @@
                 chapter,
                 (p) => p instanceof QuoteNode
             ) as QuoteNode;
-            embedNode = caretNode.getClosestParentMatching(
-                chapter,
-                (p) => p instanceof EmbedNode
-            ) as EmbedNode;
+            embedNode =
+                caretNode instanceof EmbedNode
+                    ? caretNode
+                    : (caretNode.getClosestParentMatching(
+                          chapter,
+                          (p) => p instanceof EmbedNode
+                      ) as EmbedNode);
             tableNode = caretNode.getClosestParentMatching(
                 chapter,
                 (p) => p instanceof TableNode
