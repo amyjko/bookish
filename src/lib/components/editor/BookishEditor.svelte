@@ -302,13 +302,7 @@
         // Map the browser selection to our caret range model.
         const selection = document.getSelection();
 
-        if (
-            selection &&
-            selection.anchorNode &&
-            selection.anchorOffset &&
-            selection.focusNode &&
-            selection.focusOffset
-        ) {
+        if (selection && selection.anchorNode && selection.focusNode) {
             const start = rangeToCaret(
                 selection.anchorNode,
                 selection.anchorOffset
