@@ -9,12 +9,12 @@
     import { writable, type Writable } from 'svelte/store';
     import { setContext } from 'svelte';
     import {
-        ActiveEditorSymbol,
+        CARET,
         BOOK,
         EDITION,
         STATUS,
-        type EditionContext,
-        type StatusContext,
+        type EditionStore,
+        type StatusStore,
     } from '$lib/components/page/Contexts';
     import type Book from '$lib/models/book/Book';
     import type Edition from '../lib/models/book/Edition';
@@ -24,7 +24,7 @@
 
     // A global store context for the focused editor, used to display toolbar.
     let editor = writable<CaretState | undefined>(undefined);
-    setContext(ActiveEditorSymbol, editor);
+    setContext(CARET, editor);
 
     // A global store for the current book. It's at the root so the header can do breadcrumbs.
     let book = writable<Book | undefined>(undefined);
@@ -32,11 +32,11 @@
 
     // A global store for the current edition. It's at the root so the header can do breadcrumbs.
     let edition = writable<Edition>(undefined);
-    setContext<EditionContext>(EDITION, edition);
+    setContext<EditionStore>(EDITION, edition);
 
     // A global store for save feedback.
     let status = writable<BookSaveStatus>(BookSaveStatus.Saved);
-    setContext<StatusContext>(STATUS, status);
+    setContext<StatusStore>(STATUS, status);
 
     let bookTimer: NodeJS.Timeout | undefined = undefined;
     let editionTimer: NodeJS.Timeout | undefined = undefined;

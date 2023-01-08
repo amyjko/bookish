@@ -19,10 +19,10 @@ export function getDarkMode() {
     return getContext<DarkModeStore>(DARK_MODE);
 }
 
-export type AuthContext = Writable<Authentication | undefined>;
+export type AuthStore = Writable<Authentication | undefined>;
 export const AUTH = Symbol('auth');
 export function getAuth() {
-    return getContext<AuthContext>(AUTH);
+    return getContext<AuthStore>(AUTH);
 }
 
 export type BookStore = Writable<Book | undefined>;
@@ -31,10 +31,10 @@ export function getBook() {
     return getContext<BookStore>(BOOK);
 }
 
-export type EditionContext = Writable<Edition | undefined>;
+export type EditionStore = Writable<Edition | undefined>;
 export const EDITION = Symbol('edition');
 export function getEdition() {
-    return getContext<EditionContext>(EDITION);
+    return getContext<EditionStore>(EDITION);
 }
 
 export type ChapterStore = Writable<ChapterContext>;
@@ -48,7 +48,7 @@ export function getChapter() {
  * global edition store with the new edition, propogating the changes everywhere.
  */
 export function setChapter(
-    store: EditionContext,
+    store: EditionStore,
     previous: Chapter,
     chapter: Chapter
 ) {
@@ -67,13 +67,13 @@ export function getBase() {
     return getContext<BaseStore>(BASE);
 }
 
-export const ActiveEditorSymbol = Symbol('caret');
+export const CARET = Symbol('caret');
 export function getCaret() {
-    return getContext<Writable<CaretState | undefined>>(ActiveEditorSymbol);
+    return getContext<Writable<CaretState | undefined>>(CARET);
 }
 
 export const STATUS = Symbol('status');
-export type StatusContext = Writable<BookSaveStatus>;
+export type StatusStore = Writable<BookSaveStatus>;
 export function getStatus() {
-    return getContext<StatusContext>(STATUS);
+    return getContext<StatusStore>(STATUS);
 }

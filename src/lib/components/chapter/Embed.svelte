@@ -4,7 +4,6 @@
     import type EmbedNode from '$lib/models/chapter/EmbedNode';
     import { storage } from '$lib/models/Firebase';
     import {
-        getEdition,
         isEditable,
         getCaret,
         getBook,
