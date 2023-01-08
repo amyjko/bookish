@@ -28,18 +28,6 @@ export default class Reference {
         this.short = short;
     }
 
-    getType() {
-        return 'reference';
-    }
-
-    getChildren() {
-        return [];
-    }
-
-    getParentOf(): Node | undefined {
-        return undefined;
-    }
-
     toText() {
         return (
             this.authors +
@@ -52,12 +40,7 @@ export default class Reference {
             (this.summary ? this.summary : '')
         );
     }
-    toBookdown(): string {
-        return '';
-    }
-    toHTML() {
-        return '';
-    }
+
     toList() {
         return [
             this.authors,
