@@ -946,7 +946,7 @@
     $: inAtom =
         caretRange && caretRange.start.node.isInside(editedNode, AtomNode);
     $: isSelection =
-        caretRange &&
+        caretRange !== undefined &&
         (caretRange.start.node !== caretRange.end.node ||
             caretRange.start.index !== caretRange.end.index);
     $: isItalic =
