@@ -25,6 +25,7 @@
     let dragging = false;
     let dragFeedback: undefined | string = undefined;
     let imageError = false;
+    $: if (node) imageError = false;
 
     function handleDrop(event: DragEvent) {
         event.preventDefault();

@@ -64,7 +64,7 @@ export default class EmbedNode extends BlockNode {
         return this.#urls.includes('bookish');
     }
     isLocal() {
-        return !this.#urls.startsWith('http');
+        return this.#urls.length > 0 && !this.#urls.startsWith('http');
     }
     getDescription() {
         return this.#description;
