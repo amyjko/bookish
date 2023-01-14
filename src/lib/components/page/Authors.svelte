@@ -72,7 +72,9 @@
         {/each}
     {/if}
     {#if editable}
-        &nbsp;<Button tooltip="Add an author" command={addAuthor}>+</Button>
+        &nbsp;<Button tooltip="Add an author" command={addAuthor}
+            >+ author</Button
+        >
     {/if}
 </p>
 

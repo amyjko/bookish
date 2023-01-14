@@ -1018,7 +1018,6 @@
     on:mousedown|stopPropagation={handleMouseDown}
     on:focus={updateFocus}
     on:blur={updateFocus}
-    role="textbox"
     tabIndex="0"
 >
     <!-- The chapter content -->
