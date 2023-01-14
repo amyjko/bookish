@@ -8,6 +8,7 @@
 <button
     class={$$props.class}
     title={tooltip}
+    aria-label={tooltip}
     {type}
     {disabled}
     on:mousedown={command}
