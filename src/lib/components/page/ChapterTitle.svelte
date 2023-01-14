@@ -4,16 +4,15 @@
     export let link: string | undefined = undefined;
 </script>
 
-<span>
-    {#if link}
-        <Link to={link}><slot /></Link>
-    {:else}
-        <slot />
-    {/if}
-</span>
+{#if link}
+    <Link to={link}><h3> <slot /></h3></Link>
+{:else}
+    <h3><slot /></h3>
+{/if}
 
 <style>
-    span {
+    h3 {
         font-family: var(--bookish-header-font-family);
+        margin: 0;
     }
 </style>

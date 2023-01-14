@@ -65,7 +65,7 @@
     </td>
     <td><slot name="etc" /></td>
     {#if editable && $edition}
-        <td>
+        <td class="controls">
             {#if chapter}
                 <Button
                     tooltip="move chapter up"
@@ -73,14 +73,12 @@
                         0}
                     command={moveUp}>{'↑'}</Button
                 >
-                &nbsp;
                 <Button
                     tooltip="move chapter down"
                     disabled={$edition.getChapterPosition(chapter.getID()) ===
                         $edition.getChapterCount() - 1}
                     command={moveDown}>{'↓'}</Button
                 >
-                &nbsp;
                 <ConfirmButton
                     tooltip="delete chapter {title}"
                     commandLabel="delete"
@@ -104,5 +102,24 @@
 
     .forthcoming {
         color: var(--app-muted-color);
+    }
+
+    .controls {
+        display: flex;
+        flex-direction: row;
+        flex-wrap: nowrap;
+        gap: var(--app-chrome-padding);
+    }
+
+    td:first-child {
+        padding-left: 0;
+    }
+
+    td:last-child {
+        padding-right: 0;
+    }
+
+    td {
+        vertical-align: baseline;
     }
 </style>
