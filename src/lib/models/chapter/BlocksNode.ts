@@ -346,36 +346,62 @@ export default abstract class BlocksNode extends BlockNode {
             caret = edit.range.start;
         }
 
-        // Find what paragraph the caret is in.
-        // There are some contexts with no paragraphs. Return the start range given.
-        const paragraph = caret.node.getClosestParentOfType<ParagraphNode>(
+        // Find what block the caret is in.
+        const block = caret.node.getClosestParentOfType<BlockNode>(
             blocks,
-            ParagraphNode
+            BlockNode
         );
-        if (paragraph === undefined) return;
 
-        // Split the paragraph in two.
-        const split = paragraph.split(caret);
-        if (split === undefined) return;
-        const [first, last] = split;
-        const newCaret = last.getFirstCaret();
-        if (newCaret === undefined) return;
+        if (block === undefined) return;
 
-        // Find the paragraph's blocks node.
-        const paragraphBlocks = paragraph.getParent(blocks);
-        if (!(paragraphBlocks instanceof BlocksNode)) return;
+        // If it's a paragraph, split it.
+        if (block instanceof ParagraphNode) {
+            const paragraph = block;
+            // Split the paragraph in two.
+            const split = paragraph.split(caret);
+            if (split === undefined) return;
+            const [first, last] = split;
+            const newCaret = last.getFirstCaret();
+            if (newCaret === undefined) return;
 
-        const newBlocks = paragraphBlocks
-            .withBlockInsertedBefore(paragraph, first)
-            ?.withBlockInsertedAfter(paragraph, last)
-            ?.withoutBlock(paragraph);
-        if (newBlocks === undefined) return;
+            // Find the paragraph's blocks node.
+            const paragraphBlocks = paragraph.getParent(blocks);
+            if (!(paragraphBlocks instanceof BlocksNode)) return;
 
-        // Replace the paragraphs blocks in these blocks.
-        const newRoot = blocks.withNodeReplaced(paragraphBlocks, newBlocks);
-        if (newRoot === undefined) return;
+            const newBlocks = paragraphBlocks
+                .withBlockInsertedBefore(paragraph, first)
+                ?.withBlockInsertedAfter(paragraph, last)
+                ?.withoutBlock(paragraph);
+            if (newBlocks === undefined) return;
 
-        return { root: newRoot, range: { start: newCaret, end: newCaret } };
+            // Replace the paragraphs blocks in these blocks.
+            const newRoot = blocks.withNodeReplaced(paragraphBlocks, newBlocks);
+            if (newRoot === undefined) return;
+
+            return { root: newRoot, range: { start: newCaret, end: newCaret } };
+        }
+        // If any other kind of block, and an empty paragraph after the block.
+        else {
+            // Find the paragraph's blocks node.
+            const container = block.getParent(blocks);
+            if (!(container instanceof BlocksNode)) return;
+
+            const newParagraph = new ParagraphNode();
+            const newCaret = newParagraph.getFirstCaret();
+            if (newCaret === undefined) return;
+
+            const newBlocks = container.withBlockInsertedAfter(
+                block,
+                newParagraph
+            );
+            if (newBlocks === undefined) return;
+
+            // Replace the paragraphs blocks in these blocks.
+            const newRoot = blocks.withNodeReplaced(container, newBlocks);
+            if (newRoot === undefined) return;
+
+            return { root: newRoot, range: { start: newCaret, end: newCaret } };
+        }
     }
 
     withoutRange(range: CaretRange): Edit {
