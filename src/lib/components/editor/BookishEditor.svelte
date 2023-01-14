@@ -649,14 +649,16 @@
                     (command.active instanceof Function &&
                         command.active.call(undefined, context, event.key)))
             ) {
-                event.preventDefault();
-                event.stopPropagation();
-
                 // Execute the command
-                executeCommand(command, event.key);
+                const handled = executeCommand(command, event.key);
+
+                if (handled) {
+                    event.preventDefault();
+                    event.stopPropagation();
+                }
 
                 // Stop searching for a matching command.
-                return false;
+                return handled;
             }
             // Continue searching for a matching command.
             return true;
@@ -713,7 +715,7 @@
         }
     }
 
-    function executeCommand(command: Command, key: string) {
+    function executeCommand(command: Command, key: string): boolean {
         // Assume we process it, then flip it if we don't.
         ignoredInput = false;
 
@@ -747,8 +749,13 @@
                 ) {
                     saveEdit(root as RootNode, newRange, command);
                 }
-            } else ignoredInput = true;
+                return true;
+            } else {
+                ignoredInput = true;
+                return false;
+            }
         }
+        return false;
     }
 
     async function saveEdit(
