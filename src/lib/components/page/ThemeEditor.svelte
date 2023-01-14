@@ -83,7 +83,7 @@
         <!-- If it's not one of the  -->
         {#if isDefault}
             <Button
-                tooltip="Create a custom theme"
+                tooltip="customize theme"
                 command={() =>
                     $edition
                         ? edition.set(
@@ -91,13 +91,13 @@
                                   ...(theme === null ? BookishTheme : theme),
                               })
                           )
-                        : undefined}>Customize</Button
+                        : undefined}>customize</Button
             >
         {:else}
             <ConfirmButton
                 tooltip="Change the theme to the default Bookish theme."
-                commandLabel="Revert to default"
-                confirmLabel="Delete your theme?"
+                commandLabel="- theme"
+                confirmLabel="delete your theme?"
                 command={() =>
                     $edition
                         ? edition.set($edition.withTheme(null))

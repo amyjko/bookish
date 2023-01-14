@@ -74,21 +74,21 @@
             disabled={loading}
         />
         <Button
-            tooltip="Submit your new email address"
+            tooltip="submit your new email address"
             command={handleSubmit}
             type="submit"
             disabled={loading ||
                 email == undefined ||
                 email.length === 0 ||
-                changed}>Update email</Button
+                changed}>update email</Button
         >
     </form>
 </Paragraph>
 
 <Paragraph>
-    Or, <Button tooltip="Logout of your account" command={handleLogout}
+    Or, <Button tooltip="logout of your account" command={handleLogout}
         >logout</Button
-    >.
+    >
 </Paragraph>
 
 {#if feedback}

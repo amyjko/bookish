@@ -95,12 +95,12 @@
                 <MediaPreview url={image.url} alt={''}>
                     <span
                         >uploaded <Button
-                            tooltip="Delete this unused image"
+                            tooltip="delete this unused image"
                             command={() =>
                                 media
                                     ?.remove(image)
                                     .then((images) => updateImages(images))}
-                            >x</Button
+                            >- image</Button
                         ></span
                     >
                 </MediaPreview>

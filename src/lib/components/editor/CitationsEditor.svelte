@@ -52,7 +52,7 @@
     {citationID}
     <Button
         tooltip="Remove citation"
-        command={() => removeSelection(citationID)}>&times;</Button
+        command={() => removeSelection(citationID)}>&times; citation</Button
     >
 {:else}
     <Note>&mdash;</Note>

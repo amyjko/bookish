@@ -53,11 +53,11 @@
 
 <textarea rows={5} bind:value={text} style="width: 100%" />
 <Button
-    tooltip="Attempt to convert the text above into references"
+    tooltip="convert text to references"
     disabled={text.length === 0}
     command={handleBulkAdd}>Add bulk references</Button
 >
-<Button tooltip="Add an empty reference" command={handleEmptyAdd}
+<Button tooltip="add empty reference" command={handleEmptyAdd}
     >Add empty reference</Button
 >
 

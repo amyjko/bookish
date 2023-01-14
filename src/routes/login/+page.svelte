@@ -52,7 +52,7 @@
             loading ||
             !/^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/.test(email)}
     >
-        Login
+        login
     </Button>
 </form>
 

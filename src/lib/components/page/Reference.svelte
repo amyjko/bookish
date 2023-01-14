@@ -45,8 +45,8 @@
 
 {#if editable && !reference.short}
     <ConfirmButton
-        tooltip="Delete this reference"
-        commandLabel="x"
+        tooltip="delete reference {reference.title}"
+        commandLabel="- reference"
         confirmLabel="Confirm"
         command={() =>
             $edition
@@ -54,9 +54,9 @@
                 : undefined}
     />
     <Button
-        tooltip="Finish editing this reference."
+        tooltip="stop editing reference"
         command={() => (editing ? stopEditing() : startEditing())}
-        >{editing ? 'Done' : 'Edit'}</Button
+        >{editing ? 'done' : 'edit'}</Button
     >
 {/if}
 <!-- If a short version was requested, try to abbreviate the authors. -->

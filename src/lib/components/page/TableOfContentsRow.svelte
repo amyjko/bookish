@@ -68,23 +68,23 @@
         <td>
             {#if chapter}
                 <Button
-                    tooltip="Move chapter up"
+                    tooltip="move chapter up"
                     disabled={$edition.getChapterPosition(chapter.getID()) ===
                         0}
                     command={moveUp}>{'↑'}</Button
                 >
                 &nbsp;
                 <Button
-                    tooltip="Move chapter down"
+                    tooltip="move chapter down"
                     disabled={$edition.getChapterPosition(chapter.getID()) ===
                         $edition.getChapterCount() - 1}
                     command={moveDown}>{'↓'}</Button
                 >
                 &nbsp;
                 <ConfirmButton
-                    tooltip="Delete this chapter"
-                    commandLabel="x"
-                    confirmLabel="Confirm"
+                    tooltip="delete chapter {title}"
+                    commandLabel="delete"
+                    confirmLabel="confirm"
                     command={() =>
                         chapter && $edition
                             ? edition.set(

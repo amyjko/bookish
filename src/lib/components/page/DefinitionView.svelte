@@ -79,8 +79,8 @@
                 >{/if}
             {#if editable}
                 <ConfirmButton
-                    tooltip="Delete this glossary entry."
-                    commandLabel="x"
+                    tooltip="delete entry {definition.phrase}"
+                    commandLabel="- definition"
                     confirmLabel="confirm"
                     command={() =>
                         $edition
@@ -149,8 +149,8 @@
                             {#if syns.length > 1 && index < syns.length - 1},&nbsp;{/if}
                         {/each}
                     {/if}
-                </span>&nbsp;<Button tooltip="Add synonym" command={addSynonym}
-                    >+</Button
+                </span>&nbsp;<Button tooltip="add synonym" command={addSynonym}
+                    >+ synonym</Button
                 >
             {:else if definition.synonyms !== undefined && definition.synonyms.length > 0}
                 <Note>{definition.synonyms.join(', ')}</Note>

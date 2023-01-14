@@ -122,9 +122,9 @@
 
         <PageHeader id="chapters"
             >Chapters {#if editable}<Button
-                    tooltip="Add a new chapter"
+                    tooltip="add empty chapter"
                     disabled={waitingForChapter}
-                    command={addChapter}>+</Button
+                    command={addChapter}>+ chapter</Button
                 >{/if}</PageHeader
         >
 

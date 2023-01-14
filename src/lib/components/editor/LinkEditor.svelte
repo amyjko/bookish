@@ -77,7 +77,7 @@
 
 <span>
     <Button
-        tooltip="Remove link."
+        tooltip="remove link"
         command={() => {
             if ($caret?.context?.format) {
                 const newFormat = $caret.context.format.withSegmentReplaced(

@@ -59,7 +59,7 @@
                 Add definitions and then link to them in a chapter's text.
             </Instructions>
             <Button tooltip="Add a glossary entry" command={addEmptyDefinition}
-                >+</Button
+                >+ definition</Button
             >
         {/if}
         {#if keys === null}

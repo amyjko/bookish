@@ -93,13 +93,12 @@
     {/if}
     {#if editable}
         {#if embedNode === undefined}
-            <Button tooltip="Add a header image to this page" command={addCover}
+            <Button tooltip="add cover image to page" command={addCover}
                 >+ cover image</Button
             >
         {:else}
-            <Button
-                tooltip="Remove the header image from this page"
-                command={removeCover}>x cover image</Button
+            <Button tooltip="remove cover image from page" command={removeCover}
+                >- cover image</Button
             >
         {/if}
     {/if}
