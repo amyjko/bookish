@@ -28,6 +28,7 @@
         padding: var(--app-chrome-padding);
         border-radius: var(--app-chrome-roundedness);
         border: none;
+        vertical-align: text-bottom;
     }
 
     button:hover:enabled {

@@ -120,6 +120,6 @@
     }
 
     td {
-        vertical-align: baseline;
+        vertical-align: top;
     }
 </style>
