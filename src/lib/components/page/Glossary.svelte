@@ -65,11 +65,11 @@
         {#if keys === null}
             <p>This book has no glossary.</p>
         {:else}
-            <Rows>
+            <dl>
                 {#each keys as id (id)}
                     <DefinitionView {id} definition={glossary[id]} />
                 {/each}
-            </Rows>
+            </dl>
         {/if}
     </Page>
 {/if}

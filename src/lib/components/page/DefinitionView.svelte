@@ -53,9 +53,31 @@
 </script>
 
 {#if $edition}
-    <tr>
-        {#if editable}
-            <td class="delete">
+    <section class="definition">
+        <dt>
+            {#if editable}
+                <TextEditor
+                    text={definition.phrase}
+                    label={'Glossary phrase editor.'}
+                    placeholder="Phrase"
+                    valid={(text) => {
+                        if (text.length === 0) return "Phrase can't be empty";
+                    }}
+                    save={(text) =>
+                        $edition
+                            ? edition.set(
+                                  $edition.withEditedDefinition(id, {
+                                      phrase: text,
+                                      definition: definition.definition,
+                                      synonyms: definition.synonyms,
+                                  })
+                              )
+                            : undefined}
+                />
+            {:else if definition.phrase}{definition.phrase}{:else}<em
+                    >&mdash;</em
+                >{/if}
+            {#if editable}
                 <ConfirmButton
                     tooltip="Delete this glossary entry."
                     commandLabel="x"
@@ -65,36 +87,10 @@
                             ? edition.set($edition.withoutDefinition(id))
                             : undefined}
                 />
-            </td>
-        {/if}
-        <td>
-            <strong>
-                {#if editable}
-                    <TextEditor
-                        text={definition.phrase}
-                        label={'Glossary phrase editor.'}
-                        placeholder="Phrase"
-                        valid={(text) => {
-                            if (text.length === 0)
-                                return "Phrase can't be empty";
-                        }}
-                        save={(text) =>
-                            $edition
-                                ? edition.set(
-                                      $edition.withEditedDefinition(id, {
-                                          phrase: text,
-                                          definition: definition.definition,
-                                          synonyms: definition.synonyms,
-                                      })
-                                  )
-                                : undefined}
-                    />
-                {:else if definition.phrase}{definition.phrase}{:else}<em
-                        >&mdash;</em
-                    >{/if}
-            </strong>
-        </td>
-        <td class="term">
+            {/if}
+        </dt>
+
+        <dd class="term">
             {#if editable && edition}
                 <BookishEditor
                     ast={format}
@@ -159,32 +155,17 @@
             {:else if definition.synonyms !== undefined && definition.synonyms.length > 0}
                 <Note>{definition.synonyms.join(', ')}</Note>
             {/if}
-        </td>
-    </tr>
+        </dd>
+    </section>
 {/if}
 
 <style>
-    td {
-        vertical-align: top;
-        font-family: var(--bookish-paragraph-font-family);
-        font-size: var(--bookish-paragraph-font-size);
+    dd {
+        margin: 0;
+        margin-top: var(--bookish-paragraph-spacing);
     }
 
-    td:first-child {
-        padding-left: 0;
-    }
-
-    td.term {
-        width: 10em;
-        text-align: left;
-    }
-
-    td:nth-child(3) {
-        width: 10em;
-        text-align: right;
-    }
-
-    .delete {
-        width: 5em;
+    dt {
+        font-weight: bold;
     }
 </style>
