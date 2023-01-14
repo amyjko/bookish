@@ -98,6 +98,10 @@
     function handleError() {
         imageError = true;
     }
+
+    function handleClick() {
+        if (claimCaret) claimCaret();
+    }
 </script>
 
 {#if imageError}
@@ -118,6 +122,12 @@
                     class={`bookish-figure-unspecified ${
                         dragging ? 'bookish-figure-dragging' : ''
                     }`}
+                    on:click|preventDefault={handleClick}
+                    tabIndex="0"
+                    on:keydown={(event) =>
+                        event.key === ' ' || event.key === 'Enter'
+                            ? handleClick()
+                            : undefined}
                     on:drop|preventDefault={handleDrop}
                     on:dragover={handleDrag}
                     on:dragleave={handleDragLeave}

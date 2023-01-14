@@ -12,12 +12,11 @@
 
     export let embed: EmbedNode;
 
-    let activeEditor = getCaret();
+    let caret = getCaret();
     let upload: undefined | number | string = undefined;
 
     $: description = embed.getDescription();
     let book = getBook();
-    let caret = getCaret();
 
     function isValidURL(url: string): string | undefined {
         // Is it a valid URL?
@@ -30,7 +29,7 @@
 
     function handleImageChange(event: Event) {
         if ($book === undefined) return;
-        if ($activeEditor === undefined) return;
+        if ($caret === undefined) return;
 
         const target = event.target as HTMLInputElement;
         const file = target.files === null ? undefined : target.files[0];

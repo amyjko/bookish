@@ -24,7 +24,7 @@
     }
 
     // Get the focused editor context
-    let activeEditor = getCaret();
+    let caret = getCaret();
     $: edition = getEdition();
     $: book = getBook();
 </script>
@@ -54,8 +54,8 @@
             </span>
         {/if}
     </nav>
-    {#if $activeEditor}
-        <Toolbar caret={$activeEditor} />
+    {#if $caret}
+        <Toolbar caret={$caret} />
     {/if}
 </section>
 

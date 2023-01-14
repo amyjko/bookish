@@ -803,6 +803,9 @@
 
         // Focus the editor on the new caret location, unless the toolbar is focused.
         if (!toolbarIsFocused()) element?.focus();
+
+        // Update the caret
+        claimActiveEditor();
     }
 
     function editNode(previous: BookishNode, edited: BookishNode) {
@@ -979,13 +982,7 @@
 
     // When the caret context or editor focus changes, update the active editor.
     $: {
-        if (caretRange || editorFocused) updateActiveEditor();
-    }
-
-    function updateActiveEditor() {
-        // If focused, claim it.
-        if (isFocused()) claimActiveEditor();
-        // Otherwise, unset it.
+        if ((caretRange || editorFocused) && isFocused()) claimActiveEditor();
         else activeEditor.set(undefined);
     }
 
