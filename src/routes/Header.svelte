@@ -31,7 +31,7 @@
 
 <section class="header">
     <nav class="navigation">
-        <Link to={getLink('/')}><Icon icon={HomeIcon} /></Link>
+        <Link to={getLink('/')} title="Home"><Icon icon={HomeIcon} /></Link>
         <Link to={getLink('/read')}>Read</Link>
         <Link to={getLink('/write')}>Write</Link>
         {#if $auth?.user && $auth.user.email}

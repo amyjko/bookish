@@ -25,7 +25,7 @@
                         : undefined}
                 chapter={false}
                 component={ChapterBody}
-                placeholder="What this book about?"
+                placeholder="What is this book about?"
             />
         {:else}
             <ChapterBody node={descriptionNode} />
