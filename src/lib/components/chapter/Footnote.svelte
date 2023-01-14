@@ -42,7 +42,7 @@
         <Marginal
             {node}
             id={'footnote-' + number}
-            label="footnote: {content.toBookdown()}"
+            label="footnote, press escape to edit"
         >
             <sup slot="interactor" class="bookish-footnote-symbol">{letter}</sup
             >

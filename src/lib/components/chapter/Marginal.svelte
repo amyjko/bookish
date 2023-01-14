@@ -64,7 +64,7 @@
         editable ? '' : 'interactive'
     }`}
     aria-label={label}
-    tabIndex={editable ? null : 0}
+    tabIndex="0"
     on:mousedown={toggle}
     on:keydown={(event) =>
         event.key === 'Enter' || event.key === ' ' ? toggle() : undefined}
