@@ -212,7 +212,6 @@
             {#each categories as cat}
                 {#if commandsByCategory[cat].length > 0}
                     <ToolbarGroup
-                        linebreak={false}
                         icon={cat in categoryIcons
                             ? categoryIcons[cat]
                             : cat.charAt(0).toUpperCase() + cat.slice(1)}
@@ -246,41 +245,35 @@
                 {/if}
             {/each}
         {/if}
-        {#if metaNode instanceof LinkNode}<ToolbarGroup
-                icon={LinkIcon}
-                linebreak><LinkEditor link={metaNode} /></ToolbarGroup
+        {#if metaNode instanceof LinkNode}<ToolbarGroup icon={LinkIcon}
+                ><LinkEditor link={metaNode} /></ToolbarGroup
             >
-        {:else if metaNode instanceof LabelNode}<ToolbarGroup
-                icon={LabelIcon}
-                linebreak><LabelEditor label={metaNode} /></ToolbarGroup
+        {:else if metaNode instanceof LabelNode}<ToolbarGroup icon={LabelIcon}
+                ><LabelEditor label={metaNode} /></ToolbarGroup
             >
         {:else if metaNode instanceof InlineCodeNode}<ToolbarGroup
-                linebreak
                 icon={CodeIcon}
                 ><InlineCodeEditor code={metaNode} /></ToolbarGroup
             >
         {:else if metaNode instanceof CitationsNode}<ToolbarGroup
-                linebreak
                 icon={CitationIcon}
                 ><CitationsEditor citations={metaNode} /></ToolbarGroup
             >
         {:else if metaNode instanceof DefinitionNode}<ToolbarGroup
-                linebreak
                 icon={DefineIcon}
                 ><DefinitionEditor definition={metaNode} /></ToolbarGroup
             >
         {:else if metaNode instanceof CodeNode && context}<ToolbarGroup
-                linebreak
                 icon={CodeIcon}
                 ><CaptionedCodeEditor code={metaNode} /></ToolbarGroup
             >
-        {:else if calloutNode}<ToolbarGroup icon={CalloutIcon} linebreak
+        {:else if calloutNode}<ToolbarGroup icon={CalloutIcon}
                 ><CalloutEditor callout={calloutNode} /></ToolbarGroup
             >
         {:else if quoteNode}<ToolbarGroup icon={QuoteIcon}
                 ><QuoteEditor quote={quoteNode} /></ToolbarGroup
             >
-        {:else if embedNode}<ToolbarGroup linebreak icon={MediaIcon}
+        {:else if embedNode}<ToolbarGroup icon={MediaIcon}
                 ><EmbedEditor embed={embedNode} /></ToolbarGroup
             >
         {/if}
@@ -292,6 +285,7 @@
         display: flex;
         flex-direction: row;
         flex-wrap: wrap;
+        align-items: baseline;
         background: var(--bookish-background-color);
         padding: var(--app-chrome-padding);
         font-family: var(--app-font);
