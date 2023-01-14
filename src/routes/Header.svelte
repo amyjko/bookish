@@ -12,6 +12,8 @@
     } from '../lib/util/getSubdomain';
     import Toolbar from '$lib/components/editor/Toolbar.svelte';
     import Status from '$lib/components/page/Status.svelte';
+    import HomeIcon from '$lib/components/editor/icons/home.svg?raw';
+    import Icon from '$lib/components/editor/Icon.svelte';
 
     let subdomain = getSubdomain();
 
@@ -29,7 +31,7 @@
 
 <section class="header">
     <nav class="navigation">
-        <Link to={getLink('/')}>Home</Link>
+        <Link to={getLink('/')}><Icon icon={HomeIcon} /></Link>
         <Link to={getLink('/read')}>Read</Link>
         <Link to={getLink('/write')}>Write</Link>
         {#if $auth?.user && $auth.user.email}
