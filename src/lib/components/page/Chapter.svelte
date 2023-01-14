@@ -299,13 +299,11 @@
                                 chapter.asNumbered(on)
                             )}
                     >
-                        {#if chapterNumber !== undefined}
-                            <ChapterNumber
-                                >Chapter {chapterNumber}</ChapterNumber
-                            >
-                        {:else}
-                            <Muted>Unnumbered</Muted>
-                        {/if}
+                        <ChapterNumber
+                            >{#if chapterNumber !== undefined}Chapter {chapterNumber}{:else}<Muted
+                                    >Unnumbered</Muted
+                                >{/if}</ChapterNumber
+                        >
                     </Toggle>
                 {:else if chapterNumber !== undefined}
                     <ChapterNumber>Chapter {chapterNumber}</ChapterNumber>

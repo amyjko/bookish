@@ -80,7 +80,7 @@
 
 <style>
     .bookish-authors {
-        font-family: var(--bookish-paragraph-font-family);
+        font-family: var(--bookish-header-font-family);
         font-style: italic;
         margin-top: 0;
         margin-bottom: var(--bookish-paragraph-spacing);
