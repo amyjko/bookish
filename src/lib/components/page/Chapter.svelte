@@ -341,25 +341,32 @@
         </Instructions>
 
         <!-- Render the chapter body, passing some context -->
-        {#if chapterAST}
-            {#if editable}
-                <BookishEditor
-                    ast={chapterAST}
-                    save={(ast) =>
-                        ast instanceof ChapterNode
-                            ? setChapter(edition, chapter, chapter.withAST(ast))
-                            : undefined}
-                    chapter={true}
-                    autofocus
-                    component={ChapterBody}
-                    placeholder="Type here"
-                />
+        <section class="chapter-content">
+            {#if chapterAST}
+                {#if editable}
+                    <BookishEditor
+                        ast={chapterAST}
+                        save={(ast) =>
+                            ast instanceof ChapterNode
+                                ? setChapter(
+                                      edition,
+                                      chapter,
+                                      chapter.withAST(ast)
+                                  )
+                                : undefined}
+                        chapter={true}
+                        autofocus
+                        component={ChapterBody}
+                        placeholder="Type here"
+                    />
+                {:else}
+                    <ChapterBody node={chapterAST} />
+                {/if}
             {:else}
-                <ChapterBody node={chapterAST} />
+                <span>Loading...</span>
             {/if}
-        {:else}
-            <span>Loading...</span>
-        {/if}
+        </section>
+
         {#if citations && citations.size > 0}
             {@const refs = $edition.getReferences()}
             <Title>References</Title>

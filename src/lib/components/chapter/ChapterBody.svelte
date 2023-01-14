@@ -44,7 +44,8 @@
 
     /* This implements a drop cap in the first letter of the first text in the first format of the first paragraph of a chapter (but only chapters). */
     :global(
-            .bookish-chapter-body
+            .chapter-content
+                .bookish-chapter-body
                 p:first-of-type:not(.placeholder)::first-letter
         ) {
         padding: 0 0.25rem;
