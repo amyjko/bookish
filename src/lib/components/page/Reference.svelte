@@ -91,7 +91,7 @@
             >{/if}.<em
             >&nbsp;{#if reference.source}{reference.source}{:else}Source{/if}</em
         >.
-        {#if reference.summary}<div class="summary">{reference.summary}</div
+        {#if reference.summary}<aside class="summary">{reference.summary}</aside
             >{/if}
     </p>
 {:else}

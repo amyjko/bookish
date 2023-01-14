@@ -29,7 +29,7 @@
     }
 </script>
 
-<tr class={forthcoming ? 'bookish-forthcoming' : ''}>
+<tr class="toc-row" class:forthcoming>
     <td
         ><TableOfContentsImage
             embed={chapter
@@ -38,36 +38,30 @@
         /></td
     >
     <td>
-        <div>
-            {#if editable && chapter}
-                <Toggle
-                    on={number !== undefined}
-                    save={(on) =>
-                        chapter
-                            ? setChapter(
-                                  edition,
-                                  chapter,
-                                  chapter.asNumbered(on)
-                              )
-                            : undefined}
-                >
-                    <ChapterNumber>
-                        {#if number !== undefined}
-                            Chapter {number}
-                        {:else}
-                            <Muted>Unnumbered</Muted>
-                        {/if}
-                    </ChapterNumber>
-                </Toggle>
-            {:else if number !== undefined}
-                <ChapterNumber>{'Chapter ' + number}</ChapterNumber>
-            {/if}
-        </div>
+        {#if editable && chapter}
+            <Toggle
+                on={number !== undefined}
+                save={(on) =>
+                    chapter
+                        ? setChapter(edition, chapter, chapter.asNumbered(on))
+                        : undefined}
+            >
+                <ChapterNumber>
+                    {#if number !== undefined}
+                        Chapter {number}
+                    {:else}
+                        <Muted>Unnumbered</Muted>
+                    {/if}
+                </ChapterNumber>
+            </Toggle>
+        {:else if number !== undefined}
+            <ChapterNumber>{'Chapter ' + number}</ChapterNumber>
+        {/if}
         <ChapterTitle
             link={forthcoming && !editable ? undefined : `${$base}${chapterID}`}
             >{title}</ChapterTitle
         >
-        <div><Muted><em><slot name="annotation" /></em></Muted></div>
+        <p><Muted><em><slot name="annotation" /></em></Muted></p>
     </td>
     <td><slot name="etc" /></td>
     {#if editable && $edition}
@@ -104,7 +98,11 @@
 </tr>
 
 <style>
-    .bookish-forthcoming {
-        opacity: 0.5;
+    .toc-row p {
+        margin: 0;
+    }
+
+    .forthcoming {
+        color: var(--app-muted-color);
     }
 </style>

@@ -53,13 +53,13 @@
             nodeID={node.getCodeNode().nodeID}>{node.getCode()}</Code
         >
     {/if}
-    {#if node.getLanguage() !== 'plaintext'}<div class="bookish-code-language"
-            >{node.getLanguage()}</div
+    {#if node.getLanguage() !== 'plaintext'}<aside class="language"
+            >{node.getLanguage()}</aside
         >{/if}
 </Figure>
 
 <style>
-    .bookish-code-language {
+    .language {
         float: right;
         margin-top: 0;
         font-size: small;

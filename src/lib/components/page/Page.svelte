@@ -58,9 +58,9 @@
 {#if loaded === false}
     <Loading />
 {:else}
-    <div class={'bookish-page' + (loaded ? ' loaded' : '')}>
+    <section class={'bookish-page' + (loaded ? ' loaded' : '')}>
         <slot />
-    </div>
+    </section>
 {/if}
 
 <style>

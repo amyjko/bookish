@@ -54,9 +54,9 @@
                     <Format node={caption} placeholder="caption" />
                 {/if}
                 {#if credit}
-                    <div class="bookish-figure-credit">
+                    <aside class="bookish-figure-credit">
                         <Format node={credit} placeholder="credit" />
-                    </div>
+                    </aside>
                 {/if}
             </figcaption>
         {/if}

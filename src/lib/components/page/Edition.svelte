@@ -159,9 +159,9 @@
     }
 </script>
 
-<div class="bookish {$darkMode ? ' dark' : ''}">
+<main class="bookish {$darkMode ? ' dark' : ''}">
     <slot />
-</div>
+</main>
 
 <style>
     * {

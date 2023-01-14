@@ -30,12 +30,12 @@
     );
 </script>
 
-<div
+<aside
     class={`preview ${position > window.innerHeight / 2 ? 'small' : ''}`}
     style={`${backgroundColor ? `background-color: ${backgroundColor};` : ''}`}
 >
     <ChapterBody node={preview} />
-</div>
+</aside>
 
 <svelte:window bind:scrollY={position} />
 

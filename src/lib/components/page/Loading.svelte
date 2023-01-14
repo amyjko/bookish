@@ -1,4 +1,5 @@
 <div
+    aria-live="polite"
     class={'bookish bookish-loading' +
         (typeof localStorage !== 'undefined' &&
         localStorage.getItem('dark') === 'true'

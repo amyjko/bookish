@@ -39,7 +39,7 @@
     });
 </script>
 
-<div class="bookish-authors" bind:this={authorList}>
+<p class="bookish-authors" bind:this={authorList}>
     {#if authors.length === 0}
         {#if editable && inheritedAuthors !== undefined && inheritedAuthors.length > 0}
             <Note>&nbsp;(book authors)&nbsp;</Note>
@@ -74,7 +74,7 @@
     {#if editable}
         &nbsp;<Button tooltip="Add an author" command={addAuthor}>+</Button>
     {/if}
-</div>
+</p>
 
 <style>
     .bookish-authors {

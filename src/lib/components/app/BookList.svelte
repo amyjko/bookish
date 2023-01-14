@@ -6,11 +6,11 @@
     export let write: boolean;
 </script>
 
-<div class="previews">
+<section class="previews">
     {#each books as book}
         <BookPreview {book} {write} />
     {/each}
-</div>
+</section>
 
 <style>
     .previews {

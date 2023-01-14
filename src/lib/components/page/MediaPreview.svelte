@@ -3,25 +3,25 @@
     export let alt: string;
 </script>
 
-<span class={'bookish-figure-preview'}>
+<figure class={'media-preview'}>
     <img src={url} {alt} />
-    <div class="bookish-figure-credit"><slot /></div>
-</span>
+    <figcaption class="credit"><slot /></figcaption>
+</figure>
 
 <style>
-    .bookish-figure-preview {
+    .media-preview {
         display: inline-block;
         width: 10rem;
         margin: 1em;
         vertical-align: bottom;
     }
 
-    .bookish-figure-preview img {
+    .media-preview img {
         width: 100%;
         height: auto;
     }
 
-    .bookish-figure-credit {
+    .credit {
         display: block;
         text-align: right;
         font-style: italic;

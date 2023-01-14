@@ -12,16 +12,18 @@
 </script>
 
 <Positioned position={node.getPosition()}>
-    <blockquote class={'bookish-blockquote'} data-nodeid={node.nodeID}>
-        {#each node.getBlocks() as element (element.nodeID)}
-            <Block node={element} />
-        {/each}
+    <figure>
+        <blockquote class={'bookish-blockquote'} data-nodeid={node.nodeID}>
+            {#each node.getBlocks() as element (element.nodeID)}
+                <Block node={element} />
+            {/each}
+        </blockquote>
         {#if credit}
-            <div class="bookish-blockquote-caption"
-                ><span><Format node={credit} placeholder="credit" /></span></div
+            <figcaption class="bookish-blockquote-caption"
+                ><Format node={credit} placeholder="credit" /></figcaption
             >
         {/if}
-    </blockquote>
+    </figure>
 </Positioned>
 
 <style>
@@ -44,7 +46,7 @@
         padding: 0;
     }
 
-    .bookish-blockquote .bookish-blockquote-caption {
+    .bookish-blockquote-caption {
         margin-top: 0.5em;
         text-align: right;
         font-family: var(--bookish-header-font-family);

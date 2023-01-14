@@ -14,7 +14,7 @@
     $: blocks = node.getBlocks();
 </script>
 
-<div class="bookish-chapter-body" data-nodeid={node.nodeID}>
+<section class="bookish-chapter-body" data-nodeid={node.nodeID}>
     {#if errors.length > 0}
         <p>
             <Problem
@@ -33,7 +33,7 @@
             <Block node={block} />
         {/each}
     {/if}
-</div>
+</section>
 
 <style>
     /* This accounts for completely empty chapters. */
@@ -44,8 +44,7 @@
 
     /* This implements a drop cap in the first letter of the first text in the first format of the first paragraph of a chapter (but only chapters). */
     :global(
-            .bookish-chapter
-                .bookish-chapter-body
+            .bookish-chapter-body
                 p:first-of-type:not(.placeholder)::first-letter
         ) {
         padding: 0 0.25rem;

@@ -16,7 +16,7 @@
     let expanded = false;
     let dark = getDarkMode();
     let base = getBase();
-    let outline: HTMLDivElement | null = null;
+    let outline: HTMLElement | null = null;
     let headers: Element[] = [];
 
     function toggleExpanded() {
@@ -146,7 +146,7 @@
     let darkLabel = '\u263E';
 </script>
 
-<div
+<nav
     bind:this={outline}
     class={'outline ' +
         (!expanded || collapse ? 'outline-collapsed' : 'outline-expanded')}
@@ -221,7 +221,7 @@
             {/if}
         {/each}
     </div>
-</div>
+</nav>
 
 <style>
     .outline {

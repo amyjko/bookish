@@ -5,7 +5,7 @@
 </script>
 
 {#if editable}
-    <section class="instructions"><slot /></section>
+    <aside class="instructions"><slot /></aside>
 {/if}
 
 <style>

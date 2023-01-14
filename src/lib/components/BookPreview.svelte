@@ -20,7 +20,7 @@
     $: embed = cover === null ? null : Parser.parseEmbed(undefined, cover);
 </script>
 
-<div class="book-preview">
+<article class="book-preview">
     <div class="cover" class:empty={embed === null}>
         {#if embed instanceof EmbedNode}
             <Embed node={embed} imageOnly />
@@ -29,7 +29,7 @@
         {/if}
     </div>
     <div class="content">
-        <div class="title">
+        <h2 class="title">
             {#if subdomain === undefined || write}
                 <Link
                     to={refID === undefined
@@ -39,8 +39,8 @@
             {:else}
                 <Link to={`/${subdomain}`}>{title}</Link>
             {/if}
-        </div>
-        <div class="authors">
+        </h2>
+        <p class="authors">
             {#each authors as author, index}
                 <span
                     >{author}{#if index !== authors.length - 1},&nbsp;{/if}</span
@@ -48,8 +48,8 @@
             {:else}
                 <em>No authors</em>
             {/each}
-        </div>
-        <div class="description">
+        </p>
+        <p class="description">
             {#if description.length === 0}
                 <em>No description</em>
             {:else}
@@ -57,9 +57,9 @@
                     node={Parser.parseChapter(undefined, description)}
                 />
             {/if}
-        </div>
+        </p>
     </div>
-</div>
+</article>
 
 <style>
     .book-preview {
@@ -87,19 +87,25 @@
 
     .content {
         flex: 4;
+        display: flex;
+        flex-direction: column;
+        gap: var(--app-chrome-padding);
     }
 
     .title {
         font-size: 20pt;
+        margin-top: 0;
         margin-bottom: var(--app-chrome-padding);
     }
 
     .authors {
+        margin-top: 0;
         margin-bottom: var(--app-chrome-padding);
         font-style: italic;
     }
 
     .description {
+        margin-top: 0;
         overflow: hidden;
         text-overflow: ellipsis;
         height: 5em;

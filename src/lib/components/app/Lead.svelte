@@ -1,7 +1,7 @@
-<p><slot /></p>
+<h1><slot /></h1>
 
 <style>
-    p {
+    h1 {
         font-family: var(--app-font);
         font-weight: 300;
         font-size: 24pt;

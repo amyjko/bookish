@@ -63,7 +63,7 @@
     }
 </script>
 
-<div class="bookish-chapter-header">
+<header class="bookish-chapter-header">
     {#if embedNode}
         <div class="bookish-figure-full">
             {#if edition && editable && embedNode instanceof EmbedNode}
@@ -131,7 +131,7 @@
             >
         {/if}
     </div>
-</div>
+</header>
 
 <style>
     .bookish-subtitle {

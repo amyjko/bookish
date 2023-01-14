@@ -101,10 +101,10 @@
 </script>
 
 {#if imageError}
-    <div class="bookish-figure-unspecified"
+    <p class="bookish-figure-unspecified"
         >{editable
             ? 'Unable to load image. Is the URL correct? Are you offline?'
-            : 'Unable to load image'}</div
+            : 'Unable to load image'}</p
     >
 {:else}
     <Figure
@@ -114,7 +114,7 @@
     >
         {#if url.trim().length === 0}
             {#if editable}
-                <div
+                <p
                     class={`bookish-figure-unspecified ${
                         dragging ? 'bookish-figure-dragging' : ''
                     }`}
@@ -126,23 +126,21 @@
                         : placeholder.length > 0
                         ? placeholder
                         : 'Click or drag to choose or upload an image, or enter an image or video URL.'}
-                </div>
+                </p>
             {:else}
-                <div class="bookish-figure-unspecified"
-                    >No image or video specified</div
-                >
+                <p class="bookish-figure-unspecified">Missing image or video</p>
             {/if}
         {:else if url.includes('https://www.youtube.com') || url.includes('https://youtu.be') || url.includes('https://www.tiktok.com') || url.includes('vimeo.com')}
-            <div class="bookish-figure-embed">
+            <article class="bookish-figure-embed">
                 <iframe
                     class="bookish-figure-frame"
-                    title="Embedded video content from streaming service"
+                    title={description}
                     src={url}
                     frameBorder="0"
                     allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"
                     allowFullScreen
                 />
-            </div>
+            </article>
         {:else}
             <img
                 class={'bookish-figure-image'}

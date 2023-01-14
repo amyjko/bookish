@@ -13,7 +13,7 @@
 </script>
 
 {#if descriptionNode}
-    <div class="bookish-description">
+    <section class="bookish-description">
         {#if editable}
             <BookishEditor
                 ast={descriptionNode}
@@ -30,5 +30,5 @@
         {:else}
             <ChapterBody node={descriptionNode} />
         {/if}
-    </div>
+    </section>
 {/if}
