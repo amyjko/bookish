@@ -246,29 +246,35 @@
                 {/if}
             {/each}
         {/if}
-        {#if metaNode instanceof LinkNode}<ToolbarGroup icon={LinkIcon}
-                ><LinkEditor link={metaNode} /></ToolbarGroup
+        {#if metaNode instanceof LinkNode}<ToolbarGroup
+                icon={LinkIcon}
+                linebreak><LinkEditor link={metaNode} /></ToolbarGroup
             >
-        {:else if metaNode instanceof LabelNode}<ToolbarGroup icon={LabelIcon}
-                ><LabelEditor label={metaNode} /></ToolbarGroup
+        {:else if metaNode instanceof LabelNode}<ToolbarGroup
+                icon={LabelIcon}
+                linebreak><LabelEditor label={metaNode} /></ToolbarGroup
             >
         {:else if metaNode instanceof InlineCodeNode}<ToolbarGroup
+                linebreak
                 icon={CodeIcon}
                 ><InlineCodeEditor code={metaNode} /></ToolbarGroup
             >
         {:else if metaNode instanceof CitationsNode}<ToolbarGroup
+                linebreak
                 icon={CitationIcon}
                 ><CitationsEditor citations={metaNode} /></ToolbarGroup
             >
         {:else if metaNode instanceof DefinitionNode}<ToolbarGroup
+                linebreak
                 icon={DefineIcon}
                 ><DefinitionEditor definition={metaNode} /></ToolbarGroup
             >
         {:else if metaNode instanceof CodeNode && context}<ToolbarGroup
+                linebreak
                 icon={CodeIcon}
                 ><CaptionedCodeEditor code={metaNode} /></ToolbarGroup
             >
-        {:else if calloutNode}<ToolbarGroup icon={CalloutIcon}
+        {:else if calloutNode}<ToolbarGroup icon={CalloutIcon} linebreak
                 ><CalloutEditor callout={calloutNode} /></ToolbarGroup
             >
         {:else if quoteNode}<ToolbarGroup icon={QuoteIcon}
