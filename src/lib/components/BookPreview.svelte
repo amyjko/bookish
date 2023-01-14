@@ -29,17 +29,13 @@
         {/if}
     </div>
     <div class="content">
-        <h2 class="title">
-            {#if subdomain === undefined || write}
-                <Link
-                    to={refID === undefined
-                        ? ''
-                        : (write ? '/write/' : '/') + refID}>{title}</Link
-                >
-            {:else}
-                <Link to={`/${subdomain}`}>{title}</Link>
-            {/if}
-        </h2>
+        <Link
+            to={subdomain === undefined || write
+                ? refID === undefined
+                    ? ''
+                    : (write ? '/write/' : '/') + refID
+                : `/${subdomain}`}><h2 class="title">{title}</h2></Link
+        >
         <p class="authors">
             {#each authors as author, index}
                 <span
