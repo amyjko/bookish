@@ -35,6 +35,7 @@
             options={entries.map((entry) => [entry.phrase, entry.glossaryID])}
             value={definition.getMeta()}
             changed={handleChange}
+            label="choose definition"
         />
         {#if !(definition.getMeta() in glossary)}
             <Note>Choose a glossary entry.</Note>

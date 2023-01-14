@@ -32,7 +32,7 @@
     }
 
     function validate(urlOrChapter: string): string | undefined {
-        if (urlOrChapter.length === 0) return "Can't be empty.";
+        if (urlOrChapter.length === 0) return "link URL can't be empty";
         if ($edition === undefined) return;
 
         if (isValidURL(urlOrChapter)) return;
@@ -97,6 +97,7 @@
             url = value;
         }}
         value={url}
+        label="link type"
     />
     <URLEditor
         {url}

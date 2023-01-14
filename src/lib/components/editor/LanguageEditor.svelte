@@ -12,5 +12,6 @@
     options={languages.map((lang) => [lang === '' ? 'plaintext' : lang, lang])}
     value={language}
     changed={(lang) => edit(lang)}
+    label="choose language"
 />
 <Note>Choose a programming language to enable syntax highlighting.</Note>

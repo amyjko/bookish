@@ -61,7 +61,7 @@
                     label={'Glossary phrase editor.'}
                     placeholder="Phrase"
                     valid={(text) => {
-                        if (text.length === 0) return "Phrase can't be empty";
+                        if (text.length === 0) return "phrase can't be empty";
                     }}
                     save={(text) =>
                         $edition

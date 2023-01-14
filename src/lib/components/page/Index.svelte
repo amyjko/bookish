@@ -83,30 +83,20 @@
         {:else}
             <p>Pick a letter to browse:</p>
 
-            <p>
+            <nav class="letters">
                 {#each 'abcdefghijklmnopqrstuvwxyz'.split('') as symbol, index}
-                    <span style="display: inline-block">
-                        {#if symbol in letters && letter !== symbol}
-                            <Link to={$base + 'index/' + symbol}>{symbol}</Link>
-                        {:else}
-                            <span>
-                                {#if letter === symbol}
-                                    <strong
-                                        ><span style="font-size: 200%"
-                                            >{symbol}</span
-                                        ></strong
-                                    >
-                                {:else}
-                                    <Muted>{symbol}</Muted>
-                                {/if}
-                            </span>
-                        {/if}
-                        {#if index < 26 - 1}
-                            <span>&sdot;</span>
-                        {/if}
-                    </span>
+                    {#if symbol in letters && letter !== symbol}
+                        <Link to={$base + 'index/' + symbol}>{symbol}</Link>
+                    {:else if letter === symbol}
+                        <strong
+                            ><span style="font-size: 200%">{symbol}</span
+                            ></strong
+                        >
+                    {:else}
+                        <Muted>{symbol}</Muted>
+                    {/if}
                 {/each}
-            </p>
+            </nav>
 
             <Rows>
                 {#each words as word, index}
@@ -152,3 +142,17 @@
         {/if}
     </Page>
 {/if}
+
+<style>
+    tr p {
+        margin-top: 0;
+    }
+
+    .letters {
+        display: flex;
+        flex-direction: row;
+        flex-wrap: nowrap;
+        gap: calc(2 * var(--bookish-inline-padding));
+        align-items: baseline;
+    }
+</style>

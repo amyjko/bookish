@@ -107,7 +107,8 @@
                     placeholder="Citation ID"
                     saveOnExit
                     valid={(text) => {
-                        if (text.length === 0) return "ID can't be empty.";
+                        if (text.length === 0)
+                            return "reference ID can't be empty.";
                         if ($edition && text in $edition.references) {
                             const existing = $edition.references[text];
                             if (

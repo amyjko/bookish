@@ -2,9 +2,10 @@
     export let options: [string, string][];
     export let changed: (value: string) => void;
     export let value: string;
+    export let label: string;
 </script>
 
-<select bind:value on:change={() => changed(value)}>
+<select bind:value on:change={() => changed(value)} aria-label={label}>
     <option value="" selected={value === ''} />
     {#each options as option}
         <option value={option[1]} selected={value === option[1]}

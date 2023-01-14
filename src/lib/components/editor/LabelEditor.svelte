@@ -20,15 +20,16 @@
         label="Chapter label ID"
         placeholder="label ID"
         valid={(id) => {
-            if (id.length === 0) return "Can't be empty";
-            if (!/^[a-z]+$/.test(id)) return 'Can only be a-z';
+            if (id.length === 0) return "label ID can't be empty";
+            if (!/^[a-z]+$/.test(id))
+                return 'lable ID can only be a-z characters';
             // If it's different than what it is and there's already one, then error.
             if (
                 ast &&
                 ast.getLabels().filter((l) => l.getMeta() === id).length >
                     (label.getMeta() === id ? 1 : 0)
             )
-                return 'Another label has this ID';
+                return 'label ID is already used';
         }}
         save={(labelID) => $caret?.edit(label, label.withMeta(labelID))}
         saveOnExit

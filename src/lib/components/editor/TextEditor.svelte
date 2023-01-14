@@ -126,6 +126,7 @@
         role="textbox"
         aria-invalid={error !== undefined}
         aria-label={label}
+        aria-placeholder={label}
         {placeholder}
         on:change={edit}
         on:keydown={handleKeyPress}

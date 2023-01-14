@@ -69,7 +69,9 @@
         {#each embeds as embed}
             <MediaPreview
                 url={embed.getSmallURL()}
-                alt={embed.getDescription()}
+                alt={embed.getDescription() === ''
+                    ? 'no description, image not used'
+                    : embed.getDescription()}
             >
                 <span
                     >{#if editable}{images &&

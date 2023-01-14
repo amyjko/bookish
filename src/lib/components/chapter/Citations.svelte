@@ -39,7 +39,11 @@
 <Atom {node}>
     {#if ast}
         <span class="bookish-citation" data-nodeid={node.nodeID}>
-            <Marginal {node} id={'citation-' + citations.join('-')}>
+            <Marginal
+                {node}
+                id={'citation-' + citations.join('-')}
+                label="citations"
+            >
                 <svelte:fragment slot="interactor">
                     {#each citations as citationID, index}
                         {@const citationNumber =

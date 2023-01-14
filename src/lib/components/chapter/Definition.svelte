@@ -27,7 +27,11 @@
 
 <!-- Error if there's no corresponding entry. -->
 <span class="bookish-definition" data-nodeid={node.nodeID}>
-    <Marginal {node} id={'glossary-' + glossaryID}>
+    <Marginal
+        {node}
+        id={'glossary-' + glossaryID}
+        label="definition: {entry.phrase}"
+    >
         <Text slot="interactor" node={phrase} /><span
             slot="content"
             class="bookish-definition-entry"

@@ -55,10 +55,10 @@
 <Button
     tooltip="convert text to references"
     disabled={text.length === 0}
-    command={handleBulkAdd}>Add bulk references</Button
+    command={handleBulkAdd}>+ bulk references</Button
 >
 <Button tooltip="add empty reference" command={handleEmptyAdd}
-    >Add empty reference</Button
+    >+ reference</Button
 >
 
 <style>

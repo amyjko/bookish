@@ -40,6 +40,7 @@
                 (chapterNode === undefined
                     ? '?'
                     : chapterNode.getComments().indexOf(node))}
+            label="comment: {node.getMeta().toBookdown()}"
         >
             <span slot="interactor" class="bookish-comment-symbol">
                 <Icon icon={CommentIcon} />

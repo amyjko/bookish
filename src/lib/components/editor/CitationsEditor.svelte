@@ -47,7 +47,12 @@
     }
 </script>
 
-<Options {options} bind:value changed={handleSelection} />
+<Options
+    {options}
+    bind:value
+    changed={handleSelection}
+    label="choose citations"
+/>
 {#each citations.getMeta() as citationID}
     {citationID}
     <Button

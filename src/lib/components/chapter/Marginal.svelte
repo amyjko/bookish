@@ -12,6 +12,7 @@
 
     export let node: Node;
     export let id: string;
+    export let label: string;
 
     let hovered = false;
     let chapter = getChapter();
@@ -62,6 +63,7 @@
     } ${isHidden ? '' : 'bookish-marginal-selected'} ${
         editable ? '' : 'interactive'
     }`}
+    aria-label={label}
     tabIndex={editable ? null : 0}
     on:mousedown={toggle}
     on:keydown={(event) =>
