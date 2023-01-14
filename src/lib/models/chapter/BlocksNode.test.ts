@@ -781,10 +781,8 @@ test('Copy/paste', () => {
     // Images
     expect(partialImageCaption?.toBookdown()).toBe(`image`);
     expect(partialImageCredit?.toBookdown()).toBe(`y`);
-    expect(imageCaptionAndCredit?.toBookdown()).toBe(`|nope|nothing|no |my|`);
-    expect(paragraphAndImage?.toBookdown()).toBe(
-        `last.\n\n|nope|nothing|no|Amy|`
-    );
+    expect(imageCaptionAndCredit?.toBookdown()).toBe(`|nope|nothing|image|A|`);
+    expect(paragraphAndImage?.toBookdown()).toBe(`last.\n\n|nope|nothing|no||`);
 
     const imageAndCode = chapter.copyRange({
         start: { node: imageCredit, index: 0 },
@@ -793,7 +791,7 @@ test('Copy/paste', () => {
 
     // Code
     expect(imageAndCode?.toBookdown()).toBe(
-        `|nope|nothing|no image|Amy|\n\n\`js\nlet\n\``
+        `|nope|nothing||Amy|\n\n\`js\nlet\n\``
     );
 
     const partialList = chapter.copyRange({

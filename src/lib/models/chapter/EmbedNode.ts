@@ -208,12 +208,16 @@ export default class EmbedNode extends BlockNode {
     withContentInRange(range: CaretRange): this | undefined {
         if (!this.contains(range.start.node) && !this.contains(range.end.node))
             return this.copy();
-        const newCredit = this.#caption.contains(range.start.node)
-            ? new FormatNode('', [new TextNode()])
-            : this.#credit.withContentInRange(range);
-        const newCaption = this.#credit.contains(range.end.node)
-            ? new FormatNode('', [new TextNode()])
-            : this.#caption.withContentInRange(range);
+        const newCredit =
+            this.#credit.contains(range.end.node) ||
+            this.#credit.contains(range.start.node)
+                ? this.#credit.withContentInRange(range)
+                : new FormatNode('', [new TextNode()]);
+        const newCaption =
+            this.#caption.contains(range.start.node) ||
+            this.#caption.contains(range.end.node)
+                ? this.#caption.withContentInRange(range)
+                : new FormatNode('', [new TextNode()]);
         if (newCaption === undefined || newCredit === undefined) return;
 
         return new EmbedNode(
