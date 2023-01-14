@@ -151,24 +151,6 @@
     class={'outline ' +
         (!expanded || collapse ? 'outline-collapsed' : 'outline-expanded')}
 >
-    <!-- Dark mode toggle -->
-    <div
-        class="outline-reading-mode"
-        role="button"
-        aria-label={$dark === true
-            ? 'Switch to light mode'
-            : 'Switch to dark mode'}
-        tabIndex="0"
-        on:click={toggleReadingMode}
-        on:keydown={(event) => {
-            if (event.key === 'Enter' || event.key === ' ') {
-                toggleReadingMode();
-                event.stopPropagation();
-            }
-        }}
-    >
-        {$dark ? darkLabel : lightLabel}
-    </div>
     <!-- Visual cue of expandability, only visible in footer mode. -->
     <div
         class={'outline-collapse-cue' +
@@ -220,6 +202,24 @@
                 </Link>
             {/if}
         {/each}
+    </div>
+    <!-- Dark mode toggle -->
+    <div
+        class="outline-reading-mode"
+        role="button"
+        aria-label={$dark === true
+            ? 'Switch to light mode'
+            : 'Switch to dark mode'}
+        tabIndex="0"
+        on:click={toggleReadingMode}
+        on:keydown={(event) => {
+            if (event.key === 'Enter' || event.key === ' ') {
+                toggleReadingMode();
+                event.stopPropagation();
+            }
+        }}
+    >
+        {$dark ? darkLabel : lightLabel}
     </div>
 </nav>
 
