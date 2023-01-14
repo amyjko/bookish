@@ -127,9 +127,9 @@
                                         if (numberA === undefined) return -1;
                                         if (numberB === undefined) return 1;
                                         return numberA - numberB;
-                                    } ) as chapterID, index}
+                                    } ) as chapterID}
                                     <!-- Map them to links to the first occurrence in the chapter. -->
-                                    <span>
+                                    <p>
                                         <ChapterNumber
                                             >Chapter {#if $edition.getChapterNumber(chapterID) !== undefined}{$edition.getChapterNumber(
                                                     chapterID
@@ -142,9 +142,7 @@
                                                 chapterID
                                             )}</ChapterTitle
                                         >
-                                        {#if index < bookIndex[word].size - 1}<br
-                                            />{/if}
-                                    </span>
+                                    </p>
                                 {/each}
                             </td>
                         </tr>

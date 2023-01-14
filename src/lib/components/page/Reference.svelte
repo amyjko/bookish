@@ -127,8 +127,7 @@
                               )
                             : undefined}
                     {move}
-                />
-                <br /><Note>determines order, a-z</Note>
+                /><Note>determines order, a-z</Note>
             </td>
         </tr>
         <!-- Authors -->

@@ -59,14 +59,14 @@
                 Add definitions and then link to them in a chapter's text.
             </Instructions>
             <Button tooltip="Add a glossary entry" command={addEmptyDefinition}
-                >Add definition</Button
+                >+</Button
             >
         {/if}
         {#if keys === null}
             <p>This book has no glossary.</p>
         {:else}
             <Rows>
-                {#each keys as id}
+                {#each keys as id (id)}
                     <DefinitionView {id} definition={glossary[id]} />
                 {/each}
             </Rows>

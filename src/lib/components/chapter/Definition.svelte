@@ -37,9 +37,8 @@
                     >{entry.phrase}</strong
                 >: <Format
                     node={Parser.parseFormat($edition, entry.definition)}
-                />{#if entry.synonyms && entry.synonyms.length > 0}<span
-                        class="bookish-definition-entry-synonyms"
-                        ><br /><br />{entry.synonyms.join(', ')}</span
+                />{#if entry.synonyms && entry.synonyms.length > 0}<div
+                        class="synonyms">{entry.synonyms.join(', ')}</div
                     >{/if}{/if}</span
         >
     </Marginal>
@@ -67,8 +66,9 @@
             no-repeat right;
     }
 
-    .bookish-definition-entry .bookish-definition-entry-synonyms {
+    .bookish-definition-entry .synonyms {
         color: var(--bookish-muted-color);
         font-style: italic;
+        margin-top: var(--bookish-paragraph-spacing);
     }
 </style>

@@ -37,12 +37,14 @@
     ).withTextIfEmpty();
 
     function addSynonym() {
-        if ($edition && definition.synonyms) {
-            $edition.withEditedDefinition(id, {
-                phrase: definition.phrase,
-                definition: definition.definition,
-                synonyms: [...definition.synonyms, ''],
-            });
+        if ($edition) {
+            edition.set(
+                $edition.withEditedDefinition(id, {
+                    phrase: definition.phrase,
+                    definition: definition.definition,
+                    synonyms: [...(definition.synonyms ?? []), ''],
+                })
+            );
         }
         newSynonym = true;
     }
@@ -52,6 +54,19 @@
 
 {#if $edition}
     <tr>
+        {#if editable}
+            <td class="delete">
+                <ConfirmButton
+                    tooltip="Delete this glossary entry."
+                    commandLabel="x"
+                    confirmLabel="confirm"
+                    command={() =>
+                        $edition
+                            ? edition.set($edition.withoutDefinition(id))
+                            : undefined}
+                />
+            </td>
+        {/if}
         <td>
             <strong>
                 {#if editable}
@@ -75,22 +90,11 @@
                                 : undefined}
                     />
                 {:else if definition.phrase}{definition.phrase}{:else}<em
-                        >Phrase</em
+                        >&mdash;</em
                     >{/if}
             </strong>
-            {#if editable}
-                <br /><ConfirmButton
-                    tooltip="Delete this glossary entry."
-                    commandLabel="x delete"
-                    confirmLabel="confirm"
-                    command={() =>
-                        $edition
-                            ? edition.set($edition.withoutDefinition(id))
-                            : undefined}
-                />
-            {/if}
         </td>
-        <td>
+        <td class="term">
             {#if editable && edition}
                 <BookishEditor
                     ast={format}
@@ -106,18 +110,17 @@
                             : undefined}
                     chapter={false}
                     component={Format}
-                    placeholder="How would you define this?"
+                    placeholder="write a definition"
                 />
             {:else if definition.definition === ''}
                 <em>Definition</em>
             {:else}
                 <Format node={format} />
             {/if}
-            <br />
             {#if edition && editable}
                 <span bind:this={synonymsEditor}>
                     {#if syns.length === 0}
-                        <Note>No synonyms</Note>
+                        <Note>no synonyms</Note>
                     {:else}
                         {#each syns as syn, index}
                             <Note>
@@ -150,9 +153,8 @@
                             {#if syns.length > 1 && index < syns.length - 1},&nbsp;{/if}
                         {/each}
                     {/if}
-                </span>&nbsp;<Button
-                    tooltip="Add a synonym of this glossary entry"
-                    command={addSynonym}>+</Button
+                </span>&nbsp;<Button tooltip="Add synonym" command={addSynonym}
+                    >+</Button
                 >
             {:else if definition.synonyms !== undefined && definition.synonyms.length > 0}
                 <Note>{definition.synonyms.join(', ')}</Note>
@@ -168,7 +170,11 @@
         font-size: var(--bookish-paragraph-font-size);
     }
 
-    td:nth-child(1) {
+    td:first-child {
+        padding-left: 0;
+    }
+
+    td.term {
         width: 10em;
         text-align: left;
     }
@@ -176,5 +182,9 @@
     td:nth-child(3) {
         width: 10em;
         text-align: right;
+    }
+
+    .delete {
+        width: 5em;
     }
 </style>

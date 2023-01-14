@@ -42,6 +42,5 @@
                     : undefined}
             saveOnExit={true}
         />
-        <br />
     </Muted>
 {/if}

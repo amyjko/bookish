@@ -23,7 +23,7 @@
         border-spacing: 0;
     }
 
-    table :global(td) {
+    table :global(td:not(:first-of-type)) {
         padding: var(--app-chrome-padding);
         vertical-align: top;
         font-family: var(--app-font);
