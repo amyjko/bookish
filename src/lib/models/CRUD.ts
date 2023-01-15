@@ -1,4 +1,4 @@
-import { db, functions } from './Firebase';
+import { auth, db, functions } from './Firebase';
 import {
     collection,
     getDocs,
@@ -11,7 +11,7 @@ import {
     deleteDoc,
     DocumentReference,
 } from 'firebase/firestore';
-import { getFunctions, httpsCallable } from 'firebase/functions';
+import { httpsCallable } from 'firebase/functions';
 import Edition from './book/Edition';
 import type { EditionSpecification } from './book/Edition';
 import Book from './book/Book';
@@ -39,12 +39,21 @@ export async function getUserBooks(userID: string): Promise<Book[] | null> {
         throw Error("Can't retrieve user's books, not connected to Firebase.");
 
     try {
+        // Find books that this user has access to.
         const books = await getDocs(
             query(
                 collection(db, 'books'),
                 where('uids', 'array-contains', userID)
             )
         );
+
+        // const editions = await getDocs(
+        //     query(
+        //         collection(db, 'editions'),
+        //         where('uids', 'array-contains', userID)
+        //     )
+        // );
+
         return books.docs.map((doc) =>
             Book.fromJSON(doc.ref, doc.data() as BookSpecification)
         );
@@ -52,6 +61,40 @@ export async function getUserBooks(userID: string): Promise<Book[] | null> {
         console.error(err);
         return null;
     }
+}
+
+export async function getUserEmails(
+    uids: string[]
+): Promise<Record<string, string> | null> {
+    if (!functions)
+        throw Error("Can't publish, no connection to Firebase functions.");
+
+    const getUserEmails = httpsCallable<
+        { uids: string[] },
+        Record<string, string>
+    >(functions, 'getUserEmails');
+
+    const result = await getUserEmails({
+        uids,
+    });
+
+    return result.data;
+}
+
+export async function createUser(email: string): Promise<string | null> {
+    if (!functions)
+        throw Error("Can't publish, no connection to Firebase functions.");
+
+    const createUserWithEmail = httpsCallable<{ email: string }, string>(
+        functions,
+        'createUserWithEmail'
+    );
+
+    const result = await createUserWithEmail({
+        email,
+    });
+
+    return result.data;
 }
 
 export async function getBookFromIDOrName(
@@ -185,7 +228,7 @@ export async function createNewEdition(book: Book): Promise<Book> {
         published: false,
     });
 
-    book = book.withRevisions(revisions);
+    book = book.withEditions(revisions);
 
     // Return the revised Book's revision.'
     updateBook(book);

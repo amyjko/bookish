@@ -120,6 +120,43 @@ export const deleteThumbnail = functions.storage
         return await bucket.file(thumbFilePath).delete();
     });
 
+export const getUserEmails = functions.https.onCall(
+    async (data: { uids: string[] }): Promise<Record<string, string>> => {
+        const uids = data.uids;
+
+        const users = await admin.auth().getUsers(
+            uids.map((uid) => {
+                return { uid };
+            })
+        );
+
+        const map: Record<string, string> = {};
+        users.users.forEach((user) => {
+            map[user.uid] = user.email ?? '';
+        });
+
+        return map;
+    }
+);
+
+export const createUserWithEmail = functions.https.onCall(
+    async (data: { email: string }): Promise<string | null> => {
+        // First try to get the user, in case they already exist.
+        try {
+            const existingUser = await admin.auth().getUserByEmail(data.email);
+            return existingUser.uid;
+        } catch (_) {}
+
+        try {
+            const user = await admin.auth().createUser({ email: data.email });
+            return user.uid;
+        } catch (error) {
+            console.log(error);
+            return null;
+        }
+    }
+);
+
 export const publishEdition = functions.https.onCall(
     async (data: { book: string; edition: string }) => {
         const { edition: editionID } = data;

@@ -14,6 +14,7 @@ export type ChapterSpecification = {
     forthcoming: boolean;
     section?: string;
     text?: string;
+    uids: string[];
 };
 
 export type ChapterContent = {
@@ -37,6 +38,7 @@ export default class Chapter {
     readonly forthcoming: boolean;
     readonly section: string | undefined;
     readonly text: string;
+    readonly uids: string[];
 
     // Derived values
     _ast: ChapterNode | undefined = undefined;
@@ -61,7 +63,8 @@ export default class Chapter {
         numbered: boolean,
         forthcoming: boolean,
         section: string | undefined,
-        text: string
+        text: string,
+        uids: string[]
     ) {
         this.ref = ref;
         this.id = id;
@@ -72,6 +75,7 @@ export default class Chapter {
         this.forthcoming = forthcoming;
         this.section = section;
         this.text = text;
+        this.uids = uids;
     }
 
     /**
@@ -90,7 +94,8 @@ export default class Chapter {
             spec.numbered === true || spec.numbered === undefined,
             spec.forthcoming === true,
             spec.section,
-            spec.text ?? text
+            spec.text ?? text,
+            spec.uids
         );
     }
 
@@ -104,6 +109,7 @@ export default class Chapter {
             image: this.image,
             numbered: this.numbered,
             forthcoming: this.forthcoming,
+            uids: this.uids,
         };
         if (this.ref) json.ref = this.ref;
         if (this.section) json.section = this.section;
@@ -112,6 +118,21 @@ export default class Chapter {
 
     getRef() {
         return this.ref;
+    }
+
+    withEditors(uids: string[]) {
+        return new Chapter(
+            this.ref,
+            this.id,
+            this.title,
+            this.authors,
+            this.image,
+            this.numbered,
+            this.forthcoming,
+            this.section,
+            this.text,
+            uids
+        );
     }
 
     withRef(ref: DocumentReference) {
@@ -124,7 +145,8 @@ export default class Chapter {
             this.numbered,
             this.forthcoming,
             this.section,
-            this.text
+            this.text,
+            this.uids
         );
     }
 
@@ -138,7 +160,8 @@ export default class Chapter {
             this.numbered,
             this.forthcoming,
             this.section,
-            this.text
+            this.text,
+            this.uids
         );
     }
 
@@ -156,7 +179,8 @@ export default class Chapter {
             this.numbered,
             this.forthcoming,
             this.section,
-            this.text
+            this.text,
+            this.uids
         );
     }
 
@@ -174,7 +198,8 @@ export default class Chapter {
             this.numbered,
             this.forthcoming,
             section,
-            this.text
+            this.text,
+            this.uids
         );
     }
 
@@ -192,7 +217,8 @@ export default class Chapter {
             this.numbered,
             forthcoming,
             this.section,
-            this.text
+            this.text,
+            this.uids
         );
     }
 
@@ -210,7 +236,8 @@ export default class Chapter {
             numbered,
             this.forthcoming,
             this.section,
-            this.text
+            this.text,
+            this.uids
         );
     }
 
@@ -228,7 +255,8 @@ export default class Chapter {
             this.numbered,
             this.forthcoming,
             this.section,
-            text
+            text,
+            this.uids
         );
     }
 
@@ -242,7 +270,8 @@ export default class Chapter {
             this.numbered,
             this.forthcoming,
             this.section,
-            ast.toBookdown()
+            ast.toBookdown(),
+            this.uids
         );
         newChapter._ast = ast;
         return newChapter;
@@ -262,7 +291,8 @@ export default class Chapter {
             this.numbered,
             this.forthcoming,
             this.section,
-            this.text
+            this.text,
+            this.uids
         );
     }
 
@@ -281,7 +311,8 @@ export default class Chapter {
             this.numbered,
             this.forthcoming,
             this.section,
-            this.text
+            this.text,
+            this.uids
         );
     }
 
@@ -296,7 +327,8 @@ export default class Chapter {
             this.numbered,
             this.forthcoming,
             this.section,
-            this.text
+            this.text,
+            this.uids
         );
     }
 
@@ -313,7 +345,8 @@ export default class Chapter {
             this.numbered,
             this.forthcoming,
             this.section,
-            this.text
+            this.text,
+            this.uids
         );
     }
 
@@ -331,7 +364,8 @@ export default class Chapter {
             this.numbered,
             this.forthcoming,
             this.section,
-            this.text
+            this.text,
+            this.uids
         );
     }
 

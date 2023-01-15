@@ -15,6 +15,7 @@
     import Problem from '../chapter/Problem.svelte';
     import {
         CHAPTER,
+        getAuth,
         getBook,
         getEdition,
         isEditable,
@@ -30,6 +31,8 @@
     import ChapterNode from '$lib/models/chapter/ChapterNode';
     import Muted from './Muted.svelte';
     import Title from './Title.svelte';
+    import PageHeader from './PageHeader.svelte';
+    import Permissions from '../editor/Permissions.svelte';
 
     export let chapter: ChapterModel;
     export let print: boolean = false;
@@ -37,6 +40,7 @@
     let book = getBook();
     let edition = getEdition();
     let editable = isEditable();
+    let auth = getAuth();
 
     // Keep track of the scroll position to facilitate reading during reloads.
     function rememberPosition() {
@@ -387,6 +391,20 @@
                     {/if}
                 {/each}
             </ol>
+        {/if}
+
+        {#if editable}
+            <PageHeader>Chapter Editors</PageHeader>
+            <Instructions>These emails can edit this chapter.</Instructions>
+
+            <Permissions
+                uids={chapter.uids}
+                writable={$auth?.user?.uid !== undefined &&
+                    chapter.uids.includes($auth?.user?.uid)}
+                emptyMessage="No editors for this specific chapter. Edition and book-level editors can still edit."
+                change={(uids) =>
+                    setChapter(edition, chapter, chapter.withEditors(uids))}
+            />
         {/if}
     </Page>
 {/if}

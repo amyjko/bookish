@@ -383,7 +383,8 @@ export default class Edition {
             true,
             false,
             undefined,
-            ''
+            '',
+            []
         );
         return this.withChapters([...this.chapters, newChapter]);
     }
@@ -661,6 +662,27 @@ export default class Edition {
             ...this.authors.slice(0, index),
             ...this.authors.slice(index + 1),
         ]);
+    }
+
+    withEditors(uids: string[]) {
+        return new Edition(
+            this.bookRef,
+            this.editionRef,
+            uids,
+            this.title,
+            this.authors,
+            this.images,
+            this.description,
+            this.chapters,
+            this.license,
+            this.acknowledgements,
+            this.tags,
+            this.sources,
+            this.references,
+            this.symbols,
+            this.glossary,
+            this.theme
+        );
     }
 
     hasImage(id: string) {

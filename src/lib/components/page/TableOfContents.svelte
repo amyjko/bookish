@@ -16,6 +16,7 @@
     import TextEditor from '$lib/components/editor/TextEditor.svelte';
     import Toggle from '$lib/components/editor/Toggle.svelte';
     import {
+        getAuth,
         getBase,
         getBook,
         getEdition,
@@ -28,11 +29,13 @@
     import Rows from './Rows.svelte';
     import PageParagraph from './PageParagraph.svelte';
     import Note from '../editor/Note.svelte';
+    import Permissions from '../editor/Permissions.svelte';
 
     let book = getBook();
     let edition = getEdition();
     let base = getBase();
     let editable = isEditable();
+    let auth = getAuth();
 
     function getProgressDescription(progress: null | number) {
         if (progress === null) return '';
@@ -280,5 +283,43 @@
         </PageParagraph>
 
         <Revisions />
+
+        {#if editable && $book}
+            <PageHeader
+                >{$edition.getEditionLabel($book)} Edition Editors</PageHeader
+            >
+            <Instructions>
+                These emails can edit this edition and its chapters. (If you
+                want to give someone permissions to edit a specific chapter in a
+                specific edition, navigate to the chapter and edit permissions
+                there.)
+            </Instructions>
+
+            <Permissions
+                uids={$edition.uids}
+                writable={$auth?.user?.uid !== undefined &&
+                    $edition.uids.includes($auth.user.uid)}
+                emptyMessage="No editors for this specific-edition; only book-level editors can edit it."
+                change={(uids) =>
+                    $edition
+                        ? edition.set($edition.withEditors(uids))
+                        : undefined}
+            />
+
+            <PageHeader>Book Editors</PageHeader>
+            <Instructions>
+                These emails can edit any aspect of the book and any of its
+                editions.
+            </Instructions>
+
+            <Permissions
+                uids={$book.uids}
+                writable={$auth?.user?.uid !== undefined &&
+                    $book.uids.includes($auth.user.uid)}
+                emptyMessage="No book editors; this is concerning, since a book should always have at least one editor."
+                change={(uids) =>
+                    $book ? book.set($book.withEditors(uids)) : undefined}
+            />
+        {/if}
     </Page>
 {/if}

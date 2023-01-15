@@ -219,7 +219,20 @@ export default class Book {
         return this.editions.filter((edition) => edition.published).length;
     }
 
-    withRevisions(revisions: EditionInfo[]) {
+    withEditors(uids: string[]) {
+        return new Book(
+            this.ref,
+            this.title,
+            this.authors,
+            this.description,
+            this.cover,
+            this.editions,
+            this.domain,
+            uids
+        );
+    }
+
+    withEditions(revisions: EditionInfo[]) {
         return new Book(
             this.ref,
             this.title,
@@ -235,7 +248,7 @@ export default class Book {
     withEditionSummary(summary: string, index: number) {
         if (index < 0 || index >= this.editions.length) return this;
         const revision = this.editions[index];
-        return this.withRevisions([
+        return this.withEditions([
             ...this.editions.slice(0, index),
             {
                 ref: revision.ref,
@@ -251,7 +264,7 @@ export default class Book {
         if (editionNumber < 0 || editionNumber >= this.editions.length)
             return this;
         const revision = this.editions[editionNumber];
-        return this.withRevisions([
+        return this.withEditions([
             ...this.editions.slice(0, editionNumber),
             {
                 ref: revision.ref,
