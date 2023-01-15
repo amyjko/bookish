@@ -1,6 +1,7 @@
 import { initializeApp } from 'firebase/app';
 import { connectAuthEmulator, getAuth } from 'firebase/auth';
 import { connectFirestoreEmulator, getFirestore } from 'firebase/firestore';
+import { connectFunctionsEmulator, getFunctions } from 'firebase/functions';
 import { connectStorageEmulator, getStorage } from 'firebase/storage';
 
 const isReader = import.meta.env.VITE_READER === 'true';
@@ -21,9 +22,11 @@ export const app = isReader
 export const auth = isReader ? undefined : getAuth();
 export const db = isReader ? undefined : getFirestore();
 export const storage = isReader ? undefined : getStorage();
+export const functions = isReader ? undefined : getFunctions();
 
 if (!isReader && import.meta.env.DEV) {
     if (db) connectFirestoreEmulator(db, 'localhost', 8080);
     if (auth) connectAuthEmulator(auth, 'http://localhost:9099');
     if (storage) connectStorageEmulator(storage, 'localhost', 9199);
+    if (functions) connectFunctionsEmulator(functions, 'localhost', 5001);
 }

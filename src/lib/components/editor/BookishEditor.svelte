@@ -1038,7 +1038,7 @@
 
 <style>
     .bookish-editor {
-        min-height: 2em;
+        min-height: 1em;
     }
 
     .bookish-editor:focus {

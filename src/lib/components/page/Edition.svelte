@@ -3,7 +3,7 @@
     import type EditionModel from '$lib/models/book/Edition';
     import smoothscroll from 'smoothscroll-polyfill';
     import { goto } from '$app/navigation';
-    import { setContext } from 'svelte';
+    import { onMount, setContext } from 'svelte';
     import { writable } from 'svelte/store';
     import {
         BASE,
@@ -15,7 +15,7 @@
     import { BookishTheme } from '$lib/models/book/Theme';
 
     // Poly fill smooth scrolling for Safari.
-    smoothscroll.polyfill();
+    onMount(() => smoothscroll.polyfill());
 
     // True if the edition should be editable. Distributed as context.
     export let editable: boolean = false;
@@ -51,18 +51,25 @@
 
     // When dark mode changes, update the body's class list.
     $: {
-        if ($darkMode) document.body.classList.add('dark');
-        else document.body.classList.remove('dark');
-        if (typeof localStorage !== 'undefined')
-            localStorage.setItem('dark', $darkMode ? 'true' : 'false');
+        if (typeof document !== 'undefined') {
+            if ($darkMode) document.body.classList.add('dark');
+            else document.body.classList.remove('dark');
+            if (typeof localStorage !== 'undefined')
+                localStorage.setItem('dark', $darkMode ? 'true' : 'false');
+
+            // Set the theme, whatever it is, and change it when the edition changes
+            setTheme(edition.getTheme() ?? BookishTheme);
+        }
     }
+
+    // Set the theme on mount.
+    onMount(() => {
+        setTheme(edition.getTheme() ?? BookishTheme);
+    });
 
     // Redirect old hash routes by simply replacing their hash before routing.
     if (typeof window !== 'undefined' && window.location.hash.startsWith('#/'))
         goto(location.hash.replace('#', ''));
-
-    // Set the theme, whatever it is, and change it when the edition changes.
-    $: setTheme(edition.getTheme() ?? BookishTheme);
 
     /** Given a theme, sets the appropriate CSS rules in the browser to apply the theme.*/
     function setTheme(theme: Theme | null) {

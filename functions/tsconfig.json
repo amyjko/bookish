@@ -1,6 +1,8 @@
 {
     "compilerOptions": {
-        "module": "commonjs",
+        "module": "ESNext",
+        "esModuleInterop": true,
+        "moduleResolution": "node",
         "noImplicitReturns": true,
         "noUnusedLocals": true,
         "outDir": "lib",

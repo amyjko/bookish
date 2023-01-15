@@ -1,9 +1,9 @@
 import type { DocumentReference } from 'firebase/firestore';
-import { readEdition, updateBook } from '../CRUD';
+import { readEdition } from '../CRUD';
 import BookMedia from './BookMedia';
 import type Edition from './Edition';
 
-export type Revision = {
+export type EditionInfo = {
     ref: DocumentReference;
     time: number;
     summary: string;
@@ -17,7 +17,7 @@ export type BookSpecification = {
     description: string;
     cover: string | null;
     // A list of editions
-    revisions: Revision[];
+    editions: EditionInfo[];
     // An optional subdomain
     domain?: string;
     // A list of user ids that have access to edit the book.
@@ -30,7 +30,7 @@ export default class Book {
     readonly authors: string[];
     readonly description: string;
     readonly cover: string | null;
-    readonly revisions: Revision[];
+    readonly editions: EditionInfo[];
     readonly domain: string | undefined;
     readonly uids: string[];
 
@@ -42,7 +42,7 @@ export default class Book {
         authors: string[],
         description: string,
         cover: string | null,
-        revisions: Revision[],
+        revisions: EditionInfo[],
         domain: string | undefined,
         uids: string[]
     ) {
@@ -51,7 +51,7 @@ export default class Book {
         this.authors = authors;
         this.description = description;
         this.cover = cover;
-        this.revisions = revisions;
+        this.editions = revisions;
         this.domain = domain;
         this.uids = uids;
 
@@ -69,7 +69,7 @@ export default class Book {
             book.authors,
             book.description,
             book.cover,
-            book.revisions,
+            book.editions,
             book.domain,
             book.uids
         );
@@ -81,7 +81,7 @@ export default class Book {
             authors: this.authors,
             description: this.description,
             cover: this.cover,
-            revisions: this.revisions,
+            editions: this.editions,
             uids: this.uids,
         };
         if (this.domain !== undefined) json.domain = this.domain;
@@ -99,7 +99,7 @@ export default class Book {
             this.authors,
             this.description,
             this.cover,
-            this.revisions,
+            this.editions,
             domain.length === 0 ? undefined : domain,
             this.uids
         );
@@ -116,7 +116,7 @@ export default class Book {
             this.authors,
             this.description,
             this.cover,
-            this.revisions,
+            this.editions,
             this.domain,
             this.uids
         );
@@ -133,7 +133,7 @@ export default class Book {
             this.authors,
             description,
             this.cover,
-            this.revisions,
+            this.editions,
             this.domain,
             this.uids
         );
@@ -150,7 +150,7 @@ export default class Book {
             this.authors,
             this.description,
             cover,
-            this.revisions,
+            this.editions,
             this.domain,
             this.uids
         );
@@ -167,7 +167,7 @@ export default class Book {
             authors,
             this.description,
             this.cover,
-            this.revisions,
+            this.editions,
             this.domain,
             this.uids
         );
@@ -182,9 +182,9 @@ export default class Book {
     }
 
     getDraftEdition(): undefined | Promise<Edition> {
-        return this.revisions.length === 0
+        return this.editions.length === 0
             ? undefined
-            : readEdition(this.revisions[0].ref.id);
+            : readEdition(this.editions[0].ref.id);
     }
 
     isValidEditionNumber(edition: number) {
@@ -193,11 +193,9 @@ export default class Book {
 
     /* Note: editions are numbered 1-n, but stored in reverse chronological order. */
     getEditionNumber(number: number) {
-        return number < 1 || number > this.revisions.length
+        return number < 1 || number > this.editions.length
             ? undefined
-            : readEdition(
-                  this.revisions[this.revisions.length - number].ref.id
-              );
+            : readEdition(this.editions[this.editions.length - number].ref.id);
     }
 
     getLatestPublishedEdition(): undefined | Promise<Edition> {
@@ -206,18 +204,22 @@ export default class Book {
     }
 
     getLatestPublishedEditionID() {
-        return this.revisions.find((e) => e.published)?.ref.id;
+        return this.editions.find((e) => e.published)?.ref.id;
     }
 
     getLatestEditionID(): string | undefined {
-        return this.revisions[0]?.ref.id;
+        return this.editions[0]?.ref.id;
     }
 
-    getRevisions() {
-        return this.revisions.slice();
+    getEditions() {
+        return this.editions.slice();
     }
 
-    withRevisions(revisions: Revision[]) {
+    getPublishedEditionCount() {
+        return this.editions.filter((edition) => edition.published).length;
+    }
+
+    withRevisions(revisions: EditionInfo[]) {
         return new Book(
             this.ref,
             this.title,
@@ -231,38 +233,39 @@ export default class Book {
     }
 
     withEditionSummary(summary: string, index: number) {
-        if (index < 0 || index >= this.revisions.length) return this;
-        const revision = this.revisions[index];
+        if (index < 0 || index >= this.editions.length) return this;
+        const revision = this.editions[index];
         return this.withRevisions([
-            ...this.revisions.slice(0, index),
+            ...this.editions.slice(0, index),
             {
                 ref: revision.ref,
                 time: revision.time,
                 summary,
                 published: revision.published,
             },
-            ...this.revisions.slice(index + 1),
+            ...this.editions.slice(index + 1),
         ]);
     }
 
-    asPublished(published: boolean, index: number) {
-        if (index < 0 || index >= this.revisions.length) return this;
-        const revision = this.revisions[index];
+    withEditionAsPublished(published: boolean, editionNumber: number) {
+        if (editionNumber < 0 || editionNumber >= this.editions.length)
+            return this;
+        const revision = this.editions[editionNumber];
         return this.withRevisions([
-            ...this.revisions.slice(0, index),
+            ...this.editions.slice(0, editionNumber),
             {
                 ref: revision.ref,
                 time: revision.time,
                 summary: revision.summary,
                 published,
             },
-            ...this.revisions.slice(index + 1),
+            ...this.editions.slice(editionNumber + 1),
         ]);
     }
 
     hasPublishedEdition() {
         return (
-            this.revisions.find((revision) => revision.published) !== undefined
+            this.editions.find((revision) => revision.published) !== undefined
         );
     }
 }

@@ -15,13 +15,21 @@
     import Authors from '$lib/components/page/Authors.svelte';
     import TextEditor from '$lib/components/editor/TextEditor.svelte';
     import Toggle from '$lib/components/editor/Toggle.svelte';
-    import { getBase, getEdition, isEditable, setChapter } from './Contexts';
+    import {
+        getBase,
+        getBook,
+        getEdition,
+        isEditable,
+        setChapter,
+    } from './Contexts';
     import Muted from './Muted.svelte';
     import Button from '../app/Button.svelte';
     import PageHeader from './PageHeader.svelte';
     import Rows from './Rows.svelte';
     import PageParagraph from './PageParagraph.svelte';
+    import Note from '../editor/Note.svelte';
 
+    let book = getBook();
     let edition = getEdition();
     let base = getBase();
     let editable = isEditable();
@@ -60,7 +68,7 @@
     }
 </script>
 
-{#if $edition}
+{#if $edition && $book}
     <Page title={$edition.getTitle()}>
         <Header
             label="Book title"
@@ -85,20 +93,26 @@
                 previous={null}
                 next={$edition.getNextChapterID('')}
             />
-            <Authors
-                slot="after"
-                authors={$edition.getAuthors()}
-                add={() =>
-                    $edition ? edition.set($edition.withAuthor('')) : undefined}
-                edit={(index, text) =>
-                    $edition
-                        ? edition.set($edition.withAuthorName(index, text))
-                        : undefined}
-                remove={(index) =>
-                    $edition
-                        ? edition.set($edition.withoutAuthor(index))
-                        : undefined}
-            />
+            <div slot="after">
+                <Authors
+                    authors={$edition.getAuthors()}
+                    add={() =>
+                        $edition
+                            ? edition.set($edition.withAuthor(''))
+                            : undefined}
+                    edit={(index, text) =>
+                        $edition
+                            ? edition.set($edition.withAuthorName(index, text))
+                            : undefined}
+                    remove={(index) =>
+                        $edition
+                            ? edition.set($edition.withoutAuthor(index))
+                            : undefined}
+                />
+                {#if $book.getPublishedEditionCount() > 1}
+                    <Note>{$edition.getEditionLabel($book)} edition</Note>
+                {/if}
+            </div>
         </Header>
 
         <Instructions>

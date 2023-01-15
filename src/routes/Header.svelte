@@ -23,7 +23,6 @@
         return subdomain !== undefined ? pathWithoutSubdomain(path) : path;
     }
 
-    // Get the focused editor context
     let caret = getCaret();
     $: edition = getEdition();
     $: book = getBook();

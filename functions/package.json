@@ -1,5 +1,6 @@
 {
     "name": "functions",
+    "type": "module",
     "scripts": {
         "lint": "eslint --ext .js,.ts .",
         "build": "tsc",
@@ -16,8 +17,8 @@
     "main": "lib/index.js",
     "dependencies": {
         "@google-cloud/storage": "^6.5.2",
-        "child-process-promise": "^2.2.1",
-        "firebase-admin": "^10.0.2",
+        "bookish-press": "latest",
+        "firebase-admin": "^11.4.1",
         "firebase-functions": "^4.1.1"
     },
     "devDependencies": {

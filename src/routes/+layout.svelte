@@ -21,6 +21,7 @@
     import type CaretState from '../lib/components/editor/CaretState';
     import BookSaveStatus from '../lib/models/book/BookSaveStatus';
     import { updateBook, updateEdition } from '../lib/models/CRUD';
+    import { page } from '$app/stores';
 
     // A global store context for the focused editor, used to display toolbar.
     let caret = writable<CaretState | undefined>(undefined);
@@ -149,7 +150,9 @@
 {:else}
     <div class="bookish-app">
         <Auth>
-            <Header />
+            {#if $page.route.id !== null && !$page.route.id.startsWith('/[bookid]')}
+                <Header />
+            {/if}
             <slot />
             <Footer />
         </Auth>

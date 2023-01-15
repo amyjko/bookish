@@ -1,4 +1,4 @@
-import { db } from './Firebase';
+import { db, functions } from './Firebase';
 import {
     collection,
     getDocs,
@@ -11,11 +11,11 @@ import {
     deleteDoc,
     DocumentReference,
 } from 'firebase/firestore';
+import { getFunctions, httpsCallable } from 'firebase/functions';
 import Edition from './book/Edition';
 import type { EditionSpecification } from './book/Edition';
 import Book from './book/Book';
 import type { BookSpecification } from './book/Book';
-import type Chapter from './book/Chapter';
 import type { ChapterContent } from './book/Chapter';
 
 export async function getPublishedBooks(): Promise<Book[]> {
@@ -136,7 +136,7 @@ export const createBook = async (userID: string): Promise<string> => {
         authors: [],
         description: '',
         cover: null,
-        revisions: [
+        editions: [
             {
                 ref: editionRef,
                 time: Date.now(),
@@ -177,7 +177,7 @@ export async function createNewEdition(book: Book): Promise<Book> {
     updateEdition(undefined, newEdition.withRef(newEditionRef));
 
     // Put the new edition in the book.
-    const revisions = book.getRevisions();
+    const revisions = book.getEditions();
     revisions.unshift({
         ref: newEditionRef,
         time: Date.now(),
@@ -191,20 +191,6 @@ export async function createNewEdition(book: Book): Promise<Book> {
     updateBook(book);
 
     return book;
-}
-
-export async function publishEdition(
-    book: Book,
-    index: number,
-    published: boolean
-): Promise<void> {
-    if (!db) throw Error("Can't publish draft, no Firebase connection.");
-
-    // Update the edition's published status.
-    book.asPublished(published, index);
-
-    // Return the revised Book for viewing
-    updateBook(book);
 }
 
 export const updateEdition = async (
@@ -310,4 +296,35 @@ export async function getBookIDFromName(
 
     if (!matches.empty) return matches.docs[0].id;
     else return null;
+}
+
+export async function publish(
+    book: Book,
+    index: number
+): Promise<string | undefined> {
+    if (!db) throw Error("Can't publish, no Firebase connection.");
+    if (!functions)
+        throw Error("Can't publish, no connection to Firebase functions.");
+
+    const edition = await book.getEditionNumber(index + 1);
+    if (edition === undefined)
+        return `Couldn't find edition ${index} number to publish`;
+
+    const editionRef = edition.getRef();
+    if (editionRef === undefined) return `Couldn't find edition to publish`;
+
+    const publishEdition = httpsCallable<
+        { book: string; edition: string },
+        string
+    >(functions, 'publishEdition');
+
+    const result = await publishEdition({
+        book: book.getRef().id,
+        edition: editionRef.id,
+    });
+
+    return result.data;
+
+    // Update the edition's published status in the book.
+    // await updateBook(book.withEditionAsPublished(true, index));
 }

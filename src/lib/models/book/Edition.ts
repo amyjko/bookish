@@ -92,7 +92,7 @@ export default class Edition {
         this.theme = theme;
     }
 
-    static async fromJSON(
+    static fromJSON(
         editionRef: DocumentReference | undefined,
         spec: EditionSpecification
     ) {
@@ -909,7 +909,7 @@ export default class Edition {
 
     /* Edition numbers are 1 to N */
     getEditionNumber(book: Book) {
-        const revisions = book.getRevisions();
+        const revisions = book.getEditions();
         if (revisions === undefined) return undefined;
         for (let i = 0; i < revisions.length; i++)
             if (revisions[i].ref.id === this.editionRef?.id)

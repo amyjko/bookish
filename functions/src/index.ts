@@ -1,11 +1,32 @@
-import * as functions from 'firebase-functions';
+import functions from 'firebase-functions';
 import { ObjectMetadata } from 'firebase-functions/v1/storage';
+import admin from 'firebase-admin';
+import path from 'path';
+import os from 'os';
+import fs from 'fs';
+import { spawn } from 'child_process';
+import { EditionSpecification } from 'bookish-press/models/book/Edition';
 
-const admin = require('firebase-admin');
-const spawn = require('child-process-promise').spawn;
-const path = require('path');
-const os = require('os');
-const fs = require('fs');
+/** Turn spawn into a promise for comprehensibility */
+async function exec(cmd: string, args: ReadonlyArray<string>) {
+    return new Promise((resolve, reject) => {
+        const cp = spawn(cmd, args);
+        const error: string[] = [];
+        const stdout: string[] = [];
+        cp.stdout.on('data', (data) => {
+            stdout.push(data.toString());
+        });
+
+        cp.on('error', (e) => {
+            error.push(e.toString());
+        });
+
+        cp.on('close', () => {
+            if (error.length) reject(error.join(''));
+            else resolve(stdout.join(''));
+        });
+    });
+}
 
 admin.initializeApp();
 
@@ -34,7 +55,7 @@ async function resizeImage(
     // If you're getting "Error: spawn convert ENOENT" when using the emu.ator, it's because it's not
     // installed locally. On mac OS, "brew install imagemagick" should suffice.
     console.log('Resizing downloaded image...');
-    await spawn('convert', [
+    await exec('convert', [
         tempFilePath,
         '-thumbnail',
         '320x320>',
@@ -78,7 +99,7 @@ export const deleteThumbnail = functions.storage
     .object()
     .onDelete(async (object: ObjectMetadata) => {
         if (object.name === undefined) {
-            console.log('Unknown file uplaoded.');
+            console.log('Unknown file uploaded.');
             return;
         }
         if (!object.name.startsWith('images/')) {
@@ -98,3 +119,115 @@ export const deleteThumbnail = functions.storage
 
         return await bucket.file(thumbFilePath).delete();
     });
+
+export const publishEdition = functions.https.onCall(
+    async (data: { book: string; edition: string }) => {
+        const { edition: editionID } = data;
+
+        // Move to a temporary folder workspace.
+        const tempDir = os.tmpdir();
+        process.chdir(tempDir);
+
+        // If there's already something in /bookish-reader, remove it all for a fresh build.
+        if (fs.existsSync('bookish-reader')) {
+            console.log('Cleaning workspace to prepare for build...');
+            await exec('rm', ['-rf', 'bookish-reader']);
+        }
+
+        // Clone the reader repo
+        console.log('Cloning book template...');
+        await exec('git', [
+            'clone',
+            'https://github.com/amyjko/bookish-reader',
+        ]);
+
+        // Move inside the reader
+        console.log('Changing to book folder...');
+        process.chdir(path.join(tempDir, 'bookish-reader'));
+
+        // Install all dependencies for the reader
+        console.log('Install project dependencies...');
+        await exec('npm', ['install']);
+
+        // Retrieve the edition
+        console.log('Retrieving book edition from database...');
+        const editionDoc = admin.firestore().doc(`editions/${editionID}`);
+        const editionData = await editionDoc.get();
+        if (!editionData.exists) return "Unknown book edition, can't publish.";
+
+        const editionJSON = editionData.data() as EditionSpecification;
+
+        // Retrieve all edition's chapter text.
+        for (const chapter of editionJSON.chapters) {
+            console.log(
+                `Retrieving chapter ${chapter.id} text and creating its route...`
+            );
+            if (chapter.ref === undefined)
+                return "Missing chapter, can't published book.";
+            const chapterData = await admin
+                .firestore()
+                .doc(`editions/${editionID}/chapters/${chapter.ref.id}`)
+                .get();
+            if (!chapterData.exists)
+                return "Missing chapter text, can't publish.";
+
+            const chapterText = chapterData.data()?.text;
+            if (chapterText === undefined)
+                return "Missing chapter text, can't publishing.";
+            chapter.text = chapterText;
+
+            const routePath = `src/routes/${chapter.id}`;
+            fs.mkdirSync(routePath);
+            fs.writeFileSync(
+                `${routePath}/+page.svelte`,
+                `<script lang="ts">
+                    import ChapterModel from "bookish-press/models/book/Chapter";
+                    import Chapter from '$lib/components/page/Chapter.svelte';
+                    import { getEdition } from '$lib/components/page/Contexts';
+
+                    const edition = getEdition();
+                    const chapter = $edition?.getChapter($page.params.chapterid);
+                </script>t
+            
+                <Chapter {chapter} />
+            `
+            );
+        }
+
+        // Create a book.json file based on the book and edition data
+        console.log('Writing edition content to book folder...');
+        fs.writeFileSync(
+            'src/lib/assets/book.json',
+            JSON.stringify(editionJSON, null, 2)
+        );
+
+        // Build the site
+        try {
+            console.log('Building book...');
+            await exec('npm', ['run', 'build']);
+        } catch (error) {
+            console.log(`Problem building book: ${error}`);
+            return error;
+        }
+
+        // Upload everything to Firebase Hosting at the appropriate URL
+
+        /**
+         *
+         * TODO I stopped here. Here's the proper API:
+         *
+         * https://firebase.google.com/docs/hosting/api-deploy.
+         *
+         * And unfortunately the API is still beta. It also has some dev ops complexities
+         * such as requiring hitting a live API (no emulation support), some risks about
+         * app deploys clobbering books. For now, I'm just going to serve books
+         * out of the database, which is less performant and more expensive, but less complex
+         * and therefore more maintainable.
+         *
+         */
+
+        console.log('Successfully published!');
+
+        return undefined;
+    }
+);
