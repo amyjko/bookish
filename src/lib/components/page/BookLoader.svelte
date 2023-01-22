@@ -20,13 +20,12 @@
 
     // Mege them together here
     $: currentBook =
-        booksByName === undefined || bookByID === undefined
+        // Neither loaded? Current book isn't loaded.
+        booksByName === undefined && bookByID === undefined
             ? undefined
-            : booksByName.length > 0
+            : booksByName !== undefined && booksByName.length > 0
             ? booksByName[0]
-            : bookByID
-            ? bookByID
-            : null;
+            : bookByID ?? null;
 
     // Whenever the merge changes, update the book store (updating the whole UI)
     $: book.set(currentBook ?? undefined);

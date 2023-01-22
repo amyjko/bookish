@@ -44,16 +44,23 @@
             const latestPublished = !write;
 
             // Figure out which edition to load.
-            const editionID =
-                editionNumber === undefined
-                    ? latestPublished
-                        ? $book.getLatestPublishedEditionID()
-                        : $book.getLatestEditionID()
-                    : $book.getEditionNumberID(parseFloat(editionNumber));
+            let editionID;
+            if (editionNumber === undefined) {
+                if (latestPublished) {
+                    editionID = $book.getLatestPublishedEditionID();
+                    if (editionID === undefined)
+                        error = 'There is no published edition of this book.';
+                } else {
+                    editionID = $book.getLatestEditionID();
+                }
+            } else {
+                editionID = $book.getEditionNumberID(parseFloat(editionNumber));
+                if (editionID === undefined)
+                    error = `There is no ${editionNumber} edition of this book`;
+            }
 
-            if (editionID === undefined) error = 'Unknown edition';
             // Listen to the doc for changes and listen to all of its chapters.
-            else {
+            if (editionID !== undefined) {
                 editionUnsub = listenToEdition(
                     $book.ref.id,
                     editionID,
@@ -89,7 +96,7 @@
 </script>
 
 {#if $book === undefined || error}
-    <Feedback error>Unable to load book.</Feedback>
+    <Feedback error>Unable to load edition.</Feedback>
 {:else if $edition === undefined}
     <Loading />
 {:else}
