@@ -61,6 +61,11 @@
         min-height: var(--bookish-paragraph-line-height);
     }
 
+    .placeholder {
+        color: var(--bookish-muted-color);
+        font-style: italic;
+    }
+
     h2,
     h3,
     h4,
