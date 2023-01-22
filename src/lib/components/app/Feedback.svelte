@@ -1,13 +1,22 @@
 <script lang="ts">
+    import { onMount } from 'svelte';
     import Large from './Large.svelte';
 
     export let error: boolean = false;
+
+    let visible = error;
+
+    onMount(() => {
+        setTimeout(() => (visible = true), 1000);
+    });
 </script>
 
-{#if error}
-    <p role="alert"><slot /></p>
-{:else}
-    <p role="status" aria-live="polite"><Large><slot /></Large></p>
+{#if visible}
+    {#if error}
+        <p role="alert"><slot /></p>
+    {:else}
+        <p role="status" aria-live="polite"><Large><slot /></Large></p>
+    {/if}
 {/if}
 
 <style>

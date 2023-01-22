@@ -11,7 +11,7 @@ import {
     deleteDoc,
     DocumentReference,
     onSnapshot,
-    Query,
+    QueryFieldFilterConstraint,
 } from 'firebase/firestore';
 import { httpsCallable } from 'firebase/functions';
 import Edition from './book/Edition';
@@ -25,18 +25,22 @@ function editionPath(bookID: string, editionID: string) {
     return `books/${bookID}/editions/${editionID}`;
 }
 
+const NO_DATABASE_CONNECTION = 'Not connected to database';
+
 function getBooks(
-    query: Query,
+    constraint: QueryFieldFilterConstraint,
     listener: (books: Book[]) => void
 ): Unsubscribe {
-    if (!db) throw "Can't retrieve books from the database";
+    if (!db) throw NO_DATABASE_CONNECTION;
     try {
-        return onSnapshot(query, (snapshot) =>
-            listener(
-                snapshot.docs.map((doc) =>
-                    Book.fromJSON(doc.ref, doc.data() as BookSpecification)
+        return onSnapshot(
+            query(collection(db, 'books'), constraint),
+            (snapshot) =>
+                listener(
+                    snapshot.docs.map((doc) =>
+                        Book.fromJSON(doc.ref, doc.data() as BookSpecification)
+                    )
                 )
-            )
         );
     } catch (err) {
         throw 'Issue querying database';
@@ -46,36 +50,21 @@ function getBooks(
 export function getPublishedBooks(
     listener: (books: Book[]) => void
 ): Unsubscribe {
-    if (!db) throw "Can't retrieve books from the database";
-    return getBooks(
-        query(collection(db, 'books'), where('published', '==', true)),
-        listener
-    );
+    return getBooks(where('published', '==', true), listener);
 }
 
 export function getEditableBooks(
     userID: string,
     listener: (books: Book[]) => void
 ): Unsubscribe {
-    if (!db) throw "Can't retrieve books from the database";
-    return getBooks(
-        query(collection(db, 'books'), where('uids', 'array-contains', userID)),
-        listener
-    );
+    return getBooks(where('uids', 'array-contains', userID), listener);
 }
 
 export function getPartiallyEditableBooks(
     userID: string,
     listener: (books: Book[]) => void
 ): Unsubscribe {
-    if (!db) throw "Can't retrieve books from the database";
-    return getBooks(
-        query(
-            collection(db, 'books'),
-            where('readuids', 'array-contains', userID)
-        ),
-        listener
-    );
+    return getBooks(where('readuids', 'array-contains', userID), listener);
 }
 
 export async function getUserEmails(
