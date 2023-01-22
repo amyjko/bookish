@@ -7,6 +7,7 @@
     import Embed from './chapter/Embed.svelte';
     import ErrorMessage from './chapter/ErrorMessage.svelte';
     import Link from '$lib/components/app/Link.svelte';
+    import { fade } from 'svelte/transition';
 
     export let book: Book;
     export let write: boolean = false;
@@ -27,7 +28,7 @@
             : `/${subdomain}`;
 </script>
 
-<article class="book-preview">
+<article class="book-preview" transition:fade>
     <div class="cover" class:empty={embed === null}>
         {#if embed instanceof EmbedNode}
             <Embed node={embed} imageOnly editable={false} />

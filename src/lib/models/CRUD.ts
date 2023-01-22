@@ -10,6 +10,7 @@ import {
     where,
     deleteDoc,
     DocumentReference,
+    onSnapshot,
 } from 'firebase/firestore';
 import { httpsCallable } from 'firebase/functions';
 import Edition from './book/Edition';
@@ -17,27 +18,28 @@ import type { EditionSpecification } from './book/Edition';
 import Book, { type EditionInfo } from './book/Book';
 import type { BookSpecification } from './book/Book';
 import type { ChapterContent } from './book/Chapter';
+import type { Unsubscribe } from 'firebase/auth';
 
 function editionPath(bookID: string, editionID: string) {
     return `books/${bookID}/editions/${editionID}`;
 }
 
-export async function getPublishedBooks(): Promise<Book[]> {
-    if (!db)
-        throw Error("Can't retrieve books, not connected to the database.");
+export function getPublishedBooks(
+    listener: (books: Book[]) => void
+): Unsubscribe | string {
+    if (!db) return "Can't retrieve books from the database";
 
-    try {
-        const data = await getDocs(
-            query(collection(db, 'books'), where('published', '==', true))
-        );
-        return data.docs
-            .map((doc) =>
+    const publishedBooksQuery = query(
+        collection(db, 'books'),
+        where('published', '==', true)
+    );
+    return onSnapshot(publishedBooksQuery, (snapshot) =>
+        listener(
+            snapshot.docs.map((doc) =>
                 Book.fromJSON(doc.ref, doc.data() as BookSpecification)
             )
-            .filter((book) => book.hasPublishedEdition());
-    } catch {
-        throw Error("Couldn't load books, problem reading from the database.");
-    }
+        )
+    );
 }
 
 export async function getUserBooks(userID: string): Promise<Book[] | null> {

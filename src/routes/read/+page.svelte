@@ -8,29 +8,28 @@
     import Large from '$lib/components/app/Large.svelte';
     import BookList from '$lib/components/app/BookList.svelte';
 
-    let books: Book[] = [];
-    let loading = true;
-    let error = '';
+    let books: Book[] | undefined = undefined;
+    let error: string | undefined = undefined;
 
-    function updateBooks() {
-        getPublishedBooks().then((loadedBooks) => {
-            loading = false;
-            if (loadedBooks === null) error = 'Unable to load books';
-            else books = loadedBooks;
-        });
+    function updateBooks(latestBooks: Book[]) {
+        books = latestBooks;
     }
 
-    // Get the books when the component loads.
+    // Get the books when the component loads, stop listening on unmount.
     onMount(() => {
-        updateBooks();
+        try {
+            return getPublishedBooks(updateBooks);
+        } catch (err) {
+            error = '' + err;
+        }
     });
 </script>
 
 <Lead><Large>Read</Large> something.</Lead>
 
-{#if error}
+{#if error !== undefined}
     <Feedback error>{error}</Feedback>
-{:else if loading}
+{:else if books === undefined}
     <Feedback>Loading books...</Feedback>
 {:else if books.length === 0}
     <Paragraph>There are no published books.</Paragraph>
