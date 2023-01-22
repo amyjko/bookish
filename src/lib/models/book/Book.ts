@@ -1,5 +1,4 @@
 import type { DocumentReference } from 'firebase/firestore';
-import { readEdition } from '../CRUD';
 import BookMedia from './BookMedia';
 import type Edition from './Edition';
 
@@ -22,7 +21,7 @@ export type BookSpecification = {
     published: boolean;
     editions: EditionInfo[];
     // An optional subdomain, for use in URLs
-    domain?: string;
+    domain: string | null;
     // A list of user ids that have access to edit the book.
     uids: string[];
     // A derived list of user ids that have read level access to the book via edition or chapter level write access.
@@ -37,7 +36,7 @@ export default class Book {
     readonly cover: string | null;
     readonly published: boolean;
     readonly editions: EditionInfo[];
-    readonly domain: string | undefined;
+    readonly domain: string | null;
     readonly uids: string[];
 
     media: BookMedia;
@@ -49,7 +48,7 @@ export default class Book {
         description: string,
         cover: string | null,
         editions: EditionInfo[],
-        domain: string | undefined,
+        domain: string | null,
         uids: string[]
     ) {
         this.ref = ref;
@@ -90,6 +89,7 @@ export default class Book {
             description: this.description,
             cover: this.cover,
             published: this.published,
+            domain: this.domain,
             editions: this.editions,
             uids: this.uids,
             readuids: Array.from(
@@ -103,7 +103,6 @@ export default class Book {
                 )
             ),
         };
-        if (this.domain !== undefined) json.domain = this.domain;
         return json;
     }
 
@@ -119,7 +118,7 @@ export default class Book {
             this.description,
             this.cover,
             this.editions,
-            domain.length === 0 ? undefined : domain,
+            domain.length === 0 ? null : domain,
             this.uids
         );
     }
@@ -200,22 +199,10 @@ export default class Book {
         return this.ref.id;
     }
 
-    getLatestEdition(): Promise<Edition> | undefined {
-        const draft = this.editions[0];
-        return draft ? readEdition(this.ref.id, draft.ref.id) : undefined;
-    }
-
-    getEditionNumber(number: number) {
+    getEditionNumberID(number: number) {
         // Get the ID corresponding to this number.
         const edition = this.editions.find((ed) => ed.number === number);
-        return edition ? readEdition(this.ref.id, edition.ref.id) : undefined;
-    }
-
-    getLatestPublishedEdition(): undefined | Promise<Edition> {
-        const latest = this.getLatestPublishedEditionID();
-        return latest === undefined
-            ? undefined
-            : readEdition(this.ref.id, latest);
+        return edition ? edition.ref.id : undefined;
     }
 
     getLatestPublishedEditionID() {

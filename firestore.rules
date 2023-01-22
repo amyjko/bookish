@@ -11,11 +11,7 @@ service cloud.firestore {
         return request.auth != null && request.auth.uid in bookDoc.uids;
       }
 
-      // Can read a book if it's published or editable by this user
-      allow read: if resource.data.published || (request.auth != null && (
-        bookIsEditable(resource.data) || 
-        request.auth.uid in resource.data.readuids
-      ));
+      allow read: if true;
       allow create: if request.auth != null;
       allow update: if bookIsEditable(resource.data) || request.auth.uid in resource.data.readuids;
       allow delete: if bookIsEditable(resource.data);
@@ -46,7 +42,7 @@ service cloud.firestore {
           }
 
           // Chapter text is readable if the book is published or the part or all of the edition is editable
-          allow read: if getBook().published || chapterIsEditable() || (request.auth != null && request.auth.uid in getEdition().chapteruids);
+          allow read: if getBook().published || chapterIsEditable(resource.data) || (request.auth != null && request.auth.uid in getEdition().chapteruids);
           allow create: if editionIsEditable(getEdition());
           // Chapters can be edited by anyone with chapter, edition, or book level permissions.
           allow update: if chapterIsEditable(resource.data);

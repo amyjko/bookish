@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { getPublishedBooks } from '$lib/models/CRUD';
+    import { listenToPublishedBooks } from '$lib/models/CRUD';
     import type Book from '$lib/models/book/Book';
     import { onMount } from 'svelte';
     import Feedback from '$lib/components/app/Feedback.svelte';
@@ -18,7 +18,7 @@
     // Get the books when the component loads, stop listening on unmount.
     onMount(() => {
         try {
-            return getPublishedBooks(updateBooks);
+            return listenToPublishedBooks(updateBooks);
         } catch (err) {
             error = '' + err;
         }

@@ -18,7 +18,6 @@ import Edition from './book/Edition';
 import type { EditionSpecification } from './book/Edition';
 import Book, { type EditionInfo } from './book/Book';
 import type { BookSpecification } from './book/Book';
-import type { ChapterContent } from './book/Chapter';
 import type { Unsubscribe } from 'firebase/auth';
 
 function editionPath(bookID: string, editionID: string) {
@@ -27,19 +26,28 @@ function editionPath(bookID: string, editionID: string) {
 
 const NO_DATABASE_CONNECTION = 'Not connected to database';
 
-function getBooks(
+///////////////
+//// READ BOOKS
+///////////////
+
+function listenToBooks(
     constraint: QueryFieldFilterConstraint,
-    listener: (books: Book[]) => void
+    react: (books: Book[]) => void
 ): Unsubscribe {
     if (!db) throw NO_DATABASE_CONNECTION;
     try {
         return onSnapshot(
             query(collection(db, 'books'), constraint),
             (snapshot) =>
-                listener(
-                    snapshot.docs.map((doc) =>
-                        Book.fromJSON(doc.ref, doc.data() as BookSpecification)
-                    )
+                react(
+                    snapshot.empty
+                        ? []
+                        : snapshot.docs.map((doc) =>
+                              Book.fromJSON(
+                                  doc.ref,
+                                  doc.data() as BookSpecification
+                              )
+                          )
                 )
         );
     } catch (err) {
@@ -47,26 +55,94 @@ function getBooks(
     }
 }
 
-export function getPublishedBooks(
-    listener: (books: Book[]) => void
+export function listenToPublishedBooks(
+    react: (books: Book[]) => void
 ): Unsubscribe {
-    return getBooks(where('published', '==', true), listener);
+    return listenToBooks(where('published', '==', true), react);
 }
 
-export function getEditableBooks(
+export function listenToEditableBooks(
     userID: string,
-    listener: (books: Book[]) => void
+    react: (books: Book[]) => void
 ): Unsubscribe {
-    return getBooks(where('uids', 'array-contains', userID), listener);
+    return listenToBooks(where('uids', 'array-contains', userID), react);
 }
 
-export function getPartiallyEditableBooks(
+export function listenToPartiallyEditableBooks(
     userID: string,
-    listener: (books: Book[]) => void
+    react: (books: Book[]) => void
 ): Unsubscribe {
-    return getBooks(where('readuids', 'array-contains', userID), listener);
+    return listenToBooks(where('readuids', 'array-contains', userID), react);
 }
 
+export function listenToBooksByName(
+    name: string,
+    react: (book: Book[]) => void
+): Unsubscribe {
+    return listenToBooks(where('domain', '==', name), react);
+}
+
+export function listenToBookWithID(
+    id: string,
+    react: (book: Book | null) => void
+): Unsubscribe {
+    if (!db) throw NO_DATABASE_CONNECTION;
+    const ref = doc(db, 'books', id);
+    return onSnapshot(doc(db, 'books', id), (doc) => {
+        react(
+            doc.exists()
+                ? Book.fromJSON(ref, doc.data() as BookSpecification)
+                : null
+        );
+    });
+}
+
+export function listenToEdition(
+    bookID: string,
+    editionID: string,
+    react: (edition: Edition | null) => void
+): Unsubscribe {
+    if (!db) throw NO_DATABASE_CONNECTION;
+
+    return onSnapshot(
+        doc(db, 'books', bookID, 'editions', editionID),
+        (doc) => {
+            return react(
+                doc.exists()
+                    ? Edition.fromJSON(
+                          doc.ref,
+                          doc.data() as EditionSpecification
+                      )
+                    : null
+            );
+        }
+    );
+}
+
+export function listenToChapters(
+    bookID: string,
+    editionID: string,
+    react: (chapters: [DocumentReference, string][]) => void
+): Unsubscribe {
+    if (!db) throw NO_DATABASE_CONNECTION;
+
+    return onSnapshot(
+        collection(db, 'books', bookID, 'editions', editionID, 'chapters'),
+        (docs) => {
+            const chapters: [DocumentReference, string][] = [];
+            docs.forEach((doc) => {
+                chapters.push([doc.ref, doc.data().text]);
+            });
+            react(chapters);
+        }
+    );
+}
+
+/////////////////
+//// MANAGE USERS
+/////////////////
+
+/** Hit the authentication database to get user emails. */
 export async function getUserEmails(
     uids: string[]
 ): Promise<Map<string, string> | null> {
@@ -101,52 +177,6 @@ export async function createUser(email: string): Promise<string | null> {
     return result.data;
 }
 
-export async function getBookFromIDOrName(
-    bookIDOrName: string
-): Promise<Book | null> {
-    const book = await readBook(bookIDOrName);
-
-    if (book) return book;
-
-    const bookID = await getBookIDFromName(bookIDOrName);
-    return bookID !== null ? readBook(bookID) : null;
-}
-
-export async function readBook(bookID: string): Promise<Book | null> {
-    if (!db) return null;
-
-    const bookRef = doc(db, 'books', bookID);
-    const book = await getDoc(bookRef);
-    return !book.exists()
-        ? null
-        : Book.fromJSON(bookRef, book.data() as BookSpecification);
-}
-
-export async function readEdition(
-    bookID: string,
-    editionID: string
-): Promise<Edition> {
-    if (!db) throw Error("Can't retrieve edition, not connected to Firebase.");
-
-    const editionDoc = await getDoc(
-        doc(db, 'books', bookID, 'editions', editionID)
-    );
-    if (!editionDoc.exists()) throw Error('' + editionID + " doesn't exist");
-
-    // TODO We should really be doing some validation here.
-    let edition = editionDoc.data() as EditionSpecification;
-
-    // Go through each of the edition's chapters and get its text.
-    for (const chapter of edition.chapters) {
-        if (chapter.ref) {
-            const { text } = await readChapterText(chapter.ref);
-            chapter.text = text;
-        }
-    }
-
-    return Edition.fromJSON(editionDoc.ref, edition);
-}
-
 export async function createBook(userID: string): Promise<string> {
     if (!db) throw Error("Can't create book, not connected to Firebase.");
 
@@ -157,6 +187,7 @@ export async function createBook(userID: string): Promise<string> {
         description: '',
         cover: null,
         published: false,
+        domain: null,
         editions: [],
         uids: [userID],
         readuids: [],
@@ -218,7 +249,16 @@ export async function createNewEdition(book: Book): Promise<Book> {
     if (!db) throw Error("Can't publish draft, no Firebase connection.");
 
     // Get the latest draft.
-    const latestDraft = await book.getLatestEdition();
+    const latestEditionID = book.getLatestEditionID();
+    if (latestEditionID === undefined) throw 'No editions on this book';
+
+    const latestDraftDoc = await getDoc(
+        doc(db, 'books', book.ref.id, 'editions', latestEditionID)
+    );
+    const latestDraft = latestDraftDoc.exists()
+        ? latestDraftDoc.data()
+        : undefined;
+
     if (latestDraft === undefined) return book;
 
     // Make a copy without chapter and edition refs, because we want to create new ones,
@@ -349,17 +389,6 @@ export async function updateBook(book: Book): Promise<void> {
     await setDoc(doc(db, 'books', book.getRefID()), book.toJSON());
 }
 
-export async function readChapterText(
-    chapterRef: DocumentReference
-): Promise<ChapterContent> {
-    if (!db) throw Error('Not connected to Firebase.');
-
-    const text = await getDoc(chapterRef);
-    if (!text.exists()) throw Error('Chapter text does not exist.');
-
-    return text.data() as ChapterContent;
-}
-
 export async function isSubdomainAvailable(
     subdomain: string,
     book: Book
@@ -371,20 +400,6 @@ export async function isSubdomainAvailable(
     );
 
     return matches.empty || matches.docs[0].id === book.getRefID();
-}
-
-export async function getBookIDFromName(
-    subdomain: string
-): Promise<string | null> {
-    if (!db)
-        throw Error("Can't find book ID from URL, not connected to Firebase.");
-
-    const matches = await getDocs(
-        query(collection(db, 'books'), where('domain', '==', subdomain))
-    );
-
-    if (!matches.empty) return matches.docs[0].id;
-    else return null;
 }
 
 // export async function publish(

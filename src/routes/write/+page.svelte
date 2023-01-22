@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { createBook, getEditableBooks } from '$lib/models/CRUD';
+    import { createBook, listenToEditableBooks } from '$lib/models/CRUD';
     import type Book from '$lib/models/book/Book';
     import { goto } from '$app/navigation';
     import { onMount } from 'svelte';
@@ -32,11 +32,11 @@
     onMount(() => {
         if ($auth !== undefined && $auth.user !== null) {
             try {
-                const editableUnsub = getEditableBooks(
+                const editableUnsub = listenToEditableBooks(
                     $auth.user.uid,
                     (books) => (editableBooks = books)
                 );
-                const partiallyEditableUnsub = getEditableBooks(
+                const partiallyEditableUnsub = listenToEditableBooks(
                     $auth.user.uid,
                     (books) => (partiallyEditableBooks = books)
                 );

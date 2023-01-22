@@ -450,6 +450,21 @@ export default class Edition {
         );
     }
 
+    withChapterText(text: [DocumentReference, string][]) {
+        return this.withChapters(
+            this.chapters.map((chapter) => {
+                if (chapter.ref === undefined) return chapter;
+                const match = text.find(
+                    ([ref, text]) =>
+                        chapter.ref !== undefined &&
+                        chapter.ref.id === ref.id &&
+                        chapter.text !== text
+                );
+                return match ? chapter.withText(match[1]) : chapter;
+            })
+        );
+    }
+
     withRevisedChapter(previous: Chapter, edited: Chapter) {
         const index = this.chapters.indexOf(previous);
         if (index < 0) return this;
