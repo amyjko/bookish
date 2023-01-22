@@ -11,6 +11,7 @@ import {
     deleteDoc,
     DocumentReference,
     onSnapshot,
+    Query,
 } from 'firebase/firestore';
 import { httpsCallable } from 'firebase/functions';
 import Edition from './book/Edition';
@@ -24,62 +25,57 @@ function editionPath(bookID: string, editionID: string) {
     return `books/${bookID}/editions/${editionID}`;
 }
 
+function getBooks(
+    query: Query,
+    listener: (books: Book[]) => void
+): Unsubscribe {
+    if (!db) throw "Can't retrieve books from the database";
+    try {
+        return onSnapshot(query, (snapshot) =>
+            listener(
+                snapshot.docs.map((doc) =>
+                    Book.fromJSON(doc.ref, doc.data() as BookSpecification)
+                )
+            )
+        );
+    } catch (err) {
+        throw 'Issue querying database';
+    }
+}
+
 export function getPublishedBooks(
     listener: (books: Book[]) => void
-): Unsubscribe | string {
-    if (!db) return "Can't retrieve books from the database";
-
-    const publishedBooksQuery = query(
-        collection(db, 'books'),
-        where('published', '==', true)
-    );
-    return onSnapshot(publishedBooksQuery, (snapshot) =>
-        listener(
-            snapshot.docs.map((doc) =>
-                Book.fromJSON(doc.ref, doc.data() as BookSpecification)
-            )
-        )
+): Unsubscribe {
+    if (!db) throw "Can't retrieve books from the database";
+    return getBooks(
+        query(collection(db, 'books'), where('published', '==', true)),
+        listener
     );
 }
 
-export async function getUserBooks(userID: string): Promise<Book[] | null> {
-    if (!db)
-        throw Error("Can't retrieve user's books, not connected to Firebase.");
+export function getEditableBooks(
+    userID: string,
+    listener: (books: Book[]) => void
+): Unsubscribe {
+    if (!db) throw "Can't retrieve books from the database";
+    return getBooks(
+        query(collection(db, 'books'), where('uids', 'array-contains', userID)),
+        listener
+    );
+}
 
-    try {
-        // Find books that this user book-level access to.
-        const editableBooks = await getDocs(
-            query(
-                collection(db, 'books'),
-                where('uids', 'array-contains', userID)
-            )
-        );
-        // Find books that this user has edition or chapter level access to.
-        const partiallyEditableBooks = await getDocs(
-            query(
-                collection(db, 'books'),
-                where('readuids', 'array-contains', userID)
-            )
-        );
-
-        // Merge and deduplicate the books
-        const allBooks = [
-            ...editableBooks.docs,
-            ...partiallyEditableBooks.docs,
-        ].filter(
-            (doc1, index1, docs) =>
-                !docs.some(
-                    (doc2, index2) => index2 > index1 && doc1.id === doc2.id
-                )
-        );
-
-        return allBooks.map((doc) =>
-            Book.fromJSON(doc.ref, doc.data() as BookSpecification)
-        );
-    } catch (err) {
-        console.error(err);
-        return null;
-    }
+export function getPartiallyEditableBooks(
+    userID: string,
+    listener: (books: Book[]) => void
+): Unsubscribe {
+    if (!db) throw "Can't retrieve books from the database";
+    return getBooks(
+        query(
+            collection(db, 'books'),
+            where('readuids', 'array-contains', userID)
+        ),
+        listener
+    );
 }
 
 export async function getUserEmails(

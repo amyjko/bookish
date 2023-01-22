@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { createBook, getUserBooks } from '$lib/models/CRUD';
+    import { createBook, getEditableBooks } from '$lib/models/CRUD';
     import type Book from '$lib/models/book/Book';
     import { goto } from '$app/navigation';
     import { onMount } from 'svelte';
@@ -11,24 +11,43 @@
     import Button from '$lib/components/app/Button.svelte';
     import BookList from '$lib/components/app/BookList.svelte';
 
-    let books: Book[] = [];
-    let loading = true;
-    let error = '';
-
+    let editableBooks: Book[] | undefined = undefined;
+    let partiallyEditableBooks: Book[] | undefined = undefined;
+    let error: string | undefined = undefined;
     let auth = getAuth();
 
-    function updateBooks() {
-        if ($auth?.user)
-            getUserBooks($auth.user.uid).then((loadedBooks) => {
-                loading = false;
-                if (loadedBooks === null) error = 'Unable to load books';
-                else books = loadedBooks;
-            });
-    }
+    // Merge and deduplicate the books
+    $: books =
+        editableBooks === undefined || partiallyEditableBooks === undefined
+            ? undefined
+            : [...editableBooks, ...partiallyEditableBooks].filter(
+                  (book1, index1, bookList) =>
+                      !bookList.some(
+                          (book2, index2) =>
+                              index2 > index1 && book1.ref.id === book2.ref.id
+                      )
+              );
 
     // Get the books when the component loads.
     onMount(() => {
-        updateBooks();
+        if ($auth !== undefined && $auth.user !== null) {
+            try {
+                const editableUnsub = getEditableBooks(
+                    $auth.user.uid,
+                    (books) => (editableBooks = books)
+                );
+                const partiallyEditableUnsub = getEditableBooks(
+                    $auth.user.uid,
+                    (books) => (partiallyEditableBooks = books)
+                );
+                return () => {
+                    editableUnsub();
+                    partiallyEditableUnsub();
+                };
+            } catch (err) {
+                error = '' + err;
+            }
+        } else error = "You're not logged in.";
     });
 
     let creating = false;
@@ -73,11 +92,9 @@
 
 {#if creating}
     <Feedback>{creationFeedback}</Feedback>
-{/if}
-
-{#if error}
+{:else if error}
     <Feedback error>{error}</Feedback>
-{:else if loading}
+{:else if books === undefined}
     <Feedback>Loading books...</Feedback>
 {:else if books.length === 0}
     <Paragraph>You don't have have any books.</Paragraph>
