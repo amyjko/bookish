@@ -1,7 +1,5 @@
 <script lang="ts">
-    import { isEditable } from './Contexts';
-
-    let editable = isEditable();
+    export let editable: boolean;
 </script>
 
 {#if editable}

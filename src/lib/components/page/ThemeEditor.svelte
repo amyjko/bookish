@@ -14,14 +14,13 @@
     import Instructions from './Instructions.svelte';
     import ThemeSetEditor from './ThemeSetEditor.svelte';
     import ThemeEditorPreview from './ThemeEditorPreview.svelte';
-    import { getEdition } from './Contexts';
+    import { getEdition, isEditionEditable } from './Contexts';
     import TextEditor from '../editor/TextEditor.svelte';
     import type Theme from '$lib/models/book/Theme';
     import Button from '../app/Button.svelte';
     import Switch from '../editor/Switch.svelte';
     import Link from '../app/Link.svelte';
     import Rows from './Rows.svelte';
-    import type Edition from '../../models/book/Edition';
 
     const themes: Record<string, Theme> = {
         Bookish: BookishTheme,
@@ -32,6 +31,7 @@
         Critical: CriticalTheme,
     };
 
+    let editable = isEditionEditable();
     let edition = getEdition();
     $: theme = $edition ? $edition.getTheme() : null;
     $: isDefault =
@@ -47,6 +47,7 @@
 {#if theme && $edition}
     <Page title={`${$edition?.getTitle()} - Theme`}>
         <Header
+            editable={isEditionEditable()}
             label="Theme"
             getImage={() => null}
             setImage={() => undefined}
@@ -55,7 +56,7 @@
             <Outline slot="outline" previous={null} next={null} />
         </Header>
 
-        <Instructions>
+        <Instructions {editable}>
             This is the theme editor. You can use it to choose from existing
             themes or create a custom theme for your book's appearance. To use
             it, you'll need to know a bit about how to format CSS <Link

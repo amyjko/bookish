@@ -8,13 +8,18 @@
     import Format from '$lib/components/chapter/Format.svelte';
     import MediaPreview from './MediaPreview.svelte';
     import { onMount } from 'svelte';
-    import { getBook, getEdition, isEditable } from './Contexts';
+    import {
+        getBook,
+        getEdition,
+        isBookEditable,
+        isEditionEditable,
+    } from './Contexts';
     import Button from '../app/Button.svelte';
     import PageHeader from './PageHeader.svelte';
 
     let book = getBook();
     let edition = getEdition();
-    let editable = isEditable();
+    let editable = isBookEditable();
     let images: Image[] | undefined = [];
 
     $: embeds = $edition?.getEmbeds() ?? [];
@@ -39,6 +44,7 @@
 {#if $edition}
     <Page title={`${$edition.getTitle()} - Media`}>
         <Header
+            editable={isEditionEditable()}
             label="Media title"
             getImage={() => $edition?.getImage(ChapterIDs.MediaID) ?? null}
             setImage={(embed) =>
@@ -54,7 +60,7 @@
                 next={$edition.getNextChapterID(ChapterIDs.MediaID)}
             />
         </Header>
-        <Instructions>
+        <Instructions {editable}>
             This page shows readers an index of the media in the book. Writers
             can use this page to manage any images that are linked or uploaded
             for this book. Note: images are shared between all editions, so if
@@ -88,7 +94,7 @@
         {/each}
         {#if editable && unused !== undefined && unused.length > 0}
             <PageHeader id="unused">Unused</PageHeader>
-            <Instructions>
+            <Instructions {editable}>
                 These images are uploaded to this book, but not used. Delete
                 them if you don't need them. Note, however, that these images
                 may be used in other editions of this book.

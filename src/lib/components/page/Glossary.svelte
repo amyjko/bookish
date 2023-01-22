@@ -4,13 +4,18 @@
     import Page from './Page.svelte';
     import ChapterIDs from '$lib/models/book/ChapterID';
     import DefinitionView from './DefinitionView.svelte';
-    import { getEdition, isEditable } from './Contexts';
+    import {
+        getAuth,
+        getEdition,
+        isChapterEditable,
+        isEditionEditable,
+    } from './Contexts';
     import Instructions from './Instructions.svelte';
     import Button from '../app/Button.svelte';
-    import Rows from './Rows.svelte';
 
+    let auth = getAuth();
     let edition = getEdition();
-    let editable = isEditable();
+    let editable = isEditionEditable();
 
     $: glossary = $edition?.getGlossary() ?? {};
     // Sort by canonical phrases
@@ -37,6 +42,10 @@
 {#if $edition}
     <Page title={`${$edition.getTitle()} - Glossary`}>
         <Header
+            editable={isEditionEditable() ||
+                ($auth !== undefined &&
+                    $auth.user !== null &&
+                    $edition.isChapterEditor($auth.user.uid))}
             label="Glossary title"
             getImage={() => $edition?.getImage(ChapterIDs.GlossaryID) ?? null}
             setImage={(embed) =>
@@ -55,7 +64,7 @@
             />
         </Header>
         {#if editable}
-            <Instructions>
+            <Instructions {editable}>
                 Add definitions and then link to them in a chapter's text.
             </Instructions>
             <Button tooltip="Add a glossary entry" command={addEmptyDefinition}

@@ -16,26 +16,27 @@
     $: authors = book.getAuthors();
     $: description = book.getDescription();
     $: subdomain = book.getSubdomain();
-    $: title = book.getTitle() === '' ? 'Untitled' : book.getTitle();
+    $: title = book.getTitle();
     $: embed = cover === null ? null : Parser.parseEmbed(undefined, cover);
+
+    $: url =
+        subdomain === undefined || write
+            ? refID === undefined
+                ? ''
+                : (write ? '/write/' : '/') + refID
+            : `/${subdomain}`;
 </script>
 
 <article class="book-preview">
     <div class="cover" class:empty={embed === null}>
         {#if embed instanceof EmbedNode}
-            <Embed node={embed} imageOnly />
+            <Embed node={embed} imageOnly editable={false} />
         {:else if embed instanceof ErrorNode}
             <ErrorMessage node={embed} />
         {/if}
     </div>
     <div class="content">
-        <Link
-            to={subdomain === undefined || write
-                ? refID === undefined
-                    ? ''
-                    : (write ? '/write/' : '/') + refID
-                : `/${subdomain}`}><h2 class="title">{title}</h2></Link
-        >
+        <Link to={url}><h2 class="title">{title}</h2></Link>
         <p class="authors">
             {#each authors as author, index}
                 <span
@@ -45,7 +46,7 @@
                 <em>No authors</em>
             {/each}
         </p>
-        <p class="description">
+        <div class="description">
             {#if description.length === 0}
                 <em>No description</em>
             {:else}
@@ -53,7 +54,8 @@
                     node={Parser.parseChapter(undefined, description)}
                 />
             {/if}
-        </p>
+        </div>
+        <Link to={`${url}/editions`}>Editions</Link>
     </div>
 </article>
 
@@ -104,6 +106,5 @@
         margin-top: 0;
         overflow: hidden;
         text-overflow: ellipsis;
-        height: 5em;
     }
 </style>

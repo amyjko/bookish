@@ -9,10 +9,18 @@ import ChapterIDs from './ChapterID.js';
 import type { DocumentReference } from 'firebase/firestore';
 import type Book from './Book';
 import type FormatNode from '../chapter/FormatNode';
+import type { EditionInfo } from './Book';
 
 export type EditionSpecification = {
-    bookRef?: DocumentReference;
+    bookRef: DocumentReference;
+    // The title of the book.
     title: string;
+    // A numerical string indicating the version of the book. Can be any string, but is sorted alphanumerically.
+    number: number;
+    // A summary of the revisions in the edition
+    summary: string;
+    // A time stamp or nothing, indicating when the book was published.
+    published: number | null;
     authors: string[];
     images: Record<string, string | null>;
     description: string;
@@ -26,14 +34,18 @@ export type EditionSpecification = {
     glossary: Record<string, Definition>;
     theme: Theme | null;
     uids: string[];
+    chapteruids: string[];
 };
 
 export default class Edition {
-    readonly bookRef: DocumentReference | undefined;
+    readonly bookRef: DocumentReference;
     readonly editionRef: DocumentReference | undefined;
     readonly uids: string[];
     readonly title: string;
     readonly authors: string[];
+    readonly number: number;
+    readonly summary: string;
+    readonly published: number | null;
     readonly images: Record<string, string | null>;
     readonly description: string;
     readonly chapters: Chapter[];
@@ -49,11 +61,14 @@ export default class Edition {
     // Given an object with a valid specification and an object mapping chapter IDs to chapter text,
     // construct an object representing a book.
     constructor(
-        bookRef: DocumentReference | undefined,
+        bookRef: DocumentReference,
         editionRef: DocumentReference | undefined,
         uids: string[],
         title: string,
         authors: string[],
+        number: number,
+        summary: string,
+        published: number | null,
         images: Record<string, string | null>,
         description: string,
         chapters: Chapter[],
@@ -73,6 +88,9 @@ export default class Edition {
         this.uids = uids;
         this.title = title;
         this.authors = authors;
+        this.number = number;
+        this.summary = summary;
+        this.published = published;
         this.images = images;
         this.description = description;
         this.chapters = chapters.slice();
@@ -104,6 +122,9 @@ export default class Edition {
             spec.uids,
             spec.title,
             spec.authors,
+            spec.number,
+            spec.summary,
+            spec.published,
             spec.images,
             spec.description,
             spec.chapters.map((chap) => Chapter.fromJSON(chap, '')),
@@ -155,8 +176,12 @@ export default class Edition {
                 ref instanceof Reference ? ref.toList() : ref.toBookdown();
 
         const editionJSON: EditionSpecification = {
+            bookRef: this.bookRef,
             title: this.title,
             authors: this.authors,
+            number: this.number,
+            summary: this.summary,
+            published: this.published,
             images: Object.assign({}, this.images),
             description: this.description,
             chapters: this.chapters.map((chap) => chap.toJSON()),
@@ -169,13 +194,19 @@ export default class Edition {
             glossary: Object.assign({}, this.glossary),
             theme: this.theme,
             uids: this.uids.slice(),
+            chapteruids: this.getChapterUIDS(),
         };
-        if (this.bookRef) editionJSON.bookRef = this.bookRef;
         return editionJSON;
     }
 
     getRef() {
         return this.editionRef;
+    }
+
+    getChapterUIDS() {
+        return Array.from(
+            new Set(this.chapters.map((chapter) => chapter.uids).flat())
+        );
     }
 
     withRef(editionRef: DocumentReference | undefined) {
@@ -185,6 +216,9 @@ export default class Edition {
             this.uids,
             this.title,
             this.authors,
+            this.number,
+            this.summary,
+            this.published,
             this.images,
             this.description,
             this.chapters,
@@ -210,6 +244,9 @@ export default class Edition {
             this.uids,
             title,
             this.authors,
+            this.number,
+            this.summary,
+            this.published,
             this.images,
             this.description,
             this.chapters,
@@ -234,6 +271,9 @@ export default class Edition {
             this.uids,
             this.title,
             this.authors,
+            this.number,
+            this.summary,
+            this.published,
             this.images,
             description,
             this.chapters,
@@ -251,18 +291,70 @@ export default class Edition {
     getAcknowledgements() {
         return this.acknowledgements;
     }
-    setAcknowledgements(acks: string) {
+
+    withAcknowledgements(acks: string) {
         return new Edition(
             this.bookRef,
             this.editionRef,
             this.uids,
             this.title,
             this.authors,
+            this.number,
+            this.summary,
+            this.published,
             this.images,
             this.description,
             this.chapters,
             this.license,
             acks,
+            this.tags,
+            this.sources,
+            this.references,
+            this.symbols,
+            this.glossary,
+            this.theme
+        );
+    }
+
+    withSummary(summary: string) {
+        return new Edition(
+            this.bookRef,
+            this.editionRef,
+            this.uids,
+            this.title,
+            this.authors,
+            this.number,
+            summary,
+            this.published,
+            this.images,
+            this.description,
+            this.chapters,
+            this.license,
+            this.acknowledgements,
+            this.tags,
+            this.sources,
+            this.references,
+            this.symbols,
+            this.glossary,
+            this.theme
+        );
+    }
+
+    asPublished(published: boolean) {
+        return new Edition(
+            this.bookRef,
+            this.editionRef,
+            this.uids,
+            this.title,
+            this.authors,
+            this.number,
+            this.summary,
+            published ? Date.now() : null,
+            this.images,
+            this.description,
+            this.chapters,
+            this.license,
+            this.acknowledgements,
             this.tags,
             this.sources,
             this.references,
@@ -282,6 +374,9 @@ export default class Edition {
             this.uids,
             this.title,
             this.authors,
+            this.number,
+            this.summary,
+            this.published,
             this.images,
             this.description,
             this.chapters,
@@ -338,6 +433,9 @@ export default class Edition {
             this.uids,
             this.title,
             this.authors,
+            this.number,
+            this.summary,
+            this.published,
             this.images,
             this.description,
             chapters,
@@ -365,6 +463,30 @@ export default class Edition {
     withoutRefs() {
         return this.withRef(undefined).withChapters(
             this.chapters.map((chap) => chap.withoutRef())
+        );
+    }
+
+    withIncrementedEditionNumber() {
+        return new Edition(
+            this.bookRef,
+            this.editionRef,
+            this.uids,
+            this.title,
+            this.authors,
+            this.number + 1,
+            this.summary,
+            this.published,
+            this.images,
+            this.description,
+            this.chapters,
+            this.license,
+            this.acknowledgements,
+            this.tags,
+            this.sources,
+            this.references,
+            this.symbols,
+            this.glossary,
+            this.theme
         );
     }
 
@@ -420,6 +542,9 @@ export default class Edition {
             this.uids,
             this.title,
             this.authors,
+            this.number,
+            this.summary,
+            this.published,
             this.images,
             this.description,
             newChapters,
@@ -459,6 +584,9 @@ export default class Edition {
             this.uids,
             this.title,
             this.authors,
+            this.number,
+            this.summary,
+            this.published,
             this.images,
             this.description,
             this.chapters,
@@ -522,6 +650,9 @@ export default class Edition {
             this.uids,
             this.title,
             this.authors,
+            this.number,
+            this.summary,
+            this.published,
             this.images,
             this.description,
             this.chapters,
@@ -587,6 +718,9 @@ export default class Edition {
             this.uids,
             this.title,
             this.authors,
+            this.number,
+            this.summary,
+            this.published,
             this.images,
             this.description,
             this.chapters,
@@ -629,6 +763,9 @@ export default class Edition {
             this.uids,
             this.title,
             authors,
+            this.number,
+            this.summary,
+            this.published,
             this.images,
             this.description,
             this.chapters,
@@ -671,6 +808,9 @@ export default class Edition {
             uids,
             this.title,
             this.authors,
+            this.number,
+            this.summary,
+            this.published,
             this.images,
             this.description,
             this.chapters,
@@ -702,6 +842,9 @@ export default class Edition {
             this.uids,
             this.title,
             this.authors,
+            this.number,
+            this.summary,
+            this.published,
             newImages,
             this.description,
             this.chapters,
@@ -714,6 +857,14 @@ export default class Edition {
             this.glossary,
             this.theme
         );
+    }
+
+    isEditor(uid: string) {
+        return this.uids.includes(uid);
+    }
+
+    isChapterEditor(uid: string) {
+        return this.getChapterUIDS().includes(uid);
     }
 
     getBookReadingTime() {
@@ -929,20 +1080,31 @@ export default class Edition {
         );
     }
 
-    /* Edition numbers are 1 to N */
-    getEditionNumber(book: Book) {
-        const revisions = book.getEditions();
-        if (revisions === undefined) return undefined;
-        for (let i = 0; i < revisions.length; i++)
-            if (revisions[i].ref.id === this.editionRef?.id)
-                return revisions.length - i;
-        return undefined;
+    getEditionNumber() {
+        return this.number;
     }
 
-    getEditionLabel(book: Book) {
-        const num = this.getEditionNumber(book);
+    getEditionLabel() {
+        const num = this.number;
         return `${num}${
-            num === 1 ? 'st' : num === 2 ? 'nd' : num === 3 ? 'rd' : 'th'
+            num === 1 ? 'st' : num === 2 ? 'nd' : num === 3 ? 'rd' : ''
         }`;
+    }
+
+    getInfo(): EditionInfo | undefined {
+        return this.editionRef === undefined
+            ? undefined
+            : {
+                  ref: this.editionRef,
+                  summary: this.summary,
+                  number: this.number,
+                  published: this.published,
+                  editionuids: this.uids,
+                  chapteruids: Array.from(
+                      new Set(
+                          this.chapters.map((chapter) => chapter.uids).flat()
+                      )
+                  ),
+              };
     }
 }

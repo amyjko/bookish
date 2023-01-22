@@ -7,14 +7,14 @@
     import Format from '$lib/components/chapter/Format.svelte';
     import Note from '../editor/Note.svelte';
     import { afterUpdate } from 'svelte';
-    import { getEdition, isEditable } from './Contexts';
+    import { getEdition, isChapterEditable } from './Contexts';
     import Button from '../app/Button.svelte';
 
     export let id: string;
     export let definition: Definition;
 
     let edition = getEdition();
-    let editable = isEditable();
+    let editable = isChapterEditable();
 
     // Focus after adding a new synonym.
     let newSynonym = false;

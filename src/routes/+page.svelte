@@ -1,5 +1,5 @@
 <script lang="ts">
-    import Section from '$lib/components/app/Writing.svelte';
+    import Section from '$lib/components/app/Section.svelte';
     import Paragraph from '$lib/components/app/Paragraph.svelte';
     import Lead from '$lib/components/app/Lead.svelte';
     import Link from '$lib/components/app/Link.svelte';

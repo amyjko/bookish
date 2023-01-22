@@ -7,10 +7,12 @@
     import Title from './Title.svelte';
     import { onMount } from 'svelte';
     import TextEditor from '$lib/components/editor/TextEditor.svelte';
-    import { getEdition, isEditable } from './Contexts';
+    import { getEdition, isEditionEditable } from './Contexts';
     import type ErrorNode from '../../models/chapter/ErrorNode';
     import Button from '../app/Button.svelte';
 
+    /** True if an author should be able to edit this header. */
+    export let editable: boolean;
     export let label: string;
     export let header: string;
     export let subtitle: string | undefined = undefined;
@@ -24,7 +26,6 @@
     let showReminder: boolean = true;
 
     let edition = getEdition();
-    let editable = isEditable();
 
     function updateScrollReminder() {
         // If the bottom of the window is below the top of the title, hide the reminder.
@@ -76,7 +77,7 @@
                     placeholder=""
                 />
             {:else if embedNode instanceof EmbedNode}
-                <Embed node={embedNode} />
+                <Embed node={embedNode} editable />
             {:else}
                 <ErrorMessage node={embedNode} />
             {/if}

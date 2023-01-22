@@ -4,6 +4,7 @@
         getAuth,
         getBook,
         getEdition,
+        isEditionEditable,
     } from '$lib/components/page/Contexts';
     import { getCaret } from '$lib/components/page/Contexts';
     import {
@@ -14,6 +15,7 @@
     import Status from '$lib/components/page/Status.svelte';
     import HomeIcon from '$lib/components/editor/icons/home.svg?raw';
     import Icon from '$lib/components/editor/Icon.svelte';
+    import { page } from '$app/stores';
 
     let subdomain = getSubdomain();
 
@@ -33,17 +35,27 @@
         <Link to={getLink('/')} title="Home"><Icon icon={HomeIcon} /></Link>
         <Link to={getLink('/read')}>Read</Link>
         <Link to={getLink('/write')}>Write</Link>
-        {#if $auth?.user && $auth.user.email}
-            <Link to={getLink('/email')}>{$auth.user.email}</Link>
-        {:else}
-            <Link to={getLink('/login')}>Login</Link>
-        {/if}
+        <small>
+            {#if $auth?.user && $auth.user.email}
+                <Link to={getLink('/email')}>{$auth.user.email}</Link>
+            {:else}
+                <Link to={getLink('/login')}>Login</Link>
+            {/if}
+        </small>
         {#if $book}
-            <span class="elided">&mdash; {$book.getTitle()}</span>
+            <span class="elided">{$book.getTitle()}</span>
         {/if}
-        {#if $edition && $book}
-            <span class="elided"
-                >&mdash; {$edition.getEditionLabel($book)} edition</span
+        {#if $book && $page.route.id?.includes('/[bookid]/editions')}
+            <span>&ndash; Editions</span>
+        {/if}
+        {#if $book && $edition}
+            <span
+                >&ndash; <Link
+                    to={`${
+                        $page.route.id?.startsWith('/write') ? '/write' : ''
+                    }/${$book.ref.id}/editions`}
+                    >{$edition.getEditionLabel()} edition</Link
+                ></span
             >
         {/if}
         <!-- Show status if there's a book and edition currently being viewed -->
@@ -78,6 +90,7 @@
         padding: var(--app-chrome-padding);
         gap: var(--app-chrome-padding);
         text-overflow: ellipsis;
+        align-items: baseline;
     }
 
     .status {

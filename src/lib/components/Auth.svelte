@@ -1,6 +1,6 @@
 <script lang="ts">
     import { sendSignInLinkToEmail, type User } from 'firebase/auth';
-    import { onMount, setContext } from 'svelte';
+    import { onDestroy, setContext } from 'svelte';
     import { writable, type Writable } from 'svelte/store';
     import { auth } from '../models/Firebase';
     import type Authentication from './Authentication';
@@ -46,16 +46,14 @@
     }
 
     // On mount, subscribe to authentication changes.
-    onMount(() => {
-        if (auth) {
-            const unsubscribe = auth.onAuthStateChanged((user) => {
-                loading = false;
-                updateAuth(user);
-            });
-            // On unmount, stop subscribing.
-            return unsubscribe;
-        }
-    });
+    if (auth) {
+        const unsubscribe = auth.onAuthStateChanged((user) => {
+            loading = false;
+            updateAuth(user);
+        });
+        // On unmount, stop subscribing.
+        onDestroy(unsubscribe);
+    }
 
     // Expose the state and the login/logout functionality.
     setContext<AuthStore>(AUTH, authentication);

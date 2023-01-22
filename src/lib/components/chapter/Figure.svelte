@@ -7,13 +7,13 @@
     import type CodeNode from '$lib/models/chapter/CodeNode';
     import type FormatNode from '$lib/models/chapter/FormatNode';
     import Positioned from './Positioned.svelte';
-    import { getCaret, isEditable } from '../page/Contexts';
+    import { getCaret, isChapterEditable } from '../page/Contexts';
 
     export let node: TableNode | EmbedNode | CodeNode;
     export let caption: FormatNode | undefined;
     export let credit: FormatNode | undefined = undefined;
 
-    let editable = isEditable();
+    let editable = isChapterEditable();
     let caret = getCaret();
 
     $: selected = $caret?.range?.start.node === node;

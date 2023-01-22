@@ -7,7 +7,7 @@
     import {
         getCaret,
         getChapter,
-        isEditable,
+        isChapterEditable,
     } from '$lib/components/page/Contexts';
 
     export let node: Node;
@@ -16,7 +16,7 @@
 
     let hovered = false;
     let chapter = getChapter();
-    $: editable = isEditable();
+    $: editable = isChapterEditable();
     let caret = getCaret();
 
     // If there's no marginal selected or this is different from the current selection, this is hidden.

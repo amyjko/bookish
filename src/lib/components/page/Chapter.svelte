@@ -18,7 +18,10 @@
         getAuth,
         getBook,
         getEdition,
-        isEditable,
+        isBookEditable,
+        isChapterEditable,
+        isEditionEditable,
+        isEditionPartiallyEditable,
         setChapter,
         type ChapterStore,
     } from './Contexts';
@@ -39,7 +42,6 @@
 
     let book = getBook();
     let edition = getEdition();
-    let editable = isEditable();
     let auth = getAuth();
 
     // Keep track of the scroll position to facilitate reading during reloads.
@@ -221,7 +223,7 @@
     $: chapterAST = $edition ? chapter.getAST($edition) : undefined;
     $: citations = chapterAST ? chapterAST.getCitations() : undefined;
     $: editionNumber =
-        $book && $edition ? $edition.getEditionNumber($book) : undefined;
+        $book && $edition ? $edition.getEditionNumber() : undefined;
 
     let chapterStore = writable<ChapterContext>();
     setContext<ChapterStore>(CHAPTER, chapterStore);
@@ -232,6 +234,13 @@
         marginal: marginal,
         layoutMarginals: layoutMarginals,
     });
+
+    let editable =
+        isBookEditable() ||
+        isChapterEditable() ||
+        ($auth !== undefined &&
+            $auth.user !== null &&
+            chapter.isEditor($auth.user.uid));
 </script>
 
 {#if $edition}
@@ -240,6 +249,7 @@
         title={`${$edition.getTitle()} - ${chapter.getTitle()}`}
     >
         <Header
+            editable={isChapterEditable()}
             header={chapter.getTitle()}
             label="Chapter title"
             tags={$edition.getTags()}
@@ -318,6 +328,7 @@
             </svelte:fragment>
             <!-- If there are chapter authors, render those, otherwise use the book authors -->
             <Authors
+                editable={isChapterEditable()}
                 slot="after"
                 authors={chapter.getAuthors()}
                 inheritedAuthors={$edition.getAuthors()}
@@ -333,7 +344,7 @@
             />
         </Header>
 
-        <Instructions>
+        <Instructions {editable}>
             Edit your chapter's title, authors, and cover image above. You can
             also change the ID of the chapter, which appears in it's URL. Write
             your chapter text below, using the many formatting options in the
@@ -393,15 +404,19 @@
             </ol>
         {/if}
 
-        {#if editable}
-            <PageHeader>Chapter Editors</PageHeader>
-            <Instructions>These emails can edit this chapter.</Instructions>
+        {#if editable || isEditionPartiallyEditable()}
+            <PageHeader>Editors</PageHeader>
+            <Instructions {editable}
+                >These authors can edit this chapter.</Instructions
+            >
 
             <Permissions
                 uids={chapter.uids}
-                writable={$auth?.user?.uid !== undefined &&
-                    chapter.uids.includes($auth?.user?.uid)}
-                emptyMessage="No editors for this specific chapter. Edition and book-level editors can still edit."
+                inheriteduids={Array.from(
+                    new Set([...$edition.uids, ...($book ? $book.uids : [])])
+                )}
+                atleastone={false}
+                writable={isChapterEditable()}
                 change={(uids) =>
                     setChapter(edition, chapter, chapter.withEditors(uids))}
             />

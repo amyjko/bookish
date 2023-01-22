@@ -6,14 +6,13 @@
     import Table from '../app/Table.svelte';
     import ConfirmButton from '../editor/ConfirmButton.svelte';
     import TextEditor from '../editor/TextEditor.svelte';
-    import { getEdition, isEditable } from './Contexts';
+    import { getEdition, isEditionEditable } from './Contexts';
     import Link from '../Link.svelte';
     import Note from '../editor/Note.svelte';
-    import Parser from '../../models/chapter/Parser';
 
     export let reference: Reference;
 
-    let editable = isEditable();
+    let editable = isEditionEditable();
     let edition = getEdition();
 
     let editing = false;

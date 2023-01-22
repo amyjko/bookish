@@ -6,7 +6,7 @@
     import Chapter from '$lib/models/book/Chapter';
     import type { Match } from '$lib/models/book/Chapter';
     import ChapterIDs from '$lib/models/book/ChapterID';
-    import { getBase, getEdition } from './Contexts';
+    import { getBase, getEdition, isEditionEditable } from './Contexts';
     import TextInput from '../app/TextInput.svelte';
     import ChapterTitle from './ChapterTitle.svelte';
     import ChapterNumber from './ChapterNumber.svelte';
@@ -81,6 +81,7 @@
 {#if $edition}
     <Page title={`${$edition.getTitle()} - Search`}>
         <Header
+            editable={isEditionEditable()}
             label="Search title"
             getImage={() => $edition?.getImage(ChapterIDs.SearchID) ?? null}
             setImage={(embed) =>

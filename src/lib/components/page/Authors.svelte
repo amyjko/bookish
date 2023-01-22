@@ -3,17 +3,17 @@
     import TextEditor from '$lib/components/editor/TextEditor.svelte';
     import Format from '$lib/components/chapter/Format.svelte';
     import { afterUpdate } from 'svelte';
-    import { getEdition, isEditable } from './Contexts';
+    import { getEdition, isBookEditable, isEditionEditable } from './Contexts';
     import Note from '../editor/Note.svelte';
     import Button from '../app/Button.svelte';
 
+    export let editable: boolean;
     export let authors: string[];
     export let inheritedAuthors: string[] | undefined = undefined;
     export let add: () => Promise<void> | void;
     export let edit: (index: number, text: string) => Promise<void> | void;
     export let remove: (index: number) => Promise<void> | void;
 
-    let editable = isEditable();
     let edition = getEdition();
 
     let authorList: HTMLDivElement | null = null;

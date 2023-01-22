@@ -3,11 +3,11 @@
     import BookishEditor from '$lib/components/editor/BookishEditor.svelte';
     import Instructions from '$lib/components/page/Instructions.svelte';
     import Format from '$lib/components/chapter/Format.svelte';
-    import { getEdition, isEditable } from './Contexts';
+    import { getEdition, isEditionEditable } from './Contexts';
     import PageHeader from './PageHeader.svelte';
 
     let edition = getEdition();
-    let editable = isEditable();
+    let editable = isEditionEditable();
 
     $: formatNode = $edition
         ? Parser.parseFormat($edition, $edition.getLicense()).withTextIfEmpty()
@@ -16,7 +16,7 @@
 
 <PageHeader id="license">License</PageHeader>
 
-<Instructions>
+<Instructions {editable}>
     By default of U.S. Copyright Law, your content copyrighted and owned by all
     authors. Edit this if you'd like to grant different rights.
 </Instructions>

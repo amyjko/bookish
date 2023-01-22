@@ -1,30 +1,21 @@
+import type Edition from './book/Edition';
 import { getBookFromIDOrName } from './CRUD';
 
 export default async function loadEdition(
     bookIDOrName: string,
-    editionID: string | undefined,
+    editionNumber: string | undefined,
     latestPublished: boolean
-) {
-    const getEditionNumber =
-        editionID === undefined ? undefined : parseInt(editionID);
-
+): Promise<Edition | undefined> {
     const book = await getBookFromIDOrName(bookIDOrName);
 
-    if (book === null) return null;
+    if (book === null) return undefined;
 
-    const unspecifiedEdition =
-        getEditionNumber === undefined ||
-        isNaN(getEditionNumber) ||
-        !book.isValidEditionNumber(getEditionNumber);
-    const edition = unspecifiedEdition
-        ? await (latestPublished
-              ? book.getLatestPublishedEdition()
-              : book.getDraftEdition())
-        : await book.getEditionNumber(getEditionNumber);
+    const edition =
+        editionNumber === undefined
+            ? await (latestPublished
+                  ? book.getLatestPublishedEdition()
+                  : book.getLatestEdition())
+            : await book.getEditionNumber(parseFloat(editionNumber));
 
-    return {
-        book: book,
-        edition: edition,
-        latest: unspecifiedEdition,
-    };
+    return edition;
 }

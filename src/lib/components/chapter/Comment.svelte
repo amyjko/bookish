@@ -7,7 +7,7 @@
     import Format from './Format.svelte';
     import {
         getChapter,
-        isEditable,
+        isChapterEditable,
         getCaret,
         getEdition,
     } from '$lib/components/page/Contexts';
@@ -19,7 +19,7 @@
 
     let chapter = getChapter();
     let edition = getEdition();
-    let editable = isEditable();
+    let editable = isChapterEditable();
 
     let caret = getCaret();
 

@@ -4,7 +4,7 @@
     import Auth from '$lib/components/Auth.svelte';
     import Large from '$lib/components/app/Large.svelte';
     import Lead from '$lib/components/app/Lead.svelte';
-    import Writing from '$lib/components/app/Writing.svelte';
+    import Writing from '$lib/components/app/Section.svelte';
     import Paragraph from '$lib/components/app/Paragraph.svelte';
     import { writable, type Writable } from 'svelte/store';
     import { setContext } from 'svelte';
@@ -150,7 +150,7 @@
 {:else}
     <div class="bookish-app">
         <Auth>
-            {#if $page.route.id !== null && !$page.route.id.startsWith('/[bookid]')}
+            {#if $page.route.id !== null && !$page.route.id.startsWith('/[bookid]/[[editionid=edition]]')}
                 <Header />
             {/if}
             <slot />

@@ -11,7 +11,6 @@
     import Description from './Description.svelte';
     import Acknowledgements from './Acknowledgements.svelte';
     import License from '$lib/components/page/License.svelte';
-    import Revisions from './Editions.svelte';
     import Authors from '$lib/components/page/Authors.svelte';
     import TextEditor from '$lib/components/editor/TextEditor.svelte';
     import Toggle from '$lib/components/editor/Toggle.svelte';
@@ -20,7 +19,9 @@
         getBase,
         getBook,
         getEdition,
-        isEditable,
+        isBookEditable,
+        isEditionEditable,
+        isEditionPartiallyEditable,
         setChapter,
     } from './Contexts';
     import Muted from './Muted.svelte';
@@ -30,12 +31,13 @@
     import PageParagraph from './PageParagraph.svelte';
     import Note from '../editor/Note.svelte';
     import Permissions from '../editor/Permissions.svelte';
+    import Publish from './Publish.svelte';
 
+    let auth = getAuth();
     let book = getBook();
     let edition = getEdition();
     let base = getBase();
-    let editable = isEditable();
-    let auth = getAuth();
+    let editable = isEditionEditable();
 
     function getProgressDescription(progress: null | number) {
         if (progress === null) return '';
@@ -74,6 +76,7 @@
 {#if $edition && $book}
     <Page title={$edition.getTitle()}>
         <Header
+            editable={isEditionEditable()}
             label="Book title"
             getImage={() => $edition?.getImage('cover') ?? null}
             setImage={(embed) =>
@@ -98,6 +101,7 @@
             />
             <div slot="after">
                 <Authors
+                    editable={isBookEditable()}
                     authors={$edition.getAuthors()}
                     add={() =>
                         $edition
@@ -113,25 +117,25 @@
                             : undefined}
                 />
                 {#if $book.getPublishedEditionCount() > 1}
-                    <Note>{$edition.getEditionLabel($book)} edition</Note>
+                    <Note>{$edition.getEditionLabel()} edition</Note>
                 {/if}
             </div>
         </Header>
 
-        <Instructions>
+        <Instructions {editable}>
             Above you can edit your book's authors, title, and cover image.
         </Instructions>
 
         <Description />
 
-        <Instructions>
+        <Instructions {editable}>
             This will appear on the <Link to={$base + 'read'}
                 >book browsing</Link
             > page and in your table of contents. Write an informative description
             of what your book is about.
         </Instructions>
 
-        <Instructions>
+        <Instructions {editable}>
             Add, remove, and reorder chapters here. You can add optional book
             sections to each chapter, toggle chapters as numbered/unnumbered or
             published/forthcoming. Click the title to edit the chapter.
@@ -188,6 +192,9 @@
                                     )}
                             />
                         {:else if section}{section}{/if}
+                        {#if !editable && $auth !== undefined && $auth.user !== null && chapter.uids.includes($auth.user.uid)}
+                            You can edit this chapter.
+                        {/if}
                     </span>
                     <span slot="etc">
                         <Muted>
@@ -251,7 +258,7 @@
 
         <PageHeader id="print">Print</PageHeader>
 
-        <Instructions>
+        <Instructions {editable}>
             This offers a way for readers to print the entire book as a single
             page.
         </Instructions>
@@ -264,7 +271,7 @@
 
         <PageHeader id="citation">Citation</PageHeader>
 
-        <Instructions>
+        <Instructions {editable}>
             This citation is dynamically created from the current authors,
             title, and date.
         </Instructions>
@@ -282,43 +289,32 @@
             <em>retrieved {new Date().toLocaleDateString('en-US')}</em>.
         </PageParagraph>
 
-        <Revisions />
-
-        {#if editable && $book}
-            <PageHeader
-                >{$edition.getEditionLabel($book)} Edition Editors</PageHeader
-            >
-            <Instructions>
-                These emails can edit this edition and its chapters. (If you
-                want to give someone permissions to edit a specific chapter in a
-                specific edition, navigate to the chapter and edit permissions
-                there.)
+        {#if editable}
+            <PageHeader id="publish">Publish</PageHeader>
+            <Instructions {editable}>
+                Ready to publish this edition? Write a summary then hit the
+                switch.
             </Instructions>
+            <Publish />
+        {/if}
 
+        {#if editable || isEditionPartiallyEditable()}
+            <PageHeader>Editors</PageHeader>
+            <Instructions {editable}>
+                Authors with these email addresses can edit this edition and its
+                chapters. To give book level permissions, edit the book editors
+                on the <Link to="/write/{$book.ref.id}/editions">editions</Link>
+                page. To give chapter-level permissions, navigate to the chapter.
+            </Instructions>
             <Permissions
                 uids={$edition.uids}
-                writable={$auth?.user?.uid !== undefined &&
-                    $edition.uids.includes($auth.user.uid)}
-                emptyMessage="No editors for this specific-edition; only book-level editors can edit it."
+                inheriteduids={$book.uids}
+                atleastone={false}
+                writable={editable}
                 change={(uids) =>
                     $edition
                         ? edition.set($edition.withEditors(uids))
                         : undefined}
-            />
-
-            <PageHeader>Book Editors</PageHeader>
-            <Instructions>
-                These emails can edit any aspect of the book and any of its
-                editions.
-            </Instructions>
-
-            <Permissions
-                uids={$book.uids}
-                writable={$auth?.user?.uid !== undefined &&
-                    $book.uids.includes($auth.user.uid)}
-                emptyMessage="No book editors; this is concerning, since a book should always have at least one editor."
-                change={(uids) =>
-                    $book ? book.set($book.withEditors(uids)) : undefined}
             />
         {/if}
     </Page>

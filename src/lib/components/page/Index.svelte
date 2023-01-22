@@ -5,7 +5,7 @@
     import Instructions from '$lib/components/page/Instructions.svelte';
     import ChapterIDs from '$lib/models/book/ChapterID';
     import Link from '$lib/components/Link.svelte';
-    import { getBase, getEdition } from './Contexts';
+    import { getBase, getEdition, isEditionEditable } from './Contexts';
     import { page } from '$app/stores';
     import Muted from './Muted.svelte';
     import ChapterTitle from './ChapterTitle.svelte';
@@ -13,6 +13,7 @@
     import PageHeader from './PageHeader.svelte';
     import Rows from './Rows.svelte';
 
+    let editable = isEditionEditable();
     let edition = getEdition();
     let base = getBase();
 
@@ -50,6 +51,7 @@
 {#if $edition}
     <Page title={`${$edition.getTitle()} - Index`}>
         <Header
+            editable={isEditionEditable()}
             label="Index title"
             getImage={() => $edition?.getImage(ChapterIDs.IndexID) ?? null}
             setImage={(embed) =>
@@ -66,7 +68,7 @@
             />
         </Header>
 
-        <Instructions>
+        <Instructions {editable}>
             This index is created automatically. It's not perfect; we may add
             more control over it in the future.
         </Instructions>

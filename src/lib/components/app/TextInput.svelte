@@ -17,6 +17,7 @@
     {type}
     {placeholder}
     {disabled}
+    value={text}
     bind:this={input}
     on:input={() => (text = input.value)}
 />

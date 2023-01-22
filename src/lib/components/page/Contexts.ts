@@ -12,6 +12,7 @@ import type Edition from '../../models/book/Edition';
 import type Authentication from '../Authentication';
 import type CaretState from '../editor/CaretState';
 import type ChapterContext from './ChapterContext';
+import { page } from '$app/stores';
 
 export type DarkModeStore = Writable<boolean>;
 export const DARK_MODE = Symbol('dark');
@@ -56,9 +57,60 @@ export function setChapter(
     if (edition) store.set(edition.withRevisedChapter(previous, chapter));
 }
 
-export const EDITABLE = Symbol('editable');
-export function isEditable(): boolean {
-    return getContext(EDITABLE);
+export function isChapterEditable(): boolean {
+    if (!get(page).route.id?.startsWith('/write')) return false;
+    const auth = get(getAuth());
+    const chapter = get(getChapter());
+    const edition = get(getEdition());
+    const book = get(getBook());
+    return (
+        chapter !== undefined &&
+        edition !== undefined &&
+        book !== undefined &&
+        auth !== undefined &&
+        auth.user !== null &&
+        (chapter.chapter.isEditor(auth.user.uid) ||
+            edition.isEditor(auth.user.uid) ||
+            book.isEditor(auth.user.uid))
+    );
+}
+
+export function isEditionEditable(): boolean {
+    if (!get(page).route.id?.startsWith('/write')) return false;
+    const auth = get(getAuth());
+    const edition = get(getEdition());
+    const book = get(getBook());
+    return (
+        edition !== undefined &&
+        book !== undefined &&
+        auth !== undefined &&
+        auth.user !== null &&
+        (edition.isEditor(auth.user.uid) || book.isEditor(auth.user.uid))
+    );
+}
+
+export function isEditionPartiallyEditable(): boolean {
+    if (!get(page).route.id?.startsWith('/write')) return false;
+    const auth = get(getAuth());
+    const edition = get(getEdition());
+    return (
+        edition !== undefined &&
+        auth !== undefined &&
+        auth.user !== null &&
+        edition.isChapterEditor(auth.user.uid)
+    );
+}
+
+export function isBookEditable(): boolean {
+    if (!get(page).route.id?.startsWith('/write')) return false;
+    const auth = get(getAuth());
+    const book = get(getBook());
+    return (
+        book !== undefined &&
+        auth !== undefined &&
+        auth.user !== null &&
+        book.isEditor(auth.user.uid)
+    );
 }
 
 export const BASE = Symbol('base');

@@ -5,7 +5,7 @@
     import Code from './Code.svelte';
     import Python from './Python.svelte';
     import Text from './Text.svelte';
-    import { isEditable } from '../page/Contexts';
+    import { isChapterEditable } from '../page/Contexts';
     import Figure from './Figure.svelte';
     import { getCaret } from '$lib/components/page/Contexts';
 
@@ -13,7 +13,7 @@
 
     $: language = node.getLanguage();
 
-    let editable = isEditable();
+    let editable = isChapterEditable();
 
     // const languages = [ "C", "C++", "CSS", "Go", "HTML", "Java", "JavaScript", "Markdown", "Plaintext", "Python", "TypeScript" ];
 

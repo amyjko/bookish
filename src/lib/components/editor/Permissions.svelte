@@ -5,24 +5,43 @@
     import Note from './Note.svelte';
 
     export let uids: string[];
+    export let inheriteduids: string[];
     export let writable: boolean;
-    export let emptyMessage: string;
+    export let atleastone: boolean;
     export let change: (uids: string[]) => void;
 
-    let emails: Record<string, string> | null = null;
+    let emails: Map<string, string> | null = null;
 
-    async function getEmails() {
-        emails = await getUserEmails(uids);
+    $: alluids = Array.from(new Set([...uids, ...inheriteduids]));
+
+    async function getEmails(userIDs: string[]) {
+        emails = await getUserEmails(userIDs);
     }
-    $: if (uids) getEmails();
+    $: {
+        if (
+            emails === null ||
+            (emails.size > 0 &&
+                Array.from(emails.keys()).join() !== alluids.join())
+        )
+            getEmails(alluids);
+    }
 
     let newEditor: string = '';
     let newEditorError: string | null = null;
 
+    let loading: string | undefined = undefined;
+
     async function addEditor() {
-        const uid = await createUser(newEditor);
-        if (uid === null) newEditorError = "couldn't add editor";
-        else change([...uids, uid]);
+        const email = newEditor;
+        newEditor = '';
+        loading = email;
+        try {
+            const uid = await createUser(email);
+            if (uid === null) newEditorError = "couldn't add editor";
+            else change([...uids, uid]);
+        } finally {
+            loading = undefined;
+        }
     }
 </script>
 
@@ -31,8 +50,8 @@
 {:else}
     <section class="emails">
         {#if writable}
-            <p
-                ><TextInput
+            <form on:submit|preventDefault={addEditor}>
+                <TextInput
                     type="email"
                     placeholder="email"
                     bind:text={newEditor}
@@ -41,31 +60,38 @@
                 <Button
                     tooltip="Give email editing rights"
                     disabled={newEditor.length === 0 ||
-                        Object.values(emails).includes(newEditor)}
+                        Array.from(emails.values()).includes(newEditor)}
                     command={addEditor}>+ editor</Button
                 >
                 {#if newEditorError !== null}{newEditorError}{/if}
-            </p>
+            </form>
         {/if}
 
-        {#each Object.entries(emails) as [uid, email], index (uid)}
+        {#each uids as uid, index (uid)}
+            {@const email = emails.get(uid)}
             <p>
+                {email}
                 {#if writable}
                     <Button
-                        tooltip="Remove email's editing rights"
+                        tooltip={`Remove editing rights of ${email}`}
                         command={() =>
                             change([
                                 ...uids.slice(0, index),
                                 ...uids.slice(index + 1),
                             ])}
-                        disabled={uids.length <= 1}>x</Button
+                        disabled={atleastone && uids.length <= 1}>x</Button
                     >
                 {/if}
-                {email}
             </p>
-        {:else}
-            <Note>{emptyMessage}</Note>
         {/each}
+        {#each inheriteduids as uid}
+            <p><em>{emails.get(uid)}</em> <Note>book editor</Note></p>
+        {/each}
+        {#if loading}
+            <p>
+                adding {loading}
+            </p>
+        {/if}
     </section>
 {/if}
 

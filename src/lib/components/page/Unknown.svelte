@@ -4,14 +4,16 @@
     import Page from './Page.svelte';
     import Instructions from './Instructions.svelte';
     import ChapterIDs from '$lib/models/book/ChapterID';
-    import { getEdition } from './Contexts';
+    import { getEdition, isEditionEditable } from './Contexts';
 
+    let editable = isEditionEditable();
     let edition = getEdition();
 </script>
 
 {#if $edition}
     <Page title={`${$edition.getTitle()} - Unknown Page`}>
         <Header
+            editable={isEditionEditable()}
             label="Unknown page title"
             getImage={() => $edition?.getImage(ChapterIDs.UnknownID) ?? null}
             setImage={(embed) =>
@@ -25,7 +27,7 @@
             <Outline slot="outline" previous={null} next={null} />
         </Header>
 
-        <Instructions>
+        <Instructions {editable}>
             This page will be shown if the reader somehow ends up on a page that
             doesn't exist. You can customize the image shown.
         </Instructions>

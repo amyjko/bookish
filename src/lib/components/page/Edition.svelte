@@ -8,7 +8,6 @@
     import {
         BASE,
         DARK_MODE,
-        EDITABLE,
         type BaseStore,
         type DarkModeStore,
     } from './Contexts';
@@ -16,12 +15,6 @@
 
     // Poly fill smooth scrolling for Safari.
     onMount(() => smoothscroll.polyfill());
-
-    // True if the edition should be editable. Distributed as context.
-    export let editable: boolean = false;
-
-    // When editable changes, update the context.
-    $: setContext<boolean>(EDITABLE, editable);
 
     // The base path allows links to adjust to different routing contexts in which a book is placed.
     // For example, when the book is hosted alone, all routes might start with the bare root "/",

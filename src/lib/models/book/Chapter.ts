@@ -241,6 +241,10 @@ export default class Chapter {
         );
     }
 
+    isEditor(uid: string) {
+        return this.uids.includes(uid);
+    }
+
     getText() {
         return this.text;
     }

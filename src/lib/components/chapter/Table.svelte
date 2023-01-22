@@ -5,11 +5,11 @@
     import Figure from './Figure.svelte';
     import Format from './Format.svelte';
     import Rows from '../page/Rows.svelte';
-    import { isEditable } from '../page/Contexts';
+    import { isChapterEditable } from '../page/Contexts';
 
     export let node: TableNode;
 
-    let editable = isEditable();
+    let editable = isChapterEditable();
     $: rows = node.getRows();
 </script>
 

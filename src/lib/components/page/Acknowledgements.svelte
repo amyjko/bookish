@@ -3,11 +3,11 @@
     import ChapterBody from '$lib/components/chapter/ChapterBody.svelte';
     import BookishEditor from '$lib/components/editor/BookishEditor.svelte';
     import Instructions from '$lib/components/page/Instructions.svelte';
-    import { getEdition, isEditable } from './Contexts';
+    import { getEdition, isEditionEditable } from './Contexts';
     import PageHeader from './PageHeader.svelte';
 
     let edition = getEdition();
-    let editable = isEditable();
+    let editable = isEditionEditable();
 
     $: acknowledgements = $edition?.getAcknowledgements();
     $: acksNode = acknowledgements
@@ -15,7 +15,7 @@
         : undefined;
 </script>
 
-<Instructions>
+<Instructions {editable}>
     This section is not shown if empty. But surely you have someone to thank!
 </Instructions>
 
@@ -30,7 +30,7 @@
             save={(node) =>
                 $edition
                     ? edition.set(
-                          $edition.setAcknowledgements(node.toBookdown())
+                          $edition.withAcknowledgements(node.toBookdown())
                       )
                     : undefined}
         />

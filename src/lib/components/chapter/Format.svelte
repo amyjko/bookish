@@ -21,12 +21,12 @@
     import Comment from './Comment.svelte';
     import Text from './Text.svelte';
     import Format from './Format.svelte';
-    import { isEditable } from '../page/Contexts';
+    import { isChapterEditable } from '../page/Contexts';
 
     export let node: FormatNode;
     export let placeholder: string | undefined = undefined;
 
-    let editable = isEditable();
+    let editable = isChapterEditable();
 
     $: format = node.getFormat();
     $: tag =

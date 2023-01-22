@@ -3,7 +3,12 @@
     import type Chapter from '$lib/models/book/Chapter';
     import Toggle from '$lib/components/editor/Toggle.svelte';
     import ConfirmButton from '$lib/components/editor/ConfirmButton.svelte';
-    import { getBase, getEdition, isEditable, setChapter } from './Contexts';
+    import {
+        getBase,
+        getEdition,
+        isEditionEditable,
+        setChapter,
+    } from './Contexts';
     import Muted from './Muted.svelte';
     import ChapterNumber from './ChapterNumber.svelte';
     import Button from '../app/Button.svelte';
@@ -17,7 +22,7 @@
 
     let edition = getEdition();
     let base = getBase();
-    let editable = isEditable();
+    let editable = isEditionEditable();
 
     function moveUp() {
         if ($edition && chapter)

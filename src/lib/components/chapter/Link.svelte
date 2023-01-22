@@ -2,14 +2,14 @@
 
 <script lang="ts">
     import type LinkNode from '$lib/models/chapter/LinkNode';
-    import { getBase, getEdition, isEditable } from '../page/Contexts';
+    import { getBase, getEdition, isChapterEditable } from '../page/Contexts';
     import Text from './Text.svelte';
     import Problem from './Problem.svelte';
 
     export let node: LinkNode;
 
     let base = getBase();
-    let editable = isEditable();
+    let editable = isChapterEditable();
     let edition = getEdition();
 
     $: url = node.getMeta();

@@ -2,30 +2,57 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
     match /books/{book} {
-      allow read: if true;
-      allow create: if request.auth != null;
-      allow write: if request.auth != null && request.auth.uid in resource.data.uids;
-      allow update: if request.auth != null && request.auth.uid in resource.data.uids;
+
       function getBook() {
         return get(/databases/$(database)/documents/books/$(book)).data
-      } 
-    }
-
-    match /editions/{edition} {
-      allow read: if true;
-      // Anyone can create an edition.
-      allow create: if request.auth != null;
-      // Can update or delete editions with edition level permissions
-      allow update: if request.auth != null && request.auth.uid in resource.data.uids;
-      allow delete: if request.auth != null && request.auth.uid in resource.data.uids;
-
-      function getEdition() {
-        return get(/databases/$(database)/documents/editions/$(edition)).data
       }
-      match /chapters/{chapter} {
-        allow read: if true;
-        // Chapters can be edited by anyone with chapter, edition, or book level permissions.
-        allow write: if request.auth != null && (request.auth.uid in resource.data.uids || request.auth.uid in getEdition().uids || request.auth.uid in getBook().uids);
+
+      function bookIsEditable(bookDoc) {
+        return request.auth != null && request.auth.uid in bookDoc.uids;
+      }
+
+      // Can read a book if it's published or editable by this user
+      allow read: if resource.data.published || (request.auth != null && (
+        bookIsEditable(resource.data) || 
+        request.auth.uid in resource.data.readuids
+      ));
+      allow create: if request.auth != null;
+      allow update: if bookIsEditable(resource.data) || request.auth.uid in resource.data.readuids;
+      allow delete: if bookIsEditable(resource.data);
+
+      match /editions/{edition} {
+
+        function getEdition() {
+          return get(/databases/$(database)/documents/books/$(book)/editions/$(edition)).data
+        }
+
+        function editionIsEditable(editionDoc) {
+          return request.auth != null && request.auth.uid in editionDoc.uids || bookIsEditable(getBook())
+        }
+
+        // Editions can be read if they are published or the user has permissions to edit the edition or book.
+        allow read: if resource.data.published != null || (request.auth != null && (editionIsEditable(resource.data) || request.auth.uid in resource.data.chapteruids));
+        // Anyone with book permissions can create or delete editions.
+        allow create: if bookIsEditable(getBook());
+        allow delete: if bookIsEditable(getBook());
+        // Anyone with book or edition permissions can edit the edition.
+        allow update: if request.auth != null && (editionIsEditable(resource.data) || (request.auth.uid in resource.data.chapteruids));
+
+
+        match /chapters/{chapter} {
+
+          function chapterIsEditable(chapterDoc) {
+            return (request.auth != null && request.auth.uid in chapterDoc.data.uids) || editionIsEditable(getEdition());
+          }
+
+          // Chapter text is readable if the book is published or the part or all of the edition is editable
+          allow read: if getBook().published || chapterIsEditable() || (request.auth != null && request.auth.uid in getEdition().chapteruids);
+          allow create: if editionIsEditable(getEdition());
+          // Chapters can be edited by anyone with chapter, edition, or book level permissions.
+          allow update: if chapterIsEditable(resource.data);
+          allow delete: if chapterIsEditable(resource.data);
+
+        }
       }
     }
   }

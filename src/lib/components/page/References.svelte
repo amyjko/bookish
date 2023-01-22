@@ -2,14 +2,14 @@
     import Header from './Header.svelte';
     import Outline from './Outline.svelte';
     import Page from './Page.svelte';
-    import Parser from '$lib/models/chapter/Parser';
     import ChapterIDs from '$lib/models/book/ChapterID';
     import BulkReferenceEditor from './BulkReferenceEditor.svelte';
     import PossibleReference from './PossibleReference.svelte';
-    import { getEdition, isEditable } from './Contexts';
+    import { getAuth, getEdition, isEditionEditable } from './Contexts';
 
+    let auth = getAuth();
     let edition = getEdition();
-    let editable = isEditable();
+    let editable = isEditionEditable();
 
     $: references = $edition?.hasReferences() ? $edition.getReferences() : null;
 
@@ -21,6 +21,10 @@
 {#if $edition}
     <Page title={`${$edition.getTitle()} - References`}>
         <Header
+            editable={isEditionEditable() ||
+                ($auth !== undefined &&
+                    $auth.user !== null &&
+                    $edition.isChapterEditor($auth.user.uid))}
             label="References title"
             getImage={() => $edition?.getImage(ChapterIDs.ReferencesID) ?? null}
             setImage={(embed) =>

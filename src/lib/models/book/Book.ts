@@ -3,11 +3,14 @@ import { readEdition } from '../CRUD';
 import BookMedia from './BookMedia';
 import type Edition from './Edition';
 
+/** A replication of edition info */
 export type EditionInfo = {
     ref: DocumentReference;
-    time: number;
     summary: string;
-    published: boolean;
+    number: number;
+    published: number | null;
+    editionuids: string[];
+    chapteruids: string[];
 };
 
 export type BookSpecification = {
@@ -16,12 +19,14 @@ export type BookSpecification = {
     authors: string[];
     description: string;
     cover: string | null;
-    // A list of editions
+    published: boolean;
     editions: EditionInfo[];
-    // An optional subdomain
+    // An optional subdomain, for use in URLs
     domain?: string;
     // A list of user ids that have access to edit the book.
     uids: string[];
+    // A derived list of user ids that have read level access to the book via edition or chapter level write access.
+    readuids: string[];
 };
 
 export default class Book {
@@ -30,6 +35,7 @@ export default class Book {
     readonly authors: string[];
     readonly description: string;
     readonly cover: string | null;
+    readonly published: boolean;
     readonly editions: EditionInfo[];
     readonly domain: string | undefined;
     readonly uids: string[];
@@ -42,7 +48,7 @@ export default class Book {
         authors: string[],
         description: string,
         cover: string | null,
-        revisions: EditionInfo[],
+        editions: EditionInfo[],
         domain: string | undefined,
         uids: string[]
     ) {
@@ -51,7 +57,9 @@ export default class Book {
         this.authors = authors;
         this.description = description;
         this.cover = cover;
-        this.editions = revisions;
+        // We always keep editions in reversed edition number for easy reference.
+        this.published = editions.some((edition) => edition.published !== null);
+        this.editions = editions.sort((a, b) => a.number - b.number);
         this.domain = domain;
         this.uids = uids;
 
@@ -81,8 +89,19 @@ export default class Book {
             authors: this.authors,
             description: this.description,
             cover: this.cover,
+            published: this.published,
             editions: this.editions,
             uids: this.uids,
+            readuids: Array.from(
+                new Set(
+                    this.editions
+                        .map((edition) => [
+                            ...edition.editionuids,
+                            ...edition.chapteruids,
+                        ])
+                        .flat()
+                )
+            ),
         };
         if (this.domain !== undefined) json.domain = this.domain;
         return json;
@@ -181,30 +200,26 @@ export default class Book {
         return this.ref.id;
     }
 
-    getDraftEdition(): undefined | Promise<Edition> {
-        return this.editions.length === 0
-            ? undefined
-            : readEdition(this.editions[0].ref.id);
+    getLatestEdition(): Promise<Edition> | undefined {
+        const draft = this.editions[0];
+        return draft ? readEdition(this.ref.id, draft.ref.id) : undefined;
     }
 
-    isValidEditionNumber(edition: number) {
-        return this.getEditionNumber(edition) !== undefined;
-    }
-
-    /* Note: editions are numbered 1-n, but stored in reverse chronological order. */
     getEditionNumber(number: number) {
-        return number < 1 || number > this.editions.length
-            ? undefined
-            : readEdition(this.editions[this.editions.length - number].ref.id);
+        // Get the ID corresponding to this number.
+        const edition = this.editions.find((ed) => ed.number === number);
+        return edition ? readEdition(this.ref.id, edition.ref.id) : undefined;
     }
 
     getLatestPublishedEdition(): undefined | Promise<Edition> {
         const latest = this.getLatestPublishedEditionID();
-        return latest === undefined ? undefined : readEdition(latest);
+        return latest === undefined
+            ? undefined
+            : readEdition(this.ref.id, latest);
     }
 
     getLatestPublishedEditionID() {
-        return this.editions.find((e) => e.published)?.ref.id;
+        return this.editions.filter((ed) => ed.published !== null)[0]?.ref.id;
     }
 
     getLatestEditionID(): string | undefined {
@@ -217,6 +232,10 @@ export default class Book {
 
     getPublishedEditionCount() {
         return this.editions.filter((edition) => edition.published).length;
+    }
+
+    isEditor(uid: string) {
+        return this.uids.includes(uid);
     }
 
     withEditors(uids: string[]) {
@@ -245,40 +264,30 @@ export default class Book {
         );
     }
 
-    withEditionSummary(summary: string, index: number) {
-        if (index < 0 || index >= this.editions.length) return this;
-        const revision = this.editions[index];
-        return this.withEditions([
-            ...this.editions.slice(0, index),
-            {
-                ref: revision.ref,
-                time: revision.time,
-                summary,
-                published: revision.published,
-            },
-            ...this.editions.slice(index + 1),
-        ]);
-    }
+    withRevisedEdition(previous: Edition, revised: Edition) {
+        // Get the new info.
+        const info = revised.getInfo();
+        if (info === undefined) return this;
 
-    withEditionAsPublished(published: boolean, editionNumber: number) {
-        if (editionNumber < 0 || editionNumber >= this.editions.length)
-            return this;
-        const revision = this.editions[editionNumber];
-        return this.withEditions([
-            ...this.editions.slice(0, editionNumber),
-            {
-                ref: revision.ref,
-                time: revision.time,
-                summary: revision.summary,
-                published,
-            },
-            ...this.editions.slice(editionNumber + 1),
-        ]);
+        // If no previous addition, just add it.
+        if (previous === undefined)
+            return this.withEditions([...this.editions, info]);
+
+        // Find the corresponding edition.
+        const index = this.editions.findIndex(
+            (edition) => edition.number === previous.number
+        );
+
+        return index < 0
+            ? this
+            : this.withEditions([
+                  ...this.editions.slice(0, index),
+                  info,
+                  ...this.editions.slice(index + 1),
+              ]);
     }
 
     hasPublishedEdition() {
-        return (
-            this.editions.find((revision) => revision.published) !== undefined
-        );
+        return this.editions.some((revision) => revision.published !== null);
     }
 }

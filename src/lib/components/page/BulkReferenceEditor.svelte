@@ -5,11 +5,16 @@
         mineReference,
     } from '$lib/util/mineReference';
     import Reference from '$lib/models/book/Reference';
-    import { getEdition } from './Contexts';
+    import {
+        getEdition,
+        isEditionEditable,
+        isEditionPartiallyEditable,
+    } from './Contexts';
     import Button from '../app/Button.svelte';
 
     let edition = getEdition();
     let text = '';
+    let editable = isEditionEditable() || isEditionPartiallyEditable();
 
     function handleBulkAdd() {
         // Split by lines, skipping empty lines.
@@ -43,7 +48,7 @@
     }
 </script>
 
-<Instructions>
+<Instructions {editable}>
     To cite references in a chapter, add them here. You can add one at a time,
     or try pasting them in bulk, and we'll do our best to pull out the relevant
     parts, looking for things that look like author lists, years, sources, and

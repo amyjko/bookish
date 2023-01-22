@@ -3,15 +3,12 @@
 <script lang="ts">
     import type EmbedNode from '$lib/models/chapter/EmbedNode';
     import { storage } from '$lib/models/Firebase';
-    import {
-        isEditable,
-        getCaret,
-        getBook,
-    } from '$lib/components/page/Contexts';
+    import { getCaret, getBook } from '$lib/components/page/Contexts';
     import Figure from './Figure.svelte';
     import { getContext } from 'svelte';
 
     export let node: EmbedNode;
+    export let editable: boolean = false;
     export let placeholder: string = '';
     export let imageOnly: boolean = false;
 
@@ -20,7 +17,6 @@
 
     let caret = getCaret();
     let book = getBook();
-    let editable = isEditable();
 
     // Bookish editor should have passed down a way to set the active editor.
     let claimCaret = getContext<Function>('claimeditor');

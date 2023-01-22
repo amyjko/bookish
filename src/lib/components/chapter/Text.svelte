@@ -2,7 +2,7 @@
 
 <script lang="ts">
     import type TextNode from '$lib/models/chapter/TextNode';
-    import { getChapter, isEditable } from '../page/Contexts';
+    import { getChapter, isChapterEditable } from '../page/Contexts';
 
     export let node: TextNode;
     export let placeholder: string | undefined = undefined;
@@ -10,7 +10,7 @@
     $: text = node.getText();
 
     let context = getChapter();
-    let editable = isEditable();
+    let editable = isChapterEditable();
 
     function replaceMultipleSpacesWithNonBreakingSpaces(original: string) {
         let revisedText = '';
