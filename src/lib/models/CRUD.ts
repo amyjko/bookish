@@ -89,11 +89,12 @@ export function listenToBookWithID(
     if (!db) throw NO_DATABASE_CONNECTION;
     const ref = doc(db, 'books', id);
     return onSnapshot(doc(db, 'books', id), (doc) => {
-        react(
-            doc.exists()
-                ? Book.fromJSON(ref, doc.data() as BookSpecification)
-                : null
-        );
+        if (!doc.metadata.hasPendingWrites)
+            react(
+                doc.exists()
+                    ? Book.fromJSON(ref, doc.data() as BookSpecification)
+                    : null
+            );
     });
 }
 
@@ -107,14 +108,15 @@ export function listenToEdition(
     return onSnapshot(
         doc(db, 'books', bookID, 'editions', editionID),
         (doc) => {
-            return react(
-                doc.exists()
-                    ? Edition.fromJSON(
-                          doc.ref,
-                          doc.data() as EditionSpecification
-                      )
-                    : null
-            );
+            if (!doc.metadata.hasPendingWrites)
+                react(
+                    doc.exists()
+                        ? Edition.fromJSON(
+                              doc.ref,
+                              doc.data() as EditionSpecification
+                          )
+                        : null
+                );
         }
     );
 }
