@@ -20,14 +20,16 @@
 
     // Mege them together here
     $: currentBook =
-        booksByName !== undefined && booksByName.length > 0
+        booksByName === undefined || bookByID === undefined
+            ? undefined
+            : booksByName.length > 0
             ? booksByName[0]
             : bookByID
             ? bookByID
-            : undefined;
+            : null;
 
     // Whenever the merge changes, update the book store (updating the whole UI)
-    $: book.set(currentBook);
+    $: book.set(currentBook ?? undefined);
 
     // Keep track of listeners to unsubscribe to on page changes.
     let nameUnsub: Unsubscribe | undefined = undefined;
@@ -67,7 +69,7 @@
     });
 </script>
 
-{#if error}
+{#if error || currentBook === null}
     <Feedback error>Unable to load book.</Feedback>
 {:else if currentBook === undefined}
     <Loading />

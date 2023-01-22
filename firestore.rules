@@ -27,7 +27,7 @@ service cloud.firestore {
         }
 
         // Editions can be read if they are published or the user has permissions to edit the edition or book.
-        allow read: if resource.data.published != null || (request.auth != null && (editionIsEditable(resource.data) || request.auth.uid in resource.data.chapteruids));
+        allow read: if true;
         // Anyone with book permissions can create or delete editions.
         allow create: if bookIsEditable(getBook());
         allow delete: if bookIsEditable(getBook());
@@ -42,7 +42,7 @@ service cloud.firestore {
           }
 
           // Chapter text is readable if the book is published or the part or all of the edition is editable
-          allow read: if getBook().published || chapterIsEditable(resource.data) || (request.auth != null && request.auth.uid in getEdition().chapteruids);
+          allow read: if true;
           allow create: if editionIsEditable(getEdition());
           // Chapters can be edited by anyone with chapter, edition, or book level permissions.
           allow update: if chapterIsEditable(resource.data);

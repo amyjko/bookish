@@ -59,7 +59,10 @@
                     editionID,
                     (ed) => {
                         if (ed) edition.set(ed);
-                        else error = 'Unable to load edition';
+                        else {
+                            edition.set(undefined);
+                            error = 'Unable to load edition';
+                        }
                     }
                 );
 
