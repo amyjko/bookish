@@ -476,11 +476,11 @@
 
         // Restore the content of the chapter.
         let node =
-            ast instanceof ChapterNode
+            editedNode instanceof ChapterNode
                 ? Parser.parseChapter($edition, undoState.bookdown)
-                : ast instanceof FormatNode
+                : editedNode instanceof FormatNode
                 ? Parser.parseFormat($edition, undoState.bookdown)
-                : ast instanceof EmbedNode
+                : editedNode instanceof EmbedNode
                 ? Parser.parseEmbed($edition, undoState.bookdown)
                 : undefined;
 
@@ -507,11 +507,11 @@
 
         // Restore the content of the chapter.
         let node =
-            ast instanceof ChapterNode
+            editedNode instanceof ChapterNode
                 ? Parser.parseChapter($edition, undoState.bookdown)
-                : ast instanceof FormatNode
+                : editedNode instanceof FormatNode
                 ? Parser.parseFormat($edition, undoState.bookdown)
-                : ast instanceof EmbedNode
+                : editedNode instanceof EmbedNode
                 ? Parser.parseEmbed($edition, undoState.bookdown)
                 : undefined;
 
