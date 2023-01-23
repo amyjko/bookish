@@ -15,6 +15,7 @@
         <Header
             editable={isEditionEditable()}
             label="Unknown page title"
+            id="unknown"
             getImage={() => $edition?.getImage(ChapterIDs.UnknownID) ?? null}
             setImage={(embed) =>
                 $edition

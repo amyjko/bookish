@@ -10,6 +10,7 @@
     export let disabled: boolean;
     export let ignored: boolean;
     export let blink: boolean;
+    export let locked: boolean;
 
     let element: HTMLElement;
 
@@ -37,7 +38,8 @@
     style:height="{height}px"
     style:scroll-margin-top="{headerHeight}px"
     bind:this={element}
-/>
+    >{#if locked}🔒{/if}</div
+>
 
 <style>
     .caret {

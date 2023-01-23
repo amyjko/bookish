@@ -1,20 +1,18 @@
 <script lang="ts">
-    import EmbedNode from '$lib/models/chapter/EmbedNode';
     import Parser from '$lib/models/chapter/Parser';
     import Embed from '$lib/components/chapter/Embed.svelte';
-    import ErrorMessage from '$lib/components/chapter/ErrorMessage.svelte';
     import BookishEditor from '$lib/components/editor/BookishEditor.svelte';
     import Title from './Title.svelte';
     import { onMount } from 'svelte';
     import TextEditor from '$lib/components/editor/TextEditor.svelte';
-    import { getEdition, isEditionEditable } from './Contexts';
-    import type ErrorNode from '../../models/chapter/ErrorNode';
+    import { getAuth, getEdition, getLeasee, lease } from './Contexts';
     import Button from '../app/Button.svelte';
 
     /** True if an author should be able to edit this header. */
     export let editable: boolean;
     export let label: string;
     export let header: string;
+    export let id: string;
     export let subtitle: string | undefined = undefined;
     export let print: boolean = false;
     export let tags: string[] | undefined = undefined;
@@ -25,6 +23,7 @@
     let title: HTMLHeadingElement | null = null;
     let showReminder: boolean = true;
 
+    let auth = getAuth();
     let edition = getEdition();
 
     function updateScrollReminder() {
@@ -73,6 +72,8 @@
                     chapter={false}
                     component={Embed}
                     placeholder=""
+                    leasee={getLeasee(auth, edition, `embed-${id}`)}
+                    lease={(lock) => lease(auth, edition, `embed-${id}`, lock)}
                 />
             {:else}
                 <Embed

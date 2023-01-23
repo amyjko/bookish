@@ -2,10 +2,11 @@
     import Parser from '../../models/chapter/Parser';
     import BookishEditor from '../editor/BookishEditor.svelte';
     import Switch from '../editor/Switch.svelte';
-    import { getEdition } from './Contexts';
+    import { getAuth, getEdition, getLeasee, lease } from './Contexts';
     import Format from '../chapter/Format.svelte';
     import Note from '../editor/Note.svelte';
 
+    let auth = getAuth();
     let edition = getEdition();
 
     // TODO Disabled for now. See functions/index.ts/publishEdition() for why.
@@ -37,6 +38,8 @@
                 chapter={false}
                 component={Format}
                 placeholder="Summarize this edition's changes to publish."
+                leasee={getLeasee(auth, edition, 'summary')}
+                lease={(lock) => lease(auth, edition, 'summary', lock)}
             />
         </div>
         <Switch

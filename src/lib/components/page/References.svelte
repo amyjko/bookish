@@ -26,6 +26,7 @@
                     $auth.user !== null &&
                     $edition.isChapterEditor($auth.user.uid))}
             label="References title"
+            id="references"
             getImage={() => $edition?.getImage(ChapterIDs.ReferencesID) ?? null}
             setImage={(embed) =>
                 $edition

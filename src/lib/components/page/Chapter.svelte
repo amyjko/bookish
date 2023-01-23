@@ -20,10 +20,12 @@
         getEdition,
         isBookEditable,
         isChapterEditable,
-        isEditionEditable,
         isEditionPartiallyEditable,
+        getLeasee,
+        lease,
         setChapter,
         type ChapterStore,
+        isEditionEditable,
     } from './Contexts';
     import { writable } from 'svelte/store';
     import { onMount, setContext } from 'svelte';
@@ -237,6 +239,7 @@
 
     let editable =
         isBookEditable() ||
+        isEditionEditable() ||
         isChapterEditable() ||
         ($auth !== undefined &&
             $auth.user !== null &&
@@ -250,6 +253,7 @@
     >
         <Header
             editable={isChapterEditable()}
+            id={chapter.id}
             header={chapter.getTitle()}
             label="Chapter title"
             tags={$edition.getTags()}
@@ -372,6 +376,8 @@
                         autofocus
                         component={ChapterBody}
                         placeholder="Type here"
+                        leasee={getLeasee(auth, edition, chapter.id)}
+                        lease={(lock) => lease(auth, edition, chapter.id, lock)}
                     />
                 {:else}
                     <ChapterBody node={chapterAST} />

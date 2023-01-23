@@ -2,8 +2,15 @@
     import Parser from '$lib/models/chapter/Parser';
     import ChapterBody from '$lib/components/chapter/ChapterBody.svelte';
     import BookishEditor from '$lib/components/editor/BookishEditor.svelte';
-    import { getEdition, isEditionEditable } from './Contexts';
+    import {
+        getAuth,
+        getEdition,
+        getLeasee,
+        isEditionEditable,
+        lease,
+    } from './Contexts';
 
+    let auth = getAuth();
     let editable = isEditionEditable();
     let edition = getEdition();
 </script>
@@ -23,6 +30,8 @@
                 chapter={false}
                 component={ChapterBody}
                 placeholder="What is this book about?"
+                leasee={getLeasee(auth, edition, `description`)}
+                lease={(lock) => lease(auth, edition, `description`, lock)}
             />
         {:else}
             <ChapterBody

@@ -15,6 +15,8 @@
         STATUS,
         type EditionStore,
         type StatusStore,
+        type ChapterText,
+        CHAPTERTEXT,
     } from '$lib/components/page/Contexts';
     import type Book from '$lib/models/book/Book';
     import type Edition from '../lib/models/book/Edition';
@@ -34,6 +36,10 @@
     // A global store for the current edition. It's at the root so the header can do breadcrumbs.
     let edition = writable<Edition>(undefined);
     setContext<EditionStore>(EDITION, edition);
+
+    // A global store for the current chapter text. It's at the root so the header can do breadcrumbs.
+    let chapterText = writable<ChapterText | undefined>(undefined);
+    setContext<Writable<ChapterText | undefined>>(CHAPTERTEXT, chapterText);
 
     // A global store for save feedback.
     let status = writable<BookSaveStatus>(BookSaveStatus.Saved);

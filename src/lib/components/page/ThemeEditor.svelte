@@ -49,6 +49,7 @@
         <Header
             editable={isEditionEditable()}
             label="Theme"
+            id="theme"
             getImage={() => null}
             setImage={() => undefined}
             header="Theme"

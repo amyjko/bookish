@@ -91,6 +91,7 @@
                       )
                     : undefined}
             header="Search"
+            id="search"
             tags={$edition.getTags()}
         >
             <Outline

@@ -3,9 +3,16 @@
     import BookishEditor from '$lib/components/editor/BookishEditor.svelte';
     import Instructions from '$lib/components/page/Instructions.svelte';
     import Format from '$lib/components/chapter/Format.svelte';
-    import { getEdition, isEditionEditable } from './Contexts';
+    import {
+        getAuth,
+        getEdition,
+        getLeasee,
+        isEditionEditable,
+        lease,
+    } from './Contexts';
     import PageHeader from './PageHeader.svelte';
 
+    let auth = getAuth();
     let edition = getEdition();
     let editable = isEditionEditable();
 </script>
@@ -20,6 +27,7 @@
 {#if $edition}
     <!-- If editable, show acknowledgements even if they're empty, otherwise hide -->
     {#if editable}
+        <!-- svelte-ignore missing-declaration -->
         <BookishEditor
             text={$edition.getLicense()}
             parser={(text) =>
@@ -31,6 +39,8 @@
             chapter={false}
             component={Format}
             placeholder="In the U.S., all rights reserved by default. Want to offer different rights to readers?"
+            leasee={getLeasee(auth, edition, `license`)}
+            lease={(lock) => lease(auth, edition, `license`, lock)}
         />
     {:else}
         <Format

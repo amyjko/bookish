@@ -47,6 +47,8 @@
     export let autofocus: boolean = false;
     export let component: ConstructorOfATypedSvelteComponent;
     export let placeholder: string;
+    export let leasee: string | boolean;
+    export let lease: (lock: boolean) => Promise<boolean> | boolean;
 
     let element: HTMLDivElement | null = null;
 
@@ -65,10 +67,16 @@
 
     let editedNode: RootNode;
     $: {
+        // Note: when the text changes externally, the caret will be lost. We either have
+        // to implement fancy operational transform revision control for collaborative editing
+        // or a basic chapter locking strategy to avoid data loss. I went with locking for maintenance simplicity,
+        // but it would be nice to implement operational transform in the future.
         if (editedNode === undefined || editedNode.toBookdown() !== text) {
             editedNode = parser(text);
         }
     }
+
+    $: locked = typeof leasee === 'string';
 
     onMount(() => {
         const caret = editedNode.getFirstCaret();
@@ -753,6 +761,9 @@
         newRange: CaretRange,
         command?: Command
     ) {
+        // Don't save edits if locked.
+        if (locked) return;
+
         // Call the save callback.
         save(newRoot);
 
@@ -853,8 +864,14 @@
         );
     }
 
-    function updateFocus() {
+    function handleFocus() {
         editorFocused = isFocused();
+        lease(true);
+    }
+
+    function handleBlur() {
+        editorFocused = isFocused();
+        lease(false);
     }
 
     function handleCopy(node: BookishNode) {
@@ -1004,12 +1021,14 @@
 
 <div
     class={`bookish-editor ${inAtom ? 'bookish-editor-atom-focused' : ''}`}
+    class:locked
+    aria-disabled={locked}
     bind:this={element}
     on:keydown={handleKey}
     on:keypress={handlePress}
     on:mousedown|stopPropagation={handleMouseDown}
-    on:focus={updateFocus}
-    on:blur={updateFocus}
+    on:focus={handleFocus}
+    on:blur={handleBlur}
     tabIndex="0"
 >
     <!-- A view of the root -->
@@ -1031,7 +1050,8 @@
             linked={isLink}
             bold={isBold}
             italic={isItalic}
-            disabled={!editorFocused}
+            disabled={!editorFocused || locked}
+            {locked}
         />
     {/if}
 </div>
@@ -1039,6 +1059,10 @@
 <style>
     .bookish-editor {
         min-height: 1em;
+    }
+
+    .locked :global(.bookish-text) {
+        color: var(--app-muted-color);
     }
 
     .bookish-editor:focus {

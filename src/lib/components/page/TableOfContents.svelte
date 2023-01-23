@@ -84,6 +84,7 @@
                     ? edition.set($edition.withImage('cover', embed))
                     : undefined}
             header={title}
+            id="toc"
             {subtitle}
             tags={$edition.getTags()}
             save={(text) =>

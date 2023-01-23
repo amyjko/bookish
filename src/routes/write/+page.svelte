@@ -1,5 +1,9 @@
 <script lang="ts">
-    import { createBook, listenToEditableBooks } from '$lib/models/CRUD';
+    import {
+        createBook,
+        listenToEditableBooks,
+        listenToPartiallyEditableBooks,
+    } from '$lib/models/CRUD';
     import type Book from '$lib/models/book/Book';
     import { goto } from '$app/navigation';
     import { onMount } from 'svelte';
@@ -36,7 +40,7 @@
                     $auth.user.uid,
                     (books) => (editableBooks = books)
                 );
-                const partiallyEditableUnsub = listenToEditableBooks(
+                const partiallyEditableUnsub = listenToPartiallyEditableBooks(
                     $auth.user.uid,
                     (books) => (partiallyEditableBooks = books)
                 );

@@ -35,6 +35,7 @@ export type EditionSpecification = {
     theme: Theme | null;
     uids: string[];
     chapteruids: string[];
+    active: Record<string, string>;
 };
 
 export default class Edition {
@@ -57,6 +58,7 @@ export default class Edition {
     readonly symbols: Record<string, string>;
     readonly glossary: Record<string, Definition>;
     readonly theme: Theme | null;
+    readonly active: Record<string, string>;
 
     // Given an object with a valid specification and an object mapping chapter IDs to chapter text,
     // construct an object representing a book.
@@ -81,7 +83,8 @@ export default class Edition {
             | Record<string, FormatNode | Reference>,
         symbols: Record<string, string>,
         glossary: Record<string, Definition>,
-        theme: Theme | null
+        theme: Theme | null,
+        active: Record<string, string>
     ) {
         this.bookRef = bookRef;
         this.editionRef = editionRef;
@@ -108,6 +111,7 @@ export default class Edition {
         this.symbols = Object.assign({}, symbols);
         this.glossary = Object.assign({}, glossary);
         this.theme = theme;
+        this.active = active;
     }
 
     static fromJSON(
@@ -135,7 +139,8 @@ export default class Edition {
             spec.references,
             spec.symbols,
             spec.glossary,
-            spec.theme
+            spec.theme,
+            spec.active
         );
     }
 
@@ -195,6 +200,7 @@ export default class Edition {
             theme: this.theme,
             uids: this.uids.slice(),
             chapteruids: this.getChapterUIDS(),
+            active: this.active,
         };
         return editionJSON;
     }
@@ -229,7 +235,8 @@ export default class Edition {
             this.references,
             this.symbols,
             this.glossary,
-            this.theme
+            this.theme,
+            this.active
         );
     }
 
@@ -257,7 +264,8 @@ export default class Edition {
             this.references,
             this.symbols,
             this.glossary,
-            this.theme
+            this.theme,
+            this.active
         );
     }
 
@@ -284,7 +292,8 @@ export default class Edition {
             this.references,
             this.symbols,
             this.glossary,
-            this.theme
+            this.theme,
+            this.active
         );
     }
 
@@ -312,7 +321,8 @@ export default class Edition {
             this.references,
             this.symbols,
             this.glossary,
-            this.theme
+            this.theme,
+            this.active
         );
     }
 
@@ -336,7 +346,8 @@ export default class Edition {
             this.references,
             this.symbols,
             this.glossary,
-            this.theme
+            this.theme,
+            this.active
         );
     }
 
@@ -360,7 +371,8 @@ export default class Edition {
             this.references,
             this.symbols,
             this.glossary,
-            this.theme
+            this.theme,
+            this.active
         );
     }
 
@@ -387,7 +399,8 @@ export default class Edition {
             this.references,
             this.symbols,
             this.glossary,
-            this.theme
+            this.theme,
+            this.active
         );
     }
 
@@ -446,7 +459,8 @@ export default class Edition {
             this.references,
             this.symbols,
             this.glossary,
-            this.theme
+            this.theme,
+            this.active
         );
     }
 
@@ -458,7 +472,8 @@ export default class Edition {
                     ([ref, text]) =>
                         chapter.ref !== undefined &&
                         chapter.ref.id === ref.id &&
-                        chapter.text !== text
+                        chapter.text !== text &&
+                        text !== undefined
                 );
                 return match ? chapter.withText(match[1]) : chapter;
             })
@@ -501,7 +516,8 @@ export default class Edition {
             this.references,
             this.symbols,
             this.glossary,
-            this.theme
+            this.theme,
+            this.active
         );
     }
 
@@ -570,7 +586,8 @@ export default class Edition {
             this.references,
             this.symbols,
             this.glossary,
-            this.theme
+            this.theme,
+            this.active
         );
     }
 
@@ -612,7 +629,8 @@ export default class Edition {
             newReferences,
             this.symbols,
             this.glossary,
-            this.theme
+            this.theme,
+            this.active
         );
     }
 
@@ -678,7 +696,8 @@ export default class Edition {
             this.references,
             this.symbols,
             glossary,
-            this.theme
+            this.theme,
+            this.active
         );
     }
 
@@ -746,7 +765,8 @@ export default class Edition {
             this.references,
             this.symbols,
             this.glossary,
-            theme
+            theme,
+            this.active
         );
     }
 
@@ -791,7 +811,8 @@ export default class Edition {
             this.references,
             this.symbols,
             this.glossary,
-            this.theme
+            this.theme,
+            this.active
         );
     }
 
@@ -836,7 +857,8 @@ export default class Edition {
             this.references,
             this.symbols,
             this.glossary,
-            this.theme
+            this.theme,
+            this.active
         );
     }
 
@@ -870,7 +892,8 @@ export default class Edition {
             this.references,
             this.symbols,
             this.glossary,
-            this.theme
+            this.theme,
+            this.active
         );
     }
 
@@ -880,6 +903,47 @@ export default class Edition {
 
     isChapterEditor(uid: string) {
         return this.getChapterUIDS().includes(uid);
+    }
+
+    getLeasee(content: string): string | undefined {
+        return this.active[content];
+    }
+
+    hasLease(uid: string, content: string) {
+        return this.active[content] === uid;
+    }
+
+    isLeased(contentID: string) {
+        return contentID in this.active;
+    }
+
+    withLock(uid: string, content: string, lock: boolean) {
+        const newActive = Object.assign({}, this.active);
+        if (lock) newActive[content] = uid;
+        else delete newActive[content];
+
+        return new Edition(
+            this.bookRef,
+            this.editionRef,
+            this.uids,
+            this.title,
+            this.authors,
+            this.number,
+            this.summary,
+            this.published,
+            this.images,
+            this.description,
+            this.chapters,
+            this.license,
+            this.acknowledgements,
+            this.tags,
+            this.sources,
+            this.references,
+            this.symbols,
+            this.glossary,
+            this.theme,
+            newActive
+        );
     }
 
     getBookReadingTime() {

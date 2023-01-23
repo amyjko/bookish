@@ -1,4 +1,4 @@
-import { db, functions } from './Firebase';
+import { app, db, functions } from './Firebase';
 import {
     collection,
     getDocs,
@@ -221,7 +221,8 @@ export async function createBook(userID: string): Promise<string> {
         {},
         {},
         {},
-        null
+        null,
+        {}
     ).withNewChapter();
 
     // Add the edition to the editions collection in the database so we can get an edition ref.
@@ -286,6 +287,25 @@ export async function createNewEdition(book: Book): Promise<Book> {
     updateBook(book);
 
     return book;
+}
+
+export async function updateLock(
+    edition: Edition,
+    uid: string,
+    content: string,
+    lock: boolean
+): Promise<boolean> {
+    if (!db) throw NO_DATABASE_CONNECTION;
+    if (edition.editionRef === undefined) return false;
+
+    if (lock && edition.hasLease(uid, content)) return true;
+    if (!lock && !edition.hasLease(uid, content)) return true;
+
+    await setDoc(
+        doc(db, editionPath(edition.bookRef.id, edition.editionRef.id)),
+        edition.withLock(uid, content, lock).toObject()
+    );
+    return lock;
 }
 
 /**

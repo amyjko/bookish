@@ -6,6 +6,8 @@
         getBook,
         getEdition,
         getAuth,
+        CHAPTERTEXT,
+        getChapterText,
     } from '$lib/components/page/Contexts';
     import { onDestroy } from 'svelte';
     import { page } from '$app/stores';
@@ -17,6 +19,7 @@
     let auth = getAuth();
     let book = getBook();
     let edition = getEdition();
+    let chapterText = getChapterText();
 
     let editionUnsub: Unsubscribe | undefined = undefined;
     let chaptersUnsub: Unsubscribe | undefined = undefined;
@@ -66,7 +69,12 @@
                     editionID,
                     (ed) => {
                         if (ed) {
-                            edition.set(ed);
+                            // Before setting the new edition, augmented it with the chapter text.
+                            edition.set(
+                                $chapterText
+                                    ? ed.withChapterText($chapterText)
+                                    : ed
+                            );
                         } else {
                             edition.set(undefined);
                             error = 'Unable to load edition';
@@ -78,6 +86,9 @@
                     $book.ref.id,
                     editionID,
                     (chapters) => {
+                        // Update the chapter text store.
+                        chapterText.set(chapters);
+                        // Update the chapter text in the current edition.
                         if ($edition)
                             edition.set($edition.withChapterText(chapters));
                     }

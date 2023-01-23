@@ -46,6 +46,7 @@
         <Header
             editable={isEditionEditable()}
             label="Media title"
+            id="media"
             getImage={() => $edition?.getImage(ChapterIDs.MediaID) ?? null}
             setImage={(embed) =>
                 $edition

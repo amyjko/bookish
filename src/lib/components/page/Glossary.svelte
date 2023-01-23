@@ -47,6 +47,7 @@
                     $auth.user !== null &&
                     $edition.isChapterEditor($auth.user.uid))}
             label="Glossary title"
+            id="glossary"
             getImage={() => $edition?.getImage(ChapterIDs.GlossaryID) ?? null}
             setImage={(embed) =>
                 $edition

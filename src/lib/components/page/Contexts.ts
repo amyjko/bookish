@@ -13,6 +13,8 @@ import type Authentication from '../Authentication';
 import type CaretState from '../editor/CaretState';
 import type ChapterContext from './ChapterContext';
 import { page } from '$app/stores';
+import { updateLock } from '../../models/CRUD';
+import type { DocumentReference } from 'firebase/firestore';
 
 export type DarkModeStore = Writable<boolean>;
 export const DARK_MODE = Symbol('dark');
@@ -36,6 +38,13 @@ export type EditionStore = Writable<Edition | undefined>;
 export const EDITION = Symbol('edition');
 export function getEdition() {
     return getContext<EditionStore>(EDITION);
+}
+
+export type ChapterText = [DocumentReference, string][];
+export type ChapterTextStore = Writable<ChapterText | undefined>;
+export const CHAPTERTEXT = Symbol('chaptertext');
+export function getChapterText() {
+    return getContext<ChapterTextStore>(CHAPTERTEXT);
 }
 
 export type ChapterStore = Writable<ChapterContext>;
@@ -128,4 +137,40 @@ export const STATUS = Symbol('status');
 export type StatusStore = Writable<BookSaveStatus>;
 export function getStatus() {
     return getContext<StatusStore>(STATUS);
+}
+
+export async function lease(
+    authStore: AuthStore,
+    editionStore: EditionStore,
+    contentID: string,
+    lock: boolean
+): Promise<boolean> {
+    const edition = get(editionStore);
+    const auth = get(authStore);
+    if (edition && auth && auth.user) {
+        await updateLock(edition, auth.user.uid, contentID, lock);
+        const latestEdition = get(editionStore);
+        const latestAuth = get(authStore);
+        if (latestEdition && latestAuth && latestAuth.user) {
+            editionStore.set(
+                latestEdition.withLock(latestAuth.user.uid, contentID, lock)
+            );
+            return true;
+        } else return false;
+    } else return false;
+}
+
+export function getLeasee(
+    authStore: AuthStore,
+    editionStore: EditionStore,
+    contentID: string
+): string | boolean {
+    const edition = get(editionStore);
+    const auth = get(authStore);
+    if (edition !== undefined && auth !== undefined && auth.user !== null) {
+        const leasee = edition.getLeasee(contentID);
+        if (leasee === undefined) return false;
+        else if (leasee === auth.user.uid) return true;
+        else return leasee;
+    } else return false;
 }

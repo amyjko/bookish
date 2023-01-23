@@ -7,12 +7,19 @@
     import Format from '$lib/components/chapter/Format.svelte';
     import Note from '../editor/Note.svelte';
     import { afterUpdate } from 'svelte';
-    import { getEdition, isChapterEditable } from './Contexts';
+    import {
+        getAuth,
+        getEdition,
+        getLeasee,
+        isChapterEditable,
+        lease,
+    } from './Contexts';
     import Button from '../app/Button.svelte';
 
     export let id: string;
     export let definition: Definition;
 
+    let auth = getAuth();
     let edition = getEdition();
     let editable = isChapterEditable();
 
@@ -104,6 +111,9 @@
                     chapter={false}
                     component={Format}
                     placeholder="write a definition"
+                    leasee={getLeasee(auth, edition, `definition-${id}`)}
+                    lease={(lock) =>
+                        lease(auth, edition, `definition-${id}`, lock)}
                 />
             {:else if definition.definition === ''}
                 <em>Definition</em>

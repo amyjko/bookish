@@ -3,9 +3,16 @@
     import ChapterBody from '$lib/components/chapter/ChapterBody.svelte';
     import BookishEditor from '$lib/components/editor/BookishEditor.svelte';
     import Instructions from '$lib/components/page/Instructions.svelte';
-    import { getEdition, isEditionEditable } from './Contexts';
+    import {
+        getAuth,
+        getEdition,
+        getLeasee,
+        isEditionEditable,
+        lease,
+    } from './Contexts';
     import PageHeader from './PageHeader.svelte';
 
+    let auth = getAuth();
     let edition = getEdition();
     let editable = isEditionEditable();
 
@@ -31,6 +38,8 @@
                           $edition.withAcknowledgements(node.toBookdown())
                       )
                     : undefined}
+            leasee={getLeasee(auth, edition, `acks`)}
+            lease={(lock) => lease(auth, edition, `acks`, lock)}
         />
     {:else if acknowledgements.length > 0}
         <PageHeader id="acknowledgements">Acknowledgements</PageHeader>

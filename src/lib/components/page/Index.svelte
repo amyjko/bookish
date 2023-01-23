@@ -53,6 +53,7 @@
         <Header
             editable={isEditionEditable()}
             label="Index title"
+            id="index"
             getImage={() => $edition?.getImage(ChapterIDs.IndexID) ?? null}
             setImage={(embed) =>
                 $edition
