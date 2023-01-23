@@ -66,11 +66,6 @@
     let editedNode: RootNode;
     $: {
         if (editedNode === undefined || editedNode.toBookdown() !== text) {
-            if (editedNode !== undefined) {
-                console.log('Text changed externally');
-                console.log(`Currently ${editedNode.toBookdown()}`);
-                console.log(`Updated to ${text}`);
-            }
             editedNode = parser(text);
         }
     }
