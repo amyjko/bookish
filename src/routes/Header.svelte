@@ -4,7 +4,6 @@
         getAuth,
         getBook,
         getEdition,
-        isEditionEditable,
     } from '$lib/components/page/Contexts';
     import { getCaret } from '$lib/components/page/Contexts';
     import {
@@ -42,8 +41,14 @@
                 <Link to={getLink('/login')}>Login</Link>
             {/if}
         </small>
-        {#if $book}
-            <span class="elided">{$book.getTitle()}</span>
+        {#if $book && $edition}
+            <span class="elided"
+                ><Link
+                    to={`${
+                        $page.route.id?.startsWith('/write') ? '/write' : ''
+                    }/${$book.ref.id}`}>{$book.getTitle()}</Link
+                ></span
+            >
         {/if}
         {#if $book && $page.route.id?.includes('/[bookid]/editions')}
             <span>&ndash; Editions</span>
