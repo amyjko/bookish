@@ -134,7 +134,7 @@
                         : 'Click or drag to choose or upload an image, or enter an image or video URL.'}
                 </p>
             {:else}
-                <p class="bookish-figure-unspecified">Missing image or video</p>
+                <p class="bookish-figure-unspecified">No image or video</p>
             {/if}
         {:else if url.includes('https://www.youtube.com') || url.includes('https://youtu.be') || url.includes('https://www.tiktok.com') || url.includes('vimeo.com')}
             <article class="bookish-figure-embed">

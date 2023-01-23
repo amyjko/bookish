@@ -31,11 +31,6 @@
         }
     });
 
-    $: format = Parser.parseFormat(
-        undefined,
-        definition.definition
-    ).withTextIfEmpty();
-
     function addSynonym() {
         if ($edition) {
             edition.set(
@@ -93,7 +88,9 @@
         <dd class="term">
             {#if editable && edition}
                 <BookishEditor
-                    ast={format}
+                    text={definition.definition}
+                    parser={(text) =>
+                        Parser.parseFormat(undefined, text).withTextIfEmpty()}
                     save={(node) =>
                         $edition
                             ? edition.set(
@@ -111,7 +108,12 @@
             {:else if definition.definition === ''}
                 <em>Definition</em>
             {:else}
-                <Format node={format} />
+                <Format
+                    node={Parser.parseFormat(
+                        undefined,
+                        definition.definition
+                    ).withTextIfEmpty()}
+                />
             {/if}
             {#if edition && editable}
                 <span bind:this={synonymsEditor}>

@@ -8,10 +8,6 @@
 
     let edition = getEdition();
     let editable = isEditionEditable();
-
-    $: formatNode = $edition
-        ? Parser.parseFormat($edition, $edition.getLicense()).withTextIfEmpty()
-        : undefined;
 </script>
 
 <PageHeader id="license">License</PageHeader>
@@ -21,11 +17,13 @@
     authors. Edit this if you'd like to grant different rights.
 </Instructions>
 
-{#if $edition && formatNode}
+{#if $edition}
     <!-- If editable, show acknowledgements even if they're empty, otherwise hide -->
     {#if editable}
         <BookishEditor
-            ast={formatNode}
+            text={$edition.getLicense()}
+            parser={(text) =>
+                Parser.parseFormat($edition, text).withTextIfEmpty()}
             save={(node) =>
                 $edition
                     ? edition.set($edition.setLicense(node.toBookdown()))
@@ -35,6 +33,11 @@
             placeholder="In the U.S., all rights reserved by default. Want to offer different rights to readers?"
         />
     {:else}
-        <Format node={formatNode} />
+        <Format
+            node={Parser.parseFormat(
+                $edition,
+                $edition.getLicense()
+            ).withTextIfEmpty()}
+        />
     {/if}
 {/if}

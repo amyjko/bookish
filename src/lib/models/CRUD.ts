@@ -288,15 +288,21 @@ export async function createNewEdition(book: Book): Promise<Book> {
     return book;
 }
 
-export const updateEdition = async (
+/**
+ * Persists the edition in the database, creating and deleting chapters as necessary.
+ * returns a map of DocumentReferences for new chapters so they can be persisted client side.
+ */
+export async function updateEdition(
     previousEdition: Edition | undefined,
     newEdition: Edition
-): Promise<Edition> => {
+): Promise<Map<string, DocumentReference>> {
     if (!db) throw Error("Can't update edition, not connected to Firebase.");
 
     // Get the reference to the edition, fail if we don't have one.
     const editionRef = newEdition.getRef();
     if (!editionRef) throw Error('Book given has no ID');
+
+    const newChapterRefs = new Map<string, DocumentReference>();
 
     // Create any new chapters that aren't in the current edition, and update text if it changed.
     for (const newChapter of newEdition.chapters) {
@@ -316,6 +322,9 @@ export const updateEdition = async (
                 newChapter,
                 newChapter.withRef(newChapterRef)
             );
+
+            // Map the chapter ref to it's id.
+            newChapterRefs.set(newChapter.id, newChapterRef);
         }
         // If we have a previous version, did the text change? If so, update it.
         else if (previousEdition) {
@@ -382,8 +391,8 @@ export const updateEdition = async (
         newEdition.toObject()
     );
 
-    return newEdition;
-};
+    return newChapterRefs;
+}
 
 export async function updateBook(book: Book): Promise<void> {
     if (!db) throw Error("Can't update book, not connected to Firebase.");

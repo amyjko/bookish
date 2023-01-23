@@ -10,9 +10,6 @@
     let editable = isEditionEditable();
 
     $: acknowledgements = $edition?.getAcknowledgements();
-    $: acksNode = acknowledgements
-        ? Parser.parseChapter($edition, acknowledgements)
-        : undefined;
 </script>
 
 <Instructions {editable}>
@@ -20,10 +17,11 @@
 </Instructions>
 
 <!-- If editable, show acknowledgements even if they're empty, otherwise hide -->
-{#if $edition && acknowledgements && acksNode}
+{#if $edition && acknowledgements}
     {#if editable}
         <BookishEditor
-            ast={acksNode}
+            text={acknowledgements}
+            parser={(text) => Parser.parseChapter($edition, text)}
             chapter={false}
             component={ChapterBody}
             placeholder="Who would you like to thank?"
@@ -36,6 +34,6 @@
         />
     {:else if acknowledgements.length > 0}
         <PageHeader id="acknowledgements">Acknowledgements</PageHeader>
-        <ChapterBody node={acksNode} />
+        <ChapterBody node={Parser.parseChapter($edition, acknowledgements)} />
     {/if}
 {/if}

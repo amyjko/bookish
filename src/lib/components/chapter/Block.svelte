@@ -31,7 +31,7 @@
 
 {#if node instanceof ParagraphNode}<Paragraph {node} />
 {:else if node instanceof ListNode}<List {node} />
-{:else if node instanceof EmbedNode}<Embed {node} editable />
+{:else if node instanceof EmbedNode}<Embed {node} {editable} />
 {:else if node instanceof CalloutNode}<Callout {node} />
 {:else if node instanceof QuoteNode}<Quote {node} />
 {:else if node instanceof CodeNode}<CaptionedCode {node} />

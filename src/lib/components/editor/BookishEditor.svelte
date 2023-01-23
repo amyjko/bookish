@@ -33,7 +33,6 @@
 
     import commands from './Commands';
 
-    import { getEdition } from '../page/Contexts';
     import { afterUpdate, onMount, setContext } from 'svelte';
     import type { PasteContent } from './CaretContext';
     import { getCaret } from '../page/Contexts';
@@ -41,8 +40,8 @@
 
     const IDLE_TIME = 500;
 
-    export let ast: RootNode;
-
+    export let text: string;
+    export let parser: (text: string) => RootNode;
     export let save: (node: RootNode) => Promise<void> | void;
     export let chapter: boolean;
     export let autofocus: boolean = false;
@@ -60,11 +59,21 @@
     let undoStack: UndoState[] = [];
     let undoPosition = -1;
     let clipboard: Clipboard | undefined = undefined;
-    let editedNode: RootNode = ast;
     let ignoredInput = false;
 
-    let edition = getEdition();
     let activeEditor = getCaret();
+
+    let editedNode: RootNode;
+    $: {
+        if (editedNode === undefined || editedNode.toBookdown() !== text) {
+            if (editedNode !== undefined) {
+                console.log('Text changed externally');
+                console.log(`Currently ${editedNode.toBookdown()}`);
+                console.log(`Updated to ${text}`);
+            }
+            editedNode = parser(text);
+        }
+    }
 
     onMount(() => {
         const caret = editedNode.getFirstCaret();
@@ -475,19 +484,12 @@
         let undoState = undoStack[undoPosition + 1];
 
         // Restore the content of the chapter.
-        let node =
-            editedNode instanceof ChapterNode
-                ? Parser.parseChapter($edition, undoState.bookdown)
-                : editedNode instanceof FormatNode
-                ? Parser.parseFormat($edition, undoState.bookdown)
-                : editedNode instanceof EmbedNode
-                ? Parser.parseEmbed($edition, undoState.bookdown)
-                : undefined;
+        let node = parser(undoState.bookdown);
 
         if (node === undefined || node instanceof ErrorNode) return;
 
         // Restore the view
-        editedNode = node;
+        updateRoot(node);
 
         // Save the undo.
         save(node);
@@ -506,18 +508,11 @@
         let undoState = undoStack[undoPosition - 1];
 
         // Restore the content of the chapter.
-        let node =
-            editedNode instanceof ChapterNode
-                ? Parser.parseChapter($edition, undoState.bookdown)
-                : editedNode instanceof FormatNode
-                ? Parser.parseFormat($edition, undoState.bookdown)
-                : editedNode instanceof EmbedNode
-                ? Parser.parseEmbed($edition, undoState.bookdown)
-                : undefined;
+        let node = parser(undoState.bookdown);
 
         if (node === undefined) return;
 
-        editedNode = node as RootNode;
+        updateRoot(node);
 
         // Move the undo state down a position.
         if (undoPosition > 0) undoPosition = undoPosition - 1;
@@ -783,7 +778,7 @@
         }
 
         // Change the chapter's AST.
-        editedNode = newRoot;
+        updateRoot(newRoot);
 
         // Set the new undo stack, pre-pending the new command to the front.
         const newTextRange = caretRangeToIndexRange(newRoot, newRange);
@@ -806,6 +801,11 @@
 
         // Update the caret
         claimActiveEditor();
+    }
+
+    function updateRoot(newRoot: RootNode) {
+        editedNode = newRoot;
+        text = editedNode.toBookdown();
     }
 
     function editNode(previous: BookishNode, edited: BookishNode) {
@@ -1017,8 +1017,13 @@
     on:blur={updateFocus}
     tabIndex="0"
 >
-    <!-- The chapter content -->
-    <svelte:component this={component} node={editedNode} {placeholder} />
+    <!-- A view of the root -->
+    <svelte:component
+        this={component}
+        node={editedNode}
+        {placeholder}
+        editable={true}
+    />
     <!-- The caret. We render our own since this view isn't contentEditable and we can't show a caret.
          Customize the rendering based on the formatting applied to the text node. -->
     {#if caretCoordinate && caretRange && !isAtom && isSelection === false && editorFocused}

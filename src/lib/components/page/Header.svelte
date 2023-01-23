@@ -57,29 +57,28 @@
     });
 
     // Get the embed, update when getImage function prop changes.
-    let embedNode: EmbedNode | ErrorNode | undefined = undefined;
-    $: {
-        let embed = getImage();
-        embedNode = embed ? Parser.parseEmbed($edition, embed) : undefined;
-    }
+    let embed: string | null;
+    $: embed = getImage();
 </script>
 
 <header class="bookish-chapter-header">
-    {#if embedNode}
+    {#if embed}
         <div class="bookish-figure-full">
-            {#if edition && editable && embedNode instanceof EmbedNode}
+            {#if $edition && editable}
                 <BookishEditor
-                    ast={embedNode}
+                    text={embed}
+                    parser={(text) => Parser.parseEmbed($edition, text)}
                     save={(node) =>
                         setImage ? setImage(node.toBookdown()) : undefined}
                     chapter={false}
                     component={Embed}
                     placeholder=""
                 />
-            {:else if embedNode instanceof EmbedNode}
-                <Embed node={embedNode} editable />
             {:else}
-                <ErrorMessage node={embedNode} />
+                <Embed
+                    node={Parser.parseEmbed($edition, embed)}
+                    editable={false}
+                />
             {/if}
             {#if !print && showReminder}
                 <div class="bookish-scroll-reminder" />
@@ -93,7 +92,7 @@
         <slot name="outline" />
     {/if}
     {#if editable}
-        {#if embedNode === undefined}
+        {#if embed === null}
             <Button tooltip="add cover image to page" command={addCover}
                 >+ cover image</Button
             >

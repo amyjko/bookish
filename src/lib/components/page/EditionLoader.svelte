@@ -65,8 +65,9 @@
                     $book.ref.id,
                     editionID,
                     (ed) => {
-                        if (ed) edition.set(ed);
-                        else {
+                        if (ed) {
+                            edition.set(ed);
+                        } else {
                             edition.set(undefined);
                             error = 'Unable to load edition';
                         }

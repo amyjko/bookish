@@ -4,9 +4,7 @@
     import Switch from '../editor/Switch.svelte';
     import { getEdition } from './Contexts';
     import Format from '../chapter/Format.svelte';
-    import type Edition from '../../models/book/Edition';
     import Note from '../editor/Note.svelte';
-    import { updateEdition } from '../../models/CRUD';
 
     let edition = getEdition();
 
@@ -27,10 +25,9 @@
     <div class="publisher">
         <div class="summary">
             <BookishEditor
-                ast={Parser.parseFormat(
-                    undefined,
-                    $edition.summary
-                ).withTextIfEmpty()}
+                text={$edition.summary}
+                parser={(text) =>
+                    Parser.parseFormat(undefined, text).withTextIfEmpty()}
                 save={(newSummary) =>
                     $edition
                         ? edition.set(

@@ -24,9 +24,8 @@
     import { isChapterEditable } from '../page/Contexts';
 
     export let node: FormatNode;
+    export let editable: boolean = false;
     export let placeholder: string | undefined = undefined;
-
-    let editable = isChapterEditable();
 
     $: format = node.getFormat();
     $: tag =
@@ -41,7 +40,9 @@
             : 'span';
 
     $: showPlaceholder =
-        node.isEmptyText() && placeholder !== undefined && editable;
+        node.isEmptyText() &&
+        placeholder !== undefined &&
+        (editable || isChapterEditable());
 </script>
 
 <svelte:element

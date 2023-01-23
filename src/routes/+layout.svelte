@@ -74,9 +74,28 @@
             try {
                 // Set the edition after we save it, since things like chapter refs can change for new chapters.
                 reflection = true;
-                edition.set(
-                    await updateEdition(previousSavedEdition, $edition)
+                // Get the chapter refs from the updated edition
+                const newChapterRefs = await updateEdition(
+                    previousSavedEdition,
+                    $edition
                 );
+
+                // Start with the current edition.
+                const revisedEdition = $edition;
+                for (const [id, ref] of newChapterRefs) {
+                    const chap = revisedEdition.chapters.find(
+                        (chapter) => chapter.id === id
+                    );
+                    if (chap && chap.ref === undefined) {
+                        revisedEdition.withRevisedChapter(
+                            chap,
+                            chap.withRef(ref)
+                        );
+                    }
+                }
+                // Update the current edition.
+                edition.set(revisedEdition);
+
                 status.set(BookSaveStatus.Saved);
             } catch (error) {
                 console.error(error);

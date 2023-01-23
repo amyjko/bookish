@@ -31,8 +31,6 @@
     <div class="cover" class:empty={embed === null}>
         {#if embed instanceof EmbedNode}
             <Embed node={embed} imageOnly editable={false} />
-        {:else if embed instanceof ErrorNode}
-            <ErrorMessage node={embed} />
         {/if}
     </div>
     <div class="content">

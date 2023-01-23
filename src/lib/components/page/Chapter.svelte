@@ -358,7 +358,8 @@
             {#if chapterAST}
                 {#if editable}
                     <BookishEditor
-                        ast={chapterAST}
+                        text={chapterAST.toBookdown()}
+                        parser={(text) => Parser.parseChapter($edition, text)}
                         save={(ast) =>
                             ast instanceof ChapterNode
                                 ? setChapter(

@@ -770,63 +770,50 @@ export default class Parser {
         return new FormatNode('', segments);
     }
 
-    parseEmbed(): EmbedNode | ErrorNode {
+    parseEmbed(): EmbedNode {
         // Read |
         this.read();
 
         // Read the URL
         const url = this.readUntilNewlineOr('|');
 
-        if (this.peek() !== '|')
-            return new ErrorNode(
-                this.readUntilNewLine(),
-                "Missing '|' after URL in embed"
-            );
+        let description;
+        let caption;
+        let credit;
 
-        // Read a |
-        this.read();
+        if (this.peek() === '|') {
+            // Read a |
+            this.read();
 
-        // Read the description
-        const description = this.readUntilNewlineOr('|');
+            // Read the description
+            description = this.readUntilNewlineOr('|');
 
-        if (this.peek() !== '|')
-            return new ErrorNode(
-                this.readUntilNewLine(),
-                "Missing '|' after description in embed"
-            );
+            if (this.peek() === '|') {
+                // Read a |
+                this.read();
 
-        // Read a |
-        this.read();
+                // Parse the caption
+                caption = this.parseFormat('|');
 
-        // Parse the caption
-        const caption = this.parseFormat('|');
+                if (this.peek() === '|') {
+                    // Read a |
+                    this.read();
 
-        if (this.peek() !== '|')
-            return new ErrorNode(
-                this.readUntilNewLine(),
-                "Missing '|' after caption in embed"
-            );
+                    // Parse the credit
+                    credit = this.parseFormat('|');
 
-        // Read a |
-        this.read();
-
-        // Parse the credit
-        const credit = this.parseFormat('|');
-
-        // Check for the closing delimeter
-        if (this.peek() !== '|')
-            return new ErrorNode(
-                this.readUntilNewLine(),
-                "Missing '|' after credit in embed."
-            );
-
-        // Read a |
-        this.read();
+                    // Check for the closing delimeter
+                    if (this.peek() === '|')
+                        // Read a |
+                        this.read();
+                }
+            }
+        }
 
         // Is there a position indicator?
         const position = this.parsePosition();
 
-        return new EmbedNode(url, description, caption, credit, position);
+        return new EmbedNode(url, description ?? '', caption, credit, position);
     }
 
     parseComment(): CommentNode {

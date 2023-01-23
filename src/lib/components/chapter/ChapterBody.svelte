@@ -9,13 +9,14 @@
 
     export let node: ChapterNode;
     export let placeholder: string = '';
+    export let editable: boolean = false;
 
     $: errors = node.getErrors();
     $: blocks = node.getBlocks();
 </script>
 
 <section class="bookish-chapter-body" data-nodeid={node.nodeID}>
-    {#if errors.length > 0}
+    {#if editable && errors.length > 0}
         <p>
             <Problem
                 >{errors.length +
