@@ -347,11 +347,15 @@ export async function updateEdition(
             newChapterRefs.set(newChapter.id, newChapterRef);
         }
         // If we have a previous version, did the text change? If so, update it.
-        else if (previousEdition) {
-            const previousChapter = previousEdition.getChapterByRef(
-                newChapter.ref
-            );
-            if (previousChapter && newChapter.text !== previousChapter.text) {
+        else {
+            const previousChapter =
+                previousEdition === undefined
+                    ? undefined
+                    : previousEdition.getChapterByRef(newChapter.ref);
+            if (
+                previousChapter === undefined ||
+                newChapter.text !== previousChapter.text
+            ) {
                 await setDoc(
                     doc(
                         db,
