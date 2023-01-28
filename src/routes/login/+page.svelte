@@ -19,10 +19,12 @@
         // Enter loading state, try to login and wait for it to complete, and then leave loading state.
         try {
             // Give some feedback when loading.
+            feedback = 'Logging in...';
             loading = true;
             await $auth.login(email);
             feedback = 'Check your email for a login link.';
         } catch (err) {
+            feedback = '';
             error = "Couldn't connect to the server.";
         } finally {
             loading = false;
