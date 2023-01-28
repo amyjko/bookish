@@ -12,7 +12,7 @@
         "dev": "vite dev",
         "preview": "npm run build && vite preview",
         "build": "npm run env && vite build",
-        "//emu": "echo 'This copies the .env file for the current Firebase project (local if not doing hosting) and starts the emulator'",
+        "//emu": "echo 'This copies the local .env file and starts the emulator'",
         "emu": "npm run env && firebase emulators:start",
         "package": "svelte-package --watch",
         "test": "vitest",
