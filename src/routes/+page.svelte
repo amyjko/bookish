@@ -9,8 +9,8 @@
 
 <Section>
     <Lead
-        ><Large>Bookish</Large> is a platform for writing simple, beautiful, accessible
-        online books.</Lead
+        ><Large>Bookish</Large> (beta) is a platform for writing simple, beautiful,
+        accessible online books.</Lead
     >
 
     <Head>Simple</Head>
@@ -36,35 +36,8 @@
         browser, with sight or sound.
     </Paragraph>
 
-    <Paragraph aside>
-        Bookish is built and maintained by <Link to="http://amyjko.com"
-            >Amy J. Ko</Link
-        >, a Professor at the <Link to="https://www.washington.edu/"
-            >University of Washington</Link
-        >
-        <Link to="https://ischool.uw.edu">Information School</Link>. She
-        originally built Bookish to write web-based books to support her
-        teaching. She decided to build a platform to make editing and
-        maintaining books easier for both herself and others.
-    </Paragraph>
-
-    <Paragraph aside>
-        Using Bookish to write books will always be free. However, Amy is
-        considering models for covering bandwidth costs from reading such
-        per-book fees or donations. If you have ideas, <Link
-            to="https://github.com/amyjko/bookish/issues/251"
-            >join the discussion</Link
-        >.
-    </Paragraph>
-
-    <Paragraph aside>
-        Do you have feedback or want to contribute? The project is free and open
-        source <Link to="https://github.com/amyjko/bookish">on GitHub</Link>.
-        Write <Link to="mailto:ajko@uw.edu">Amy</Link> if you'd like to collaborate,
-        or <Link to="https://github.com/amyjko/bookish/issues"
-            >submit an issue</Link
-        > or <Link to="https://github.com/amyjko/bookish/pulls"
-            >pull request</Link
-        > directly.
+    <Paragraph>
+        <Link to="/about">Learn more</Link>
+        about the platform.
     </Paragraph>
 </Section>

@@ -287,7 +287,6 @@
         flex-wrap: wrap;
         align-items: baseline;
         background: var(--bookish-background-color);
-        padding: var(--app-chrome-padding);
         font-family: var(--app-font);
         font-size: var(--app-chrome-font-size);
     }

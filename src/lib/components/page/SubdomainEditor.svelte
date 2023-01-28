@@ -10,6 +10,7 @@
         'email',
         'login',
         'confirm',
+        'about',
         'read',
         'write',
     ];
