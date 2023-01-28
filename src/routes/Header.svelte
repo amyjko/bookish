@@ -107,6 +107,11 @@
         /* This puts the saved status in the top right and pushes everything else left. */
         margin-left: auto;
         font-size: 90%;
+        display: flex;
+        flex-direction: row;
+        flex-wrap: nowrap;
+        gap: var(--app-chrome-padding);
+        align-items: baseline;
     }
 
     .elided {

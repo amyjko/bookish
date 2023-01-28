@@ -8,9 +8,9 @@
 <span
     class={`status ${
         $status === BookSaveStatus.Saving
-            ? 'status-saving'
+            ? 'saving'
             : $status === BookSaveStatus.Error
-            ? 'status-error'
+            ? 'error'
             : ''
     }`}
 >
@@ -27,33 +27,32 @@
 
 <style>
     .status {
-        color: var(--app-muted-color);
+        color: var(--app-font-color-inverted);
         font-family: var(--app-font);
         white-space: nowrap;
+        background-color: var(--app-interactive-color);
+        padding: calc(var(--app-chrome-padding) / 2);
+        border-radius: var(--app-chrome-roundedness);
     }
 
-    .status-error {
-        color: var(--app-error-color);
+    .error {
+        background-color: var(--app-error-color);
         animation: failure 100ms infinite;
     }
 
-    .status-saving {
-        animation: waiting 100ms infinite;
+    .saving {
+        animation: waiting 1s infinite;
     }
 
     @keyframes waiting {
-        from,
-        to {
-            transform: scale(1, 1);
-        }
-        25% {
-            transform: scale(1, 1.2);
+        0% {
+            transform: rotate(-3deg);
         }
         50% {
-            transform: scale(1, 1);
+            transform: rotate(3deg);
         }
-        75% {
-            transform: scale(1, 1.1);
+        100% {
+            transform: rotate(-3deg);
         }
     }
 </style>
