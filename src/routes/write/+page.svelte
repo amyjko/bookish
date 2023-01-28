@@ -88,18 +88,18 @@
     }
 </script>
 
-<Section>
-    <Lead><Large>Write</Large> something.</Lead>
+<Lead><Large>Write</Large> something.</Lead>
 
-    <Paragraph
-        >Publishing is currently <Link to="about#editing">invitation only</Link
-        >.</Paragraph
-    >
-</Section>
-
-<Button tooltip="create new book" command={newBook} disabled={creating}
-    >+ book</Button
+<Paragraph
+    >Publishing is currently <Link to="about#editing">invitation only</Link
+    >.</Paragraph
 >
+
+<Paragraph>
+    <Button tooltip="create new book" command={newBook} disabled={creating}
+        >+ book</Button
+    >
+</Paragraph>
 
 {#if creating}
     <Feedback>{creationFeedback}</Feedback>
