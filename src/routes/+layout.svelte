@@ -2,10 +2,6 @@
     import Footer from './Footer.svelte';
     import Header from './Header.svelte';
     import Auth from '$lib/components/Auth.svelte';
-    import Large from '$lib/components/app/Large.svelte';
-    import Lead from '$lib/components/app/Lead.svelte';
-    import Writing from '$lib/components/app/Section.svelte';
-    import Paragraph from '$lib/components/app/Paragraph.svelte';
     import { writable, type Writable } from 'svelte/store';
     import { setContext } from 'svelte';
     import {

@@ -92,7 +92,7 @@
     <Lead><Large>Write</Large> something.</Lead>
 
     <Paragraph
-        >Publishing is currently <Link to="#editing">invitation only</Link
+        >Publishing is currently <Link to="about#editing">invitation only</Link
         >.</Paragraph
     >
 </Section>

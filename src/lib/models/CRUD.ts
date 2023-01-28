@@ -1,4 +1,4 @@
-import { app, db, functions } from './Firebase';
+import { db, functions } from './Firebase';
 import {
     collection,
     getDocs,

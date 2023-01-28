@@ -32,11 +32,6 @@
         color: var(--app-error-color);
     }
 
-    p[role='alert']:before {
-        content: '! ';
-        font-size: 200%;
-    }
-
     p[role='status'] {
         color: var(--app-font-color);
         animation: waiting 1s infinite;

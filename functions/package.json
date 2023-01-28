@@ -19,7 +19,7 @@
         "@google-cloud/storage": "^6.5.2",
         "bookish-press": "latest",
         "firebase-admin": "^11.4.1",
-        "firebase-functions": "^4.1.1"
+        "firebase-functions": "^4.2.0"
     },
     "devDependencies": {
         "@typescript-eslint/eslint-plugin": "^5.12.0",

@@ -45,7 +45,7 @@
 </Button>
 
 <style>
-    :global(button.bookish-editor-confirm) {
+    :global(bookish-editor-confirm) {
         animation: failure 100ms infinite;
     }
 </style>

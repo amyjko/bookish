@@ -6,23 +6,13 @@
         getEdition,
     } from '$lib/components/page/Contexts';
     import { getCaret } from '$lib/components/page/Contexts';
-    import {
-        getSubdomain,
-        pathWithoutSubdomain,
-    } from '../lib/util/getSubdomain';
     import Toolbar from '$lib/components/editor/Toolbar.svelte';
     import Status from '$lib/components/page/Status.svelte';
     import HomeIcon from '$lib/components/editor/icons/home.svg?raw';
     import Icon from '$lib/components/editor/Icon.svelte';
     import { page } from '$app/stores';
 
-    let subdomain = getSubdomain();
-
     let auth = getAuth();
-
-    function getLink(path: string) {
-        return subdomain !== undefined ? pathWithoutSubdomain(path) : path;
-    }
 
     let caret = getCaret();
     $: edition = getEdition();
@@ -31,7 +21,7 @@
 
 <section class="header">
     <nav class="navigation">
-        <Link to={getLink('/')} title="Home"><Icon icon={HomeIcon} /></Link>
+        <Link to="/" title="Home"><Icon icon={HomeIcon} /></Link>
         {#if $book && $edition}
             <span class="elided"
                 ><Link
@@ -53,21 +43,21 @@
             >
             <span class="status">
                 {#if $auth?.user && $auth.user.email}
-                    <Link to={getLink('/email')}>{$auth.user.email}</Link>
+                    <Link to="/email">{$auth.user.email}</Link>
                 {:else}
-                    <Link to={getLink('/login')}>Login</Link>
+                    <Link to="/login">Login</Link>
                 {/if}
                 <Status />
             </span>
         {:else}
-            <Link to={getLink('/read')}>Read</Link>
-            <Link to={getLink('/write')}>Write</Link>
-            <Link to={getLink('/about')}>About</Link>
+            <Link to="/read">Read</Link>
+            <Link to="/write">Write</Link>
+            <Link to="/about">About</Link>
             <small>
                 {#if $auth?.user && $auth.user.email}
-                    <Link to={getLink('/email')}>{$auth.user.email}</Link>
+                    <Link to="/email">{$auth.user.email}</Link>
                 {:else}
-                    <Link to={getLink('/login')}>Login</Link>
+                    <Link to="/login">Login</Link>
                 {/if}
             </small>
         {/if}
