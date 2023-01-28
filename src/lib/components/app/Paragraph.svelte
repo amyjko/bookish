@@ -16,5 +16,6 @@
 
     .aside {
         font-style: italic;
+        font-size: 90%;
     }
 </style>

@@ -9,31 +9,31 @@
 
 <Section>
     <Lead
-        ><Large>Bookish</Large> press is a platform for reading and writing simple,
-        accessible, beautiful online books.</Lead
+        ><Large>Bookish</Large> is a platform for writing simple, beautiful, accessible
+        online books.</Lead
     >
 
     <Head>Simple</Head>
     <Paragraph>
         Print is full gatekeeping and other digital platforms have complex
         tools. Bookish strives to be a Google Docs for books: the workflow is as
-        simple as write, share, read.
-    </Paragraph>
-
-    <Head>Accessible</Head>
-    <Paragraph>
-        Most platforms produce books that are incompatible with screen readers,
-        excluding readers who are blind, low vision, dyslexic, and others who
-        rely on them. Bookish ensures that books are readable on any device by
-        any person with a modern web browser.
+        simple as write and share.
     </Paragraph>
 
     <Head>Beautiful</Head>
     <Paragraph>
         Typography matters. Print books can be beautiful, but are complex to
-        make and inaccessible. Many e-book and online book platforms prioritize
-        navigation over content. Bookish tries to prioritizes content over
-        structure.
+        make. E-books can be easier to make, but are often typographically
+        messy. Bookish strives for a happy medium, making digital content
+        typographicaaly beautiful.
+    </Paragraph>
+
+    <Head>Accessible</Head>
+    <Paragraph>
+        Most platforms produce books that are incompatible with screen readers,
+        excluding readers who are blind, low vision, dyslexic, or otherwise
+        prefer to have text spoken. Bookish strives to be readable in any web
+        browser, with sight or sound.
     </Paragraph>
 
     <Paragraph aside>
@@ -43,10 +43,24 @@
             >University of Washington</Link
         >
         <Link to="https://ischool.uw.edu">Information School</Link>. She
-        originally built Bookish to write books to support her teaching. Do you
-        have feedback or want to contribute? The project is free and open source <Link
-            to="https://github.com/amyjko/bookish">on GitHub</Link
-        >. Write <Link to="mailto:ajko@uw.edu">Amy</Link> if you'd like to collaborate,
+        originally built Bookish to write web-based books to support her
+        teaching. She decided to build a platform to make editing and
+        maintaining books easier for both herself and others.
+    </Paragraph>
+
+    <Paragraph aside>
+        Using Bookish to write books will always be free. However, Amy is
+        considering models for covering bandwidth costs from reading such
+        per-book fees or donations. If you have ideas, <Link
+            to="https://github.com/amyjko/bookish/issues/251"
+            >join the discussion</Link
+        >.
+    </Paragraph>
+
+    <Paragraph aside>
+        Do you have feedback or want to contribute? The project is free and open
+        source <Link to="https://github.com/amyjko/bookish">on GitHub</Link>.
+        Write <Link to="mailto:ajko@uw.edu">Amy</Link> if you'd like to collaborate,
         or <Link to="https://github.com/amyjko/bookish/issues"
             >submit an issue</Link
         > or <Link to="https://github.com/amyjko/bookish/pulls"

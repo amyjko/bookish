@@ -192,7 +192,7 @@
         /* Define some UI defaults not used in the Bookish theme. */
         --app-font: 'Outfit', sans-serif;
         --app-line-height: 1.7;
-        --app-font-size: 14pt;
+        --app-font-size: 16pt;
         --app-text-spacing: 2rem;
 
         --app-interactive-color: #1b499c;
