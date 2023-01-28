@@ -7,6 +7,7 @@ export type EditionInfo = {
     ref: DocumentReference;
     summary: string;
     number: number;
+    // The author specified edition number, or null if not published.
     published: number | null;
     editionuids: string[];
     chapteruids: string[];
@@ -18,6 +19,7 @@ export type BookSpecification = {
     authors: string[];
     description: string;
     cover: string | null;
+    // True if one of the book's editions is published.
     published: boolean;
     editions: EditionInfo[];
     // An optional subdomain, for use in URLs
@@ -56,8 +58,9 @@ export default class Book {
         this.authors = authors;
         this.description = description;
         this.cover = cover;
-        // We always keep editions in reversed edition number for easy reference.
+        // The published state is always true if some edition's published flag isn't null.
         this.published = editions.some((edition) => edition.published !== null);
+        // We always keep editions in reversed edition number for easy reference.
         this.editions = editions.sort((a, b) => a.number - b.number);
         this.domain = domain;
         this.uids = uids;

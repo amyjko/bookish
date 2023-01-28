@@ -2,12 +2,21 @@
     import Parser from '../../models/chapter/Parser';
     import BookishEditor from '../editor/BookishEditor.svelte';
     import Switch from '../editor/Switch.svelte';
-    import { getAuth, getEdition, getLeasee, lease } from './Contexts';
+    import {
+        getAuth,
+        getEdition,
+        getLeasee,
+        isEditionEditable,
+        lease,
+    } from './Contexts';
     import Format from '../chapter/Format.svelte';
     import Note from '../editor/Note.svelte';
+    import Instructions from './Instructions.svelte';
+    import Link from '../Link.svelte';
 
     let auth = getAuth();
     let edition = getEdition();
+    let editable = isEditionEditable();
 
     // TODO Disabled for now. See functions/index.ts/publishEdition() for why.
     // let publishing = new Map<number, boolean | string>();
@@ -20,9 +29,26 @@
     //         publishing = new Map(publishing);
     //     }
     // }
+
+    let publisher: boolean | undefined = undefined;
+
+    $: {
+        if ($auth && $auth.user) updateUserClaims();
+    }
+
+    async function updateUserClaims() {
+        if ($auth === undefined || $auth.user === null) return;
+        const token = await $auth.user.getIdTokenResult();
+        publisher =
+            'publisher' in token.claims && token.claims.publisher === true;
+    }
 </script>
 
-{#if $edition}
+{#if $edition && publisher === true}
+    <Instructions {editable}>
+        Ready to publish this edition? Write a summary then hit the switch.
+    </Instructions>
+
     <div class="publisher">
         <div class="summary">
             <BookishEditor
@@ -59,6 +85,12 @@
                 $edition.published
             ).toLocaleDateString('en-us')}{/if}</Note
     >
+{:else}
+    <Instructions {editable}>
+        You don't yet have publishing privileges. <Link
+            to="mailto:amy@amyjko.com">Write Amy</Link
+        > to schedule a chat about your book and ask for publishing privileges.
+    </Instructions>
 {/if}
 
 <!-- TODO Disabled for now.  See functions/index.ts/publishEdition() for why. -->

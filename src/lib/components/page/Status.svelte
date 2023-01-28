@@ -6,11 +6,11 @@
 </script>
 
 <span
-    class={`bookish-editor-status ${
+    class={`status ${
         $status === BookSaveStatus.Saving
-            ? 'bookish-editor-status-saving'
+            ? 'status-saving'
             : $status === BookSaveStatus.Error
-            ? 'bookish-editor-status-error'
+            ? 'status-error'
             : ''
     }`}
 >
@@ -21,23 +21,23 @@
         : $status === BookSaveStatus.Saved
         ? '\u2713 Saved'
         : $status === BookSaveStatus.Error
-        ? "\u2715 Couldn't save."
+        ? '\u2715 Not saved'
         : ''}
 </span>
 
 <style>
-    .bookish-editor-status {
+    .status {
         color: var(--app-muted-color);
         font-family: var(--app-font);
         white-space: nowrap;
     }
 
-    .bookish-editor-status-error {
+    .status-error {
         color: var(--app-error-color);
         animation: failure 100ms infinite;
     }
 
-    .bookish-editor-status-saving {
+    .status-saving {
         animation: waiting 100ms infinite;
     }
 

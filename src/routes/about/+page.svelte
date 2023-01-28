@@ -23,7 +23,7 @@
         a side project and continues to use it extensively in her classes.
     </Paragraph>
 
-    <Head>Beta</Head>
+    <Head id="beta">Beta</Head>
 
     <Paragraph
         >Bookish is currently in <em>beta</em>. That means there are likely to
@@ -35,7 +35,7 @@
         > to check our progress (and help, if you are able).</Paragraph
     >
 
-    <Head>Costs</Head>
+    <Head id="costs">Costs</Head>
 
     <Paragraph>
         Using Bookish to write books will always be free. However, hosting is
@@ -47,7 +47,7 @@
         >.
     </Paragraph>
 
-    <Head>Vision</Head>
+    <Head id="vision">Vision</Head>
 
     <Paragraph>
         As with any publisher, Bookish as an editorial policy and philosophy.
@@ -66,7 +66,7 @@
         more strictly technical ideas in sociotechnical ways.
     </Paragraph>
 
-    <Head>Editing</Head>
+    <Head id="editing">Editing</Head>
 
     <Paragraph
         >For now, anyone can create an account and write books, but publishing
@@ -85,7 +85,7 @@
         different editorial vision.
     </Paragraph>
 
-    <Head>Feedback</Head>
+    <Head id="feedback">Feedback</Head>
 
     <Paragraph>
         Do you have feedback or want to contribute to the plaform? The project

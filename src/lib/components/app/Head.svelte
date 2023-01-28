@@ -1,4 +1,8 @@
-<h2><slot /></h2>
+<script lang="ts">
+    export let id: string | null = null;
+</script>
+
+<h2 {id}><slot /></h2>
 
 <style>
     h2 {

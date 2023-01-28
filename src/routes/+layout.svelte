@@ -86,14 +86,14 @@
                     $edition
                 );
 
-                // Start with the current edition.
-                const revisedEdition = $edition;
+                // If we succeeded, update all of the chapters with the new chapter references, if there are any.
+                let revisedEdition = $edition;
                 for (const [id, ref] of newChapterRefs) {
                     const chap = revisedEdition.chapters.find(
                         (chapter) => chapter.id === id
                     );
                     if (chap && chap.ref === undefined) {
-                        revisedEdition.withRevisedChapter(
+                        revisedEdition = revisedEdition.withRevisedChapter(
                             chap,
                             chap.withRef(ref)
                         );
@@ -125,11 +125,6 @@
         }
     }
 
-    // When the edition changes, update the book and debounce a save.
-    $: {
-        if ($edition) scheduleSave();
-    }
-
     function scheduleSave() {
         // If this is the latest edition, update the book's metadata to reflect the changes.
         if (
@@ -156,6 +151,11 @@
 
         if (!reflection) status.set(BookSaveStatus.Changed);
         editionTimer = debounce(editionTimer, saveEdition);
+    }
+
+    // When the edition changes, update the book and debounce a save.
+    $: {
+        if ($edition) scheduleSave();
     }
 
     // When the book changes, debounce a save.

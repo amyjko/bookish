@@ -14,6 +14,8 @@
     import Paragraph from '$lib/components/app/Paragraph.svelte';
     import Button from '$lib/components/app/Button.svelte';
     import BookList from '$lib/components/app/BookList.svelte';
+    import Section from '$lib/components/app/Section.svelte';
+    import Link from '$lib/components/app/Link.svelte';
 
     let editableBooks: Book[] | undefined = undefined;
     let partiallyEditableBooks: Book[] | undefined = undefined;
@@ -86,13 +88,18 @@
     }
 </script>
 
-<Lead><Large>Write</Large> something.</Lead>
+<Section>
+    <Lead><Large>Write</Large> something.</Lead>
 
-<Paragraph>
-    <Button tooltip="create new book" command={newBook} disabled={creating}
-        >+ book</Button
+    <Paragraph
+        >Publishing is currently <Link to="#editing">invitation only</Link
+        >.</Paragraph
     >
-</Paragraph>
+</Section>
+
+<Button tooltip="create new book" command={newBook} disabled={creating}
+    >+ book</Button
+>
 
 {#if creating}
     <Feedback>{creationFeedback}</Feedback>

@@ -292,10 +292,6 @@
 
         {#if editable}
             <PageHeader id="publish">Publish</PageHeader>
-            <Instructions {editable}>
-                Ready to publish this edition? Write a summary then hit the
-                switch.
-            </Instructions>
             <Publish />
         {/if}
 
