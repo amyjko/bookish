@@ -167,22 +167,15 @@
     }
 </script>
 
-{#if import.meta.env.PROD}
-    <Writing>
-        <Lead><Large>Bookish</Large> is coming.</Lead>
-        <Paragraph>A new way to write books online.</Paragraph>
-    </Writing>
-{:else}
-    <div class="bookish-app">
-        <Auth>
-            {#if $page.route.id !== null && !$page.route.id.startsWith('/[bookid]/[[editionid=edition]]')}
-                <Header />
-            {/if}
-            <slot />
-            <Footer />
-        </Auth>
-    </div>
-{/if}
+<div class="bookish-app">
+    <Auth>
+        {#if $page.route.id !== null && !$page.route.id.startsWith('/[bookid]/[[editionid=edition]]')}
+            <Header />
+        {/if}
+        <slot />
+        <Footer />
+    </Auth>
+</div>
 
 <style>
     /* Custom fonts for app */
