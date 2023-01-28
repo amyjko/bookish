@@ -94,11 +94,11 @@
     {/if}
     {#if editable}
         {#if embed === null}
-            <Button tooltip="add cover image to page" command={addCover}
+            <Button tooltip="add cover image" command={addCover}
                 >+ cover image</Button
             >
         {:else}
-            <Button tooltip="remove cover image from page" command={removeCover}
+            <Button tooltip="remove cover image" command={removeCover}
                 >- cover image</Button
             >
         {/if}
@@ -110,7 +110,7 @@
                 <TextEditor
                     {label}
                     text={header + (subtitle ? ': ' + subtitle : '')}
-                    placeholder="Title"
+                    placeholder="title"
                     valid={(text) =>
                         text.length === 0
                             ? 'Titles have to be at least one character long.'

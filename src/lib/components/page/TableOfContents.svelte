@@ -124,7 +124,8 @@
         </Header>
 
         <Instructions {editable}>
-            Above you can edit your book's authors, title, and cover image.
+            Edit this book's cover image, ID, title, and authors above. The book
+            ID appears in the book's URL (e.g., bookish.press/<em>bookid</em>).
         </Instructions>
 
         <Description />
@@ -183,7 +184,7 @@
                             <TextEditor
                                 label={'Chapter section editor'}
                                 text={section ? section : ''}
-                                placeholder="Section"
+                                placeholder="section"
                                 valid={() => undefined}
                                 save={(text) =>
                                     setChapter(
@@ -260,8 +261,8 @@
         <PageHeader id="print">Print</PageHeader>
 
         <Instructions {editable}>
-            This offers a way for readers to print the entire book as a single
-            page.
+            This link will generate the entire book on a single page, suitable
+            for printing.
         </Instructions>
 
         <PageParagraph>
@@ -273,8 +274,7 @@
         <PageHeader id="citation">Citation</PageHeader>
 
         <Instructions {editable}>
-            This citation is dynamically created from the current authors,
-            title, and date.
+            This citation is created from the current authors, title, and date.
         </Instructions>
 
         <!-- Book citation -->
@@ -302,9 +302,10 @@
         {#if editable || isEditionPartiallyEditable()}
             <PageHeader>Editors</PageHeader>
             <Instructions {editable}>
-                Authors with these email addresses can edit this edition and its
-                chapters. To give book level permissions, edit the book editors
-                on the <Link to="/write/{$book.ref.id}/editions">editions</Link>
+                These authors can edit this edition and its chapters. To give
+                book-level permissions, edit the book editors on the <Link
+                    to="/write/{$book.ref.id}/editions">editions</Link
+                >
                 page. To give chapter-level permissions, navigate to the chapter.
             </Instructions>
             <Permissions

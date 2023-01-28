@@ -61,7 +61,7 @@
                 <TextEditor
                     text={definition.phrase}
                     label={'Glossary phrase editor.'}
-                    placeholder="Phrase"
+                    placeholder="phrase"
                     valid={(text) => {
                         if (text.length === 0) return "phrase can't be empty";
                     }}
@@ -110,7 +110,7 @@
                             : undefined}
                     chapter={false}
                     component={Format}
-                    placeholder="write a definition"
+                    placeholder="definition"
                     leasee={getLeasee(auth, edition, `definition-${id}`)}
                     lease={(lock) =>
                         lease(auth, edition, `definition-${id}`, lock)}
@@ -135,7 +135,7 @@
                                 <TextEditor
                                     text={syn}
                                     label={'Synonym editor.'}
-                                    placeholder="Synonym"
+                                    placeholder="synonym"
                                     valid={() => undefined}
                                     save={(text) => {
                                         const newSyns = [...syns];

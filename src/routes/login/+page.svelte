@@ -45,7 +45,7 @@
         disabled={auth === undefined || loading}
     />
     <Button
-        tooltip="Login with your email"
+        tooltip="login into your account"
         command={handleSubmit}
         type="submit"
         disabled={auth === undefined ||

@@ -49,16 +49,15 @@
 </script>
 
 <Instructions {editable}>
-    To cite references in a chapter, add them here. You can add one at a time,
-    or try pasting them in bulk, and we'll do our best to pull out the relevant
-    parts, looking for things that look like author lists, years, sources, and
-    URLs. Be sure to verify it though &mdash; it's likely to get some things
-    wrong!
+    To add references to a chapter, add them here first. You can add one at a
+    time, or try pasting them in bulk, and this page will try to pull out author
+    lists, years, sources, and URLs. Be sure to verify it though &mdash; it's
+    likely to get some things wrong.
 </Instructions>
 
 <textarea rows={5} bind:value={text} style="width: 100%" />
 <Button
-    tooltip="convert text to references"
+    tooltip="convert to references"
     disabled={text.length === 0}
     command={handleBulkAdd}>+ bulk references</Button
 >

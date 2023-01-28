@@ -58,7 +58,7 @@
                     disabled={false}
                 />
                 <Button
-                    tooltip="Give email editing rights"
+                    tooltip="give {newEditor} editing rights"
                     disabled={newEditor.length === 0 ||
                         Array.from(emails.values()).includes(newEditor)}
                     command={addEditor}>+ editor</Button
@@ -73,7 +73,7 @@
                 {email}
                 {#if writable}
                     <Button
-                        tooltip={`Remove editing rights of ${email}`}
+                        tooltip="remove {email} editing rights"
                         command={() =>
                             change([
                                 ...uids.slice(0, index),

@@ -350,11 +350,11 @@
 
         <Instructions {editable}>
             Edit your chapter's title, authors, and cover image above. You can
-            also change the ID of the chapter, which appears in it's URL. Write
-            your chapter text below, using the many formatting options in the
-            toolbar above to format text, add headers, lists, tables, comments,
+            also change the ID of the chapter, which is the text that appears in
+            the chapter URL. Write your chapter text below, formatting options
+            in the toolbar above to add headers, lists, tables, comments,
             citations, footnotes, and more. It's okay to try things, you can
-            always undo! Saves are automatic, each time you stop typing.
+            always undo. Saves are automatic.
         </Instructions>
 
         <!-- Render the chapter body, passing some context -->
@@ -375,7 +375,7 @@
                         chapter={true}
                         autofocus
                         component={ChapterBody}
-                        placeholder="Type here"
+                        placeholder="write here"
                         leasee={getLeasee(auth, edition, chapter.id)}
                         lease={(lock) => lease(auth, edition, chapter.id, lock)}
                     />
@@ -414,7 +414,8 @@
         {#if editable || isEditionPartiallyEditable()}
             <PageHeader>Editors</PageHeader>
             <Instructions {editable}
-                >These authors can edit this chapter.</Instructions
+                >These authors can edit this chapter. Add an email here to
+                provide chapter-level edit permissions.</Instructions
             >
 
             <Permissions

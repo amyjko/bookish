@@ -29,7 +29,7 @@
                         : undefined}
                 chapter={false}
                 component={ChapterBody}
-                placeholder="What is this book about?"
+                placeholder="book description"
                 leasee={getLeasee(auth, edition, `description`)}
                 lease={(lock) => lease(auth, edition, `description`, lock)}
             />

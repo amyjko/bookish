@@ -26,7 +26,7 @@
 {#if $book && editions}
     {#if editable}
         <p>
-            <Button tooltip="Create a new edition" command={handleDraftEdition}
+            <Button tooltip="create new edition" command={handleDraftEdition}
                 >+ edition</Button
             >
         </p>
@@ -34,9 +34,10 @@
     <Instructions {editable}>
         Each book has one or more editions, allowing you to track revisions and
         ensure previous versions remain available. When you're ready to revise,
-        make a new edition, make your revisions, write a summary, and then
-        publish. By default, readers will see the latest published edition, but
-        they will be able to access older editions here.
+        add a new edition here; it will copy the latest edition, which you can
+        then edit. When you're ready to publish an edition, write a summary here
+        and then publish. By default, readers will see the latest published
+        edition, but they can access older editions here.
     </Instructions>
     {#each editions as bookEdition, index (bookEdition.ref)}
         {@const editionNumber =
@@ -94,7 +95,7 @@
     {#if editable}
         <h2>Editors</h2>
         <Instructions {editable}>
-            These emails can edit any aspect of the book and any of its
+            These authors can edit any aspect of the book and any of its
             editions.
         </Instructions>
 

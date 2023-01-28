@@ -102,8 +102,8 @@
             <td>
                 <TextEditor
                     text={reference.citationID}
-                    label={'Citation ID'}
-                    placeholder="Citation ID"
+                    label={'reference ID'}
+                    placeholder="reference ID"
                     saveOnExit
                     valid={(text) => {
                         if (text.length === 0)
@@ -136,8 +136,8 @@
             <td>
                 <TextEditor
                     text={reference.authors}
-                    label={'Author list editor.'}
-                    placeholder="Authors"
+                    label={'author list editor'}
+                    placeholder="authors"
                     valid={(text) => {
                         if (text.length === 0) return "Authors can't be empty.";
                     }}
@@ -159,8 +159,8 @@
             <td>
                 <TextEditor
                     text={reference.year}
-                    label={'Year editor.'}
-                    placeholder="Year"
+                    label={'year editor'}
+                    placeholder="year"
                     valid={(text) => {
                         if (text.length === 0) return "Year can't be empty";
                         if (!/1?[0-9)[0-9]{2}/.test(text))
@@ -184,8 +184,8 @@
             <td>
                 <TextEditor
                     text={reference.title}
-                    label={'Title editor.'}
-                    placeholder="Title"
+                    label={'title editor'}
+                    placeholder="title"
                     valid={(text) => {
                         if (text.length === 0) return "Title can't be empty.";
                     }}
@@ -208,8 +208,8 @@
                 <em>
                     <TextEditor
                         text={reference.source}
-                        label={'Source editor.'}
-                        placeholder="Source"
+                        label={'source editor'}
+                        placeholder="source"
                         valid={(text) => {
                             if (text.length === 0)
                                 return "Source can't be empty";
@@ -233,8 +233,8 @@
             <td>
                 <TextEditor
                     text={reference.url}
-                    label={'URL editor.'}
-                    placeholder="URL"
+                    label={'url editor'}
+                    placeholder="url"
                     valid={() => undefined}
                     save={(text) =>
                         $edition
@@ -253,8 +253,8 @@
             <td>
                 <TextEditor
                     text={reference.summary}
-                    label={'Summary editor.'}
-                    placeholder="Summary"
+                    label={'summary editor'}
+                    placeholder="summary"
                     valid={() => undefined}
                     save={(text) =>
                         $edition

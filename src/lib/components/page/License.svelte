@@ -20,8 +20,8 @@
 <PageHeader id="license">License</PageHeader>
 
 <Instructions {editable}>
-    By default of U.S. Copyright Law, your content copyrighted and owned by all
-    authors. Edit this if you'd like to grant different rights.
+    Do you want to specify rights other than your region's default copyrights?
+    Edit them here.
 </Instructions>
 
 {#if $edition}
@@ -38,7 +38,7 @@
                     : undefined}
             chapter={false}
             component={Format}
-            placeholder="In the U.S., all rights reserved by default. Want to offer different rights to readers?"
+            placeholder="license"
             leasee={getLeasee(auth, edition, `license`)}
             lease={(lock) => lease(auth, edition, `license`, lock)}
         />

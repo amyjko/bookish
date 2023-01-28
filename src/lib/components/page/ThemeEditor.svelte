@@ -97,7 +97,7 @@
             >
         {:else}
             <ConfirmButton
-                tooltip="Change the theme to the default Bookish theme."
+                tooltip="change theme to the default"
                 commandLabel="- theme"
                 confirmLabel="delete your theme?"
                 command={() =>
@@ -153,7 +153,7 @@
                     </td>
                     <td style="text-align:right;">
                         <Button
-                            tooltip="Add a CSS import"
+                            tooltip="add CSS URL import"
                             command={() => {
                                 if (theme === null) return;
                                 if (theme.imports === undefined)
@@ -185,7 +185,7 @@
                         </td>
                         <td style="text-align: right">
                             <Button
-                                tooltip="Remove this CSS import"
+                                tooltip="Remove CSS URL import"
                                 command={() => {
                                     theme?.imports?.splice(index, 1);
                                     if ($edition)

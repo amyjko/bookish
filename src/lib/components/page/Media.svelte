@@ -62,10 +62,10 @@
             />
         </Header>
         <Instructions {editable}>
-            This page shows readers an index of the media in the book. Writers
-            can use this page to manage any images that are linked or uploaded
-            for this book. Note: images are shared between all editions, so if
-            you delete one not used in this edition, it might be used in others.
+            These are a sequential index of the media in the book. You can use
+            this page to manage any images that are linked or uploaded for this
+            book. Note: images are shared between all editions, so if you delete
+            one not used in this edition, it might be used in others.
         </Instructions>
 
         {#if embeds.length === 0}
@@ -96,15 +96,15 @@
         {#if editable && unused !== undefined && unused.length > 0}
             <PageHeader id="unused">Unused</PageHeader>
             <Instructions {editable}>
-                These images are uploaded to this book, but not used. Delete
-                them if you don't need them. Note, however, that these images
-                may be used in other editions of this book.
+                These images are uploaded for this book, but not used in this
+                edition. Delete them if you don't need them. Warning: images may
+                be used in other editions of this book.
             </Instructions>
             {#each unused as image}
                 <MediaPreview url={image.url} alt={''}>
                     <span
                         >uploaded <Button
-                            tooltip="delete this unused image"
+                            tooltip="delete unused image"
                             command={() =>
                                 media
                                     ?.remove(image)

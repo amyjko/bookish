@@ -66,9 +66,11 @@
         </Header>
         {#if editable}
             <Instructions {editable}>
-                Add definitions and then link to them in a chapter's text.
+                Build a glossary here, adding terms, phrases, definitions, and
+                synonyms. Then, in a chapter, you can select any text and link
+                it to a definition.
             </Instructions>
-            <Button tooltip="Add a glossary entry" command={addEmptyDefinition}
+            <Button tooltip="add glossary entry" command={addEmptyDefinition}
                 >+ definition</Button
             >
         {/if}

@@ -20,7 +20,8 @@
 </script>
 
 <Instructions {editable}>
-    This section is not shown if empty. But surely you have someone to thank!
+    Do you have people, communities, or institutions to thank? Do it here. This
+    section is not shown if empty.
 </Instructions>
 
 <!-- If editable, show acknowledgements even if they're empty, otherwise hide -->

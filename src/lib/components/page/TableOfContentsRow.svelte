@@ -73,13 +73,13 @@
         <td class="controls">
             {#if chapter}
                 <Button
-                    tooltip="move chapter up"
+                    tooltip="move chapter {title} up"
                     disabled={$edition.getChapterPosition(chapter.getID()) ===
                         0}
                     command={moveUp}>{'↑'}</Button
                 >
                 <Button
-                    tooltip="move chapter down"
+                    tooltip="move chapter {title} down"
                     disabled={$edition.getChapterPosition(chapter.getID()) ===
                         $edition.getChapterCount() - 1}
                     command={moveDown}>{'↓'}</Button

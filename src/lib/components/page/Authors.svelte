@@ -53,7 +53,7 @@
                 <TextEditor
                     text={author}
                     label={'Author name editor'}
-                    placeholder="Author"
+                    placeholder="author"
                     valid={() => undefined}
                     save={(text) =>
                         /* If text is already empty, remove */ author.length >
@@ -72,9 +72,7 @@
         {/each}
     {/if}
     {#if editable}
-        &nbsp;<Button tooltip="Add an author" command={addAuthor}
-            >+ author</Button
-        >
+        &nbsp;<Button tooltip="add author" command={addAuthor}>+ author</Button>
     {/if}
 </p>
 

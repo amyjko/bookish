@@ -74,7 +74,7 @@
             disabled={loading}
         />
         <Button
-            tooltip="submit your new email address"
+            tooltip="submit new email address"
             command={handleSubmit}
             type="submit"
             disabled={loading ||

@@ -70,8 +70,7 @@
         </Header>
 
         <Instructions {editable}>
-            This index is created automatically. It's not perfect; we may add
-            more control over it in the future.
+            This index is created automatically using the words in the chapters.
         </Instructions>
 
         <p
