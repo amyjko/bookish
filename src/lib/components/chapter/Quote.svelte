@@ -13,16 +13,13 @@
 
 <Positioned position={node.getPosition()}>
     <figure>
-        <blockquote class={'bookish-blockquote'} data-nodeid={node.nodeID}>
+        <blockquote class={'quote'} data-nodeid={node.nodeID}>
             {#each node.getBlocks() as element (element.nodeID)}
                 <Block node={element} />
             {/each}
         </blockquote>
         {#if credit}
-            <figcaption
-                class="bookish-blockquote-caption {credit.isEmptyText()
-                    ? 'empty'
-                    : ''}"
+            <figcaption class="caption {credit.isEmptyText() ? 'empty' : ''}"
                 ><Format node={credit} placeholder="credit" /></figcaption
             >
         {/if}
@@ -30,7 +27,7 @@
 </Positioned>
 
 <style>
-    .bookish-blockquote {
+    .quote {
         clear: both;
         border: none;
         font-family: var(--bookish-header-font-family);
@@ -44,12 +41,12 @@
         position: relative;
     }
 
-    .bookish-blockquote > :global(p) {
+    .quote > :global(p) {
         margin: 0;
         padding: 0;
     }
 
-    .bookish-blockquote-caption {
+    .caption {
         margin-top: 0.5em;
         text-align: right;
         font-family: var(--bookish-header-font-family);
@@ -57,7 +54,7 @@
         color: var(--bookish-muted-color);
     }
 
-    .bookish-blockquote:not(.empty):before {
+    .quote:before {
         content: '\201C';
         position: relative;
         top: 80pt;
@@ -69,7 +66,7 @@
         z-index: -1;
     }
 
-    .bookish-blockquote-caption:before {
+    .caption:not(.empty):before {
         content: '--';
         margin-right: 0.25em;
     }
