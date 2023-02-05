@@ -176,7 +176,7 @@
                     >{previousLabel}</span
                 >{/if}
             &nbsp;&middot;&nbsp;
-            <Link to={$base}>Home</Link>
+            <Link to="{$base}/">Home</Link>
             &nbsp;&middot;&nbsp;
             {#if next !== null}<Link to={$base + next}>{nextLabel}</Link
                 >{:else}<span class="outline-header-nav-disabled"
