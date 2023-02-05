@@ -41,17 +41,18 @@
     <a href={url} target="_blank" rel="noreferrer"><Text node={content} /></a>
     <!-- If's a chapter link with a label -->
 {:else if url.indexOf(':') >= 0}
-    <!-- If the chapter isn't specified, set to the current chapter's id. -->
     {#if url.split(':')[0] === ''}
+        <!-- If the chapter isn't specified, assume this chapter. -->
         <a href={'#' + url.split(':')[1]}><Text node={content} /></a>
     {:else}
-        <a href={'/' + url.split(':')[0] + '#' + url.split(':')[1]}
+        <!-- If it is specified, include the base relative chapter ID and the label -->
+        <a href={`${$base}${url.split(':')[0]}#${url.split(':')[1]}`}
             ><Text node={content} /></a
         >
     {/if}
-    <!-- If this is internal link, make a route link to the chapter. -->
 {:else}
-    <a href={`${base}${url}`}><Text node={content} /></a>
+    <!-- If this is internal link, make a route link to the chapter. -->
+    <a href={`${$base}${url}`}><Text node={content} /></a>
 {/if}
 
 <style>
