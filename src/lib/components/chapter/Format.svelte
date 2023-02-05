@@ -53,7 +53,7 @@
     {#each node.getSegments() as segment (segment.nodeID)}
         {#if segment instanceof TextNode}<Text
                 node={segment}
-                placeholder={node.getSegments().length === 1
+                placeholder={showPlaceholder && node.getSegments().length === 1
                     ? placeholder
                     : undefined}
             />
