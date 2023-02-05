@@ -51,10 +51,11 @@
     {/if}
     <!-- If this is internal link, make a route link to the chapter. -->
 {:else}
-    <a href={$base + '/' + url}><Text node={content} /></a>
+    <a href={`${base}${url}`}><Text node={content} /></a>
 {/if}
 
 <style>
+    a,
     .bookish-editor-link {
         color: var(--bookish-link-color);
         font-weight: var(--bookish-link-font-weight);

@@ -273,7 +273,7 @@
 
 <style>
     .reference {
-        line-height: var(--bookish-paragraph-line-height);
+        line-height: var(--bookish-paragraph-line-height-tight);
         margin-top: 0;
         margin-bottom: var(--bookish-header-spacing);
     }

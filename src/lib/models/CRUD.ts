@@ -222,6 +222,7 @@ export async function createBook(userID: string): Promise<string> {
         {},
         {},
         null,
+        null,
         {}
     ).withNewChapter();
 

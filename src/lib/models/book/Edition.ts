@@ -33,6 +33,7 @@ export type EditionSpecification = {
     symbols: Record<string, string>;
     glossary: Record<string, Definition>;
     theme: Theme | null;
+    base: string | null;
     uids: string[];
     chapteruids: string[];
     active: Record<string, string>;
@@ -58,6 +59,7 @@ export default class Edition {
     readonly symbols: Record<string, string>;
     readonly glossary: Record<string, Definition>;
     readonly theme: Theme | null;
+    readonly base: string | null;
     readonly active: Record<string, string>;
 
     // Given an object with a valid specification and an object mapping chapter IDs to chapter text,
@@ -84,6 +86,7 @@ export default class Edition {
         symbols: Record<string, string>,
         glossary: Record<string, Definition>,
         theme: Theme | null,
+        base: string | null,
         active: Record<string, string>
     ) {
         this.bookRef = bookRef;
@@ -111,6 +114,7 @@ export default class Edition {
         this.symbols = Object.assign({}, symbols);
         this.glossary = Object.assign({}, glossary);
         this.theme = theme;
+        this.base = base;
         this.active = active;
     }
 
@@ -140,6 +144,7 @@ export default class Edition {
             spec.symbols ?? {},
             spec.glossary ?? {},
             spec.theme,
+            spec.base ?? '',
             spec.active
         );
     }
@@ -198,6 +203,7 @@ export default class Edition {
             symbols: Object.assign({}, this.symbols),
             glossary: Object.assign({}, this.glossary),
             theme: this.theme,
+            base: this.base,
             uids: this.uids.slice(),
             chapteruids: this.getChapterUIDS(),
             active: this.active,
@@ -240,6 +246,7 @@ export default class Edition {
             this.symbols,
             this.glossary,
             this.theme,
+            this.base,
             this.active
         );
     }
@@ -269,6 +276,7 @@ export default class Edition {
             this.symbols,
             this.glossary,
             this.theme,
+            this.base,
             this.active
         );
     }
@@ -297,6 +305,7 @@ export default class Edition {
             this.symbols,
             this.glossary,
             this.theme,
+            this.base,
             this.active
         );
     }
@@ -326,6 +335,7 @@ export default class Edition {
             this.symbols,
             this.glossary,
             this.theme,
+            this.base,
             this.active
         );
     }
@@ -351,6 +361,7 @@ export default class Edition {
             this.symbols,
             this.glossary,
             this.theme,
+            this.base,
             this.active
         );
     }
@@ -376,6 +387,7 @@ export default class Edition {
             this.symbols,
             this.glossary,
             this.theme,
+            this.base,
             this.active
         );
     }
@@ -404,6 +416,7 @@ export default class Edition {
             this.symbols,
             this.glossary,
             this.theme,
+            this.base,
             this.active
         );
     }
@@ -464,6 +477,7 @@ export default class Edition {
             this.symbols,
             this.glossary,
             this.theme,
+            this.base,
             this.active
         );
     }
@@ -521,6 +535,7 @@ export default class Edition {
             this.symbols,
             this.glossary,
             this.theme,
+            this.base,
             this.active
         );
     }
@@ -591,6 +606,7 @@ export default class Edition {
             this.symbols,
             this.glossary,
             this.theme,
+            this.base,
             this.active
         );
     }
@@ -634,6 +650,7 @@ export default class Edition {
             this.symbols,
             this.glossary,
             this.theme,
+            this.base,
             this.active
         );
     }
@@ -701,6 +718,7 @@ export default class Edition {
             this.symbols,
             glossary,
             this.theme,
+            this.base,
             this.active
         );
     }
@@ -770,6 +788,7 @@ export default class Edition {
             this.symbols,
             this.glossary,
             theme,
+            this.base,
             this.active
         );
     }
@@ -816,6 +835,7 @@ export default class Edition {
             this.symbols,
             this.glossary,
             this.theme,
+            this.base,
             this.active
         );
     }
@@ -862,6 +882,7 @@ export default class Edition {
             this.symbols,
             this.glossary,
             this.theme,
+            this.base,
             this.active
         );
     }
@@ -897,6 +918,7 @@ export default class Edition {
             this.symbols,
             this.glossary,
             this.theme,
+            this.base,
             this.active
         );
     }
@@ -946,6 +968,7 @@ export default class Edition {
             this.symbols,
             this.glossary,
             this.theme,
+            this.base,
             newActive
         );
     }

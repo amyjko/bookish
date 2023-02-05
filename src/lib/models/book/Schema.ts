@@ -107,6 +107,9 @@ const Schema = {
         theme: {
             type: ['object', 'null'],
         },
+        base: {
+            type: ['string'],
+        },
     },
 };
 

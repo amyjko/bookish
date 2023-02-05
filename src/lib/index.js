@@ -11,4 +11,4 @@ export { default as Feedback } from './components/app/Feedback.svelte';
 export { default as Loading } from './components/page/Loading.svelte';
 export { default as EditionModel } from './models/book/Edition';
 export { EDITION } from './components/page/Contexts';
-export { Schema } from './models/book/Schema';
+export { default as Schema } from './models/book/Schema';

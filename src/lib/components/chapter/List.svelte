@@ -21,6 +21,11 @@
 </svelte:element>
 
 <style>
+    ol,
+    ul {
+        line-height: var(--bookish-paragraph-line-height-tight);
+    }
+
     ol {
         list-style: none;
         counter-reset: item;
