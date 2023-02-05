@@ -7,6 +7,7 @@ import fs from 'fs';
 import { spawn } from 'child_process';
 import { EditionSpecification } from 'bookish-press/models/book/Edition';
 import { zip } from 'zip-a-folder';
+import { build } from 'vite';
 
 admin.initializeApp();
 
@@ -234,26 +235,16 @@ export const publishEdition = functions
             return `Couldn't create book metadata`;
         }
 
-        // Install all dependencies for the reader, pointing cache to writable /tmp
-        try {
-            console.log('Installing build dependencies...');
-            await execute('npm', ['install', '--cache', tempDir]);
-        } catch (err) {
-            console.log(err);
-            return 'Unable to create book.';
-        }
-
         // Build a static version of the book for the web.
         try {
             console.log('Building book...');
-            // Note that we have to vite build with a local cache, since we don't otherwise have write permissions.
-            const output = await execute('npm', [
-                'exec',
-                'vite',
-                'build',
-                '--cache',
-                tempDir,
-            ]);
+
+            await execute('npm', ['exec', 'svelte-kit', 'sync']);
+
+            // At this point, all of the Svelte, Sveltekit, Vite, and bookish-reader dependencies should already be installed.
+            const output = await build();
+
+            console.log(output);
 
             console.log('Checking if build was successful...');
             if (fs.existsSync('build')) console.log('Successfully built book.');
@@ -264,14 +255,10 @@ export const publishEdition = functions
                     console.log(file);
                 });
 
-                console.log(
-                    `Here is the output of the build (${output.length} chars): ${output}`
-                );
-
                 return 'Could not build book.';
             }
         } catch (err) {
-            console.log('Could not find reason for build failure: ' + err);
+            console.log('Build error: ' + err);
             return 'Could not create book.';
         }
 
