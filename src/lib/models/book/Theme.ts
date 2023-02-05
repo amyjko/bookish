@@ -476,7 +476,7 @@ export const SketchyTheme: Theme = {
     // Spacing
     spacing: {
         paragraphLineHeight: '2.4em',
-        paragraphLineHeightTight: '1.4em',
+        paragraphLineHeightTight: '1.8em',
         headerLineHeight: '1.3em',
         paragraphSpacing: '1.8rem',
         headerSpacing: '2rem',
