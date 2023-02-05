@@ -19,7 +19,10 @@
             {/each}
         </blockquote>
         {#if credit}
-            <figcaption class="bookish-blockquote-caption"
+            <figcaption
+                class="bookish-blockquote-caption {credit.isEmptyText()
+                    ? 'empty'
+                    : ''}"
                 ><Format node={credit} placeholder="credit" /></figcaption
             >
         {/if}
@@ -54,7 +57,7 @@
         color: var(--bookish-muted-color);
     }
 
-    .bookish-blockquote:before {
+    .bookish-blockquote:not(.empty):before {
         content: '\201C';
         position: relative;
         top: 80pt;
