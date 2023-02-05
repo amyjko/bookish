@@ -18,12 +18,9 @@ const Schema = {
         'description',
         'license',
         'acknowledgements',
-        'tags',
         'sources',
         'references',
         'chapters',
-        'symbols',
-        'theme',
     ],
     additionalProperties: false,
     properties: {
@@ -80,7 +77,7 @@ const Schema = {
                         minItems: 5,
                         items: [
                             { type: 'string' },
-                            { type: 'integer' },
+                            { type: ['integer', 'string'] },
                             { type: 'string' },
                             { type: 'string' },
                             { type: ['string', 'null'], format: 'uri' },

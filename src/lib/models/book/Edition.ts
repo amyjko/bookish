@@ -134,11 +134,11 @@ export default class Edition {
             spec.chapters.map((chap) => Chapter.fromJSON(chap, '')),
             spec.license,
             spec.acknowledgements,
-            spec.tags,
-            spec.sources,
-            spec.references,
-            spec.symbols,
-            spec.glossary,
+            spec.tags ?? [],
+            spec.sources ?? {},
+            spec.references ?? {},
+            spec.symbols ?? {},
+            spec.glossary ?? {},
             spec.theme,
             spec.active
         );
