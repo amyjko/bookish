@@ -1,4 +1,4 @@
-export const Schema = {
+const Schema = {
     $schema: 'http://json-schema.org/draft-07/schema#',
     title: 'Bookish book schema',
     type: 'object',
@@ -10,18 +10,27 @@ export const Schema = {
     },
     required: [
         'title',
+        'number',
+        'summary',
+        'published',
         'authors',
+        'images',
         'description',
-        'chapters',
-        'revisions',
         'license',
+        'acknowledgements',
+        'tags',
         'sources',
         'references',
-        'images',
+        'chapters',
+        'symbols',
+        'theme',
     ],
     additionalProperties: false,
     properties: {
         title: { type: 'string' },
+        number: { type: 'number' },
+        summary: { type: 'string' },
+        published: { type: ['number', 'null'] },
         authors: {
             type: 'array',
             items: { type: 'string' },
@@ -55,15 +64,6 @@ export const Schema = {
                 },
             },
         },
-        revisions: {
-            type: 'array',
-            items: {
-                type: 'array',
-                minItems: 2,
-                maxItems: 2,
-                items: { type: 'string' },
-            },
-        },
         tags: {
             type: 'array',
             items: { type: 'string' },
@@ -77,7 +77,7 @@ export const Schema = {
                     { type: 'string' },
                     {
                         type: 'array',
-                        maxItems: 6,
+                        minItems: 5,
                         items: [
                             { type: 'string' },
                             { type: 'integer' },
@@ -108,7 +108,9 @@ export const Schema = {
             },
         },
         theme: {
-            type: 'object',
+            type: ['object', 'null'],
         },
     },
 };
+
+export default Schema;
