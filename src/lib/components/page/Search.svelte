@@ -58,7 +58,7 @@
                                 .toLowerCase()
                                 .indexOf(lowerQuery);
                             results.push({
-                                link: `${$base}${chapter.getID()}?word=${match.match.toLowerCase()}&number=${index}`,
+                                link: `${$base}/${chapter.getID()}?word=${match.match.toLowerCase()}&number=${index}`,
                                 left:
                                     match.left +
                                     match.match.substring(0, start),

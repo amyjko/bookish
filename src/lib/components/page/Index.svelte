@@ -88,7 +88,7 @@
             <nav class="letters">
                 {#each 'abcdefghijklmnopqrstuvwxyz'.split('') as symbol, index}
                     {#if symbol in letters && letter !== symbol}
-                        <Link to={$base + 'index/' + symbol}>{symbol}</Link>
+                        <Link to="{$base}/index/{symbol}">{symbol}</Link>
                     {:else if letter === symbol}
                         <strong
                             ><span style="font-size: 200%">{symbol}</span
@@ -129,7 +129,7 @@
                                             {/if}</ChapterNumber
                                         >
                                         <ChapterTitle
-                                            link={`${$base}${chapterID}?word=${word}`}
+                                            link={`${$base}/${chapterID}?word=${word}`}
                                             >{$edition.getChapterName(
                                                 chapterID
                                             )}</ChapterTitle

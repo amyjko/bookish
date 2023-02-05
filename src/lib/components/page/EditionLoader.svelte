@@ -115,8 +115,8 @@
     <Edition
         edition={$edition}
         base={write
-            ? `/write/${$book.getRefID()}/${$edition.getEditionNumber()}/`
-            : `/${$book.getSubdomain() ?? $book.getRefID()}/`}
+            ? `/write/${$book.getRefID()}/${$edition.getEditionNumber()}`
+            : `/${$book.getSubdomain() ?? $book.getRefID()}`}
     >
         <slot />
     </Edition>

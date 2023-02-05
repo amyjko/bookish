@@ -63,8 +63,9 @@
             <ChapterNumber>{'Chapter ' + number}</ChapterNumber>
         {/if}
         <ChapterTitle
-            link={forthcoming && !editable ? undefined : `${$base}${chapterID}`}
-            >{title}</ChapterTitle
+            link={forthcoming && !editable
+                ? undefined
+                : `${$base}/${chapterID}`}>{title}</ChapterTitle
         >
         <p><Muted><em><slot name="annotation" /></em></Muted></p>
     </td>

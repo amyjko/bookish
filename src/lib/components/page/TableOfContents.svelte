@@ -129,9 +129,8 @@
         <Description />
 
         <Instructions {editable}>
-            This will appear on the <Link to={$base + 'read'}
-                >book browsing</Link
-            > page and in your table of contents. Write an informative description
+            This will appear on the <Link to="{$base}/read">book browsing</Link>
+            page and in your table of contents. Write an informative description
             of what your book is about.
         </Instructions>
 
@@ -265,7 +264,7 @@
 
         <PageParagraph>
             Want to print this book or generate a PDF? See <Link
-                to={$base + 'print'}>all chapters on a single page</Link
+                to="{$base}/print">all chapters on a single page</Link
             > and then print or export. Long books can take some time to render.
         </PageParagraph>
 

@@ -46,13 +46,13 @@
         <a href={'#' + url.split(':')[1]}><Text node={content} /></a>
     {:else}
         <!-- If it is specified, include the base relative chapter ID and the label -->
-        <a href={`${$base}${url.split(':')[0]}#${url.split(':')[1]}`}
+        <a href={`${$base}/${url.split(':')[0]}#${url.split(':')[1]}`}
             ><Text node={content} /></a
         >
     {/if}
 {:else}
     <!-- If this is internal link, make a route link to the chapter. -->
-    <a href={`${$base}${url}`}><Text node={content} /></a>
+    <a href={`${$base}/${url}`}><Text node={content} /></a>
 {/if}
 
 <style>
