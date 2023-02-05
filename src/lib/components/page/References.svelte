@@ -5,9 +5,9 @@
     import ChapterIDs from '$lib/models/book/ChapterID';
     import BulkReferenceEditor from './BulkReferenceEditor.svelte';
     import PossibleReference from './PossibleReference.svelte';
-    import { getAuth, getEdition, isEditionEditable } from './Contexts';
+    import { getUser, getEdition, isEditionEditable } from './Contexts';
 
-    let auth = getAuth();
+    let auth = getUser();
     let edition = getEdition();
     let editable = isEditionEditable();
 

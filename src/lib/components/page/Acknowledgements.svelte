@@ -4,7 +4,7 @@
     import BookishEditor from '$lib/components/editor/BookishEditor.svelte';
     import Instructions from '$lib/components/page/Instructions.svelte';
     import {
-        getAuth,
+        getUser,
         getEdition,
         getLeasee,
         isEditionEditable,
@@ -12,7 +12,7 @@
     } from './Contexts';
     import PageHeader from './PageHeader.svelte';
 
-    let auth = getAuth();
+    let auth = getUser();
     let edition = getEdition();
     let editable = isEditionEditable();
 

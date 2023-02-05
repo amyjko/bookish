@@ -22,10 +22,10 @@ export function getDarkMode() {
     return getContext<DarkModeStore>(DARK_MODE);
 }
 
-export type AuthStore = Writable<Authentication | undefined>;
-export const AUTH = Symbol('auth');
-export function getAuth() {
-    return getContext<AuthStore>(AUTH);
+export type UserStore = Writable<Authentication | undefined>;
+export const USER = Symbol('user');
+export function getUser() {
+    return getContext<UserStore>(USER);
 }
 
 export type BookStore = Writable<Book | undefined>;
@@ -68,7 +68,7 @@ export function setChapter(
 
 export function isChapterEditable(): boolean {
     if (!get(page).route.id?.startsWith('/write')) return false;
-    const auth = get(getAuth());
+    const auth = get(getUser());
     const chapter = get(getChapter());
     const edition = get(getEdition());
     const book = get(getBook());
@@ -86,7 +86,7 @@ export function isChapterEditable(): boolean {
 
 export function isEditionEditable(): boolean {
     if (!get(page).route.id?.startsWith('/write')) return false;
-    const auth = get(getAuth());
+    const auth = get(getUser());
     const edition = get(getEdition());
     const book = get(getBook());
     return (
@@ -100,7 +100,7 @@ export function isEditionEditable(): boolean {
 
 export function isEditionPartiallyEditable(): boolean {
     if (!get(page).route.id?.startsWith('/write')) return false;
-    const auth = get(getAuth());
+    const auth = get(getUser());
     const edition = get(getEdition());
     return (
         edition !== undefined &&
@@ -112,7 +112,7 @@ export function isEditionPartiallyEditable(): boolean {
 
 export function isBookEditable(): boolean {
     if (!get(page).route.id?.startsWith('/write')) return false;
-    const auth = get(getAuth());
+    const auth = get(getUser());
     const book = get(getBook());
     return (
         book !== undefined &&
@@ -140,7 +140,7 @@ export function getStatus() {
 }
 
 export async function lease(
-    authStore: AuthStore,
+    authStore: UserStore,
     editionStore: EditionStore,
     contentID: string,
     lock: boolean
@@ -161,7 +161,7 @@ export async function lease(
 }
 
 export function getLeasee(
-    authStore: AuthStore,
+    authStore: UserStore,
     editionStore: EditionStore,
     contentID: string
 ): string | boolean {

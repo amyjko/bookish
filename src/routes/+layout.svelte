@@ -63,8 +63,8 @@
             return;
         }
 
-        const previousDocID = previousSavedEdition?.getRef()?.id;
-        const newDocID = $edition.getRef()?.id;
+        const previousDocID = previousSavedEdition?.getEditionRef()?.id;
+        const newDocID = $edition.getEditionRef()?.id;
 
         if (
             ($book && $edition && previousDocID === undefined) ||
@@ -127,7 +127,8 @@
             $book &&
             $edition.isLatestEdition($book) &&
             previousSavedEdition &&
-            previousSavedEdition.getRef()?.id === $edition.getRef()?.id &&
+            previousSavedEdition.getEditionRef()?.id ===
+                $edition.getEditionRef()?.id &&
             (previousSavedEdition.getTitle() !== $edition.getTitle() ||
                 previousSavedEdition.getImage('cover') !==
                     $edition.getImage('cover') ||

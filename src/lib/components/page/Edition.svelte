@@ -16,6 +16,9 @@
     // Poly fill smooth scrolling for Safari.
     onMount(() => smoothscroll.polyfill());
 
+    // The book edition to render.
+    export let edition: EditionModel;
+
     // The base path allows links to adjust to different routing contexts in which a book is placed.
     // For example, when the book is hosted alone, all routes might start with the bare root "/",
     // but when the book is being viewed or edited in the Bookish app, it needs a prefix for the
@@ -26,9 +29,6 @@
     let baseStore = writable<string>(base);
     $: setContext<BaseStore>(BASE, baseStore);
     $: baseStore.set(base);
-
-    // The book edition to render.
-    export let edition: EditionModel;
 
     // Default dark mode to whatever's stored in local storage, if anything.
     // respect user choice on the website despite the system theme

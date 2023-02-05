@@ -8,7 +8,7 @@
     import Note from '../editor/Note.svelte';
     import { afterUpdate } from 'svelte';
     import {
-        getAuth,
+        getUser,
         getEdition,
         getLeasee,
         isChapterEditable,
@@ -19,7 +19,7 @@
     export let id: string;
     export let definition: Definition;
 
-    let auth = getAuth();
+    let auth = getUser();
     let edition = getEdition();
     let editable = isChapterEditable();
 

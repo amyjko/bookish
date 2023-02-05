@@ -207,7 +207,7 @@ export async function createBook(userID: string): Promise<string> {
         undefined,
         [],
         'Untitled',
-        ['Anonymous'],
+        [],
         1,
         '',
         null,
@@ -236,7 +236,8 @@ export async function createBook(userID: string): Promise<string> {
 
     // Now replicate the edition info in the book. We dodge type checking here because we know with certainty
     // that the ref was just added the line before.
-    book = book.withEditions([newEdition.getInfo() as EditionInfo]);
+    const info = newEdition.getInfo();
+    if (info) book = book.withEditions([info]);
 
     // Update the book with the edition info.
     await updateBook(book);
@@ -319,7 +320,7 @@ export async function updateEdition(
     if (!db) throw Error("Can't update edition, not connected to Firebase.");
 
     // Get the reference to the edition, fail if we don't have one.
-    const editionRef = newEdition.getRef();
+    const editionRef = newEdition.getEditionRef();
     if (!editionRef) throw Error('Book given has no ID');
 
     const newChapterRefs = new Map<string, DocumentReference>();
@@ -437,33 +438,31 @@ export async function isSubdomainAvailable(
     return matches.empty || matches.docs[0].id === book.getRefID();
 }
 
-// export async function publish(
-//     book: Book,
-//     index: number
-// ): Promise<string | undefined> {
-//     if (!db) throw Error("Can't publish, no Firebase connection.");
-//     if (!functions)
-//         throw Error("Can't publish, no connection to Firebase functions.");
+export async function publish(
+    edition: Edition
+): Promise<string | { url: string }> {
+    if (!db) throw Error('Cannot publish, no database connection');
+    if (!functions) throw Error('Cannot publish, no cloud connection');
 
-//     const edition = await book.getEditionNumber(index + 1);
-//     if (edition === undefined)
-//         return `Couldn't find edition ${index} number to publish`;
+    const editionRef = edition.getEditionRef();
+    const bookRef = edition.getBookRef();
 
-//     const editionRef = edition.getRef();
-//     if (editionRef === undefined) return `Couldn't find edition to publish`;
+    if (editionRef === undefined) return `Cannot publish, no edition ID`;
 
-//     const publishEdition = httpsCallable<
-//         { book: string; edition: string },
-//         string
-//     >(functions, 'publishEdition');
+    // Get a reference to the publishing function
+    const publishEdition = httpsCallable<
+        { bookID: string; editionID: string },
+        string
+    >(functions, 'publishEdition');
 
-//     const result = await publishEdition({
-//         book: book.getRef().id,
-//         edition: editionRef.id,
-//     });
+    // Call the function, passing
+    const result = await publishEdition({
+        bookID: bookRef.id,
+        editionID: editionRef.id,
+    });
 
-//     return result.data;
+    return result.data;
 
-//     // Update the edition's published status in the book.
-//     // await updateBook(book.withEditionAsPublished(true, index));
-// }
+    // Update the edition's published status in the book.
+    // await updateBook(book.withEditionAsPublished(true, index));
+}

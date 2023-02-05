@@ -1,6 +1,6 @@
 <script lang="ts">
     import { updateEmail } from 'firebase/auth';
-    import { getAuth } from '../../lib/components/page/Contexts';
+    import { getUser } from '../../lib/components/page/Contexts';
     import Feedback from '$lib/components/app/Feedback.svelte';
     import Button from '../../lib/components/app/Button.svelte';
     import Lead from '../../lib/components/app/Lead.svelte';
@@ -10,7 +10,7 @@
     import { goto } from '$app/navigation';
 
     let email: string;
-    let auth = getAuth();
+    let auth = getUser();
 
     let loading = false;
     let feedback = '';

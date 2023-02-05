@@ -5,7 +5,7 @@
     import {
         getBook,
         getEdition,
-        getAuth,
+        getUser,
         CHAPTERTEXT,
         getChapterText,
     } from '$lib/components/page/Contexts';
@@ -16,7 +16,7 @@
 
     export let write: boolean;
 
-    let auth = getAuth();
+    let auth = getUser();
     let book = getBook();
     let edition = getEdition();
     let chapterText = getChapterText();

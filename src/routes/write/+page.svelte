@@ -7,7 +7,7 @@
     import type Book from '$lib/models/book/Book';
     import { goto } from '$app/navigation';
     import { onMount } from 'svelte';
-    import { getAuth } from '$lib/components/page/Contexts';
+    import { getUser } from '$lib/components/page/Contexts';
     import Feedback from '$lib/components/app/Feedback.svelte';
     import Lead from '$lib/components/app/Lead.svelte';
     import Large from '$lib/components/app/Large.svelte';
@@ -20,7 +20,7 @@
     let editableBooks: Book[] | undefined = undefined;
     let partiallyEditableBooks: Book[] | undefined = undefined;
     let error: string | undefined = undefined;
-    let auth = getAuth();
+    let auth = getUser();
 
     // Merge and deduplicate the books
     $: books =

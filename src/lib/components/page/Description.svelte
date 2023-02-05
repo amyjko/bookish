@@ -3,14 +3,14 @@
     import ChapterBody from '$lib/components/chapter/ChapterBody.svelte';
     import BookishEditor from '$lib/components/editor/BookishEditor.svelte';
     import {
-        getAuth,
+        getUser,
         getEdition,
         getLeasee,
         isEditionEditable,
         lease,
     } from './Contexts';
 
-    let auth = getAuth();
+    let auth = getUser();
     let editable = isEditionEditable();
     let edition = getEdition();
 </script>

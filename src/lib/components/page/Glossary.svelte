@@ -4,16 +4,11 @@
     import Page from './Page.svelte';
     import ChapterIDs from '$lib/models/book/ChapterID';
     import DefinitionView from './DefinitionView.svelte';
-    import {
-        getAuth,
-        getEdition,
-        isChapterEditable,
-        isEditionEditable,
-    } from './Contexts';
+    import { getUser, getEdition, isEditionEditable } from './Contexts';
     import Instructions from './Instructions.svelte';
     import Button from '../app/Button.svelte';
 
-    let auth = getAuth();
+    let auth = getUser();
     let edition = getEdition();
     let editable = isEditionEditable();
 

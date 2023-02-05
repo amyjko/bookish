@@ -15,7 +15,7 @@
     import TextEditor from '$lib/components/editor/TextEditor.svelte';
     import Toggle from '$lib/components/editor/Toggle.svelte';
     import {
-        getAuth,
+        getUser,
         getBase,
         getBook,
         getEdition,
@@ -33,7 +33,7 @@
     import Permissions from '../editor/Permissions.svelte';
     import Publish from './Publish.svelte';
 
-    let auth = getAuth();
+    let auth = getUser();
     let book = getBook();
     let edition = getEdition();
     let base = getBase();
@@ -73,7 +73,7 @@
     }
 </script>
 
-{#if $edition && $book}
+{#if $edition}
     <Page title={$edition.getTitle()}>
         <Header
             editable={isEditionEditable()}
@@ -117,9 +117,7 @@
                             ? edition.set($edition.withoutAuthor(index))
                             : undefined}
                 />
-                {#if $book.getPublishedEditionCount() > 1}
-                    <Note>{$edition.getEditionLabel()} edition</Note>
-                {/if}
+                <Note>{$edition.getEditionLabel()} edition</Note>
             </div>
         </Header>
 
@@ -295,7 +293,7 @@
             <Publish />
         {/if}
 
-        {#if editable || isEditionPartiallyEditable()}
+        {#if $book && (editable || isEditionPartiallyEditable())}
             <PageHeader>Editors</PageHeader>
             <Instructions {editable}>
                 These authors can edit this edition and its chapters. To give

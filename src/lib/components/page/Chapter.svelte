@@ -15,7 +15,7 @@
     import Problem from '../chapter/Problem.svelte';
     import {
         CHAPTER,
-        getAuth,
+        getUser,
         getBook,
         getEdition,
         isBookEditable,
@@ -44,7 +44,7 @@
 
     let book = getBook();
     let edition = getEdition();
-    let auth = getAuth();
+    let auth = getUser();
 
     // Keep track of the scroll position to facilitate reading during reloads.
     function rememberPosition() {
@@ -210,11 +210,16 @@
         }
     }
 
+    /** Account for static builds, where location isn't defined */
+    function getLocation() {
+        return typeof location === 'undefined' ? undefined : location;
+    }
+
     function getHighlightedWord() {
-        return location.search.split('&')[0]?.split('=')[1] ?? undefined;
+        return getLocation()?.search.split('&')[0]?.split('=')[1] ?? undefined;
     }
     function getHighlightedNumber() {
-        const number = location.search.split('&')[1]?.split('=')[1];
+        const number = getLocation()?.search.split('&')[1]?.split('=')[1];
         return number === undefined ? undefined : parseInt(number);
     }
 
@@ -224,8 +229,7 @@
     $: chapterSection = $edition?.getChapterSection(chapterID);
     $: chapterAST = $edition ? chapter.getAST($edition) : undefined;
     $: citations = chapterAST ? chapterAST.getCitations() : undefined;
-    $: editionNumber =
-        $book && $edition ? $edition.getEditionNumber() : undefined;
+    $: editionNumber = $edition ? $edition.getEditionNumber() : undefined;
 
     let chapterStore = writable<ChapterContext>();
     setContext<ChapterStore>(CHAPTER, chapterStore);

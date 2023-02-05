@@ -205,7 +205,11 @@ export default class Edition {
         return editionJSON;
     }
 
-    getRef() {
+    getBookRef() {
+        return this.bookRef;
+    }
+
+    getEditionRef() {
         return this.editionRef;
     }
 

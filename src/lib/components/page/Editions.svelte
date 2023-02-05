@@ -2,7 +2,7 @@
     import { createNewEdition } from '$lib/models/CRUD';
     import Instructions from '$lib/components/page/Instructions.svelte';
     import Note from '../editor/Note.svelte';
-    import { getAuth, getBook, isBookEditable } from './Contexts';
+    import { getUser, getBook, isBookEditable } from './Contexts';
     import Button from '../app/Button.svelte';
     import Link from '../app/Link.svelte';
     import Format from '../chapter/Format.svelte';
@@ -11,7 +11,6 @@
 
     let book = getBook();
     let editable = isBookEditable();
-    let auth = getAuth();
 
     $: editions = $book?.getEditions();
 

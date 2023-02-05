@@ -1,7 +1,7 @@
 <script lang="ts">
     import Link from '$lib/components/app/Link.svelte';
     import {
-        getAuth,
+        getUser,
         getBook,
         getEdition,
     } from '$lib/components/page/Contexts';
@@ -12,7 +12,7 @@
     import Icon from '$lib/components/editor/Icon.svelte';
     import { page } from '$app/stores';
 
-    let auth = getAuth();
+    let auth = getUser();
 
     let caret = getCaret();
     $: edition = getEdition();

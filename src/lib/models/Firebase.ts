@@ -4,6 +4,7 @@ import { connectFirestoreEmulator, getFirestore } from 'firebase/firestore';
 import { connectFunctionsEmulator, getFunctions } from 'firebase/functions';
 import { connectStorageEmulator, getStorage } from 'firebase/storage';
 import {
+    PUBLIC_READER,
     PUBLIC_CONTEXT,
     PUBLIC_FIREBASE_API_KEY,
     PUBLIC_FIREBASE_AUTH_DOMAIN,
@@ -13,10 +14,10 @@ import {
     PUBLIC_FIREBASE_APP_ID,
 } from '$env/static/public';
 
-const isReader = typeof PUBLIC_FIREBASE_API_KEY === 'undefined';
+const isReader = PUBLIC_READER === 'true';
 
 // Some feedback about context
-if (PUBLIC_CONTEXT !== 'prod')
+if (!isReader && PUBLIC_CONTEXT !== 'prod')
     console.log(`*** ${PUBLIC_CONTEXT.toLocaleUpperCase()} ***`);
 
 // Initialize Firebase using the environment variables provided at build time.

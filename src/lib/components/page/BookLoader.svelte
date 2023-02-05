@@ -4,14 +4,14 @@
     import { onDestroy } from 'svelte';
     import { page } from '$app/stores';
     import type Book from '$lib/models/book/Book';
-    import { getBook, getAuth } from '$lib/components/page/Contexts';
+    import { getBook, getUser } from '$lib/components/page/Contexts';
     import {
         listenToBookWithID as listenToBooksWithID,
         listenToBooksByName as listenToBooksWithName,
     } from '$lib/models/CRUD';
     import type { Unsubscribe } from 'firebase/auth';
 
-    let auth = getAuth();
+    let auth = getUser();
     let book = getBook();
 
     // Keep track of the query updates

@@ -5,7 +5,7 @@
     import Title from './Title.svelte';
     import { onMount } from 'svelte';
     import TextEditor from '$lib/components/editor/TextEditor.svelte';
-    import { getAuth, getEdition, getLeasee, lease } from './Contexts';
+    import { getUser, getEdition, getLeasee, lease } from './Contexts';
     import Button from '../app/Button.svelte';
 
     /** True if an author should be able to edit this header. */
@@ -23,7 +23,7 @@
     let title: HTMLHeadingElement | null = null;
     let showReminder: boolean = true;
 
-    let auth = getAuth();
+    let auth = getUser();
     let edition = getEdition();
 
     function updateScrollReminder() {

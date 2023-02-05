@@ -3,7 +3,7 @@
     import BookishEditor from '../editor/BookishEditor.svelte';
     import Switch from '../editor/Switch.svelte';
     import {
-        getAuth,
+        getUser,
         getEdition,
         getLeasee,
         isEditionEditable,
@@ -13,22 +13,41 @@
     import Note from '../editor/Note.svelte';
     import Instructions from './Instructions.svelte';
     import Link from '../Link.svelte';
+    import { PUBLIC_CONTEXT } from '$env/static/public';
+    import Button from '../app/Button.svelte';
+    import { publish } from '../../models/CRUD';
+    import Feedback from '../app/Feedback.svelte';
 
-    let auth = getAuth();
+    let auth = getUser();
     let edition = getEdition();
     let editable = isEditionEditable();
 
-    // TODO Disabled for now. See functions/index.ts/publishEdition() for why.
-    // let publishing = new Map<number, boolean | string>();
-    // async function handlePublish(index: number) {
-    //     if ($book) {
-    //         publishing.set(index, true);
-    //         const error = await publish($book, index);
-    //         if (error) publishing.set(index, error);
-    //         else publishing.delete(index);
-    //         publishing = new Map(publishing);
-    //     }
-    // }
+    let publishing = false;
+    let feedback: string | undefined = undefined;
+    let error: string | undefined = undefined;
+    let url: string | undefined = undefined;
+    async function requestPublish() {
+        if ($edition) {
+            publishing = true;
+            error = undefined;
+            feedback = 'Binding the book, this could take a minute...';
+            try {
+                const result = await publish($edition);
+                if (typeof result === 'string') {
+                    error = result;
+                    feedback = undefined;
+                } else {
+                    url = result.url;
+                }
+            } catch (err) {
+                console.log(err);
+                feedback = undefined;
+                error = 'Unable to bundle the book for download :(';
+            } finally {
+                publishing = false;
+            }
+        }
+    }
 
     let publisher: boolean | undefined = undefined;
 
@@ -44,7 +63,7 @@
     }
 </script>
 
-{#if $edition && publisher === true}
+{#if $edition && (publisher === true || PUBLIC_CONTEXT === 'local')}
     <Instructions {editable}>
         Ready to publish this edition? Write a summary then hit the switch.
     </Instructions>
@@ -79,12 +98,26 @@
                       )
                     : undefined}
         />
+        <Button
+            tooltip="Publish the book online"
+            disabled={publishing}
+            command={() => requestPublish()}>↓ download</Button
+        >
     </div>
-    <Note
-        >{#if $edition.published}Last published {new Date(
-                $edition.published
-            ).toLocaleDateString('en-us')}{/if}</Note
-    >
+    {#if error}
+        <Feedback error>{error}</Feedback>
+    {:else if url}
+        <p>Your book is <Link to={url}>ready for download</Link>.</p>
+    {:else if feedback}
+        <Feedback>{feedback}</Feedback>
+    {/if}
+    <div>
+        <Note
+            >{#if $edition.published}Last published {new Date(
+                    $edition.published
+                ).toLocaleDateString('en-us')}{/if}</Note
+        >
+    </div>
 {:else}
     <Instructions {editable}>
         You don't yet have publishing privileges. <Link
@@ -93,14 +126,6 @@
     </Instructions>
 {/if}
 
-<!-- TODO Disabled for now.  See functions/index.ts/publishEdition() for why. -->
-
-<!-- <Button
-    tooltip="publish edition"
-    command={() => handlePublish(index)}
-    disabled={publishing.has(index)}
-    >publish</Button
--->
 <style>
     .publisher {
         display: flex;
