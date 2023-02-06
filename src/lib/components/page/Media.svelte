@@ -74,29 +74,31 @@
         {#if embeds.length === 0}
             <p>No images or videos appear in the book.</p>
         {:else}
-            <p>These are the images and videos in the book:</p>
+            <p>These are the images in the book:</p>
         {/if}
         {#each embeds as embed}
-            <MediaPreview
-                url={embed.isLocal()
-                    ? `${$base}/${embed.getSmallURL()}`
-                    : embed.getSmallURL()}
-                alt={embed.getDescription() === ''
-                    ? 'no description, image not used'
-                    : embed.getDescription()}
-            >
-                <span
-                    >{#if editable}{images &&
-                        images.find((i) => i.url === embed.getURL()) ===
-                            undefined
-                            ? 'linked'
-                            : 'uploaded'}{embed.getCredit().isEmptyText()
-                            ? ''
-                            : ' • '}{/if}<Format
-                        node={embed.getCredit()}
-                    /></span
+            {#if !embed.isVideo()}
+                <MediaPreview
+                    url={embed.isLocal()
+                        ? `${$base}/${embed.getSmallURL()}`
+                        : embed.getSmallURL()}
+                    alt={embed.getDescription() === ''
+                        ? 'no description, image not used'
+                        : embed.getDescription()}
                 >
-            </MediaPreview>
+                    <span
+                        >{#if editable}{images &&
+                            images.find((i) => i.url === embed.getURL()) ===
+                                undefined
+                                ? 'linked'
+                                : 'uploaded'}{embed.getCredit().isEmptyText()
+                                ? ''
+                                : ' • '}{/if}<Format
+                            node={embed.getCredit()}
+                        /></span
+                    >
+                </MediaPreview>
+            {/if}
         {/each}
         {#if editable && unused !== undefined && unused.length > 0}
             <PageHeader id="unused">Unused</PageHeader>

@@ -46,6 +46,15 @@ export default class EmbedNode extends BlockNode {
     getType() {
         return 'embed';
     }
+
+    isVideo() {
+        return (
+            this.#urls.includes('https://www.youtube.com') ||
+            this.#urls.includes('https://youtu.be') ||
+            this.#urls.includes('https://www.tiktok.com') ||
+            this.#urls.includes('vimeo.com')
+        );
+    }
     getURL() {
         return this.#urls.split(URL_SEPARATOR)[0];
     }

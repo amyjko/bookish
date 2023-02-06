@@ -137,7 +137,7 @@
             {:else}
                 <p class="bookish-figure-unspecified">No image or video</p>
             {/if}
-        {:else if url.includes('https://www.youtube.com') || url.includes('https://youtu.be') || url.includes('https://www.tiktok.com') || url.includes('vimeo.com')}
+        {:else if node.isVideo()}
             <article class="bookish-figure-embed">
                 <iframe
                     class="bookish-figure-frame"

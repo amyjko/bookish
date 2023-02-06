@@ -1,6 +1,4 @@
 <script lang="ts">
-    import { getBase } from './Contexts';
-
     export let url: string;
     export let alt: string;
 </script>
