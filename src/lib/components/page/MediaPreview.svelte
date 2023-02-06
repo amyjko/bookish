@@ -1,10 +1,17 @@
 <script lang="ts">
+    import { getBase } from './Contexts';
+
     export let url: string;
     export let alt: string;
+
+    let base = getBase();
 </script>
 
 <figure class={'media-preview'}>
-    <img src={url} {alt} />
+    <img
+        src={url.startsWith('http') ? url : `${$base}/images/small/${url}`}
+        {alt}
+    />
     <figcaption class="credit"><slot /></figcaption>
 </figure>
 

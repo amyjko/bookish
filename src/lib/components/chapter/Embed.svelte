@@ -3,7 +3,7 @@
 <script lang="ts">
     import type EmbedNode from '$lib/models/chapter/EmbedNode';
     import { storage } from '$lib/models/Firebase';
-    import { getCaret, getBook } from '$lib/components/page/Contexts';
+    import { getCaret, getBook, getBase } from '$lib/components/page/Contexts';
     import Figure from './Figure.svelte';
     import { getContext } from 'svelte';
 
@@ -17,6 +17,7 @@
 
     let caret = getCaret();
     let book = getBook();
+    let base = getBase();
 
     // Bookish editor should have passed down a way to set the active editor.
     let claimCaret = getContext<Function>('claimeditor');
@@ -150,7 +151,7 @@
         {:else}
             <img
                 class={'bookish-figure-image'}
-                src={url.startsWith('http') ? url : 'images/' + url}
+                src={url.startsWith('http') ? url : `${$base}/images/${url}`}
                 srcset={node.hasSmallURL()
                     ? `${node.getSmallURL()} 320w, ${url} 1024w`
                     : undefined}
