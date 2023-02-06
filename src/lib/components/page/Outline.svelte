@@ -97,7 +97,7 @@
 
         // Find the header that we're past so we can update the outline.
         let indexOfNearestHeaderAbove = -1; // -1 represents the title
-        Array.from(document.getElementsByClassName('bookish-header')).forEach(
+        Array.from(document.getElementsByClassName('page-header')).forEach(
             (header, index) => {
                 // Is this a header we care about?
                 if (

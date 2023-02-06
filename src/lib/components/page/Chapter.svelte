@@ -271,7 +271,7 @@
             <!-- Collapse the outline if a marginal is selected. -->
             <Outline
                 slot="outline"
-                collapse={marginal !== undefined}
+                collapse={$marginal !== undefined}
                 previous={$edition.getPreviousChapterID(chapterID)}
                 next={$edition.getNextChapterID(chapterID)}
                 listener={(expanded) => {

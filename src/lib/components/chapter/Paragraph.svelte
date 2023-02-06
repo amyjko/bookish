@@ -23,7 +23,7 @@
     $: classes =
         node.getLevel() === 0
             ? undefined
-            : 'bookish-header' +
+            : 'page-header' +
               ($chapter && $chapter.highlightedID === id
                   ? ' bookish-content-highlight'
                   : '');
