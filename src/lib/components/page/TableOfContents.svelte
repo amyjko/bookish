@@ -32,6 +32,7 @@
     import Note from '../editor/Note.svelte';
     import Permissions from '../editor/Permissions.svelte';
     import Publish from './Publish.svelte';
+    import { onMount } from 'svelte';
 
     let auth = getUser();
     let book = getBook();
@@ -71,6 +72,12 @@
     function addChapter() {
         if ($edition) edition.set($edition.withNewChapter());
     }
+
+    /** Doing this on mount allows for prerendering an an update. */
+    let bookURL = '…';
+    onMount(() => {
+        bookURL = location.protocol + '//' + location.host + location.pathname;
+    });
 </script>
 
 {#if $edition}
@@ -280,10 +287,7 @@
                 .getAuthors()
                 .map((author) => Parser.parseFormat($edition, author).toText())
                 .join(', ')} ({new Date().getFullYear()}).
-            <em>{$edition.getTitle()}</em>. {location.protocol +
-                '//' +
-                location.host +
-                location.pathname},
+            <em>{$edition.getTitle()}</em>. {bookURL},
             <em>retrieved {new Date().toLocaleDateString('en-US')}</em>.
         </PageParagraph>
 
