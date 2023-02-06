@@ -55,12 +55,12 @@
     <meta name="description" content={title} />
 </svelte:head>
 
+<section class={'bookish-page' + (loaded ? ' loaded' : '')}>
+    <slot />
+</section>
+<!-- Overlay loading feedback if loading, but still render the page. -->
 {#if loaded === false}
     <Loading />
-{:else}
-    <section class={'bookish-page' + (loaded ? ' loaded' : '')}>
-        <slot />
-    </section>
 {/if}
 
 <style>
