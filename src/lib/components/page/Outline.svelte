@@ -170,7 +170,7 @@
     <div class="outline-headers">
         <!-- Book navigation links -->
         <div class="outline-header-nav">
-            {#if previous !== null}<Link to="{$base}/{previous}">
+            {#if previous !== null}<Link to="{$base}/{previous}"
                     >{previousLabel}</Link
                 >{:else}<span class="outline-header-nav-disabled"
                     >{previousLabel}</span
