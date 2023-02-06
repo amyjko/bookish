@@ -9,6 +9,7 @@
     import MediaPreview from './MediaPreview.svelte';
     import { onMount } from 'svelte';
     import {
+        getBase,
         getBook,
         getEdition,
         isBookEditable,
@@ -20,6 +21,8 @@
     let book = getBook();
     let edition = getEdition();
     let editable = isBookEditable();
+    let base = getBase();
+
     let images: Image[] | undefined = [];
 
     $: embeds = $edition?.getEmbeds() ?? [];
@@ -75,7 +78,9 @@
         {/if}
         {#each embeds as embed}
             <MediaPreview
-                url={embed.getSmallURL()}
+                url={embed.isLocal()
+                    ? `${$base}/${embed.getSmallURL()}`
+                    : embed.getSmallURL()}
                 alt={embed.getDescription() === ''
                     ? 'no description, image not used'
                     : embed.getDescription()}

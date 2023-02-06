@@ -3,15 +3,10 @@
 
     export let url: string;
     export let alt: string;
-
-    let base = getBase();
 </script>
 
 <figure class={'media-preview'}>
-    <img
-        src={url.startsWith('http') ? url : `${$base}/images/small/${url}`}
-        {alt}
-    />
+    <img src={url.startsWith('http') ? url : `${url}`} {alt} />
     <figcaption class="credit"><slot /></figcaption>
 </figure>
 
