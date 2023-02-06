@@ -49,12 +49,12 @@
             <slot />
         </div>
         {#if caption !== undefined}
-            <figcaption class="bookish-figure-caption">
+            <figcaption class="caption">
                 {#if caption}
                     <Format node={caption} placeholder="caption" />
                 {/if}
                 {#if credit}
-                    <aside class="bookish-figure-credit">
+                    <aside class="credit">
                         <Format node={credit} placeholder="credit" />
                     </aside>
                 {/if}
@@ -76,7 +76,7 @@
         filter: opacity(50%);
     }
 
-    .bookish-figure-caption {
+    .caption {
         text-align: center;
         position: relative;
         color: var(--bookish-muted-color);
@@ -86,11 +86,11 @@
         margin-bottom: var(--bookish-block-padding);
     }
 
-    .bookish-figure-credit {
+    .credit {
         display: block;
         position: absolute;
-        top: -1em;
-        right: 0;
+        top: calc(-1.2 * var(--bookish-block-padding));
+        right: var(--bookish-block-padding);
         text-align: right;
         font-style: italic;
         font-size: var(--bookish-small-font-size);
