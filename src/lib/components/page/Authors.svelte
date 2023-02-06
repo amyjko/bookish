@@ -19,6 +19,13 @@
     let authorList: HTMLDivElement | null = null;
     let newAuthor = false;
 
+    $: authorsToShow =
+        authors.length > 0
+            ? authors
+            : inheritedAuthors !== undefined && inheritedAuthors.length > 0
+            ? inheritedAuthors
+            : undefined;
+
     function addAuthor() {
         add();
         newAuthor = true;
@@ -40,15 +47,12 @@
 </script>
 
 <p class="bookish-authors" bind:this={authorList}>
-    {#if authors.length === 0}
-        {#if editable && inheritedAuthors !== undefined && inheritedAuthors.length > 0}
-            <Note>&nbsp;(book authors)&nbsp;</Note>
-        {:else}
-            No authors
-        {/if}
+    <!-- Editing and inherited authors? Say they're  -->
+    {#if authorsToShow === undefined}
+        No authors
     {:else}
         <em>by </em>
-        {#each authors as author, index}
+        {#each authorsToShow as author, index}
             {#if editable}
                 <TextEditor
                     text={author}
@@ -70,6 +74,9 @@
             {/if}
             {#if index < authors.length - 1},&nbsp{/if}
         {/each}
+    {/if}
+    {#if editable}
+        <Note>(edition authors)&nbsp;</Note>
     {/if}
     {#if editable}
         &nbsp;<Button tooltip="add author" command={addAuthor}>+ author</Button>
