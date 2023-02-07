@@ -304,7 +304,7 @@ export const TechTheme: Theme = {
         paragraphLineHeightTight: '1.4em',
         headerLineHeight: '3em',
         paragraphSpacing: '1.8rem',
-        headerSpacing: '2rem',
+        headerSpacing: '1.4rem',
         indent: '10%',
         inlinePadding: '0.25rem',
         blockPadding: '1rem',
