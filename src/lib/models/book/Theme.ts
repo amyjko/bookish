@@ -273,6 +273,7 @@ export const TechTheme: Theme = {
         paragraphFontFamily: '"Roboto", serif',
         headerFontFamily: '"Russo One", serif',
         bulletFontFamily: '"Roboto"',
+        codeFontFamily: '"Courier New", monospace',
     },
 
     // Font sizes
