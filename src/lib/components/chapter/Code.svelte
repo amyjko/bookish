@@ -65,6 +65,7 @@
         display: inline;
         padding: calc(1.5 * var(--bookish-inline-padding))
             var(--bookish-inline-padding);
+        white-space: pre-line;
     }
 
     .bookish-code-inline :global(code) {
