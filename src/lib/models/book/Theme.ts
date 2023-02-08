@@ -301,7 +301,7 @@ export const TechTheme: Theme = {
     // Spacing
     spacing: {
         paragraphLineHeight: '2rem',
-        paragraphLineHeightTight: '1.4em',
+        paragraphLineHeightTight: '1.6em',
         headerLineHeight: '3em',
         paragraphSpacing: '1.8rem',
         headerSpacing: '1.4rem',
