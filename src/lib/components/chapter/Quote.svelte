@@ -66,7 +66,7 @@
         content: '\201C';
         position: relative;
         top: 0;
-        left: -0.5em em;
+        left: -0.5em;
         height: 0.3em;
         font-family: var(--bookish-header-font-family);
         font-size: 120pt;
