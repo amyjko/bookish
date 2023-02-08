@@ -82,10 +82,10 @@
     */
 
     code[class*='language-'] {
-        color: black;
+        color: var(--bookish-paragraph-color);
         background: none;
         font-family: var(--bookish-code-font-family);
-        font-size: 1em;
+        font-size: var(--bookish-code-font-size);
         text-align: left;
         white-space: pre;
         word-spacing: normal;

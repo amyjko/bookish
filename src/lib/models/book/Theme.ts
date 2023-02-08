@@ -389,7 +389,7 @@ export const HumanTheme: Theme = {
     // Spacing
     spacing: {
         paragraphLineHeight: '2.2rem',
-        paragraphLineHeightTight: '1.1em',
+        paragraphLineHeightTight: '1.8em',
         headerLineHeight: '1.4em',
         paragraphSpacing: '1.8rem',
         headerSpacing: '2rem',

@@ -13,7 +13,7 @@
 
 <Positioned position={node.getPosition()}>
     <figure>
-        <blockquote class={'quote'} data-nodeid={node.nodeID}>
+        <blockquote class="quote" data-nodeid={node.nodeID}>
             {#each node.getBlocks() as element (element.nodeID)}
                 <Block node={element} />
             {/each}
@@ -27,6 +27,14 @@
 </Positioned>
 
 <style>
+    figure {
+        margin: 0;
+        margin-block-start: 0;
+        margin-block-end: 0;
+        margin-inline-start: 0;
+        margin-inline-end: 0;
+    }
+
     .quote {
         clear: both;
         border: none;
@@ -57,13 +65,15 @@
     .quote:before {
         content: '\201C';
         position: relative;
-        top: 80pt;
-        left: -40pt;
-        font-family: 'Modum Extra';
+        top: 0;
+        left: -0.5em em;
+        height: 0.3em;
+        font-family: var(--bookish-header-font-family);
         font-size: 120pt;
         font-weight: bold;
         color: var(--bookish-highlight-color);
         z-index: -1;
+        display: block;
     }
 
     .caption:not(.empty):before {

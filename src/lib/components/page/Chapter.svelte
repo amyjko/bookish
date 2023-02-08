@@ -439,6 +439,7 @@
 <style>
     .section-name {
         display: inline-block;
+        margin-left: 0.5em;
         font-family: var(--bookish-paragraph-font-family);
         font-size: var(--bookish-small-font-size);
         font-weight: normal;

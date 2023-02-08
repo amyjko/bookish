@@ -104,13 +104,13 @@
                 {#each words as word, index}
                     {#if word === true}
                         <tr
-                            ><td colspan={2}
+                            ><td class="term" colspan={2}
                                 ><PageHeader>{words[index + 1]}</PageHeader></td
                             ></tr
                         >
                     {:else}
                         <tr>
-                            <td>{word}</td>
+                            <td class="term">{word}</td>
                             <td>
                                 <!-- Sort the chapters by chapter number -->
                                 {#each Array.from(bookIndex[word]).sort( (a, b) => {
@@ -148,6 +148,10 @@
 <style>
     tr p {
         margin-top: 0;
+    }
+
+    .term {
+        vertical-align: baseline;
     }
 
     .letters {

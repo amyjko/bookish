@@ -174,7 +174,7 @@
 <style>
     dd {
         margin: 0;
-        margin-top: var(--bookish-paragraph-spacing);
+        margin-bottom: var(--bookish-paragraph-spacing);
     }
 
     dt {
