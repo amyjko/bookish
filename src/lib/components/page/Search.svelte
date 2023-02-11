@@ -106,14 +106,12 @@
             this book:
         </p>
 
-        <p>
-            <TextInput
-                type="text"
-                placeholder={'search for a word'}
-                disabled={false}
-                bind:text={query}
-            />
-        </p>
+        <input
+            class="query"
+            type="text"
+            placeholder="search for a word"
+            bind:value={query}
+        />
 
         {#if query.trim() !== ''}
             {#if query.trim().length < 3}
@@ -151,3 +149,20 @@
         {/if}
     </Page>
 {/if}
+
+<style>
+    .query {
+        font-family: var(--bookish-header-font-family);
+        font-size: var(--bookish-header-font-size);
+        border: none;
+        border-bottom: 3px solid var(--bookish-border-color-light);
+        padding: var(--bookish-inline-padding);
+        display: inline-block;
+        margin-top: 2em;
+    }
+
+    .query:focus {
+        outline: none;
+        border-color: var(--bookish-highlight-color);
+    }
+</style>
