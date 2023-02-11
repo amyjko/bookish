@@ -98,11 +98,12 @@
                       )
                     : undefined}
         />
-        <Button
+        <!-- Disabled until we can find a way to properly build the book in a cloud function. -->
+        <!-- <Button
             tooltip="Publish the book online"
             disabled={publishing}
             command={() => requestPublish()}>↓ download</Button
-        >
+        > -->
     </div>
     {#if error}
         <Feedback error>{error}</Feedback>
