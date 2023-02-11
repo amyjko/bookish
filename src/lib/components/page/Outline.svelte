@@ -151,24 +151,24 @@
     class={'outline ' +
         (!expanded || collapse ? 'outline-collapsed' : 'outline-expanded')}
 >
-    <!-- Visual cue of expandability, only visible in footer mode. -->
-    <div
-        class={'outline-collapse-cue' +
-            (headers.length === 0 ? ' outline-collapse-cue-disabled' : '')}
-        role="button"
-        aria-label={expanded
-            ? 'Collapse navigation menu'
-            : 'Expand navigation menu'}
-        tabIndex="0"
-        on:click={headers.length > 0 ? toggleExpanded : undefined}
-        on:keydown={(event) => {
-            if (event.key === 'Enter' || event.key === ' ') toggleExpanded();
-        }}
-    >
-        {expandLabel}
-    </div>
-    <div class="outline-headers">
-        <!-- Book navigation links -->
+    <div class="outline-top">
+        <!-- Visual cue of expandability, only visible in footer mode. -->
+        <div
+            class={'outline-toggle' +
+                (headers.length === 0 ? ' outline-toggle-disabled' : '')}
+            role="button"
+            aria-label={expanded
+                ? 'Collapse navigation menu'
+                : 'Expand navigation menu'}
+            tabIndex="0"
+            on:click={headers.length > 0 ? toggleExpanded : undefined}
+            on:keydown={(event) => {
+                if (event.key === 'Enter' || event.key === ' ')
+                    toggleExpanded();
+            }}
+        >
+            {expandLabel}
+        </div>
         <div class="outline-header-nav">
             {#if previous !== null}<Link to="{$base}/{previous}"
                     >{previousLabel}</Link
@@ -183,6 +183,26 @@
                     >{nextLabel}</span
                 >{/if}
         </div>
+        <!-- Dark mode toggle -->
+        <div
+            class="outline-dark-toggle"
+            role="button"
+            aria-label={$dark === true
+                ? 'Switch to light mode'
+                : 'Switch to dark mode'}
+            tabIndex="0"
+            on:click={toggleReadingMode}
+            on:keydown={(event) => {
+                if (event.key === 'Enter' || event.key === ' ') {
+                    toggleReadingMode();
+                    event.stopPropagation();
+                }
+            }}
+        >
+            {$dark ? darkLabel : lightLabel}
+        </div>
+    </div>
+    <div class="outline-headers">
         <!--  Scan through the headers and add a properly formatted link for each. -->
         {#each headers as header, index}
             <!-- Assumes that all headers have an H1, H2, etc. tag. -->
@@ -203,24 +223,6 @@
             {/if}
         {/each}
     </div>
-    <!-- Dark mode toggle -->
-    <div
-        class="outline-reading-mode"
-        role="button"
-        aria-label={$dark === true
-            ? 'Switch to light mode'
-            : 'Switch to dark mode'}
-        tabIndex="0"
-        on:click={toggleReadingMode}
-        on:keydown={(event) => {
-            if (event.key === 'Enter' || event.key === ' ') {
-                toggleReadingMode();
-                event.stopPropagation();
-            }
-        }}
-    >
-        {$dark ? darkLabel : lightLabel}
-    </div>
 </nav>
 
 <style>
@@ -236,18 +238,10 @@
         );
     }
 
-    .outline-header-nav {
-        display: inline-block;
-        width: 100%;
-        padding-bottom: var(--outline-padding);
-    }
-
     .outline-header {
         display: block;
         line-height: var(--bookish-paragraph-line-height-tight);
         text-indent: 0;
-        padding-left: 1rem;
-        padding-right: 1rem;
         margin-bottom: 0.75rem;
     }
 
@@ -294,14 +288,28 @@
         color: var(--bookish-paragraph-color);
     }
 
-    .outline-reading-mode {
+    .outline-dark-toggle {
         transition: transform 0.2s ease-in;
     }
 
-    .outline-reading-mode:hover {
+    .outline-dark-toggle:hover {
         cursor: pointer;
         transform: scale(1.25, 1.25);
         color: var(--bookish-paragraph-color);
+    }
+
+    .outline-top {
+        display: flex;
+        flex-direction: row;
+        flex-wrap: nowrap;
+        align-items: center;
+        width: 100%;
+        margin-bottom: 0.75rem;
+    }
+
+    /* Make a little centered box to store the outline to preserve its left aligned structure, while making it easier to click. */
+    .outline-headers {
+        margin: auto;
     }
 
     /* Mobile */
@@ -311,7 +319,6 @@
             top: 100%; /* Put it all the way off screen on the bottom, then let JS translate */
             left: 0;
             right: 0;
-            width: 100%;
             z-index: 2; /* Put it above content when it's a sheet in the footer */
             border-top: 1px solid var(--bookish-border-color-light);
             text-align: left;
@@ -319,58 +326,38 @@
             background-color: var(--bookish-background-color);
             box-shadow: 0px -1px 2px rgba(0, 0, 0, 0.25);
             backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
             /* Cap height at window size. If the content is too tall, scroll it. */
             max-height: 100%;
             overflow-y: scroll;
+            padding: 0.5em;
         }
 
-        /* Make a little centered box to store the outline to preserve its left aligned structure, while making it easier to click. */
-        .outline-headers {
-            width: 20em;
-            margin: auto;
-        }
-
-        .outline-header-nav {
-            text-align: center;
-            padding-top: 0.5em; /* Add some spacing when in the footer */
-            padding-bottom: 0.5em;
-            text-indent: 0 !important; /* Override header default */
-            font-size: 1.25rem !important;
-        }
-
-        .outline-reading-mode {
-            position: absolute;
-            top: 0.5em;
-            left: 0;
+        .outline-dark-toggle {
             font-size: 1em;
             display: inline-block;
-            padding-left: 1em;
-            padding-right: 1em;
         }
 
-        .outline-collapse-cue {
-            position: absolute;
-            top: 0.5em;
-            right: 0;
+        .outline-top {
+            flex-direction: row-reverse;
+        }
+
+        .outline-toggle {
             font-size: 1em;
             display: inline-block;
-            padding-left: 1em;
-            padding-right: 1em;
             transition: transform 0.2s ease-in;
         }
 
-        .outline-collapse-cue:hover {
+        .outline-toggle:hover {
             cursor: pointer;
             transform: scale(1.25, 1.25);
             color: var(--bookish-paragraph-color);
         }
 
-        .outline-collapse-cue-disabled {
+        .outline-toggle-disabled {
             display: none;
         }
 
-        .outline-expanded .outline-collapse-cue {
+        .outline-expanded .outline-toggle {
             transform: rotate(90deg);
         }
 
@@ -380,6 +367,15 @@
 
         .outline.outline-collapsed {
             transform: translateY(-3rem);
+        }
+
+        .outline-headers {
+            width: 20em;
+        }
+
+        /* Center on mobile */
+        .outline-header-nav {
+            margin: auto;
         }
     }
 
@@ -410,14 +406,19 @@
             margin-left: var(--outline-offset);
         }
 
-        .outline-collapse-cue {
+        .outline-toggle {
             display: none;
         }
 
-        .outline-reading-mode {
+        .outline-dark-toggle {
             position: absolute;
             top: calc(var(--outline-padding));
             right: calc(var(--outline-padding));
+        }
+
+        /* Left align on desktop, since no collapse cue. */
+        .outline-header-nav {
+            margin-right: auto;
         }
     }
 </style>
