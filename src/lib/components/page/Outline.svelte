@@ -261,7 +261,7 @@
 
     :global(a .outline-header),
     :global(.outline-header-nav a) {
-        color: var(--bookish-muted-color);
+        color: var(--bookish-muted-color) !important;
     }
 
     :global(a .outline-header-active),
