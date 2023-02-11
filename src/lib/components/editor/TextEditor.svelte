@@ -33,7 +33,7 @@
             const sizedText = showPlaceholder()
                 ? placeholder
                 : text.replace(/\s/g, '\u00a0');
-            // Clip the text to prevent this editor from getting too long when editing or when asked to.. If it goes past one line,
+            // Clip the text to prevent this editor from getting too long when editing. If it goes past one line,
             // the measurements and layout are way off.
             const trimmedText =
                 width !== undefined &&

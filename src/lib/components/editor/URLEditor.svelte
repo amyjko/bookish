@@ -11,5 +11,7 @@
     text={url}
     label="URL editor"
     valid={(url) => validator(url)}
+    width={20}
+    clip
     save={(url) => edit(url)}
 />
