@@ -9,8 +9,8 @@
 
 <Section>
     <Lead
-        ><Large>Bookish</Large> is a (beta) platform for writing simple, beautiful,
-        accessible online books.</Lead
+        ><Large>Bookish</Large> (beta) platform for writing simple, beautiful, accessible
+        online books.</Lead
     >
 
     <Head>Simple</Head>
