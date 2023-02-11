@@ -286,9 +286,9 @@
         flex-direction: row;
         flex-wrap: wrap;
         align-items: baseline;
-        background: var(--bookish-background-color);
         font-family: var(--app-font);
         font-size: var(--app-chrome-font-size);
+        row-gap: var(--app-chrome-padding);
     }
 
     .bookish-editor-toolbar:focus {
