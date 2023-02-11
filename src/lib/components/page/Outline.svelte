@@ -266,7 +266,7 @@
 
     :global(a .outline-header-active),
     :global(a:hover .outline-header) {
-        color: var(--bookish-paragraph-color);
+        color: var(--bookish-paragraph-color) !important;
     }
 
     .outline-header-nav-disabled {
@@ -274,7 +274,8 @@
     }
 
     :global(.outline a:hover) {
-        text-decoration: none;
+        text-decoration: none !important;
+        color: var(--bookish-paragraph-color) !important;
     }
 
     /* Only apply this on devices with hover abilities. */
@@ -282,10 +283,6 @@
         :global(.outline a:hover) {
             color: var(--bookish-paragraph-color);
         }
-    }
-
-    :global(a .outline-header-active) {
-        color: var(--bookish-paragraph-color);
     }
 
     .outline-dark-toggle {
