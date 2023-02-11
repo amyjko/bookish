@@ -125,7 +125,7 @@ export const BookishTheme = {
     // Spacing
     spacing: {
         paragraphLineHeight: '1.8em',
-        paragraphLineHeightTight: '1.4em',
+        paragraphLineHeightTight: '1.6em',
         headerLineHeight: '1.4em',
         paragraphSpacing: '1.8rem',
         headerSpacing: '2rem',
