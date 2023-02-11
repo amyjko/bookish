@@ -2,10 +2,8 @@
     import type Book from '$lib/models/book/Book';
     import EmbedNode from '$lib/models/chapter/EmbedNode';
     import Parser from '$lib/models/chapter/Parser';
-    import ErrorNode from '../models/chapter/ErrorNode';
     import ChapterBody from './chapter/ChapterBody.svelte';
     import Embed from './chapter/Embed.svelte';
-    import ErrorMessage from './chapter/ErrorMessage.svelte';
     import Link from '$lib/components/app/Link.svelte';
 
     export let book: Book;
@@ -20,7 +18,7 @@
     $: embed = cover === null ? null : Parser.parseEmbed(undefined, cover);
 
     $: url =
-        subdomain === undefined || write
+        subdomain === null || write
             ? refID === undefined
                 ? ''
                 : (write ? '/write/' : '/') + refID
