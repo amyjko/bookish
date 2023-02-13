@@ -66,8 +66,12 @@ export function setChapter(
     if (edition) store.set(edition.withRevisedChapter(previous, chapter));
 }
 
+function isRouteWrite(): boolean {
+    return get(page).route.id?.startsWith('/(app)/write') ?? false;
+}
+
 export function isChapterEditable(): boolean {
-    if (!get(page).route.id?.startsWith('/write')) return false;
+    if (!isRouteWrite()) return false;
     const auth = get(getUser());
     const chapter = get(getChapter());
     const edition = get(getEdition());
@@ -85,7 +89,7 @@ export function isChapterEditable(): boolean {
 }
 
 export function isEditionEditable(): boolean {
-    if (!get(page).route.id?.startsWith('/write')) return false;
+    if (!isRouteWrite()) return false;
     const auth = get(getUser());
     const edition = get(getEdition());
     const book = get(getBook());
@@ -99,7 +103,7 @@ export function isEditionEditable(): boolean {
 }
 
 export function isEditionPartiallyEditable(): boolean {
-    if (!get(page).route.id?.startsWith('/write')) return false;
+    if (!isRouteWrite()) return false;
     const auth = get(getUser());
     const edition = get(getEdition());
     return (
@@ -111,7 +115,7 @@ export function isEditionPartiallyEditable(): boolean {
 }
 
 export function isBookEditable(): boolean {
-    if (!get(page).route.id?.startsWith('/write')) return false;
+    if (!isRouteWrite()) return false;
     const auth = get(getUser());
     const book = get(getBook());
     return (

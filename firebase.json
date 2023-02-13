@@ -9,6 +9,10 @@
         "ignore": ["firebase.json", "**/.*", "**/node_modules/**"],
         "rewrites": [
             {
+                "source": "/book/**",
+                "function": "getEdition"
+            },
+            {
                 "source": "**",
                 "destination": "/index.html"
             }
@@ -37,6 +41,7 @@
             ".git",
             "firebase-debug.log",
             "firebase-debug.*.log"
-        ]
+        ],
+        "source": "functions"
     }
 }

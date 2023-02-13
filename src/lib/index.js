@@ -11,5 +11,6 @@ export { default as Edition } from './components/page/Edition.svelte';
 export { default as Feedback } from './components/app/Feedback.svelte';
 export { default as Loading } from './components/page/Loading.svelte';
 export { default as EditionModel } from './models/book/Edition';
+export { getBookIDWithSubdomain } from './models/CRUD';
 export { EDITION } from './components/page/Contexts';
 export { default as Schema } from './models/book/Schema';

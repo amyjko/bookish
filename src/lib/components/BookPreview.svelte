@@ -9,7 +9,7 @@
     export let book: Book;
     export let write: boolean = false;
 
-    $: refID = book.getRefID();
+    $: refID = book.getID();
     $: cover = book.getCover();
     $: authors = book.getAuthors();
     $: description = book.getDescription();

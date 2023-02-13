@@ -30,7 +30,7 @@
                   (book1, index1, bookList) =>
                       !bookList.some(
                           (book2, index2) =>
-                              index2 > index1 && book1.ref.id === book2.ref.id
+                              index2 > index1 && book1.getID() === book2.getID()
                       )
               );
 

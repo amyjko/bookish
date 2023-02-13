@@ -44,7 +44,7 @@ function listenToBooks(
                         ? []
                         : snapshot.docs.map((doc) =>
                               Book.fromJSON(
-                                  doc.ref,
+                                  doc.id,
                                   doc.data() as BookSpecification
                               )
                           )
@@ -92,7 +92,7 @@ export function listenToBookWithID(
         if (!doc.metadata.hasPendingWrites)
             react(
                 doc.exists()
-                    ? Book.fromJSON(ref, doc.data() as BookSpecification)
+                    ? Book.fromJSON(id, doc.data() as BookSpecification)
                     : null
             );
     });
@@ -199,7 +199,7 @@ export async function createBook(userID: string): Promise<string> {
     const bookRef = await addDoc(collection(db, 'books'), newBookData);
 
     // Create a model to store it.
-    let book = Book.fromJSON(bookRef, newBookData);
+    let book = Book.fromJSON(bookRef.id, newBookData);
 
     // Make a new default edition with a single chapter with this user id.
     let newEdition = new Edition(
@@ -258,7 +258,7 @@ export async function createNewEdition(book: Book): Promise<Book> {
     if (latestEditionID === undefined) throw 'No editions on this book';
 
     const latestDraftDoc = await getDoc(
-        doc(db, 'books', book.ref.id, 'editions', latestEditionID)
+        doc(db, 'books', book.id, 'editions', latestEditionID)
     );
     const latestDraft = latestDraftDoc.exists()
         ? latestDraftDoc.data()
@@ -401,7 +401,7 @@ export async function updateEdition(
                 );
                 if (!bookDoc.exists()) throw Error('Book does not exist');
                 const book = Book.fromJSON(
-                    newEdition.bookRef,
+                    newEdition.bookRef.id,
                     bookDoc.data() as BookSpecification
                 );
                 updateBook(
@@ -423,7 +423,7 @@ export async function updateEdition(
 export async function updateBook(book: Book): Promise<void> {
     if (!db) throw Error("Can't update book, not connected to Firebase.");
 
-    await setDoc(doc(db, 'books', book.getRefID()), book.toJSON());
+    await setDoc(doc(db, 'books', book.getID()), book.toJSON());
 }
 
 export async function isSubdomainAvailable(
@@ -432,11 +432,18 @@ export async function isSubdomainAvailable(
 ): Promise<boolean> {
     if (!db) throw Error('Not connected to Firebase.');
 
+    return (await getBookIDWithSubdomain(subdomain)) === null;
+}
+
+export async function getBookIDWithSubdomain(
+    subdomain: string
+): Promise<string | null> {
+    if (!db) throw Error('Not connected to Firebase.');
     const matches = await getDocs(
         query(collection(db, 'books'), where('domain', '==', subdomain))
     );
 
-    return matches.empty || matches.docs[0].id === book.getRefID();
+    return matches.empty ? null : matches.docs[0].id;
 }
 
 export async function publish(

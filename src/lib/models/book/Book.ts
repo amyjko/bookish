@@ -31,7 +31,7 @@ export type BookSpecification = {
 };
 
 export default class Book {
-    readonly ref: DocumentReference;
+    readonly id: string;
     readonly title: string;
     readonly authors: string[];
     readonly description: string;
@@ -44,7 +44,7 @@ export default class Book {
     media: BookMedia;
 
     constructor(
-        ref: DocumentReference,
+        id: string,
         title: string,
         authors: string[],
         description: string,
@@ -53,7 +53,7 @@ export default class Book {
         domain: string | null,
         uids: string[]
     ) {
-        this.ref = ref;
+        this.id = id;
         this.title = title;
         this.authors = authors;
         this.description = description;
@@ -72,9 +72,9 @@ export default class Book {
         return this.media;
     }
 
-    static fromJSON(ref: DocumentReference, book: BookSpecification): Book {
+    static fromJSON(id: string, book: BookSpecification): Book {
         return new Book(
-            ref,
+            id,
             book.title,
             book.authors,
             book.description,
@@ -113,9 +113,13 @@ export default class Book {
         return this.domain;
     }
 
+    hasSubdomain(domain: string) {
+        return this.domain === domain;
+    }
+
     withSubdomain(domain: string) {
         return new Book(
-            this.ref,
+            this.id,
             this.title,
             this.authors,
             this.description,
@@ -132,7 +136,7 @@ export default class Book {
 
     withTitle(title: string) {
         return new Book(
-            this.ref,
+            this.id,
             title,
             this.authors,
             this.description,
@@ -149,7 +153,7 @@ export default class Book {
 
     withDescription(description: string) {
         return new Book(
-            this.ref,
+            this.id,
             this.title,
             this.authors,
             description,
@@ -166,7 +170,7 @@ export default class Book {
 
     withCover(cover: string | null) {
         return new Book(
-            this.ref,
+            this.id,
             this.title,
             this.authors,
             this.description,
@@ -183,7 +187,7 @@ export default class Book {
 
     withAuthors(authors: string[]) {
         return new Book(
-            this.ref,
+            this.id,
             this.title,
             authors,
             this.description,
@@ -194,12 +198,8 @@ export default class Book {
         );
     }
 
-    getRef() {
-        return this.ref;
-    }
-
-    getRefID() {
-        return this.ref.id;
+    getID() {
+        return this.id;
     }
 
     getEditionNumberID(number: number) {
@@ -230,7 +230,7 @@ export default class Book {
 
     withEditors(uids: string[]) {
         return new Book(
-            this.ref,
+            this.id,
             this.title,
             this.authors,
             this.description,
@@ -243,7 +243,7 @@ export default class Book {
 
     withEditions(revisions: EditionInfo[]) {
         return new Book(
-            this.ref,
+            this.id,
             this.title,
             this.authors,
             this.description,

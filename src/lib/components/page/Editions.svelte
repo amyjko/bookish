@@ -2,12 +2,14 @@
     import { createNewEdition } from '$lib/models/CRUD';
     import Instructions from '$lib/components/page/Instructions.svelte';
     import Note from '../editor/Note.svelte';
-    import { getUser, getBook, isBookEditable } from './Contexts';
+    import { getBook, isBookEditable } from './Contexts';
     import Button from '../app/Button.svelte';
     import Link from '../app/Link.svelte';
     import Format from '../chapter/Format.svelte';
     import Parser from '../../models/chapter/Parser';
     import Permissions from '../editor/Permissions.svelte';
+
+    export let editors: boolean = true;
 
     let book = getBook();
     let editable = isBookEditable();
@@ -66,13 +68,14 @@
                             to={latestPublishedID === bookEdition.ref.id &&
                             $book.getSubdomain() !== undefined
                                 ? `/${$book.getSubdomain()}`
-                                : `/${$book.ref.id}/${editions.length - index}`}
-                            >read</Link
+                                : `/${$book.getID()}/${
+                                      editions.length - index
+                                  }`}>read</Link
                         >
                         {#if editable}
                             &nbsp;
                             <Link
-                                to={`/write/${$book.ref.id}/${
+                                to={`/write/${$book.getID()}/${
                                     editions.length - index
                                 }`}>edit</Link
                             >
@@ -91,7 +94,7 @@
         {/if}
     {/each}
 
-    {#if editable}
+    {#if editable && editors}
         <h2>Editors</h2>
         <Instructions {editable}>
             These authors can edit any aspect of the book and any of its

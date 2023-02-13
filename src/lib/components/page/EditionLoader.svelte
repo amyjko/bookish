@@ -6,7 +6,6 @@
         getBook,
         getEdition,
         getUser,
-        CHAPTERTEXT,
         getChapterText,
     } from '$lib/components/page/Contexts';
     import { onDestroy } from 'svelte';
@@ -65,7 +64,7 @@
             // Listen to the doc for changes and listen to all of its chapters.
             if (editionID !== undefined) {
                 editionUnsub = listenToEdition(
-                    $book.ref.id,
+                    $book.getID(),
                     editionID,
                     (ed) => {
                         if (ed) {
@@ -83,7 +82,7 @@
                 );
 
                 chaptersUnsub = listenToChapters(
-                    $book.ref.id,
+                    $book.getID(),
                     editionID,
                     (chapters) => {
                         // Update the chapter text store.
@@ -115,8 +114,8 @@
     <Edition
         edition={$edition}
         base={write
-            ? `/write/${$book.getRefID()}/${$edition.getEditionNumber()}`
-            : `/${$book.getSubdomain() ?? $book.getRefID()}`}
+            ? `/write/${$book.getID()}/${$edition.getEditionNumber()}`
+            : `/${$book.getSubdomain() ?? $book.getID()}`}
     >
         <slot />
     </Edition>

@@ -15,10 +15,10 @@
         CHAPTERTEXT,
     } from '$lib/components/page/Contexts';
     import type Book from '$lib/models/book/Book';
-    import type Edition from '../lib/models/book/Edition';
-    import type CaretState from '../lib/components/editor/CaretState';
-    import BookSaveStatus from '../lib/models/book/BookSaveStatus';
-    import { updateBook, updateEdition } from '../lib/models/CRUD';
+    import type Edition from '$lib/models/book/Edition';
+    import type CaretState from '$lib/components/editor/CaretState';
+    import BookSaveStatus from '$lib/models/book/BookSaveStatus';
+    import { updateBook, updateEdition } from '$lib/models/CRUD';
     import { page } from '$app/stores';
 
     // A global store context for the focused editor, used to display toolbar.
@@ -178,7 +178,16 @@
     /* Custom fonts for app */
     @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;700&display=swap');
 
-    :global(.bookish-app) {
+    .bookish-app {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        font-weight: 300;
+        color: var(--app-font-color);
+        font-family: var(--app-font);
+        font-size: 14pt;
+        background-color: var(--app-background-color);
+
         /* Define some UI defaults not used in the Bookish theme. */
         --app-font: 'Outfit', sans-serif;
         --app-line-height: 1.7;
@@ -200,7 +209,7 @@
         --app-chrome-roundedness: 5px;
     }
 
-    :global(.dark .bookish-app) {
+    :global(.dark) .bookish-app {
         --app-interactive-color: #1455ce;
         --app-background-color: #050505;
         --app-font-color: white;
@@ -209,17 +218,6 @@
         --app-muted-color: #a9a9a9;
         --app-error-color: rgb(80, 8, 8);
         --app-chrome-background: rgb(46, 46, 46);
-    }
-
-    .bookish-app {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        font-weight: 300;
-        color: var(--app-font-color);
-        font-family: var(--app-font);
-        font-size: 14pt;
-        background-color: var(--app-background-color);
     }
 
     :global(.firebase-emulator-warning) {

@@ -295,7 +295,7 @@
                                     chapter.withChapterID(newChapterID);
                                     // Navigate to the new ID
                                     goto(
-                                        `/write/${$book.ref.id}/${editionNumber}/${newChapterID}`
+                                        `/write/${$book.getID()}/${editionNumber}/${newChapterID}`
                                     );
                                 }
                             }}

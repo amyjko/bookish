@@ -27,7 +27,7 @@
                 ><Link
                     to={`${
                         $page.route.id?.startsWith('/write') ? '/write' : ''
-                    }/${$book.ref.id}`}>{$book.getTitle()}</Link
+                    }/${$book.getID()}`}>{$book.getTitle()}</Link
                 ></span
             >
             {#if $page.route.id?.includes('/[bookid]/editions')}
@@ -37,7 +37,7 @@
                 >&ndash; <Link
                     to={`${
                         $page.route.id?.startsWith('/write') ? '/write' : ''
-                    }/${$book.ref.id}/editions`}
+                    }/${$book.getID()}/editions`}
                     >{$edition.getEditionLabel()} edition</Link
                 ></span
             >

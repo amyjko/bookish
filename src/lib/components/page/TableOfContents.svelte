@@ -33,6 +33,7 @@
     import Permissions from '../editor/Permissions.svelte';
     import Publish from './Publish.svelte';
     import { onMount } from 'svelte';
+    import Editions from './Editions.svelte';
 
     let auth = getUser();
     let book = getBook();
@@ -296,12 +297,17 @@
             <Publish />
         {/if}
 
+        {#if $book}
+            <PageHeader id="editions">Editions</PageHeader>
+            <Editions editors={false} />
+        {/if}
+
         {#if $book && (editable || isEditionPartiallyEditable())}
             <PageHeader>Editors</PageHeader>
             <Instructions {editable}>
                 These authors can edit this edition and its chapters. To give
                 book-level permissions, edit the book editors on the <Link
-                    to="/write/{$book.ref.id}/editions">editions</Link
+                    to="/write/{$book.getID()}/editions">editions</Link
                 >
                 page. To give chapter-level permissions, navigate to the chapter.
             </Instructions>

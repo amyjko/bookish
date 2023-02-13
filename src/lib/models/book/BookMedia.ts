@@ -42,7 +42,7 @@ export default class BookMedia {
     }
 
     getImagePath() {
-        return `images/${this.book.getRefID()}/`;
+        return `images/${this.book.getID()}/`;
     }
 
     /** Get a listing of all of the images for the book. */

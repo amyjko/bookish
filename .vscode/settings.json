@@ -13,5 +13,6 @@
         "unindex"
     ],
     "typescript.tsdk": "node_modules/typescript/lib",
-    "findUnusedExports.detectCircularImports": true
+    "findUnusedExports.detectCircularImports": true,
+    "testing.automaticallyOpenPeekView": "never"
 }
