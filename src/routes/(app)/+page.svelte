@@ -23,17 +23,16 @@
     <Head>Beautiful</Head>
     <Paragraph>
         Typography matters. Print books can be beautiful, but are complex to
-        make. E-books can be easier to make, but are often typographically
-        messy. Bookish strives for a happy medium, making digital content
-        typographicaaly beautiful.
+        make. E-books can be easier to make, but are often typographically messy
+        on the web. Bookish strives for a happy medium, striving for
+        typographically beautiful web-based reading experiences.
     </Paragraph>
 
     <Head>Accessible</Head>
     <Paragraph>
         Most platforms produce books that are incompatible with screen readers,
-        excluding readers who are blind, low vision, dyslexic, or otherwise
-        prefer to have text spoken. Bookish strives to be readable in any web
-        browser, with sight or sound.
+        excluding readers who prefer or require that text be spoken. Bookish
+        strives to be readable in any web browser, with sight or sound.
     </Paragraph>
 
     <Paragraph>
