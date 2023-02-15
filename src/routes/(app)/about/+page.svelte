@@ -59,11 +59,11 @@
         works that advance progress toward a society that
         <em
             >radically embraces the beautiful diversity of humanity and nature
-            and seeks to dismantle systems and ideas that get in the way.</em
-        > While this definitely includes works broadly explicitly about social justice
-        toopics such as diversity, equality, equity, inclusion, justice, accessibility,
-        sustainability, indigienous sovereignty, it also includes works that discuss
-        more strictly technical ideas in sociotechnical ways.
+            and seeks to dismantle systems that get in the way.</em
+        > While this includes works broadly explicitly about social justice toopics
+        such as diversity, equality, equity, inclusion, justice, accessibility, sustainability,
+        indigienous sovereignty, it also includes works that discuss more strictly
+        technical ideas in sociotechnical ways.
     </Paragraph>
 
     <Head id="editing">Editing</Head>
