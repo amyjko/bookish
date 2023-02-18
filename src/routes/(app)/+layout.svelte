@@ -13,12 +13,14 @@
         type StatusStore,
         type ChapterText,
         CHAPTERTEXT,
+        type EditorsStore,
+        EDITORS,
     } from '$lib/components/page/Contexts';
     import type Book from '$lib/models/book/Book';
     import type Edition from '$lib/models/book/Edition';
     import type CaretState from '$lib/components/editor/CaretState';
     import BookSaveStatus from '$lib/models/book/BookSaveStatus';
-    import { updateBook, updateEdition } from '$lib/models/CRUD';
+    import { getUserEmails, updateBook, updateEdition } from '$lib/models/CRUD';
     import { page } from '$app/stores';
 
     // A global store context for the focused editor, used to display toolbar.
@@ -40,6 +42,43 @@
     // A global store for save feedback.
     let status = writable<BookSaveStatus>(BookSaveStatus.Saved);
     setContext<StatusStore>(STATUS, status);
+
+    // A global store mapping user IDs to emails, a more human readable form of identity.
+    let editors = writable<Map<string, string>>(new Map());
+    setContext<EditorsStore>(EDITORS, editors);
+
+    $: {
+        // Each time the book or edition changes, request any new user emails we don't have
+        // and add them to the cache.
+        if ($book && $edition) {
+            // Get a list of all of the book, edition, and chapter user IDs that aren't in the editors store.
+            retrieveEmails(
+                Array.from(
+                    new Set([
+                        ...$book.uids,
+                        ...$edition.uids,
+                        ...$edition.chapters.reduce(
+                            (uids: string[], chapter) => [
+                                ...uids,
+                                ...chapter.uids,
+                            ],
+                            []
+                        ),
+                    ])
+                ).filter((uid) => !$editors.has(uid))
+            );
+        }
+    }
+
+    async function retrieveEmails(uids: string[]) {
+        if (uids.length === 0) return;
+        // Mark all of the emails as being retrieved so that we don't redundantly retrieve them.
+        for (const uid of uids) $editors.set(uid, '');
+        const emails = await getUserEmails(uids);
+        if (emails === null) return;
+        for (const [uid, email] of emails.entries()) $editors.set(uid, email);
+        editors.set(new Map($editors));
+    }
 
     let bookTimer: NodeJS.Timeout | undefined = undefined;
     let editionTimer: NodeJS.Timeout | undefined = undefined;

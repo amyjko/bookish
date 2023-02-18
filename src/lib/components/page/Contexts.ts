@@ -143,6 +143,12 @@ export function getStatus() {
     return getContext<StatusStore>(STATUS);
 }
 
+export const EDITORS = Symbol('editors');
+export type EditorsStore = Writable<Map<string, string>>;
+export function getEditors() {
+    return getContext<EditorsStore>(EDITORS);
+}
+
 export async function lease(
     authStore: UserStore,
     editionStore: EditionStore,

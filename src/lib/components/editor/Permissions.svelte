@@ -2,6 +2,7 @@
     import { createUser, getUserEmails } from '../../models/CRUD';
     import Button from '../app/Button.svelte';
     import TextInput from '../app/TextInput.svelte';
+    import { getEditors } from '../page/Contexts';
     import Note from './Note.svelte';
 
     export let uids: string[];
@@ -10,21 +11,7 @@
     export let atleastone: boolean;
     export let change: (uids: string[]) => void;
 
-    let emails: Map<string, string> | null = null;
-
-    $: alluids = Array.from(new Set([...uids, ...inheriteduids]));
-
-    async function getEmails(userIDs: string[]) {
-        emails = await getUserEmails(userIDs);
-    }
-    $: {
-        if (
-            emails === null ||
-            (emails.size > 0 &&
-                Array.from(emails.keys()).join() !== alluids.join())
-        )
-            getEmails(alluids);
-    }
+    let emails = getEditors();
 
     let newEditor: string = '';
     let newEditorError: string | null = null;
@@ -43,6 +30,15 @@
             loading = undefined;
         }
     }
+
+    function hasEditor(email: string): boolean {
+        const match = Array.from($emails.entries()).find(
+            ([, e]) => e === email
+        );
+        if (match === undefined) return false;
+        const uid = match[0];
+        return uids.includes(uid) || inheriteduids.includes(uid);
+    }
 </script>
 
 {#if emails === null}
@@ -59,16 +55,16 @@
                 />
                 <Button
                     tooltip="give {newEditor} editing rights"
-                    disabled={newEditor.length === 0 ||
-                        Array.from(emails.values()).includes(newEditor)}
+                    disabled={newEditor.length === 0 || hasEditor(newEditor)}
                     command={addEditor}>+ editor</Button
                 >
+                {#if hasEditor(newEditor)}<Note>already added</Note>{/if}
                 {#if newEditorError !== null}{newEditorError}{/if}
             </form>
         {/if}
 
         {#each uids as uid, index (uid)}
-            {@const email = emails.get(uid)}
+            {@const email = $emails.get(uid)}
             <p>
                 {email}
                 {#if writable}
@@ -79,13 +75,13 @@
                                 ...uids.slice(0, index),
                                 ...uids.slice(index + 1),
                             ])}
-                        disabled={atleastone && uids.length <= 1}>x</Button
+                        disabled={atleastone && uids.length <= 1}>⨉</Button
                     >
                 {/if}
             </p>
         {/each}
         {#each inheriteduids as uid}
-            <p><em>{emails.get(uid)}</em> <Note>book editor</Note></p>
+            <p><em>{$emails.get(uid)}</em> <Note>book editor</Note></p>
         {/each}
         {#if loading}
             <p>
