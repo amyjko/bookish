@@ -31,7 +31,10 @@
         font-family: var(--app-font);
         white-space: nowrap;
         background-color: var(--app-interactive-color);
-        padding: calc(var(--app-chrome-padding) / 2);
+        padding-left: calc(var(--app-chrome-padding));
+        padding-right: calc(var(--app-chrome-padding));
+        padding-top: calc(var(--app-chrome-padding) / 2);
+        padding-bottom: calc(var(--app-chrome-padding) / 2);
         border-radius: var(--app-chrome-roundedness);
     }
 
