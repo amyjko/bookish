@@ -19,6 +19,8 @@
     let caret = getCaret();
     $: edition = getEdition();
     $: book = getBook();
+
+    $: writing = $page.route.id?.includes('/write/');
 </script>
 
 <section class="header">
@@ -26,10 +28,8 @@
         <Link to="/" title="Home"><Icon icon={HomeIcon} /></Link>
         {#if $book && $edition}
             <span class="elided"
-                ><Link
-                    to={`${
-                        $page.route.id?.startsWith('/write') ? '/write' : ''
-                    }/${$book.getID()}`}>{$book.getTitle()}</Link
+                ><Link to={`${writing ? '/write' : ''}/${$book.getID()}`}
+                    >{$book.getTitle()}</Link
                 ></span
             >
             {#if $page.route.id?.includes('/[bookid]/editions')}
@@ -37,9 +37,7 @@
             {/if}
             <span
                 >&ndash; <Link
-                    to={`${
-                        $page.route.id?.startsWith('/write') ? '/write' : ''
-                    }/${$book.getID()}/editions`}
+                    to={`${writing ? '/write' : ''}/${$book.getID()}/editions`}
                     >{$edition.getEditionLabel()} edition</Link
                 ></span
             >
