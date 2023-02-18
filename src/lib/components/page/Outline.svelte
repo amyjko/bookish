@@ -3,6 +3,7 @@
     import { onMount } from 'svelte';
     import Link from '$lib/components/Link.svelte';
     import { getBase, getDarkMode } from './Contexts';
+    import DarkToggle from '$lib/components/controls/DarkToggle.svelte';
 
     export let previous: string | null;
     export let next: string | null;
@@ -142,8 +143,6 @@
     let previousLabel = '\u25C0\uFE0E';
     let nextLabel = '\u25B6\uFE0E';
     let expandLabel = '\u2630';
-    let lightLabel = '\u263C';
-    let darkLabel = '\u263E';
 </script>
 
 <nav
@@ -184,23 +183,9 @@
                 >{/if}
         </div>
         <!-- Dark mode toggle -->
-        <div
-            class="outline-dark-toggle"
-            role="button"
-            aria-label={$dark === true
-                ? 'Switch to light mode'
-                : 'Switch to dark mode'}
-            tabIndex="0"
-            on:click={toggleReadingMode}
-            on:keydown={(event) => {
-                if (event.key === 'Enter' || event.key === ' ') {
-                    toggleReadingMode();
-                    event.stopPropagation();
-                }
-            }}
+        <div class="outline-dark-toggle"
+            ><DarkToggle dark={$dark} toggle={toggleReadingMode} /></div
         >
-            {$dark ? darkLabel : lightLabel}
-        </div>
     </div>
     <div class="outline-headers">
         <!--  Scan through the headers and add a properly formatted link for each. -->
@@ -283,16 +268,6 @@
         :global(.outline a:hover) {
             color: var(--bookish-paragraph-color);
         }
-    }
-
-    .outline-dark-toggle {
-        transition: transform 0.2s ease-in;
-    }
-
-    .outline-dark-toggle:hover {
-        cursor: pointer;
-        transform: scale(1.25, 1.25);
-        color: var(--bookish-paragraph-color);
     }
 
     .outline-top {

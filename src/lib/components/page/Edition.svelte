@@ -12,6 +12,7 @@
         type DarkModeStore,
     } from './Contexts';
     import { BookishTheme } from '$lib/models/book/Theme';
+    import { isDark, setDark } from '../../util/dark';
 
     // Poly fill smooth scrolling for Safari.
     onMount(() => smoothscroll.polyfill());
@@ -32,27 +33,17 @@
 
     // Default dark mode to whatever's stored in local storage, if anything.
     // respect user choice on the website despite the system theme
-    let darkMode = writable<boolean>(
-        typeof localStorage !== 'undefined' &&
-            localStorage.getItem('dark') !== 'false' &&
-            (localStorage.getItem('dark') === 'true' || // A previous setting
-                window.matchMedia('(prefers-color-scheme: dark)').matches) // Operating system is set to dark
-    );
+    let darkMode = writable<boolean>(isDark());
 
     // Expose dark mode to descendants
     setContext<DarkModeStore>(DARK_MODE, darkMode);
 
     // When dark mode changes, update the body's class list.
     $: {
-        if (typeof document !== 'undefined') {
-            if ($darkMode) document.body.classList.add('dark');
-            else document.body.classList.remove('dark');
-            if (typeof localStorage !== 'undefined')
-                localStorage.setItem('dark', $darkMode ? 'true' : 'false');
+        setDark($darkMode);
 
-            // Set the theme, whatever it is, and change it when the edition changes
-            setTheme(edition.getTheme() ?? BookishTheme);
-        }
+        // Set the theme, whatever it is, and change it when the edition changes
+        setTheme(edition.getTheme() ?? BookishTheme);
     }
 
     // Set the theme on mount.

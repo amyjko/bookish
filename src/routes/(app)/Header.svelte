@@ -11,6 +11,8 @@
     import HomeIcon from '$lib/components/editor/icons/home.svg?raw';
     import Icon from '$lib/components/editor/Icon.svelte';
     import { page } from '$app/stores';
+    import DarkToggle from '$lib/components/controls/DarkToggle.svelte';
+    import { isDark, setDark } from '$lib/util/dark';
 
     let auth = getUser();
 
@@ -21,6 +23,7 @@
 
 <section class="header">
     <nav class="navigation">
+        <Link to="/about"><small>beta</small></Link>
         <Link to="/" title="Home"><Icon icon={HomeIcon} /></Link>
         {#if $book && $edition}
             <span class="elided"
@@ -60,8 +63,10 @@
                     <Link to="/login">Login</Link>
                 {/if}
             </small>
+            <div class="controls">
+                <DarkToggle dark={isDark()} toggle={() => setDark(!isDark())} />
+            </div>
         {/if}
-        <Link to="/about"><small>beta</small></Link>
     </nav>
     {#if $caret}
         <Toolbar caret={$caret} />
@@ -109,5 +114,13 @@
         overflow-x: clip;
         white-space: nowrap;
         text-overflow: ellipsis;
+    }
+
+    .controls {
+        margin-left: auto;
+        display: flex;
+        flex-direction: row;
+        flex-wrap: nowrap;
+        gap: var(--app-chrome-padding);
     }
 </style>
