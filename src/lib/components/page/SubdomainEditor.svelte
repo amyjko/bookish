@@ -1,6 +1,7 @@
 <script lang="ts">
     import TextEditor from '$lib/components/editor/TextEditor.svelte';
     import { isSubdomainAvailable } from '$lib/models/CRUD';
+    import Note from '../editor/Note.svelte';
     import { getBook } from './Contexts';
     import Muted from './Muted.svelte';
 
@@ -18,7 +19,7 @@
 
 {#if $book}
     <Muted>
-        <TextEditor
+        <em>bookish.press/</em><TextEditor
             text={$book.getSubdomain() ?? ''}
             label="Book domain editor"
             save={// Save the new domain
@@ -29,7 +30,7 @@
                     else throw Error("Domain isn't available");
                 }
             }}
-            placeholder="link name (e.g., bookish.press/linkname)"
+            placeholder="book name"
             valid={(newDomain) =>
                 // If not the empty string, must be a valid URL subdomain, and none of the existing routes.
                 invalidNames.includes(newDomain) ||

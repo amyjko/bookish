@@ -38,6 +38,7 @@
     import Title from './Title.svelte';
     import PageHeader from './PageHeader.svelte';
     import Permissions from '../editor/Permissions.svelte';
+    import Note from '../editor/Note.svelte';
 
     export let chapter: ChapterModel;
     export let print: boolean = false;
@@ -286,20 +287,24 @@
             <svelte:fragment slot="before">
                 {#if editable && $book}
                     <Muted>
-                        <TextEditor
+                        <em>bookish.press/book/</em><TextEditor
                             text={chapter.getID()}
                             label="Chapter URL ID editor"
                             save={// After the ID is edited, reload the page with the new URL.
                             (newChapterID) => {
                                 if ($book) {
-                                    chapter.withChapterID(newChapterID);
+                                    setChapter(
+                                        edition,
+                                        chapter,
+                                        chapter.withChapterID(newChapterID)
+                                    );
                                     // Navigate to the new ID
                                     goto(
                                         `/write/${$book.getID()}/${editionNumber}/${newChapterID}`
                                     );
                                 }
                             }}
-                            placeholder="chapter ID"
+                            placeholder="chapter name"
                             valid={(newChapterID) =>
                                 !/^[a-zA-Z0-9]+$/.test(newChapterID)
                                     ? 'Chapter IDs must be one or more letters or numbers'
