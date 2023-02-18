@@ -40,7 +40,7 @@
         and then publish. By default, readers will see the latest published
         edition, but they can access older editions here.
     </Instructions>
-    {#each editions as bookEdition, index (bookEdition.ref)}
+    {#each editions as edition, index (edition.ref)}
         {@const editionNumber =
             editions === undefined ? -1 : editions.length - index}
         {@const editionLabel =
@@ -53,25 +53,26 @@
                 ? 'rd'
                 : 'th')}
 
-        {#if $book && (editable || bookEdition.published)}
+        {#if $book && (editable || edition.published)}
             <section class="edition">
                 <h3
                     >{editionLabel}
                     <Note
-                        >{#if bookEdition.published}{new Date(
-                                bookEdition.published
+                        >{#if edition.published}{new Date(
+                                edition.published
                             ).toLocaleDateString(
                                 'en-us'
                             )}{:else}unpublished{/if}
-                        &nbsp;
-                        <Link
-                            to={latestPublishedID === bookEdition.ref.id &&
-                            $book.getSubdomain() !== undefined
-                                ? `/${$book.getSubdomain()}`
-                                : `/${$book.getID()}/${
-                                      editions.length - index
-                                  }`}>read</Link
-                        >
+                        {#if edition.published}&nbsp;
+                            <Link
+                                to={latestPublishedID === edition.ref.id &&
+                                $book.getSubdomain() !== undefined
+                                    ? `/${$book.getSubdomain()}`
+                                    : `/${$book.getID()}/${
+                                          editions.length - index
+                                      }`}
+                                external>read</Link
+                            >{/if}
                         {#if editable}
                             &nbsp;
                             <Link
@@ -83,10 +84,10 @@
                     </Note>
                 </h3>
                 <p
-                    >{#if bookEdition.summary !== ''}<Format
+                    >{#if edition.summary !== ''}<Format
                             node={Parser.parseFormat(
                                 undefined,
-                                bookEdition.summary
+                                edition.summary
                             )}
                         />{:else}&mdash{/if}</p
                 >
