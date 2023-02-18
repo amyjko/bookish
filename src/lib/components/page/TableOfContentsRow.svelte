@@ -87,15 +87,14 @@
                 >
                 <ConfirmButton
                     tooltip="delete chapter {title}"
-                    commandLabel="delete"
-                    confirmLabel="confirm"
+                    confirm="delete?"
                     command={() =>
                         chapter && $edition
                             ? edition.set(
                                   $edition.withoutChapter(chapter.getID())
                               )
-                            : undefined}
-                />
+                            : undefined}>- chapter</ConfirmButton
+                >
             {/if}
         </td>
     {/if}

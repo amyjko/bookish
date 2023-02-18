@@ -1,40 +1,30 @@
 <script lang="ts">
-    import { onMount } from 'svelte';
     import Button from '../app/Button.svelte';
 
-    export let commandLabel: string;
     export let tooltip: string;
-    export let confirmLabel: string;
+    export let confirm: string;
     export let command: () => Promise<void> | void;
 
     let confirming = false;
-    let executing = false;
-    let timeoutID: NodeJS.Timer | undefined = undefined;
-    let isMounted = false;
-
-    onMount(() => {
-        isMounted = true;
-        return () => (isMounted = false);
-    });
-
-    function execute() {
-        if (!confirming && !executing) {
-            confirming = true;
-            timeoutID = setTimeout(() => {
-                if (isMounted) confirming = false;
-            }, 2000);
-        } else if (confirming) {
-            command()?.finally(() => {
-                if (isMounted) {
-                    if (timeoutID) clearTimeout(timeoutID);
-                    confirming = false;
-                    executing = false;
-                }
-            });
-        }
-    }
 </script>
 
-<Button disabled={executing} {tooltip} command={execute}>
-    {confirming ? confirmLabel : commandLabel}
-</Button>
+<div class="confirm">
+    {#if !confirming}
+        <Button {tooltip} command={() => (confirming = true)}><slot /></Button>
+    {:else}
+        <Button tooltip="yes" {command}>{confirm}</Button>
+        <Button tooltip="no" command={() => (confirming = false)}>no</Button>
+    {/if}
+</div>
+
+<style>
+    .confirm {
+        font-family: var(--app-font);
+        font-size: var(--app-chrome-font-size);
+        display: flex;
+        flex-direction: row;
+        flex-wrap: nowrap;
+        align-items: baseline;
+        gap: var(--app-chrome-padding);
+    }
+</style>

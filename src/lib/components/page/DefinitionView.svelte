@@ -81,14 +81,13 @@
                 >{/if}
             {#if editable}
                 <ConfirmButton
-                    tooltip="delete entry {definition.phrase}"
-                    commandLabel="- definition"
-                    confirmLabel="confirm"
+                    tooltip="delete definition of {definition.phrase}"
+                    confirm="remove definition?"
                     command={() =>
                         $edition
                             ? edition.set($edition.withoutDefinition(id))
-                            : undefined}
-                />
+                            : undefined}>- definition</ConfirmButton
+                >
             {/if}
         </dt>
 

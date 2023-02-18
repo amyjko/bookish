@@ -44,14 +44,14 @@
 
 {#if editable && !reference.short}
     <ConfirmButton
-        tooltip="delete reference {reference.title}"
-        commandLabel="- reference"
-        confirmLabel="Confirm"
+        tooltip="remove reference {reference.title}"
+        confirm="remove reference?"
         command={() =>
             $edition
                 ? edition.set($edition.withoutReference(reference.citationID))
-                : undefined}
-    />
+                : undefined}>- reference</ConfirmButton
+    >
+
     <Button
         tooltip="stop editing reference"
         command={() => (editing ? stopEditing() : startEditing())}

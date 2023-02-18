@@ -100,11 +100,10 @@
             >
         {:else}
             <ConfirmButton
-                commandLabel="- cover image"
-                confirmLabel="remove image?"
+                confirm="remove image?"
                 tooltip="remove cover image"
-                command={removeCover}
-            />
+                command={removeCover}>- cover image</ConfirmButton
+            >
         {/if}
     {/if}
     <div bind:this={title} class="bookish-chapter-header-text">

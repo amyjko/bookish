@@ -98,13 +98,12 @@
         {:else}
             <ConfirmButton
                 tooltip="change theme to the default"
-                commandLabel="- theme"
-                confirmLabel="delete your theme?"
+                confirm="delete your theme?"
                 command={() =>
                     $edition
                         ? edition.set($edition.withTheme(null))
-                        : undefined}
-            />
+                        : undefined}>- theme</ConfirmButton
+            >
         {/if}
 
         <ThemeEditorPreview {theme} />
