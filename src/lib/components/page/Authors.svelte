@@ -6,6 +6,7 @@
     import { getEdition } from './Contexts';
     import Note from '../editor/Note.svelte';
     import Button from '../app/Button.svelte';
+    import { tick } from 'svelte';
 
     export let editable: boolean;
     export let authors: string[];
@@ -17,33 +18,24 @@
     let edition = getEdition();
 
     let authorList: HTMLDivElement | null = null;
-    let newAuthor = false;
 
-    $: authorsToShow =
-        authors.length > 0
-            ? authors
-            : inheritedAuthors !== undefined && inheritedAuthors.length > 0
-            ? inheritedAuthors
-            : undefined;
+    $: showInherited = authors.length === 0 && inheritedAuthors !== undefined;
+    $: authorsToShow = showInherited ? inheritedAuthors : authors;
 
-    function addAuthor() {
+    async function addAuthor() {
         add();
-        newAuthor = true;
-    }
-
-    // When there's a new author, focus on it.
-    afterUpdate(() => {
-        if (authors.length > 0 && authorList && newAuthor) {
+        await tick();
+        if (authors.length > 0 && authorList) {
             const editors = authorList.querySelectorAll('input');
             if (editors.length > 0) {
                 const lastAuthor = editors[editors.length - 1];
-                if (lastAuthor instanceof HTMLElement) {
-                    lastAuthor.focus();
-                }
+                if (lastAuthor instanceof HTMLElement) lastAuthor.focus();
             }
-            newAuthor = false;
         }
-    });
+    }
+
+    // When there's a new author, focus on it.
+    afterUpdate(() => {});
 </script>
 
 <p class="bookish-authors" bind:this={authorList}>
@@ -53,33 +45,37 @@
     {:else}
         <em>by </em>
         {#each authorsToShow as author, index}
-            {#if editable}
-                <TextEditor
-                    text={author}
-                    label={'Author name editor'}
-                    placeholder="author"
-                    valid={() => undefined}
-                    save={(text) =>
-                        /* If text is already empty, remove */ author.length >
-                            0 && text === ''
-                            ? remove(index)
-                            : edit(index, text)}
-                />
+            {#if editable && !showInherited}
+                <span class="author-editor">
+                    <TextEditor
+                        text={author}
+                        label={'Author name editor'}
+                        placeholder="author"
+                        valid={() => undefined}
+                        save={(text) =>
+                            /* If text is already empty, remove */ author.length >
+                                0 && text === ''
+                                ? remove(index)
+                                : edit(index, text)}
+                    />
+                    <Button
+                        tooltip="remove this author"
+                        command={() => remove(index)}>⨉</Button
+                    >
+                </span>
             {:else}
                 <span
                     ><Format
                         node={Parser.parseFormat($edition, author)}
                     /></span
-                >
-            {/if}
-            {#if index < authors.length - 1},&nbsp{/if}
+                >{/if}{#if index < authorsToShow.length - 1},&nbsp{/if}
         {/each}
     {/if}
     {#if editable}
+        <Button tooltip="add author" command={addAuthor}>+ author</Button>
         {#if inheritedAuthors !== undefined && authors.length === 0}<Note
                 >(showing book authors)&nbsp;</Note
             >{/if}
-        <Button tooltip="add author" command={addAuthor}>+ author</Button>
     {/if}
 </p>
 
@@ -88,5 +84,9 @@
         font-family: var(--bookish-header-font-family);
         font-style: italic;
         margin: 0;
+    }
+
+    .author-editor {
+        display: inline-block;
     }
 </style>

@@ -25,7 +25,10 @@
         font-size: var(--app-chrome-font-size);
         color: var(--app-font-color);
         background-color: var(--app-chrome-background);
-        padding: var(--app-chrome-padding);
+        padding-left: var(--app-chrome-padding);
+        padding-right: var(--app-chrome-padding);
+        padding-top: calc(var(--app-chrome-padding) / 2);
+        padding-bottom: calc(var(--app-chrome-padding) / 2);
         border-radius: var(--app-chrome-roundedness);
         border: none;
     }
