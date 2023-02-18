@@ -15,7 +15,6 @@
         isBookEditable,
         isEditionEditable,
     } from './Contexts';
-    import Button from '../app/Button.svelte';
     import PageHeader from './PageHeader.svelte';
     import ConfirmButton from '../editor/ConfirmButton.svelte';
 
@@ -66,10 +65,10 @@
             />
         </Header>
         <Instructions {editable}>
-            These are a sequential index of the media in the book. You can use
-            this page to manage any images that are linked or uploaded for this
-            book. Note: images are shared between all editions, so if you delete
-            one not used in this edition, it might be used in others.
+            These are the images in the book, in order of appearance. You can
+            use this page to manage any images that are linked or uploaded for
+            this book. Note: images are shared between all editions, so if you
+            delete one not used in this edition, it might be used in others.
         </Instructions>
 
         {#if embeds.length === 0}
@@ -84,20 +83,18 @@
                         ? `${$base}/${embed.getSmallURL()}`
                         : embed.getSmallURL()}
                     alt={embed.getDescription() === ''
-                        ? 'no description, image not used'
+                        ? 'no description'
                         : embed.getDescription()}
                 >
-                    <span
-                        >{#if editable}{images &&
-                            images.find((i) => i.url === embed.getURL()) ===
-                                undefined
-                                ? 'linked'
-                                : 'uploaded'}{embed.getCredit().isEmptyText()
-                                ? ''
-                                : ' • '}{/if}<Format
-                            node={embed.getCredit()}
-                        /></span
-                    >
+                    {#if editable}{images &&
+                        images.find((i) => i.url === embed.getURL()) ===
+                            undefined
+                            ? embed.getURL().length === 0
+                                ? 'no url'
+                                : 'linked'
+                            : 'uploaded'}{embed.getCredit().isEmptyText()
+                            ? ''
+                            : ' • '}{/if}<Format node={embed.getCredit()} />
                 </MediaPreview>
             {/if}
         {/each}
