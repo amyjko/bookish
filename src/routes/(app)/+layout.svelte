@@ -187,7 +187,9 @@
         font-family: var(--app-font);
         font-size: 14pt;
         background-color: var(--app-background-color);
+    }
 
+    :global(:root) {
         /* Define some UI defaults not used in the Bookish theme. */
         --app-font: 'Outfit', sans-serif;
         --app-line-height: 1.7;
@@ -209,7 +211,7 @@
         --app-chrome-roundedness: 5px;
     }
 
-    :global(.dark) .bookish-app {
+    :global(.dark) {
         --app-interactive-color: #5f97ff;
         --app-background-color: #050505;
         --app-font-color: white;
@@ -218,6 +220,10 @@
         --app-muted-color: #a9a9a9;
         --app-error-color: rgb(80, 8, 8);
         --app-chrome-background: rgb(46, 46, 46);
+    }
+
+    :global(body) {
+        background-color: var(--app-background-color) !important;
     }
 
     :global(.firebase-emulator-warning) {

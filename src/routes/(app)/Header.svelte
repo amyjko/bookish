@@ -23,7 +23,6 @@
 
 <section class="header">
     <nav class="navigation">
-        <Link to="/about"><small>beta</small></Link>
         <Link to="/" title="Home"><Icon icon={HomeIcon} /></Link>
         {#if $book && $edition}
             <span class="elided"
@@ -50,6 +49,7 @@
                 {:else}
                     <Link to="/login">Login</Link>
                 {/if}
+                <Link to="/about">(beta)</Link>
                 <Status />
             </span>
         {:else}
@@ -62,6 +62,7 @@
                 {:else}
                     <Link to="/login">Login</Link>
                 {/if}
+                <Link to="/about">(beta)</Link>
             </small>
             <div class="controls">
                 <DarkToggle dark={isDark()} toggle={() => setDark(!isDark())} />
