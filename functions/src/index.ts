@@ -576,3 +576,28 @@ async function completeEdition(
 
     return editionJSON;
 }
+
+export const backup = functions.pubsub
+    .schedule('every 24 hours')
+    .onRun(async (context) => {
+        const client = new admin.firestore.v1.FirestoreAdminClient({});
+        const projectID = process.env.GCP_PROJECT || process.env.GCLOUD_PROJECT;
+        if (projectID === undefined) {
+            console.log('Skipping backup, no project ID.');
+            return;
+        }
+
+        // Get the default bucket
+        const bucket = admin.storage().bucket();
+
+        // Get the project default database
+        const database = client.databasePath(projectID, '(default)');
+        console.log('Exporting database');
+        // Export the documents to the default bucket, in a backup folder, with the timestamp of the scheduled event.
+        await client.exportDocuments({
+            name: database,
+            outputUriPrefix: `gs://${bucket.name}/backup/${context.timestamp}`,
+            collectionIds: [],
+        });
+        console.log('Done exporting database');
+    });
