@@ -38,7 +38,6 @@
     import Title from './Title.svelte';
     import PageHeader from './PageHeader.svelte';
     import Permissions from '../editor/Permissions.svelte';
-    import Note from '../editor/Note.svelte';
 
     export let chapter: ChapterModel;
     export let print: boolean = false;
@@ -50,12 +49,6 @@
     // Keep track of the scroll position to facilitate reading during reloads.
     function rememberPosition() {
         localStorage.setItem('scrollposition', '' + window.scrollY);
-    }
-
-    // When the window resizes, the responsive layout might cause the marginals to move to the footer.
-    // when this happens, we want to immediately remove all of the explicit positioning.
-    function handleResize() {
-        layoutMarginals();
     }
 
     // The currently selected marginal; we only do one at a time.
@@ -99,7 +92,11 @@
 
         // Lay things out when the window or scroll changes.
         window.addEventListener('scroll', handleScroll);
-        window.addEventListener('resize', handleResize);
+
+        // When the chapter view resizes, the responsive layout might cause the marginals to move to the footer.
+        // when this happens, we want to immediately remove all of the explicit positioning.
+        const resize = new ResizeObserver(() => layoutMarginals());
+        resize.observe(document.body);
 
         // Remember the scroll position before a refresh.
         // We have to do all of these because browser support varies.
@@ -141,7 +138,7 @@
         // On cleanup, unsubscribe from everything above.
         return () => {
             window.removeEventListener('scroll', handleScroll);
-            window.removeEventListener('resize', handleResize);
+            resize.unobserve(document.body);
 
             // Stop listening to page visibility changes.
             window.removeEventListener('beforeunload', rememberPosition);
