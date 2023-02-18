@@ -61,6 +61,7 @@
                 {/if}
             </small>
         {/if}
+        <Link to="/about"><small>beta</small></Link>
     </nav>
     {#if $caret}
         <Toolbar caret={$caret} />
