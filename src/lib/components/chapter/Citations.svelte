@@ -75,7 +75,7 @@
                                 <sup class="bookish-citation-symbol"
                                     >{citationNumber}</sup
                                 >
-                                <PossibleReference node={ref} />
+                                <PossibleReference node={ref} edit={false} />
                             </span>
                         {/if}
                     {/each}

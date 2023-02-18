@@ -403,7 +403,7 @@
                             class={'bookish-reference'}
                             id={'ref-' + citationID}
                         >
-                            <PossibleReference node={refs[citationID]} />
+                            <PossibleReference node={refs[citationID]} edit />
                         </li>
                     {:else}
                         <li

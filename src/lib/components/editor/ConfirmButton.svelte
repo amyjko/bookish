@@ -12,8 +12,8 @@
     {#if !confirming}
         <Button {tooltip} command={() => (confirming = true)}><slot /></Button>
     {:else}
-        <Button tooltip="yes" {command}>{confirm}</Button>
-        <Button tooltip="no" command={() => (confirming = false)}>no</Button>
+        <Button tooltip="no" command={() => (confirming = false)}>no</Button
+        >&nbsp;<Button tooltip="yes" {command}>{confirm}</Button>
     {/if}
 </div>
 
@@ -21,10 +21,6 @@
     .confirm {
         font-family: var(--app-font);
         font-size: var(--app-chrome-font-size);
-        display: flex;
-        flex-direction: row;
-        flex-wrap: nowrap;
-        align-items: baseline;
-        gap: var(--app-chrome-padding);
+        display: inline-block;
     }
 </style>

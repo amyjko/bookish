@@ -11,6 +11,7 @@
     import Note from '../editor/Note.svelte';
 
     export let reference: Reference;
+    export let edit: boolean = false;
 
     let editable = isEditionEditable();
     let edition = getEdition();
@@ -42,22 +43,6 @@
     }
 </script>
 
-{#if editable && !reference.short}
-    <ConfirmButton
-        tooltip="remove reference {reference.title}"
-        confirm="remove reference?"
-        command={() =>
-            $edition
-                ? edition.set($edition.withoutReference(reference.citationID))
-                : undefined}>- reference</ConfirmButton
-    >
-
-    <Button
-        tooltip="stop editing reference"
-        command={() => (editing ? stopEditing() : startEditing())}
-        >{editing ? 'done' : 'edit'}</Button
-    >
-{/if}
 <!-- If a short version was requested, try to abbreviate the authors. -->
 {#if reference.short}
     {@const authorList = reference.authors.split(',')}
@@ -78,22 +63,7 @@
         {reference.title.charAt(reference.title.length - 1) === '?' ? '' : '.'}
         <em>{reference.source}</em>
     </p>
-{:else if !editable || !editing}
-    <!-- If not editable, just render the reference. -->
-    <p class="reference">
-        {#if reference.authors}{reference.authors}{:else}<em>Authors</em>{/if}
-        {#if reference.year}({reference.year}){:else}<em>Year</em>{/if}. {#if reference.url === null || reference.url.length === 0}{#if reference.title}{reference.title}{:else}<em
-                    >Title</em
-                >{/if}{:else}<Link to={reference.url}
-                >{#if reference.title}{reference.title}{:else}<em>Title</em
-                    >{/if}</Link
-            >{/if}.<em
-            >&nbsp;{#if reference.source}{reference.source}{:else}Source{/if}</em
-        >.
-        {#if reference.summary}<aside class="summary">{reference.summary}</aside
-            >{/if}
-    </p>
-{:else}
+{:else if editable && edit && editing}
     <!-- If editable, place in rows to make room for text editors to not have to wrap. -->
     <Table>
         <!-- CitationID -->
@@ -269,13 +239,47 @@
             </td>
         </tr>
     </Table>
+{:else}
+    <!-- If not editable, just render the reference. -->
+    <p class="reference">
+        {#if reference.authors}{reference.authors}{:else}<em>Authors</em>{/if}
+        {#if reference.year}({reference.year}){:else}<em>Year</em>{/if}. {#if reference.url === null || reference.url.length === 0}{#if reference.title}{reference.title}{:else}<em
+                    >Title</em
+                >{/if}{:else}<Link to={reference.url}
+                >{#if reference.title}{reference.title}{:else}<em>Title</em
+                    >{/if}</Link
+            >{/if}.<em
+            >&nbsp;{#if reference.source}{reference.source}{:else}Source{/if}</em
+        >.
+        {#if reference.summary}<aside class="summary">{reference.summary}</aside
+            >{/if}
+    </p>
+{/if}
+{#if edit && editable && !reference.short}
+    <ConfirmButton
+        tooltip="delete reference {reference.title}"
+        confirm="delete reference..."
+        command={() =>
+            $edition
+                ? edition.set($edition.withoutReference(reference.citationID))
+                : undefined}>⨉</ConfirmButton
+    >
+    <Button
+        tooltip="stop editing reference"
+        command={() => (editing ? stopEditing() : startEditing())}
+        >{editing ? 'done' : 'edit'}</Button
+    >
 {/if}
 
 <style>
     .reference {
         line-height: var(--bookish-paragraph-line-height-tight);
         margin-top: 0;
-        margin-bottom: var(--bookish-header-spacing);
+    }
+
+    p {
+        margin-top: 0;
+        margin-bottom: 0;
     }
 
     .reference .summary {

@@ -50,7 +50,7 @@
             <p><em>Sorted by last name of first author.</em></p>
 
             {#each Object.keys(references).sort() as citationID (citationID)}
-                <PossibleReference node={references[citationID]} />
+                <PossibleReference node={references[citationID]} edit />
             {/each}
         {:else}
             <p>This book has no references.</p>
