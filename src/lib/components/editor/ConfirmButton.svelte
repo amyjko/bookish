@@ -35,17 +35,6 @@
     }
 </script>
 
-<Button
-    disabled={executing}
-    {tooltip}
-    command={execute}
-    class={confirming ? 'bookish-editor-confirm' : ''}
->
+<Button disabled={executing} {tooltip} command={execute}>
     {confirming ? confirmLabel : commandLabel}
 </Button>
-
-<style>
-    :global(bookish-editor-confirm) {
-        animation: failure 100ms infinite;
-    }
-</style>

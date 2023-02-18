@@ -7,6 +7,7 @@
     import TextEditor from '$lib/components/editor/TextEditor.svelte';
     import { getUser, getEdition, getLeasee, lease } from './Contexts';
     import Button from '../app/Button.svelte';
+    import ConfirmButton from '../editor/ConfirmButton.svelte';
 
     /** True if an author should be able to edit this header. */
     export let editable: boolean;
@@ -98,9 +99,12 @@
                 >+ cover image</Button
             >
         {:else}
-            <Button tooltip="remove cover image" command={removeCover}
-                >- cover image</Button
-            >
+            <ConfirmButton
+                commandLabel="- cover image"
+                confirmLabel="remove image?"
+                tooltip="remove cover image"
+                command={removeCover}
+            />
         {/if}
     {/if}
     <div bind:this={title} class="bookish-chapter-header-text">
