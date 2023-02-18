@@ -288,7 +288,7 @@
         align-items: baseline;
         font-family: var(--app-font);
         font-size: var(--app-chrome-font-size);
-        row-gap: var(--app-chrome-padding);
+        row-gap: calc(2 * var(--app-chrome-padding));
     }
 
     .bookish-editor-toolbar:focus {
