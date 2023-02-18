@@ -199,7 +199,7 @@
         --app-font-color: black;
         --app-border-color: #444444;
         --app-font-color-inverted: #ffffff;
-        --app-muted-color: #aaaaaa;
+        --app-muted-color: #989898;
         --app-error-color: rgb(191, 15, 15);
 
         --app-chrome-background: rgb(244, 244, 244);
