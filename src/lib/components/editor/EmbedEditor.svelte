@@ -44,7 +44,7 @@
             (progress: number) => (upload = `${progress}% done`),
             (error: string) => (upload = error),
             (url: string, thumbnail: string) => {
-                // Upload completed successfully, now we can get the download URL
+                // Upload completed successfully, update the front end.
                 $caret?.edit(
                     embed,
                     embed.withURLs(url, thumbnail).withDescription('')

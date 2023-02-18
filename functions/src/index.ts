@@ -5,8 +5,9 @@ import path from 'path';
 import os from 'os';
 import fs from 'fs';
 import { EditionSpecification } from 'bookish-press/models/book/Edition';
-import { spawn } from 'child_process';
+// import { spawn } from 'child_process';
 import { BookSpecification } from 'bookish-press/models/book/Book';
+import sharp from 'sharp';
 
 admin.initializeApp();
 
@@ -17,43 +18,38 @@ function getThumbnailPath(filePath: string) {
 }
 
 async function resizeImage(
-    filePath: string,
+    storagePath: string,
     bucketID: string,
     contentType: string | undefined
 ) {
-    const fileName = path.basename(filePath);
+    const storageFileName = path.basename(storagePath);
 
     // Download file from bucket into a temporary location.
     const bucket = admin.storage().bucket(bucketID);
-    const tempFilePath = path.join(os.tmpdir(), fileName);
-    console.log('Downloading image to', tempFilePath);
+    const downloadedImagePath = path.join(os.tmpdir(), storageFileName);
+    console.log('Downloading image to', downloadedImagePath);
+    await bucket
+        .file(storagePath)
+        .download({ destination: downloadedImagePath });
 
-    await bucket.file(filePath).download({ destination: tempFilePath });
-
-    // Generate a thumbnail using ImageMagick, which is installed by default in Google Cloud.
-    // Note: to test locally, ImageMagick has to be installed locally.
-    // If you're getting "Error: spawn convert ENOENT" when using the emu.ator, it's because it's not
-    // installed locally. On mac OS, "brew install imagemagick" should suffice.
-    console.log('Resizing downloaded image...');
-    await execute('convert', [
-        tempFilePath,
-        '-thumbnail',
-        '320x320>',
-        tempFilePath,
-    ]);
-
-    const thumbFilePath = getThumbnailPath(filePath);
-
-    console.log('Uploading resized image to ', thumbFilePath);
+    console.log('Resize the image...');
+    const resizedImagePath = `${downloadedImagePath}-small`;
+    try {
+        // Save over the original image
+        await sharp(downloadedImagePath).resize(320).toFile(resizedImagePath);
+    } catch (err) {
+        console.log(`Unable to save resized image: ${err}`);
+        return;
+    }
 
     // Uploading the thumbnail.
-    await bucket.upload(tempFilePath, {
-        destination: thumbFilePath,
+    await bucket.upload(resizedImagePath, {
+        destination: getThumbnailPath(storagePath),
         metadata: { contentType: contentType },
     });
 
-    // Once the thumbnail has been uploaded delete the local file to free up disk space.
-    fs.unlinkSync(tempFilePath);
+    // Once the thumbnail has been uploaded delete the local file, just to keep /tmp clean.
+    fs.unlinkSync(downloadedImagePath);
 
     return;
 }
@@ -317,33 +313,33 @@ export const createUserWithEmail = functions.https.onCall(
 //     });
 
 /** Turn spawn into a promise for comprehensibility */
-async function execute(cmd: string, args: ReadonlyArray<string>) {
-    return new Promise<string>((resolve, reject) => {
-        try {
-            console.log(`Executing ${cmd} ${args.join(' ')}...`);
-            const process = spawn(cmd, args, { stdio: 'inherit' });
-            const error: string[] = [];
-            const stdout: string[] = [];
-            // Save each bit of standard output that comes out.
-            // process.stdout.on('data', (data) => {
-            //     stdout.push(data.toString());
-            // });
+// async function execute(cmd: string, args: ReadonlyArray<string>) {
+//     return new Promise<string>((resolve, reject) => {
+//         try {
+//             console.log(`Executing ${cmd} ${args.join(' ')}...`);
+//             const process = spawn(cmd, args, { stdio: 'inherit' });
+//             const error: string[] = [];
+//             const stdout: string[] = [];
+//             // Save each bit of standard output that comes out.
+//             // process.stdout.on('data', (data) => {
+//             //     stdout.push(data.toString());
+//             // });
 
-            // // Save the errors that come
-            // process.on('error', (e) => {
-            //     error.push(e.toString());
-            // });
+//             // // Save the errors that come
+//             // process.on('error', (e) => {
+//             //     error.push(e.toString());
+//             // });
 
-            // When the process closes, resolve with the output or errors.
-            process.on('close', () => {
-                if (error.length) reject(error.join(''));
-                else resolve(stdout.join(''));
-            });
-        } catch (error) {
-            reject('' + error);
-        }
-    });
-}
+//             // When the process closes, resolve with the output or errors.
+//             process.on('close', () => {
+//                 if (error.length) reject(error.join(''));
+//                 else resolve(stdout.join(''));
+//             });
+//         } catch (error) {
+//             reject('' + error);
+//         }
+//     });
+// }
 
 /**
  * Provide the book/edition requested. This is an expensive operation and likely to return the same content
@@ -581,7 +577,7 @@ export const backup = functions.pubsub
     .schedule('every 24 hours')
     .onRun(async (context) => {
         const client = new admin.firestore.v1.FirestoreAdminClient({});
-        const projectID = process.env.GCP_PROJECT || process.env.GCLOUD_PROJECT;
+        const projectID = getProjectID();
         if (projectID === undefined) {
             console.log('Skipping backup, no project ID.');
             return;
@@ -601,3 +597,7 @@ export const backup = functions.pubsub
         });
         console.log('Done exporting database');
     });
+
+function getProjectID() {
+    return process.env.GCP_PROJECT || process.env.GCLOUD_PROJECT;
+}

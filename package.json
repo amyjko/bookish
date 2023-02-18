@@ -14,7 +14,7 @@
         "build": "npm run env && vite build",
         "//emu": "echo 'This copies the local .env file and starts the emulator'",
         "emu": "npm run env && firebase emulators:start",
-        "pacnkage": "svelte-package --watch",
+        "package": "svelte-package --watch",
         "test": "vitest",
         "check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch",
         "//env": "echo 'This copies the .env file corresponding to the current Firebase project specified with firebase use, defaulting to local'",

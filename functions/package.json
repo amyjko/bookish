@@ -19,10 +19,12 @@
         "@google-cloud/storage": "^6.9.2",
         "bookish-press": "latest",
         "firebase-admin": "^11.5.0",
-        "firebase-functions": "^4.2.1"
+        "firebase-functions": "^4.2.1",
+        "sharp": "^0.31.3"
     },
     "devDependencies": {
         "@types/node": "^18.13.0",
+        "@types/sharp": "^0.31.1",
         "@typescript-eslint/eslint-plugin": "^5.51.0",
         "@typescript-eslint/parser": "^5.51.0",
         "eslint": "^8.34.0",

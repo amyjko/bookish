@@ -33,10 +33,10 @@ export const app = isReader
           appId: PUBLIC_FIREBASE_APP_ID,
       });
 
-export const auth = isReader ? undefined : getAuth();
+export const auth = isReader ? undefined : getAuth(app);
 export const db = isReader ? undefined : getFirestore();
-export const storage = isReader ? undefined : getStorage();
-export const functions = isReader ? undefined : getFunctions();
+export const storage = isReader ? undefined : getStorage(app);
+export const functions = isReader ? undefined : getFunctions(app);
 
 if (!isReader && PUBLIC_CONTEXT === 'local') {
     if (db) connectFirestoreEmulator(db, 'localhost', 8080);

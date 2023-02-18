@@ -98,7 +98,7 @@ export default class BookMedia {
             // Try again in a bit.
             .catch(() =>
                 attempt > 25
-                    ? error("Couldn't get the image URL. Connection issues?")
+                    ? error("Couldn't get the image's thumbnail URL")
                     : setTimeout(
                           () =>
                               this.getThumbnailURL(
@@ -108,19 +108,17 @@ export default class BookMedia {
                                   finished,
                                   attempt + 1
                               ),
-                          250
+                          100
                       )
             );
     }
 
     upload(
         file: File,
-        progressHandler: (progress: number) => void,
+        _: (progress: number) => void,
         errorHandler: (message: string) => void,
         finishedHandler: (url: string, thumbnailURL: string) => void
     ) {
-        progressHandler;
-
         if (storage === undefined) return;
 
         // The canonical path format for Bookish images in the store is image/{bookid}/{imageid}
@@ -135,22 +133,20 @@ export default class BookMedia {
         uploadBytes(imageRef, file)
             .then((snapshot) => {
                 getDownloadURL(snapshot.ref)
-                    .then((url) => {
-                        // Give some time for the cloud function to create a thumbnail, then try to get it's URL.
-                        setTimeout(
-                            () =>
-                                this.getThumbnailURL(
-                                    url,
-                                    thumbnailRef,
-                                    errorHandler,
-                                    finishedHandler
-                                ),
-                            250
-                        );
-                    })
+                    // After we get the download URL for the uploaded image,
+                    // try to get the thumbnail URL for the resized image on the server.
+                    .then((url) =>
+                        this.getThumbnailURL(
+                            url,
+                            thumbnailRef,
+                            errorHandler,
+                            finishedHandler
+                        )
+                    )
                     .catch(() => errorHandler('Unable to get image URL.'));
             })
-            .then(() => this.cacheImages());
+            .then(() => this.cacheImages())
+            .catch(() => errorHandler('Unable to upload image.'));
 
         // This seems to be broken in Firebase right now. Switched above to a no-feedback approach.
         // const uploadTask = uploadBytesResumable(imageRef, file);
