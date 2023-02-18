@@ -44,7 +44,7 @@
     }
 </script>
 
-{#if theme && $edition}
+{#if $edition}
     <Page title={`${$edition?.getTitle()} - Theme`}>
         <Header
             editable={isEditionEditable()}
