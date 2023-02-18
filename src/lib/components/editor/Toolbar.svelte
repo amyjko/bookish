@@ -273,7 +273,7 @@
         {:else if quoteNode}<ToolbarGroup icon={QuoteIcon}
                 ><QuoteEditor quote={quoteNode} /></ToolbarGroup
             >
-        {:else if embedNode}<ToolbarGroup icon={MediaIcon}
+        {:else if embedNode}<span class="break" /><ToolbarGroup icon={MediaIcon}
                 ><EmbedEditor embed={embedNode} /></ToolbarGroup
             >
         {/if}
@@ -288,7 +288,13 @@
         align-items: baseline;
         font-family: var(--app-font);
         font-size: var(--app-chrome-font-size);
-        row-gap: calc(2 * var(--app-chrome-padding));
+        row-gap: var(--app-chrome-padding);
+        justify-content: left;
+    }
+
+    .break {
+        flex-basis: 100%;
+        height: 0;
     }
 
     .bookish-editor-toolbar:focus {
