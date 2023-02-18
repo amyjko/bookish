@@ -34,9 +34,7 @@
 
 <Lead><Large>Login</Large> to write.</Lead>
 
-<Paragraph>
-    We'll send you an email each time to login, no password required.
-</Paragraph>
+<Paragraph>No password required to create an account or login.</Paragraph>
 
 <form on:submit|preventDefault={handleSubmit}>
     <TextInput

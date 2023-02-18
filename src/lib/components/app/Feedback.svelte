@@ -1,22 +1,13 @@
 <script lang="ts">
-    import { onMount } from 'svelte';
     import Large from './Large.svelte';
 
     export let error: boolean = false;
-
-    let visible = error;
-
-    onMount(() => {
-        setTimeout(() => (visible = true), 1000);
-    });
 </script>
 
-{#if visible}
-    {#if error}
-        <p role="alert"><slot /></p>
-    {:else}
-        <p role="status" aria-live="polite"><Large><slot /></Large></p>
-    {/if}
+{#if error}
+    <p role="alert"><slot /></p>
+{:else}
+    <p role="status" aria-live="polite"><Large><slot /></Large></p>
 {/if}
 
 <style>
@@ -34,18 +25,18 @@
 
     p[role='status'] {
         color: var(--app-font-color);
-        animation: waiting 1s infinite;
+        /* animation: waiting 1s 1; */
     }
 
     @keyframes waiting {
         0% {
-            transform: rotate(2deg);
+            transform: rotate(1deg);
         }
         50% {
-            transform: rotate(-2deg);
+            transform: rotate(-1deg);
         }
         100% {
-            transform: rotate(2deg);
+            transform: rotate(1deg);
         }
     }
 </style>
