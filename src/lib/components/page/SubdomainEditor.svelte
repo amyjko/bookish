@@ -29,7 +29,7 @@
                     else throw Error("Domain isn't available");
                 }
             }}
-            placeholder="book id"
+            placeholder="book link name (e.g., bookish.press/name)"
             valid={(newDomain) =>
                 // If not the empty string, must be a valid URL subdomain, and none of the existing routes.
                 invalidNames.includes(newDomain) ||
