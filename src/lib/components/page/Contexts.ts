@@ -15,6 +15,8 @@ import type ChapterContext from './ChapterContext';
 import { page } from '$app/stores';
 import { updateLock } from '../../models/CRUD';
 import type { DocumentReference } from 'firebase/firestore';
+import type RootNode from '../../models/chapter/RootNode';
+import type ChapterNode from '../../models/chapter/ChapterNode';
 
 export type DarkModeStore = Writable<boolean>;
 export const DARK_MODE = Symbol('dark');
@@ -51,6 +53,12 @@ export type ChapterStore = Writable<ChapterContext>;
 export const CHAPTER = Symbol('chapter');
 export function getChapter() {
     return getContext<ChapterStore>(CHAPTER);
+}
+
+export type RootStore = Writable<ChapterNode>;
+export const ROOT = Symbol('root');
+export function getRoot() {
+    return getContext<RootStore>(ROOT);
 }
 
 /**

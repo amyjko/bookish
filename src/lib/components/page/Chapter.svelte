@@ -232,11 +232,11 @@
     let chapterStore = writable<ChapterContext>();
     setContext<ChapterStore>(CHAPTER, chapterStore);
     $: chapterStore.set({
-        chapter: chapter,
+        chapter,
         highlightedWord: getHighlightedWord(),
-        highlightedID: highlightedID,
-        marginal: marginal,
-        layoutMarginals: layoutMarginals,
+        highlightedID,
+        marginal,
+        layoutMarginals,
     });
 
     let editable =

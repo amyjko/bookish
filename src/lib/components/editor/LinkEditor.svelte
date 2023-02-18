@@ -1,7 +1,7 @@
 <script lang="ts">
     import type LinkNode from '$lib/models/chapter/LinkNode';
     import URLEditor from './URLEditor.svelte';
-    import { getChapter, getEdition } from '../page/Contexts';
+    import { getChapter, getEdition, getRoot } from '../page/Contexts';
     import Icon from './Icon.svelte';
     import Button from '../app/Button.svelte';
     import UnlinkIcon from './icons/unlink.svg?raw';
@@ -14,6 +14,7 @@
     let edition = getEdition();
 
     let chapter = getChapter();
+    let root = getRoot();
 
     $: url = link.getMeta();
 
@@ -46,8 +47,8 @@
 
         // The chapter ID is optional; if it's missing, it refers to this chapter.
         const correspondingChapter =
-            chapterID === '' && $chapter
-                ? $chapter.chapter.getAST($edition)
+            chapterID === ''
+                ? $root
                 : $edition?.getChapter(chapterID)?.getAST($edition);
         if (correspondingChapter === undefined)
             return 'Not a valid URL or chapter.';

@@ -9,6 +9,7 @@
         getChapter,
         getEdition,
         getCaret,
+        getRoot,
     } from '$lib/components/page/Contexts';
     import { afterUpdate } from 'svelte';
 
@@ -19,19 +20,17 @@
 
     let chapter = getChapter();
     let edition = getEdition();
+    let root = getRoot();
 
     // What footnote number is this?
-    $: ast =
-        $edition && $chapter ? $chapter.chapter.getAST($edition) : undefined;
-    $: number = ast?.getFootnotes().indexOf(node);
+    $: number = $root.getFootnotes().indexOf(node);
     $: letter =
         number === undefined ? undefined : $edition?.getFootnoteSymbol(number);
 
     $: focused =
-        ast &&
         $caret &&
         $caret.range &&
-        $caret.range.start.node.hasAncestor(ast, node);
+        $caret.range.start.node.hasAncestor($root, node);
 
     // Position the marginals on every render.
     afterUpdate(() => $chapter?.layoutMarginals());

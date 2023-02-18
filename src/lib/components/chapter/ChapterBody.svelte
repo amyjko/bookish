@@ -3,6 +3,9 @@
 <script lang="ts">
     import type ChapterNode from '$lib/models/chapter/ChapterNode';
     import ParagraphNode from '$lib/models/chapter/ParagraphNode';
+    import { writable } from 'svelte/store';
+    import { setContext } from 'svelte';
+    import { ROOT } from '../page/Contexts';
     import Block from './Block.svelte';
     import Paragraph from './Paragraph.svelte';
     import Problem from './Problem.svelte';
@@ -13,6 +16,11 @@
 
     $: errors = node.getErrors();
     $: blocks = node.getBlocks();
+
+    // Make this chapter node available to all children in a reactive store.
+    let root = writable<ChapterNode>(node);
+    setContext(ROOT, root);
+    $: root.set(node);
 </script>
 
 <section class="bookish-chapter-body" data-nodeid={node.nodeID}>

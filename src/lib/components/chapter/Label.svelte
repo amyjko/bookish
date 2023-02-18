@@ -3,25 +3,19 @@
 <script lang="ts">
     import type LabelNode from '$lib/models/chapter/LabelNode';
     import Atom from '$lib/components/chapter/Atom.svelte';
-    import {
-        getChapter,
-        getEdition,
-        isChapterEditable,
-    } from '../page/Contexts';
+    import { getChapter, getRoot, isChapterEditable } from '../page/Contexts';
     import Problem from './Problem.svelte';
 
     export let node: LabelNode;
 
     let editable = isChapterEditable();
     let chapter = getChapter();
-    let edition = getEdition();
+    let root = getRoot();
 
-    $: ast =
-        $edition && $chapter ? $chapter.chapter.getAST($edition) : undefined;
     $: duplicate =
-        ast === undefined
+        $root === undefined
             ? false
-            : ast.getLabels().filter((l) => l.getMeta() === node.getMeta())
+            : $root.getLabels().filter((l) => l.getMeta() === node.getMeta())
                   .length > 1;
 </script>
 

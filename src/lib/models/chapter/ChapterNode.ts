@@ -34,8 +34,8 @@ export default class ChapterNode extends BlocksNode {
 
     getErrors(): ErrorNode[] {
         return this.getNodes().filter(
-            (n) => n instanceof ErrorNode
-        ) as ErrorNode[];
+            (n): n is ErrorNode => n instanceof ErrorNode
+        );
     }
     getCitations(): Set<string> {
         const citations = new Set<string>();
@@ -50,29 +50,30 @@ export default class ChapterNode extends BlocksNode {
     }
     getFootnotes(): FootnoteNode[] {
         return this.getNodes().filter(
-            (n) => n instanceof FootnoteNode
-        ) as FootnoteNode[];
+            (n): n is FootnoteNode => n instanceof FootnoteNode
+        );
     }
     getHeaders(): ParagraphNode[] {
         return this.getNodes().filter(
-            (n) => n instanceof ParagraphNode && n.getLevel() > 0
-        ) as ParagraphNode[];
+            (n): n is ParagraphNode =>
+                n instanceof ParagraphNode && n.getLevel() > 0
+        );
     }
     getEmbeds(): EmbedNode[] {
         return this.getNodes().filter(
-            (n) => n instanceof EmbedNode
-        ) as EmbedNode[];
+            (n): n is EmbedNode => n instanceof EmbedNode
+        );
     }
     getComments(): CommentNode[] {
         return this.getNodes().filter(
-            (n) => n instanceof CommentNode
-        ) as CommentNode[];
+            (n): n is CommentNode => n instanceof CommentNode
+        );
     }
 
     getLabels(): LabelNode[] {
         return this.getNodes().filter(
-            (n) => n instanceof LabelNode
-        ) as LabelNode[];
+            (n): n is LabelNode => n instanceof LabelNode
+        );
     }
 
     hasLabel(labelID: string) {

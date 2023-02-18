@@ -10,6 +10,7 @@
         isChapterEditable,
         getCaret,
         getEdition,
+        getRoot,
     } from '$lib/components/page/Contexts';
     import { afterUpdate } from 'svelte';
     import Icon from '../editor/Icon.svelte';
@@ -20,11 +21,10 @@
     let chapter = getChapter();
     let edition = getEdition();
     let editable = isChapterEditable();
+    let root = getRoot();
 
     let caret = getCaret();
 
-    $: chapterNode =
-        $edition && $chapter ? $chapter.chapter.getAST($edition) : undefined;
     $: focused =
         $caret && $caret.range && node.contains($caret.range.start.node);
 
@@ -37,9 +37,7 @@
         <Marginal
             {node}
             id={'comment-' +
-                (chapterNode === undefined
-                    ? '?'
-                    : chapterNode.getComments().indexOf(node))}
+                ($root === undefined ? '?' : $root.getComments().indexOf(node))}
             label="comment, escape to edit"
         >
             <span slot="interactor" class="bookish-comment-symbol">

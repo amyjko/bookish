@@ -2,11 +2,10 @@
 
 <script lang="ts">
     import Marginal from './Marginal.svelte';
-    import Parser from '$lib/models/chapter/Parser';
     import type CitationsNode from '$lib/models/chapter/CitationsNode';
     import Problem from './Problem.svelte';
     import Atom from './Atom.svelte';
-    import { getChapter, getEdition } from '../page/Contexts';
+    import { getChapter, getEdition, getRoot } from '../page/Contexts';
     import PossibleReference from '../page/PossibleReference.svelte';
     import { afterUpdate } from 'svelte';
 
@@ -14,15 +13,13 @@
 
     let chapter = getChapter();
     let edition = getEdition();
-
-    $: ast =
-        $edition && $chapter ? $chapter.chapter.getAST($edition) : undefined;
+    let root = getRoot();
 
     // Sort citations numerically, however they're numbered.
     $: citations = node.getMeta().sort((a, b) => {
-        if (ast === undefined) return 0;
-        let aNumber = ast.getCitationNumber(a);
-        let bNumber = ast.getCitationNumber(b);
+        if ($root === undefined) return 0;
+        let aNumber = $root.getCitationNumber(a);
+        let bNumber = $root.getCitationNumber(b);
         if (aNumber === null) {
             if (bNumber === null) return 0;
             else return 1;
@@ -37,7 +34,7 @@
 </script>
 
 <Atom {node}>
-    {#if ast}
+    {#if $root}
         <span class="bookish-citation" data-nodeid={node.nodeID}>
             <Marginal
                 {node}
@@ -47,7 +44,7 @@
                 <svelte:fragment slot="interactor">
                     {#each citations as citationID, index}
                         {@const citationNumber =
-                            ast?.getCitationNumber(citationID)}
+                            $root.getCitationNumber(citationID)}
                         {#if citationNumber && citationID in ($edition?.getReferences() ?? {})}
                             <sup class="bookish-citation-symbol"
                                 >{citationNumber}</sup
@@ -68,7 +65,7 @@
                 <span slot="content" class="bookish-references">
                     {#each citations as citationID}
                         {@const citationNumber =
-                            ast?.getCitationNumber(citationID)}
+                            $root.getCitationNumber(citationID)}
                         {@const ref = $edition?.getReference(citationID)}
                         {#if citationNumber && ref && $edition}
                             <span class="bookish-reference">

@@ -1,7 +1,6 @@
 <script lang="ts">
     import BookishNode from '$lib/models/chapter/Node';
     import ChapterNode from '$lib/models/chapter/ChapterNode';
-    import Parser from '$lib/models/chapter/Parser';
     import LinkNode from '$lib/models/chapter/LinkNode';
     import ParagraphNode from '$lib/models/chapter/ParagraphNode';
     import TextNode from '$lib/models/chapter/TextNode';
@@ -35,8 +34,9 @@
 
     import { afterUpdate, onMount, setContext } from 'svelte';
     import type { PasteContent } from './CaretContext';
-    import { getCaret } from '../page/Contexts';
+    import { getCaret, getRoot } from '../page/Contexts';
     import CaretView from './CaretView.svelte';
+    import { writable } from 'svelte/store';
 
     const IDLE_TIME = 500;
 
