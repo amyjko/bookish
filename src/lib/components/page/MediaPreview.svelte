@@ -11,7 +11,7 @@
 <style>
     .media-preview {
         display: inline-block;
-        width: 10rem;
+        width: 12rem;
         margin: 1em;
         vertical-align: bottom;
     }

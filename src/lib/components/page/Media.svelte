@@ -17,6 +17,7 @@
     } from './Contexts';
     import Button from '../app/Button.svelte';
     import PageHeader from './PageHeader.svelte';
+    import ConfirmButton from '../editor/ConfirmButton.svelte';
 
     let book = getBook();
     let edition = getEdition();
@@ -109,15 +110,15 @@
             </Instructions>
             {#each unused as image}
                 <MediaPreview url={image.url} alt={''}>
-                    <span
-                        >uploaded <Button
-                            tooltip="delete unused image"
-                            command={() =>
-                                media
-                                    ?.remove(image)
-                                    .then((images) => updateImages(images))}
-                            >- image</Button
-                        ></span
+                    uploaded
+                    <ConfirmButton
+                        tooltip="delete unused image"
+                        confirm="delete image?"
+                        command={() =>
+                            media
+                                ?.remove(image)
+                                .then((images) => updateImages(images))}
+                        >⨉ image</ConfirmButton
                     >
                 </MediaPreview>
             {/each}
