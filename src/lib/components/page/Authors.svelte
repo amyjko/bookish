@@ -3,7 +3,7 @@
     import TextEditor from '$lib/components/editor/TextEditor.svelte';
     import Format from '$lib/components/chapter/Format.svelte';
     import { afterUpdate } from 'svelte';
-    import { getEdition, isBookEditable, isEditionEditable } from './Contexts';
+    import { getEdition } from './Contexts';
     import Note from '../editor/Note.svelte';
     import Button from '../app/Button.svelte';
 
@@ -76,10 +76,10 @@
         {/each}
     {/if}
     {#if editable}
-        <Note>(edition authors)&nbsp;</Note>
-    {/if}
-    {#if editable}
-        &nbsp;<Button tooltip="add author" command={addAuthor}>+ author</Button>
+        {#if inheritedAuthors !== undefined && authors.length === 0}<Note
+                >(showing book authors)&nbsp;</Note
+            >{/if}
+        <Button tooltip="add author" command={addAuthor}>+ author</Button>
     {/if}
 </p>
 
