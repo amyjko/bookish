@@ -110,7 +110,6 @@
             </Instructions>
             {#each unused as image}
                 <MediaPreview url={image.url} alt={''}>
-                    uploaded
                     <ConfirmButton
                         tooltip="delete unused image"
                         confirm="delete image?"
