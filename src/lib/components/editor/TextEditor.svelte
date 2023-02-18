@@ -238,6 +238,5 @@
         color: var(--app-error-color);
         border-radius: var(--app-chrome-roundedness);
         background: var(--app-chrome-background);
-        animation: failure 100ms 10;
     }
 </style>
