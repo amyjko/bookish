@@ -26,6 +26,7 @@
     input {
         font-family: var(--app-font);
         font-size: var(--app-chrome-font-size);
+        background: var(--app-background-color);
         color: var(--app-font-color);
         padding: var(--app-chrome-padding);
         font-size: var(--app-chrome-font-size);
