@@ -37,11 +37,10 @@
 
     .error {
         background-color: var(--app-error-color);
-        animation: failure 100ms infinite;
     }
 
     .saving {
-        animation: waiting 1s infinite;
+        background-color: var(--app-muted-color);
     }
 
     @keyframes waiting {

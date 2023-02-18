@@ -210,7 +210,7 @@
     }
 
     :global(.dark) .bookish-app {
-        --app-interactive-color: #1455ce;
+        --app-interactive-color: #5f97ff;
         --app-background-color: #050505;
         --app-font-color: white;
         --app-border-color: #353535;

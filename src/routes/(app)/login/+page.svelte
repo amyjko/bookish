@@ -34,7 +34,10 @@
 
 <Lead><Large>Login</Large> to write.</Lead>
 
-<Paragraph>No password required to create an account or login.</Paragraph>
+<Paragraph
+    >No password required to create an account. We'll email each time with a
+    link.</Paragraph
+>
 
 <form on:submit|preventDefault={handleSubmit}>
     <TextInput

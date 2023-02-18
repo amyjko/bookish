@@ -36,7 +36,8 @@
     </Paragraph>
 
     <Paragraph>
-        <Link to="/about">Learn more</Link>
-        about the platform.
+        <Link to="/write">Start writing</Link> or <Link to="/about"
+            >learn more</Link
+        >.
     </Paragraph>
 </Section>
