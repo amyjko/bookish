@@ -5,7 +5,7 @@
     let status = getStatus();
 </script>
 
-<span
+<small
     class={`status ${
         $status === BookSaveStatus.Saving
             ? 'saving'
@@ -23,7 +23,7 @@
         : $status === BookSaveStatus.Error
         ? '\u2715 Not saved'
         : ''}
-</span>
+</small>
 
 <style>
     .status {
@@ -33,8 +33,8 @@
         background-color: var(--app-interactive-color);
         padding-left: calc(var(--app-chrome-padding));
         padding-right: calc(var(--app-chrome-padding));
-        padding-top: calc(var(--app-chrome-padding) / 2);
-        padding-bottom: calc(var(--app-chrome-padding) / 2);
+        padding-top: calc(var(--app-chrome-padding) / 3);
+        padding-bottom: calc(var(--app-chrome-padding) / 3);
         border-radius: var(--app-chrome-roundedness);
     }
 

@@ -244,7 +244,7 @@ export async function createBook(userID: string): Promise<string> {
     await updateBook(book);
 
     // Update all of the changes to the edition in Firestore, persisting the refs and chapter text.
-    await updateEdition(undefined, newEdition);
+    await updateEdition(book, undefined, newEdition);
 
     // Return the book id
     return bookRef.id;
@@ -277,7 +277,7 @@ export async function createNewEdition(book: Book): Promise<Book> {
     );
 
     // Create the edition, creating chapter text as necessary, using the edition sync function.
-    updateEdition(undefined, newEdition.withRef(newEditionRef));
+    updateEdition(book, undefined, newEdition.withRef(newEditionRef));
 
     // Put the new edition in the book.
     book = book.withEditions([
@@ -315,6 +315,7 @@ export async function updateLock(
  * returns a map of DocumentReferences for new chapters so they can be persisted client side.
  */
 export async function updateEdition(
+    book: Book,
     previousEdition: Edition | undefined,
     newEdition: Edition
 ): Promise<Map<string, DocumentReference>> {
@@ -396,14 +397,6 @@ export async function updateEdition(
                 previousKeys.length !== newKeys.length ||
                 !previousKeys.every((key) => previousInfo[key] === newInfo[key])
             ) {
-                const bookDoc = await getDoc(
-                    doc(db, 'books', newEdition.bookRef.id)
-                );
-                if (!bookDoc.exists()) throw Error('Book does not exist');
-                const book = Book.fromJSON(
-                    newEdition.bookRef.id,
-                    bookDoc.data() as BookSpecification
-                );
                 updateBook(
                     book.withRevisedEdition(previousEdition, newEdition)
                 );

@@ -13,7 +13,7 @@
         "preview": "npm run build && vite preview",
         "build": "npm run env && vite build",
         "//emu": "echo 'This copies the local .env file and starts the emulator'",
-        "emu": "npm run env && firebase emulators:start",
+        "emu": "firebase use dev && npm run env && firebase emulators:start",
         "package": "svelte-package --watch",
         "test": "vitest",
         "check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch",

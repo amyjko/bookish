@@ -232,7 +232,7 @@
         margin-left: -0.5em;
         padding: 0.5em 0.5em;
         font-family: var(--app-font);
-        font-size: 80%;
+        font-size: small;
         font-weight: normal;
         font-style: normal;
         color: var(--app-error-color);

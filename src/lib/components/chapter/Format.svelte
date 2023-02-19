@@ -21,10 +21,9 @@
     import Comment from './Comment.svelte';
     import Text from './Text.svelte';
     import Format from './Format.svelte';
-    import { isChapterEditable } from '../page/Contexts';
+    import { isChapterEditable, isEditionEditable } from '../page/Contexts';
 
     export let node: FormatNode;
-    export let editable: boolean = false;
     export let placeholder: string | undefined = undefined;
 
     $: format = node.getFormat();
@@ -42,7 +41,7 @@
     $: showPlaceholder =
         node.isEmptyText() &&
         placeholder !== undefined &&
-        (editable || isChapterEditable());
+        (isChapterEditable() || isEditionEditable());
 </script>
 
 <svelte:element

@@ -105,11 +105,14 @@
         const previousDocID = previousSavedEdition?.getEditionRef()?.id;
         const newDocID = $edition.getEditionRef()?.id;
 
+        // If there's a book, and there's an edition but no previous doc, or we're updating the same doc,
+        // update the edition.
         if (
-            ($book && $edition && previousDocID === undefined) ||
-            (newDocID !== undefined &&
-                previousDocID !== undefined &&
-                newDocID === previousDocID)
+            $book &&
+            (($edition && previousDocID === undefined) ||
+                (newDocID !== undefined &&
+                    previousDocID !== undefined &&
+                    newDocID === previousDocID))
         ) {
             status.set(BookSaveStatus.Saving);
             try {
@@ -117,6 +120,7 @@
                 reflection = true;
                 // Get the chapter refs from the updated edition
                 const newChapterRefs = await updateEdition(
+                    $book,
                     previousSavedEdition,
                     $edition
                 );
