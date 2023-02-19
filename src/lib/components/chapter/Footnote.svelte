@@ -53,7 +53,6 @@
                 class={`bookish-footnote ${
                     focused ? 'bookish-footnote-focused' : ''
                 }`}
-                on:mousedown|preventDefault
             >
                 <sup class="bookish-footnote-symbol">{letter}</sup><Format
                     node={content}
