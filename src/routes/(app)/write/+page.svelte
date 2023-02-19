@@ -108,7 +108,7 @@
 {:else if books === undefined}
     <Feedback>Loading books...</Feedback>
 {:else if books.length === 0}
-    <Paragraph>You don't have have any books.</Paragraph>
+    <Paragraph>Create a book above or ask an editor for access.</Paragraph>
 {:else}
     <BookList {books} write />
 {/if}
