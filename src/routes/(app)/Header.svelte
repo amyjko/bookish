@@ -92,7 +92,7 @@
         display: flex;
         flex-direction: row;
         flex-wrap: nowrap;
-        align-items: baseline;
+        align-items: center;
         gap: var(--app-chrome-padding);
     }
 </style>
