@@ -1,47 +1,53 @@
 {
+  "firestore": {
+    "rules": "firestore.rules",
+    "indexes": "firestore.indexes.json"
+  },
+  "hosting": {
+    "public": "dist",
+    "predeploy": [
+      "npm run build"
+    ],
+    "ignore": [
+      "firebase.json",
+      "**/.*",
+      "**/node_modules/**"
+    ],
+    "rewrites": [
+      {
+        "source": "/book/**",
+        "function": "getEdition"
+      },
+      {
+        "source": "**",
+        "destination": "/index.html"
+      }
+    ]
+  },
+  "emulators": {
     "firestore": {
-        "rules": "firestore.rules",
-        "indexes": "firestore.indexes.json"
+      "port": 8080
     },
     "hosting": {
-        "public": "dist",
-        "predeploy": ["npm run build"],
-        "ignore": ["firebase.json", "**/.*", "**/node_modules/**"],
-        "rewrites": [
-            {
-                "source": "/book/**",
-                "function": "getEdition"
-            },
-            {
-                "source": "**",
-                "destination": "/index.html"
-            }
-        ]
+      "port": 8000
     },
-    "emulators": {
-        "firestore": {
-            "port": 8080
-        },
-        "hosting": {
-            "port": 8000
-        },
-        "auth": {
-            "port": 9099
-        },
-        "storage": {
-            "port": 9199
-        }
+    "auth": {
+      "port": 9099
     },
     "storage": {
-        "rules": "storage.rules"
-    },
-    "functions": {
-        "ignore": [
-            "node_modules",
-            ".git",
-            "firebase-debug.log",
-            "firebase-debug.*.log"
-        ],
-        "source": "functions"
+      "port": 9199
     }
+  },
+  "storage": {
+    "rules": "storage.rules"
+  },
+  "functions": {
+    "ignore": [
+      "node_modules",
+      ".git",
+      "firebase-debug.log",
+      "firebase-debug.*.log"
+    ],
+    "source": "functions"
+  }
 }
