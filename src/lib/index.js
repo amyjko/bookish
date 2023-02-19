@@ -3,6 +3,7 @@ export { default as EditionModel } from './models/book/Edition.js';
 export { default as ChapterModel } from './models/book/Chapter.js';
 export { getEdition, EDITION } from './components/page/Contexts.js';
 export { default as TableOfContents } from './components/page/TableOfContents.svelte';
+export { default as Chapter } from './components/page/Chapter.svelte';
 export { default as Search } from './components/page/Search.svelte';
 export { default as Index } from './components/page/Index.svelte';
 export { default as References } from './components/page/References.svelte';
