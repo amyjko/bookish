@@ -221,19 +221,25 @@
 
                         // Is the caret in relatively positioned ancestors above the editor? Undo their offsets.
                         let caretAncestor: HTMLElement | null =
-                            startNode.closest('.bookish-editor');
+                            startNode.parentElement;
                         let relativeX = 0;
                         let relativeY = 0;
+                        let fixedX: number | undefined = undefined;
+                        let fixedY: number | undefined = undefined;
                         while (caretAncestor != null) {
-                            if (
-                                window.getComputedStyle(caretAncestor)
-                                    .position === 'relative'
-                            ) {
+                            const style =
+                                window.getComputedStyle(caretAncestor);
+                            if (style.position === 'relative') {
                                 relativeX += caretAncestor.offsetLeft;
                                 relativeY += caretAncestor.offsetTop;
+                            } else if (style.position === 'fixed') {
+                                fixedX = caretAncestor.offsetLeft;
+                                fixedY = caretAncestor.offsetTop;
                             }
                             caretAncestor = caretAncestor.parentElement;
                         }
+
+                        // Is the caret in a fixed position marginal? Get it's position.
 
                         // If we're after a new line, calculate the correct position, since selections don't actually render to the next line.
                         const left = afterNewLine
@@ -243,6 +249,9 @@
                             afterNewLine && lineHeight
                                 ? rangeRect.top + lineHeight
                                 : rangeRect.top;
+                        if (fixedY) {
+                            console.log('dfdsf');
+                        }
                         const position = {
                             x: left + window.scrollX - relativeX,
                             y: top + window.scrollY - relativeY,

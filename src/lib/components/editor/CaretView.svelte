@@ -51,7 +51,7 @@
         display: inline-block;
         box-sizing: border-box;
         position: absolute;
-        z-index: 1;
+        z-index: 2;
     }
 
     @keyframes caret-blink {
