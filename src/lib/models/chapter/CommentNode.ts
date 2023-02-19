@@ -3,6 +3,7 @@ import type Caret from './Caret';
 import type { CaretRange } from './Caret';
 import FormatNode from './FormatNode';
 import type Node from './Node';
+import TextNode from './TextNode';
 
 export default class CommentNode extends AtomNode<FormatNode> {
     constructor(comment: FormatNode) {
@@ -24,10 +25,19 @@ export default class CommentNode extends AtomNode<FormatNode> {
     }
 
     toBookdown(format?: FormatNode): string {
-        const previousText = format?.getPreviousTextOrAtom(this)?.toBookdown();
-        // Insert a space before the % if there isn't one before this.
+        const text = format
+            ?.getTextAndAtomNodes()
+            .filter((child) => child === this || !this.contains(child));
+        let previousText;
+        if (text) {
+            const index = text.indexOf(this);
+            const previous = text[index - 1];
+            previousText = previous instanceof TextNode ? previous : undefined;
+        }
         return `${
-            previousText?.endsWith(' ') ? '' : ' '
+            previousText !== undefined && !previousText.getText().endsWith(' ')
+                ? ' '
+                : ''
         }%${this.getMeta().toBookdown()}%`;
     }
 

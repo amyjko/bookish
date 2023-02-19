@@ -19,10 +19,8 @@
     export let node: CommentNode;
 
     let chapter = getChapter();
-    let edition = getEdition();
     let editable = isChapterEditable();
     let root = getRoot();
-
     let caret = getCaret();
 
     $: focused =
@@ -45,9 +43,7 @@
             </span>
             <span
                 slot="content"
-                class={`bookish-app-comment ${
-                    focused ? 'bookish-app-comment-focused' : ''
-                }`}
+                class={`comment ${focused ? 'comment-focused' : ''}`}
             >
                 <Format node={node.getMeta()} placeholder="comment" />
             </span>
@@ -56,7 +52,7 @@
 </Atom>
 
 <style>
-    .bookish-app-comment {
+    .comment {
         background: var(--app-chrome-background);
         border: var(--app-chrome-border-size) solid var(--app-border-color);
         border-radius: 0 var(--app-chrome-padding) var(--app-chrome-padding)
@@ -67,7 +63,7 @@
         line-height: 1.5em;
     }
 
-    .bookish-app-comment-focused,
+    .comment-focused,
     .bookish-footnote-focused {
         outline: 2px solid var(--bookish-highlight-color);
     }

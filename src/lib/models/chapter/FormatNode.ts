@@ -136,14 +136,7 @@ export default class FormatNode extends Node {
         next: boolean
     ): TextNode | AtomNode<any> | undefined {
         // Find all of the text and atom nodes not in atom nodes in this node.
-        const text = this.getTextAndAtomNodes().filter((n) => {
-            const atomAncestor = n.getClosestParentOfType(this, AtomNode);
-            return (
-                atomAncestor === undefined ||
-                (atomAncestor instanceof AtomNode &&
-                    atomAncestor.getMeta() === this)
-            );
-        });
+        const text = this.getTextAndAtomNodes();
         const index = text.indexOf(node);
         return index === undefined
             ? undefined

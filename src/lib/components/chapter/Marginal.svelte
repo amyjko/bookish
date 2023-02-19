@@ -3,12 +3,13 @@
 <script lang="ts">
     import { isMobile, watchMobile } from '$lib/util/isMobile';
     import { onMount } from 'svelte';
-    import type Node from '../../models/chapter/Node';
     import {
         getCaret,
         getChapter,
         isChapterEditable,
     } from '$lib/components/page/Contexts';
+    import type Node from '../../models/chapter/Node';
+    import AtomNode from '../../models/chapter/AtomNode';
 
     export let node: Node;
     export let id: string;
@@ -32,8 +33,19 @@
         : // If not editable, it's hidden if it's not selected.
           $selectedMarginal !== id;
 
-    function toggle() {
-        if (editable) return;
+    function toggle(interactor: boolean) {
+        if (editable) {
+            if (interactor) {
+                if (editable && $caret && node instanceof AtomNode) {
+                    // Select this so that the view stays focused.
+                    $caret.setCaret({
+                        start: { node, index: 0 },
+                        end: { node, index: 0 },
+                    });
+                }
+            }
+            return;
+        }
 
         if ($chapter) {
             if (isMobile() && isHidden) $chapter.marginal.set(id);
@@ -51,9 +63,10 @@
 
     onMount(() => {
         const mediaWatch = watchMobile();
-        mediaWatch.addEventListener('change', toggle);
+        mediaWatch.addEventListener('change', () => toggle(false));
 
-        return () => mediaWatch.removeEventListener('change', toggle);
+        return () =>
+            mediaWatch.removeEventListener('change', () => toggle(false));
     });
 </script>
 
@@ -65,9 +78,9 @@
     }`}
     aria-label={label}
     tabIndex="0"
-    on:mousedown={toggle}
+    on:mousedown|stopPropagation|preventDefault={() => toggle(true)}
     on:keydown={(event) =>
-        event.key === 'Enter' || event.key === ' ' ? toggle() : undefined}
+        event.key === 'Enter' || event.key === ' ' ? toggle(true) : undefined}
     on:mouseenter={handleEnter}
     on:mouseleave={handleExit}><slot name="interactor" /></span
 ><span
@@ -75,9 +88,9 @@
         (isHidden ? ' bookish-marginal-hidden' : '') +
         (hovered ? ' bookish-marginal-hovered' : '')}
     tabIndex={editable ? null : 0}
-    on:mousedown={toggle}
+    on:mousedown={() => toggle(false)}
     on:keydown={(event) =>
-        event.key === 'Enter' || event.key === ' ' ? toggle() : undefined}
+        event.key === 'Enter' || event.key === ' ' ? toggle(false) : undefined}
     on:mouseenter={handleEnter}
     on:mouseleave={handleExit}
 >
