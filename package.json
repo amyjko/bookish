@@ -1,7 +1,7 @@
 {
     "name": "bookish-press",
     "private": false,
-    "version": "0.5.11",
+    "version": "0.5.12",
     "type": "module",
     "description": "A platform for reading and writing readable, accessible, beautiful online books.",
     "license": "MIT",
@@ -14,7 +14,7 @@
         "build": "npm run env && vite build",
         "//emu": "echo 'This copies the local .env file and starts the emulator'",
         "emu": "firebase use dev && npm run env && firebase emulators:start",
-        "package": "svelte-package -o package --watch",
+        "package": "svelte-package --watch",
         "test": "vitest",
         "check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch",
         "//env": "echo 'This copies the .env file corresponding to the current Firebase project specified with firebase use, defaulting to local'",
@@ -55,78 +55,12 @@
     "types": "./src/lib/index.d.ts",
     "exports": {
         ".": {
-            "types": "./package/index.d.ts",
-            "svelte": "./package/index.js"
-        },
-        "./Chapter": {
-            "types": "./package/models/book/Chapter.d.ts",
-            "default": "./package/models/book/Chapter.js"
-        },
-        "./Edition": {
-            "types": "./package/models/book/Edition.d.ts",
-            "default": "./package/models/book/Edition.js"
-        },
-        "./Contexts": {
-            "types": "./package/components/page/Contexts.d.ts",
-            "default": "./package/components/page/Contexts.js"
-        },
-        "./Edition.svelte": {
-            "types": "./package/components/page/Edition.svelte.d.ts",
-            "svelte": "./package/components/page/Edition.svelte",
-            "default": "./package/components/page/Edition.svelte"
-        },
-        "./Chapter.svelte": {
-            "types": "./package/components/page/Chapter.svelte.d.ts",
-            "svelte": "./package/components/page/Chapter.svelte",
-            "default": "./package/components/page/Chapter.svelte"
-        },
-        "./TableOfContents.svelte": {
-            "types": "./package/components/page/TableOfContents.svelte.d.ts",
-            "svelte": "./package/components/page/TableOfContents.svelte",
-            "default": "./package/components/page/TableOfContents.svelte"
-        },
-        "./Glossary.svelte": {
-            "types": "./package/components/page/Glossary.svelte.d.ts",
-            "svelte": "./package/components/page/Glossary.svelte",
-            "default": "./package/components/page/Glossary.svelte"
-        },
-        "./Index.svelte": {
-            "types": "./package/components/page/Index.svelte.d.ts",
-            "svelte": "./package/components/page/Index.svelte",
-            "default": "./package/components/page/Index.svelte"
-        },
-        "./Unknown.svelte": {
-            "types": "./package/components/page/Unknown.svelte.d.ts",
-            "svelte": "./package/components/page/Unknown.svelte",
-            "default": "./package/components/page/Unknown.svelte"
-        },
-        "./Media.svelte": {
-            "types": "./package/components/page/Media.svelte.d.ts",
-            "svelte": "./package/components/page/Media.svelte",
-            "default": "./package/components/page/Media.svelte"
-        },
-        "./Print.svelte": {
-            "types": "./package/components/page/Print.svelte.d.ts",
-            "svelte": "./package/components/page/Print.svelte",
-            "default": "./package/components/page/Print.svelte"
-        },
-        "./References.svelte": {
-            "types": "./package/components/page/References.svelte.d.ts",
-            "svelte": "./package/components/page/References.svelte",
-            "default": "./package/components/page/References.svelte"
-        },
-        "./Search.svelte": {
-            "types": "./package/components/page/Search.svelte.d.ts",
-            "svelte": "./package/components/page/Search.svelte",
-            "default": "./package/components/page/Search.svelte"
-        },
-        "./Schema": {
-            "types": "./package/models/book/Schema.d.ts",
-            "default": "./package/models/book/Schema.js"
+            "types": "./dist/index.d.ts",
+            "svelte": "./dist/index.js"
         }
     },
     "files": [
-        "package"
+        "dist"
     ],
-    "svelte": "./package/index.js"
+    "svelte": "./dist/index.js"
 }
