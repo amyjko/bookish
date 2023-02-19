@@ -53,7 +53,6 @@
     },
     "types": "./src/lib/index.d.ts",
     "exports": {
-        "./package.json": "./package.json",
         "./components/Auth.svelte": {
             "types": "./package/components/Auth.svelte.d.ts",
             "svelte": "./package/components/Auth.svelte",
@@ -277,7 +276,6 @@
             "svelte": "./package/components/controls/DarkToggle.svelte",
             "default": "./package/components/controls/DarkToggle.svelte"
         },
-        "./components/editor/.DS_Store": "./package/components/editor/.DS_Store",
         "./components/editor/BookishEditor.svelte": {
             "types": "./package/components/editor/BookishEditor.svelte.d.ts",
             "svelte": "./package/components/editor/BookishEditor.svelte",
