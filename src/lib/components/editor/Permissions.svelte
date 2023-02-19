@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { createUser, getUserEmails } from '../../models/CRUD';
+    import { createUser } from '../../models/CRUD';
     import Button from '../app/Button.svelte';
     import TextInput from '../app/TextInput.svelte';
     import { getEditors } from '../page/Contexts';
@@ -66,7 +66,7 @@
         {#each uids as uid, index (uid)}
             {@const email = $emails.get(uid)}
             <p>
-                {email}
+                {#if email}{email}{:else}<em>missing email</em>{/if}
                 {#if writable}
                     <Button
                         tooltip="remove {email} editing rights"
