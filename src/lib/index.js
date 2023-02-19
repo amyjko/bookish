@@ -1,5 +1,7 @@
-export { default as Schema } from './models/book/Schema';
-export { EDITION } from './components/page/Contexts';
+export { default as Schema } from './models/book/Schema.js';
+export { default as EditionModel } from './models/book/Edition.js';
+export { default as ChapterModel } from './models/book/Chapter.js';
+export { getEdition, EDITION } from './components/page/Contexts.js';
 export { default as TableOfContents } from './components/page/TableOfContents.svelte';
 export { default as Search } from './components/page/Search.svelte';
 export { default as Index } from './components/page/Index.svelte';
@@ -11,4 +13,3 @@ export { default as Glossary } from './components/page/Glossary.svelte';
 export { default as Edition } from './components/page/Edition.svelte';
 export { default as Feedback } from './components/app/Feedback.svelte';
 export { default as Loading } from './components/page/Loading.svelte';
-export { default as EditionModel } from './models/book/Edition';
