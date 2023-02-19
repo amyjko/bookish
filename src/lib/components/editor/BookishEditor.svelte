@@ -1038,12 +1038,7 @@
     tabIndex="0"
 >
     <!-- A view of the root -->
-    <svelte:component
-        this={component}
-        node={editedNode}
-        {placeholder}
-        editable={true}
-    />
+    <svelte:component this={component} node={editedNode} {placeholder} />
     <!-- The caret. We render our own since this view isn't contentEditable and we can't show a caret.
          Customize the rendering based on the formatting applied to the text node. -->
     {#if caretCoordinate && caretRange && !isAtom && isSelection === false && editorFocused}
