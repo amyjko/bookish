@@ -30,7 +30,7 @@
     <Marginal
         {node}
         id={'glossary-' + glossaryID}
-        label="definition: {entry.phrase}"
+        label={entry ? `definition: ${entry.phrase}` : 'undefined phrase'}
     >
         <Text slot="interactor" node={phrase} /><span
             slot="content"
