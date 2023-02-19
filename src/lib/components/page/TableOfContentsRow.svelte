@@ -32,6 +32,9 @@
         if ($edition && chapter)
             edition.set($edition.withMovedChapter(chapter.getID(), 1));
     }
+
+    $: chapterURL =
+        forthcoming && !editable ? undefined : `${$base}/${chapterID}`;
 </script>
 
 <tr class="toc-row" class:forthcoming>
@@ -40,6 +43,7 @@
             embed={chapter
                 ? chapter.getImage()
                 : $edition?.getImage(chapterID) ?? null}
+            url={chapterURL}
         /></td
     >
     <td>
@@ -62,11 +66,7 @@
         {:else if number !== undefined}
             <ChapterNumber>{'Chapter ' + number}</ChapterNumber>
         {/if}
-        <ChapterTitle
-            link={forthcoming && !editable
-                ? undefined
-                : `${$base}/${chapterID}`}>{title}</ChapterTitle
-        >
+        <ChapterTitle link={chapterURL}>{title}</ChapterTitle>
         <p><Muted><em><slot name="annotation" /></em></Muted></p>
     </td>
     <td><slot name="etc" /></td>

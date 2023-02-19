@@ -2,6 +2,7 @@
     import { page } from '$app/stores';
 
     export let to: string;
+    export let linked: boolean = true;
 
     let link: HTMLAnchorElement;
 
@@ -34,7 +35,7 @@
     }
 </script>
 
-{#if $page.url.pathname === (to.charAt(to.length - 1) === '/' ? to.substring(0, to.length - 1) : to)}
+{#if !linked || $page.url.pathname === (to.charAt(to.length - 1) === '/' ? to.substring(0, to.length - 1) : to)}
     <slot />
 {:else}
     <a
