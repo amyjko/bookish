@@ -19,53 +19,36 @@
     let caret = getCaret();
     $: edition = getEdition();
     $: book = getBook();
-
-    $: writing = $page.route.id?.includes('/write/');
 </script>
 
 <section class="header">
     <nav class="navigation">
         <Link to="/" title="Home"><Icon icon={HomeIcon} /></Link>
-        {#if $book && $edition}
-            <span class="elided"
-                ><Link to={`${writing ? '/write' : ''}/${$book.getID()}`}
+        <Link to="/read">Read</Link>
+        <Link to="/write">Write</Link>
+        {#if $book}
+            /<span class="elided"
+                ><Link to={`/write/${$book.getID()}/editions`}
                     >{$book.getTitle()}</Link
                 ></span
-            >
-            {#if $page.route.id?.includes('/[bookid]/editions')}
-                <span>&ndash; Editions</span>
+            >{#if $edition}
+                / <Link to={`/write/${$book.getID()}`}
+                    >{$edition.getEditionLabel()} Edition</Link
+                >
             {/if}
-            <span
-                >&ndash; <Link
-                    to={`${writing ? '/write' : ''}/${$book.getID()}/editions`}
-                    >{$edition.getEditionLabel()} edition</Link
-                ></span
-            >
-            <span class="status">
-                {#if $auth?.user && $auth.user.email}
-                    <Link to="/email">{$auth.user.email}</Link>
-                {:else}
-                    <Link to="/login">Login</Link>
-                {/if}
-                <Link to="/about">(beta)</Link>
-                <Status />
-            </span>
-        {:else}
-            <Link to="/read">Read</Link>
-            <Link to="/write">Write</Link>
-            <Link to="/about">About</Link>
+        {/if}
+        <div class="controls">
             <small>
                 {#if $auth?.user && $auth.user.email}
                     <Link to="/email">{$auth.user.email}</Link>
                 {:else}
                     <Link to="/login">Login</Link>
                 {/if}
-                <Link to="/about">(beta)</Link>
             </small>
-            <div class="controls">
-                <DarkToggle dark={isDark()} toggle={() => setDark(!isDark())} />
-            </div>
-        {/if}
+            <small><Link to="/about">about</Link></small>
+            <DarkToggle dark={isDark()} toggle={() => setDark(!isDark())} />
+            {#if $edition}<Status />{/if}
+        </div>
     </nav>
     {#if $caret}
         <Toolbar caret={$caret} />
@@ -98,17 +81,6 @@
         align-items: baseline;
     }
 
-    .status {
-        /* This puts the saved status in the top right and pushes everything else left. */
-        margin-left: auto;
-        font-size: 90%;
-        display: flex;
-        flex-direction: row;
-        flex-wrap: nowrap;
-        gap: var(--app-chrome-padding);
-        align-items: baseline;
-    }
-
     .elided {
         overflow-x: clip;
         white-space: nowrap;
@@ -120,6 +92,7 @@
         display: flex;
         flex-direction: row;
         flex-wrap: nowrap;
+        align-items: baseline;
         gap: var(--app-chrome-padding);
     }
 </style>
