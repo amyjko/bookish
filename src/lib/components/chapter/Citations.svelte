@@ -83,6 +83,10 @@
 </Atom>
 
 <style>
+    sup {
+        line-height: 0;
+    }
+
     .bookish-reference {
         font-family: var(--bookish-paragraph-font-family);
         list-style-position: outside;

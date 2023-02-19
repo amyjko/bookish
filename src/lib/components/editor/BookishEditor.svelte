@@ -249,9 +249,6 @@
                             afterNewLine && lineHeight
                                 ? rangeRect.top + lineHeight
                                 : rangeRect.top;
-                        if (fixedY) {
-                            console.log('dfdsf');
-                        }
                         const position = {
                             x: left + window.scrollX - relativeX,
                             y: top + window.scrollY - relativeY,
