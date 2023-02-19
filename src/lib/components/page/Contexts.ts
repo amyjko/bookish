@@ -15,7 +15,6 @@ import type ChapterContext from './ChapterContext';
 import { page } from '$app/stores';
 import { updateLock } from '../../models/CRUD';
 import type { DocumentReference } from 'firebase/firestore';
-import type RootNode from '../../models/chapter/RootNode';
 import type ChapterNode from '../../models/chapter/ChapterNode';
 
 export type DarkModeStore = Writable<boolean>;
