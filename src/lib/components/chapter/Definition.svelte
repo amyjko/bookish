@@ -7,11 +7,16 @@
     import Format from './Format.svelte';
     import Marginal from './Marginal.svelte';
     import Problem from './Problem.svelte';
-    import { getChapter, getEdition } from '../page/Contexts';
+    import {
+        getChapter,
+        getEdition,
+        isChapterEditable,
+    } from '../page/Contexts';
     import { afterUpdate } from 'svelte';
 
     export let node: DefinitionNode;
 
+    let editable = isChapterEditable();
     let edition = getEdition();
     let chapter = getChapter();
 
@@ -36,7 +41,11 @@
             slot="content"
             class="bookish-definition-entry"
             >{#if entry === undefined}<Problem
-                    >Unknown glossary entry "{glossaryID}"</Problem
+                    >{#if editable}{glossaryID.length === 0
+                            ? 'choose a definition'
+                            : `unknown glossary ID ${glossaryID}`}{:else}<em
+                            >missing definition</em
+                        >{/if}</Problem
                 >{:else}<strong class="bookish-definition-entry-phrase"
                     >{entry.phrase}</strong
                 >: <Format

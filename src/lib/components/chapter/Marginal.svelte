@@ -33,7 +33,7 @@
         : // If not editable, it's hidden if it's not selected.
           $selectedMarginal !== id;
 
-    function toggle(interactor: boolean) {
+    function toggle(event: MouseEvent | undefined, interactor: boolean) {
         if (editable) {
             if (interactor) {
                 if (editable && $caret && node instanceof AtomNode) {
@@ -42,9 +42,13 @@
                         start: { node, index: 0 },
                         end: { node, index: 0 },
                     });
+                    if (event) {
+                        event.stopPropagation();
+                        event.preventDefault();
+                    }
                 }
+                return;
             }
-            return;
         }
 
         if ($chapter) {
@@ -63,10 +67,12 @@
 
     onMount(() => {
         const mediaWatch = watchMobile();
-        mediaWatch.addEventListener('change', () => toggle(false));
+        mediaWatch.addEventListener('change', () => toggle(undefined, false));
 
         return () =>
-            mediaWatch.removeEventListener('change', () => toggle(false));
+            mediaWatch.removeEventListener('change', () =>
+                toggle(undefined, false)
+            );
     });
 </script>
 
@@ -77,10 +83,11 @@
         editable ? '' : 'interactive'
     }`}
     aria-label={label}
-    tabIndex="0"
-    on:mousedown|stopPropagation|preventDefault={() => toggle(true)}
+    on:mousedown={(event) => toggle(event, true)}
     on:keydown={(event) =>
-        event.key === 'Enter' || event.key === ' ' ? toggle(true) : undefined}
+        event.key === 'Enter' || event.key === ' '
+            ? toggle(undefined, true)
+            : undefined}
     on:mouseenter={handleEnter}
     on:mouseleave={handleExit}><slot name="interactor" /></span
 ><span
@@ -88,9 +95,11 @@
         (isHidden ? ' bookish-marginal-hidden' : '') +
         (hovered ? ' bookish-marginal-hovered' : '')}
     tabIndex={editable ? null : 0}
-    on:mousedown={() => toggle(false)}
+    on:mousedown={() => toggle(undefined, false)}
     on:keydown={(event) =>
-        event.key === 'Enter' || event.key === ' ' ? toggle(false) : undefined}
+        event.key === 'Enter' || event.key === ' '
+            ? toggle(undefined, false)
+            : undefined}
     on:mouseenter={handleEnter}
     on:mouseleave={handleExit}
 >
