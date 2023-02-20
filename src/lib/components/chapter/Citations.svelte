@@ -125,7 +125,6 @@
     .bookish-reference .bookish-citation-symbol {
         display: block;
         float: left;
-        margin-top: -0.5em;
         position: absolute;
         left: -1.75em;
         text-align: right;
