@@ -57,7 +57,7 @@
 
     /** Given a theme, sets the appropriate CSS rules in the browser to apply the theme.*/
     function setTheme(theme: Theme | null) {
-        // Allow for prerendering.
+        // Allow for prerendering; rely on mount callback to set the theme.
         if (typeof document === 'undefined') return;
 
         // If the theme is being unset, make sure we've removed any overrding style declaration.

@@ -5,7 +5,7 @@
     let loaded: boolean | null;
     let urlChecked: string;
     $: {
-        if (urlChecked !== url) {
+        if (urlChecked !== url && typeof Image !== 'undefined') {
             urlChecked = url;
             let image = new Image();
             image.src = url;
