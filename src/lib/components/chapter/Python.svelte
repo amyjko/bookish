@@ -48,7 +48,7 @@
     });
 
     function skulptLoaded() {
-        return window.hasOwnProperty('Sk');
+        return typeof window !== 'undefined' && window.hasOwnProperty('Sk');
     }
 
     function reset() {
