@@ -275,6 +275,7 @@
     .reference {
         line-height: var(--bookish-paragraph-line-height-tight);
         margin-top: 0;
+        margin-bottom: var(--bookish-block-padding);
     }
 
     p {

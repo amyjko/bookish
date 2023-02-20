@@ -110,8 +110,6 @@
     .bookish-references .bookish-reference {
         display: block;
         line-height: var(--bookish-paragraph-line-height-tight);
-        margin-left: 1rem;
-        margin-bottom: 1rem;
         text-align: left;
     }
 

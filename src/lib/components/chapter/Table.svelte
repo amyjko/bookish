@@ -18,7 +18,8 @@
         {#each rows as row, index}
             <tr class={editable ? 'editable' : null}>
                 {#if row.length === 1}
-                    <svelte:element this={index === 0 ? 'th' : 'td'}>
+                    <svelte:element
+                        this={index === 0 ? 'th' : 'td'}
                         colspan={rows.reduce(
                             (max, row) => Math.max(row.length, max),
                             0
@@ -40,5 +41,6 @@
     tr.editable td,
     tr.editable th {
         border: 1px dotted var(--app-border-color);
+        vertical-align: baseline;
     }
 </style>

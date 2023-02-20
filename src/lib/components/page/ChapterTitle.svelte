@@ -13,6 +13,8 @@
 <style>
     h3 {
         font-family: var(--bookish-header-font-family);
+        /* Disable heavy weight in this context. */
+        font-weight: normal;
         margin: 0;
     }
 </style>

@@ -569,7 +569,7 @@ export const CriticalTheme: Theme = {
     // Spacing
     spacing: {
         paragraphLineHeight: '2.2em',
-        paragraphLineHeightTight: '1.5em',
+        paragraphLineHeightTight: '1.9em',
         headerLineHeight: '1.4em',
         paragraphSpacing: '1.8rem',
         headerSpacing: '2rem',

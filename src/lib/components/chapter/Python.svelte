@@ -132,7 +132,7 @@
         flex: 1;
         border: 1px solid lightGray;
         padding: 0.5rem;
-        height: 3rem;
+        height: 2rem;
         overflow-y: scroll;
         display: inline-block;
         vertical-align: top;
