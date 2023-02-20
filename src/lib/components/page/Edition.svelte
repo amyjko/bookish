@@ -3,7 +3,7 @@
     import type EditionModel from '$lib/models/book/Edition';
     import smoothscroll from 'smoothscroll-polyfill';
     import { goto } from '$app/navigation';
-    import { onMount, setContext } from 'svelte';
+    import { onMount, setContext, tick } from 'svelte';
     import { writable } from 'svelte/store';
     import {
         BASE,
@@ -57,6 +57,9 @@
 
     /** Given a theme, sets the appropriate CSS rules in the browser to apply the theme.*/
     function setTheme(theme: Theme | null) {
+        // Allow for prerendering.
+        if (typeof document === 'undefined') return;
+
         // If the theme is being unset, make sure we've removed any overrding style declaration.
         // This let's the default theme kick in.
         let themeTagImports = document.getElementById('bookish-theme-imports');

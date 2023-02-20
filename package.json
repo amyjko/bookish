@@ -1,7 +1,7 @@
 {
     "name": "bookish-press",
     "private": false,
-    "version": "0.5.17",
+    "version": "0.5.19",
     "type": "module",
     "description": "A platform for reading and writing readable, accessible, beautiful online books.",
     "license": "MIT",
@@ -63,6 +63,12 @@
         "./Schema": {
             "types": "./dist/models/book/Schema.d.ts",
             "default": "./dist/models/book/Schema.js"
+        },
+        "./Chapter": {
+            "types": "./dist/models/book/Chapter.d.ts"
+        },
+        "./Edition": {
+            "types": "./dist/models/book/Edition.d.ts"
         }
     },
     "files": [
