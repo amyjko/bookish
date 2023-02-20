@@ -7,7 +7,7 @@
     import Paragraph from '$lib/components/app/Paragraph.svelte';
     import Large from '$lib/components/app/Large.svelte';
     import BookList from '$lib/components/app/BookList.svelte';
-    import Link from '../../../lib/components/app/Link.svelte';
+    import Link from '$lib/components/app/Link.svelte';
 
     let books: Book[] | undefined = undefined;
     let error: string | undefined = undefined;
