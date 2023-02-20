@@ -1,5 +1,5 @@
 <script lang="ts">
-    export let dark: Boolean;
+    export let dark: boolean;
     export let toggle: () => void;
 
     const lightLabel = '\u263C';
