@@ -45,7 +45,7 @@
                     <Link to="/login">Login</Link>
                 {/if}
             </small>
-            <small><Link to="/about">about</Link></small>
+            <small><Link to="/about">About</Link></small>
             <DarkToggle dark={isDark()} toggle={() => setDark(!isDark())} />
             {#if $edition}<Status />{/if}
         </div>
