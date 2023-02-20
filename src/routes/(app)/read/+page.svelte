@@ -7,6 +7,7 @@
     import Paragraph from '$lib/components/app/Paragraph.svelte';
     import Large from '$lib/components/app/Large.svelte';
     import BookList from '$lib/components/app/BookList.svelte';
+    import Link from '../../../lib/components/app/Link.svelte';
 
     let books: Book[] | undefined = undefined;
     let error: string | undefined = undefined;
@@ -36,3 +37,8 @@
 {:else}
     <BookList {books} write={false} />
 {/if}
+<Paragraph
+    >See <Link to="https://faculty.washington.edu/ajko/books/" external
+        >Amy's books</Link
+    > for other examples.</Paragraph
+>
