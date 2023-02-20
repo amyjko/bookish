@@ -9,9 +9,9 @@ import {
     query,
     where,
     deleteDoc,
-    DocumentReference,
+    type DocumentReference,
+    type QueryFieldFilterConstraint,
     onSnapshot,
-    QueryFieldFilterConstraint,
 } from 'firebase/firestore';
 import { httpsCallable } from 'firebase/functions';
 import Edition from './book/Edition';

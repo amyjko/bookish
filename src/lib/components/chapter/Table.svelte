@@ -41,6 +41,10 @@
     tr.editable td,
     tr.editable th {
         border: 1px dotted var(--app-border-color);
+    }
+
+    td,
+    th {
         vertical-align: baseline;
     }
 </style>
