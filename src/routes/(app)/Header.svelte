@@ -10,7 +10,6 @@
     import Status from '$lib/components/page/Status.svelte';
     import HomeIcon from '$lib/components/editor/icons/home.svg?raw';
     import Icon from '$lib/components/editor/Icon.svelte';
-    import { page } from '$app/stores';
     import DarkToggle from '$lib/components/controls/DarkToggle.svelte';
     import { isDark, setDark } from '$lib/util/dark';
 
@@ -46,7 +45,9 @@
                 {/if}
             </small>
             <small><Link to="/about">About</Link></small>
-            <DarkToggle dark={isDark()} toggle={() => setDark(!isDark())} />
+            {#if $edition === undefined}
+                <DarkToggle dark={isDark()} toggle={() => setDark(!isDark())} />
+            {/if}
             {#if $edition}<Status />{/if}
         </div>
     </nav>
