@@ -102,6 +102,14 @@
 <!-- Keep the imports up to date -->
 <svelte:head>
     {@html '<' + `style>${themeCSS}</style>`}
+
+    <meta property="og:title" content={edition.getTitle()} />
+    <meta property="og:image" content={edition.getImage('cover')} />
+    <meta property="og:description" content={edition.getDescription()} />
+    <!-- <meta
+        property="og:url"
+        content="https://criticallyconsciouscomputing.org"
+    /> -->
 </svelte:head>
 
 <main class="bookish {$darkMode ? ' dark' : ''}" style={themeCSS}>
