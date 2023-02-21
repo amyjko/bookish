@@ -112,7 +112,7 @@
     /> -->
 </svelte:head>
 
-<main class="bookish {$darkMode ? ' dark' : ''}" style={themeCSS}>
+<main class="bookish {$darkMode ? ' dark' : ''}">
     <slot />
 </main>
 
