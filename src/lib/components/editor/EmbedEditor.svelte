@@ -55,12 +55,12 @@
     }
 
     function handleImageSelection(image: Image) {
-        // Toggle the embed
         $caret?.edit(
             embed,
             embed.getURL() === image.url
-                ? embed.withURL('').withDescription('')
-                : embed.withURL(image.url)
+                ? // Toggle the embed if choosing the same image
+                  embed.withURL('').withDescription('')
+                : embed.withURLs(image.url, image.thumb)
         );
     }
 </script>

@@ -1,7 +1,8 @@
 <script lang="ts">
     import type { Image } from '$lib/models/book/BookMedia';
     import { onMount } from 'svelte';
-    import { getBook, getCaret } from '$lib/components/page/Contexts';
+    import { getBook } from '$lib/components/page/Contexts';
+    import ImageThumbnail from './ImageThumbnail.svelte';
 
     export let select: (image: Image) => void;
     export let selection: string;
@@ -41,18 +42,10 @@
             <!-- Sort the images by their URL. There's probably a more meaningful sort,
                     such as placing unused images at the front of the list. -->
             {#each images.sort((a, b) => a.url.localeCompare(b.url)) as image}
-                <img
-                    class={`bookish-image-chooser-image ${
-                        image.url === selection ? 'selected' : ''
-                    }`}
-                    src={image.url}
-                    alt={`Image named ${image.url}`}
-                    tabIndex="0"
-                    on:click|stopPropagation={() => select(image)}
-                    on:keydown={(event) =>
-                        event.key === 'Enter' || event.key === ' '
-                            ? select(image)
-                            : undefined}
+                <ImageThumbnail
+                    {image}
+                    selected={image.url === selection}
+                    {select}
                 />
             {:else}
                 No images uploaded
@@ -77,17 +70,5 @@
     .bookish-image-chooser.expanded {
         height: auto;
         overflow-y: auto;
-    }
-
-    .bookish-image-chooser-image {
-        display: inline-block;
-        height: 2em;
-        cursor: pointer;
-    }
-
-    .bookish-image-chooser-image.selected {
-        outline: var(--app-chrome-border-size) solid
-            var(--app-interactive-color);
-        outline-offset: calc(-1 * var(--app-chrome-border-size));
     }
 </style>

@@ -11,6 +11,7 @@ import { storage } from '../Firebase';
 
 export type Image = {
     url: string;
+    thumb: string;
     ref: StorageReference;
 };
 
@@ -72,6 +73,7 @@ export default class BookMedia {
                     getDownloadURL(itemRef).then((url) => {
                         const image = {
                             url,
+                            thumb: this.makeThumbnailURL(url),
                             description: '',
                             ref: itemRef,
                         };
@@ -83,6 +85,29 @@ export default class BookMedia {
                 )
             )
         );
+    }
+
+    stripTokenFromURL(url: string) {
+        const tokenIndex = url.indexOf('&token=');
+        return tokenIndex >= 0 ? (url = url.substring(0, tokenIndex)) : url;
+    }
+
+    // Construct a thumbnail URL from the base URL.
+    makeThumbnailURL(url: string) {
+        // The structure of the URL is
+        // https://[firebase-domain]/v0/b/[projectid].appspot.com/o/images%2F[bookID]%2F[imagename]?alt=media
+        // And we want
+        // https://[firebase-domain]/v0/b/[projectid].appspot.com/o/images%2F[bookID]%2Fthumbnails%2F[imagename]?alt=media
+        const bookID = this.book.getID();
+        const bookIDIndex = url.indexOf(bookID);
+        return bookIDIndex >= 0
+            ? `${url.substring(
+                  0,
+                  bookIDIndex
+              )}${bookID}%2Fthumbnails${url.substring(
+                  bookIDIndex + bookID.length
+              )}`
+            : url;
     }
 
     getThumbnailURL(
@@ -136,11 +161,9 @@ export default class BookMedia {
                     // After we get the download URL for the uploaded image,
                     // try to get the thumbnail URL for the resized image on the server.
                     .then((url) =>
-                        this.getThumbnailURL(
-                            url,
-                            thumbnailRef,
-                            errorHandler,
-                            finishedHandler
+                        finishedHandler(
+                            this.stripTokenFromURL(url),
+                            this.makeThumbnailURL(this.stripTokenFromURL(url))
                         )
                     )
                     .catch(() => errorHandler('Unable to get image URL.'));
