@@ -5,16 +5,20 @@
     export let selected: boolean;
     export let select: (image: Image) => void;
 
-    let retries = 5;
+    let retries = 3;
     let error: boolean = false;
     let loading: boolean = true;
 
     function loadImage(url: string) {
+        retries--;
         let img = new Image();
         img.onerror = () => {
             if (retries > 0) {
-                setTimeout(() => loadImage(url), 250);
-            } else error = true;
+                setTimeout(() => loadImage(url), 1000);
+            } else {
+                loading = false;
+                error = true;
+            }
         };
         img.onload = () => {
             loading = false;
@@ -27,8 +31,6 @@
 
 {#if loading}
     <div class="thumbnail loading" />
-{:else if error}
-    <div class="thumbnail error" />
 {:else}
     <img
         class="thumbnail"
@@ -60,10 +62,5 @@
     .loading {
         width: 2.5em;
         background: var(--app-chrome-background);
-    }
-
-    .error {
-        width: 2.5em;
-        background: var(--app-error-color);
     }
 </style>
