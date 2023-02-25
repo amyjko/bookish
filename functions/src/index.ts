@@ -22,10 +22,16 @@ async function resizeImage(
     bucketID: string,
     contentType: string | undefined
 ) {
+    // Get the bucket.
+    const bucket = admin.storage().bucket(bucketID);
+
+    // Get the path to the filename.
     const storageFileName = path.basename(storagePath);
 
-    // Download file from bucket into a temporary location.
-    const bucket = admin.storage().bucket(bucketID);
+    // Make the new image public
+    await bucket.file(storagePath).makePublic();
+
+    // Download file from bucket into a temporary location
     const downloadedImagePath = path.join(os.tmpdir(), storageFileName);
     console.log('Downloading image to', downloadedImagePath);
     await bucket
@@ -42,7 +48,7 @@ async function resizeImage(
         return;
     }
 
-    // Uploading the thumbnail.
+    // Uploading the thumbnail and make it public.
     await bucket.upload(resizedImagePath, {
         destination: getThumbnailPath(storagePath),
         metadata: { contentType: contentType },
@@ -71,6 +77,14 @@ export const createThumbnail = functions.storage
             return;
         }
 
+        // First, make the new image public.
+        await admin
+            .storage()
+            .bucket(object.bucket)
+            .file(object.name)
+            .makePublic();
+
+        // Then, create a thumbnail for it.
         return resizeImage(object.name, object.bucket, object.contentType);
     });
 
