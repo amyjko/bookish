@@ -46,6 +46,7 @@ async function resizeImage(
     await bucket.upload(resizedImagePath, {
         destination: getThumbnailPath(storagePath),
         metadata: { contentType: contentType },
+        public: true,
     });
 
     // Once the thumbnail has been uploaded delete the local file, just to keep /tmp clean.
