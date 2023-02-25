@@ -267,6 +267,7 @@
 
     :global(body) {
         background-color: var(--app-background-color) !important;
+        margin: 0;
     }
 
     :global(.firebase-emulator-warning) {
