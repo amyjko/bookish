@@ -72,7 +72,7 @@ export default class BookMedia {
                 res.items.map((itemRef) =>
                     getDownloadURL(itemRef).then((url) => {
                         const image = {
-                            url: url,
+                            url,
                             description: '',
                             ref: itemRef,
                         };
