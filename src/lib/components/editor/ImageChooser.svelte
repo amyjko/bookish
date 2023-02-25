@@ -6,7 +6,6 @@
     export let select: (image: Image) => void;
     export let selection: string;
 
-    let editor = getCaret();
     let book = getBook();
     let images: Image[] | undefined = undefined;
     let expanded = false;
