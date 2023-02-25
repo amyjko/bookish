@@ -218,27 +218,19 @@
                               )
                             : undefined;
 
-                        // Is the caret in relatively positioned ancestors above the editor? Undo their offsets.
-                        let caretAncestor: HTMLElement | null =
-                            startNode.parentElement;
+                        // Figure out the relative position of this editor.
+                        let editorAncestor: HTMLElement | null = element;
                         let relativeX = 0;
                         let relativeY = 0;
-                        let fixedX: number | undefined = undefined;
-                        let fixedY: number | undefined = undefined;
-                        while (caretAncestor != null) {
+                        while (editorAncestor != null) {
                             const style =
-                                window.getComputedStyle(caretAncestor);
+                                window.getComputedStyle(editorAncestor);
                             if (style.position === 'relative') {
-                                relativeX += caretAncestor.offsetLeft;
-                                relativeY += caretAncestor.offsetTop;
-                            } else if (style.position === 'fixed') {
-                                fixedX = caretAncestor.offsetLeft;
-                                fixedY = caretAncestor.offsetTop;
+                                relativeX += editorAncestor.offsetLeft;
+                                relativeY += editorAncestor.offsetTop;
                             }
-                            caretAncestor = caretAncestor.parentElement;
+                            editorAncestor = editorAncestor.parentElement;
                         }
-
-                        // Is the caret in a fixed position marginal? Get it's position.
 
                         // If we're after a new line, calculate the correct position, since selections don't actually render to the next line.
                         const left = afterNewLine
@@ -248,6 +240,7 @@
                             afterNewLine && lineHeight
                                 ? rangeRect.top + lineHeight
                                 : rangeRect.top;
+                        // Compute the final position of the caret.
                         const position = {
                             x: left + window.scrollX - relativeX,
                             y: top + window.scrollY - relativeY,
