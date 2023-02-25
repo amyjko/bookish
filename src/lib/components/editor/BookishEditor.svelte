@@ -34,9 +34,8 @@
 
     import { afterUpdate, onMount, setContext } from 'svelte';
     import type { PasteContent } from './CaretContext';
-    import { getCaret, getRoot } from '../page/Contexts';
+    import { getCaret } from '../page/Contexts';
     import CaretView from './CaretView.svelte';
-    import { writable } from 'svelte/store';
 
     const IDLE_TIME = 500;
 
