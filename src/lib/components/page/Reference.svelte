@@ -258,7 +258,7 @@
 {#if edit && editable && !reference.short}
     <ConfirmButton
         tooltip="delete reference {reference.title}"
-        confirm="delete reference..."
+        confirm="delete reference"
         command={() =>
             $edition
                 ? edition.set($edition.withoutReference(reference.citationID))

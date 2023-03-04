@@ -87,7 +87,7 @@
                 >
                 <ConfirmButton
                     tooltip="delete chapter {title}"
-                    confirm="delete"
+                    confirm="delete chapter"
                     command={() =>
                         chapter && $edition
                             ? edition.set(

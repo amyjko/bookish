@@ -100,8 +100,8 @@
             >
         {:else}
             <ConfirmButton
-                confirm="remove image?"
-                tooltip="remove cover image"
+                confirm="delete image"
+                tooltip="delete cover image"
                 command={removeCover}>- cover image</ConfirmButton
             >
         {/if}

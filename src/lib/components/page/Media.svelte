@@ -110,7 +110,7 @@
                 <MediaPreview chapterID={undefined} url={image.url} alt={''}>
                     <ConfirmButton
                         tooltip="delete unused image"
-                        confirm="delete image?"
+                        confirm="delete image"
                         command={() =>
                             media
                                 ?.remove(image)

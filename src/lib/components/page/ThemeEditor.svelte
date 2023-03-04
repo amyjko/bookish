@@ -98,7 +98,7 @@
         {:else}
             <ConfirmButton
                 tooltip="change theme to the default"
-                confirm="delete your theme?"
+                confirm="delete theme"
                 command={() =>
                     $edition
                         ? edition.set($edition.withTheme(null))

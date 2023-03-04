@@ -106,7 +106,7 @@
             {#if editable}
                 <ConfirmButton
                     tooltip="delete definition of {definition.phrase}"
-                    confirm="remove definition?"
+                    confirm="delete entry"
                     command={() =>
                         $edition
                             ? edition.set($edition.withoutDefinition(id))
