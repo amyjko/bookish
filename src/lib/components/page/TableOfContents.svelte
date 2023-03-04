@@ -284,10 +284,7 @@
 
         <!-- Book citation -->
         <PageParagraph>
-            {$edition
-                .getAuthors()
-                .map((author) => Parser.parseFormat($edition, author).toText())
-                .join(', ')} ({new Date().getFullYear()}).
+            {$edition.getAuthorsText()} ({new Date().getFullYear()}).
             <em>{$edition.getTitle()}</em>. {bookURL},
             <em>retrieved {new Date().toLocaleDateString('en-US')}</em>.
         </PageParagraph>

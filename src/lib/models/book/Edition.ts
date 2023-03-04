@@ -144,7 +144,7 @@ export default class Edition {
             spec.symbols ?? {},
             spec.glossary ?? {},
             spec.theme,
-            spec.base ?? '',
+            spec.base,
             spec.active
         );
     }
@@ -812,6 +812,12 @@ export default class Edition {
     // Don't let callers get their sneaky hands on this mutable array...
     getAuthors() {
         return [...this.authors];
+    }
+
+    getAuthorsText() {
+        return this.getAuthors()
+            .map((author) => Parser.parseFormat(this, author).toText())
+            .join(', ');
     }
 
     withAuthors(authors: string[]) {

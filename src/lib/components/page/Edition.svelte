@@ -8,11 +8,13 @@
     import {
         BASE,
         DARK_MODE,
+        getBook,
         type BaseStore,
         type DarkModeStore,
     } from './Contexts';
     import { BookishTheme } from '$lib/models/book/Theme';
     import { isDark, setDark } from '../../util/dark';
+    import { page } from '$app/stores';
 
     // Poly fill smooth scrolling for Safari.
     onMount(() => smoothscroll.polyfill());
@@ -25,6 +27,8 @@
     // but when the book is being viewed or edited in the Bookish app, it needs a prefix for the
     // route in the app.
     export let base: string = '';
+
+    let book = getBook();
 
     // When the base changes, update the context.
     let baseStore = writable<string>(base);
@@ -106,10 +110,15 @@
     <meta property="og:title" content={edition.getTitle()} />
     <meta property="og:image" content={edition.getImage('cover')} />
     <meta property="og:description" content={edition.getDescription()} />
-    <!-- <meta
+    <meta property="og:type" content="book" />
+    <meta property="og:author" content={edition.getAuthorsText()} />
+    <meta
         property="og:url"
-        content="https://criticallyconsciouscomputing.org"
-    /> -->
+        content={edition.base ??
+            `https://bookish.press/${
+                $book && $book.domain ? $book.domain : $page.params.bookid
+            }`}
+    />
 </svelte:head>
 
 <main class="bookish {$darkMode ? ' dark' : ''}">
