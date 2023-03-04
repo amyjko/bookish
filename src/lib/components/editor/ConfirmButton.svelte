@@ -12,7 +12,7 @@
     {#if !confirming}
         <Button {tooltip} command={() => (confirming = true)}><slot /></Button>
     {:else}
-        <Button tooltip="no" command={() => (confirming = false)}>no</Button
+        <Button tooltip="no" command={() => (confirming = false)}>cancel</Button
         >&nbsp;<Button tooltip="yes" {command}>{confirm}</Button>
     {/if}
 </div>
