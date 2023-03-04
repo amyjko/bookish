@@ -203,7 +203,7 @@ export default class Edition {
             symbols: Object.assign({}, this.symbols),
             glossary: Object.assign({}, this.glossary),
             theme: this.theme,
-            base: this.base,
+            base: this.base && this.base.length > 0 ? this.base : null,
             uids: this.uids.slice(),
             chapteruids: this.getChapterUIDS(),
             active: this.active,
