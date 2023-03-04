@@ -32,7 +32,7 @@
             // them with non-breaking spaces.
             const sizedText = showPlaceholder()
                 ? placeholder
-                : text.replace(/\s/g, '\u00a0');
+                : text.replace(/\s$/g, '\u00a0');
             // Clip the text to prevent this editor from getting too long when editing. If it goes past one line,
             // the measurements and layout are way off.
             const trimmedText =
@@ -148,6 +148,8 @@
 <style>
     .text-editor {
         position: relative;
+        display: inline-block;
+        max-width: 100%;
     }
 
     input[type='text'] {
@@ -187,6 +189,8 @@
 
     /* This ensures the error message always appears below empty text editors */
     .sizer {
+        display: inline-block;
+        max-width: 100%;
         min-height: 1em;
         opacity: 0;
         border: none;
