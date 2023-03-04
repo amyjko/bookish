@@ -39,8 +39,7 @@
     });
 
     $: unused = images?.filter(
-        (image) =>
-            embeds.find((embed) => embed.getURL() === image.url) === undefined
+        (image) => !embeds.some((embed) => image.url.includes(embed.getURL()))
     );
 </script>
 
