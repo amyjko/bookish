@@ -50,20 +50,20 @@
     <Head id="vision">Vision</Head>
 
     <Paragraph>
-        As with any publisher, Bookish as an editorial policy and philosophy.
+        As with any publisher, Bookish has an editorial policy and philosophy.
         Much like university publishers (e.g., <Link
             to="https://mitpress.mit.edu/about/">MIT Press</Link
-        >), Amy views the mission of Bookish as <em>scholarly</em>: books on the
-        platform should advance knowledge, educate the public, and be informed
-        by other scholarly work. However, Bookish is particularly interested in
-        works that advance progress toward a society that
+        >), Amy views the mission of Bookish Press as <em>scholarly</em>: books
+        on the platform should advance knowledge, educate the public, and be
+        informed by other scholarly work. However, Bookish is particularly
+        interested in works that advance progress toward a society that
         <em
             >radically embraces the beautiful diversity of humanity and nature
             and seeks to dismantle systems that get in the way.</em
-        > While this includes works broadly explicitly about social justice toopics
+        > While this includes works broadly explicitly about social justice topics
         such as diversity, equality, equity, inclusion, justice, accessibility, sustainability,
-        indigienous sovereignty, it also includes works that discuss more strictly
-        technical ideas in sociotechnical ways.
+        indigienous sovereignty, and oppression, it also includes works that discuss
+        more strictly technical ideas in sociotechnical ways.
     </Paragraph>
 
     <Head id="editing">Editing</Head>
@@ -72,10 +72,10 @@
         >For now, anyone can create an account and write books, but publishing
         rights are <strong>invitation only</strong>. <Link
             to="mailto:amy@amyjko.com">Write Amy</Link
-        > to arrange a time to discuss your your vision, to ensure it aligns with
-        our editioral mission. Amy retains the right to revoke publishing rights
-        and unpublish books that do not align with the vision above; publishing on
-        the platform is a privilege, not a right.</Paragraph
+        > to discuss your vision, to ensure it aligns with our editioral mission.
+        Amy retains the right to revoke publishing rights and unpublish books that
+        do not align with the vision above; publishing on the platform is a privilege,
+        not a right.</Paragraph
     >
 
     <Paragraph>
@@ -97,6 +97,6 @@
         > or <Link to="https://github.com/amyjko/bookish/pulls"
             >pull request</Link
         > directly. Note that this is not a full-time project for Amy, so it will
-        progress will be leisurely; defects take priority over new features.
+        progress leisurely; defects take priority over new features.
     </Paragraph>
 </Section>
