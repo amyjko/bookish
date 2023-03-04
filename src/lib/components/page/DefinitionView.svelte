@@ -13,6 +13,7 @@
         getLeasee,
         isChapterEditable,
         lease,
+        isEditionEditable,
     } from './Contexts';
     import Button from '../app/Button.svelte';
 
@@ -21,7 +22,7 @@
 
     let auth = getUser();
     let edition = getEdition();
-    let editable = isChapterEditable();
+    let editable = isEditionEditable();
 
     // Focus after adding a new synonym.
     let newSynonym = false;
@@ -49,6 +50,29 @@
             );
         }
         newSynonym = true;
+    }
+
+    function removeSynonym(index: number) {
+        if (
+            definition.synonyms &&
+            index >= 0 &&
+            index < definition.synonyms.length
+        )
+            updateSynonyms([
+                ...definition.synonyms.slice(0, index),
+                ...definition.synonyms.slice(index + 1),
+            ]);
+    }
+
+    function updateSynonyms(synonyms: string[]) {
+        if ($edition)
+            edition.set(
+                $edition.withEditedDefinition(id, {
+                    phrase: definition.phrase,
+                    definition: definition.definition,
+                    synonyms: synonyms,
+                })
+            );
     }
 
     $: syns = definition.synonyms || [];
@@ -86,7 +110,7 @@
                     command={() =>
                         $edition
                             ? edition.set($edition.withoutDefinition(id))
-                            : undefined}>- definition</ConfirmButton
+                            : undefined}>⨉</ConfirmButton
                 >
             {/if}
         </dt>
@@ -126,40 +150,26 @@
             {/if}
             {#if edition && editable}
                 <span bind:this={synonymsEditor}>
-                    {#if syns.length === 0}
-                        <Note>no synonyms</Note>
-                    {:else}
-                        {#each syns as syn, index}
-                            <Note>
-                                <TextEditor
-                                    text={syn}
-                                    label={'Synonym editor.'}
-                                    placeholder="synonym"
-                                    valid={() => undefined}
-                                    save={(text) => {
-                                        const newSyns = [...syns];
-                                        // Remove the synonym if it's empty but wasn't before
-                                        if (syn.length > 0 && text.length === 0)
-                                            newSyns.splice(index, 1);
-                                        else newSyns[index] = text;
-                                        if ($edition)
-                                            edition.set(
-                                                $edition.withEditedDefinition(
-                                                    id,
-                                                    {
-                                                        phrase: definition.phrase,
-                                                        definition:
-                                                            definition.definition,
-                                                        synonyms: newSyns,
-                                                    }
-                                                )
-                                            );
-                                    }}
-                                />
-                            </Note>
-                            {#if syns.length > 1 && index < syns.length - 1},&nbsp;{/if}
-                        {/each}
-                    {/if}
+                    {#each syns as syn, index}
+                        <Note>
+                            <TextEditor
+                                text={syn}
+                                label={'Synonym editor.'}
+                                placeholder="synonym"
+                                valid={() => undefined}
+                                save={(text) => {
+                                    const newSyns = [...syns];
+                                    newSyns[index] = text;
+                                    updateSynonyms(newSyns);
+                                }}
+                            />
+                            <Button
+                                tooltip="delete synonym"
+                                command={() => removeSynonym(index)}>x</Button
+                            >
+                        </Note>
+                        {#if syns.length > 1 && index < syns.length - 1},&nbsp;{/if}
+                    {/each}
                 </span>&nbsp;<Button tooltip="add synonym" command={addSynonym}
                     >+ synonym</Button
                 >
@@ -177,6 +187,8 @@
     }
 
     dt {
+        font-family: var(--bookish-header-font-family);
         font-weight: bold;
+        vertical-align: baseline;
     }
 </style>
