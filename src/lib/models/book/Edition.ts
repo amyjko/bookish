@@ -1140,14 +1140,15 @@ export default class Edition {
     }
 
     // Get all of the embeds in the book
-    getEmbeds(): EmbedNode[] {
-        let embeds: EmbedNode[] = [];
+    getEmbeds(): { embed: EmbedNode; chapterID: string | undefined }[] {
+        let embeds: { embed: EmbedNode; chapterID: string | undefined }[] = [];
 
         // Add the book cover
         const cover = this.getImage('cover');
         if (cover) {
             let coverNode = Parser.parseEmbed(this, cover);
-            if (coverNode instanceof EmbedNode) embeds.push(coverNode);
+            if (coverNode instanceof EmbedNode)
+                embeds.push({ embed: coverNode, chapterID: undefined });
         }
 
         // Add the cover and images from each chapter.
@@ -1155,12 +1156,15 @@ export default class Edition {
             const image = c.getImage();
             let cover =
                 image === null ? undefined : Parser.parseEmbed(this, image);
-            if (cover && cover instanceof EmbedNode) embeds.push(cover);
+            if (cover && cover instanceof EmbedNode)
+                embeds.push({ embed: cover, chapterID: c.id });
 
             // Get the chapter body's embeds
             let bodyEmbeds = c?.getAST(this)?.getEmbeds();
             if (bodyEmbeds)
-                bodyEmbeds.forEach((embed: EmbedNode) => embeds.push(embed));
+                bodyEmbeds.forEach((embed: EmbedNode) =>
+                    embeds.push({ embed, chapterID: c.id })
+                );
         });
 
         // Add the back matter covers
@@ -1169,7 +1173,8 @@ export default class Edition {
             const img = this.getImage(id);
             if (img) {
                 let image = Parser.parseEmbed(this, img);
-                if (image instanceof EmbedNode) embeds.push(image);
+                if (image instanceof EmbedNode)
+                    embeds.push({ embed: image, chapterID: id });
             }
         });
 

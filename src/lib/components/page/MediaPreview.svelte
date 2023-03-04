@@ -1,6 +1,12 @@
 <script lang="ts">
+    import Link from '../Link.svelte';
+    import { getBase } from './Contexts';
+
     export let url: string;
     export let alt: string;
+    export let chapterID: string | undefined;
+
+    let base = getBase();
 
     let loaded: boolean | null;
     let urlChecked: string;
@@ -20,7 +26,9 @@
 
 <figure class={'media-preview'}>
     {#if loaded}
-        <img src={url.startsWith('http') ? url : `${url}`} {alt} />
+        <Link to={`${$base}/${chapterID}`} linked={chapterID !== undefined}
+            ><img src={url.startsWith('http') ? url : `${url}`} {alt} /></Link
+        >
     {:else if loaded === null}
         <div class="missing">missing image</div>
     {/if}

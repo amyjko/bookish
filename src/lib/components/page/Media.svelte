@@ -39,7 +39,8 @@
     });
 
     $: unused = images?.filter(
-        (image) => !embeds.some((embed) => image.url.includes(embed.getURL()))
+        (image) =>
+            !embeds.some((embed) => image.url.includes(embed.embed.getURL()))
     );
 </script>
 
@@ -75,9 +76,10 @@
         {:else}
             <p>These are the images in the book:</p>
         {/if}
-        {#each embeds as embed}
+        {#each embeds as { embed, chapterID }}
             {#if !embed.isVideo()}
                 <MediaPreview
+                    {chapterID}
                     url={embed.isLocal()
                         ? `${$base}/${embed.getSmallURL()}`
                         : embed.getSmallURL()}
@@ -105,7 +107,7 @@
                 be used in other editions of this book.
             </Instructions>
             {#each unused as image}
-                <MediaPreview url={image.url} alt={''}>
+                <MediaPreview chapterID={undefined} url={image.url} alt={''}>
                     <ConfirmButton
                         tooltip="delete unused image"
                         confirm="delete image?"
