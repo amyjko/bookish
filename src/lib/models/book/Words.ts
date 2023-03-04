@@ -62,7 +62,6 @@ const CommonWords = [
     'other',
     'our',
     'out',
-    'people',
     'say',
     'see',
     'she',

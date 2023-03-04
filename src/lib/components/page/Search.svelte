@@ -103,7 +103,7 @@
 
         <p>
             Type a word—just a single word—and we'll show its occurrences in
-            this book:
+            this book's chapters:
         </p>
 
         <input
