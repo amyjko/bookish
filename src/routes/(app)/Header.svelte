@@ -86,6 +86,7 @@
         overflow-x: clip;
         white-space: nowrap;
         text-overflow: ellipsis;
+        max-width: 10em;
     }
 
     .controls {
