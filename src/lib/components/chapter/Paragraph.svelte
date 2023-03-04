@@ -25,10 +25,16 @@
               ($chapter && $chapter.highlightedID === id
                   ? ' bookish-content-highlight'
                   : '');
+
+    $: firstParagraph = $root.getFirstParagraph();
+    $: dropcap =
+        placeholder === undefined &&
+        node === firstParagraph &&
+        /^[a-zA-Z]/.test(firstParagraph.getFirstTextNode().getText());
 </script>
 
 {#if level === 0}
-    <p data-nodeid={node.nodeID} class:placeholder
+    <p data-nodeid={node.nodeID} class:placeholder class:dropcap
         ><Format node={node.getFormat()} placeholder={placeholder ?? '¶'} /></p
     >
 {:else}
@@ -60,7 +66,7 @@
     }
 
     /* This implements a drop cap in the first letter of the first text in the first format of the first paragraph of a chapter (but only chapters). */
-    :global(.chapter-content) p:first-of-type:not(.placeholder)::first-letter {
+    p.dropcap::first-letter {
         padding: 0 0.25rem;
         margin: 0 0.25rem 0 0;
         font-size: 4rem;

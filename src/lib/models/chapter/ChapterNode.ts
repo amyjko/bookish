@@ -48,22 +48,26 @@ export default class ChapterNode extends BlocksNode {
         );
         return citations;
     }
+
     getFootnotes(): FootnoteNode[] {
         return this.getNodes().filter(
             (n): n is FootnoteNode => n instanceof FootnoteNode
         );
     }
+
     getHeaders(): ParagraphNode[] {
         return this.getNodes().filter(
             (n): n is ParagraphNode =>
                 n instanceof ParagraphNode && n.getLevel() > 0
         );
     }
+
     getEmbeds(): EmbedNode[] {
         return this.getNodes().filter(
             (n): n is EmbedNode => n instanceof EmbedNode
         );
     }
+
     getComments(): CommentNode[] {
         return this.getNodes().filter(
             (n): n is CommentNode => n instanceof CommentNode
@@ -73,6 +77,12 @@ export default class ChapterNode extends BlocksNode {
     getLabels(): LabelNode[] {
         return this.getNodes().filter(
             (n): n is LabelNode => n instanceof LabelNode
+        );
+    }
+
+    getFirstParagraph(): ParagraphNode | undefined {
+        return this.getBlocks().find(
+            (b): b is ParagraphNode => b instanceof ParagraphNode
         );
     }
 
