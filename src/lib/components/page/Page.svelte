@@ -5,10 +5,13 @@
     export let title: string;
     export let afterLoaded: Function | undefined = undefined;
 
-    let loaded = false;
+    let fontsLoaded = false;
+    let imagesLoaded = false;
     let lastHeight = 0;
     let intervalID: NodeJS.Timer | null = null;
     let mountTime = Date.now();
+
+    $: loaded = fontsLoaded && imagesLoaded;
 
     function watchLoading() {
         const bodyHeight = document.body.clientHeight;
@@ -21,7 +24,7 @@
             // Stop watching the images
             stopWatching();
             // Set to loaded to hide the overlay and notify callback if there is one.
-            loaded = true;
+            imagesLoaded = true;
             if (afterLoaded) afterLoaded();
         }
 
@@ -37,6 +40,8 @@
         // Watch the height of the document and wait until it's been stable for a while before scrolling
         // to any targets. We use the data below to monitor the document height over time.
         intervalID = setInterval(() => watchLoading(), 50);
+
+        document.fonts.ready.then(() => (fontsLoaded = true));
 
         return () => stopWatching();
     });
@@ -55,7 +60,7 @@
     <meta name="description" content={title} />
 </svelte:head>
 
-<section class={'bookish-page' + (loaded ? ' loaded' : '')}>
+<section class={'bookish-page' + (imagesLoaded ? ' loaded' : '')}>
     <slot />
 </section>
 <!-- Overlay loading feedback if loading, but still render the page. -->

@@ -3,7 +3,7 @@
     import Header from './Header.svelte';
     import Auth from '$lib/components/Auth.svelte';
     import { writable, type Writable } from 'svelte/store';
-    import { setContext } from 'svelte';
+    import { onMount, setContext } from 'svelte';
     import {
         CARET,
         BOOK,
@@ -22,6 +22,7 @@
     import BookSaveStatus from '$lib/models/book/BookSaveStatus';
     import { getUserEmails, updateBook, updateEdition } from '$lib/models/CRUD';
     import { page } from '$app/stores';
+    import Loading from '$lib/components/page/Loading.svelte';
 
     // A global store context for the focused editor, used to display toolbar.
     let caret = writable<CaretState | undefined>(undefined);
@@ -219,7 +220,7 @@
 
 <style>
     /* Custom fonts for app */
-    @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;700&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;700&display=block');
 
     .bookish-app {
         display: flex;
