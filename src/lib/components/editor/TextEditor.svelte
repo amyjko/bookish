@@ -123,7 +123,6 @@
         bind:this={field}
         bind:value={text}
         required
-        role="textbox"
         aria-invalid={error !== undefined}
         aria-label={label}
         aria-placeholder={label}
