@@ -61,80 +61,84 @@
     $: embed = getImage();
 </script>
 
-<header class="bookish-chapter-header">
-    {#if embed}
-        <div class="bookish-figure-full">
-            {#if $edition && editable}
-                <BookishEditor
-                    text={embed}
-                    parser={(text) => Parser.parseEmbed($edition, text)}
-                    save={(node) =>
-                        setImage ? setImage(node.toBookdown()) : undefined}
-                    chapter={false}
-                    component={Embed}
-                    placeholder=""
-                    leasee={getLeasee(auth, edition, `embed-${id}`)}
-                    lease={(lock) => lease(auth, edition, `embed-${id}`, lock)}
-                />
+<!-- We key on the chapter ID to avoid laggy updates from image loading -->
+{#key id}
+    <header class="bookish-chapter-header">
+        {#if embed}
+            <div class="bookish-figure-full">
+                {#if $edition && editable}
+                    <BookishEditor
+                        text={embed}
+                        parser={(text) => Parser.parseEmbed($edition, text)}
+                        save={(node) =>
+                            setImage ? setImage(node.toBookdown()) : undefined}
+                        chapter={false}
+                        component={Embed}
+                        placeholder=""
+                        leasee={getLeasee(auth, edition, `embed-${id}`)}
+                        lease={(lock) =>
+                            lease(auth, edition, `embed-${id}`, lock)}
+                    />
+                {:else}
+                    <Embed
+                        node={Parser.parseEmbed($edition, embed)}
+                        editable={false}
+                    />
+                {/if}
+                {#if !print && showReminder}
+                    <div class="bookish-scroll-reminder" />
+                {/if}
+            </div>
+        {:else}
+            <!-- Add a bit of space to account for the lack of an image. -->
+            <p>&nbsp;</p>
+        {/if}
+        {#if !print}
+            <slot name="outline" />
+        {/if}
+        {#if editable}
+            {#if embed === null}
+                <Button tooltip="add cover image" command={addCover}
+                    >+ cover image</Button
+                >
             {:else}
-                <Embed
-                    node={Parser.parseEmbed($edition, embed)}
-                    editable={false}
-                />
+                <ConfirmButton
+                    confirm="delete image"
+                    tooltip="delete cover image"
+                    command={removeCover}>- cover image</ConfirmButton
+                >
             {/if}
-            {#if !print && showReminder}
-                <div class="bookish-scroll-reminder" />
+        {/if}
+        <div bind:this={title} class="bookish-chapter-header-text">
+            <slot name="before" />
+            <Title>
+                {#if editable && save}
+                    <TextEditor
+                        {label}
+                        text={header + (subtitle ? ': ' + subtitle : '')}
+                        placeholder="title"
+                        valid={(text) =>
+                            text.length === 0
+                                ? 'Titles have to be at least one character long.'
+                                : undefined}
+                        {save}
+                    />
+                {:else}
+                    {header}
+                    {#if subtitle}<div class="bookish-subtitle">{subtitle}</div
+                        >{/if}
+                {/if}
+            </Title>
+            <slot name="after" />
+            {#if tags}
+                <div
+                    >{#each tags as tag}<span class="bookish-tag">{tag}</span
+                        >{/each}</div
+                >
             {/if}
         </div>
-    {:else}
-        <!-- Add a bit of space to account for the lack of an image. -->
-        <p>&nbsp;</p>
-    {/if}
-    {#if !print}
-        <slot name="outline" />
-    {/if}
-    {#if editable}
-        {#if embed === null}
-            <Button tooltip="add cover image" command={addCover}
-                >+ cover image</Button
-            >
-        {:else}
-            <ConfirmButton
-                confirm="delete image"
-                tooltip="delete cover image"
-                command={removeCover}>- cover image</ConfirmButton
-            >
-        {/if}
-    {/if}
-    <div bind:this={title} class="bookish-chapter-header-text">
-        <slot name="before" />
-        <Title>
-            {#if editable && save}
-                <TextEditor
-                    {label}
-                    text={header + (subtitle ? ': ' + subtitle : '')}
-                    placeholder="title"
-                    valid={(text) =>
-                        text.length === 0
-                            ? 'Titles have to be at least one character long.'
-                            : undefined}
-                    {save}
-                />
-            {:else}
-                {header}
-                {#if subtitle}<div class="bookish-subtitle">{subtitle}</div
-                    >{/if}
-            {/if}
-        </Title>
-        <slot name="after" />
-        {#if tags}
-            <div
-                >{#each tags as tag}<span class="bookish-tag">{tag}</span
-                    >{/each}</div
-            >
-        {/if}
-    </div>
-</header>
+    </header>
+{/key}
 
 <style>
     .bookish-subtitle {

@@ -8,3 +8,4 @@
 -   Updated to Sveltekit 1.11
 -   Uupdated to Vitest 0.29.2
 -   Corrected positioning of marginals in callouts, quotes, and other blocks [#323](#323)
+-   Fixed laggy udpates of chapter cover images
