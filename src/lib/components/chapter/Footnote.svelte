@@ -80,6 +80,7 @@
         font-weight: 300;
         font-size: var(--bookish-small-font-size);
         /* line-height: 1.5em; */
+        text-align: left;
     }
 
     .bookish-footnote-symbol {

@@ -78,7 +78,6 @@
 
     .caption {
         text-align: center;
-        position: relative;
         color: var(--bookish-muted-color);
         line-height: var(--bookish-paragraph-line-height-tight);
         font-size: var(--bookish-block-font-size);

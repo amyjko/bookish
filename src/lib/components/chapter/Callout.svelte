@@ -28,7 +28,6 @@
         padding-bottom: var(--bookish-paragraph-spacing);
         line-height: var(--bookish-paragraph-line-height-tight);
         clear: both;
-        position: relative;
     }
 
     .bookish-callout :global(h2),

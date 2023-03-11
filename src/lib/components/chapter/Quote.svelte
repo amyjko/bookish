@@ -41,12 +41,11 @@
         font-family: var(--bookish-header-font-family);
         font-weight: 400;
         font-style: italic;
-        padding: 0;
-        margin-top: var(--bookish-paragraph-spacing);
-        margin-bottom: var(--bookish-paragraph-spacing);
-        margin-left: var(--bookish-indent);
-        margin-right: var(--bookish-indent);
-        position: relative;
+        margin: 0;
+        padding-top: 0;
+        padding-bottom: var(--bookish-paragraph-spacing);
+        padding-left: var(--bookish-indent);
+        padding-right: var(--bookish-indent);
     }
 
     .quote > :global(p) {
@@ -56,6 +55,7 @@
 
     .caption {
         margin-top: 0.5em;
+        margin-right: var(--bookish-indent);
         text-align: right;
         font-family: var(--bookish-header-font-family);
         font-style: italic;
