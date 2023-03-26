@@ -418,7 +418,7 @@
         {/if}
 
         {#if editable || isEditionPartiallyEditable()}
-            <PageHeader>Editors</PageHeader>
+            <PageHeader id="editors">Editors</PageHeader>
             <Instructions {editable}
                 >These authors can edit this chapter. Add an email here to
                 provide chapter-level edit permissions.</Instructions

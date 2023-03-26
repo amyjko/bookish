@@ -300,7 +300,7 @@
         {/if}
 
         {#if $book && (editable || isEditionPartiallyEditable())}
-            <PageHeader>Editors</PageHeader>
+            <PageHeader id="editors">Editors</PageHeader>
             <Instructions {editable}>
                 These authors can edit this edition and its chapters. To give
                 book-level permissions, edit the book editors on the <Link
