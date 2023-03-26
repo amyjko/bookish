@@ -149,7 +149,7 @@
         </Instructions>
 
         <PageHeader id="chapters"
-            >Chapters {#if editable}<Button
+            >Chapters{#if editable}&nbsp;<Button
                     tooltip="add empty chapter"
                     disabled={waitingForChapter}
                     command={addChapter}>+ chapter</Button
