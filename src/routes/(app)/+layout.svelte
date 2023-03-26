@@ -22,7 +22,6 @@
     import BookSaveStatus from '$lib/models/book/BookSaveStatus';
     import { getUserEmails, updateBook, updateEdition } from '$lib/models/CRUD';
     import { page } from '$app/stores';
-    import Loading from '$lib/components/page/Loading.svelte';
 
     // A global store context for the focused editor, used to display toolbar.
     let caret = writable<CaretState | undefined>(undefined);
