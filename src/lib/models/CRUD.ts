@@ -133,7 +133,9 @@ export function listenToChapters(
         (docs) => {
             const chapters: [DocumentReference, string][] = [];
             docs.forEach((doc) => {
-                chapters.push([doc.ref, doc.data().text]);
+                // If the chapter text is somehow null, set it to an empty string.
+                // This accounts for previous defects that could lead to null.
+                chapters.push([doc.ref, doc.data().text ?? '']);
             });
             react(chapters);
         }
@@ -337,7 +339,8 @@ export async function updateEdition(
                     editionPath(newEdition.bookRef.id, editionRef.id),
                     'chapters'
                 ),
-                { text: newChapter.text }
+                // If the new chapter has null text, set it to empty string
+                { text: newChapter.text ?? '' }
             );
 
             // Add the ref of the new chapter to the revised chapter.
@@ -356,8 +359,11 @@ export async function updateEdition(
                     ? undefined
                     : previousEdition.getChapterByRef(newChapter.ref);
             if (
-                previousChapter === undefined ||
-                newChapter.text !== previousChapter.text
+                // A null chapter text means that we haven't loaded it yet from the database, so we
+                // only set it if it's not null.
+                newChapter.text !== null &&
+                (previousChapter === undefined ||
+                    newChapter.text !== previousChapter.text)
             ) {
                 await setDoc(
                     doc(
@@ -411,6 +417,10 @@ export async function updateEdition(
     );
 
     return newChapterRefs;
+}
+
+export async function deleteChapterText(ref: DocumentReference) {
+    deleteDoc(ref);
 }
 
 export async function updateBook(book: Book): Promise<void> {

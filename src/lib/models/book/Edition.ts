@@ -135,7 +135,7 @@ export default class Edition {
             spec.published,
             spec.images,
             spec.description,
-            spec.chapters.map((chap) => Chapter.fromJSON(chap, '')),
+            spec.chapters.map((chap) => Chapter.fromJSON(chap)),
             spec.license,
             spec.acknowledgements,
             spec.tags ?? [],
@@ -490,8 +490,7 @@ export default class Edition {
                     ([ref, text]) =>
                         chapter.ref !== undefined &&
                         chapter.ref.id === ref.id &&
-                        chapter.text !== text &&
-                        text !== undefined
+                        chapter.text !== text
                 );
                 return match ? chapter.withText(match[1]) : chapter;
             })
@@ -559,6 +558,10 @@ export default class Edition {
             []
         );
         return this.withChapters([...this.chapters, newChapter]);
+    }
+
+    hasChapterRefID(id: string) {
+        return this.chapters.some((chapter) => chapter.hasRefID(id));
     }
 
     withoutChapter(chapterID: string): Edition {

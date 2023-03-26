@@ -13,7 +13,8 @@ export type ChapterSpecification = {
     numbered: boolean;
     forthcoming: boolean;
     section?: string;
-    text?: string;
+    /** A string means that we know the chapter's text; null means we haven't loaded it yet from the database and should not be editing or saving it. */
+    text?: string | null;
     uids: string[];
 };
 
@@ -37,7 +38,7 @@ export default class Chapter {
     readonly numbered: boolean;
     readonly forthcoming: boolean;
     readonly section: string | undefined;
-    readonly text: string;
+    readonly text: string | null;
     readonly uids: string[];
 
     // Derived values
@@ -63,7 +64,7 @@ export default class Chapter {
         numbered: boolean,
         forthcoming: boolean,
         section: string | undefined,
-        text: string,
+        text: string | null,
         uids: string[]
     ) {
         this.ref = ref;
@@ -83,7 +84,7 @@ export default class Chapter {
      * The spec may contain the text itself, but it may not, so we require it to be
      * repeated here to guarantee its provided.
      */
-    static fromJSON(spec: ChapterSpecification, text: string) {
+    static fromJSON(spec: ChapterSpecification) {
         // Copy the spec, filling in defaults as necessary.
         return new Chapter(
             spec.ref,
@@ -94,7 +95,7 @@ export default class Chapter {
             spec.numbered === true || spec.numbered === undefined,
             spec.forthcoming === true,
             spec.section,
-            spec.text ?? text,
+            spec.text ?? null,
             spec.uids
         );
     }
@@ -118,6 +119,10 @@ export default class Chapter {
 
     getRef() {
         return this.ref;
+    }
+
+    hasRefID(id: string) {
+        return this.ref !== undefined && this.ref.id === id;
     }
 
     withEditors(uids: string[]) {
@@ -373,29 +378,34 @@ export default class Chapter {
         );
     }
 
-    getAST(edition: Edition): ChapterNode {
+    getAST(edition: Edition): ChapterNode | undefined {
+        if (this.text === null) return undefined;
         // Compute the cache if necessary
         if (this._ast === undefined)
             this._ast = Parser.parseChapter(edition, this.text);
         return this._ast;
     }
 
-    getWordCount(edition: Edition): number {
+    getWordCount(edition: Edition): number | undefined {
         if (this._wordCount === undefined)
-            this._wordCount = this.getAST(edition).toText().split(/\s+/).length;
+            this._wordCount = this.getAST(edition)
+                ?.toText()
+                .split(/\s+/).length;
         return this._wordCount;
     }
 
     // Utility function
     getReadingTime(edition: Edition) {
-        return this.isForthcoming()
+        const wordCount = this.getWordCount(edition);
+        return wordCount === undefined || this.isForthcoming()
             ? undefined
-            : Math.max(1, Math.round(this.getWordCount(edition) / 150));
+            : Math.max(1, Math.round(wordCount / 150));
     }
 
     getIndex(edition: Edition): Record<string, Match[]> {
         if (this._index === undefined) {
             const ast = this.getAST(edition);
+            if (ast === undefined) return {};
 
             // Build a list of common words
             let commonWords: Set<string> = new Set();
@@ -457,6 +467,6 @@ export default class Chapter {
     toString() {
         return `${this.title} by ${this.authors.join(
             ', '
-        )}: ${this.text.substring(0, 32)}}`;
+        )}: ${this.text?.substring(0, 32)}}`;
     }
 }

@@ -89,7 +89,7 @@
                                 undefined,
                                 edition.summary
                             )}
-                        />{:else}&mdash{/if}</p
+                        />{:else}&mdash;{/if}</p
                 >
             </section>
         {/if}
