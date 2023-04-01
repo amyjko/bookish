@@ -1573,7 +1573,7 @@ const commands: Command[] = [
                     ),
                     () => {
                         return {
-                            node: newTable.getRows()[0][0].getTextNodes()[0],
+                            node: newTable.getRows()[0][0].getFirstTextNode(),
                             index: 0,
                         };
                     }

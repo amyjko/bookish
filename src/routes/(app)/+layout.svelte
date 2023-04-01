@@ -32,7 +32,7 @@
     setContext<Writable<Book | undefined>>(BOOK, book);
 
     // A global store for the current edition. It's at the root so the header can do breadcrumbs.
-    let edition = writable<Edition>(undefined);
+    let edition = writable<Edition | undefined>(undefined);
     setContext<EditionStore>(EDITION, edition);
 
     // A global store for the current chapter text. It's at the root so the header can do breadcrumbs.
@@ -97,6 +97,8 @@
      */
     let reflection = false;
     async function saveEdition() {
+        if ($edition === undefined) return;
+
         if (reflection) {
             reflection = false;
             return;
@@ -109,7 +111,7 @@
         // update the edition.
         if (
             $book &&
-            (($edition && previousDocID === undefined) ||
+            (previousDocID === undefined ||
                 (newDocID !== undefined &&
                     previousDocID !== undefined &&
                     newDocID === previousDocID))
@@ -165,6 +167,7 @@
     }
 
     function scheduleSave() {
+        if ($edition === undefined) return;
         // If this is the latest edition, update the book's metadata to reflect the changes.
         if (
             $book &&

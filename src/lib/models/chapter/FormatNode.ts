@@ -41,6 +41,9 @@ export default class FormatNode extends Node {
                 previous instanceof TextNode && previous.getLength() === 0
             );
         });
+
+        // Always ensure an empty text node.
+        if (this.#segments.length === 0) this.#segments.push(new TextNode());
     }
 
     getType() {
@@ -119,8 +122,8 @@ export default class FormatNode extends Node {
 
     getTextNodes(): TextNode[] {
         return this.getNodes().filter(
-            (n) => n instanceof TextNode
-        ) as TextNode[];
+            (n): n is TextNode => n instanceof TextNode
+        );
     }
 
     // Get all text or atom nodes in this format, except for any inside an atom node,
@@ -201,7 +204,7 @@ export default class FormatNode extends Node {
     getFirstCaret(): Caret | undefined {
         const text = this.getTextNodes();
         if (text.length === 0) return undefined;
-        return { node: this.getTextNodes()[0], index: 0 };
+        return { node: this.getFirstTextNode(), index: 0 };
     }
 
     getLastCaret(): Caret | undefined {

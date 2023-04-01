@@ -135,7 +135,7 @@ export default class ListNode extends BlockNode {
             format !== undefined &&
             caret.node.hasAncestor(root, this) &&
             caret.index === 0 &&
-            format.getTextNodes()[0] === caret.node
+            format.getFirstTextNode() === caret.node
         );
     }
 
