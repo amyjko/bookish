@@ -32,6 +32,7 @@
     }
 
     function hasEditor(email: string): boolean {
+        if (email.length === 0) return false;
         const match = Array.from($emails.entries()).find(
             ([, e]) => e === email
         );
