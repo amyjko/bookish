@@ -1,8 +1,15 @@
 # bookish changelog
 
-## 0.5.26 - 2023-03-11
+# 0.5.27 - 2023-04-01
 
-# Fixed
+## Fixed
+
+-   Fixed case where an empty format caused a crash [#324](#324).
+-   Fixed incorrect editor permissions warning
+
+# 0.5.26 - 2023-03-11
+
+## Fixed
 
 -   Created a change log
 -   Updated to Sveltekit 1.11
