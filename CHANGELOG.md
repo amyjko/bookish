@@ -1,5 +1,9 @@
 # bookish changelog
 
+# 0.5.29 - 2023-05-13
+
+-   Fixed overlapping book previews.
+
 # 0.5.27 - 2023-04-01
 
 ## Fixed

@@ -65,6 +65,7 @@
         text-align: left;
         flex-wrap: wrap;
         height: 12em;
+        overflow-y: hidden;
     }
 
     .cover {

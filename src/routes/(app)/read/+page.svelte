@@ -28,6 +28,12 @@
 
 <Lead><Large>Read</Large> something.</Lead>
 
+<Paragraph
+    >See <Link to="https://faculty.washington.edu/ajko/books/" external
+        >Amy's books</Link
+    > for other examples.</Paragraph
+>
+
 {#if error !== undefined}
     <Feedback error>{error}</Feedback>
 {:else if books === undefined}
@@ -37,8 +43,3 @@
 {:else}
     <BookList {books} write={false} />
 {/if}
-<Paragraph
-    >See <Link to="https://faculty.washington.edu/ajko/books/" external
-        >Amy's books</Link
-    > for other examples.</Paragraph
->
