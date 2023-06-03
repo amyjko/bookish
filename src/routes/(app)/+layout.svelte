@@ -86,7 +86,7 @@
         clearTimeout(timer);
         return setTimeout(() => {
             fun();
-        }, 250);
+        }, 1000);
     }
 
     /** Save whatever edition is stored. */
@@ -95,14 +95,8 @@
      * Note whether the update was due to us storing the revised edition from the
      * database so that we don't get in an infinite loop of saving.
      */
-    let reflection = false;
     async function saveEdition() {
         if ($edition === undefined) return;
-
-        if (reflection) {
-            reflection = false;
-            return;
-        }
 
         const previousDocID = previousSavedEdition?.getEditionRef()?.id;
         const newDocID = $edition.getEditionRef()?.id;
@@ -118,8 +112,6 @@
         ) {
             status.set(BookSaveStatus.Saving);
             try {
-                // Set the edition after we save it, since things like chapter refs can change for new chapters.
-                reflection = true;
                 // Get the chapter refs from the updated edition
                 const newChapterRefs = await updateEdition(
                     $book,
@@ -140,7 +132,7 @@
                         );
                     }
                 }
-                // Update the current edition.
+                // Set the edition after we save it, since things like chapter refs can change for new chapters.
                 edition.set(revisedEdition);
 
                 status.set(BookSaveStatus.Saved);
@@ -192,13 +184,14 @@
             );
         }
 
-        if (!reflection) status.set(BookSaveStatus.Changed);
+        status.set(BookSaveStatus.Changed);
         editionTimer = debounce(editionTimer, saveEdition);
     }
 
     // When the edition changes, update the book and debounce a save.
     $: {
-        if ($edition) scheduleSave();
+        // If the changed edition is different from the previously saved one, schedule a save.
+        if ($edition && $edition !== previousSavedEdition) scheduleSave();
     }
 
     // When the book changes, debounce a save.

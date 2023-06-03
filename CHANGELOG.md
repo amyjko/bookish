@@ -2,6 +2,7 @@
 
 # 0.5.30 - 2023-06-03
 
+-   Fixed #340: decreased frequency of saves; prevented stale data overwrite on failed save.
 -   Updated to firebase-functions 4.4.0
 -   Updated to TypeScript 5
 -   Updated to SvelteKit 1.2

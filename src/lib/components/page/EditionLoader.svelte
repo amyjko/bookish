@@ -93,7 +93,10 @@
                         chapterText.set(chapters);
                         // Update the chapter text in the current edition.
                         if ($edition) {
-                            edition.set($edition.withChapterText(chapters));
+                            const newEdition =
+                                $edition.withChapterText(chapters);
+                            if (newEdition !== $edition)
+                                edition.set(newEdition);
 
                             // Get all the chapters in the updated chapter list and
                             // delete the ones not referenced by the edition.
