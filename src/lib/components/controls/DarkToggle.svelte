@@ -16,7 +16,7 @@
     class="dark-toggle"
     role="button"
     aria-label={dark === true ? 'Switch to light mode' : 'Switch to dark mode'}
-    tabIndex="0"
+    tabindex="0"
     on:click={change}
     on:keydown={(event) => {
         if (event.key === 'Enter' || event.key === ' ') {

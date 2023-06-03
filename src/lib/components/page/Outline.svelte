@@ -159,7 +159,7 @@
             aria-label={expanded
                 ? 'Collapse navigation menu'
                 : 'Expand navigation menu'}
-            tabIndex="0"
+            tabindex="0"
             on:click={headers.length > 0 ? toggleExpanded : undefined}
             on:keydown={(event) => {
                 if (event.key === 'Enter' || event.key === ' ')

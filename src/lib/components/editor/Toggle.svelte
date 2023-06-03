@@ -30,7 +30,7 @@
     class={`bookish-app-interactive ${
         saving === Status.Saving ? ' bookish-text-editor-saving' : ''
     } ${saving === Status.Error ? ' bookish-text-editor-error' : ''}`}
-    tabIndex="0"
+    tabindex="0"
     role="switch"
     aria-checked={on}
     on:keydown={(event) =>
