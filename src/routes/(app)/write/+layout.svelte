@@ -5,7 +5,7 @@
     let auth = getUser();
 
     // Redirect to the login page if not authenticated.
-    if ($auth === undefined || $auth.user === null)
+    $: if ($auth === undefined || $auth.user === null)
         goto('/login', { replaceState: true });
 </script>
 
