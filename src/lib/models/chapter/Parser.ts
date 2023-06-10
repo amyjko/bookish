@@ -903,12 +903,8 @@ export default class Parser {
         let code = '';
         while (this.more() && !this.nextIs('`')) {
             let next = this.read(false);
-            if (next === '\\') {
-                if (this.nextIs('`')) {
-                    this.read();
-                    next = '`';
-                }
-            }
+            // Skip backslash of escaped characters.
+            if (next === '\\') next = this.read();
             code = code + next;
         }
 

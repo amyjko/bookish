@@ -1,5 +1,10 @@
 # bookish changelog
 
+# 0.5.31 - 2023-06-10
+
+-   Login redirect on session expiration auth change
+-   Fixed #342: Prevented runaway escapes in inline code and links.
+
 # 0.5.30 - 2023-06-03
 
 -   Fixed #340: decreased frequency of saves; prevented stale data overwrite on failed save.

@@ -17,7 +17,7 @@ export default class LinkNode extends MetadataNode<string> {
         return `<a href="${this.getMeta()}">${this.getText().toHTML()}</a>`;
     }
     toBookdown(): string {
-        return `[${this.getText().toBookdown()}|${this.getMeta()}]`;
+        return `[${this.getText().getText()}|${this.getMeta()}]`;
     }
 
     copy() {

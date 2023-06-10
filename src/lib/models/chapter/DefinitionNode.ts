@@ -18,7 +18,7 @@ export default class DefinitionNode extends MetadataNode<string> {
     }
 
     toBookdown(): string {
-        return `~${this.getText().toBookdown()}~${this.getMeta()}`;
+        return `~${this.getText().getText()}~${this.getMeta()}`;
     }
 
     copy() {

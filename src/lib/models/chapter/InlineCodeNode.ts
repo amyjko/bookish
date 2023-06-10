@@ -20,7 +20,7 @@ export default class InlineCodeNode extends MetadataNode<string> {
     toBookdown(): string {
         return (
             '`' +
-            this.getText().toBookdown().replace(/`/g, '\\`') +
+            this.getText().getText().replace(/`/g, '\\`') +
             '`' +
             (this.getMeta() === 'plaintext' ? '' : this.getMeta())
         );
