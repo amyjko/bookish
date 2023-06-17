@@ -1,5 +1,9 @@
 # bookish changelog
 
+# 0.5.32 - 2023-06-17
+
+-   Added better definition of beta to home page.
+
 # 0.5.31 - 2023-06-10
 
 -   Login redirect on session expiration auth change

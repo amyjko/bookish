@@ -9,7 +9,7 @@
 
 <Section>
     <Lead
-        ><Large>Bookish</Large> (beta) is a platform for writing simple, beautiful,
+        ><Large>Bookish</Large> (beta*) is a platform for writing simple, beautiful,
         accessible online books.</Lead
     >
 
@@ -40,4 +40,16 @@
             >learn more</Link
         >.
     </Paragraph>
+
+    <Paragraph
+        ><em
+            >* Beta means that I'm still working toward a <Link
+                to="https://github.com/amyjko/bookish/milestones/1.0">1.0</Link
+            >, so there are still many known issues that may disrupt authoring,
+            or even lead to data loss. The reading experience, however, is quite
+            stable. If you'd like to accelerate progress toward a 1.0, <Link
+                to="mailto:ajko@uw.edu">write Amy</Link
+            >.</em
+        ></Paragraph
+    >
 </Section>
