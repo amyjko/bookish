@@ -3,6 +3,7 @@
 # 0.5.32 - 2023-06-17
 
 -   Added better definition of beta to home page.
+-   Fixed #349, correcting numbered list numbering.
 
 # 0.5.31 - 2023-06-10
 

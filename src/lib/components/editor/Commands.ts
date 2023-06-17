@@ -1029,24 +1029,6 @@ const commands: Command[] = [
         },
     },
     {
-        icon: IndentIcon,
-        description: 'indent list item',
-        category: 'list',
-        mutates: true,
-        control: false,
-        alt: false,
-        shift: false,
-        key: 'Tab',
-        visible: (context) => context.list !== undefined,
-        active: (context) => context.list !== undefined,
-        handler: (context) =>
-            rootWithNode(
-                context,
-                context.blocks,
-                context.blocks?.withListsIndented(context.range, true)
-            ),
-    },
-    {
         icon: UnindentIcon,
         description: 'unindent list item',
         mutates: true,
@@ -1064,6 +1046,24 @@ const commands: Command[] = [
                 context,
                 context.blocks,
                 context.blocks?.withListsIndented(context.range, false)
+            ),
+    },
+    {
+        icon: IndentIcon,
+        description: 'indent list item',
+        category: 'list',
+        mutates: true,
+        control: false,
+        alt: false,
+        shift: false,
+        key: 'Tab',
+        visible: (context) => context.list !== undefined,
+        active: (context) => context.list !== undefined,
+        handler: (context) =>
+            rootWithNode(
+                context,
+                context.blocks,
+                context.blocks?.withListsIndented(context.range, true)
             ),
     },
     {

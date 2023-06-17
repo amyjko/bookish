@@ -26,50 +26,33 @@
         line-height: var(--bookish-paragraph-line-height-tight);
     }
 
-    ol {
-        list-style: none;
-        counter-reset: item;
-    }
-
-    ol > li {
-        counter-increment: item;
-    }
-
-    ol > li {
-        list-style-type: none;
-    }
-
-    ol > :global(ol > li) {
-        list-style-type: none;
-    }
-
-    ol > :global(ol > ol > li) {
-        list-style-type: none;
-    }
-
-    ol > :global(li::before),
-    ul > :global(ol > li::before),
-    ul > :global(ul > ol > li::before) {
-        content: counter(item) '. ';
-        color: var(--bookish-bullet-color);
-        display: inline-block;
-        width: 1em;
-        margin-left: -1.5rem;
-        margin-right: 0.5rem;
-        text-align: right;
-    }
-
-    ol > :global(ol > li::before),
-    ul > :global(ol > ol > li::before) {
-        content: counter(item, lower-alpha) '. ';
-    }
-
-    ol > :global(ol > ol > li:before) {
-        content: counter(item, upper-alpha) '. ';
-    }
-
     li {
         margin-bottom: calc(0.5 * var(--bookish-paragraph-spacing));
+    }
+
+    /* Lists are decimal numbered */
+    ol {
+        list-style: decimal;
+    }
+
+    /* First level is decimal */
+    ol li {
+        counter-increment: list-item;
+        list-style-type: decimal;
+    }
+
+    /* Second level is lowercase alpha */
+    ol ol li {
+        list-style-type: lower-alpha;
+    }
+
+    /* Third level is uppercase alpha */
+    ol ol ol li {
+        list-style-type: upper-alpha;
+    }
+
+    ol li::marker {
+        color: var(--bookish-bullet-color);
     }
 
     ul li {
