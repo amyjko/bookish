@@ -41,19 +41,41 @@
         >.
     </Paragraph>
 
-    <Paragraph
-        ><em
-            >* Beta means that we are still working toward a <Link
-                to="https://github.com/amyjko/bookish/milestones/1.0">1.0</Link
-            >, so there are still many known issues that may disrupt authoring,
-            or even lead to data loss. The reading experience, however, is quite
-            stable. If you'd like to accelerate progress toward a 1.0, <Link
-                to="mailto:ajko@uw.edu">write Amy</Link
-            >.</em
-        ></Paragraph
-    >
-
     <Head>FAQs</Head>
+
+    <Paragraph>
+        <strong>What does beta mean?</strong> Beta means that we are still
+        working toward a <Link
+            to="https://github.com/amyjko/bookish/milestones/1.0">1.0</Link
+        >, so there are still many known issues that may disrupt authoring, or
+        even lead to data loss. The reading experience, however, is quite
+        stable. If you'd like to accelerate progress toward a 1.0, <Link
+            to="mailto:ajko@uw.edu">write Amy</Link
+        >. We do not have a timeline for the 1.0 release, but the project is
+        actively progressing.
+    </Paragraph>
+
+    <Paragraph>
+        <strong>Is Bookish a company?</strong> No. At the moment, it is strictly
+        an open source project maintained by <Link to="https://amyjko.phd"
+            >Amy J. Ko</Link
+        >, and the occasional contributor from around the world. It has no
+        revenue stream or organization to support it, although Amy's role as
+        Professor at the University of Washington Information School, and the
+        public funding that supports the university, is a key part of what
+        enables Amy to work on the project. In particular, some National Science
+        Foundation grants (<Link
+            to="https://www.nsf.gov/awardsearch/showAward?AWD_ID=1703734"
+            >#1703734</Link
+        >, <Link to="https://www.nsf.gov/awardsearch/showAward?AWD_ID=2031265"
+            >#2031265</Link
+        >), have partially funded her time to work on book writing
+        infrastructure. Not having an organization has tradeoffs. For example,
+        we can't take money, and therefore can use money to grow a team to
+        better support the project. However, because we don't rely on a revenue
+        stream, it means we can focus on the values above without them being
+        warped by capital.
+    </Paragraph>
 
     <Paragraph
         ><strong>Can Bookish export PDFs?</strong> No, although you can visit a chapter
