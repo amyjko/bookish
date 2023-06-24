@@ -121,12 +121,13 @@
     >
         {#if url.trim().length === 0}
             {#if editable && editionEditable}
-                <p
+                <div
+                    role="button"
                     class={`bookish-figure-unspecified ${
                         dragging ? 'bookish-figure-dragging' : ''
                     }`}
                     on:click|preventDefault={handleClick}
-                    tabIndex="0"
+                    tabindex="0"
                     on:keydown={(event) =>
                         event.key === ' ' || event.key === 'Enter'
                             ? handleClick()
@@ -139,7 +140,7 @@
                         : placeholder.length > 0
                         ? placeholder
                         : 'Click or drag to choose or upload an image, or enter an image or video URL.'}
-                </p>
+                </div>
             {:else}
                 <p class="bookish-figure-unspecified">No image or video</p>
             {/if}

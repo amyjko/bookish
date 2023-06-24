@@ -202,10 +202,11 @@
     <section
         class="bookish-editor-toolbar"
         bind:this={element}
+        role="button"
         on:keypress={handleKeyPress}
         on:keydown={handleKeyPress}
         on:mousedown|stopPropagation={() => element?.focus()}
-        tabIndex="0"
+        tabindex="0"
         transition:slide={{ duration: 200 }}
     >
         {#if context && categories}

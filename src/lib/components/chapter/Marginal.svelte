@@ -83,6 +83,8 @@
         editable ? '' : 'interactive'
     }`}
     aria-label={label}
+    role="button"
+    tabindex="0"
     on:mousedown={(event) => toggle(event, true)}
     on:keydown={(event) =>
         event.key === 'Enter' || event.key === ' '
@@ -94,7 +96,8 @@
     class={'bookish-marginal' +
         (isHidden ? ' bookish-marginal-hidden' : '') +
         (hovered ? ' bookish-marginal-hovered' : '')}
-    tabIndex={editable ? null : 0}
+    role="button"
+    tabindex={editable ? null : 0}
     on:mousedown={() => toggle(undefined, false)}
     on:keydown={(event) =>
         event.key === 'Enter' || event.key === ' '

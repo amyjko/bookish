@@ -40,6 +40,8 @@
     <figure class="bookish-figure" data-nodeid={node.nodeID}>
         <div
             class:selected
+            role="button"
+            tabindex="0"
             on:mousedown={focusFigure}
             on:keydown={(event) =>
                 event.key === ' ' || event.key === 'Enter'

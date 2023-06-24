@@ -26,7 +26,8 @@
 
 <div
     class={`bookish-image-chooser ${expanded ? 'expanded' : ''}`}
-    tabIndex="0"
+    tabindex="0"
+    role="button"
     on:click={() => (expanded = !expanded)}
     on:keydown={(event) =>
         event.key === 'Enter' || event.key === ' '

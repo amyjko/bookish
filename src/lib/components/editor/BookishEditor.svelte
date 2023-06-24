@@ -1021,13 +1021,14 @@
     class={`bookish-editor ${inAtom ? 'bookish-editor-atom-focused' : ''}`}
     class:locked
     aria-disabled={locked}
+    role="textbox"
     bind:this={element}
     on:keydown={handleKey}
     on:keypress={handlePress}
     on:mousedown|stopPropagation={handleMouseDown}
     on:focus={handleFocus}
     on:blur={handleBlur}
-    tabIndex="0"
+    tabindex="0"
 >
     <!-- A view of the root -->
     <svelte:component this={component} node={editedNode} {placeholder} />

@@ -1,5 +1,10 @@
 # bookish changelog
 
+# 0.5.4 - 2023-06-24
+
+-   Upgraded to Svelte 4, and associated dependencies.
+-   Fixed several missing ARIA roles on interactive elements
+
 # 0.5.32 - 2023-06-17
 
 -   Added better definition of beta to home page.

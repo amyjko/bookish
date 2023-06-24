@@ -32,18 +32,22 @@
 {#if loading}
     <div class="thumbnail loading" />
 {:else}
-    <img
-        class="thumbnail"
-        class:selected
-        src={error ? image.url : image.thumb}
-        alt={`Image named ${image.url}`}
-        tabIndex="0"
+    <div
+        tabindex="0"
+        role="button"
         on:click|stopPropagation={() => select(image)}
         on:keydown={(event) =>
             event.key === 'Enter' || event.key === ' '
                 ? select(image)
                 : undefined}
-    />
+    >
+        <img
+            class="thumbnail"
+            class:selected
+            src={error ? image.url : image.thumb}
+            alt={`Image named ${image.url}`}
+        />
+    </div>
 {/if}
 
 <style>
