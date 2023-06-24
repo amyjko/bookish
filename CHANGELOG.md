@@ -2,6 +2,10 @@
 
 # 0.5.4 - 2023-06-24
 
+## Content
+
+-   Added landing page FAQ
+
 ## Dependencies
 
 -   Upgraded to Svelte 4
