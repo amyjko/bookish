@@ -10,7 +10,7 @@
 
 -   Fixed several missing ARIA roles on interactive elements
 -   Fixed ConfirmButton, which didn't revert to non-confirming state after evaluating command.
--   Fixed #352, correcting command handling.
+-   Fixed [#352](https://github.com/amyjko/bookish/issues/352), correcting command handling.
 
 # 0.5.32 - 2023-06-17
 
@@ -20,14 +20,14 @@
 
 ## Fixed
 
--   Fixed #349, correcting numbered list numbering.
+-   Fixed [#349](https://github.com/amyjko/bookish/issues/349), correcting numbered list numbering.
 
 # 0.5.31 - 2023-06-10
 
 ## Fixed
 
 -   Login redirect on session expiration auth change
--   Fixed #342: Prevented runaway escapes in inline code and links.
+-   Fixed [#342](https://github.com/amyjko/bookish/issues/342): Prevented runaway escapes in inline code and links.
 
 # 0.5.30 - 2023-06-03
 
@@ -40,7 +40,7 @@
 
 ## Fixed
 
--   Fixed #340: decreased frequency of saves; prevented stale data overwrite on failed save.
+-   Fixed [#340](https://github.com/amyjko/bookish/issues/340): decreased frequency of saves; prevented stale data overwrite on failed save.
 
 # 0.5.29 - 2023-05-13
 
@@ -50,7 +50,7 @@
 
 ## Fixed
 
--   Fixed case where an empty format caused a crash [#324](#324).
+-   Fixed case where an empty format caused a crash.
 -   Fixed incorrect editor permissions warning
 
 # 0.5.26 - 2023-03-11
@@ -60,5 +60,5 @@
 -   Created a change log
 -   Updated to Sveltekit 1.11
 -   Updated to Vitest 0.29.2
--   Corrected positioning of marginals in callouts, quotes, and other blocks [#323](#323)
+-   Corrected positioning of marginals in callouts, quotes, and other blocks [#323](https://github.com/amyjko/bookish/issues/323)
 -   Fixed laggy udpates of chapter cover images
