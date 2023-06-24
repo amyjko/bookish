@@ -10,6 +10,7 @@
 
 -   Fixed several missing ARIA roles on interactive elements
 -   Fixed ConfirmButton, which didn't revert to non-confirming state after evaluating command.
+-   Fixed #352, correcting command handling.
 
 # 0.5.32 - 2023-06-17
 
