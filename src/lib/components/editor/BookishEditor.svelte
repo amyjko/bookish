@@ -624,8 +624,8 @@
 
         if (context === undefined) return;
 
-        // Loop through the commands to see if there's a match.
-        const unmatched = commands.every((command) => {
+        // Find a command that handles the event.
+        const command = commands.find((command) => {
             // If the keystroke and caret position matches the command signature, execute the command and update the caret range.
             if (
                 (command.press === undefined || command.press === press) &&
@@ -645,22 +645,20 @@
                     (command.active instanceof Function &&
                         command.active.call(undefined, context, event.key)))
             ) {
-                // Execute the command
-                const handled = executeCommand(command, event.key);
-
-                if (handled) {
+                // See if the command is handled
+                if (executeCommand(command, event.key)) {
                     event.preventDefault();
                     event.stopPropagation();
+                    return true;
                 }
-
-                // Stop searching for a matching command.
-                return handled;
+                // If not, this is not it.
+                else return false;
             }
             // Continue searching for a matching command.
-            return true;
+            return false;
         });
 
-        if (unmatched) {
+        if (command === undefined) {
             // Toolbar navigation
             if (event.key === 'Escape') {
                 // If we've selected a FootnoteNode or Comment, navigate to the footnote or comment text to edit it.

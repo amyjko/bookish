@@ -2,27 +2,44 @@
 
 # 0.5.4 - 2023-06-24
 
--   Upgraded to Svelte 4, and associated dependencies.
+## Dependencies
+
+-   Upgraded to Svelte 4
+
+## Fixed
+
 -   Fixed several missing ARIA roles on interactive elements
 -   Fixed ConfirmButton, which didn't revert to non-confirming state after evaluating command.
 
 # 0.5.32 - 2023-06-17
 
+## Content
+
 -   Added better definition of beta to home page.
+
+## Fixed
+
 -   Fixed #349, correcting numbered list numbering.
 
 # 0.5.31 - 2023-06-10
+
+## Fixed
 
 -   Login redirect on session expiration auth change
 -   Fixed #342: Prevented runaway escapes in inline code and links.
 
 # 0.5.30 - 2023-06-03
 
--   Fixed #340: decreased frequency of saves; prevented stale data overwrite on failed save.
+# Dependencies
+
 -   Updated to firebase-functions 4.4.0
 -   Updated to TypeScript 5
 -   Updated to SvelteKit 1.2
 -   Updated to Firebase 9.22
+
+## Fixed
+
+-   Fixed #340: decreased frequency of saves; prevented stale data overwrite on failed save.
 
 # 0.5.29 - 2023-05-13
 
