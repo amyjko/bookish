@@ -96,4 +96,8 @@
         font-style: italic;
         font-size: var(--bookish-small-font-size);
     }
+
+    figcaption {
+        position: relative;
+    }
 </style>
