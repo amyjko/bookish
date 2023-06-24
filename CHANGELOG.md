@@ -15,6 +15,7 @@
 -   Fixed several missing ARIA roles on interactive elements
 -   Fixed ConfirmButton, which didn't revert to non-confirming state after evaluating command.
 -   Fixed [#352](https://github.com/amyjko/bookish/issues/352), correcting command handling.
+-   Fixed layout of figure credit.
 
 # 0.5.32 - 2023-06-17
 
