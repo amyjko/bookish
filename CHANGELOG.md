@@ -1,5 +1,11 @@
 # bookish changelog
 
+# 0.5.6 - 2023-07-01
+
+## Feature
+
+-   #355 Added support for inserting line breaks in paragraph with shift-Enter.
+
 # 0.5.4 - 2023-06-24
 
 ## Content
