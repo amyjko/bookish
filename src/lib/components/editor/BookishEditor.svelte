@@ -572,7 +572,7 @@
             ) as MetadataNode<FormatNode>,
             includesList: includesList,
             table: parents?.find((n) => n instanceof TableNode) as TableNode,
-            format:
+            formatRoot:
                 caretRange.end.node instanceof TextNode ||
                 caretRange.end.node instanceof AtomNode
                     ? caretRange.end.node.getFormatRoot(editedNode)

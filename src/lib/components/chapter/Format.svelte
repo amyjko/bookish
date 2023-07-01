@@ -22,6 +22,8 @@
     import Text from './Text.svelte';
     import Format from './Format.svelte';
     import { isChapterEditable, isEditionEditable } from '../page/Contexts';
+    import LineBreakNode from '../../models/chapter/LineBreakNode';
+    import LineBreak from './LineBreak.svelte';
 
     export let node: FormatNode;
     export let placeholder: string | undefined = undefined;
@@ -56,6 +58,7 @@
                     ? placeholder
                     : undefined}
             />
+        {:else if segment instanceof LineBreakNode}<LineBreak node={segment} />
         {:else if segment instanceof InlineCodeNode}<InlineCode
                 node={segment}
             />

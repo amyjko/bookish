@@ -62,6 +62,7 @@ import TableIcon from './icons/table.svg?raw';
 import UndoIcon from './icons/undo.svg?raw';
 import UnindentIcon from './icons/unindent.svg?raw';
 import type { PasteContent } from './CaretContext';
+import LineBreakNode from '../../models/chapter/LineBreakNode';
 /**
  * Icons:
  *      From: https://www.streamlinehq.com/icons/streamline-mini-line
@@ -169,13 +170,13 @@ const commands: Command[] = [
         key: 'ArrowUp',
         visible: (context) => context.table !== undefined,
         active: (context) =>
-            context.table !== undefined && context.format !== undefined,
+            context.table !== undefined && context.formatRoot !== undefined,
         handler: (context) =>
-            context.table !== undefined && context.format !== undefined
+            context.table !== undefined && context.formatRoot !== undefined
                 ? insertTableRowColumn(
                       context,
                       context.table,
-                      context.format,
+                      context.formatRoot,
                       true,
                       true
                   )
@@ -192,13 +193,13 @@ const commands: Command[] = [
         key: 'ArrowDown',
         visible: (context) => context.table !== undefined,
         active: (context) =>
-            context.table !== undefined && context.format !== undefined,
+            context.table !== undefined && context.formatRoot !== undefined,
         handler: (context) =>
-            context.table !== undefined && context.format !== undefined
+            context.table !== undefined && context.formatRoot !== undefined
                 ? insertTableRowColumn(
                       context,
                       context.table,
-                      context.format,
+                      context.formatRoot,
                       true,
                       false
                   )
@@ -215,13 +216,13 @@ const commands: Command[] = [
         key: 'ArrowRight',
         visible: (context) => context.table !== undefined,
         active: (context) =>
-            context.table !== undefined && context.format !== undefined,
+            context.table !== undefined && context.formatRoot !== undefined,
         handler: (context) =>
-            context.table !== undefined && context.format !== undefined
+            context.table !== undefined && context.formatRoot !== undefined
                 ? insertTableRowColumn(
                       context,
                       context.table,
-                      context.format,
+                      context.formatRoot,
                       false,
                       false
                   )
@@ -238,13 +239,13 @@ const commands: Command[] = [
         key: 'ArrowLeft',
         visible: (context) => context.table !== undefined,
         active: (context) =>
-            context.table !== undefined && context.format !== undefined,
+            context.table !== undefined && context.formatRoot !== undefined,
         handler: (context) =>
-            context.table !== undefined && context.format !== undefined
+            context.table !== undefined && context.formatRoot !== undefined
                 ? insertTableRowColumn(
                       context,
                       context.table,
-                      context.format,
+                      context.formatRoot,
                       false,
                       true
                   )
@@ -261,15 +262,15 @@ const commands: Command[] = [
         key: 'Backspace',
         visible: (context) => context.table !== undefined,
         active: (context) =>
-            context.format !== undefined &&
+            context.formatRoot !== undefined &&
             context.table !== undefined &&
             context.table.getRowCount() > 1,
         handler: (context) =>
-            context.format !== undefined && context.table !== undefined
+            context.formatRoot !== undefined && context.table !== undefined
                 ? deleteTableRowColumn(
                       context,
                       context.table,
-                      context.format,
+                      context.formatRoot,
                       true
                   )
                 : undefined,
@@ -285,15 +286,15 @@ const commands: Command[] = [
         key: 'Backspace',
         visible: (context) => context.table !== undefined,
         active: (context) =>
-            context.format !== undefined &&
+            context.formatRoot !== undefined &&
             context.table !== undefined &&
             context.table.getColumnCount() > 1,
         handler: (context) =>
-            context.format !== undefined && context.table !== undefined
+            context.formatRoot !== undefined && context.table !== undefined
                 ? deleteTableRowColumn(
                       context,
                       context.table,
-                      context.format,
+                      context.formatRoot,
                       false
                   )
                 : undefined,
@@ -308,12 +309,12 @@ const commands: Command[] = [
         shift: false,
         key: 'Tab',
         visible: () => false,
-        active: (context) => context.format !== undefined,
+        active: (context) => context.formatRoot !== undefined,
         handler: (context) => {
-            if (context.format) {
+            if (context.formatRoot) {
                 let caret = context.root
                     .getNodeAfter<FormatNode>(
-                        context.format,
+                        context.formatRoot,
                         (node): node is FormatNode => node instanceof FormatNode
                     )
                     ?.getFirstCaret();
@@ -335,13 +336,13 @@ const commands: Command[] = [
         shift: true,
         key: 'Tab',
         visible: () => false,
-        active: (context) => context.format !== undefined,
+        active: (context) => context.formatRoot !== undefined,
         // If we're in a table, find the previous cell.
         handler: (context) => {
-            if (context.format) {
+            if (context.formatRoot) {
                 let caret = context.root
                     .getNodeBefore<FormatNode>(
-                        context.format,
+                        context.formatRoot,
                         (node): node is FormatNode => node instanceof FormatNode
                     )
                     ?.getFirstCaret();
@@ -426,10 +427,10 @@ const commands: Command[] = [
         shift: false,
         key: 'ArrowLeft',
         visible: false,
-        active: (context) => context.format !== undefined,
+        active: (context) => context.formatRoot !== undefined,
         handler: (context) => {
-            if (context.format !== undefined) {
-                const first = context.format.getFirstTextNode();
+            if (context.formatRoot !== undefined) {
+                const first = context.formatRoot.getFirstTextNode();
                 return {
                     root: context.root,
                     range: {
@@ -507,10 +508,10 @@ const commands: Command[] = [
         shift: true,
         key: 'ArrowLeft',
         visible: false,
-        active: (context) => context.format !== undefined,
+        active: (context) => context.formatRoot !== undefined,
         handler: (context) => {
-            if (context.format !== undefined) {
-                const first = context.format.getFirstTextNode();
+            if (context.formatRoot !== undefined) {
+                const first = context.formatRoot.getFirstTextNode();
                 return {
                     root: context.root,
                     range: {
@@ -592,10 +593,10 @@ const commands: Command[] = [
         shift: false,
         key: 'ArrowRight',
         visible: false,
-        active: (context) => context.format !== undefined,
+        active: (context) => context.formatRoot !== undefined,
         handler: (context) => {
-            if (context.format !== undefined) {
-                const last = context.format.getLastTextNode();
+            if (context.formatRoot !== undefined) {
+                const last = context.formatRoot.getLastTextNode();
                 const caret = { node: last, index: last.getLength() };
                 return {
                     root: context.root,
@@ -668,10 +669,10 @@ const commands: Command[] = [
         shift: true,
         key: 'ArrowRight',
         visible: false,
-        active: (context) => context.format !== undefined,
+        active: (context) => context.formatRoot !== undefined,
         handler: (context) => {
-            if (context.format !== undefined) {
-                const last = context.format.getLastTextNode();
+            if (context.formatRoot !== undefined) {
+                const last = context.formatRoot.getLastTextNode();
                 return {
                     root: context.root,
                     range: {
@@ -723,13 +724,13 @@ const commands: Command[] = [
             else if (
                 context.paragraph === undefined &&
                 context.block &&
-                context.format
+                context.formatRoot
             ) {
                 return {
                     root: context.root,
                     range: {
-                        start: context.format.getFirstCaret(),
-                        end: context.format.getLastCaret(),
+                        start: context.formatRoot.getFirstCaret(),
+                        end: context.formatRoot.getLastCaret(),
                     },
                 };
             } else {
@@ -1006,6 +1007,37 @@ const commands: Command[] = [
         },
     },
     {
+        icon: 'insert line break',
+        description: 'insert line break',
+        category: 'text',
+        mutates: true,
+        control: false,
+        alt: false,
+        shift: true,
+        key: 'Enter',
+        visible: false,
+        active: true,
+        handler: (context) => {
+            const format =
+                context.range.start.node.getClosestParentOfType<FormatNode>(
+                    context.root,
+                    FormatNode
+                );
+            if (format === undefined) return;
+            const edit = format.withNodeInserted(
+                context.range.start,
+                new LineBreakNode()
+            );
+            if (edit === undefined) return;
+            return rootWithNode<Node>(
+                context,
+                format,
+                edit.root,
+                () => edit.range.start
+            );
+        },
+    },
+    {
         icon: 'split paragraph',
         description: 'split paragraph',
         category: 'text',
@@ -1151,8 +1183,8 @@ const commands: Command[] = [
             context.meta instanceof InlineCodeNode
                 ? rootWithNode(
                       context,
-                      context.format,
-                      context.format?.withSegmentReplaced(
+                      context.formatRoot,
+                      context.formatRoot?.withSegmentReplaced(
                           context.meta,
                           context.meta.getText()
                       )
@@ -1179,8 +1211,8 @@ const commands: Command[] = [
             context.meta instanceof LinkNode
                 ? rootWithNode(
                       context,
-                      context.format,
-                      context.format?.withSegmentReplaced(
+                      context.formatRoot,
+                      context.formatRoot?.withSegmentReplaced(
                           context.meta,
                           context.meta.getText()
                       )
@@ -1211,8 +1243,8 @@ const commands: Command[] = [
             context.meta instanceof DefinitionNode
                 ? rootWithNode(
                       context,
-                      context.format,
-                      context.format?.withSegmentReplaced(
+                      context.formatRoot,
+                      context.formatRoot?.withSegmentReplaced(
                           context.meta,
                           context.meta.getText()
                       )

@@ -16,13 +16,14 @@ import LinkNode from './LinkNode';
 import ListNode from './ListNode';
 import ParagraphNode from './ParagraphNode';
 import QuoteNode from './QuoteNode';
-import Reference from '../book/Reference';
 import RuleNode from './RuleNode';
 import TableNode from './TableNode';
 import TextNode from './TextNode';
 import type Position from './Position';
 import type BlockNode from './BlockNode';
 import type Bookkeeping from './Bookkeeping';
+import LineBreakNode from './LineBreakNode';
+import { LINE_BREAK } from './Symbols';
 
 const numberedRE = /^[0-9]+\.+/;
 const bulletRE = /^\*+\s+/;
@@ -234,6 +235,7 @@ export default class Parser {
             next === '*' ||
             next === '`' ||
             next === '@' ||
+            next === LINE_BREAK ||
             next === '~' ||
             (next === ':' &&
                 charAfterNext !== null &&
@@ -712,7 +714,10 @@ export default class Parser {
             // Parse some bold, italic, subscript, superscript
             if (next === '_' || next === '*' || next === '^')
                 segments.push(this.parseStyle(next));
-            // Parse unformatted text
+            // Parse a line break
+            else if (this.nextIs(LINE_BREAK))
+                segments.push(this.parseLineBreak());
+            // Parse inline code text
             else if (this.nextIs('`')) segments.push(this.parseInlineCode());
             // Parse a citation list
             else if (this.nextIs('<')) segments.push(this.parseCitations());
@@ -768,6 +773,13 @@ export default class Parser {
         }
 
         return new FormatNode('', segments);
+    }
+
+    parseLineBreak(): LineBreakNode {
+        // Read the line break
+        this.read();
+
+        return new LineBreakNode();
     }
 
     parseEmbed(): EmbedNode {

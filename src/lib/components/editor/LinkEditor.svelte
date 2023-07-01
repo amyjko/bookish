@@ -80,12 +80,13 @@
     <Button
         tooltip="remove link"
         command={() => {
-            if ($caret?.context?.format) {
-                const newFormat = $caret.context.format.withSegmentReplaced(
+            if ($caret?.context?.formatRoot) {
+                const newFormat = $caret.context.formatRoot.withSegmentReplaced(
                     link,
                     link.getText()
                 );
-                if (newFormat) $caret.edit($caret.context.format, newFormat);
+                if (newFormat)
+                    $caret.edit($caret.context.formatRoot, newFormat);
             }
         }}
     >

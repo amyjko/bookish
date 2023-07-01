@@ -11,11 +11,13 @@ import {
 import MetadataNode from './MetadataNode';
 import AtomNode from './AtomNode';
 import type Edit from './Edit';
+import LineBreakNode from './LineBreakNode';
 
 export type Format = '' | '*' | '_' | '^' | 'v';
 export type FormatNodeSegmentType =
     | FormatNode
     | TextNode
+    | LineBreakNode
     | ErrorNode
     | MetadataNode<any>
     | AtomNode<any>;
@@ -29,18 +31,28 @@ export default class FormatNode extends Node {
 
         this.#format = format;
         // Remove consecutive empty text nodes.
-        this.#segments = segments.filter((item, position, list) => {
-            if (
-                position === 0 ||
-                !(item instanceof TextNode) ||
-                item.getLength() > 0
+        this.#segments = segments
+            .filter((item, position, list) => {
+                if (
+                    position === 0 ||
+                    !(item instanceof TextNode) ||
+                    item.getLength() > 0
+                )
+                    return true;
+                const previous = list[position - 1];
+                return !(
+                    previous instanceof TextNode && previous.getLength() === 0
+                );
+            })
+            // Insert text nodes between consecutive line breaks without them.
+            .map((item, position, list) =>
+                item instanceof LineBreakNode &&
+                list[position + 1] instanceof LineBreakNode
+                    ? [item, new TextNode()]
+                    : [item]
             )
-                return true;
-            const previous = list[position - 1];
-            return !(
-                previous instanceof TextNode && previous.getLength() === 0
-            );
-        });
+            // Flatten the mapped list we made.
+            .flat();
 
         // Always ensure an empty text node.
         if (this.#segments.length === 0) this.#segments.push(new TextNode());
@@ -179,6 +191,14 @@ export default class FormatNode extends Node {
         }
         // If there's not, is there an adjacent caret in the sequence of text and atom nodes?
         const adjacentNode = this.getAdjacentTextOrAtom(caret.node, next);
+
+        // If there's a line break adjacent to the next node, account for it.
+        const linebreak =
+            adjacentNode &&
+            (next
+                ? this.getSegmentBefore(adjacentNode) instanceof LineBreakNode
+                : this.getSegmentAfter(adjacentNode) instanceof LineBreakNode);
+
         if (adjacentNode !== undefined) {
             // Normally we skip over node boundaries because they look identical to each other.
             // But some nodes are zero length, so we have to account for that.
@@ -186,18 +206,20 @@ export default class FormatNode extends Node {
                 node: adjacentNode,
                 index: next
                     ? adjacentNode instanceof TextNode
-                        ? adjacentNode.isEmpty()
+                        ? adjacentNode.isEmpty() || linebreak
                             ? 0
                             : 1
                         : 0
                     : adjacentNode instanceof TextNode
                     ? adjacentNode.isEmpty()
                         ? 0
+                        : linebreak
+                        ? adjacentNode.getLength()
                         : adjacentNode.getLength() - 1
                     : 0,
             };
         }
-        // Otherwise, there is no adjascent caret.
+        // Otherwise, there is no adjacent caret.
         return undefined;
     }
 
@@ -362,9 +384,10 @@ export default class FormatNode extends Node {
 
         // Find all of the content in the node, except for format nodes and decendants of atom nodes that have format nodes,
         // to construct a new format tree with the old content.
-        const everythingButFormats = this.getNodes().filter(
-            (n) => !(n instanceof FormatNode)
-        );
+        const everythingButFormats: FormatNodeSegmentType[] =
+            this.getNodes().filter(
+                (n) => !(n instanceof FormatNode)
+            ) as FormatNodeSegmentType[];
 
         // Check if all of the selected content has the requested format so we can toggle it if so.
         let checkIndex = 0; // This tracks the current location in our scan.
@@ -672,6 +695,21 @@ export default class FormatNode extends Node {
                 // Increment the text index; atoms count for one character.
                 textIndex++;
             }
+            // Line break? Preserve the node, unless it's being deleted.
+            else if (node instanceof LineBreakNode) {
+                // Save any text prior to the line break as a text node in the current format.
+                saveText();
+                // Insert the line break unless we're deleting
+                if (
+                    format !== undefined ||
+                    textIndex < selectionStartIndex ||
+                    textIndex > selectionEndIndex
+                ) {
+                    newFormats[0].segments.push(node);
+                }
+                // Increment the text index; atoms count for one character.
+                textIndex++;
+            }
         });
 
         // Save any remaining text that we've accumulated.
@@ -902,21 +940,41 @@ export default class FormatNode extends Node {
                 node instanceof FormatNode ||
                 node instanceof TextNode ||
                 node instanceof MetadataNode ||
+                node instanceof LineBreakNode ||
                 node instanceof AtomNode
             )
         )
             return;
 
         const newFormat = this.withSegmentAt(node, caret);
+        if (newFormat === undefined) return;
+        const segmentAfter = newFormat.getSegmentAfter(node);
         const newCaret =
             node instanceof AtomNode
                 ? node.getDefaultCaret()
                 : node instanceof FormatNode
                 ? node.getLastCaret()
+                : // Line break? Place the caret just after the line break, whether a text node or something else
+                node instanceof LineBreakNode
+                ? segmentAfter !== undefined && segmentAfter instanceof TextNode
+                    ? { node: segmentAfter, index: 0 }
+                    : undefined
                 : node instanceof MetadataNode
                 ? { node: node.getText(), index: node.getText().getLength() }
                 : { node: node, index: node.getLength() };
-        if (newFormat === undefined || newCaret === undefined) return;
+        if (newCaret === undefined) return;
         return { root: newFormat, range: { start: newCaret, end: newCaret } };
+    }
+
+    getSegmentAfter(
+        segment: FormatNodeSegmentType
+    ): FormatNodeSegmentType | undefined {
+        return this.#segments[this.#segments.indexOf(segment) + 1];
+    }
+
+    getSegmentBefore(
+        segment: FormatNodeSegmentType
+    ): FormatNodeSegmentType | undefined {
+        return this.#segments[this.#segments.indexOf(segment) - 1];
     }
 }

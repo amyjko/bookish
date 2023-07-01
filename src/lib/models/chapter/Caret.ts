@@ -3,6 +3,7 @@ import AtomNode from './AtomNode';
 import TextNode from './TextNode';
 import FormatNode from './FormatNode';
 import type EmbedNode from './EmbedNode';
+import LineBreakNode from './LineBreakNode';
 
 export type SelectableNode = TextNode | AtomNode<any> | EmbedNode;
 type Caret = { node: SelectableNode; index: number };
@@ -11,13 +12,17 @@ export default Caret;
 export type CaretRange = { start: Caret; end: Caret };
 export type IndexRange = { start: number; end: number };
 
-export function getTextAndAtomNodes(node: Node): (AtomNode<any> | TextNode)[] {
+export function getNavigableNodes(
+    node: Node
+): (AtomNode<any> | TextNode | LineBreakNode)[] {
     return node
         .getNodes()
-        .filter((n) => n instanceof TextNode || n instanceof AtomNode) as (
-        | AtomNode<any>
-        | TextNode
-    )[];
+        .filter(
+            (n) =>
+                n instanceof TextNode ||
+                n instanceof AtomNode ||
+                n instanceof LineBreakNode
+        ) as (AtomNode<any> | TextNode | LineBreakNode)[];
 }
 
 function getFormatRoots(node: Node): FormatNode[] {
@@ -39,7 +44,7 @@ export function caretToIndex(node: Node, caret: Caret): number | undefined {
 
     let currentIndex = 0;
     for (let n = 0; n < roots.length; n++) {
-        const nodes = getTextAndAtomNodes(roots[n]);
+        const nodes = getNavigableNodes(roots[n]);
         for (let i = 0; i < nodes.length; i++) {
             const t = nodes[i];
             if (t !== caret.node) currentIndex += t.getCaretPositionCount();
@@ -56,9 +61,9 @@ export function indexToCaret(node: Node, index: number): Caret | undefined {
 
     let currentIndex = 0;
     for (let n = 0; n < roots.length; n++) {
-        const nodes = getTextAndAtomNodes(roots[n]);
+        const nodes = getNavigableNodes(roots[n]);
         for (let i = 0; i < nodes.length; i++) {
-            const t = nodes[i];
+            let t = nodes[i];
             if (
                 index >= currentIndex &&
                 index <= currentIndex + t.getCaretPositionCount()
@@ -69,7 +74,18 @@ export function indexToCaret(node: Node, index: number): Caret | undefined {
                     if (next instanceof TextNode && next.getLength() === 0)
                         return { node: next, index: 0 };
                 }
-                return { node: t, index: index - currentIndex };
+                // If it's a line break node, find the next non-line break node.
+                if (t instanceof LineBreakNode) {
+                    while (
+                        i < nodes.length &&
+                        nodes[i] instanceof LineBreakNode
+                    )
+                        i++;
+                    t = nodes[i];
+                    if (i === nodes.length || t instanceof LineBreakNode)
+                        return undefined;
+                    return { node: t, index: 0 };
+                } else return { node: t, index: index - currentIndex };
             }
             currentIndex += t.getCaretPositionCount();
         }

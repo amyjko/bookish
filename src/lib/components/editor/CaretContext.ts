@@ -31,7 +31,7 @@ type CaretContext = {
     code: CodeNode | undefined;
     list: ListNode | undefined;
     table: TableNode | undefined;
-    format: FormatNode | undefined;
+    formatRoot: FormatNode | undefined;
     atom: AtomNode<any> | undefined;
     meta: MetadataNode<any> | undefined;
     startIsText: boolean;
