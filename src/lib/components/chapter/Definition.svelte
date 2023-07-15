@@ -31,13 +31,12 @@
 </script>
 
 <!-- Error if there's no corresponding entry. -->
-<span class="bookish-definition" data-nodeid={node.nodeID}>
-    <Marginal
+<span class="bookish-definition" data-nodeid={node.nodeID}
+    ><Marginal
         {node}
         id={'glossary-' + glossaryID}
         label={entry ? `definition: ${entry.phrase}` : 'undefined phrase'}
-    >
-        <Text slot="interactor" node={phrase} /><span
+        ><Text slot="interactor" node={phrase} /><span
             slot="content"
             class="bookish-definition-entry"
             >{#if entry === undefined}<Problem
@@ -53,9 +52,9 @@
                 />{#if entry.synonyms && entry.synonyms.length > 0}<p
                         class="synonyms">{entry.synonyms.join(', ')}</p
                     >{/if}{/if}</span
-        >
-    </Marginal>
-</span>
+        ></Marginal
+    ></span
+>
 
 <style>
     .bookish-definition :global(.bookish-marginal-interactor) {

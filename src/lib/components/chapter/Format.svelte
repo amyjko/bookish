@@ -50,31 +50,33 @@
     this={tag}
     data-nodeid={node.nodeID}
     class={`format ${showPlaceholder ? 'bookish-editor-placeholder' : ''}`}
->
-    {#each node.getSegments() as segment (segment.nodeID)}
-        {#if segment instanceof TextNode}<Text
+    >{#each node.getSegments() as segment (segment.nodeID)}{#if segment instanceof TextNode}<Text
                 node={segment}
                 placeholder={showPlaceholder && node.getSegments().length === 1
                     ? placeholder
                     : undefined}
+            />{:else if segment instanceof LineBreakNode}<LineBreak
+                node={segment}
             />
-        {:else if segment instanceof LineBreakNode}<LineBreak node={segment} />
         {:else if segment instanceof InlineCodeNode}<InlineCode
                 node={segment}
-            />
-        {:else if segment instanceof LinkNode}<Link node={segment} />
-        {:else if segment instanceof CitationsNode}<Citations node={segment} />
-        {:else if segment instanceof DefinitionNode}<Definition
+            />{:else if segment instanceof LinkNode}<Link
                 node={segment}
-            />
-        {:else if segment instanceof FootnoteNode}<Footnote node={segment} />
-        {:else if segment instanceof LabelNode}<Label node={segment} />
-        {:else if segment instanceof CommentNode}<Comment node={segment} />
-        {:else if segment instanceof FormatNode}<Format node={segment} />
-        {:else}<Problem>Unknown segment type node={segment}</Problem>
-        {/if}
-    {/each}
-</svelte:element>
+            />{:else if segment instanceof CitationsNode}<Citations
+                node={segment}
+            />{:else if segment instanceof DefinitionNode}<Definition
+                node={segment}
+            />{:else if segment instanceof FootnoteNode}<Footnote
+                node={segment}
+            />{:else if segment instanceof LabelNode}<Label
+                node={segment}
+            />{:else if segment instanceof CommentNode}<Comment
+                node={segment}
+            />{:else if segment instanceof FormatNode}<Format
+                node={segment}
+            />{:else}<Problem>Unknown segment type node={segment}</Problem
+            >{/if}{/each}</svelte:element
+>
 
 <style>
     .bookish-editor-placeholder {

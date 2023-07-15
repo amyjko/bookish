@@ -104,10 +104,8 @@
             ? toggle(undefined, false)
             : undefined}
     on:mouseenter={handleEnter}
-    on:mouseleave={handleExit}
+    on:mouseleave={handleExit}><slot name="content" /></span
 >
-    <slot name="content" />
-</span>
 
 <style>
     :global(.bookish-definition)
