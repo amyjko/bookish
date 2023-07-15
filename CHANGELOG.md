@@ -2,7 +2,10 @@
 
 # 0.5.61 - 2023-07-15
 
--   #343 Convert inline code into block
+## Fixed
+
+-   [#343](https://github.com/amyjko/bookish/issues/343): Convert inline code into block on Enter
+-   [#347](https://github.com/amyjko/bookish/issues/347): `overflow-wrap` on chapter body to prevent overflow of very long text.
 
 # 0.5.6 - 2023-07-01
 
@@ -23,7 +26,7 @@
 ## Fixed
 
 -   Fixed several missing ARIA roles on interactive elements
--   Fixed ConfirmButton, which didn't revert to non-confirming state after evaluating command.
+-   Fixed `ConfirmButton`, which didn't revert to non-confirming state after evaluating command.
 -   Fixed [#352](https://github.com/amyjko/bookish/issues/352), correcting command handling.
 -   Fixed layout of figure credit.
 

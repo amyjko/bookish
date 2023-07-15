@@ -49,6 +49,8 @@
     .bookish-chapter-body {
         min-height: 2em;
         min-width: 100%;
+
+        overflow-wrap: break-word;
     }
 
     :global(.bookish-content-highlight) {
