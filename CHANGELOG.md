@@ -1,5 +1,9 @@
 # bookish changelog
 
+# 0.5.61 - 2023-07-15
+
+-   #343 Convert inline code into block
+
 # 0.5.6 - 2023-07-01
 
 ## Feature

@@ -1007,6 +1007,68 @@ const commands: Command[] = [
         },
     },
     {
+        icon: 'convert inline code to block code',
+        description: 'convert inline code to block code',
+        category: 'text',
+        mutates: true,
+        control: false,
+        alt: false,
+        shift: false,
+        key: 'Enter',
+        visible: false,
+        // We must be in a solo inline code node (other than empty text nodes) that's in a paragraph that's in a blocks node
+        active: (context) => {
+            if (
+                !(context.block instanceof ParagraphNode) ||
+                context.blocks === undefined
+            )
+                return false;
+            const nonEmptySegments = context.block
+                .getFormat()
+                .getSegments()
+                .filter((n) => !(n instanceof TextNode && n.getText() === ''));
+            return (
+                nonEmptySegments.length === 1 &&
+                nonEmptySegments[0] instanceof InlineCodeNode
+            );
+        },
+        handler: (context) => {
+            // Find the inline code node we're in
+            const inline =
+                context.range.start.node.getClosestParentOfType<InlineCodeNode>(
+                    context.root,
+                    InlineCodeNode
+                );
+            const block = context.block;
+            const blocks = context.blocks;
+
+            if (
+                block === undefined ||
+                blocks === undefined ||
+                inline === undefined
+            )
+                return;
+
+            // First, remove the inline code block from the block it's in.
+            const newBlock = block.withNodeReplaced(inline, undefined);
+            if (newBlock === undefined) return;
+            let newBlocks = blocks.withChildReplaced(block, newBlock);
+            if (newBlocks === undefined) return;
+            newBlocks = newBlocks.withBlockInsertedAfter(
+                newBlock,
+                new CodeNode(inline.getText(), inline.getMeta(), '<')
+            );
+            if (newBlocks === undefined) return;
+
+            return rootWithNode<Node>(
+                context,
+                blocks,
+                newBlocks,
+                () => context.range.start
+            );
+        },
+    },
+    {
         icon: 'insert line break',
         description: 'insert line break',
         category: 'text',
