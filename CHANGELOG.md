@@ -1,6 +1,6 @@
 # bookish changelog
 
-# 06.62 - 2023-7-29
+# 0.5.62 - 2023-7-29
 
 -   [#356](https://github.com/amyjko/bookish/issues/356): Fixed faulty horizontal rule margins.
 -   Removed caching of editions in hosting, at least until cost becomes an issue.
