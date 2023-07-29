@@ -524,8 +524,10 @@ export const getEdition = functions.https.onRequest(
 
         // Otherwise, success! We resolved a book. Return it's JSON.
         response
-            // Browsers and CDNs can cache this for 5 minutes.
-            .set('Cache-Control', 'public, max-age=300, s-maxage=300')
+            // Browsers and CDNs can cache this for 5 seconds.
+            // This is tradeoff between const and liveness, and since costs are currently low,
+            // we're going to keep content fresh.
+            .set('Cache-Control', 'public, max-age=5, s-maxage=5')
             .status(200)
             .send(
                 JSON.stringify({
