@@ -12,7 +12,7 @@
     hr {
         border: none;
         border-bottom: 1px solid var(--bookish-border-color-light);
-        margin-top: calc(var(--bookish-paragraph-spacing) * 3);
-        margin-bottom: calc(var(--bookish-paragraph-spacing) * 3);
+        margin-top: calc(var(--bookish-paragraph-spacing));
+        margin-bottom: calc(var(--bookish-paragraph-spacing));
     }
 </style>

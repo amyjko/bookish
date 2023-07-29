@@ -1,5 +1,9 @@
 # bookish changelog
 
+# 06.62 - 2023-7-29
+
+-   [#356](https://github.com/amyjko/bookish/issues/356): Fixed faulty horizontal rule margins.
+
 # 0.5.61 - 2023-07-15
 
 ## Fixed

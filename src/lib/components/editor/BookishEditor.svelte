@@ -1085,9 +1085,4 @@
     .bookish-link-active {
         font-weight: bold;
     }
-
-    .bookish-editor :global(hr) {
-        margin-top: 1em;
-        margin-bottom: 1em;
-    }
 </style>
