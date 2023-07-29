@@ -4,6 +4,7 @@
 
 -   [#356](https://github.com/amyjko/bookish/issues/356): Fixed faulty horizontal rule margins.
 -   Removed caching of editions in hosting, at least until cost becomes an issue.
+-   Updated minor versions of Svelte, Sveltekit, Vite, Firebase, and various dev dependencies.
 
 # 0.5.61 - 2023-07-15
 
