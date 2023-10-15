@@ -1,6 +1,10 @@
 # bookish changelog
 
-# 0.5.62 - 2023-7-29
+# 0.5.62 - 2023-10-15
+
+-   Added .gitattributes to avoid cross platform line break issues.
+
+# 0.5.62 - 2023-07-29
 
 -   [#356](https://github.com/amyjko/bookish/issues/356): Fixed faulty horizontal rule margins.
 -   Removed caching of editions in hosting, at least until cost becomes an issue.
