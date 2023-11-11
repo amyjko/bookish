@@ -203,7 +203,7 @@
                             You can edit this chapter.
                         {/if}
                     </span>
-                    <span slot="etc">
+                    <span class="etc" slot="etc">
                         <Muted>
                             {#if editable}
                                 <Toggle
@@ -321,3 +321,9 @@
         {/if}
     </Page>
 {/if}
+
+<style>
+    .etc {
+        white-space: nowrap;
+    }
+</style>

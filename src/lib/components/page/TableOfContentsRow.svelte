@@ -93,7 +93,7 @@
                             ? edition.set(
                                   $edition.withoutChapter(chapter.getID())
                               )
-                            : undefined}>- chapter</ConfirmButton
+                            : undefined}>⨉</ConfirmButton
                 >
             {/if}
         </td>
@@ -113,6 +113,8 @@
         display: flex;
         flex-direction: row;
         flex-wrap: nowrap;
+        justify-content: end;
+        margin-inline-end: var(--app-chrome-padding);
         gap: var(--app-chrome-padding);
     }
 
