@@ -4,6 +4,7 @@
 
 -   Updated minor versions of dependencies
 -   Updated to Firebase 10.5 libraries.
+-   Fixed link in book description instructions.
 
 # 0.5.62 - 2023-10-15
 

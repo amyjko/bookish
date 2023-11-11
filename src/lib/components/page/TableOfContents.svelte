@@ -137,7 +137,7 @@
         <Description />
 
         <Instructions {editable}>
-            This will appear on the <Link to="{$base}/read">book browsing</Link>
+            This will appear on the <Link to="/read">book browsing</Link>
             page and in your table of contents. Write an informative description
             of what your book is about.
         </Instructions>
