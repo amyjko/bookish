@@ -2,8 +2,13 @@
 
 # 0.5.63 - 2023-11-11
 
+## Dependencies
+
 -   Updated minor versions of dependencies
 -   Updated to Firebase 10.5 libraries.
+
+## Fixed
+
 -   Fixed link in book description instructions.
 -   [#359](https://github.com/amyjko/bookish/issues/359): Show reference IDs when not editing
 -   [#358](https://github.com/amyjko/bookish/issues/358): Clarified button label.
