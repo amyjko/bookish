@@ -242,7 +242,7 @@
 {:else}
     <!-- Otherwise, just render the reference. -->
     <p class="reference">
-        {#if editable}<Note>{reference.citationID}</Note> {/if}{#if reference.authors}{reference.authors}{:else}<em>Authors</em>{/if}
+        {#if editable}<Note>{reference.citationID}</Note><br/>{/if}{#if reference.authors}{reference.authors}{:else}<em>Authors</em>{/if}
         {#if reference.year}({reference.year}){:else}<em>Year</em>{/if}. {#if reference.url === null || reference.url.length === 0}{#if reference.title}{reference.title}{:else}<em
                     >Title</em
                 >{/if}{:else}<Link to={reference.url}

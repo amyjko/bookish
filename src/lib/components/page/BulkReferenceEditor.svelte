@@ -62,7 +62,7 @@
     command={handleBulkAdd}>+ bulk references</Button
 >
 <Button tooltip="add empty reference" command={handleEmptyAdd}
-    >+ reference</Button
+    >+ empty reference</Button
 >
 
 <style>
