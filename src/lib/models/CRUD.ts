@@ -32,7 +32,7 @@ const NO_DATABASE_CONNECTION = 'Not connected to database';
 
 function listenToBooks(
     constraint: QueryFieldFilterConstraint,
-    react: (books: Book[]) => void
+    react: (books: Book[]) => void,
 ): Unsubscribe {
     if (!db) throw NO_DATABASE_CONNECTION;
     try {
@@ -45,10 +45,10 @@ function listenToBooks(
                         : snapshot.docs.map((doc) =>
                               Book.fromJSON(
                                   doc.id,
-                                  doc.data() as BookSpecification
-                              )
-                          )
-                )
+                                  doc.data() as BookSpecification,
+                              ),
+                          ),
+                ),
         );
     } catch (err) {
         throw 'Issue querying database';
@@ -56,35 +56,35 @@ function listenToBooks(
 }
 
 export function listenToPublishedBooks(
-    react: (books: Book[]) => void
+    react: (books: Book[]) => void,
 ): Unsubscribe {
     return listenToBooks(where('published', '==', true), react);
 }
 
 export function listenToEditableBooks(
     userID: string,
-    react: (books: Book[]) => void
+    react: (books: Book[]) => void,
 ): Unsubscribe {
     return listenToBooks(where('uids', 'array-contains', userID), react);
 }
 
 export function listenToPartiallyEditableBooks(
     userID: string,
-    react: (books: Book[]) => void
+    react: (books: Book[]) => void,
 ): Unsubscribe {
     return listenToBooks(where('readuids', 'array-contains', userID), react);
 }
 
 export function listenToBooksByName(
     name: string,
-    react: (book: Book[]) => void
+    react: (book: Book[]) => void,
 ): Unsubscribe {
     return listenToBooks(where('domain', '==', name), react);
 }
 
 export function listenToBookWithID(
     id: string,
-    react: (book: Book | null) => void
+    react: (book: Book | null) => void,
 ): Unsubscribe {
     if (!db) throw NO_DATABASE_CONNECTION;
     const ref = doc(db, 'books', id);
@@ -93,7 +93,7 @@ export function listenToBookWithID(
             react(
                 doc.exists()
                     ? Book.fromJSON(id, doc.data() as BookSpecification)
-                    : null
+                    : null,
             );
     });
 }
@@ -101,7 +101,7 @@ export function listenToBookWithID(
 export function listenToEdition(
     bookID: string,
     editionID: string,
-    react: (edition: Edition | null) => void
+    react: (edition: Edition | null) => void,
 ): Unsubscribe {
     if (!db) throw NO_DATABASE_CONNECTION;
 
@@ -113,18 +113,18 @@ export function listenToEdition(
                     doc.exists()
                         ? Edition.fromJSON(
                               doc.ref,
-                              doc.data() as EditionSpecification
+                              doc.data() as EditionSpecification,
                           )
-                        : null
+                        : null,
                 );
-        }
+        },
     );
 }
 
 export function listenToChapters(
     bookID: string,
     editionID: string,
-    react: (chapters: [DocumentReference, string][]) => void
+    react: (chapters: [DocumentReference, string][]) => void,
 ): Unsubscribe {
     if (!db) throw NO_DATABASE_CONNECTION;
 
@@ -140,7 +140,7 @@ export function listenToChapters(
                     chapters.push([doc.ref, doc.data().text ?? '']);
             });
             react(chapters);
-        }
+        },
     );
 }
 
@@ -150,7 +150,7 @@ export function listenToChapters(
 
 /** Hit the authentication database to get user emails. */
 export async function getUserEmails(
-    uids: string[]
+    uids: string[],
 ): Promise<Map<string, string> | null> {
     if (!functions)
         throw Error("Can't publish, no connection to Firebase functions.");
@@ -173,7 +173,7 @@ export async function createUser(email: string): Promise<string | null> {
 
     const createUserWithEmail = httpsCallable<{ email: string }, string>(
         functions,
-        'createUserWithEmail'
+        'createUserWithEmail',
     );
 
     const result = await createUserWithEmail({
@@ -227,13 +227,13 @@ export async function createBook(userID: string): Promise<string> {
         {},
         null,
         null,
-        {}
+        {},
     ).withNewChapter();
 
     // Add the edition to the editions collection in the database so we can get an edition ref.
     const editionRef = await addDoc(
         collection(db, 'books', bookRef.id, 'editions'),
-        newEdition.toObject()
+        newEdition.toObject(),
     );
 
     // Remember the ref.
@@ -262,7 +262,7 @@ export async function createNewEdition(book: Book): Promise<Book> {
     if (latestEditionID === undefined) throw 'No editions on this book';
 
     const latestDraftDoc = await getDoc(
-        doc(db, 'books', book.id, 'editions', latestEditionID)
+        doc(db, 'books', book.id, 'editions', latestEditionID),
     );
     const latestDraft = latestDraftDoc.exists()
         ? latestDraftDoc.data()
@@ -277,7 +277,7 @@ export async function createNewEdition(book: Book): Promise<Book> {
     // Create a copy of the existing draft as a new edition.
     const newEditionRef = await addDoc(
         collection(db, 'editions'),
-        newEdition.toObject()
+        newEdition.toObject(),
     );
 
     // Create the edition, creating chapter text as necessary, using the edition sync function.
@@ -299,7 +299,7 @@ export async function updateLock(
     edition: Edition,
     uid: string,
     content: string,
-    lock: boolean
+    lock: boolean,
 ): Promise<boolean> {
     if (!db) throw NO_DATABASE_CONNECTION;
     if (edition.editionRef === undefined) return false;
@@ -309,7 +309,7 @@ export async function updateLock(
 
     await setDoc(
         doc(db, editionPath(edition.bookRef.id, edition.editionRef.id)),
-        edition.withLock(uid, content, lock).toObject()
+        edition.withLock(uid, content, lock).toObject(),
     );
     return lock;
 }
@@ -321,7 +321,7 @@ export async function updateLock(
 export async function updateEdition(
     book: Book,
     previousEdition: Edition | undefined,
-    newEdition: Edition
+    newEdition: Edition,
 ): Promise<Map<string, DocumentReference>> {
     if (!db) throw Error("Can't update edition, not connected to Firebase.");
 
@@ -339,16 +339,16 @@ export async function updateEdition(
                 collection(
                     db,
                     editionPath(newEdition.bookRef.id, editionRef.id),
-                    'chapters'
+                    'chapters',
                 ),
                 // If the new chapter has null text, set it to empty string
-                { text: newChapter.text ?? '' }
+                { text: newChapter.text ?? '' },
             );
 
             // Add the ref of the new chapter to the revised chapter.
             newEdition = newEdition.withRevisedChapter(
                 newChapter,
-                newChapter.withRef(newChapterRef)
+                newChapter.withRef(newChapterRef),
             );
 
             // Map the chapter ref to it's id.
@@ -372,9 +372,9 @@ export async function updateEdition(
                         db,
                         editionPath(newEdition.bookRef.id, editionRef.id),
                         'chapters',
-                        newChapter.ref.id
+                        newChapter.ref.id,
                     ),
-                    { text: newChapter.text }
+                    { text: newChapter.text },
                 );
             }
         }
@@ -398,7 +398,7 @@ export async function updateEdition(
         const newInfo = newEdition.getInfo();
         if (previousInfo && newInfo) {
             const previousKeys = Object.keys(
-                previousInfo
+                previousInfo,
             ) as (keyof EditionInfo)[];
             const newKeys = Object.keys(newInfo) as (keyof EditionInfo)[];
             if (
@@ -406,7 +406,7 @@ export async function updateEdition(
                 !previousKeys.every((key) => previousInfo[key] === newInfo[key])
             ) {
                 updateBook(
-                    book.withRevisedEdition(previousEdition, newEdition)
+                    book.withRevisedEdition(previousEdition, newEdition),
                 );
             }
         }
@@ -415,14 +415,10 @@ export async function updateEdition(
     // Finally, update the edition's document.
     await setDoc(
         doc(db, editionPath(newEdition.bookRef.id, editionRef.id)),
-        newEdition.toObject()
+        newEdition.toObject(),
     );
 
     return newChapterRefs;
-}
-
-export async function deleteChapterText(ref: DocumentReference) {
-    deleteDoc(ref);
 }
 
 export async function updateBook(book: Book): Promise<void> {
@@ -433,7 +429,7 @@ export async function updateBook(book: Book): Promise<void> {
 
 export async function isSubdomainAvailable(
     subdomain: string,
-    book: Book
+    book: Book,
 ): Promise<boolean> {
     if (!db) throw Error('Not connected to Firebase.');
 
@@ -441,18 +437,18 @@ export async function isSubdomainAvailable(
 }
 
 export async function getBookIDWithSubdomain(
-    subdomain: string
+    subdomain: string,
 ): Promise<string | null> {
     if (!db) throw Error('Not connected to Firebase.');
     const matches = await getDocs(
-        query(collection(db, 'books'), where('domain', '==', subdomain))
+        query(collection(db, 'books'), where('domain', '==', subdomain)),
     );
 
     return matches.empty ? null : matches.docs[0].id;
 }
 
 export async function publish(
-    edition: Edition
+    edition: Edition,
 ): Promise<string | { url: string }> {
     if (!db) throw Error('Cannot publish, no database connection');
     if (!functions) throw Error('Cannot publish, no cloud connection');

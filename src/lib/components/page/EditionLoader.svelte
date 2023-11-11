@@ -11,11 +11,7 @@
     import { onDestroy } from 'svelte';
     import { page } from '$app/stores';
     import type { Unsubscribe } from 'firebase/auth';
-    import {
-        deleteChapterText,
-        listenToChapters,
-        listenToEdition,
-    } from '../../models/CRUD';
+    import { listenToChapters, listenToEdition } from '../../models/CRUD';
 
     export let write: boolean;
 
@@ -97,16 +93,6 @@
                                 $edition.withChapterText(chapters);
                             if (newEdition !== $edition)
                                 edition.set(newEdition);
-
-                            // Get all the chapters in the updated chapter list and
-                            // delete the ones not referenced by the edition.
-                            chapters
-                                .filter(
-                                    ([ref]) =>
-                                        $edition &&
-                                        !$edition.hasChapterRefID(ref.id)
-                                )
-                                .forEach(([ref]) => deleteChapterText(ref));
                         }
                     }
                 );
