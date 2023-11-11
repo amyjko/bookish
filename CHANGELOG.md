@@ -1,5 +1,10 @@
 # bookish changelog
 
+# 0.5.63 - 2023-11-11
+
+-   Updated minor versions of dependencies
+-   Updated to Firebase 10.5 libraries.
+
 # 0.5.62 - 2023-10-15
 
 -   Added .gitattributes to avoid cross platform line break issues.
