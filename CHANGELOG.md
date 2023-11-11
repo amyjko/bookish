@@ -12,6 +12,7 @@
 -   Fixed link in book description instructions.
 -   [#359](https://github.com/amyjko/bookish/issues/359): Show reference IDs when not editing
 -   [#358](https://github.com/amyjko/bookish/issues/358): Clarified button label.
+-   [#357](https://github.com/amyjko/bookish/issues/357): Fixed multi-agent chapter add/delete async bug.
 
 # 0.5.62 - 2023-10-15
 
