@@ -5,6 +5,7 @@
 -   Updated minor versions of dependencies
 -   Updated to Firebase 10.5 libraries.
 -   Fixed link in book description instructions.
+-   [#359](https://github.com/amyjko/bookish/issues/359): Show reference IDs when not editing
 
 # 0.5.62 - 2023-10-15
 

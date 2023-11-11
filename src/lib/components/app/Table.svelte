@@ -9,7 +9,6 @@
         width: 100%;
         overflow-x: auto;
         margin-top: var(--app-text-spacing);
-        margin-bottom: var(--app-text-spacing);
         border-top: var(--app-chrome-border-size) solid var(--app-border-color);
         border-bottom: var(--app-chrome-border-size) solid
             var(--app-border-color);

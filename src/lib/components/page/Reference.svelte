@@ -240,9 +240,9 @@
         </tr>
     </Table>
 {:else}
-    <!-- If not editable, just render the reference. -->
+    <!-- Otherwise, just render the reference. -->
     <p class="reference">
-        {#if reference.authors}{reference.authors}{:else}<em>Authors</em>{/if}
+        {#if editable}<Note>{reference.citationID}</Note> {/if}{#if reference.authors}{reference.authors}{:else}<em>Authors</em>{/if}
         {#if reference.year}({reference.year}){:else}<em>Year</em>{/if}. {#if reference.url === null || reference.url.length === 0}{#if reference.title}{reference.title}{:else}<em
                     >Title</em
                 >{/if}{:else}<Link to={reference.url}
@@ -253,29 +253,32 @@
         >.
         {#if reference.summary}<aside class="summary">{reference.summary}</aside
             >{/if}
+        
     </p>
 {/if}
 {#if edit && editable && !reference.short}
-    <ConfirmButton
-        tooltip="delete reference {reference.title}"
-        confirm="delete reference"
-        command={() =>
-            $edition
-                ? edition.set($edition.withoutReference(reference.citationID))
-                : undefined}>⨉</ConfirmButton
-    >
-    <Button
-        tooltip="stop editing reference"
-        command={() => (editing ? stopEditing() : startEditing())}
-        >{editing ? 'done' : 'edit'}</Button
-    >
+    <div class='controls'>
+        <ConfirmButton
+            tooltip="delete reference {reference.title}"
+            confirm="delete reference"
+            command={() =>
+                $edition
+                    ? edition.set($edition.withoutReference(reference.citationID))
+                    : undefined}>⨉</ConfirmButton
+        >
+        <Button
+            tooltip="stop editing reference"
+            command={() => (editing ? stopEditing() : startEditing())}
+            >{editing ? 'done' : 'edit'}</Button
+        >
+    </div>
 {/if}
 
 <style>
     .reference {
         line-height: var(--bookish-paragraph-line-height-tight);
         margin-top: 0;
-        margin-bottom: var(--bookish-block-padding);
+        margin-top: var(--bookish-block-padding);
     }
 
     p {
@@ -297,5 +300,9 @@
 
     td {
         line-height: 1;
+    }
+
+    .controls {
+        margin-top: calc(var(--bookish-block-padding) / 2);
     }
 </style>
