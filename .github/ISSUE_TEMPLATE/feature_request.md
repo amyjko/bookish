@@ -3,7 +3,8 @@ name: Feature request
 about: Suggest an feature idea or improvement
 title: ''
 labels: ['feature', 'needs triage']
-assignees: ''
+assignees:
+    - amyjko
 ---
 
 ## What's the problem?
