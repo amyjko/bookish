@@ -4,9 +4,8 @@ import admin from 'firebase-admin';
 import path from 'path';
 import os from 'os';
 import fs from 'fs';
-import { EditionSpecification } from 'bookish-press/models/book/Edition';
-// import { spawn } from 'child_process';
-import { BookSpecification } from 'bookish-press/models/book/Book';
+import type { EditionSpecification } from 'bookish-press/models/book/Edition';
+import type { BookSpecification } from 'bookish-press/models/book/Book';
 import sharp from 'sharp';
 
 admin.initializeApp();
@@ -20,7 +19,7 @@ function getThumbnailPath(filePath: string) {
 async function resizeImage(
     storagePath: string,
     bucketID: string,
-    contentType: string | undefined
+    contentType: string | undefined,
 ) {
     // Get the bucket.
     const bucket = admin.storage().bucket(bucketID);
@@ -120,7 +119,7 @@ export const getUserEmails = functions.https.onCall(
         const users = await admin.auth().getUsers(
             uids.map((uid) => {
                 return { uid };
-            })
+            }),
         );
 
         const map: Record<string, string> = {};
@@ -129,7 +128,7 @@ export const getUserEmails = functions.https.onCall(
         });
 
         return map;
-    }
+    },
 );
 
 export const createUserWithEmail = functions.https.onCall(
@@ -147,7 +146,7 @@ export const createUserWithEmail = functions.https.onCall(
             console.log(error);
             return null;
         }
-    }
+    },
 );
 
 // export const publishEdition = functions
@@ -433,11 +432,11 @@ export const getEdition = functions.https.onRequest(
                         editionJSON = candidateEdition;
                     } else
                         console.log(
-                            `Found latest published edition, but it wasn't published; data is out of sync.`
+                            `Found latest published edition, but it wasn't published; data is out of sync.`,
                         );
                 } else {
                     console.error(
-                        `Book's edition record is wrong, edition ${editionID} doesn't exist.`
+                        `Book's edition record is wrong, edition ${editionID} doesn't exist.`,
                     );
                 }
             }
@@ -445,7 +444,7 @@ export const getEdition = functions.https.onRequest(
         // Otherwise, resolve the edition name provided.
         else {
             console.log(
-                `Looking for book with edition number ${editionName}...`
+                `Looking for book with edition number ${editionName}...`,
             );
             // Is it an edition number that's published?
             const editions = admin
@@ -454,7 +453,7 @@ export const getEdition = functions.https.onRequest(
             const editionsWithNumber = editions.where(
                 'number',
                 '==',
-                parseInt(editionName)
+                parseInt(editionName),
             );
             const editionsWithNumberResults = await editionsWithNumber.get();
             if (editionsWithNumberResults.size > 0) {
@@ -471,7 +470,7 @@ export const getEdition = functions.https.onRequest(
                     editionJSON = editionCandidate;
                 } else {
                     console.error(
-                        `Found edition number, but it's not published.`
+                        `Found edition number, but it's not published.`,
                     );
                 }
             } else {
@@ -490,7 +489,7 @@ export const getEdition = functions.https.onRequest(
                         editionWithIDDoc.data() as EditionSpecification;
                     if (editionCandidate.published !== null) {
                         console.log(
-                            `Found published edition with matching ID.`
+                            `Found published edition with matching ID.`,
                         );
                         editionID = editionName;
                         editionJSON = editionCandidate;
@@ -510,7 +509,7 @@ export const getEdition = functions.https.onRequest(
         const completeEditionJSON = await completeEdition(
             bookID,
             editionID,
-            editionJSON
+            editionJSON,
         );
 
         // If we couldn't, fail.
@@ -534,9 +533,9 @@ export const getEdition = functions.https.onRequest(
                     bookID,
                     book: bookJSON,
                     edition: completeEditionJSON,
-                })
+                }),
             );
-    }
+    },
 );
 
 // /** Get an edition with all of the chapter text embedded */
@@ -562,13 +561,13 @@ export const getEdition = functions.https.onRequest(
 async function completeEdition(
     bookID: string,
     editionID: string,
-    editionJSON: EditionSpecification
+    editionJSON: EditionSpecification,
 ) {
     // Retrieve all edition's chapter text.
     for (const chapter of editionJSON.chapters) {
         if (chapter.ref === undefined) {
             console.log(
-                'No chapter ID in the chapter edition metadata, bailing.'
+                'No chapter ID in the chapter edition metadata, bailing.',
             );
             return null;
         }

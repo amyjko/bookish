@@ -16,11 +16,11 @@
     },
     "main": "lib/index.js",
     "dependencies": {
-        "@google-cloud/storage": "^6.9.2",
+        "@google-cloud/storage": "^7.6",
         "bookish-press": "latest",
-        "firebase-admin": "^11.5.0",
-        "firebase-functions": "^4.4.1",
-        "sharp": "^0.31.3"
+        "firebase-admin": "^11",
+        "firebase-functions": "^4",
+        "sharp": "^0.32"
     },
     "devDependencies": {
         "@types/node": "^18.13.0",
