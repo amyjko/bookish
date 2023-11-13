@@ -18,7 +18,8 @@
     let auth = getUser();
     let book = getBook();
     let edition = getEdition();
-    let chapterText = getChapterText();
+    /** Mapping from Firestore docuemnt IDs to chapter text */
+    let chapterText: Map<string, string> = new Map();
 
     let editionUnsub: Unsubscribe | undefined = undefined;
     let chaptersUnsub: Unsubscribe | undefined = undefined;
@@ -69,11 +70,7 @@
                     (ed) => {
                         if (ed) {
                             // Before setting the new edition, augmented it with the chapter text.
-                            edition.set(
-                                $chapterText
-                                    ? ed.withChapterText($chapterText)
-                                    : ed
-                            );
+                            edition.set(ed.withChapterText(chapterText));
                         } else {
                             edition.set(undefined);
                             error = 'Unable to load edition';
@@ -85,15 +82,12 @@
                     $book.getID(),
                     editionID,
                     (chapters) => {
-                        // Update the chapter text store.
-                        chapterText.set(chapters);
+                        // Update the text of the chapters we received.
+                        for (const [ref, text] of chapters)
+                            chapterText.set(ref.id, text);
                         // Update the chapter text in the current edition.
-                        if ($edition) {
-                            const newEdition =
-                                $edition.withChapterText(chapters);
-                            if (newEdition !== $edition)
-                                edition.set(newEdition);
-                        }
+                        if ($edition)
+                            edition.set($edition.withChapterText(chapterText));
                     }
                 );
             }

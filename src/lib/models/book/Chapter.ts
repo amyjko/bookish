@@ -65,7 +65,7 @@ export default class Chapter {
         forthcoming: boolean,
         section: string | undefined,
         text: string | null,
-        uids: string[]
+        uids: string[],
     ) {
         this.ref = ref;
         this.id = id;
@@ -96,7 +96,7 @@ export default class Chapter {
             spec.forthcoming === true,
             spec.section,
             spec.text ?? null,
-            spec.uids
+            spec.uids,
         );
     }
 
@@ -136,7 +136,7 @@ export default class Chapter {
             this.forthcoming,
             this.section,
             this.text,
-            uids
+            uids,
         );
     }
 
@@ -151,7 +151,7 @@ export default class Chapter {
             this.forthcoming,
             this.section,
             this.text,
-            this.uids
+            this.uids,
         );
     }
 
@@ -166,7 +166,7 @@ export default class Chapter {
             this.forthcoming,
             this.section,
             this.text,
-            this.uids
+            this.uids,
         );
     }
 
@@ -185,7 +185,7 @@ export default class Chapter {
             this.forthcoming,
             this.section,
             this.text,
-            this.uids
+            this.uids,
         );
     }
 
@@ -204,7 +204,7 @@ export default class Chapter {
             this.forthcoming,
             section,
             this.text,
-            this.uids
+            this.uids,
         );
     }
 
@@ -223,7 +223,7 @@ export default class Chapter {
             forthcoming,
             this.section,
             this.text,
-            this.uids
+            this.uids,
         );
     }
 
@@ -242,7 +242,7 @@ export default class Chapter {
             this.forthcoming,
             this.section,
             this.text,
-            this.uids
+            this.uids,
         );
     }
 
@@ -265,7 +265,7 @@ export default class Chapter {
             this.forthcoming,
             this.section,
             text,
-            this.uids
+            this.uids,
         );
     }
 
@@ -280,7 +280,7 @@ export default class Chapter {
             this.forthcoming,
             this.section,
             ast.toBookdown(),
-            this.uids
+            this.uids,
         );
         newChapter._ast = ast;
         return newChapter;
@@ -301,7 +301,7 @@ export default class Chapter {
             this.forthcoming,
             this.section,
             this.text,
-            this.uids
+            this.uids,
         );
     }
 
@@ -321,7 +321,7 @@ export default class Chapter {
             this.forthcoming,
             this.section,
             this.text,
-            this.uids
+            this.uids,
         );
     }
 
@@ -337,7 +337,7 @@ export default class Chapter {
             this.forthcoming,
             this.section,
             this.text,
-            this.uids
+            this.uids,
         );
     }
 
@@ -355,7 +355,7 @@ export default class Chapter {
             this.forthcoming,
             this.section,
             this.text,
-            this.uids
+            this.uids,
         );
     }
 
@@ -374,7 +374,7 @@ export default class Chapter {
             this.forthcoming,
             this.section,
             this.text,
-            this.uids
+            this.uids,
         );
     }
 
@@ -388,9 +388,8 @@ export default class Chapter {
 
     getWordCount(edition: Edition): number | undefined {
         if (this._wordCount === undefined)
-            this._wordCount = this.getAST(edition)
-                ?.toText()
-                .split(/\s+/).length;
+            this._wordCount = this.getAST(edition)?.toText().split(/\s+/)
+                .length;
         return this._wordCount;
     }
 
@@ -443,14 +442,14 @@ export default class Chapter {
                         left: words
                             .slice(
                                 Math.max(0, wordNumber - 10),
-                                Math.max(0, wordNumber - 1) + 1
+                                Math.max(0, wordNumber - 1) + 1,
                             )
                             .join(''),
                         match: words[wordNumber],
                         right: words
                             .slice(
                                 Math.min(words.length - 1, wordNumber + 1),
-                                Math.min(words.length - 1, wordNumber + 10) + 1
+                                Math.min(words.length - 1, wordNumber + 10) + 1,
                             )
                             .join(''),
                     };
@@ -466,7 +465,7 @@ export default class Chapter {
 
     toString() {
         return `${this.title} by ${this.authors.join(
-            ', '
+            ', ',
         )}: ${this.text?.substring(0, 32)}}`;
     }
 }

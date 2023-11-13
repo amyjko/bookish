@@ -87,7 +87,7 @@ export default class Edition {
         glossary: Record<string, Definition>,
         theme: Theme | null,
         base: string | null,
-        active: Record<string, string>
+        active: Record<string, string>,
     ) {
         this.bookRef = bookRef;
         this.editionRef = editionRef;
@@ -120,7 +120,7 @@ export default class Edition {
 
     static fromJSON(
         editionRef: DocumentReference | undefined,
-        spec: EditionSpecification
+        spec: EditionSpecification,
     ) {
         // Copy all of the specification metadata to fields.
         // Choose suitable defaults if the spec is lacking a field.
@@ -145,7 +145,7 @@ export default class Edition {
             spec.glossary ?? {},
             spec.theme,
             spec.base,
-            spec.active
+            spec.active,
         );
     }
 
@@ -153,7 +153,7 @@ export default class Edition {
         citationID: string,
         ref: string | string[],
         edition: Edition,
-        short = false
+        short = false,
     ) {
         if (typeof ref === 'string') return Parser.parseFormat(edition, ref);
         else {
@@ -173,7 +173,7 @@ export default class Edition {
                 source ?? '',
                 url ?? '',
                 summary ?? '',
-                short
+                short,
             );
         }
     }
@@ -221,7 +221,7 @@ export default class Edition {
 
     getChapterUIDS() {
         return Array.from(
-            new Set(this.chapters.map((chapter) => chapter.uids).flat())
+            new Set(this.chapters.map((chapter) => chapter.uids).flat()),
         );
     }
 
@@ -247,7 +247,7 @@ export default class Edition {
             this.glossary,
             this.theme,
             this.base,
-            this.active
+            this.active,
         );
     }
 
@@ -277,7 +277,7 @@ export default class Edition {
             this.glossary,
             this.theme,
             this.base,
-            this.active
+            this.active,
         );
     }
 
@@ -306,7 +306,7 @@ export default class Edition {
             this.glossary,
             this.theme,
             this.base,
-            this.active
+            this.active,
         );
     }
 
@@ -336,7 +336,7 @@ export default class Edition {
             this.glossary,
             this.theme,
             this.base,
-            this.active
+            this.active,
         );
     }
 
@@ -362,7 +362,7 @@ export default class Edition {
             this.glossary,
             this.theme,
             this.base,
-            this.active
+            this.active,
         );
     }
 
@@ -388,7 +388,7 @@ export default class Edition {
             this.glossary,
             this.theme,
             this.base,
-            this.active
+            this.active,
         );
     }
 
@@ -417,7 +417,7 @@ export default class Edition {
             this.glossary,
             this.theme,
             this.base,
-            this.active
+            this.active,
         );
     }
 
@@ -429,7 +429,7 @@ export default class Edition {
         return (
             this.getChapter(chapterID) !== undefined ||
             ['references', 'glossary', 'index', 'search', 'media'].includes(
-                chapterID
+                chapterID,
             )
         );
     }
@@ -440,7 +440,7 @@ export default class Edition {
 
     getChapterByRef(ref: DocumentReference): Chapter | undefined {
         return this.chapters.find(
-            (chap) => chap.ref !== undefined && chap.ref.id === ref.id
+            (chap) => chap.ref !== undefined && chap.ref.id === ref.id,
         );
     }
 
@@ -478,25 +478,19 @@ export default class Edition {
             this.glossary,
             this.theme,
             this.base,
-            this.active
+            this.active,
         );
     }
 
-    withChapterText(text: [DocumentReference, string][]) {
-        // No need to make a new edition if no chapter was changed.
-        let modified = false;
+    withChapterText(textByID: Map<string, string>) {
         const newChapters = this.chapters.map((chapter) => {
-            if (chapter.ref === undefined) return chapter;
-            const match = text.find(
-                ([ref, text]) =>
-                    chapter.ref !== undefined &&
-                    chapter.ref.id === ref.id &&
-                    chapter.text !== text
-            );
-            if (match) modified = true;
-            return match ? chapter.withText(match[1]) : chapter;
+            if (chapter.ref === undefined) {
+                return chapter;
+            }
+            const text = textByID.get(chapter.ref.id);
+            return text === undefined ? chapter : chapter.withText(text);
         });
-        return modified ? this.withChapters(newChapters) : this;
+        return this.withChapters(newChapters);
     }
 
     withRevisedChapter(previous: Chapter, edited: Chapter) {
@@ -511,7 +505,7 @@ export default class Edition {
 
     withoutRefs() {
         return this.withRef(undefined).withChapters(
-            this.chapters.map((chap) => chap.withoutRef())
+            this.chapters.map((chap) => chap.withoutRef()),
         );
     }
 
@@ -537,7 +531,7 @@ export default class Edition {
             this.glossary,
             this.theme,
             this.base,
-            this.active
+            this.active,
         );
     }
 
@@ -557,7 +551,7 @@ export default class Edition {
             false,
             undefined,
             '',
-            []
+            [],
         );
         return this.withChapters([...this.chapters, newChapter]);
     }
@@ -568,7 +562,7 @@ export default class Edition {
 
     withoutChapter(chapterID: string): Edition {
         let index = this.chapters.findIndex(
-            (chapter) => chapter.getID() === chapterID
+            (chapter) => chapter.getID() === chapterID,
         );
         if (index < 0) return this;
 
@@ -581,7 +575,7 @@ export default class Edition {
     withMovedChapter(chapterID: string, increment: number): Edition {
         // Get the index of the chapter.
         let index = this.chapters.findIndex(
-            (chapter) => chapter.getID() === chapterID
+            (chapter) => chapter.getID() === chapterID,
         );
         if (index + increment < 0 || index + increment >= this.chapters.length)
             return this;
@@ -612,7 +606,7 @@ export default class Edition {
             this.glossary,
             this.theme,
             this.base,
-            this.active
+            this.active,
         );
     }
 
@@ -656,7 +650,7 @@ export default class Edition {
             this.glossary,
             this.theme,
             this.base,
-            this.active
+            this.active,
         );
     }
 
@@ -724,7 +718,7 @@ export default class Edition {
             glossary,
             this.theme,
             this.base,
-            this.active
+            this.active,
         );
     }
 
@@ -732,7 +726,7 @@ export default class Edition {
         id: string,
         phrase: string,
         definition: string,
-        synonyms: string[]
+        synonyms: string[],
     ): Edition {
         const newGlossary = Object.assign({}, this.glossary);
         newGlossary[id] = {
@@ -794,7 +788,7 @@ export default class Edition {
             this.glossary,
             theme,
             this.base,
-            this.active
+            this.active,
         );
     }
 
@@ -803,11 +797,11 @@ export default class Edition {
         if (group === 'imports') return this;
         const newTheme: Record<string, Record<string, string>> = Object.assign(
             {},
-            this.theme as Record<string, Record<string, string>>
+            this.theme as Record<string, Record<string, string>>,
         );
         const newGroup: Record<string, string> = Object.assign(
             {},
-            (this.theme as Record<string, Record<string, string>>)[group]
+            (this.theme as Record<string, Record<string, string>>)[group],
         );
         newGroup[name] = value;
         newTheme[group] = newGroup;
@@ -847,7 +841,7 @@ export default class Edition {
             this.glossary,
             this.theme,
             this.base,
-            this.active
+            this.active,
         );
     }
 
@@ -894,7 +888,7 @@ export default class Edition {
             this.glossary,
             this.theme,
             this.base,
-            this.active
+            this.active,
         );
     }
 
@@ -930,7 +924,7 @@ export default class Edition {
             this.glossary,
             this.theme,
             this.base,
-            this.active
+            this.active,
         );
     }
 
@@ -980,7 +974,7 @@ export default class Edition {
             this.glossary,
             this.theme,
             this.base,
-            newActive
+            newActive,
         );
     }
 
@@ -994,7 +988,7 @@ export default class Edition {
                         : time === undefined
                         ? total
                         : total + time,
-                0
+                0,
             );
     }
 
@@ -1168,7 +1162,7 @@ export default class Edition {
             let bodyEmbeds = c?.getAST(this)?.getEmbeds();
             if (bodyEmbeds)
                 bodyEmbeds.forEach((embed: EmbedNode) =>
-                    embeds.push({ embed, chapterID: c.id })
+                    embeds.push({ embed, chapterID: c.id }),
                 );
         });
 
@@ -1224,8 +1218,8 @@ export default class Edition {
                   editionuids: this.uids,
                   chapteruids: Array.from(
                       new Set(
-                          this.chapters.map((chapter) => chapter.uids).flat()
-                      )
+                          this.chapters.map((chapter) => chapter.uids).flat(),
+                      ),
                   ),
               };
     }

@@ -134,7 +134,8 @@ export function listenToChapters(
             const chapters: [DocumentReference, string][] = [];
             // For each chapter in the book, if the doc exists and it's not a pending local write, send updated chapters to the front end.
             docs.forEach((doc) => {
-                if (doc.exists() && !doc.metadata.hasPendingWrites)
+                // We propagate pending writes to cycle back local edits to the client.
+                if (doc.exists())
                     // If the chapter text is somehow null, set it to an empty string.
                     // This accounts for previous defects that could lead to null.
                     chapters.push([doc.ref, doc.data().text ?? '']);

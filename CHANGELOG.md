@@ -1,5 +1,11 @@
 # bookish changelog
 
+# 05.64 - 2023-11-13
+
+## Fixed
+
+-   Fixed faulty synchronization of chapter text when multiple clients are editing a book that led to temporarily missing chapter text.
+
 # 0.5.63 - 2023-11-11
 
 ## Dependencies

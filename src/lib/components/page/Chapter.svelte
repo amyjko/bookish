@@ -388,9 +388,8 @@
                 {:else}
                     <ChapterBody node={chapterAST} />
                 {/if}
-            {:else}
-                <span>Loading...</span>
-            {/if}
+            {:else if $edition === undefined}Loading...{:else}Unable to load
+                chapter text{/if}
         </section>
 
         {#if citations && citations.size > 0}
