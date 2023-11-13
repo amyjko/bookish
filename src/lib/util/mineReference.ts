@@ -12,7 +12,7 @@ export function mineReference(ids: string[], text: string): Reference {
     // Next, find the URL
     let url: string | null = null;
     let urlMatches = text.match(
-        /https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()!@:%_\+.~#?&\/\/=]*)/
+        /https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()!@:%_\+.~#?&\/\/=]*)/,
     );
     if (urlMatches !== null && urlMatches.length > 0) {
         url = urlMatches[0];
@@ -57,7 +57,7 @@ export function mineReference(ids: string[], text: string): Reference {
               source || '',
               url || '',
               '',
-              false
+              false,
           );
 }
 
@@ -91,7 +91,7 @@ export function splitIntoSentences(text: string): string[] {
 export function getUniqueReferenceID(
     ids: string[],
     authors?: string,
-    year?: string
+    year?: string,
 ): string {
     if (authors && year) {
         // Split the authors, combine the first initials of each, then append the year.
@@ -113,7 +113,7 @@ export function getUniqueReferenceID(
         }
         return revisedID;
     } else {
-        let id = 'ref';
+        let id = '00';
         for (let i = 0; i < 4; i++) id = id + Math.round(Math.random() * 9);
         return id;
     }
