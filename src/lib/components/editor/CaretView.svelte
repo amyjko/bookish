@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { afterUpdate } from 'svelte';
+    import { afterUpdate, tick } from 'svelte';
 
     export let left: number;
     export let top: number;
@@ -12,13 +12,21 @@
     export let blink: boolean;
     export let locked: boolean;
 
-    let element: HTMLElement;
+    let element: HTMLElement | undefined;
 
     let headerHeight = 0;
 
-    // When the caret updates, make sure it's in view.
+    // When the caret updates position, scroll the element into view after the render is complete.
+    $: {
+        left;
+        top;
+        tick().then(() =>
+            element ? element.scrollIntoView({ block: 'nearest' }) : undefined
+        );
+    }
+
+    /** Keep track of the header height, so we can snap to the caret position. */
     afterUpdate(() => {
-        element?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
         headerHeight =
             (document.querySelector('.bookish-app > .header') as HTMLElement)
                 ?.offsetHeight ?? 0;
