@@ -6,6 +6,7 @@
 
 -   Fixed faulty synchronization of chapter text when multiple clients are editing a book that led to temporarily missing chapter text.
 -   Fixed jumpy smooth scrolling of caret position.
+-   Place new empty references at top of list.
 
 # 0.5.63 - 2023-11-11
 
