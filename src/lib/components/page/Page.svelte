@@ -8,7 +8,7 @@
     let fontsLoaded = false;
     let imagesLoaded = false;
     let lastHeight = 0;
-    let intervalID: NodeJS.Timer | null = null;
+    let intervalID: NodeJS.Timeout | null = null;
     let mountTime = Date.now();
 
     $: loaded = fontsLoaded && imagesLoaded;
