@@ -1,7 +1,7 @@
 <script lang="ts">
     import TextEditor from '$lib/components/editor/TextEditor.svelte';
     import { isSubdomainAvailable } from '$lib/models/CRUD';
-    import Note from '../editor/Note.svelte';
+    import { getSubdomain } from '$lib/util/getSubdomain';
     import { getBook } from './Contexts';
     import Muted from './Muted.svelte';
 
@@ -25,9 +25,10 @@
             save={// Save the new domain
             async (domain) => {
                 if ($book) {
-                    const available = await isSubdomainAvailable(domain, $book);
+                    const available = await isSubdomainAvailable(domain);
                     if (available) book.set($book.withSubdomain(domain));
-                    else throw Error("Domain isn't available");
+                    else if ($book.getSubdomain() !== domain)
+                        throw Error("Domain isn't available");
                 }
             }}
             placeholder="book name"

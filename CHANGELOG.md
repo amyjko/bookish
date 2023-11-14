@@ -13,6 +13,7 @@
 -   Improved position of reference ID in edit mode.
 -   Fixed editability of code blocks.
 -   Allow chapter navigation to forthcoming chapters if editable.
+-   No error on book domain if it's the book domain.
 
 # 0.5.63 - 2023-11-11
 

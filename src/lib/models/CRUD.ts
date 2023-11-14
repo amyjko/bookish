@@ -430,7 +430,6 @@ export async function updateBook(book: Book): Promise<void> {
 
 export async function isSubdomainAvailable(
     subdomain: string,
-    book: Book,
 ): Promise<boolean> {
     if (!db) throw Error('Not connected to Firebase.');
 
