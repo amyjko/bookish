@@ -2,12 +2,16 @@ import Reference from '../models/book/Reference';
 
 export function mineReference(ids: string[], text: string): Reference {
     // First find the year, since it's the most easily detected. Optional parens.
-    let yearMatches = text.match(/(\(?[0-9]{4}\)?)/);
+    let yearMatches = text.match(/(\(?[0-9]{4}(,[a-zA-Z ]+)?\)?)/);
     let year =
         yearMatches !== null && yearMatches.length > 0
             ? yearMatches[1].replace('(', '').replace(')', '')
             : undefined;
-    if (year && yearMatches) text = text.replace(yearMatches[1], '');
+    if (year && yearMatches) {
+        const digits = year.match(/([0-9]{4})/);
+        if (digits !== null) year = digits[1];
+        text = text.replace(yearMatches[1], '');
+    }
 
     // Next, find the URL
     let url: string | null = null;
@@ -47,18 +51,16 @@ export function mineReference(ids: string[], text: string): Reference {
     }
 
     // If there's anything left, fall back to just a string.
-    return chunks.length > 0
-        ? new Reference(getUniqueReferenceID(ids), text)
-        : new Reference(
-              getUniqueReferenceID(ids, authors, year),
-              authors || '',
-              year || '',
-              title || '',
-              source || '',
-              url || '',
-              '',
-              false,
-          );
+    return new Reference(
+        getUniqueReferenceID(ids, authors, year),
+        authors || '',
+        year || '',
+        title || '',
+        source || '',
+        url || '',
+        '',
+        false,
+    );
 }
 
 export function splitIntoSentences(text: string): string[] {
