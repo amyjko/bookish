@@ -7,7 +7,7 @@
     import Text from './Text.svelte';
     import { isChapterEditable } from '../page/Contexts';
     import Figure from './Figure.svelte';
-    import { getCaret } from '$lib/components/page/Contexts';
+    import Button from '../app/Button.svelte';
 
     export let node: CodeNode;
 
@@ -17,31 +17,17 @@
 
     // const languages = [ "C", "C++", "CSS", "Go", "HTML", "Java", "JavaScript", "Markdown", "Plaintext", "Python", "TypeScript" ];
 
-    let caret = getCaret();
-
-    $: inside =
-        $caret?.range?.start.node === node.getCodeNode() ||
-        $caret?.range?.end.node === node.getCodeNode();
+    let editing = true;
 </script>
 
-<Figure {node} caption={node.getCaption()}>
-    {#if editable}
-        <div class="container">
+<Figure {node} caption={node.getCaption()} focusable={false}>
+    {#if editable && editing}
+        <div class="container" class:editing>
             <code
-                class={`bookish-code bookish-code-block language-${language} ${
-                    !inside ? 'hidden' : ''
-                }`}
+                class={`bookish-code bookish-code-block language-${language}`}
             >
                 <Text node={node.getCodeNode()} />
             </code>
-            <div class="code" class:inside>
-                <Code
-                    editable={false}
-                    inline={false}
-                    language={node.getLanguage()}
-                    nodeID={node.getCodeNode().nodeID}>{node.getCode()}</Code
-                >
-            </div>
         </div>
     {:else if node.getLanguage() === 'python' && node.isExecutable()}
         <Python {node} startCode={node.getCode()} />
@@ -51,6 +37,15 @@
             inline={false}
             language={node.getLanguage()}
             nodeID={node.getCodeNode().nodeID}>{node.getCode()}</Code
+        >
+    {/if}
+    {#if editable}
+        <Button
+            tooltip={editing ? 'stop editing' : 'start editing'}
+            command={() => {
+                editing = !editing;
+            }}
+            >{#if editing}done{:else}edit{/if}</Button
         >
     {/if}
     {#if node.getLanguage() !== 'plaintext'}<aside class="language"
@@ -74,6 +69,12 @@
     .container {
         position: relative;
     }
+
+    .container.editing {
+        border: 1px solid var(--app-interactive-color);
+        border-radius: var(--app-chrome-roundedness);
+    }
+
     .code {
         position: absolute;
         top: 0;

@@ -12,6 +12,7 @@
     export let node: TableNode | EmbedNode | CodeNode;
     export let caption: FormatNode | undefined;
     export let credit: FormatNode | undefined = undefined;
+    export let focusable: boolean = true;
 
     let editable = isChapterEditable();
     let caret = getCaret();
@@ -38,11 +39,12 @@
 
 <Positioned position={node.getPosition()}>
     <figure class="bookish-figure" data-nodeid={node.nodeID}>
+        <!-- svelte-ignore a11y-no-noninteractive-tabindex -->
         <div
             class:selected
-            role="button"
-            tabindex="0"
-            on:mousedown={focusFigure}
+            role={focusable ? 'button' : undefined}
+            tabindex={focusable ? 0 : undefined}
+            on:mousedown={focusable ? focusFigure : null}
             on:keydown={(event) =>
                 event.key === ' ' || event.key === 'Enter'
                     ? focusFigure()

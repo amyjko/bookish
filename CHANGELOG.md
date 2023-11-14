@@ -11,6 +11,7 @@
 -   Make unpublished editions visible to users with edition edit privileges.
 -   Maximum width on select widgets.
 -   Improved position of reference ID in edit mode.
+-   Fixed editability of code blocks.
 
 # 0.5.63 - 2023-11-11
 
