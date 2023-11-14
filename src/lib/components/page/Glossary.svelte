@@ -55,8 +55,14 @@
         >
             <Outline
                 slot="outline"
-                previous={$edition.getPreviousChapterID(ChapterIDs.GlossaryID)}
-                next={$edition.getNextChapterID(ChapterIDs.GlossaryID)}
+                previous={$edition.getPreviousChapterID(
+                    ChapterIDs.GlossaryID,
+                    editable
+                )}
+                next={$edition.getNextChapterID(
+                    ChapterIDs.GlossaryID,
+                    editable
+                )}
             />
         </Header>
         {#if editable}

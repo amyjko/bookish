@@ -7,7 +7,6 @@
     import type { Match } from '$lib/models/book/Chapter';
     import ChapterIDs from '$lib/models/book/ChapterID';
     import { getBase, getEdition, isEditionEditable } from './Contexts';
-    import TextInput from '../app/TextInput.svelte';
     import ChapterTitle from './ChapterTitle.svelte';
     import ChapterNumber from './ChapterNumber.svelte';
     import PageHeader from './PageHeader.svelte';
@@ -96,8 +95,11 @@
         >
             <Outline
                 slot="outline"
-                previous={$edition.getPreviousChapterID(ChapterIDs.SearchID)}
-                next={$edition.getNextChapterID(ChapterIDs.SearchID)}
+                previous={$edition.getPreviousChapterID(
+                    ChapterIDs.SearchID,
+                    false
+                )}
+                next={$edition.getNextChapterID(ChapterIDs.SearchID, false)}
             />
         </Header>
 

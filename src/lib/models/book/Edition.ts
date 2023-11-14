@@ -1058,7 +1058,7 @@ export default class Edition {
     }
 
     // Given the current chapter, find the available chapter after it.
-    getNextChapterID(chapterID: string) {
+    getNextChapterID(chapterID: string, editable: boolean) {
         // Handle back matter chapters.
         switch (chapterID) {
             case ChapterIDs.ReferencesID:
@@ -1083,7 +1083,7 @@ export default class Edition {
                     let chapter = this.chapters[i];
                     if (chapter.getID() === chapterID) after = true;
                     // If we're after the given chapter and it's not forthcoming.
-                    else if (after && !chapter.isForthcoming())
+                    else if (after && (!chapter.isForthcoming() || editable))
                         return chapter.getID();
                 }
                 // If the given ID was the last chapter, go to the next back matter chapter.
@@ -1099,7 +1099,7 @@ export default class Edition {
     }
 
     // Given a chapter id, find the available chapter before it.
-    getPreviousChapterID(chapterID: string) {
+    getPreviousChapterID(chapterID: string, editable: boolean) {
         switch (chapterID) {
             // Handle back matter chapters.
             case ChapterIDs.ReferencesID:
@@ -1130,7 +1130,7 @@ export default class Edition {
                     let chapter = this.chapters[i];
                     if (chapter.getID() === chapterID) before = true;
                     // If we're before the given chapter and it's not forthcoming.
-                    else if (before && !chapter.isForthcoming())
+                    else if (before && (!chapter.isForthcoming() || editable))
                         return chapter.getID();
                 }
                 // If the given ID was the last chapter, go to the next back matter chapter.

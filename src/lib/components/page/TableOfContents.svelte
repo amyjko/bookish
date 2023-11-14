@@ -106,7 +106,7 @@
             <Outline
                 slot="outline"
                 previous={null}
-                next={$edition.getNextChapterID('')}
+                next={$edition.getNextChapterID('', editable)}
             />
             <div slot="after">
                 <Authors

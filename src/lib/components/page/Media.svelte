@@ -60,8 +60,11 @@
         >
             <Outline
                 slot="outline"
-                previous={$edition.getPreviousChapterID(ChapterIDs.MediaID)}
-                next={$edition.getNextChapterID(ChapterIDs.MediaID)}
+                previous={$edition.getPreviousChapterID(
+                    ChapterIDs.MediaID,
+                    editable
+                )}
+                next={$edition.getNextChapterID(ChapterIDs.MediaID, editable)}
             />
         </Header>
         <Instructions {editable}>

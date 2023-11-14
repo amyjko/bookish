@@ -64,8 +64,11 @@
         >
             <Outline
                 slot="outline"
-                previous={$edition.getPreviousChapterID(ChapterIDs.IndexID)}
-                next={$edition.getNextChapterID(ChapterIDs.IndexID)}
+                previous={$edition.getPreviousChapterID(
+                    ChapterIDs.IndexID,
+                    editable
+                )}
+                next={$edition.getNextChapterID(ChapterIDs.IndexID, editable)}
             />
         </Header>
 

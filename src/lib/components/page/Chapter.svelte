@@ -270,8 +270,8 @@
             <Outline
                 slot="outline"
                 collapse={$marginal !== undefined}
-                previous={$edition.getPreviousChapterID(chapterID)}
-                next={$edition.getNextChapterID(chapterID)}
+                previous={$edition.getPreviousChapterID(chapterID, editable)}
+                next={$edition.getNextChapterID(chapterID, editable)}
                 listener={(expanded) => {
                     // If the outline is being expanded, hide the marginal, otherwise leave it alone.
                     if (expanded) marginal.set(undefined);

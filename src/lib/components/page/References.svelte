@@ -40,9 +40,13 @@
             <Outline
                 slot="outline"
                 previous={$edition.getPreviousChapterID(
-                    ChapterIDs.ReferencesID
+                    ChapterIDs.ReferencesID,
+                    editable
                 )}
-                next={$edition.getNextChapterID(ChapterIDs.ReferencesID)}
+                next={$edition.getNextChapterID(
+                    ChapterIDs.ReferencesID,
+                    editable
+                )}
             />
         </Header>
         {#if editable}<BulkReferenceEditor />{/if}
