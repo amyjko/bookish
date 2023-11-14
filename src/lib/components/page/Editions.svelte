@@ -2,7 +2,7 @@
     import { createNewEdition } from '$lib/models/CRUD';
     import Instructions from '$lib/components/page/Instructions.svelte';
     import Note from '../editor/Note.svelte';
-    import { getBook, isBookEditable } from './Contexts';
+    import { getBook, getUser, isBookEditable } from './Contexts';
     import Button from '../app/Button.svelte';
     import Link from '../app/Link.svelte';
     import Format from '../chapter/Format.svelte';
@@ -13,6 +13,7 @@
 
     let book = getBook();
     let editable = isBookEditable();
+    let user = getUser();
 
     $: editions = $book?.getEditions();
 
@@ -53,7 +54,7 @@
                 ? 'rd'
                 : 'th')}
 
-        {#if $book && (editable || edition.published)}
+        {#if $book && (editable || edition.published || ($user?.user?.uid && edition.editionuids.includes($user.user.uid)))}
             <section class="edition">
                 <h3
                     >{editionLabel}
@@ -73,7 +74,7 @@
                                       }`}
                                 external>read</Link
                             >{/if}
-                        {#if editable}
+                        {#if editable || ($user?.user?.uid && edition.editionuids.includes($user?.user.uid))}
                             &nbsp;
                             <Link
                                 to={`/write/${$book.getID()}/${
