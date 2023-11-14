@@ -9,6 +9,7 @@
 -   Place new empty references at top of list.
 -   Gave edition and chapter editors permission to upload images.
 -   Make unpublished editions visible to users with edition edit privileges.
+-   Maximum width on select widgets.
 
 # 0.5.63 - 2023-11-11
 

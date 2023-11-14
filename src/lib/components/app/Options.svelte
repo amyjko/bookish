@@ -21,5 +21,6 @@
         padding: var(--app-chrome-padding);
         font-family: var(--app-font);
         font-size: var(--app-chrome-font-size);
+        max-width: 10em;
     }
 </style>
