@@ -78,7 +78,7 @@ function insertTableRowColumn(
     table: TableNode,
     format: FormatNode,
     row: boolean,
-    before: boolean
+    before: boolean,
 ): Edit {
     const location = table.locate(format);
     if (location === undefined) return;
@@ -92,9 +92,9 @@ function insertTableRowColumn(
             (
                 (t as TableNode).getCell(
                     location.row + (row && !before ? 1 : 0),
-                    location.column + (!row && !before ? 1 : 0)
+                    location.column + (!row && !before ? 1 : 0),
                 ) as FormatNode
-            ).getFirstCaret()
+            ).getFirstCaret(),
     );
 }
 
@@ -102,7 +102,7 @@ function deleteTableRowColumn(
     context: CaretContext,
     table: TableNode,
     format: FormatNode,
-    row: boolean
+    row: boolean,
 ): Edit {
     const location = table.locate(format);
     if (location === undefined) return;
@@ -119,16 +119,16 @@ function deleteTableRowColumn(
                           location.row === table.getRowCount()
                               ? location.row - 1
                               : location.row,
-                          location.column
+                          location.column,
                       )
                     : (t as TableNode).getCell(
                           location.row,
                           location.column === table.getColumnCount()
                               ? location.column - 1
-                              : location.column
+                              : location.column,
                       )
             )?.getFirstCaret();
-        }
+        },
     );
 }
 
@@ -137,7 +137,7 @@ function rootWithNode<NodeType extends Node>(
     context: CaretContext,
     original: NodeType | undefined,
     replacement: NodeType | undefined,
-    caret?: (node: NodeType) => Caret | undefined
+    caret?: (node: NodeType) => Caret | undefined,
 ): Edit | undefined {
     // If there was no original or replacement, do nothing. Saves commands from having to check.
     if (original === undefined || replacement === undefined) return;
@@ -178,7 +178,7 @@ const commands: Command[] = [
                       context.table,
                       context.formatRoot,
                       true,
-                      true
+                      true,
                   )
                 : undefined,
     },
@@ -201,7 +201,7 @@ const commands: Command[] = [
                       context.table,
                       context.formatRoot,
                       true,
-                      false
+                      false,
                   )
                 : undefined,
     },
@@ -224,7 +224,7 @@ const commands: Command[] = [
                       context.table,
                       context.formatRoot,
                       false,
-                      false
+                      false,
                   )
                 : undefined,
     },
@@ -247,7 +247,7 @@ const commands: Command[] = [
                       context.table,
                       context.formatRoot,
                       false,
-                      true
+                      true,
                   )
                 : undefined,
     },
@@ -271,7 +271,7 @@ const commands: Command[] = [
                       context,
                       context.table,
                       context.formatRoot,
-                      true
+                      true,
                   )
                 : undefined,
     },
@@ -295,7 +295,7 @@ const commands: Command[] = [
                       context,
                       context.table,
                       context.formatRoot,
-                      false
+                      false,
                   )
                 : undefined,
     },
@@ -315,7 +315,8 @@ const commands: Command[] = [
                 let caret = context.root
                     .getNodeAfter<FormatNode>(
                         context.formatRoot,
-                        (node): node is FormatNode => node instanceof FormatNode
+                        (node): node is FormatNode =>
+                            node instanceof FormatNode,
                     )
                     ?.getFirstCaret();
                 if (caret)
@@ -343,7 +344,8 @@ const commands: Command[] = [
                 let caret = context.root
                     .getNodeBefore<FormatNode>(
                         context.formatRoot,
-                        (node): node is FormatNode => node instanceof FormatNode
+                        (node): node is FormatNode =>
+                            node instanceof FormatNode,
                     )
                     ?.getFirstCaret();
                 if (caret)
@@ -373,7 +375,7 @@ const commands: Command[] = [
             ) {
                 const nextCaret = context.root.getAdjacentCaret(
                     context.end,
-                    false
+                    false,
                 );
                 const sortedRange = context.root.sortRange(context.range);
                 return {
@@ -408,7 +410,7 @@ const commands: Command[] = [
             ) {
                 const previous = context.end.node.previousWord(
                     context.root,
-                    context.end.index
+                    context.end.index,
                 );
                 return {
                     root: context.root,
@@ -460,7 +462,7 @@ const commands: Command[] = [
             ) {
                 const previous = context.root.getAdjacentCaret(
                     context.end,
-                    false
+                    false,
                 );
                 if (previous === undefined) return;
                 return {
@@ -489,7 +491,7 @@ const commands: Command[] = [
             ) {
                 const previous = context.end.node.previousWord(
                     context.root,
-                    context.end.index
+                    context.end.index,
                 );
                 return {
                     root: context.root,
@@ -541,7 +543,7 @@ const commands: Command[] = [
             ) {
                 const nextCaret = context.root.getAdjacentCaret(
                     context.end,
-                    true
+                    true,
                 );
                 const sortedRange = context.root.sortRange(context.range);
                 // If there is no next caret, move the caret to the largest of the current start and end.
@@ -574,7 +576,7 @@ const commands: Command[] = [
             ) {
                 const next = context.end.node.nextWord(
                     context.root,
-                    context.end.index
+                    context.end.index,
                 );
                 return {
                     root: context.root,
@@ -650,7 +652,7 @@ const commands: Command[] = [
             ) {
                 const previous = context.end.node.nextWord(
                     context.root,
-                    context.end.index
+                    context.end.index,
                 );
                 return {
                     root: context.root,
@@ -837,26 +839,26 @@ const commands: Command[] = [
             if (context.isSelection) {
                 const edit = context.root.withRangeFormatted(
                     context.range,
-                    undefined
+                    undefined,
                 );
                 if (edit === undefined) return;
                 return rootWithNode<RootNode>(
                     context,
                     context.root,
                     edit.root as RootNode,
-                    () => edit.range.start
+                    () => edit.range.start,
                 );
             } else {
                 const edit = context.root.withoutAdjacentContent(
                     context.start,
-                    false
+                    false,
                 );
                 if (edit === undefined) return;
                 return rootWithNode<RootNode>(
                     context,
                     context.root,
                     edit.root as RootNode,
-                    () => edit.range.start
+                    () => edit.range.start,
                 );
             }
         },
@@ -877,26 +879,26 @@ const commands: Command[] = [
             if (context.isSelection) {
                 const edit = context.root.withRangeFormatted(
                     context.range,
-                    undefined
+                    undefined,
                 );
                 if (edit === undefined) return;
                 return rootWithNode<RootNode>(
                     context,
                     context.root,
                     edit.root as RootNode,
-                    () => edit.range.start
+                    () => edit.range.start,
                 );
             } else {
                 const edit = context.root.withoutAdjacentContent(
                     context.start,
-                    true
+                    true,
                 );
                 if (edit === undefined) return;
                 return rootWithNode<RootNode>(
                     context,
                     context.root,
                     edit.root as RootNode,
-                    () => edit.range.start
+                    () => edit.range.start,
                 );
             }
         },
@@ -916,7 +918,7 @@ const commands: Command[] = [
             if (context.code?.getCodeNode() !== context.start.node) return;
             const newText = context.start.node.withCharacterAt(
                 '\n',
-                context.start.index
+                context.start.index,
             );
             if (newText === undefined) return;
             return rootWithNode(
@@ -925,7 +927,7 @@ const commands: Command[] = [
                 newText,
                 (text) => {
                     return { node: text, index: context.start.index + 1 };
-                }
+                },
             );
         },
     },
@@ -963,14 +965,14 @@ const commands: Command[] = [
                     const newListWithSublistItem =
                         newListWithoutSublistItem.withItemAfter(
                             lastItem,
-                            newSublist
+                            newSublist,
                         );
                     if (newListWithSublistItem === undefined) return;
                     return rootWithNode(
                         context,
                         listParent,
                         newListWithSublistItem,
-                        () => lastCaret
+                        () => lastCaret,
                     );
                 } else if (listParent instanceof BlocksNode) {
                     const listWithoutItem = context.list.withoutItem(lastItem);
@@ -979,14 +981,14 @@ const commands: Command[] = [
                         .withChildReplaced(context.list, listWithoutItem)
                         ?.withBlockInsertedAfter(
                             listWithoutItem,
-                            new ParagraphNode(0, lastItem)
+                            new ParagraphNode(0, lastItem),
                         );
                     if (newBlocks === undefined) return;
                     return rootWithNode(
                         context,
                         listParent,
                         newBlocks,
-                        () => lastCaret
+                        () => lastCaret,
                     );
                 }
             } else
@@ -996,13 +998,13 @@ const commands: Command[] = [
                     context.list?.withItemSplit(context.range.start),
                     (newList) => {
                         const index = context.list?.getItemContaining(
-                            context.range.start
+                            context.range.start,
                         );
                         if (index === undefined) return;
                         const item = (newList as ListNode).getItem(index + 1);
                         if (item === undefined) return;
                         return item.getFirstCaret();
-                    }
+                    },
                 );
         },
     },
@@ -1037,7 +1039,7 @@ const commands: Command[] = [
             const inline =
                 context.range.start.node.getClosestParentOfType<InlineCodeNode>(
                     context.root,
-                    InlineCodeNode
+                    InlineCodeNode,
                 );
             const block = context.block;
             const blocks = context.blocks;
@@ -1056,7 +1058,7 @@ const commands: Command[] = [
             if (newBlocks === undefined) return;
             newBlocks = newBlocks.withBlockInsertedAfter(
                 newBlock,
-                new CodeNode(inline.getText(), inline.getMeta(), '<')
+                new CodeNode(inline.getText(), inline.getMeta(), '<'),
             );
             if (newBlocks === undefined) return;
 
@@ -1064,7 +1066,7 @@ const commands: Command[] = [
                 context,
                 blocks,
                 newBlocks,
-                () => context.range.start
+                () => context.range.start,
             );
         },
     },
@@ -1083,19 +1085,19 @@ const commands: Command[] = [
             const format =
                 context.range.start.node.getClosestParentOfType<FormatNode>(
                     context.root,
-                    FormatNode
+                    FormatNode,
                 );
             if (format === undefined) return;
             const edit = format.withNodeInserted(
                 context.range.start,
-                new LineBreakNode()
+                new LineBreakNode(),
             );
             if (edit === undefined) return;
             return rootWithNode<Node>(
                 context,
                 format,
                 edit.root,
-                () => edit.range.start
+                () => edit.range.start,
             );
         },
     },
@@ -1118,7 +1120,7 @@ const commands: Command[] = [
                 context,
                 context.blocks,
                 edit.root,
-                () => edit.range.start
+                () => edit.range.start,
             );
         },
     },
@@ -1139,7 +1141,7 @@ const commands: Command[] = [
             rootWithNode(
                 context,
                 context.blocks,
-                context.blocks?.withListsIndented(context.range, false)
+                context.blocks?.withListsIndented(context.range, false),
             ),
     },
     {
@@ -1157,7 +1159,7 @@ const commands: Command[] = [
             rootWithNode(
                 context,
                 context.blocks,
-                context.blocks?.withListsIndented(context.range, true)
+                context.blocks?.withListsIndented(context.range, true),
             ),
     },
     {
@@ -1248,12 +1250,12 @@ const commands: Command[] = [
                       context.formatRoot,
                       context.formatRoot?.withSegmentReplaced(
                           context.meta,
-                          context.meta.getText()
-                      )
+                          context.meta.getText(),
+                      ),
                   )
                 : context.root.withSegmentAtSelection(
                       context.range,
-                      (text) => new InlineCodeNode(new TextNode(text))
+                      (text) => new InlineCodeNode(new TextNode(text)),
                   ),
     },
     {
@@ -1276,12 +1278,12 @@ const commands: Command[] = [
                       context.formatRoot,
                       context.formatRoot?.withSegmentReplaced(
                           context.meta,
-                          context.meta.getText()
-                      )
+                          context.meta.getText(),
+                      ),
                   )
                 : context.root.withSegmentAtSelection(
                       context.range,
-                      (text) => new LinkNode(new TextNode(text))
+                      (text) => new LinkNode(new TextNode(text)),
                   ),
     },
     {
@@ -1308,12 +1310,12 @@ const commands: Command[] = [
                       context.formatRoot,
                       context.formatRoot?.withSegmentReplaced(
                           context.meta,
-                          context.meta.getText()
-                      )
+                          context.meta.getText(),
+                      ),
                   )
                 : context.root.withSegmentAtSelection(
                       context.range,
-                      (text) => new DefinitionNode(new TextNode(text))
+                      (text) => new DefinitionNode(new TextNode(text)),
                   ),
     },
     {
@@ -1337,7 +1339,7 @@ const commands: Command[] = [
             context.root.withSegmentAtSelection(
                 context.range,
                 (text) =>
-                    new FootnoteNode(new FormatNode('', [new TextNode(text)]))
+                    new FootnoteNode(new FormatNode('', [new TextNode(text)])),
             ),
     },
     {
@@ -1360,7 +1362,7 @@ const commands: Command[] = [
         handler: (context) =>
             context.root.withSegmentAtSelection(
                 context.range,
-                () => new CitationsNode([])
+                () => new CitationsNode([]),
             ),
     },
     {
@@ -1383,7 +1385,7 @@ const commands: Command[] = [
         handler: (context) =>
             context.root.withSegmentAtSelection(
                 context.range,
-                () => new LabelNode('')
+                () => new LabelNode(''),
             ),
     },
     {
@@ -1407,7 +1409,7 @@ const commands: Command[] = [
             context.root.withSegmentAtSelection(
                 context.range,
                 (text) =>
-                    new CommentNode(new FormatNode('', [new TextNode(text)]))
+                    new CommentNode(new FormatNode('', [new TextNode(text)])),
             ),
     },
     {
@@ -1430,7 +1432,7 @@ const commands: Command[] = [
             return rootWithNode(
                 context,
                 context.paragraph,
-                context.paragraph.withLevel(0)
+                context.paragraph.withLevel(0),
             );
         },
     },
@@ -1451,7 +1453,7 @@ const commands: Command[] = [
             rootWithNode(
                 context,
                 context.paragraph,
-                context.paragraph?.withLevel(1)
+                context.paragraph?.withLevel(1),
             ),
     },
     {
@@ -1471,7 +1473,7 @@ const commands: Command[] = [
             rootWithNode(
                 context,
                 context.paragraph,
-                context.paragraph?.withLevel(2)
+                context.paragraph?.withLevel(2),
             ),
     },
     {
@@ -1491,7 +1493,7 @@ const commands: Command[] = [
             rootWithNode(
                 context,
                 context.paragraph,
-                context.paragraph?.withLevel(3)
+                context.paragraph?.withLevel(3),
             ),
     },
     {
@@ -1513,8 +1515,8 @@ const commands: Command[] = [
                       context.blocks,
                       context.blocks?.withBlockInsertedBefore(
                           context.paragraph,
-                          new RuleNode()
-                      )
+                          new RuleNode(),
+                      ),
                   )
                 : undefined,
     },
@@ -1540,9 +1542,9 @@ const commands: Command[] = [
                     context.blocks,
                     context.blocks.withBlockInsertedBefore(
                         context.paragraph,
-                        new CalloutNode([newParagraph])
+                        new CalloutNode([newParagraph]),
                     ),
-                    () => newParagraph.getFirstCaret()
+                    () => newParagraph.getFirstCaret(),
                 );
             }
         },
@@ -1568,9 +1570,9 @@ const commands: Command[] = [
                     context.blocks,
                     context.blocks.withBlockInsertedBefore(
                         context.paragraph,
-                        new QuoteNode([newParagraph])
+                        new QuoteNode([newParagraph]),
                     ),
-                    () => newParagraph.getFirstCaret()
+                    () => newParagraph.getFirstCaret(),
                 );
             }
         },
@@ -1595,11 +1597,11 @@ const commands: Command[] = [
                     context.blocks,
                     context.blocks.withBlockInsertedBefore(
                         context.paragraph,
-                        newCode
+                        newCode,
                     ),
                     () => {
                         return { node: newCode.getCodeNode(), index: 0 };
-                    }
+                    },
                 );
             }
         },
@@ -1625,9 +1627,9 @@ const commands: Command[] = [
                     context.blocks,
                     context.blocks.withBlockInsertedBefore(
                         context.paragraph,
-                        newEmbed
+                        newEmbed,
                     ),
-                    () => newEmbed.getCaption().getFirstCaret()
+                    () => newEmbed.getCaption().getFirstCaret(),
                 );
             }
         },
@@ -1656,21 +1658,21 @@ const commands: Command[] = [
                 const newTable = new TableNode(
                     newRows,
                     '|',
-                    new FormatNode('', [new TextNode()])
+                    new FormatNode('', [new TextNode()]),
                 );
                 return rootWithNode(
                     context,
                     context.blocks,
                     context.blocks.withBlockInsertedBefore(
                         context.paragraph,
-                        newTable
+                        newTable,
                     ),
                     () => {
                         return {
                             node: newTable.getRows()[0][0].getFirstTextNode(),
                             index: 0,
                         };
-                    }
+                    },
                 );
             }
         },
@@ -1692,7 +1694,7 @@ const commands: Command[] = [
             rootWithNode(
                 context,
                 context.blocks,
-                context.blocks?.withParagraphsAsLists(context.range, false)
+                context.blocks?.withParagraphsAsLists(context.range, false),
             ),
     },
     {
@@ -1712,7 +1714,7 @@ const commands: Command[] = [
             rootWithNode(
                 context,
                 context.blocks,
-                context.blocks?.withParagraphsAsLists(context.range, true)
+                context.blocks?.withParagraphsAsLists(context.range, true),
             ),
     },
     {
@@ -1733,7 +1735,7 @@ const commands: Command[] = [
                 ? rootWithNode(
                       context,
                       context.blocks,
-                      context.blocks?.withListAsStyle(context.list, false)
+                      context.blocks?.withListAsStyle(context.list, false),
                   )
                 : undefined,
     },
@@ -1755,7 +1757,7 @@ const commands: Command[] = [
                 ? rootWithNode(
                       context,
                       context.blocks,
-                      context.blocks?.withListAsStyle(context.list, true)
+                      context.blocks?.withListAsStyle(context.list, true),
                   )
                 : undefined,
     },
@@ -1774,7 +1776,7 @@ const commands: Command[] = [
             rootWithNode(
                 context,
                 context.blocks,
-                context.blocks?.withListsAsParagraphs(context.range)
+                context.blocks?.withListsAsParagraphs(context.range),
             ),
     },
     {
@@ -1822,7 +1824,7 @@ const commands: Command[] = [
             const copy = context.root.copyRange(context.range);
             const edit = context.root.withRangeFormatted(
                 context.range,
-                undefined
+                undefined,
             );
             if (edit === undefined || copy === undefined) return;
             context.handleCopy(copy);
@@ -1831,7 +1833,7 @@ const commands: Command[] = [
                 context,
                 context.root,
                 edit.root as RootNode,
-                () => edit.range.start
+                () => edit.range.start,
             );
         },
     },
@@ -1886,16 +1888,15 @@ const commands: Command[] = [
                                 };
                                 try {
                                     {
-                                        const blob = await item.getType(
-                                            'text/plain'
-                                        );
+                                        const blob =
+                                            await item.getType('text/plain');
                                         const text = await blob.text();
                                         contents.plain = text;
                                     }
-                                    context.handlePaste(
+                                    return context.handlePaste(
                                         context,
                                         contents,
-                                        true
+                                        true,
                                     );
                                 } catch (err) {}
                             }
@@ -1906,7 +1907,7 @@ const commands: Command[] = [
                             return context.handlePaste(
                                 context,
                                 context.clipboard,
-                                false
+                                false,
                             );
                     }
                 });
@@ -1953,7 +1954,7 @@ const commands: Command[] = [
                             if (newText === undefined) return;
                             const edit = newRoot.withNodeReplaced(
                                 insertionPoint.node,
-                                newText
+                                newText,
                             );
                             if (edit === undefined) return;
                             newRoot = edit;
@@ -1966,7 +1967,7 @@ const commands: Command[] = [
                         // Try to remove the range.
                         let edit = newRoot.withRangeFormatted(
                             sortedRange,
-                            undefined
+                            undefined,
                         );
                         // If we fail, fail to insert at the selection.
                         if (edit === undefined) return;
@@ -1981,14 +1982,14 @@ const commands: Command[] = [
                 // Update the text node.
                 const newText = insertionPoint.node.withCharacterAt(
                     key,
-                    insertionPoint.index
+                    insertionPoint.index,
                 );
                 if (newText === undefined) return;
 
                 // Replace the text.
                 newRoot = newRoot.withNodeReplaced(
                     insertionPoint.node,
-                    newText
+                    newText,
                 );
                 if (newRoot === undefined) return;
 
