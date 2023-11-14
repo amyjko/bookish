@@ -36,6 +36,7 @@
     import type { PasteContent } from './CaretContext';
     import { getCaret } from '../page/Contexts';
     import CaretView from './CaretView.svelte';
+    import Parser from '$lib/models/chapter/Parser';
 
     const IDLE_TIME = 500;
 
@@ -897,16 +898,16 @@
         text: PasteContent | BookishNode,
         save: boolean
     ) {
+        // If we're pasting a node, see what will accept it.
         if (text instanceof BookishNode)
             return handlePasteNode(context, text, save);
 
-        const plain =
-            text.plain === undefined ? undefined : new TextNode(text.plain);
+        if (text.plain === undefined) return undefined;
 
-        if (plain) {
-            const edit = handlePasteNode(context, plain, save);
-            if (edit) return edit;
-        }
+        // If we're pasting text, then we parse it as a series of paragraphs.
+        const chapter = Parser.parseChapter(undefined, text.plain);
+        const edit = handlePasteNode(context, chapter, save);
+        if (edit) return edit;
         return undefined;
     }
 

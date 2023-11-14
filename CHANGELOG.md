@@ -16,6 +16,7 @@
 -   No error on book domain if it's the book domain.
 -   More robust reference mining.
 -   Fixed missing return statement in paste command.
+-   Parse text as chapter before inserting into document.
 
 # 0.5.63 - 2023-11-11
 
