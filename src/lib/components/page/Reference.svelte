@@ -242,7 +242,7 @@
 {:else}
     <!-- Otherwise, just render the reference. -->
     <p class="reference">
-        {#if editable}<Note>{reference.citationID}</Note><br/>{/if}{#if reference.authors}{reference.authors}{:else}<em>Authors</em>{/if}
+        {#if reference.authors}{reference.authors}{:else}<em>Authors</em>{/if}
         {#if reference.year}({reference.year}){:else}<em>Year</em>{/if}. {#if reference.url === null || reference.url.length === 0}{#if reference.title}{reference.title}{:else}<em
                     >Title</em
                 >{/if}{:else}<Link to={reference.url}
@@ -253,17 +253,19 @@
         >.
         {#if reference.summary}<aside class="summary">{reference.summary}</aside
             >{/if}
-        
     </p>
 {/if}
 {#if edit && editable && !reference.short}
-    <div class='controls'>
+    <div class="controls">
+        {#if editable}<Note>{reference.citationID}</Note>{/if}
         <ConfirmButton
             tooltip="delete reference {reference.title}"
             confirm="delete reference"
             command={() =>
                 $edition
-                    ? edition.set($edition.withoutReference(reference.citationID))
+                    ? edition.set(
+                          $edition.withoutReference(reference.citationID)
+                      )
                     : undefined}>⨉</ConfirmButton
         >
         <Button
