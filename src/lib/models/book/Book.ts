@@ -9,7 +9,9 @@ export type EditionInfo = {
     number: number;
     // The author specified edition number, or null if not published.
     published: number | null;
+    // All uids that have edition edit access. Used in Firestore/Storage rules to regulate access.
     editionuids: string[];
+    // All uids that have chapter level access
     chapteruids: string[];
 };
 
@@ -51,7 +53,7 @@ export default class Book {
         cover: string | null,
         editions: EditionInfo[],
         domain: string | null,
-        uids: string[]
+        uids: string[],
     ) {
         this.id = id;
         this.title = title;
@@ -81,7 +83,7 @@ export default class Book {
             book.cover,
             book.editions,
             book.domain,
-            book.uids
+            book.uids,
         );
     }
 
@@ -102,8 +104,8 @@ export default class Book {
                             ...edition.editionuids,
                             ...edition.chapteruids,
                         ])
-                        .flat()
-                )
+                        .flat(),
+                ),
             ),
         };
         return json;
@@ -126,7 +128,7 @@ export default class Book {
             this.cover,
             this.editions,
             domain.length === 0 ? null : domain,
-            this.uids
+            this.uids,
         );
     }
 
@@ -143,7 +145,7 @@ export default class Book {
             this.cover,
             this.editions,
             this.domain,
-            this.uids
+            this.uids,
         );
     }
 
@@ -160,7 +162,7 @@ export default class Book {
             this.cover,
             this.editions,
             this.domain,
-            this.uids
+            this.uids,
         );
     }
 
@@ -177,7 +179,7 @@ export default class Book {
             cover,
             this.editions,
             this.domain,
-            this.uids
+            this.uids,
         );
     }
 
@@ -194,7 +196,7 @@ export default class Book {
             this.cover,
             this.editions,
             this.domain,
-            this.uids
+            this.uids,
         );
     }
 
@@ -237,7 +239,7 @@ export default class Book {
             this.cover,
             this.editions,
             this.domain,
-            uids
+            uids,
         );
     }
 
@@ -250,7 +252,7 @@ export default class Book {
             this.cover,
             revisions,
             this.domain,
-            this.uids
+            this.uids,
         );
     }
 
@@ -265,7 +267,7 @@ export default class Book {
 
         // Find the corresponding edition.
         const index = this.editions.findIndex(
-            (edition) => edition.number === previous.number
+            (edition) => edition.number === previous.number,
         );
 
         return index < 0

@@ -2,10 +2,16 @@ rules_version = '2';
 service firebase.storage {
   match /b/{bucket}/o {
     match /images/{bookID}/{images=**} {
+
+      function bookEditionIsEditable(uid) {
+        let book = firestore.get(/databases/(default)/documents/books/$(bookID));
+        return uid in book.data.uids || uid in book.data.readuids;
+      }
+
       // Allow anyone to read any image
       allow read: if true
-      // Allow users to modify them if they have permissions to edit the book
-      allow write: if request.auth.uid in firestore.get(/databases/(default)/documents/books/$(bookID)).data.uids
+      // Allow users to modify them if they have permissions to edit the book or its editions.
+      allow write: if request != null && request.auth != null && bookEditionIsEditable(request.auth.uid)
     }
   }
 }

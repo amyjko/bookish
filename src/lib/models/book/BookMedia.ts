@@ -51,7 +51,7 @@ export default class BookMedia {
 
         // Find all the prefixes and items.
         this._images = (await this.retrieveImages()).filter(
-            (image) => image !== undefined
+            (image) => image !== undefined,
         ) as Image[];
 
         // Notify observers
@@ -81,9 +81,9 @@ export default class BookMedia {
                             this._images.push(image);
                         }
                         return image;
-                    })
-                )
-            )
+                    }),
+                ),
+            ),
         );
     }
 
@@ -103,9 +103,9 @@ export default class BookMedia {
         return bookIDIndex >= 0
             ? `${url.substring(
                   0,
-                  bookIDIndex
+                  bookIDIndex,
               )}${bookID}%2Fthumbnails${url.substring(
-                  bookIDIndex + bookID.length
+                  bookIDIndex + bookID.length,
               )}`
             : url;
     }
@@ -115,7 +115,7 @@ export default class BookMedia {
         thumbnailRef: StorageReference,
         error: (message: string) => void,
         finished: (url: string, thumbnailURL: string) => void,
-        attempt = 0
+        attempt = 0,
     ) {
         getDownloadURL(thumbnailRef)
             .then((thumbnail) => finished(url, thumbnail))
@@ -130,10 +130,10 @@ export default class BookMedia {
                                   thumbnailRef,
                                   error,
                                   finished,
-                                  attempt + 1
+                                  attempt + 1,
                               ),
-                          200
-                      )
+                          200,
+                      ),
             );
     }
 
@@ -141,7 +141,7 @@ export default class BookMedia {
         file: File,
         _: (progress: number) => void,
         errorHandler: (message: string) => void,
-        finishedHandler: (url: string, thumbnailURL: string) => void
+        finishedHandler: (url: string, thumbnailURL: string) => void,
     ) {
         if (storage === undefined) return;
 
@@ -150,10 +150,6 @@ export default class BookMedia {
         // The canonical path format for Bookish images in the store is image/{bookid}/{imageid}
         // where {bookid} is the Firestore document ID of the book being edited and {imageid} is just a random id.
         const imageRef = ref(storage, `${this.getImagePath()}/${imageName}`);
-        const thumbnailRef = ref(
-            storage,
-            `${this.getImagePath()}/thumbnails/${imageName}`
-        );
 
         uploadBytes(imageRef, file)
             .then((snapshot) => {
@@ -163,13 +159,19 @@ export default class BookMedia {
                     .then((url) =>
                         finishedHandler(
                             this.stripTokenFromURL(url),
-                            this.makeThumbnailURL(this.stripTokenFromURL(url))
-                        )
+                            this.makeThumbnailURL(this.stripTokenFromURL(url)),
+                        ),
                     )
-                    .catch(() => errorHandler('Unable to get image URL.'));
+                    .catch((error) => {
+                        console.error(error);
+                        errorHandler('Unable to get image URL.');
+                    });
             })
             .then(() => this.cacheImages())
-            .catch(() => errorHandler('Unable to upload image.'));
+            .catch((error) => {
+                console.error(error);
+                errorHandler('Unable to upload image.');
+            });
 
         // This seems to be broken in Firebase right now. Switched above to a no-feedback approach.
         // const uploadTask = uploadBytesResumable(imageRef, file);

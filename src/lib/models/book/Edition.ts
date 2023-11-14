@@ -34,7 +34,9 @@ export type EditionSpecification = {
     glossary: Record<string, Definition>;
     theme: Theme | null;
     base: string | null;
+    /** People who have edit access to this edition */
     uids: string[];
+    /** All uids who have edit access to at least one chapter. Used in firestore rules to give permission to update book. */
     chapteruids: string[];
     active: Record<string, string>;
 };
