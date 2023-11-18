@@ -1,6 +1,6 @@
 # bookish changelog
 
-# 0.5.65 - 2023-11-18
+# 0.5.7 - 2023-11-18
 
 -   Updated minor versions.
 -   Enable SvelteKit server-side rendering.
