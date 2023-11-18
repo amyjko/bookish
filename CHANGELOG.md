@@ -1,5 +1,9 @@
 # bookish changelog
 
+# 0.5.65 - 2023-11-18
+
+-   Updated minor versions.
+
 # 0.5.64 - 2023-11-13
 
 ## Fixed
