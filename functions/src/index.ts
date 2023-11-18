@@ -401,7 +401,12 @@ export const getEdition = functions.https.onRequest(
         // If there's no book ID or book, bail with a 404 error
         if (bookID === null || bookJSON === null) {
             console.log(`No matching book.`);
-            response.status(404).send(JSON.stringify({ book: null }));
+            response.status(404).send(
+                JSON.stringify({
+                    book: null,
+                    message: 'There is no book with this name or ID.',
+                }),
+            );
             return;
         }
 
@@ -501,7 +506,12 @@ export const getEdition = functions.https.onRequest(
         // No edition, no book. Bail.
         if (editionID === null || editionJSON === null) {
             console.log(`Didn't find edition, bailing.`);
-            response.status(404).send(JSON.stringify({ book: null }));
+            response.status(404).send(
+                JSON.stringify({
+                    book: null,
+                    message: "Couldn't find an edition for this book.",
+                }),
+            );
             return;
         }
 
@@ -515,16 +525,32 @@ export const getEdition = functions.https.onRequest(
         // If we couldn't, fail.
         if (completeEditionJSON === null) {
             console.log(`Couldn't get all chapter text.`);
-            response.status(404).send(JSON.stringify({ book: null }));
+            response.status(404).send(
+                JSON.stringify({
+                    book: null,
+                    message: "Couldn't find all of the book's chapter text.",
+                }),
+            );
             return;
         }
+
+        // Convert all document references to paths for serialization.
+        // This breaks the type on the client side, but since we're
+        // only using this to read books, not write them, it shouldn't
+        // break anything.
+        const book = bookJSON as unknown as any;
+        for (const edition of book.editions) edition.ref = edition.ref.path;
+        const edition = completeEditionJSON as unknown as any;
+        edition.bookRef = edition.bookRef.path;
+        for (const chap of edition.chapters)
+            if (chap.ref) chap.ref = chap.ref.path;
 
         console.log(`Succeeded! Returning book.`);
 
         // Otherwise, success! We resolved a book. Return it's JSON.
         response
             // Browsers and CDNs can cache this for 5 seconds.
-            // This is tradeoff between const and liveness, and since costs are currently low,
+            // This is tradeoff between cost and liveness, and since costs are currently low,
             // we're going to keep content fresh.
             .set('Cache-Control', 'public, max-age=5, s-maxage=5')
             .status(200)
@@ -533,30 +559,11 @@ export const getEdition = functions.https.onRequest(
                     bookID,
                     book: bookJSON,
                     edition: completeEditionJSON,
+                    message: 'Found the book!',
                 }),
             );
     },
 );
-
-// /** Get an edition with all of the chapter text embedded */
-// async function getCompleteEdition(
-//     bookID: string,
-//     editionID: string
-// ): Promise<EditionSpecification | null> {
-//     // Retrieve the edition
-//     const editionDoc = admin
-//         .firestore()
-//         .doc(`books/${bookID}/editions/${editionID}`);
-//     const editionData = await editionDoc.get();
-//     if (!editionData.exists) {
-//         console.log("Couldn't get edition from firestore, bailing.");
-//         return null;
-//     }
-
-//     const editionJSON = editionData.data() as EditionSpecification;
-
-//     return completeEdition(bookID, editionID, editionJSON);
-// }
 
 async function completeEdition(
     bookID: string,

@@ -16,19 +16,18 @@
         "source": "functions"
     },
     "hosting": {
-        "public": "dist",
+        "source": ".",
         "predeploy": ["npm run build"],
         "ignore": ["firebase.json", "**/.*", "**/node_modules/**"],
         "rewrites": [
             {
                 "source": "/book/**",
                 "function": "getEdition"
-            },
-            {
-                "source": "**",
-                "destination": "/index.html"
             }
-        ]
+        ],
+        "frameworksBackend": {
+            "region": "us-central1"
+        }
     },
     "emulators": {
         "firestore": {

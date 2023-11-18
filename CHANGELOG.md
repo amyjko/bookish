@@ -3,6 +3,7 @@
 # 0.5.65 - 2023-11-18
 
 -   Updated minor versions.
+-   Enable SvelteKit server-side rendering.
 
 # 0.5.64 - 2023-11-13
 

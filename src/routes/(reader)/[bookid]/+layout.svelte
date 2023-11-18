@@ -12,13 +12,13 @@
     import { writable } from 'svelte/store';
     import { setContext } from 'svelte';
     import EditionModel from '$lib/models/book/Edition';
-    import { doc } from 'firebase/firestore';
     import Error from '../+error.svelte';
 
     export let data: {
         bookID: string;
-        book: BookSpecification;
+        book: BookSpecification | null;
         edition: EditionSpecification;
+        message: string;
     };
 
     // A global store for the current book. It's at the root so the header can do breadcrumbs.
@@ -30,7 +30,7 @@
     setContext<EditionStore>(EDITION, edition);
 
     // Set the context if we received the book edition.
-    if (data?.book && data?.edition && data?.bookID) {
+    if (data && data.book && data.edition && data.bookID) {
         book.set(Book.fromJSON(data.bookID, data.book));
         edition.set(EditionModel.fromJSON(undefined, data.edition));
     }
@@ -44,5 +44,5 @@
         <slot />
     </Edition>
 {:else}
-    <Error>Unable to retrieve this book.</Error>
+    <Error>{data.message}</Error>
 {/if}

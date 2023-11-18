@@ -28,6 +28,7 @@
     },
     "devDependencies": {
         "@sveltejs/adapter-static": "^2.0",
+        "@sveltejs/adapter-auto": "^2.1.1",
         "@sveltejs/kit": "^1.27",
         "@sveltejs/package": "^2.2",
         "@types/prismjs": "^1.26",
@@ -44,6 +45,7 @@
         "vitest": "^0"
     },
     "dependencies": {
+        "@sveltejs/kit": "^1.27",
         "ajv": "^8",
         "ajv-formats": "^2",
         "firebase": "latest",
@@ -51,7 +53,6 @@
         "prismjs": "^1.29",
         "smoothscroll-polyfill": "^0.4",
         "svelte": "^4.2",
-        "@sveltejs/kit": "^1.27",
         "uuid": "^9.0"
     },
     "types": "./dist/index.d.ts",
