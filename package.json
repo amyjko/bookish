@@ -1,7 +1,7 @@
 {
     "name": "bookish-press",
     "private": false,
-    "version": "0.5.7",
+    "version": "0.5.71",
     "type": "module",
     "description": "A platform for reading and writing readable, accessible, beautiful online books.",
     "license": "MIT",
@@ -56,10 +56,12 @@
         "uuid": "^9.0"
     },
     "types": "./dist/index.d.ts",
+    "main": "./dist/index.js",
     "exports": {
         "./package.json": "./package.json",
         ".": {
             "types": "./dist/index.d.ts",
+            "main": "./dist/index.js",
             "svelte": "./dist/index.js",
             "default": "./dist/index.js"
         },
