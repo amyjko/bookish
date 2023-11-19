@@ -4,8 +4,8 @@ import admin from 'firebase-admin';
 import path from 'path';
 import os from 'os';
 import fs from 'fs';
-import type { EditionSpecification } from 'bookish-press/models/book/Edition';
-import type { BookSpecification } from 'bookish-press/models/book/Book';
+import type { EditionSpecification } from 'bookish-press/dist/models/book/Edition';
+import type { BookSpecification } from 'bookish-press/dist/models/book/Book';
 import sharp from 'sharp';
 
 admin.initializeApp();
@@ -549,10 +549,10 @@ export const getEdition = functions.https.onRequest(
 
         // Otherwise, success! We resolved a book. Return it's JSON.
         response
-            // Browsers and CDNs can cache this for 5 seconds.
+            // Browsers and CDNs can cache this for 5 minutes.
             // This is tradeoff between cost and liveness, and since costs are currently low,
             // we're going to keep content fresh.
-            .set('Cache-Control', 'public, max-age=5, s-maxage=5')
+            .set('Cache-Control', 'public, max-age=300, s-maxage=600')
             .status(200)
             .send(
                 JSON.stringify({
