@@ -3,6 +3,7 @@
 # 0.5.71 - 2023-11-20
 
 -   Link to header feature.
+-   Don't replace selection on comment insertion.
 
 # 0.5.7 - 2023-11-18
 

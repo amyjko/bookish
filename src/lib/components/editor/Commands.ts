@@ -1407,7 +1407,10 @@ const commands: Command[] = [
             context.meta === undefined,
         handler: (context) =>
             context.root.withSegmentAtSelection(
-                context.range,
+                {
+                    start: context.root.sortRange(context.range).end,
+                    end: context.root.sortRange(context.range).end,
+                },
                 (text) =>
                     new CommentNode(new FormatNode('', [new TextNode(text)])),
             ),
