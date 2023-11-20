@@ -23,6 +23,9 @@
             if (url.indexOf(':') >= 0) {
                 let parts = chapter.split(':');
                 chapter = parts[0];
+            } else if (url.indexOf('#') >= 0) {
+                let parts = chapter.split('#');
+                chapter = parts[0];
             }
 
             if (chapter !== '' && !$edition?.hasChapter(chapter)) return true;

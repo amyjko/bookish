@@ -1,5 +1,9 @@
 # bookish changelog
 
+# 0.5.71 - 2023-11-20
+
+-   Link to header feature.
+
 # 0.5.7 - 2023-11-18
 
 -   Updated minor versions.

@@ -65,12 +65,25 @@
         // Add an option for each chapter and it's labels.
         if ($edition) {
             for (const chap of $edition?.getChapters() ?? []) {
+                // Include the chapter itself
                 options.push([`Chapter: ${chap.getTitle()}`, chap.getID()]);
-                for (const label of chap.getAST($edition)?.getLabels() ?? [])
-                    options.push([
-                        chap.getTitle() + ': ' + label.getMeta(),
-                        `${chap.getID()}:${label.getMeta()}`,
-                    ]);
+                const root = chap.getAST($edition);
+                if (root) {
+                    // Include the chapter's headers
+                    const headers = root.getHeaders();
+                    for (let number = 0; number < headers.length; number++) {
+                        options.push([
+                            chap.getTitle() + ': ' + headers[number].toText(),
+                            `${chap.getID()}#header-${number}`,
+                        ]);
+                    }
+                    // Include all of the labels in the chapter
+                    for (const label of root.getLabels())
+                        options.push([
+                            chap.getTitle() + ': ' + label.getMeta(),
+                            `${chap.getID()}:${label.getMeta()}`,
+                        ]);
+                }
             }
         }
     }

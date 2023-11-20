@@ -549,7 +549,7 @@ export const getEdition = functions.https.onRequest(
 
         // Otherwise, success! We resolved a book. Return it's JSON.
         response
-            // Browsers and CDNs can cache this for 5 minutes.
+            // Browsers can cache for 5 minutes, CDNs for 10 minutes.
             // This is tradeoff between cost and liveness, and since costs are currently low,
             // we're going to keep content fresh.
             .set('Cache-Control', 'public, max-age=300, s-maxage=600')
