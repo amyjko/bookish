@@ -20,9 +20,9 @@
         "//env": "echo 'This copies the .env file corresponding to the current Firebase project specified with firebase use, defaulting to local'",
         "env": "cp .env.${GCLOUD_PROJECT:-example} .env",
         "//stage": "echo 'switch to the dev project, deploy, relying on Firebase's predeploy hook to run the build script above before release'",
-        "stage": "firebase use dev && firebase deploy",
+        "stage": "firebase use dev && && .env.bookish-dev-21ac3 .env && firebase deploy",
         "//release": "echo 'switch to the prod project, deploy, relying on Firebase's predeploy hook to run the build script above before release'",
-        "release": "firebase use prod && firebase deploy",
+        "release": "firebase use prod && cp .env.bookish-prod .env && firebase deploy",
         "//merge": "merge dev into main, push to remote",
         "merge": "git checkout main && git merge dev && git push origin main && git checkout dev"
     },
