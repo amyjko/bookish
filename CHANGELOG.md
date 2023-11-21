@@ -4,6 +4,8 @@
 
 -   Link to header feature.
 -   Don't replace selection on comment insertion.
+-   Don't focus on tables on cell click.
+-   Fix off by one on table row and column deletion.
 
 # 0.5.7 - 2023-11-18
 

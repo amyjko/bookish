@@ -15,7 +15,7 @@ export default class TableNode extends BlockNode {
     constructor(
         rows: FormatNode[][],
         position?: Position,
-        caption?: FormatNode
+        caption?: FormatNode,
     ) {
         super();
         this.#rows = rows.map((r) => r.map((c) => c.withTextIfEmpty()));
@@ -50,7 +50,7 @@ export default class TableNode extends BlockNode {
         this.#rows.forEach((row) =>
             row.forEach((cell) => {
                 formats.push(cell);
-            })
+            }),
         );
         return [...formats, this.#caption];
     }
@@ -82,7 +82,7 @@ export default class TableNode extends BlockNode {
             this.#rows
                 .map(
                     (row) =>
-                        `,${row.map((cell) => cell.toBookdown()).join('|')}`
+                        `,${row.map((cell) => cell.toBookdown()).join('|')}`,
                 )
                 .join('\n') +
             `\n${this.#position === '|' ? '' : this.#position}${
@@ -97,10 +97,10 @@ export default class TableNode extends BlockNode {
                 (row) =>
                     `<tr>${row
                         .map((cell) => `<td>${cell.toHTML()}</td>`)
-                        .join('')}`
+                        .join('')}`,
             )
             .join(
-                ''
+                '',
             )}</tbody></table><center>${this.#caption.toHTML()}</center>`;
     }
 
@@ -152,7 +152,7 @@ export default class TableNode extends BlockNode {
         return new TableNode(
             rows,
             this.#position,
-            this.#caption ? this.#caption.copy() : undefined
+            this.#caption ? this.#caption.copy() : undefined,
         ) as this;
     }
 
@@ -165,7 +165,7 @@ export default class TableNode extends BlockNode {
             return new TableNode(
                 this.#rows,
                 this.#position,
-                replacement
+                replacement,
             ) as this;
 
         // If it's a cell, update the cell.
@@ -185,7 +185,7 @@ export default class TableNode extends BlockNode {
                 return new TableNode(
                     newRows,
                     this.#position,
-                    this.#caption
+                    this.#caption,
                 ) as this;
             }
         }
@@ -217,7 +217,10 @@ export default class TableNode extends BlockNode {
     withoutColumn(index: number): TableNode | undefined {
         if (index < 0 || index >= this.getColumnCount()) return;
         const newRows = this.#rows.slice();
-        for (let r = 0; r < this.#rows.length; r++) newRows[r].splice(index, 1);
+        for (let r = 0; r < this.#rows.length; r++) {
+            newRows[r] = newRows[r].slice();
+            newRows[r].splice(index, 1);
+        }
         return new TableNode(newRows, this.#position, this.#caption);
     }
 
@@ -272,7 +275,7 @@ export default class TableNode extends BlockNode {
                     ((containsStart && foundStart) || !containsStart) &&
                         ((containsEnd && !foundEnd) || !containsEnd)
                         ? newCell
-                        : new FormatNode('', [new TextNode()])
+                        : new FormatNode('', [new TextNode()]),
                 );
                 if (row[c].contains(range.end.node)) foundEnd = true;
             }

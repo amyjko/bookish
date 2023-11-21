@@ -116,14 +116,14 @@ function deleteTableRowColumn(
             return (
                 row
                     ? (t as TableNode).getCell(
-                          location.row === table.getRowCount()
+                          location.row === table.getRowCount() - 1
                               ? location.row - 1
                               : location.row,
                           location.column,
                       )
                     : (t as TableNode).getCell(
                           location.row,
-                          location.column === table.getColumnCount()
+                          location.column === table.getColumnCount() - 1
                               ? location.column - 1
                               : location.column,
                       )
