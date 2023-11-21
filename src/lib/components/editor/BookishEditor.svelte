@@ -904,8 +904,14 @@
 
         if (text.plain === undefined) return undefined;
 
-        // If we're pasting text, then we parse it as a series of paragraphs.
-        const chapter = Parser.parseChapter(undefined, text.plain);
+        // If we're pasting text into a block node, then we parse it as a series of paragraphs.
+        const chapter =
+            context.block instanceof ParagraphNode
+                ? Parser.parseChapter(undefined, text.plain)
+                : Parser.parseFormat(
+                      undefined,
+                      text.plain.replaceAll('\n', ' ')
+                  );
         const edit = handlePasteNode(context, chapter, save);
         if (edit) return edit;
         return undefined;
