@@ -13,7 +13,7 @@
     $: rows = node.getRows();
 </script>
 
-<Figure {node} caption={node.getCaption()}>
+<Figure {node} caption={node.getCaption()} focusable={false}>
     <Rows>
         {#each rows as row, index}
             <tr class={editable ? 'editable' : null}>
