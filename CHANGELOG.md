@@ -1,5 +1,11 @@
 # bookish changelog
 
+# 0.5.72 - 2023-11-27
+
+## Fixed
+
+-   [#364](https://github.com/amyjko/bookish/issues/364) Escape reserved characters on paste.
+
 # 0.5.71 - 2023-11-20
 
 -   Link to header feature.

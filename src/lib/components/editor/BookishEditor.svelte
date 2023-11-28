@@ -36,7 +36,7 @@
     import type { PasteContent } from './CaretContext';
     import { getCaret } from '../page/Contexts';
     import CaretView from './CaretView.svelte';
-    import Parser from '$lib/models/chapter/Parser';
+    import Parser, { Reserved } from '$lib/models/chapter/Parser';
 
     const IDLE_TIME = 500;
 
@@ -94,7 +94,7 @@
         return () => {
             document.removeEventListener(
                 'selectionchange',
-                handleSelectionChange
+                handleSelectionChange,
             );
         };
     });
@@ -129,10 +129,10 @@
                 // Browsers don't render backwards ranges, so we sort this before measuring.
                 const sortedRange = caretRange;
                 let startNode = document.querySelector(
-                    `[data-nodeid='${sortedRange.start.node.nodeID}`
+                    `[data-nodeid='${sortedRange.start.node.nodeID}`,
                 );
                 let endNode = document.querySelector(
-                    `[data-nodeid='${sortedRange.end.node.nodeID}`
+                    `[data-nodeid='${sortedRange.end.node.nodeID}`,
                 );
 
                 // If we found both selected nodes and we have a reference to the DOM, update the
@@ -171,7 +171,7 @@
                         endNode.childNodes.length === 0;
                     if (emptyStart)
                         startNode.appendChild(
-                            document.createTextNode('\ufeff')
+                            document.createTextNode('\ufeff'),
                         );
                     if (emptyEnd)
                         endNode.appendChild(document.createTextNode('\ufeff'));
@@ -192,12 +192,12 @@
                                 startNode.childNodes[0],
                                 sortedRange.start.index,
                                 endNode.childNodes[0],
-                                sortedRange.end.index
+                                sortedRange.end.index,
                             );
                         } catch (e) {
                             console.error(e);
                             console.error(
-                                `Error setting caret range, trying to set to ${startNode.childNodes[0]}:${sortedRange.start.index} - ${endNode.childNodes[0]}:${sortedRange.end.index}`
+                                `Error setting caret range, trying to set to ${startNode.childNodes[0]}:${sortedRange.start.index} - ${endNode.childNodes[0]}:${sortedRange.end.index}`,
                             );
                         }
                         currentRange = docSelection.getRangeAt(0);
@@ -214,8 +214,8 @@
                             ? parseInt(
                                   lineHeightString.substring(
                                       0,
-                                      lineHeightString.length - 2
-                                  )
+                                      lineHeightString.length - 2,
+                                  ),
                               )
                             : undefined;
 
@@ -274,7 +274,7 @@
                 parent = parent.parentNode;
             if (parent && parent.dataset.nodeid) {
                 const node = editedNode.getNode(
-                    parseInt(parent.dataset.nodeid)
+                    parseInt(parent.dataset.nodeid),
                 );
                 if (node instanceof TextNode)
                     // Account for the zero-width spaces that we insert in order to make selections possible on empty text nodes.
@@ -316,11 +316,11 @@
         if (selection && selection.anchorNode && selection.focusNode) {
             const start = rangeToCaret(
                 selection.anchorNode,
-                selection.anchorOffset
+                selection.anchorOffset,
             );
             const end = rangeToCaret(
                 selection.focusNode,
-                selection.focusOffset
+                selection.focusOffset,
             );
             // If we found to text nodes, set the selection
             if (start && end) {
@@ -330,12 +330,12 @@
     }
 
     function getCaretCoordinate(
-        caret: Caret
+        caret: Caret,
     ): { top: number; left: number; height: number } | undefined {
         if (!(caret.node instanceof TextNode || caret.node instanceof AtomNode))
             return undefined;
         const domNode = document.querySelector(
-            `[data-nodeid='${caret.node.nodeID}`
+            `[data-nodeid='${caret.node.nodeID}`,
         );
         // If we didn't find the node or there's no text node inside it, then there's no caret position.
         // This happens temporarily before the useEffect above has a chance to insert zero-width non-breaking space.
@@ -344,7 +344,7 @@
         const range = document.createRange();
         range.setStart(
             domNode.childNodes.length === 0 ? domNode : domNode.childNodes[0],
-            domNode.childNodes.length === 0 ? 0 : caret.index
+            domNode.childNodes.length === 0 ? 0 : caret.index,
         );
         const characterRect = range.getBoundingClientRect();
         if (characterRect.left > 0)
@@ -385,11 +385,11 @@
                             previousCoordinate &&
                             previousCandidate &&
                             Math.abs(
-                                startCoordinate.left - previousCoordinate.left
+                                startCoordinate.left - previousCoordinate.left,
                             ) <
                                 Math.abs(
                                     startCoordinate.left -
-                                        candidateCoordinate.left
+                                        candidateCoordinate.left,
                                 )
                                 ? previousCandidate
                                 : candidate;
@@ -539,7 +539,7 @@
                 inside &&
                 n.getClosestParentMatching(
                     editedNode,
-                    (p) => p instanceof ListNode
+                    (p) => p instanceof ListNode,
                 ) !== undefined
             )
                 includesList = true;
@@ -562,14 +562,14 @@
             root: editedNode,
             blocks: parents?.find((n) => n instanceof BlocksNode) as BlocksNode,
             paragraph: parents?.find(
-                (n) => n instanceof ParagraphNode
+                (n) => n instanceof ParagraphNode,
             ) as ParagraphNode,
             block: parents?.find((n) => n instanceof BlockNode) as BlockNode,
             code: parents?.find((n) => n instanceof CodeNode) as CodeNode,
             list: parents?.find((n) => n instanceof ListNode) as ListNode,
             atom: parents?.find((n) => n instanceof AtomNode) as AtomNode<any>,
             meta: parents?.find(
-                (n) => n instanceof MetadataNode
+                (n) => n instanceof MetadataNode,
             ) as MetadataNode<FormatNode>,
             includesList: includesList,
             table: parents?.find((n) => n instanceof TableNode) as TableNode,
@@ -691,14 +691,14 @@
                 // Otherwise, if we have a reference to this editor's DOM element, find the nearest focusable element in it's toolbar and focus on that.
                 const controls = [
                     document.querySelector(
-                        '.bookish-editor-toolbar [tabindex="0"]'
+                        '.bookish-editor-toolbar [tabindex="0"]',
                     ),
                     document.querySelector('.bookish-editor-toolbar input'),
                     document.querySelector('.bookish-editor-toolbar select'),
                     document.querySelector('.bookish-editor-toolbar button'),
                 ];
                 const match = controls.find(
-                    (control) => control && control instanceof HTMLElement
+                    (control) => control && control instanceof HTMLElement,
                 );
                 if (match && match instanceof HTMLElement) {
                     match.focus();
@@ -720,7 +720,7 @@
                 undefined,
                 context,
                 getUtilities(),
-                key
+                key,
             );
 
             // If the command invoked produced a new range
@@ -730,7 +730,7 @@
 
                 if (root === editedNode && command.mutates)
                     console.error(
-                        `Warning: immutability violation on ${command.description}`
+                        `Warning: immutability violation on ${command.description}`,
                     );
 
                 // Set the range to force a rerender, assuming something in the document changed.
@@ -756,7 +756,7 @@
     async function saveEdit(
         newRoot: RootNode,
         newRange: CaretRange,
-        command?: Command
+        command?: Command,
     ) {
         // Don't save edits if locked.
         if (locked) return;
@@ -889,14 +889,14 @@
             ]);
         } else
             window.alert(
-                "Your browser doesn't support copying to the clipboard :("
+                "Your browser doesn't support copying to the clipboard :(",
             );
     }
 
     function handlePaste(
         context: WhatsAroundTheCaret,
         text: PasteContent | BookishNode,
-        save: boolean
+        save: boolean,
     ) {
         // If we're pasting a node, see what will accept it.
         if (text instanceof BookishNode)
@@ -904,14 +904,15 @@
 
         if (text.plain === undefined) return undefined;
 
-        // If we're pasting text into a block node, then we parse it as a series of paragraphs.
+        // Escape all reserved Bookdown characters.
+        const escaped = text.plain.replaceAll(Reserved, '\\$1');
+
         const chapter =
+            // If we're pasting text into a paragraph node, then we parse it as a series of paragraphs.
             context.block instanceof ParagraphNode
-                ? Parser.parseChapter(undefined, text.plain)
-                : Parser.parseFormat(
-                      undefined,
-                      text.plain.replaceAll('\n', ' ')
-                  );
+                ? Parser.parseChapter(undefined, escaped)
+                : // Otherwise parse as just a format node, replacing all text newlines with a space.
+                  Parser.parseFormat(undefined, escaped.replaceAll('\n', ' '));
         const edit = handlePasteNode(context, chapter, save);
         if (edit) return edit;
         return undefined;
@@ -920,7 +921,7 @@
     function handlePasteNode(
         context: WhatsAroundTheCaret,
         node: BookishNode,
-        save: boolean
+        save: boolean,
     ) {
         // Track revisions in these two variables.
         let newRoot = context.root;
@@ -992,7 +993,7 @@
         isSelection === false &&
         caretRange.start.node.getClosestParentMatching(
             editedNode,
-            (p) => p instanceof LinkNode
+            (p) => p instanceof LinkNode,
         ) !== undefined;
 
     // When the caret context or editor focus changes, update the active editor.

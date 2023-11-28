@@ -54,6 +54,8 @@ const bulletRE = /^\*+\s+/;
 // FOOTNOTE :: {TEXT}
 // TEXT :: (.+)
 
+export const Reserved = /([_*`@~:^<>{}\[\]])/g;
+
 export default class Parser {
     book: Edition | undefined;
     text: string;
@@ -79,13 +81,13 @@ export default class Parser {
         // Replace any remaining symbols with any definitions given.
         if (book && book.getSymbols()) {
             for (const [symbol, definition] of Object.entries(
-                book.getSymbols()
+                book.getSymbols(),
             )) {
                 // Don't replace escaped at symbols. Otherwise, be liberal in replacing any matching symbol that starts with the symbol
                 // name and ends with a word boundary.
                 text = text.replace(
                     new RegExp('([^\\\\])@' + symbol + '\\b', 'g'),
-                    '$1' + definition
+                    '$1' + definition,
                 );
             }
         }
@@ -95,21 +97,21 @@ export default class Parser {
     static parseChapter(book: Edition | undefined, text: string) {
         return new Parser(
             book,
-            book === undefined ? text : Parser.preprocessSymbols(book, text)
+            book === undefined ? text : Parser.preprocessSymbols(book, text),
         ).parseChapter();
     }
 
     static parseFormat(book: Edition | undefined, text: string) {
         return new Parser(
             book,
-            book === undefined ? text : Parser.preprocessSymbols(book, text)
+            book === undefined ? text : Parser.preprocessSymbols(book, text),
         ).parseFormat();
     }
 
     static parseEmbed(book: Edition | undefined, text: string) {
         return new Parser(
             book,
-            book === undefined ? text : Parser.preprocessSymbols(book, text)
+            book === undefined ? text : Parser.preprocessSymbols(book, text),
         ).parseEmbed();
     }
 
@@ -213,7 +215,7 @@ export default class Parser {
         else
             return this.text.substring(
                 this.index,
-                Math.max(this.index, nextNewline)
+                Math.max(this.index, nextNewline),
             );
     }
 
@@ -298,7 +300,7 @@ export default class Parser {
         for (const [symbol, text] of Object.entries(this.metadata.symbols)) {
             rest = rest.replace(
                 new RegExp('([^\\\\])@' + symbol + '\\b', 'g'),
-                '$1' + text
+                '$1' + text,
             );
         }
 
@@ -349,7 +351,7 @@ export default class Parser {
                         ? 'Did you mean to declare a symbol? Use an @ symbol, then a name of only numbers and letters, then a colon, then whatever content you want it to represent.'
                         : "'" +
                           name +
-                          "' isn't a valid name for a symbol; letters and numbers only"
+                          "' isn't a valid name for a symbol; letters and numbers only",
                 );
                 return;
             }
@@ -361,7 +363,7 @@ export default class Parser {
             if (!this.nextIs(':')) {
                 new ErrorNode(
                     this.readUntilNewLine(),
-                    "Symbol names are to be followed by a ':'"
+                    "Symbol names are to be followed by a ':'",
                 );
                 return;
             }
@@ -493,7 +495,7 @@ export default class Parser {
                 items.push(
                     format.isEmpty()
                         ? format.withSegmentAppended(new TextNode())
-                        : format
+                        : format,
                 );
             }
             // Otherwise, unread the stars, then either stop parsing or parse nested list.
@@ -744,7 +746,7 @@ export default class Parser {
                     next = this.peek();
                 }
                 segments.push(
-                    new ErrorNode(undefined, "Couldn't find symbol @" + symbol)
+                    new ErrorNode(undefined, "Couldn't find symbol @" + symbol),
                 );
             }
             // Parse a label
@@ -872,7 +874,7 @@ export default class Parser {
         if (delimeter === null)
             return new ErrorNode(
                 undefined,
-                'Somehow parsing formatted text at end of file.'
+                'Somehow parsing formatted text at end of file.',
             );
 
         // Read some content until reaching the delimiter or the end of the line
@@ -903,7 +905,7 @@ export default class Parser {
 
         return new FormatNode(
             subscript ? 'v' : (delimeter as Format),
-            segments
+            segments,
         );
     }
 
