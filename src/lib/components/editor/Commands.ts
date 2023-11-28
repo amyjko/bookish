@@ -43,6 +43,7 @@ import FootnoteIcon from './icons/footnote.svg?raw';
 import Header1Icon from './icons/header1.svg?raw';
 import Header2Icon from './icons/header2.svg?raw';
 import Header3Icon from './icons/header3.svg?raw';
+import Header4Icon from './icons/header4.svg?raw';
 import IndentIcon from './icons/indent.svg?raw';
 import ItalicIcon from './icons/italic.svg?raw';
 import LabelIcon from './icons/label.svg?raw';
@@ -1497,6 +1498,26 @@ const commands: Command[] = [
                 context,
                 context.paragraph,
                 context.paragraph?.withLevel(3),
+            ),
+    },
+    {
+        icon: Header4Icon,
+        description: 'format as 4rd level header',
+        category: 'level',
+        mutates: true,
+        control: true,
+        alt: true,
+        shift: false,
+        code: 'Digit4',
+        visible: (context) => context.paragraph !== undefined,
+        active: (context) =>
+            context.paragraph !== undefined &&
+            context.paragraph.getLevel() !== 4,
+        handler: (context) =>
+            rootWithNode(
+                context,
+                context.paragraph,
+                context.paragraph?.withLevel(4),
             ),
     },
     {

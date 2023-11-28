@@ -22,11 +22,11 @@ export default class ParagraphNode extends BlockNode {
                 adjustedFormat.getSegments()[adjustedFormat.getLength() - 1];
             if (first instanceof AtomNode || first instanceof MetadataNode)
                 adjustedFormat = adjustedFormat.withSegmentPrepended(
-                    new TextNode()
+                    new TextNode(),
                 );
             if (last instanceof AtomNode || last instanceof MetadataNode)
                 adjustedFormat = adjustedFormat.withSegmentAppended(
-                    new TextNode()
+                    new TextNode(),
                 );
         }
         // Always ensure a paragraph has at least an empty text node.
@@ -59,7 +59,7 @@ export default class ParagraphNode extends BlockNode {
     }
     getTextNodes(): TextNode[] {
         return this.getNodes().filter(
-            (n) => n instanceof TextNode
+            (n) => n instanceof TextNode,
         ) as TextNode[];
     }
     getFirstCaret(): Caret | undefined {
@@ -85,26 +85,13 @@ export default class ParagraphNode extends BlockNode {
     }
 
     toBookdown(): string {
-        return (
-            (this.#level === 1
-                ? '# '
-                : this.#level === 2
-                ? '## '
-                : this.#level === 3
-                ? '### '
-                : '') + this.#format.toBookdown()
-        );
+        return this.#level === 0
+            ? this.#format.toBookdown()
+            : `${'#'.repeat(this.#level)} ${this.#format.toBookdown()}`;
     }
 
     toHTML(): string {
-        const tag =
-            this.#level === 1
-                ? 'h1'
-                : this.#level === 2
-                ? 'h2'
-                : this.#level === 3
-                ? 'h2'
-                : 'p';
+        const tag = this.#level === 0 ? 'p' : `h${this.#level}`;
         return `<${tag}>${this.#format.toHTML()}</${tag}>`;
     }
 
@@ -122,7 +109,7 @@ export default class ParagraphNode extends BlockNode {
             new FormatNode('', [
                 ...this.#format.getSegments(),
                 ...paragraph.#format.getSegments(),
-            ])
+            ]),
         );
     }
 
@@ -132,7 +119,7 @@ export default class ParagraphNode extends BlockNode {
             new FormatNode('', [
                 ...paragraph.#format.getSegments(),
                 ...this.#format.getSegments(),
-            ])
+            ]),
         );
     }
 

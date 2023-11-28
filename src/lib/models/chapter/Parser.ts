@@ -438,7 +438,7 @@ export default class Parser {
         this.readWhitespace();
 
         // Parse some content.
-        return new ParagraphNode(Math.min(3, count), this.parseFormat());
+        return new ParagraphNode(Math.min(4, count), this.parseFormat());
     }
 
     parseRule(): RuleNode {

@@ -105,4 +105,22 @@
         font-size: var(--bookish-header-3-font-size);
         font-style: italic;
     }
+
+    h5 {
+        font-size: var(--bookish-paragraph-font-size);
+        display: inline;
+    }
+
+    h5::after {
+        content: '. ';
+    }
+
+    h5 + :global(p) {
+        display: inline;
+    }
+
+    h5 + :global(p::after) {
+        content: '\0A';
+        display: block;
+    }
 </style>
