@@ -5,6 +5,7 @@
 ## Fixed
 
 -   [#364](https://github.com/amyjko/bookish/issues/364) Escape reserved characters on paste.
+-   [#363](https://github.com/amyjko/bookish/issues/363) Level 4 headers.
 
 # 0.5.71 - 2023-11-20
 
