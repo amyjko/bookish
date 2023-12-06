@@ -46,7 +46,7 @@
                     phrase: definition.phrase,
                     definition: definition.definition,
                     synonyms: [...(definition.synonyms ?? []), ''],
-                })
+                }),
             );
         }
         newSynonym = true;
@@ -71,7 +71,7 @@
                     phrase: definition.phrase,
                     definition: definition.definition,
                     synonyms: synonyms,
-                })
+                }),
             );
     }
 
@@ -84,6 +84,7 @@
             {#if editable}
                 <TextEditor
                     text={definition.phrase}
+                    saveOnExit
                     label={'Glossary phrase editor.'}
                     placeholder="phrase"
                     valid={(text) => {
@@ -96,7 +97,7 @@
                                       phrase: text,
                                       definition: definition.definition,
                                       synonyms: definition.synonyms,
-                                  })
+                                  }),
                               )
                             : undefined}
                 />
@@ -128,7 +129,7 @@
                                       phrase: definition.phrase,
                                       definition: node.toBookdown(),
                                       synonyms: definition.synonyms,
-                                  })
+                                  }),
                               )
                             : undefined}
                     chapter={false}
@@ -144,7 +145,7 @@
                 <Format
                     node={Parser.parseFormat(
                         undefined,
-                        definition.definition
+                        definition.definition,
                     ).withTextIfEmpty()}
                 />
             {/if}

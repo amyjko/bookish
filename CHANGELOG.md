@@ -1,5 +1,11 @@
 # bookish changelog
 
+# 0.5.73 - 2023-12-06
+
+## Fixed
+
+-   [#365](https://github.com/amyjko/bookish/issues/365) Save on glossry definition exit.
+
 # 0.5.72 - 2023-11-27
 
 ## Fixed
