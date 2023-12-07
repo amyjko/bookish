@@ -28,6 +28,7 @@ const Schema = {
         number: { type: 'number' },
         summary: { type: 'string' },
         published: { type: ['number', 'null'] },
+        gtagid: { type: ['string', 'null'] },
         authors: {
             type: 'array',
             items: { type: 'string' },
