@@ -229,6 +229,7 @@ export async function createBook(userID: string): Promise<string> {
         null,
         null,
         {},
+        null,
     ).withNewChapter();
 
     // Add the edition to the editions collection in the database so we can get an edition ref.

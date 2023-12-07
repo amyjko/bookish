@@ -13,6 +13,7 @@
     import { setContext } from 'svelte';
     import EditionModel from '$lib/models/book/Edition';
     import Error from '../+error.svelte';
+    import Analytics from '$lib/components/page/Analytics.svelte';
 
     export let data: {
         bookID: string;
@@ -37,6 +38,9 @@
 </script>
 
 {#if $book && $edition}
+    <!-- Do book analytics for the book's analytics ID, unless there is no id -->
+    <Analytics gtagid={$edition.gtagid}></Analytics>
+
     <Edition
         edition={$edition}
         base={`/${$book.getSubdomain() ?? $book.getID()}`}

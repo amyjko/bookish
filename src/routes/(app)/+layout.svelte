@@ -22,6 +22,7 @@
     import BookSaveStatus from '$lib/models/book/BookSaveStatus';
     import { getUserEmails, updateBook, updateEdition } from '$lib/models/CRUD';
     import { page } from '$app/stores';
+    import Analytics from '$lib/components/page/Analytics.svelte';
 
     // A global store context for the focused editor, used to display toolbar.
     let caret = writable<CaretState | undefined>(undefined);
@@ -62,10 +63,10 @@
                                 ...uids,
                                 ...chapter.uids,
                             ],
-                            []
+                            [],
                         ),
-                    ])
-                ).filter((uid) => !$editors.has(uid))
+                    ]),
+                ).filter((uid) => !$editors.has(uid)),
             );
         }
     }
@@ -116,19 +117,19 @@
                 const newChapterRefs = await updateEdition(
                     $book,
                     previousSavedEdition,
-                    $edition
+                    $edition,
                 );
 
                 // If we succeeded, update all of the chapters with the new chapter references, if there are any.
                 let revisedEdition = $edition;
                 for (const [id, ref] of newChapterRefs) {
                     const chap = revisedEdition.chapters.find(
-                        (chapter) => chapter.id === id
+                        (chapter) => chapter.id === id,
                     );
                     if (chap && chap.ref === undefined) {
                         revisedEdition = revisedEdition.withRevisedChapter(
                             chap,
-                            chap.withRef(ref)
+                            chap.withRef(ref),
                         );
                     }
                 }
@@ -180,7 +181,7 @@
                     .withTitle($edition.getTitle())
                     .withCover($edition.getImage('cover') ?? null)
                     .withAuthors($edition.getAuthors())
-                    .withDescription($edition.getDescription())
+                    .withDescription($edition.getDescription()),
             );
         }
 
@@ -202,6 +203,9 @@
         }
     }
 </script>
+
+<!-- Do app analytics for Bookish.press -->
+<Analytics></Analytics>
 
 <div class="bookish-app">
     <Auth>

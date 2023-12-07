@@ -39,6 +39,8 @@ export type EditionSpecification = {
     /** All uids who have edit access to at least one chapter. Used in firestore rules to give permission to update book. */
     chapteruids: string[];
     active: Record<string, string>;
+    /** An optional Google Analytics tag ID */
+    gtagid: string | null;
 };
 
 export default class Edition {
@@ -63,6 +65,7 @@ export default class Edition {
     readonly theme: Theme | null;
     readonly base: string | null;
     readonly active: Record<string, string>;
+    readonly gtagid: string | null;
 
     // Given an object with a valid specification and an object mapping chapter IDs to chapter text,
     // construct an object representing a book.
@@ -90,6 +93,7 @@ export default class Edition {
         theme: Theme | null,
         base: string | null,
         active: Record<string, string>,
+        gtagid: string | null,
     ) {
         this.bookRef = bookRef;
         this.editionRef = editionRef;
@@ -118,6 +122,7 @@ export default class Edition {
         this.theme = theme;
         this.base = base;
         this.active = active;
+        this.gtagid = gtagid;
     }
 
     static fromJSON(
@@ -148,6 +153,7 @@ export default class Edition {
             spec.theme,
             spec.base,
             spec.active,
+            spec.gtagid,
         );
     }
 
@@ -209,6 +215,7 @@ export default class Edition {
             uids: this.uids.slice(),
             chapteruids: this.getChapterUIDS(),
             active: this.active,
+            gtagid: this.gtagid ?? null,
         };
         return editionJSON;
     }
@@ -250,6 +257,7 @@ export default class Edition {
             this.theme,
             this.base,
             this.active,
+            this.gtagid,
         );
     }
 
@@ -280,6 +288,7 @@ export default class Edition {
             this.theme,
             this.base,
             this.active,
+            this.gtagid,
         );
     }
 
@@ -309,6 +318,7 @@ export default class Edition {
             this.theme,
             this.base,
             this.active,
+            this.gtagid,
         );
     }
 
@@ -339,6 +349,7 @@ export default class Edition {
             this.theme,
             this.base,
             this.active,
+            this.gtagid,
         );
     }
 
@@ -365,6 +376,7 @@ export default class Edition {
             this.theme,
             this.base,
             this.active,
+            this.gtagid,
         );
     }
 
@@ -391,6 +403,7 @@ export default class Edition {
             this.theme,
             this.base,
             this.active,
+            this.gtagid,
         );
     }
 
@@ -420,6 +433,7 @@ export default class Edition {
             this.theme,
             this.base,
             this.active,
+            this.gtagid,
         );
     }
 
@@ -481,6 +495,7 @@ export default class Edition {
             this.theme,
             this.base,
             this.active,
+            this.gtagid,
         );
     }
 
@@ -534,6 +549,7 @@ export default class Edition {
             this.theme,
             this.base,
             this.active,
+            this.gtagid,
         );
     }
 
@@ -609,6 +625,7 @@ export default class Edition {
             this.theme,
             this.base,
             this.active,
+            this.gtagid,
         );
     }
 
@@ -653,6 +670,7 @@ export default class Edition {
             this.theme,
             this.base,
             this.active,
+            this.gtagid,
         );
     }
 
@@ -721,6 +739,7 @@ export default class Edition {
             this.theme,
             this.base,
             this.active,
+            this.gtagid,
         );
     }
 
@@ -791,6 +810,7 @@ export default class Edition {
             theme,
             this.base,
             this.active,
+            this.gtagid,
         );
     }
 
@@ -844,6 +864,7 @@ export default class Edition {
             this.theme,
             this.base,
             this.active,
+            this.gtagid,
         );
     }
 
@@ -891,6 +912,7 @@ export default class Edition {
             this.theme,
             this.base,
             this.active,
+            this.gtagid,
         );
     }
 
@@ -927,6 +949,7 @@ export default class Edition {
             this.theme,
             this.base,
             this.active,
+            this.gtagid,
         );
     }
 
@@ -977,6 +1000,34 @@ export default class Edition {
             this.theme,
             this.base,
             newActive,
+            this.gtagid,
+        );
+    }
+
+    withGTag(gtagid: string | null) {
+        return new Edition(
+            this.bookRef,
+            this.editionRef,
+            this.uids,
+            this.title,
+            this.authors,
+            this.number,
+            this.summary,
+            this.published,
+            this.images,
+            this.description,
+            this.chapters,
+            this.license,
+            this.acknowledgements,
+            this.tags,
+            this.sources,
+            this.references,
+            this.symbols,
+            this.glossary,
+            this.theme,
+            this.base,
+            this.active,
+            gtagid,
         );
     }
 
@@ -988,8 +1039,8 @@ export default class Edition {
                     total === undefined
                         ? 0
                         : time === undefined
-                        ? total
-                        : total + time,
+                          ? total
+                          : total + time,
                 0,
             );
     }
@@ -1091,8 +1142,8 @@ export default class Edition {
                     return this.hasReferences()
                         ? ChapterIDs.ReferencesID
                         : this.hasGlossary()
-                        ? ChapterIDs.GlossaryID
-                        : ChapterIDs.IndexID;
+                          ? ChapterIDs.GlossaryID
+                          : ChapterIDs.IndexID;
                 // Otherwise, it wasn't a valid ID
                 else return null;
         }
@@ -1110,16 +1161,16 @@ export default class Edition {
                 return this.hasReferences()
                     ? ChapterIDs.ReferencesID
                     : this.chapters.length > 0
-                    ? this.chapters[this.chapters.length - 1].getID()
-                    : ChapterIDs.TableOfContentsID;
+                      ? this.chapters[this.chapters.length - 1].getID()
+                      : ChapterIDs.TableOfContentsID;
             case ChapterIDs.IndexID:
                 return this.hasGlossary()
                     ? ChapterIDs.GlossaryID
                     : this.hasReferences()
-                    ? ChapterIDs.ReferencesID
-                    : this.chapters.length > 0
-                    ? this.chapters[this.chapters.length - 1].getID()
-                    : ChapterIDs.TableOfContentsID;
+                      ? ChapterIDs.ReferencesID
+                      : this.chapters.length > 0
+                        ? this.chapters[this.chapters.length - 1].getID()
+                        : ChapterIDs.TableOfContentsID;
             case ChapterIDs.SearchID:
                 return ChapterIDs.IndexID;
             case ChapterIDs.MediaID:

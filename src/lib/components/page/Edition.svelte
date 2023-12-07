@@ -19,7 +19,7 @@
     // Poly fill smooth scrolling for Safari.
     onMount(() => smoothscroll.polyfill());
 
-    // The book edition to render.
+    // The book and edition to render
     export let edition: EditionModel;
 
     // The base path allows links to adjust to different routing contexts in which a book is placed.
@@ -103,8 +103,8 @@
     }
 </script>
 
-<!-- Keep the imports up to date -->
 <svelte:head>
+    <!-- Keep the imports up to date -->
     {@html '<' + `style>${themeCSS}</style>`}
 
     <meta property="og:title" content={edition.getTitle()} />

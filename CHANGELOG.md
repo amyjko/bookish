@@ -5,6 +5,7 @@
 ## Fixed
 
 -   [#365](https://github.com/amyjko/bookish/issues/365) Save on glossry definition exit.
+-   Added support for custom Google Analytics tag on an edition.
 
 # 0.5.72 - 2023-11-27
 

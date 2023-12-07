@@ -1,6 +1,5 @@
 <script lang="ts">
     import Instructions from '$lib/components/page/Instructions.svelte';
-    import Parser from '$lib/models/chapter/Parser';
     import TableOfContentsRow from './TableOfContentsRow.svelte';
     import ChapterIDs from '$lib/models/book/ChapterID';
     import Page from '$lib/components/page/Page.svelte';
@@ -164,16 +163,20 @@
                     readingTime === undefined
                         ? 'Forthcoming'
                         : readingTime < 5
-                        ? '<5 min read'
-                        : readingTime < 60
-                        ? '~' + Math.floor(readingTime / 5) * 5 + ' min read'
-                        : '~' + Math.floor(readingTime / 60) + ' hour read'}
+                          ? '<5 min read'
+                          : readingTime < 60
+                            ? '~' +
+                              Math.floor(readingTime / 5) * 5 +
+                              ' min read'
+                            : '~' + Math.floor(readingTime / 60) + ' hour read'}
                 {@const section = chapter.getSection()}
                 {@const etc =
                     readingEstimate +
                     (!chapter.isForthcoming()
                         ? getProgressDescription(
-                              chapterID in progress ? progress[chapterID] : null
+                              chapterID in progress
+                                  ? progress[chapterID]
+                                  : null,
                           )
                         : '')}
 
@@ -195,7 +198,7 @@
                                     setChapter(
                                         edition,
                                         chapter,
-                                        chapter.withSection(text)
+                                        chapter.withSection(text),
                                     )}
                             />
                         {:else if section}{section}{/if}
@@ -212,7 +215,7 @@
                                         setChapter(
                                             edition,
                                             chapter,
-                                            chapter.asForthcoming(on)
+                                            chapter.asForthcoming(on),
                                         )}
                                 >
                                     {etc}
@@ -297,6 +300,28 @@
         {#if $book}
             <PageHeader id="editions">Editions</PageHeader>
             <Editions editors={false} />
+        {/if}
+
+        {#if editable && $edition}
+            <PageHeader id="editions">Analytics</PageHeader>
+            <Instructions {editable}
+                >Want to use Google Analytics to track traffic? Enter your tag
+                ID here.</Instructions
+            >
+            <TextEditor
+                label={'Google Analytics ag'}
+                text={$edition.gtagid ?? ''}
+                placeholder="gtag ID"
+                valid={() => undefined}
+                save={(text) =>
+                    $edition
+                        ? edition.set(
+                              $edition.withGTag(
+                                  text.length === 0 ? null : text,
+                              ),
+                          )
+                        : undefined}
+            />
         {/if}
 
         {#if $book && (editable || isEditionPartiallyEditable())}
