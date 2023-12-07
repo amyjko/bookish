@@ -14,3 +14,4 @@ export { default as Glossary } from './components/page/Glossary.svelte';
 export { default as Edition } from './components/page/Edition.svelte';
 export { default as Feedback } from './components/app/Feedback.svelte';
 export { default as Loading } from './components/page/Loading.svelte';
+export { default as Analytics } from './components/page/Analytics.svelte';
