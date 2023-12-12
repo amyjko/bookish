@@ -48,7 +48,7 @@
         headers = Array.from(document.getElementsByClassName('page-header'));
         let newHeaderString = headers.reduce(
             (sum, el) => sum + el.outerHTML,
-            ''
+            '',
         );
 
         // If the headers change, update the outline.
@@ -63,7 +63,7 @@
         // Left align the floating outline with the left margin of the chapter
         // and the top of the title, unless we're past it.
         let title = document.getElementsByClassName(
-            'bookish-chapter-header-text'
+            'bookish-chapter-header-text',
         )[0];
 
         // If we found them both...
@@ -112,7 +112,7 @@
                     if (top > headerTop - threshold)
                         indexOfNearestHeaderAbove = index;
                 }
-            }
+            },
         );
 
         // Update the outline and progress bar.
@@ -369,6 +369,8 @@
             display: inline-block;
             top: 50px;
             transform: translateX(var(--outline-offset));
+            max-height: 90vh;
+            overflow-y: auto;
         }
 
         /* When the outline is fixed to title, it's positioned absolutely relative to the book container. */

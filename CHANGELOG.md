@@ -1,5 +1,9 @@
 # bookish changelog
 
+# 0.5.78 - 2023-12-12
+
+-   Account for very long chapter outlines on shorter displays.
+
 # 0.5.74 - 2023-12-06
 
 ## Fixed
