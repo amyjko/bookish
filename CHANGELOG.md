@@ -3,6 +3,7 @@
 # 0.5.78 - 2023-12-12
 
 -   Account for very long chapter outlines on shorter displays.
+-   Handle pastes into atom nodes.
 
 # 0.5.74 - 2023-12-06
 

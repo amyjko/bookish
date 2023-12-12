@@ -909,7 +909,7 @@
 
         const chapter =
             // If we're pasting text into a paragraph node, then we parse it as a series of paragraphs.
-            context.block instanceof ParagraphNode
+            context.block instanceof ParagraphNode && context.atom === undefined
                 ? Parser.parseChapter(undefined, escaped)
                 : // Otherwise parse as just a format node, replacing all text newlines with a space.
                   Parser.parseFormat(undefined, escaped.replaceAll('\n', ' '));
