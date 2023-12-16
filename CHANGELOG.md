@@ -1,6 +1,15 @@
 # bookish changelog
 
+# 0.6.0 - 2023-12-16
+
+# Dependencies
+
+-   Updated to SvelteKit 2
+-   Updated to Vite 5
+
 # 0.5.78 - 2023-12-12
+
+## Fixed
 
 -   Account for very long chapter outlines on shorter displays.
 -   Handle pastes into atom nodes.

@@ -15,4 +15,4 @@ type CaretState = {
     focused: boolean;
 };
 
-export default CaretState;
+export type { CaretState as default };

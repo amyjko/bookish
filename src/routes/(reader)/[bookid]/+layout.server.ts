@@ -27,15 +27,15 @@ export async function load({ params, url }) {
             data = JSON.parse(text);
         }
     } catch (err) {
-        throw error(404, {
-            message: `Error retrieving book metadata at ${path}: ${response?.status} ${response?.statusText} ${text} ${err}`,
-        });
+        error(404, {
+                    message: `Error retrieving book metadata at ${path}: ${response?.status} ${response?.statusText} ${text} ${err}`,
+                });
     }
 
     if (data === null)
-        throw error(404, {
-            message: `There doesn't seem to be a book here.`,
-        });
+        error(404, {
+                    message: `There doesn't seem to be a book here.`,
+                });
 
     return data;
 }

@@ -48,8 +48,8 @@ type CaretContext = {
     handlePaste: (
         context: CaretContext,
         text: PasteContent | Node,
-        save: boolean
+        save: boolean,
     ) => Edit;
 };
 
-export default CaretContext;
+export type { CaretContext as default };

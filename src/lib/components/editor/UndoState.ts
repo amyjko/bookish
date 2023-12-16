@@ -6,4 +6,4 @@ type UndoState = {
     bookdown: string;
     range: IndexRange;
 };
-export default UndoState;
+export type { UndoState as default };

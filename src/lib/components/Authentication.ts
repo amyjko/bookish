@@ -7,4 +7,4 @@ type Authentication = {
     logout: Function;
 };
 
-export default Authentication;
+export type { Authentication as default };

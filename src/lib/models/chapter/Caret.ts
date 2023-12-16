@@ -7,13 +7,13 @@ import LineBreakNode from './LineBreakNode';
 
 export type SelectableNode = TextNode | AtomNode<any> | EmbedNode;
 type Caret = { node: SelectableNode; index: number };
-export default Caret;
+export type { Caret as default };
 
 export type CaretRange = { start: Caret; end: Caret };
 export type IndexRange = { start: number; end: number };
 
 export function getNavigableNodes(
-    node: Node
+    node: Node,
 ): (AtomNode<any> | TextNode | LineBreakNode)[] {
     return node
         .getNodes()
@@ -21,7 +21,7 @@ export function getNavigableNodes(
             (n) =>
                 n instanceof TextNode ||
                 n instanceof AtomNode ||
-                n instanceof LineBreakNode
+                n instanceof LineBreakNode,
         ) as (AtomNode<any> | TextNode | LineBreakNode)[];
 }
 
@@ -95,7 +95,7 @@ export function indexToCaret(node: Node, index: number): Caret | undefined {
 
 export function caretRangeToIndexRange(
     node: Node,
-    range: CaretRange
+    range: CaretRange,
 ): IndexRange | undefined {
     const startIndex = caretToIndex(node, range.start);
     const endIndex = caretToIndex(node, range.end);
@@ -105,7 +105,7 @@ export function caretRangeToIndexRange(
 
 export function indexRangeToCaretRange(
     node: Node,
-    range: IndexRange
+    range: IndexRange,
 ): CaretRange | undefined {
     const start = indexToCaret(node, range.start);
     const end = indexToCaret(node, range.end);

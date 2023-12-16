@@ -10,4 +10,4 @@ type ChapterContext =
           layoutMarginals: () => void;
       }
     | undefined;
-export default ChapterContext;
+export type { ChapterContext as default };

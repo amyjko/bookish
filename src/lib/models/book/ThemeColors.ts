@@ -18,4 +18,4 @@ type ThemeColors = {
     bulletColor: string;
 };
 
-export default ThemeColors;
+export type { ThemeColors as default };

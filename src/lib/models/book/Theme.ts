@@ -46,7 +46,7 @@ type Theme = {
     };
 };
 
-export default Theme;
+export type { Theme as default };
 
 export const BookishTheme = {
     imports: [

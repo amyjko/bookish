@@ -18,8 +18,8 @@ type Command = {
     handler: (
         context: CaretContext,
         utilities: CaretUtilities,
-        key: string
+        key: string,
     ) => Edit;
 };
 
-export default Command;
+export type { Command as default };
