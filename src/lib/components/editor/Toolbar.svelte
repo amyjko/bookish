@@ -50,6 +50,7 @@
     import TableNode from '../../models/chapter/TableNode';
     import { slide } from 'svelte/transition';
     import type CaretState from './CaretState';
+    import Note from './Note.svelte';
 
     const keyLabels: { [key: string]: string } = {
         Digit0: '0',
@@ -87,10 +88,10 @@
         history: TimeIcon,
     };
 
-    export let caret: CaretState;
+    export let caret: CaretState | undefined;
 
-    $: context = caret.context;
-    $: chapter = context?.root;
+    $: context = caret?.context;
+    $: root = context?.root;
 
     let element: HTMLElement | null = null;
     let categories: string[] | undefined = undefined;
@@ -126,7 +127,7 @@
 
     // Update the above when the dependencies below change.
     $: {
-        if (context !== undefined && chapter) {
+        if (context !== undefined && root) {
             // Filter the commands by those interactive with a mouse and active.
             const visible = commands.filter(
                 (command) =>
@@ -160,26 +161,26 @@
                 caretNode instanceof AtomNode
                     ? caretNode
                     : caretNode instanceof TextNode
-                      ? (caretNode.getParent(chapter) as MetadataNode<any>)
+                      ? (caretNode.getParent(root) as MetadataNode<any>)
                       : undefined;
 
             calloutNode = caretNode.getClosestParentMatching(
-                chapter,
+                root,
                 (p) => p instanceof CalloutNode,
             ) as CalloutNode;
             quoteNode = caretNode.getClosestParentMatching(
-                chapter,
+                root,
                 (p) => p instanceof QuoteNode,
             ) as QuoteNode;
             embedNode =
                 caretNode instanceof EmbedNode
                     ? caretNode
                     : (caretNode.getClosestParentMatching(
-                          chapter,
+                          root,
                           (p) => p instanceof EmbedNode,
                       ) as EmbedNode);
             tableNode = caretNode.getClosestParentMatching(
-                chapter,
+                root,
                 (p) => p instanceof TableNode,
             ) as TableNode;
         }
@@ -198,17 +199,19 @@
     }
 </script>
 
-{#if chapter}
-    <section
-        class="bookish-editor-toolbar"
-        bind:this={element}
-        role="button"
-        on:keypress={handleKeyPress}
-        on:keydown={handleKeyPress}
-        on:pointerdown|stopPropagation={() => element?.focus()}
-        tabindex="0"
-        transition:slide={{ duration: 200 }}
-    >
+<section
+    class="bookish-editor-toolbar"
+    bind:this={element}
+    role="button"
+    on:keypress={handleKeyPress}
+    on:keydown={handleKeyPress}
+    on:pointerdown|stopPropagation={() => element?.focus()}
+    tabindex="0"
+    transition:slide={{ duration: 200 }}
+>
+    {#if caret == undefined}
+        <div class="no-selection"><Note>~ no selection ~</Note></div>
+    {:else}
         {#if context && categories}
             {#each categories as cat}
                 {#if commandsByCategory[cat].length > 0}
@@ -278,8 +281,8 @@
                 ><EmbedEditor embed={embedNode} /></ToolbarGroup
             >
         {/if}
-    </section>
-{/if}
+    {/if}
+</section>
 
 <style>
     .bookish-editor-toolbar {
@@ -289,8 +292,11 @@
         align-items: baseline;
         font-family: var(--app-font);
         font-size: var(--app-chrome-font-size);
-        row-gap: var(--app-chrome-padding);
+        row-gap: calc(var(--app-chrome-padding) / 2);
         justify-content: left;
+        /* Fixed height to prevent jumpiness */
+        height: 4.5em;
+        overflow-y: auto;
     }
 
     .break {
@@ -300,5 +306,19 @@
 
     .bookish-editor-toolbar:focus {
         outline: 2px solid var(--app-interactive-color);
+        /* Expand on focus */
+        min-height: 4.5em;
+        height: fit-content;
+    }
+
+    .no-selection {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        justify-content: center;
+        height: 4em;
+        width: 100%;
+        font-style: italic;
+        font-size: var(--app-font-size);
     }
 </style>

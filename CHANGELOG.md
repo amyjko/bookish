@@ -9,6 +9,7 @@
 ## Fixed
 
 -   [#362](https://github.com/amyjko/bookish/issues/362) Soft wrap code while editing to ensure cursor is visible.
+-   Constant height of toolbar to prevent jumpiness.
 
 ## Dependencies
 

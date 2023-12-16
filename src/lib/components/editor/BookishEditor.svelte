@@ -73,7 +73,6 @@
         // or a basic chapter locking strategy to avoid data loss. I went with locking for maintenance simplicity,
         // but it would be nice to implement operational transform in the future.
         if (editedNode === undefined || editedNode.toBookdown() !== text) {
-            console.log('Parsing node');
             editedNode = parser(text);
         }
     }
