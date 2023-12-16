@@ -2,6 +2,10 @@
 
 # 0.6.0 - 2023-12-16
 
+## Fixed
+
+-   [#362](https://github.com/amyjko/bookish/issues/362) Soft wrap code while editing to ensure cursor is visible.
+
 # Dependencies
 
 -   Updated to SvelteKit 2

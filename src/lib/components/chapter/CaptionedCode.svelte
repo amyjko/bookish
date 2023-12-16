@@ -24,7 +24,7 @@
     {#if editable && editing}
         <div class="container" class:editing>
             <code
-                class={`bookish-code bookish-code-block language-${language}`}
+                class={`bookish-code bookish-code-block wrap language-${language}`}
             >
                 <Text node={node.getCodeNode()} />
             </code>

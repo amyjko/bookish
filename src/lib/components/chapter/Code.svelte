@@ -61,6 +61,10 @@
         border-radius: var(--bookish-roundedness);
     }
 
+    .bookish-code-block.wrap {
+        white-space: pre-wrap !important;
+    }
+
     .bookish-code-inline {
         display: inline;
         padding: calc(1.5 * var(--bookish-inline-padding))

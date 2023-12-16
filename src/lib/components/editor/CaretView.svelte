@@ -21,7 +21,7 @@
         left;
         top;
         tick().then(() =>
-            element ? element.scrollIntoView({ block: 'nearest' }) : undefined
+            element ? element.scrollIntoView({ block: 'nearest' }) : undefined,
         );
     }
 
