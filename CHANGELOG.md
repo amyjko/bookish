@@ -2,11 +2,15 @@
 
 # 0.6.0 - 2023-12-16
 
+## Enhancements
+
+-   [#366](https://github.com/amyjko/bookish/issues/366) Added ability to rich text format authors, including links.
+
 ## Fixed
 
 -   [#362](https://github.com/amyjko/bookish/issues/362) Soft wrap code while editing to ensure cursor is visible.
 
-# Dependencies
+## Dependencies
 
 -   Updated to SvelteKit 2
 -   Updated to Vite 5
