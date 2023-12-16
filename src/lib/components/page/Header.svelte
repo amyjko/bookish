@@ -45,7 +45,7 @@
     // When the title becomes visible or hidden, update the scroll reminder.
     onMount(() => {
         const intersectionObserver = new IntersectionObserver(() =>
-            updateScrollReminder()
+            updateScrollReminder(),
         );
         if (title) intersectionObserver.observe(title);
         updateScrollReminder();

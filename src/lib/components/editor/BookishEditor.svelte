@@ -49,6 +49,7 @@
     export let placeholder: string;
     export let leasee: string | boolean;
     export let lease: (lock: boolean) => Promise<boolean> | boolean;
+    export let inline = false;
 
     let element: HTMLDivElement | null = null;
 
@@ -72,6 +73,7 @@
         // or a basic chapter locking strategy to avoid data loss. I went with locking for maintenance simplicity,
         // but it would be nice to implement operational transform in the future.
         if (editedNode === undefined || editedNode.toBookdown() !== text) {
+            console.log('Parsing node');
             editedNode = parser(text);
         }
     }
@@ -812,6 +814,7 @@
     }
 
     function editNode(previous: BookishNode, edited: BookishNode) {
+        if (previous === edited) return;
         if (caretRange) {
             const newRoot = editedNode.withNodeReplaced(previous, edited);
             if (newRoot === undefined) return;
@@ -830,7 +833,7 @@
         }
     }
 
-    function handleMouseDown() {
+    function handlePointerDown() {
         if (!element) return;
 
         // Grab focus.
@@ -1026,12 +1029,13 @@
 <div
     class={`bookish-editor ${inAtom ? 'bookish-editor-atom-focused' : ''}`}
     class:locked
+    class:inline
     aria-disabled={locked}
     role="textbox"
     bind:this={element}
     on:keydown={handleKey}
     on:keypress={handlePress}
-    on:mousedown|stopPropagation={handleMouseDown}
+    on:pointerdown|stopPropagation={handlePointerDown}
     on:focus={handleFocus}
     on:blur={handleBlur}
     tabindex="0"
@@ -1059,6 +1063,10 @@
 <style>
     .bookish-editor {
         min-height: 1em;
+    }
+
+    .inline {
+        display: inline-block;
     }
 
     .locked :global(.bookish-text) {

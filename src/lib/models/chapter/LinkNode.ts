@@ -25,7 +25,9 @@ export default class LinkNode extends MetadataNode<string> {
     }
 
     withMeta(meta: string): MetadataNode<string> {
-        return new LinkNode(this.getText(), meta);
+        return this.getMeta() === meta
+            ? this
+            : new LinkNode(this.getText(), meta);
     }
     withText(text: TextNode): MetadataNode<string> {
         return new LinkNode(text, this.getMeta());

@@ -306,7 +306,11 @@ export default class Chapter {
     }
 
     withRenamedAuthor(index: number, name: string) {
+        // Bad index? No change.
         if (index < 0 || index >= this.authors.length) return this;
+        // No change in author? No new chapter.
+        if (this.authors[index] === name) return this;
+        // Make a new chapter.
         return new Chapter(
             this.ref,
             this.id,

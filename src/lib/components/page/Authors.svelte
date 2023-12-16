@@ -3,10 +3,12 @@
     import TextEditor from '$lib/components/editor/TextEditor.svelte';
     import Format from '$lib/components/chapter/Format.svelte';
     import { afterUpdate } from 'svelte';
-    import { getEdition } from './Contexts';
+    import { getEdition, getLeasee, getUser, lease } from './Contexts';
     import Note from '../editor/Note.svelte';
     import Button from '../app/Button.svelte';
     import { tick } from 'svelte';
+    import BookishEditor from '../editor/BookishEditor.svelte';
+    import { auth } from '$lib/models/Firebase';
 
     export let editable: boolean;
     export let authors: string[];
@@ -15,6 +17,7 @@
     export let edit: (index: number, text: string) => Promise<void> | void;
     export let remove: (index: number) => Promise<void> | void;
 
+    let user = getUser();
     let edition = getEdition();
 
     let authorList: HTMLDivElement | null = null;
@@ -33,9 +36,6 @@
             }
         }
     }
-
-    // When there's a new author, focus on it.
-    afterUpdate(() => {});
 </script>
 
 <p class="bookish-authors" bind:this={authorList}>
@@ -47,16 +47,17 @@
         {#each authorsToShow as author, index}
             {#if editable && !showInherited}
                 <span class="author-editor">
-                    <TextEditor
+                    <!-- We don't do leases on author names since chances of collisions are so low. -->
+                    <BookishEditor
+                        inline
                         text={author}
-                        label={'Author name editor'}
+                        parser={(text) => Parser.parseFormat($edition, text)}
+                        save={(node) => edit(index, node.toBookdown())}
+                        chapter={false}
+                        component={Format}
                         placeholder="author"
-                        valid={() => undefined}
-                        save={(text) =>
-                            /* If text is already empty, remove */ author.length >
-                                0 && text === ''
-                                ? remove(index)
-                                : edit(index, text)}
+                        leasee={false}
+                        lease={() => true}
                     />
                     <Button
                         tooltip="remove this author"

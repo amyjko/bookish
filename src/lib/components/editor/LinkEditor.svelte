@@ -96,7 +96,7 @@
             if ($caret?.context?.formatRoot) {
                 const newFormat = $caret.context.formatRoot.withSegmentReplaced(
                     link,
-                    link.getText()
+                    link.getText(),
                 );
                 if (newFormat)
                     $caret.edit($caret.context.formatRoot, newFormat);

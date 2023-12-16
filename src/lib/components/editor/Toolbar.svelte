@@ -110,8 +110,8 @@
                 ? command.key.join('/')
                 : command.key
             : command.code
-            ? command.code
-            : 'any';
+              ? command.code
+              : 'any';
         const keyLabel = (
             typeof key === 'string'
                 ? key in keyLabels
@@ -133,16 +133,16 @@
                     command.visible === true ||
                     (context &&
                         command.visible instanceof Function &&
-                        command.visible(context))
+                        command.visible(context)),
             );
 
             // Extract the active categories and sort them
             categories = Array.from(
-                new Set(commands.map((command) => command.category))
+                new Set(commands.map((command) => command.category)),
             ).sort((a, b) =>
                 a in categoryOrder && b in categoryOrder
                     ? categoryOrder[a] - categoryOrder[b]
-                    : 0
+                    : 0,
             );
 
             // Make a list for each category of commands
@@ -150,7 +150,7 @@
             categories.forEach((cat) => {
                 if (commandsByCategory)
                     commandsByCategory[cat] = visible.filter(
-                        (command) => command.category === cat
+                        (command) => command.category === cat,
                     );
             });
 
@@ -160,27 +160,27 @@
                 caretNode instanceof AtomNode
                     ? caretNode
                     : caretNode instanceof TextNode
-                    ? (caretNode.getParent(chapter) as MetadataNode<any>)
-                    : undefined;
+                      ? (caretNode.getParent(chapter) as MetadataNode<any>)
+                      : undefined;
 
             calloutNode = caretNode.getClosestParentMatching(
                 chapter,
-                (p) => p instanceof CalloutNode
+                (p) => p instanceof CalloutNode,
             ) as CalloutNode;
             quoteNode = caretNode.getClosestParentMatching(
                 chapter,
-                (p) => p instanceof QuoteNode
+                (p) => p instanceof QuoteNode,
             ) as QuoteNode;
             embedNode =
                 caretNode instanceof EmbedNode
                     ? caretNode
                     : (caretNode.getClosestParentMatching(
                           chapter,
-                          (p) => p instanceof EmbedNode
+                          (p) => p instanceof EmbedNode,
                       ) as EmbedNode);
             tableNode = caretNode.getClosestParentMatching(
                 chapter,
-                (p) => p instanceof TableNode
+                (p) => p instanceof TableNode,
             ) as TableNode;
         }
     }
@@ -205,7 +205,7 @@
         role="button"
         on:keypress={handleKeyPress}
         on:keydown={handleKeyPress}
-        on:mousedown|stopPropagation={() => element?.focus()}
+        on:pointerdown|stopPropagation={() => element?.focus()}
         tabindex="0"
         transition:slide={{ duration: 200 }}
     >
@@ -223,7 +223,7 @@
                                     (command.active instanceof Function &&
                                         command.active.call(
                                             undefined,
-                                            context
+                                            context,
                                         ) === false)}
                                 tooltip={command.description +
                                     ' ' +
@@ -233,7 +233,7 @@
                                     caret?.executor.call(
                                         undefined,
                                         command,
-                                        ''
+                                        '',
                                     )}
                             >
                                 <Icon icon={command.icon} />

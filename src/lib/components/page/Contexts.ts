@@ -67,8 +67,10 @@ export function getRoot() {
 export function setChapter(
     store: EditionStore,
     previous: Chapter,
-    chapter: Chapter
+    chapter: Chapter,
 ) {
+    // Don't set if its the same chapter.
+    if (previous === chapter) return;
     const edition = get(store);
     if (edition) store.set(edition.withRevisedChapter(previous, chapter));
 }
@@ -160,7 +162,7 @@ export async function lease(
     authStore: UserStore,
     editionStore: EditionStore,
     contentID: string,
-    lock: boolean
+    lock: boolean,
 ): Promise<boolean> {
     const edition = get(editionStore);
     const auth = get(authStore);
@@ -170,7 +172,7 @@ export async function lease(
         const latestAuth = get(authStore);
         if (latestEdition && latestAuth && latestAuth.user) {
             editionStore.set(
-                latestEdition.withLock(latestAuth.user.uid, contentID, lock)
+                latestEdition.withLock(latestAuth.user.uid, contentID, lock),
             );
             return true;
         } else return false;
@@ -180,7 +182,7 @@ export async function lease(
 export function getLeasee(
     authStore: UserStore,
     editionStore: EditionStore,
-    contentID: string
+    contentID: string,
 ): string | boolean {
     const edition = get(editionStore);
     const auth = get(authStore);
