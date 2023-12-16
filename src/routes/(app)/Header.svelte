@@ -51,7 +51,9 @@
             {#if $edition}<Status />{/if}
         </div>
     </nav>
-    <Toolbar caret={$caret} />
+    {#if $edition}
+        <Toolbar caret={$caret} />
+    {/if}
 </section>
 
 <style>

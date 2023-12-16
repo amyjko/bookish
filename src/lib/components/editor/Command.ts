@@ -2,10 +2,22 @@ import type Edit from '$lib/models/chapter/Edit';
 import type CaretUtilities from './CaretUtilities';
 import type CaretContext from './CaretContext';
 
+export type CommandCategory =
+    | 'navigation'
+    | 'selection'
+    | 'text'
+    | 'history'
+    | 'clipboard'
+    | 'annotation'
+    | 'block'
+    | 'level'
+    | 'list'
+    | 'table';
+
 type Command = {
     icon: string;
     description: string;
-    category: string;
+    category: CommandCategory;
     control: boolean | undefined;
     press?: boolean | undefined;
     alt: boolean | undefined;

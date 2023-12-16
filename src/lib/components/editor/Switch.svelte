@@ -39,6 +39,8 @@
         color: var(--app-font-color);
         background-color: var(--app-chrome-background);
         padding: var(--app-chrome-padding);
+        padding-top: calc(var(--app-chrome-padding) / 2);
+        padding-bottom: calc(var(--app-chrome-padding) / 2);
         border: none;
         border-radius: 0;
     }

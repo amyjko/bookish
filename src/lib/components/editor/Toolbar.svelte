@@ -51,6 +51,7 @@
     import { slide } from 'svelte/transition';
     import type CaretState from './CaretState';
     import Note from './Note.svelte';
+    import type { CommandCategory } from './Command';
 
     const keyLabels: { [key: string]: string } = {
         Digit0: '0',
@@ -64,17 +65,17 @@
         Backspace: '\u232B',
     };
 
-    const categoryOrder: { [key: string]: number } = {
+    const categoryOrder: Record<CommandCategory, number> = {
         navigation: 1,
         selection: 2,
         text: 3,
-        clipboard: 4,
-        annotation: 5,
-        paragraph: 6,
-        level: 7,
-        list: 8,
-        table: 9,
-        block: 10,
+        history: 4,
+        clipboard: 5,
+        annotation: 6,
+        level: 8,
+        list: 9,
+        table: 10,
+        block: 11,
     };
 
     const categoryIcons: { [key: string]: string } = {
@@ -94,7 +95,7 @@
     $: root = context?.root;
 
     let element: HTMLElement | null = null;
-    let categories: string[] | undefined = undefined;
+    let categories: CommandCategory[] | undefined = undefined;
     let commandsByCategory: { [key: string]: Command[] } = {};
     let metaNode: MetadataNode<any> | AtomNode<any> | undefined = undefined;
     let calloutNode: CalloutNode | undefined = undefined;
@@ -210,11 +211,16 @@
     transition:slide={{ duration: 200 }}
 >
     {#if caret == undefined}
-        <div class="no-selection"><Note>~ no selection ~</Note></div>
+        <div class="no-selection"
+            ><Note>Select rich text or images to see the toolbar.</Note></div
+        >
     {:else}
         {#if context && categories}
             {#each categories as cat}
                 {#if commandsByCategory[cat].length > 0}
+                    {#if cat === 'annotation'}
+                        <span class="break" />
+                    {/if}
                     <ToolbarGroup
                         icon={cat in categoryIcons
                             ? categoryIcons[cat]
@@ -277,7 +283,7 @@
         {:else if quoteNode}<ToolbarGroup icon={QuoteIcon}
                 ><QuoteEditor quote={quoteNode} /></ToolbarGroup
             >
-        {:else if embedNode}<span class="break" /><ToolbarGroup icon={MediaIcon}
+        {:else if embedNode}<ToolbarGroup icon={MediaIcon}
                 ><EmbedEditor embed={embedNode} /></ToolbarGroup
             >
         {/if}
@@ -308,7 +314,6 @@
         outline: 2px solid var(--app-interactive-color);
         /* Expand on focus */
         min-height: 4.5em;
-        height: fit-content;
     }
 
     .no-selection {
@@ -316,7 +321,7 @@
         flex-direction: row;
         align-items: center;
         justify-content: center;
-        height: 4em;
+        height: 3em;
         width: 100%;
         font-style: italic;
         font-size: var(--app-font-size);
