@@ -19,12 +19,6 @@
         "source": ".",
         "predeploy": ["npm run build"],
         "ignore": ["firebase.json", "**/.*", "**/node_modules/**"],
-        "rewrites": [
-            {
-                "source": "/book/**",
-                "function": "getEdition"
-            }
-        ],
         "frameworksBackend": {
             "region": "us-central1"
         }

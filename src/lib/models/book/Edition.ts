@@ -1035,10 +1035,10 @@ export default class Edition {
         return this.chapters
             .map((chapter) => chapter.getReadingTime(this))
             .reduce(
-                (total, time) =>
+                (total: number, time) =>
                     total === undefined
                         ? 0
-                        : time === undefined
+                        : time === undefined || time === null
                           ? total
                           : total + time,
                 0,

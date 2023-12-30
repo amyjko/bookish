@@ -15,12 +15,19 @@
     import Error from '../+error.svelte';
     import Analytics from '$lib/components/page/Analytics.svelte';
 
+    /** This is the data we load in +layout.sever.ts */
     export let data: {
-        bookID: string;
-        book: BookSpecification | null;
-        edition: EditionSpecification;
-        message: string;
+        meta: {
+            bookID: string;
+            editionID: string;
+            book: BookSpecification | null;
+            edition: EditionSpecification;
+            message: string;
+        };
+        chapters: Promise<Record<string, string>>;
     };
+
+    const meta = data.meta;
 
     // A global store for the current book. It's at the root so the header can do breadcrumbs.
     let book = writable<Book | undefined>(undefined);
@@ -30,11 +37,20 @@
     let edition = writable<EditionModel | undefined>(undefined);
     setContext<EditionStore>(EDITION, edition);
 
-    // Set the context if we received the book edition.
-    if (data && data.book && data.edition && data.bookID) {
-        book.set(Book.fromJSON(data.bookID, data.book));
-        edition.set(EditionModel.fromJSON(undefined, data.edition));
+    // Set the context if we received the book.
+    if (meta.book) {
+        book.set(Book.fromJSON(meta.bookID, meta.book));
+        edition.set(EditionModel.fromJSON(undefined, meta.edition));
     }
+
+    // After the chapter text promise resolves, update the edition with the chapter text.
+    // We stream this to load the table of contents faster.
+    data.chapters.then((textByID) => {
+        if ($edition !== undefined)
+            edition.set(
+                $edition.withChapterText(new Map(Object.entries(textByID))),
+            );
+    });
 </script>
 
 {#if $book && $edition}
@@ -48,5 +64,5 @@
         <slot />
     </Edition>
 {:else}
-    <Error>{data.message}</Error>
+    <Error>{meta.message}</Error>
 {/if}

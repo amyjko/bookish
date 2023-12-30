@@ -161,14 +161,18 @@
                 {@const readingTime = chapter.getReadingTime($edition)}
                 {@const readingEstimate =
                     readingTime === undefined
-                        ? 'Forthcoming'
-                        : readingTime < 5
-                          ? '<5 min read'
-                          : readingTime < 60
-                            ? '~' +
-                              Math.floor(readingTime / 5) * 5 +
-                              ' min read'
-                            : '~' + Math.floor(readingTime / 60) + ' hour read'}
+                        ? '...'
+                        : readingTime === null
+                          ? 'Forthcoming'
+                          : readingTime < 5
+                            ? '<5 min read'
+                            : readingTime < 60
+                              ? '~' +
+                                Math.floor(readingTime / 5) * 5 +
+                                ' min read'
+                              : '~' +
+                                Math.floor(readingTime / 60) +
+                                ' hour read'}
                 {@const section = chapter.getSection()}
                 {@const etc =
                     readingEstimate +

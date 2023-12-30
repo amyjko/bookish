@@ -397,12 +397,14 @@ export default class Chapter {
         return this._wordCount;
     }
 
-    // Utility function
+    /** Either a number of minutes, or undefined if there's no text yet, or null if forthcoming. */
     getReadingTime(edition: Edition) {
         const wordCount = this.getWordCount(edition);
-        return wordCount === undefined || this.isForthcoming()
+        return wordCount === undefined
             ? undefined
-            : Math.max(1, Math.round(wordCount / 150));
+            : this.isForthcoming()
+              ? null
+              : Math.max(1, Math.round(wordCount / 150));
     }
 
     getIndex(edition: Edition): Record<string, Match[]> {

@@ -1,5 +1,11 @@
 # bookish changelog
 
+# 0.6.1 - 2023-12-30
+
+## Enhancements
+
+-   [#360](https://github.com/amyjko/bookish/issues/360) Streamlined server-side rendering of book for faster first load. Also removing the cache for freshness.
+
 # 0.6.0 - 2023-12-16
 
 ## Enhancements
