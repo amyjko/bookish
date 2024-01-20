@@ -8,6 +8,7 @@ import {
 } from 'firebase/storage';
 import type Book from './Book';
 import { storage } from '../Firebase';
+import { v4 as uuidv4 } from 'uuid';
 
 export type Image = {
     url: string;
@@ -145,8 +146,11 @@ export default class BookMedia {
     ) {
         if (storage === undefined) return;
 
+        // Get the extension if there is one.
+        const [name, extension] = file.name.split('.');
+
         // We use the file name given, but append a unique string to avoid collisions.
-        const imageName = file.name;
+        const imageName = `${name}-${uuidv4()}.${extension ?? ''}`;
         // The canonical path format for Bookish images in the store is image/{bookid}/{imageid}
         // where {bookid} is the Firestore document ID of the book being edited and {imageid} is just a random id.
         const imageRef = ref(storage, `${this.getImagePath()}/${imageName}`);

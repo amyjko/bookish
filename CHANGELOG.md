@@ -6,6 +6,7 @@
 
 -   Better toolbar wrapping on large image editor.
 -   Moved theme settings from table of contents entry to link in settings.
+-   Avoid name collisions in image uploads.
 
 # 0.6.1 - 2023-12-30
 
