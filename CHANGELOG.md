@@ -4,6 +4,7 @@
 
 ## Fixed
 
+-   Fixed critical defect preventing Firebase initialization in book reading SSR cloud function.
 -   Better toolbar wrapping on large image editor.
 -   Moved theme settings from table of contents entry to link in settings.
 -   Avoid name collisions in image uploads.

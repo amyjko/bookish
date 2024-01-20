@@ -2,9 +2,8 @@ import type { BookSpecification } from '$lib/models/book/Book';
 import type { EditionSpecification } from '$lib/models/book/Edition';
 import { error } from '@sveltejs/kit';
 import admin from 'firebase-admin';
-import { getApps } from 'firebase/app';
 
-if (getApps().length === 0) admin.initializeApp();
+admin.initializeApp();
 const db = admin.firestore();
 
 type BookMatch = { bookID: string | null; bookJSON: BookSpecification | null };
