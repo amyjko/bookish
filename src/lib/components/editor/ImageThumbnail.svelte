@@ -53,7 +53,7 @@
 <style>
     .thumbnail {
         display: inline-block;
-        height: 2em;
+        height: 1.5em;
         cursor: pointer;
     }
 

@@ -218,9 +218,6 @@
         {#if context && categories}
             {#each categories as cat}
                 {#if commandsByCategory[cat].length > 0}
-                    {#if cat === 'annotation'}
-                        <span class="break" />
-                    {/if}
                     <ToolbarGroup
                         icon={cat in categoryIcons
                             ? categoryIcons[cat]
@@ -283,9 +280,10 @@
         {:else if quoteNode}<ToolbarGroup icon={QuoteIcon}
                 ><QuoteEditor quote={quoteNode} /></ToolbarGroup
             >
-        {:else if embedNode}<ToolbarGroup icon={MediaIcon}
-                ><EmbedEditor embed={embedNode} /></ToolbarGroup
-            >
+        {:else if embedNode}<div class="break" />
+            <ToolbarGroup icon={MediaIcon}>
+                <EmbedEditor embed={embedNode} />
+            </ToolbarGroup>
         {/if}
     {/if}
 </section>
@@ -300,8 +298,9 @@
         font-size: var(--app-chrome-font-size);
         row-gap: calc(var(--app-chrome-padding) / 2);
         justify-content: left;
-        /* Fixed height to prevent jumpiness */
-        height: 4.5em;
+        height: fit-content;
+        /* Max fixed height to prevent jumpiness */
+        min-height: 3em;
         overflow-y: auto;
     }
 
@@ -312,8 +311,6 @@
 
     .bookish-editor-toolbar:focus {
         outline: 2px solid var(--app-interactive-color);
-        /* Expand on focus */
-        min-height: 4.5em;
     }
 
     .no-selection {

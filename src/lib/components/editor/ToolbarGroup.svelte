@@ -1,18 +1,22 @@
 <script lang="ts">
-    import ToolbarIcon from './Icon.svelte';
+    import Icon from './Icon.svelte';
     import ToolbarSpacer from './ToolbarSpacer.svelte';
 
     export let icon: string;
 </script>
 
 <div class="toolbar-group">
-    <ToolbarIcon {icon} /><ToolbarSpacer /><slot />
+    <Icon {icon} /><ToolbarSpacer /><slot />
 </div>
 
 <style>
     .toolbar-group {
-        display: inline-block;
+        display: flex;
         margin-right: calc(2 * var(--app-chrome-padding));
+        flex-direction: row;
+        flex-wrap: wrap;
+        row-gap: var(--app-chrome-padding);
+        align-items: baseline;
     }
 
     .toolbar-group :global(button:first-of-type) {

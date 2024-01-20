@@ -36,36 +36,31 @@
     on:mouseenter={() => (expanded = true)}
     on:mouseleave={() => (expanded = false)}
 >
-    <div class="images">
-        {#if images === undefined}
-            Loading images
-        {:else}
-            <!-- Sort the images by their URL. There's probably a more meaningful sort,
+    {#if images === undefined}
+        Loading images
+    {:else}
+        <!-- Sort the images by their URL. There's probably a more meaningful sort,
                     such as placing unused images at the front of the list. -->
-            {#each images.sort((a, b) => a.url.localeCompare(b.url)) as image}
-                <ImageThumbnail
-                    {image}
-                    selected={image.url === selection}
-                    {select}
-                />
-            {:else}
-                No images uploaded
-            {/each}
-        {/if}
-    </div>
+        {#each images.sort((a, b) => a.url.localeCompare(b.url)) as image}
+            <ImageThumbnail
+                {image}
+                selected={image.url === selection}
+                {select}
+            />
+        {:else}
+            No images uploaded
+        {/each}
+    {/if}
 </div>
 
 <style>
     .bookish-image-chooser {
-        display: inline-block;
-        vertical-align: middle;
-    }
-
-    .images {
         display: flex;
         flex-direction: row;
-        flex-wrap: nowrap;
+        align-items: center;
+        flex-wrap: wrap;
         overflow-x: scroll;
+        gap: calc(var(--app-chrome-padding) / 2);
     }
 
     .bookish-image-chooser.expanded {

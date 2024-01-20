@@ -47,10 +47,10 @@
                 // Upload completed successfully, update the front end.
                 $caret?.edit(
                     embed,
-                    embed.withURLs(url, thumbnail).withDescription('')
+                    embed.withURLs(url, thumbnail).withDescription(''),
                 );
                 upload = undefined;
-            }
+            },
         );
     }
 
@@ -60,7 +60,7 @@
             embed.getURL() === image.url
                 ? // Toggle the embed if choosing the same image
                   embed.withURL('').withDescription('')
-                : embed.withURLs(image.url, image.thumb)
+                : embed.withURLs(image.url, image.thumb),
         );
     }
 </script>
@@ -118,7 +118,10 @@
 <style>
     .file-upload {
         background-color: var(--app-chrome-background);
-        padding: var(--app-chrome-padding);
+        padding-left: var(--app-chrome-padding);
+        padding-right: var(--app-chrome-padding);
+        padding-top: calc(var(--app-chrome-padding) / 2);
+        padding-bottom: calc(var(--app-chrome-padding) / 2);
         border-radius: var(--app-chrome-roundedness);
         border: none;
     }

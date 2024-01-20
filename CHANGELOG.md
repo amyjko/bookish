@@ -1,5 +1,12 @@
 # bookish changelog
 
+# 0.6.11 - 2024-01-20
+
+## Fixed
+
+-   Better toolbar wrapping on large image editor.
+-   Moved theme settings from table of contents entry to link in settings.
+
 # 0.6.1 - 2023-12-30
 
 ## Enhancements
