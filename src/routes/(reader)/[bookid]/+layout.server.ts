@@ -46,7 +46,7 @@ export async function load({ params }) {
     // If there's no edition name provided in the request, choose the latest published,
     // if there is one.
     if (editionName === undefined) {
-        console.log(`No edition specified, getting latest published edition.`);
+        console.log(`No edition specified, getting latest edition.`);
         ({ editionID, editionJSON } = await getLatestEdition(bookID, bookJSON));
     }
     // Otherwise, resolve the edition name provided.
@@ -85,7 +85,7 @@ export async function load({ params }) {
             bookID,
             editionID,
             book,
-            edition,
+            edition: editionJSON.published ? edition : null,
             message: 'Found the book!',
         },
     };
@@ -134,9 +134,10 @@ async function getLatestEdition(
     bookID: string,
     bookJSON: BookSpecification,
 ): Promise<EditionMatch> {
+    // If there's no latest published edition, get the latest unpublished edition
     const editionID =
         bookJSON.editions.filter((ed) => ed.published !== null)[0]?.ref.id ??
-        null;
+        bookJSON.editions[0].ref.id;
 
     // If there is one, get the edition.
     if (editionID !== null) {
@@ -145,18 +146,13 @@ async function getLatestEdition(
         );
         const latestEditionDoc = await latestEditionRef.get();
         if (latestEditionDoc.exists) {
-            console.log(`Found latest published edition.`);
+            console.log(`Found latest edition.`);
             const candidateEdition =
                 latestEditionDoc.data() as EditionSpecification;
-            if (candidateEdition.published !== null) {
-                return {
-                    editionID,
-                    editionJSON: candidateEdition,
-                };
-            } else
-                console.log(
-                    `Found latest published edition, but it wasn't published; data is out of sync.`,
-                );
+            return {
+                editionID,
+                editionJSON: candidateEdition,
+            };
         } else {
             console.error(
                 `Book's edition record is wrong, edition ${editionID} doesn't exist.`,

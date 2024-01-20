@@ -3,7 +3,7 @@
     import type EditionModel from '$lib/models/book/Edition';
     import smoothscroll from 'smoothscroll-polyfill';
     import { goto } from '$app/navigation';
-    import { onMount, setContext, tick } from 'svelte';
+    import { onMount, setContext } from 'svelte';
     import { writable } from 'svelte/store';
     import {
         BASE,
@@ -15,12 +15,14 @@
     import { BookishTheme } from '$lib/models/book/Theme';
     import { isDark, setDark } from '../../util/dark';
     import { page } from '$app/stores';
+    import Title from './Title.svelte';
+    import Page from './Page.svelte';
 
     // Poly fill smooth scrolling for Safari.
     onMount(() => smoothscroll.polyfill());
 
     // The book and edition to render
-    export let edition: EditionModel;
+    export let edition: EditionModel | undefined;
 
     // The base path allows links to adjust to different routing contexts in which a book is placed.
     // For example, when the book is hosted alone, all routes might start with the bare root "/",
@@ -47,7 +49,7 @@
         setDark($darkMode);
 
         // Set the theme, whatever it is, and change it when the edition changes
-        setTheme(edition.getTheme() ?? BookishTheme);
+        setTheme(edition?.getTheme() ?? BookishTheme);
     }
 
     // The CSS to set on the edition.
@@ -55,7 +57,7 @@
 
     // Set the theme on mount.
     onMount(() => {
-        setTheme(edition.getTheme() ?? BookishTheme);
+        setTheme(edition?.getTheme() ?? BookishTheme);
     });
 
     // Redirect old hash routes by simply replacing their hash before routing.
@@ -107,22 +109,34 @@
     <!-- Keep the imports up to date -->
     {@html '<' + `style>${themeCSS}</style>`}
 
-    <meta property="og:title" content={edition.getTitle()} />
-    <meta property="og:image" content={edition.getImage('cover')} />
-    <meta property="og:description" content={edition.getDescription()} />
-    <meta property="og:type" content="book" />
-    <meta property="og:author" content={edition.getAuthorsText()} />
-    <meta
-        property="og:url"
-        content={edition.base ??
-            `https://bookish.press/${
-                $book && $book.domain ? $book.domain : $page.params.bookid
-            }`}
-    />
+    {#if edition}
+        <meta property="og:title" content={edition.getTitle()} />
+        <meta property="og:image" content={edition.getImage('cover')} />
+        <meta property="og:description" content={edition.getDescription()} />
+        <meta property="og:type" content="book" />
+        <meta property="og:author" content={edition.getAuthorsText()} />
+        <meta
+            property="og:url"
+            content={edition.base ??
+                `https://bookish.press/${
+                    $book && $book.domain ? $book.domain : $page.params.bookid
+                }`}
+        />
+    {/if}
 </svelte:head>
 
 <main class="bookish {$darkMode ? ' dark' : ''}">
-    <slot />
+    {#if edition}
+        <slot />
+        <!-- No edition to render? Coming soon. -->
+    {:else if $book}
+        <Page title={$book.title}>
+            <div class="comingsoon">
+                <Title>{$book.title}</Title>
+                <p>Coming soon.</p>
+            </div>
+        </Page>
+    {/if}
 </main>
 
 <style>
@@ -147,5 +161,10 @@
         width: 100%;
         z-index: 0;
         text-align: left;
+    }
+
+    .comingsoon {
+        margin-top: 4em;
+        text-align: center;
     }
 </style>

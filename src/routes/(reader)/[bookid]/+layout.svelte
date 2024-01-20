@@ -21,7 +21,7 @@
             bookID: string;
             editionID: string;
             book: BookSpecification | null;
-            edition: EditionSpecification;
+            edition: EditionSpecification | null;
             message: string;
         };
         chapters: Promise<Record<string, string>>;
@@ -38,10 +38,9 @@
     setContext<EditionStore>(EDITION, edition);
 
     // Set the context if we received the book.
-    if (meta.book) {
-        book.set(Book.fromJSON(meta.bookID, meta.book));
+    if (meta.book) book.set(Book.fromJSON(meta.bookID, meta.book));
+    if (meta.edition)
         edition.set(EditionModel.fromJSON(undefined, meta.edition));
-    }
 
     // After the chapter text promise resolves, update the edition with the chapter text.
     // We stream this to load the table of contents faster.
@@ -53,9 +52,9 @@
     });
 </script>
 
-{#if $book && $edition}
+{#if $book}
     <!-- Do book analytics for the book's analytics ID, unless there is no id -->
-    <Analytics gtagid={$edition.gtagid}></Analytics>
+    {#if $edition}<Analytics gtagid={$edition.gtagid}></Analytics>{/if}
 
     <Edition
         edition={$edition}

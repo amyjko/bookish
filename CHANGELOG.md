@@ -2,6 +2,10 @@
 
 # 0.6.11 - 2024-01-20
 
+## Enhancement
+
+-   Added "coming soon" feedback to unpublished book URLs.
+
 ## Fixed
 
 -   Fixed critical defect preventing Firebase initialization in book reading SSR cloud functionb.
