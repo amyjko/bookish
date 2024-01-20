@@ -258,9 +258,6 @@
                 <span slot="annotation">Images and video in the book</span>
             </TableOfContentsRow>
             {#if editable}
-                <TableOfContentsRow chapterID="theme" title="Theme">
-                    <span slot="annotation">Style the book</span>
-                </TableOfContentsRow>
                 <TableOfContentsRow chapterID="unknown" title="Unknown">
                     <span slot="annotation">Customize bad links</span>
                 </TableOfContentsRow>
@@ -296,17 +293,14 @@
             <em>retrieved {new Date().toLocaleDateString('en-US')}</em>.
         </PageParagraph>
 
-        {#if editable}
-            <PageHeader id="publish">Publish</PageHeader>
-            <Publish />
-        {/if}
-
         {#if $book}
             <PageHeader id="editions">Editions</PageHeader>
             <Editions editors={false} />
         {/if}
 
         {#if editable && $edition}
+            <PageHeader id="publish">Publish</PageHeader>
+            <Publish />
             <PageHeader id="editions">Analytics</PageHeader>
             <Instructions {editable}
                 >Want to use Google Analytics to track traffic? Enter your tag
@@ -326,6 +320,11 @@
                           )
                         : undefined}
             />
+            <PageHeader id="theme">Theme</PageHeader>
+            <Instructions {editable}
+                >Customize <Link to="{$base}/theme">this book's theme</Link> to match
+                its tone.</Instructions
+            >
         {/if}
 
         {#if $book && (editable || isEditionPartiallyEditable())}

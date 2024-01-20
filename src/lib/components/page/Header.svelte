@@ -17,8 +17,10 @@
     export let subtitle: string | undefined = undefined;
     export let print: boolean = false;
     export let tags: string[] | undefined = undefined;
-    export let getImage: () => string | null;
-    export let setImage: (embed: string | null) => Promise<void> | void;
+    export let getImage: undefined | (() => string | null) = undefined;
+    export let setImage:
+        | undefined
+        | ((embed: string | null) => Promise<void> | void) = undefined;
     export let save: ((text: string) => Promise<void> | void) | null = null;
 
     let title: HTMLHeadingElement | null = null;
@@ -58,7 +60,7 @@
 
     // Get the embed, update when getImage function prop changes.
     let embed: string | null;
-    $: embed = getImage();
+    $: embed = getImage ? getImage() : null;
 </script>
 
 <!-- We key on the chapter ID to avoid laggy updates from image loading -->
@@ -96,7 +98,7 @@
         {#if !print}
             <slot name="outline" />
         {/if}
-        {#if editable}
+        {#if editable && getImage && setImage}
             {#if embed === null}
                 <Button tooltip="add cover image" command={addCover}
                     >+ cover image</Button

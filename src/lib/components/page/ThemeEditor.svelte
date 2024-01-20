@@ -50,8 +50,6 @@
             editable={isEditionEditable()}
             label="Theme"
             id="theme"
-            getImage={() => null}
-            setImage={() => undefined}
             header="Theme"
         >
             <Outline slot="outline" previous={null} next={null} />
@@ -91,7 +89,7 @@
                         ? edition.set(
                               $edition.withTheme({
                                   ...(theme === null ? BookishTheme : theme),
-                              })
+                              }),
                           )
                         : undefined}>customize</Button
             >
