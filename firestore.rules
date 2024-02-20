@@ -4,7 +4,7 @@ service cloud.firestore {
     match /books/{book} {
 
       function getBook() {
-        return get(/databases/$(database)/documents/books/$(book)).data
+        return get(/databases/$(database)/documents/books/$(book)).data;
       }
 
       function bookIsEditable(bookDoc) {
@@ -41,16 +41,21 @@ service cloud.firestore {
 
         match /chapters/{chapter} {
 
-          function chapterIsEditable(chapterDoc) {
-            return (request.auth != null && request.auth.uid in chapterDoc.data.uids) || editionIsEditable(getEdition());
+          // This is not entirely right: this gives permission to anyone who has any chapter level permissions to edit
+          // any chapter. This relies on the front end to enforce chapter level permissions. Boo Firebase security rules.
+          // The only way to make this more precise would be to denormalize permissions data, replicating it on the chapter document.
+          function chapterIsEditable(edition) {
+            return (request.auth != null && request.auth.uid in edition.chapteruids) || editionIsEditable(edition);
           }
 
           // Chapter text is readable if the book is published or the part or all of the edition is editable
           allow read: if true;
+          // Only edition editors can create chapters.
           allow create: if editionIsEditable(getEdition());
           // Chapters can be edited by anyone with chapter, edition, or book level permissions.
-          allow update: if chapterIsEditable(resource.data);
-          allow delete: if chapterIsEditable(resource.data);
+          allow update: if chapterIsEditable(getEdition());
+          // Only edition editors can delete chapters.
+          allow delete: if editionIsEditable(getEdition());
 
         }
       }
