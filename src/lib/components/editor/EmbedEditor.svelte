@@ -45,10 +45,8 @@
             (error: string) => (upload = error),
             (url: string, thumbnail: string) => {
                 // Upload completed successfully, update the front end.
-                $caret?.edit(
-                    embed,
-                    embed.withURLs(url, thumbnail).withDescription(''),
-                );
+                // Preserve the description, in case it's an image revision, to avoid data loss.
+                $caret?.edit(embed, embed.withURLs(url, thumbnail));
                 upload = undefined;
             },
         );

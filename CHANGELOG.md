@@ -1,5 +1,11 @@
 # bookish changelog
 
+# 0.7.0 - 2024-02-25
+
+## Fixed
+
+-   Preserve alt text when new image is uploaded for an embed, or new image is selected. This prevents data loss in case its a revised image (while also risking being out of date and an author forgetting to update it).
+
 # 0.6.11 - 2024-01-20
 
 ## Enhancement
