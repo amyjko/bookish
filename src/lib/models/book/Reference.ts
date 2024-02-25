@@ -16,9 +16,10 @@ export default class Reference {
         source: string = '',
         url: string = '',
         summary: string = '',
-        short: boolean = false
+        short: boolean = false,
     ) {
-        this.citationID = citationID;
+        // Citation IDs should be case insensitive.
+        this.citationID = citationID.toLowerCase();
         this.authors = authors;
         this.year = year;
         this.title = title;
@@ -61,7 +62,7 @@ export default class Reference {
             this.source,
             this.url,
             this.summary,
-            this.short
+            this.short,
         ) as this;
     }
 
@@ -82,7 +83,7 @@ export default class Reference {
             this.source,
             this.url,
             this.summary,
-            this.short
+            this.short,
         );
     }
     withAuthors(authors: string) {
@@ -94,7 +95,7 @@ export default class Reference {
             this.source,
             this.url,
             this.summary,
-            this.short
+            this.short,
         );
     }
     withYear(year: string) {
@@ -106,7 +107,7 @@ export default class Reference {
             this.source,
             this.url,
             this.summary,
-            this.short
+            this.short,
         );
     }
     withTitle(title: string) {
@@ -118,7 +119,7 @@ export default class Reference {
             this.source,
             this.url,
             this.summary,
-            this.short
+            this.short,
         );
     }
     withSource(source: string) {
@@ -130,7 +131,7 @@ export default class Reference {
             source,
             this.url,
             this.summary,
-            this.short
+            this.short,
         );
     }
     withURL(url: string) {
@@ -142,7 +143,7 @@ export default class Reference {
             this.source,
             url,
             this.summary,
-            this.short
+            this.short,
         );
     }
     withSummary(summary: string) {
@@ -154,7 +155,7 @@ export default class Reference {
             this.source,
             this.url,
             summary,
-            this.short
+            this.short,
         );
     }
 
