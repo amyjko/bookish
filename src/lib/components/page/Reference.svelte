@@ -28,7 +28,7 @@
 
     function move(field: HTMLElement, direction: 1 | -1) {
         let fields = Array.from(
-            document.querySelectorAll('input[type="text"]')
+            document.querySelectorAll('input[type="text"]'),
         ) as HTMLElement[];
         let index = fields.indexOf(field);
         if (index >= 0) {
@@ -36,8 +36,8 @@
                 direction < 0 && index > 0
                     ? fields[index - 1]
                     : direction > 0 && index < fields.length - 1
-                    ? fields[index + 1]
-                    : undefined;
+                      ? fields[index + 1]
+                      : undefined;
             if (newInput) newInput.focus();
         }
     }
@@ -50,8 +50,8 @@
         authorList.length === 1
             ? authorList[0]
             : authorList.length === 2
-            ? authorList[0].trim() + ' & ' + authorList[1].trim()
-            : authorList[0].trim() + ', et al.'}
+              ? authorList[0].trim() + ' & ' + authorList[1].trim()
+              : authorList[0].trim() + ', et al.'}
     <p class="reference">
         {authors}
         ({reference.year}).
@@ -68,7 +68,7 @@
     <Table>
         <!-- CitationID -->
         <tr>
-            <td width="25%">id</td>
+            <td width="25%">id <Note>determines order, a-z</Note></td>
             <td>
                 <TextEditor
                     text={reference.citationID}
@@ -92,12 +92,12 @@
                             ? edition.set(
                                   $edition.withEditedReferenceID(
                                       text,
-                                      reference
-                                  )
+                                      reference,
+                                  ),
                               )
                             : undefined}
                     {move}
-                /><Note>determines order, a-z</Note>
+                />
             </td>
         </tr>
         <!-- Authors -->
@@ -115,8 +115,8 @@
                         $edition
                             ? edition.set(
                                   $edition.withEditedReference(
-                                      reference.withAuthors(text)
-                                  )
+                                      reference.withAuthors(text),
+                                  ),
                               )
                             : undefined}
                     {move}
@@ -140,8 +140,8 @@
                         $edition
                             ? edition.set(
                                   $edition.withEditedReference(
-                                      reference.withYear(text)
-                                  )
+                                      reference.withYear(text),
+                                  ),
                               )
                             : undefined}
                     {move}
@@ -163,8 +163,8 @@
                         $edition
                             ? edition.set(
                                   $edition.withEditedReference(
-                                      reference.withTitle(text)
-                                  )
+                                      reference.withTitle(text),
+                                  ),
                               )
                             : undefined}
                     {move}
@@ -188,8 +188,8 @@
                             $edition
                                 ? edition.set(
                                       $edition.withEditedReference(
-                                          reference.withSource(text)
-                                      )
+                                          reference.withSource(text),
+                                      ),
                                   )
                                 : undefined}
                         {move}
@@ -210,8 +210,8 @@
                         $edition
                             ? edition.set(
                                   $edition.withEditedReference(
-                                      reference.withURL(text)
-                                  )
+                                      reference.withURL(text),
+                                  ),
                               )
                             : undefined}
                     {move}
@@ -230,8 +230,8 @@
                         $edition
                             ? edition.set(
                                   $edition.withEditedReference(
-                                      reference.withSummary(text)
-                                  )
+                                      reference.withSummary(text),
+                                  ),
                               )
                             : undefined}
                     {move}
@@ -264,7 +264,7 @@
             command={() =>
                 $edition
                     ? edition.set(
-                          $edition.withoutReference(reference.citationID)
+                          $edition.withoutReference(reference.citationID),
                       )
                     : undefined}>⨉</ConfirmButton
         >

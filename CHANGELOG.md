@@ -5,6 +5,7 @@
 ## Fixed
 
 -   Preserve alt text when new image is uploaded for an embed, or new image is selected. This prevents data loss in case its a revised image (while also risking being out of date and an author forgetting to update it).
+-   [#370](https://github.com/amyjko/bookish/issues/370). Clarified that references are sorted by ID.
 
 # 0.6.11 - 2024-01-20
 

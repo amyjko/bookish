@@ -31,7 +31,7 @@
             setImage={(embed) =>
                 $edition
                     ? edition.set(
-                          $edition.withImage(ChapterIDs.ReferencesID, embed)
+                          $edition.withImage(ChapterIDs.ReferencesID, embed),
                       )
                     : undefined}
             header="References"
@@ -41,18 +41,16 @@
                 slot="outline"
                 previous={$edition.getPreviousChapterID(
                     ChapterIDs.ReferencesID,
-                    editable
+                    editable,
                 )}
                 next={$edition.getNextChapterID(
                     ChapterIDs.ReferencesID,
-                    editable
+                    editable,
                 )}
             />
         </Header>
         {#if editable}<BulkReferenceEditor />{/if}
         {#if references !== null}
-            <p><em>Sorted by last name of first author.</em></p>
-
             {#each Object.keys(references).sort() as citationID (citationID)}
                 <PossibleReference node={references[citationID]} edit />
             {/each}
