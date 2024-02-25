@@ -18,17 +18,28 @@
 
     function handleBulkAdd() {
         // Split by lines, skipping empty lines.
-        const references = text
-            .split(/\n+/)
-            .map((line) =>
+        const chunks = text.split(/\n+/);
+
+        const newReferences: Reference[] = [];
+        for (const chunk of chunks) {
+            newReferences.push(
                 mineReference(
-                    Object.keys($edition?.getReferences() ?? []),
-                    line
-                )
+                    // Pass the current IDs and the new reference IDs
+                    Array.from(
+                        new Set([
+                            ...Object.keys($edition?.getReferences() ?? []),
+                            ...newReferences.map((ref) => ref.citationID),
+                        ]),
+                    ),
+                    chunk,
+                ),
             );
+        }
+
+        // Handle possible duplicate IDs.
 
         if ($edition) {
-            edition.set($edition.withNewReferences(references));
+            edition.set($edition.withNewReferences(newReferences));
             text = '';
         }
     }
@@ -39,10 +50,10 @@
                 $edition.withNewReferences([
                     new Reference(
                         getUniqueReferenceID(
-                            Object.keys($edition.getReferences())
-                        )
+                            Object.keys($edition.getReferences()),
+                        ),
                     ),
-                ])
+                ]),
             );
         }
     }
