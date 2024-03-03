@@ -107,7 +107,9 @@ export function isEditionEditable(): boolean {
         book !== undefined &&
         auth !== undefined &&
         auth.user !== null &&
-        (edition.isEditor(auth.user.uid) || book.isEditor(auth.user.uid))
+        (edition.isEditor(auth.user.uid) ||
+            book.isEditor(auth.user.uid) ||
+            edition.isChapterEditor(auth.user.uid))
     );
 }
 

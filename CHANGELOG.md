@@ -5,6 +5,7 @@
 ## Enhancement
 
 -   Added link to link editor in the toolbar to simplify link testing.
+-   Allow chapter editors to edit references.
 
 ## Fixed
 

@@ -24,7 +24,7 @@ service cloud.firestore {
         }
 
         function editionIsEditable(editionDoc) {
-          return request.auth != null && request.auth.uid in editionDoc.uids || bookIsEditable(getBook())
+          return request.auth != null && (request.auth.uid in editionDoc.uids || bookIsEditable(getBook()))
         }
 
         // Editions can be read if they are published or the user has permissions to edit the edition or book.
