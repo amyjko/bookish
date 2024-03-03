@@ -1,5 +1,11 @@
 # bookish changelog
 
+# 0.6.51 - 2024-03-03
+
+## Enhancement
+
+-   Added link to link editor in the toolbar to simplify link testing.
+
 # 0.6.5 - 2024-02-25
 
 ## Fixed
