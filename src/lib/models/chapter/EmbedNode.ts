@@ -26,7 +26,7 @@ export default class EmbedNode extends BlockNode {
         description: string,
         caption?: FormatNode,
         credit?: FormatNode,
-        position: Position = '|'
+        position: Position = '|',
     ) {
         super();
 
@@ -62,8 +62,8 @@ export default class EmbedNode extends BlockNode {
         return this.isLocal()
             ? 'images/small/' + this.getURL()
             : this.hasSmallURL()
-            ? this.#urls.split(URL_SEPARATOR)[1]
-            : this.getURL();
+              ? this.#urls.split(URL_SEPARATOR)[1]
+              : this.getURL();
     }
     hasSmallURL() {
         return (
@@ -112,7 +112,9 @@ export default class EmbedNode extends BlockNode {
     toBookdown(): string {
         return `|${this.#urls}|${
             this.#description
-        }|${this.#caption.toBookdown()}|${this.#credit.toBookdown()}|`;
+        }|${this.#caption.toBookdown()}|${this.#credit.toBookdown()}|${
+            this.#position === '|' ? '' : this.#position
+        }`;
     }
     toJSON() {
         return {
@@ -129,7 +131,7 @@ export default class EmbedNode extends BlockNode {
             this.#description,
             this.#caption.copy(),
             this.#credit.copy(),
-            this.#position
+            this.#position,
         ) as this;
     }
 
@@ -150,7 +152,7 @@ export default class EmbedNode extends BlockNode {
                   this.#description,
                   newCaption,
                   newCredit,
-                  this.#position
+                  this.#position,
               ) as this)
             : undefined;
     }
@@ -165,7 +167,7 @@ export default class EmbedNode extends BlockNode {
             this.#description,
             this.#caption,
             this.#credit,
-            this.#position
+            this.#position,
         );
     }
     withURLs(url: string, thumbnail: string) {
@@ -174,7 +176,7 @@ export default class EmbedNode extends BlockNode {
             this.#description,
             this.#caption,
             this.#credit,
-            this.#position
+            this.#position,
         );
     }
     withDescription(description: string) {
@@ -183,7 +185,7 @@ export default class EmbedNode extends BlockNode {
             description,
             this.#caption,
             this.#credit,
-            this.#position
+            this.#position,
         );
     }
     withCaption(caption: FormatNode) {
@@ -192,7 +194,7 @@ export default class EmbedNode extends BlockNode {
             this.#description,
             caption,
             this.#credit,
-            this.#position
+            this.#position,
         );
     }
     withCredit(credit: FormatNode) {
@@ -201,7 +203,7 @@ export default class EmbedNode extends BlockNode {
             this.#description,
             this.#caption,
             credit,
-            this.#position
+            this.#position,
         );
     }
     withPosition(position: Position) {
@@ -210,7 +212,7 @@ export default class EmbedNode extends BlockNode {
             this.#description,
             this.#caption,
             this.#credit,
-            position
+            position,
         );
     }
 
@@ -234,7 +236,7 @@ export default class EmbedNode extends BlockNode {
             this.#description,
             newCaption,
             newCredit,
-            this.#position
+            this.#position,
         ) as this;
     }
 
@@ -244,7 +246,7 @@ export default class EmbedNode extends BlockNode {
 
     previousWord(root: RootNode): Caret {
         const previous = root.getPreviousTextOrAtom(
-            this.#caption.getFirstTextNode()
+            this.#caption.getFirstTextNode(),
         );
         return previous
             ? {

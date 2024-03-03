@@ -6,6 +6,10 @@
 
 -   Added link to link editor in the toolbar to simplify link testing.
 
+## Fixed
+
+-   Fixed issue where image alignment setting was not saved.
+
 # 0.6.5 - 2024-02-25
 
 ## Fixed
