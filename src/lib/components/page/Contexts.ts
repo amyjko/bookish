@@ -67,12 +67,12 @@ export function getRoot() {
 export function setChapter(
     store: EditionStore,
     previous: Chapter,
-    chapter: Chapter,
+    revised: Chapter,
 ) {
     // Don't set if its the same chapter.
-    if (previous === chapter) return;
+    if (previous === revised) return;
     const edition = get(store);
-    if (edition) store.set(edition.withRevisedChapter(previous, chapter));
+    if (edition) store.set(edition.withRevisedChapter(previous, revised));
 }
 
 function isRouteWrite(): boolean {

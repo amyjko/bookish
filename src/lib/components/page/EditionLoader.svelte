@@ -15,6 +15,8 @@
 
     export let write: boolean;
 
+    let currentEditionID: string | undefined;
+
     let auth = getUser();
     let book = getBook();
     let edition = getEdition();
@@ -43,12 +45,12 @@
             error = 'Unknown book.';
             return;
         } else {
-            const editionNumber = $page.params.editionid;
+            currentEditionID = $page.params.editionid;
             const latestPublished = !write;
 
             // Figure out which edition to load.
             let editionID;
-            if (editionNumber === undefined) {
+            if (currentEditionID === undefined) {
                 if (latestPublished) {
                     editionID = $book.getLatestPublishedEditionID();
                     if (editionID === undefined)
@@ -57,9 +59,11 @@
                     editionID = $book.getLatestEditionID();
                 }
             } else {
-                editionID = $book.getEditionNumberID(parseFloat(editionNumber));
+                editionID = $book.getEditionNumberID(
+                    parseFloat(currentEditionID),
+                );
                 if (editionID === undefined)
-                    error = `There is no ${editionNumber} edition of this book`;
+                    error = `There is no ${currentEditionID} edition of this book`;
             }
 
             // Listen to the doc for changes and listen to all of its chapters.
@@ -75,7 +79,7 @@
                             edition.set(undefined);
                             error = 'Unable to load edition';
                         }
-                    }
+                    },
                 );
 
                 chaptersUnsub = listenToChapters(
@@ -86,16 +90,32 @@
                         for (const [ref, text] of chapters)
                             chapterText.set(ref.id, text);
                         // Update the chapter text in the current edition.
-                        if ($edition)
+                        if ($edition) {
                             edition.set($edition.withChapterText(chapterText));
-                    }
+                        }
+                    },
                 );
             }
         }
     }
 
-    // Whenever the book or page changes, change the listener.
-    $: if ($page && $auth && $auth.user !== null) listen();
+    // Remember the chapter text whenever the edition changes, so we don't overwrite stale text.
+    // when other things change.
+    $: if ($edition) {
+        for (const chapter of $edition.chapters) {
+            if (chapter.ref && chapter.text !== null)
+                chapterText.set(chapter.ref.id, chapter.text);
+        }
+    }
+
+    // Whenever the book changes, change the listener.
+    $: if (
+        (currentEditionID === undefined ||
+            $page.params.editionid !== currentEditionID) &&
+        $auth &&
+        $auth.user !== null
+    )
+        listen();
 
     // When unmounted, unset the stores — no longer viewing a book.
     onDestroy(() => {

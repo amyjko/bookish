@@ -511,13 +511,40 @@ export default class Edition {
     }
 
     withRevisedChapter(previous: Chapter, edited: Chapter) {
-        const index = this.chapters.indexOf(previous);
-        if (index < 0) return this;
-        return this.withChapters([
-            ...this.chapters.slice(0, index),
-            edited,
-            ...this.chapters.slice(index + 1),
-        ]);
+        return this.withChapters(
+            this.chapters.map((chapter) => {
+                // Is this the edited chapter? Return the edited one.
+                if (chapter === previous) return edited;
+
+                // If it's a different chapter, did the chapter change it's ID? Change all links to the chapter to have the new ID.
+                if (previous.id !== edited.id) {
+                    // Start with the chapter as is.
+                    let newChapter = chapter;
+
+                    // Replace the chapter ID in the chapter's text.
+                    if (newChapter.text !== null) {
+                        const revisedText = newChapter.text.replaceAll(
+                            new RegExp(
+                                `\\|(${previous.id})(:[a-zA-Z0-9]+)?\\]`,
+                                'g',
+                            ),
+                            `|${edited.id}$2]`,
+                        );
+                        if (revisedText !== chapter.text) {
+                            newChapter = newChapter.withText(revisedText);
+                            console.log(
+                                'Updated chapter text: ' + newChapter.text,
+                            );
+                        }
+                    }
+
+                    // Return the possibily revised chapter.
+                    return newChapter;
+                }
+                // Otherwise, just return the chapter as is.
+                else return chapter;
+            }),
+        );
     }
 
     withoutRefs() {

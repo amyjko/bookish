@@ -10,6 +10,7 @@
 ## Fixed
 
 -   Fixed issue where image alignment setting was not saved.
+-   Update links to chapters when chapter IDs change.
 
 # 0.6.5 - 2024-02-25
 

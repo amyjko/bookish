@@ -121,7 +121,7 @@
                     history.pushState(
                         '',
                         document.title,
-                        window.location.pathname + window.location.search
+                        window.location.pathname + window.location.search,
                     );
                     observer.unobserve(entry.target);
                     highlightedID = undefined;
@@ -169,7 +169,7 @@
         // If there's a word we're trying to highlight in the URL path, scroll to the corresponding match.
         if (location.search) {
             const highlights = document.getElementsByClassName(
-                'bookish-text bookish-content-highlight'
+                'bookish-text bookish-content-highlight',
             );
             const num = getHighlightedNumber();
             if (
@@ -288,16 +288,19 @@
                             text={chapter.getID()}
                             label="Chapter URL ID editor"
                             save={// After the ID is edited, reload the page with the new URL.
-                            (newChapterID) => {
+                            async (newChapterID) => {
                                 if ($book) {
                                     setChapter(
                                         edition,
                                         chapter,
-                                        chapter.withChapterID(newChapterID)
+                                        chapter.withChapterID(newChapterID),
                                     );
                                     // Navigate to the new ID
                                     goto(
-                                        `/write/${$book.getID()}/${editionNumber}/${newChapterID}`
+                                        `/write/${$book.getID()}/${editionNumber}/${newChapterID}`,
+                                        {
+                                            keepFocus: true,
+                                        },
                                     );
                                 }
                             }}
@@ -306,9 +309,9 @@
                                 !/^[a-zA-Z0-9]+$/.test(newChapterID)
                                     ? 'Chapter IDs must be one or more letters or numbers'
                                     : chapter.getID() !== newChapterID &&
-                                      $edition?.hasChapter(newChapterID)
-                                    ? "There's already a chapter that has this ID."
-                                    : undefined}
+                                        $edition?.hasChapter(newChapterID)
+                                      ? "There's already a chapter that has this ID."
+                                      : undefined}
                             saveOnExit={true}
                         />
                     </Muted>
@@ -320,7 +323,7 @@
                             setChapter(
                                 edition,
                                 chapter,
-                                chapter.asNumbered(on)
+                                chapter.asNumbered(on),
                             )}
                     >
                         <ChapterNumber
@@ -347,7 +350,7 @@
                     setChapter(
                         edition,
                         chapter,
-                        chapter.withRenamedAuthor(index, text)
+                        chapter.withRenamedAuthor(index, text),
                     )}
                 remove={(index) =>
                     setChapter(edition, chapter, chapter.withoutAuthor(index))}
@@ -375,7 +378,7 @@
                                 ? setChapter(
                                       edition,
                                       chapter,
-                                      chapter.withAST(ast)
+                                      chapter.withAST(ast),
                                   )
                                 : undefined}
                         chapter={true}
@@ -426,7 +429,7 @@
             <Permissions
                 uids={chapter.uids}
                 inheriteduids={Array.from(
-                    new Set([...$edition.uids, ...($book ? $book.uids : [])])
+                    new Set([...$edition.uids, ...($book ? $book.uids : [])]),
                 )}
                 atleastone={false}
                 writable={isChapterEditable()}
