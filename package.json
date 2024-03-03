@@ -1,7 +1,7 @@
 {
     "name": "bookish-press",
     "private": false,
-    "version": "0.6.5",
+    "version": "0.6.51",
     "type": "module",
     "description": "A platform for reading and writing readable, accessible, beautiful online books.",
     "license": "MIT",
