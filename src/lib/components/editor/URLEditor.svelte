@@ -1,7 +1,5 @@
 <script lang="ts">
-    import Icon from './Icon.svelte';
     import TextEditor from './TextEditor.svelte';
-    import LinkIcon from './icons/link.svg?raw';
     import Link from '../app/Link.svelte';
 
     export let url: string;
@@ -18,4 +16,6 @@
     clip
     save={(url) => edit(url)}
 />
-<Link to={url}>↗</Link>
+{#if url.startsWith('http')}
+    <Link to={url}>↗</Link>
+{/if}
