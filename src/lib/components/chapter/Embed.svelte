@@ -42,7 +42,7 @@
                 .map((item) => item.getAsFile())
                 .filter(
                     (file) =>
-                        file !== null && /.*\.(jpg|jpeg|png)/i.test(file.name)
+                        file !== null && /.*\.(jpg|jpeg|png)/i.test(file.name),
                 );
             if (imageFiles.length === 0)
                 dragFeedback = 'Only JPEG or PNG images are allowed.';
@@ -69,11 +69,11 @@
                         // Upload completed successfully, now we can get the download URL
                         $caret?.edit(
                             node,
-                            node.withURLs(url, thumbnails).withDescription('')
+                            node.withURLs(url, thumbnails).withDescription(''),
                         );
                         dragging = false;
                         dragFeedback = undefined;
-                    }
+                    },
                 );
             }
         }
@@ -138,8 +138,8 @@
                     >{dragFeedback !== undefined
                         ? dragFeedback
                         : placeholder.length > 0
-                        ? placeholder
-                        : 'Click or drag to choose or upload an image, or enter an image or video URL.'}
+                          ? placeholder
+                          : 'Click or drag to choose or upload an image, or enter an image or video URL.'}
                 </div>
             {:else}
                 <p class="bookish-figure-unspecified">No image or video</p>
@@ -189,7 +189,7 @@
     }
 
     :global(.dark) .bookish-figure-image {
-        filter: brightness(50%);
+        filter: brightness(90%);
     }
 
     .bookish-figure-embed {
