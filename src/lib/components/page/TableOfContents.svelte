@@ -123,6 +123,7 @@
                         $edition
                             ? edition.set($edition.withoutAuthor(index))
                             : undefined}
+                    editors={$edition.isEdited()}
                 />
                 <Note>{$edition.getEditionLabel()} edition</Note>
             </div>

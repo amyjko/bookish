@@ -13,6 +13,7 @@
     import ChapterNumber from './ChapterNumber.svelte';
     import Button from '../app/Button.svelte';
     import ChapterTitle from './ChapterTitle.svelte';
+    import Authors from './Authors.svelte';
 
     export let chapterID: string;
     export let chapter: Chapter | undefined = undefined;
@@ -67,6 +68,14 @@
             <ChapterNumber>{'Chapter ' + number}</ChapterNumber>
         {/if}
         <ChapterTitle link={chapterURL}>{title}</ChapterTitle>
+        {#if chapter && chapter.getAuthors().length > 0}
+            <Authors
+                editable={false}
+                authors={chapter.getAuthors()}
+                add={() => {}}
+                edit={() => {}}
+                remove={() => {}}
+            />{/if}
         <p><Muted><em><slot name="annotation" /></em></Muted></p>
     </td>
     <td><slot name="etc" /></td>
@@ -91,7 +100,7 @@
                     command={() =>
                         chapter && $edition
                             ? edition.set(
-                                  $edition.withoutChapter(chapter.getID())
+                                  $edition.withoutChapter(chapter.getID()),
                               )
                             : undefined}>⨉</ConfirmButton
                 >

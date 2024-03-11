@@ -16,8 +16,8 @@
     export let add: () => Promise<void> | void;
     export let edit: (index: number, text: string) => Promise<void> | void;
     export let remove: (index: number) => Promise<void> | void;
+    export let editors: boolean = false;
 
-    let user = getUser();
     let edition = getEdition();
 
     let authorList: HTMLDivElement | null = null;
@@ -43,7 +43,9 @@
     {#if authorsToShow === undefined}
         No authors
     {:else}
-        <em>by </em>
+        <em
+            >{#if editors}edited by{:else}by{/if}</em
+        >
         {#each authorsToShow as author, index}
             {#if editable && !showInherited}
                 <span class="author-editor">

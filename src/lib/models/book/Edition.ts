@@ -857,6 +857,11 @@ export default class Edition {
         return this.withTheme(newTheme);
     }
 
+    // Edited if chapters have their own authors
+    isEdited() {
+        return this.chapters.some((chapter) => chapter.getAuthors().length > 0);
+    }
+
     // Don't let callers get their sneaky hands on this mutable array...
     getAuthors() {
         return [...this.authors];

@@ -1,5 +1,11 @@
 # bookish changelog
 
+# 0.6.52 - 2024-03-03
+
+## Enhancement
+
+-   Label book as edited if any chapters have explicit authors.
+
 # 0.6.51 - 2024-03-03
 
 ## Enhancement
