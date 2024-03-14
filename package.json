@@ -48,7 +48,7 @@
         "@sveltejs/kit": "^2.0.0",
         "ajv": "^8",
         "ajv-formats": "^2",
-        "firebase": "latest",
+        "firebase": "^10.8.1",
         "firebase-functions": "latest",
         "prismjs": "^1.29",
         "smoothscroll-polyfill": "^0.4",
