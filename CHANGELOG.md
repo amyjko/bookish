@@ -1,5 +1,11 @@
 # bookish changelog
 
+# 0.6.53 - 2024-04-21
+
+## Fixed
+
+-   Removed errant space after citations.
+
 # 0.6.52 - 2024-03-03
 
 ## Enhancement

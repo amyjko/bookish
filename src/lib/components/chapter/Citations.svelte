@@ -33,54 +33,48 @@
     afterUpdate(() => $chapter?.layoutMarginals());
 </script>
 
-<Atom {node}>
-    {#if $root}
-        <span class="bookish-citation" data-nodeid={node.nodeID}>
-            <Marginal
+<Atom {node}
+    >{#if $root}<span class="bookish-citation" data-nodeid={node.nodeID}
+            ><Marginal
                 {node}
                 id={'citation-' + citations.join('-')}
                 label="citations"
-            >
-                <svelte:fragment slot="interactor">
-                    {#each citations as citationID, index}
-                        {@const citationNumber =
-                            $root.getCitationNumber(citationID)}
-                        {#if citationNumber && citationID in ($edition?.getReferences() ?? {})}
-                            <sup class="bookish-citation-symbol"
+                ><svelte:fragment slot="interactor">
+                    {#each citations as citationID, index}{@const citationNumber =
+                            $root.getCitationNumber(
+                                citationID,
+                            )}{#if citationNumber && citationID in ($edition?.getReferences() ?? {})}<sup
+                                class="bookish-citation-symbol"
                                 >{citationNumber}</sup
-                            >
-                        {:else}
-                            <Problem
+                            >{:else}<Problem
                                 >Unknown reference: <code>{citationID}</code
                                 ></Problem
-                            >
-                        {/if}
-                        {#if citations.length > 1 && index < citations.length - 1}<sup
+                            >{/if}{#if citations.length > 1 && index < citations.length - 1}<sup
                                 >,</sup
-                            >{/if}
-                    {:else}
-                        <sup class="bookish-citation-symbol">{'\u2014'}</sup>
-                    {/each}
-                </svelte:fragment>
-                <span slot="content" class="bookish-references">
-                    {#each citations as citationID}
+                            >{/if}{:else}<sup class="bookish-citation-symbol"
+                            >{'\u2014'}</sup
+                        >{/each}</svelte:fragment
+                ><span slot="content" class="bookish-references"
+                    >{#each citations as citationID}
                         {@const citationNumber =
                             $root.getCitationNumber(citationID)}
                         {@const ref = $edition?.getReference(citationID)}
-                        {#if citationNumber && ref && $edition}
-                            <span class="bookish-reference">
+                        {#if citationNumber && ref && $edition}<span
+                                class="bookish-reference"
+                            >
                                 <sup class="bookish-citation-symbol"
                                     >{citationNumber}</sup
                                 >
-                                <PossibleReference node={ref} edit={false} />
-                            </span>
-                        {/if}
-                    {/each}
-                </span>
-            </Marginal>
-        </span>
-    {/if}
-</Atom>
+                                <PossibleReference
+                                    node={ref}
+                                    edit={false}
+                                /></span
+                            >{/if}
+                    {/each}</span
+                ></Marginal
+            ></span
+        >{/if}</Atom
+>
 
 <style>
     sup {
