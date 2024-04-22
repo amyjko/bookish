@@ -5,6 +5,7 @@
 ## Fixed
 
 -   Removed errant space after citations.
+-   Added Java syntax highlighting support (in a hacky way, given PrismJS is defunct.)
 
 # 0.6.52 - 2024-03-03
 

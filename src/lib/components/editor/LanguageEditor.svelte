@@ -5,7 +5,7 @@
     export let language: string;
     export let edit: (newValue: string) => void;
 
-    const languages = ['', 'html', 'css', 'javascript', 'python'];
+    const languages = ['', 'html', 'css', 'javascript', 'python', 'java'];
 </script>
 
 <Options
