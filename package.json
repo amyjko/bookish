@@ -47,7 +47,7 @@
     "dependencies": {
         "@sveltejs/kit": "^2.0.0",
         "ajv": "^8",
-        "ajv-formats": "^2",
+        "ajv-formats": "^3",
         "firebase": "^10.8.1",
         "firebase-functions": "latest",
         "prismjs": "^1.29",
