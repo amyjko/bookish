@@ -1,5 +1,11 @@
 # bookish changelog
 
+# 0.6.54 - 2024-05-26
+
+## Maintenance
+
+-   Updated to vitest 1.6.0.
+
 # 0.6.53 - 2024-04-21
 
 ## Fixed
