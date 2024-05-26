@@ -8,6 +8,7 @@
 -   Updated to Typescript 5.4.5
 -   Updated to prettier 3.2.5
 -   Updated to vite 5.2.11
+-   Updated to Sveltekit 2.5.10 and related dependencies.
 
 # 0.6.53 - 2024-04-21
 
