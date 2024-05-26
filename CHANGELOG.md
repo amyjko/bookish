@@ -4,9 +4,10 @@
 
 ## Maintenance
 
--   Updated to vitest 1.6.0.
--   Updated to Typescript 5.4.5.
--   Updated to prettier 3.2.5.
+-   Updated to vitest 1.6.0
+-   Updated to Typescript 5.4.5
+-   Updated to prettier 3.2.5
+-   Updated to vite 5.2.11
 
 # 0.6.53 - 2024-04-21
 
