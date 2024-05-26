@@ -5,6 +5,7 @@
 ## Maintenance
 
 -   Updated to vitest 1.6.0.
+-   Updated to Typescript 5.4.5.
 
 # 0.6.53 - 2024-04-21
 
