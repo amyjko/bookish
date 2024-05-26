@@ -9,7 +9,9 @@
 -   Updated to prettier 3.2.5
 -   Updated to vite 5.2.11
 -   Updated to Sveltekit 2.5.10 and related dependencies.
--   Updated ajv and ajv-formats.
+-   Updated ajv and ajv-formats
+-   Updated firebase to 10.12.1
+-   Updated firebase-functinos to 5.0.1
 
 # 0.6.53 - 2024-04-21
 
