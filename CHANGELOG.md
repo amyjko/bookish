@@ -12,6 +12,7 @@
 -   Updated ajv and ajv-formats
 -   Updated firebase to 10.12.1
 -   Updated firebase-functinos to 5.0.1
+-   Upgraded all Firebase functions to Gen 2
 
 # 0.6.53 - 2024-04-21
 

@@ -159,7 +159,7 @@ export async function getUserEmails(
     const getUserEmails = httpsCallable<
         { uids: string[] },
         Record<string, string>
-    >(functions, 'getUserEmails');
+    >(functions, 'getUserEmailsGen2');
 
     const result = await getUserEmails({
         uids,
@@ -174,7 +174,7 @@ export async function createUser(email: string): Promise<string | null> {
 
     const createUserWithEmail = httpsCallable<{ email: string }, string>(
         functions,
-        'createUserWithEmail',
+        'createUserWithEmailGen2',
     );
 
     const result = await createUserWithEmail({
