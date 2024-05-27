@@ -14,6 +14,10 @@
 -   Updated firebase-functinos to 5.0.1
 -   Upgraded all Firebase functions to Gen 2
 
+## Added
+
+Created an import script for loading a book from local files into Firebase.
+
 # 0.6.53 - 2024-04-21
 
 ## Fixed
