@@ -107,6 +107,24 @@
         warped by capital.
     </Paragraph>
 
+    <Head id="ip">How do licenses work?</Head>
+    <Paragraph>
+        Bookish claims no ownership over your content, rights to license your
+        content. The only right we require is to host your content and make it
+        available for others to read, per your book's settings. You can delete
+        your content at any time and we will delete all traces of it. You can
+        set your own license for your content to be displayed on your book's
+        table of contents.
+    </Paragraph>
+
+    <Paragraph
+        >Because we claim no other rights to your writing, we will not do
+        anything with it other than host it online on your behalf. That includes
+        not selling it to companies for the purposes of training machine learned
+        models such as large language models. (That doesn't stop companies from
+        scraping it from our site.)</Paragraph
+    >
+
     <Head id="pdf">PDFs?</Head>
     <Paragraph
         >No, although you can visit a chapter or show all chapters on a page and
