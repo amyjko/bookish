@@ -51,8 +51,8 @@
         "ajv": "^8",
         "ajv-formats": "^3",
         "firebase": "^11",
-        "firebase-admin": "^13.2.0",
-        "firebase-functions": "^6.3.2",
+        "firebase-admin": "^12.7.0",
+        "firebase-functions": "^6",
         "prismjs": "^1.29",
         "smoothscroll-polyfill": "^0.4",
         "svelte": "^4"
