@@ -6,6 +6,10 @@
 
 - Editing built-in chapter names and table of contents headers.
 
+## Fixed
+
+- Fixed glossary saving error.
+
 ## Maintenance
 
 - Updated minor versions of vite, vitest, Typescript, prettier, vite, Svelte, SvelteKit, ajv, firebase, firebase-functions.

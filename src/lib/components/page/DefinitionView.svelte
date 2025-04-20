@@ -96,7 +96,7 @@
                                   $edition.withEditedDefinition(id, {
                                       phrase: text,
                                       definition: definition.definition,
-                                      synonyms: definition.synonyms,
+                                      synonyms: definition.synonyms ?? [],
                                   }),
                               )
                             : undefined}
@@ -128,7 +128,7 @@
                                   $edition.withEditedDefinition(id, {
                                       phrase: definition.phrase,
                                       definition: node.toBookdown(),
-                                      synonyms: definition.synonyms,
+                                      synonyms: definition.synonyms ?? [],
                                   }),
                               )
                             : undefined}
