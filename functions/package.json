@@ -12,22 +12,22 @@
         "logs": "firebase functions:log"
     },
     "engines": {
-        "node": "18"
+        "node": "20"
     },
     "main": "lib/index.js",
     "dependencies": {
         "@google-cloud/storage": "^7.6",
         "bookish-press": "latest",
-        "firebase-admin": "^12",
-        "firebase-functions": "^5",
+        "firebase-admin": "^13",
+        "firebase-functions": "^6",
         "sharp": "^0"
     },
     "devDependencies": {
-        "@types/node": "^20",
+        "@types/node": "^22",
         "@types/sharp": "^0",
-        "@typescript-eslint/eslint-plugin": "^7",
-        "@typescript-eslint/parser": "^7",
-        "eslint": "^8.57.0",
+        "@typescript-eslint/eslint-plugin": "^8",
+        "@typescript-eslint/parser": "^8",
+        "eslint": "^9",
         "eslint-config-google": "^0",
         "eslint-plugin-import": "^2",
         "firebase-functions-test": "^3.0.0",

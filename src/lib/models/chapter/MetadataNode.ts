@@ -2,7 +2,7 @@ import type { CaretRange } from './Caret';
 import Node from './Node';
 import type TextNode from './TextNode';
 
-export default abstract class MetadataNode<MetaType> extends Node {
+export default abstract class MetadataNode<MetaType = any> extends Node {
     readonly #text: TextNode;
     readonly #meta: MetaType;
 
@@ -19,8 +19,8 @@ export default abstract class MetadataNode<MetaType> extends Node {
         return this.#text;
     }
 
-    abstract withMeta(meta: MetaType): MetadataNode<MetaType>;
-    abstract withText(text: TextNode): MetadataNode<MetaType>;
+    abstract withMeta(meta: MetaType): MetadataNode;
+    abstract withText(text: TextNode): MetadataNode;
     abstract toText(): string;
     abstract toBookdown(): string;
 

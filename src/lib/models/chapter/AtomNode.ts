@@ -4,7 +4,7 @@ import Node from './Node';
 import TextNode from './TextNode';
 import type RootNode from './RootNode';
 
-export default abstract class AtomNode<MetadataType> extends Node {
+export default abstract class AtomNode<MetadataType = any> extends Node {
     readonly #meta: MetadataType;
 
     constructor(meta: MetadataType) {
@@ -44,7 +44,7 @@ export default abstract class AtomNode<MetadataType> extends Node {
     getFormatRoot(root: Node): FormatNode | undefined {
         return this.getFarthestParentMatching(
             root,
-            (p) => p instanceof FormatNode
+            (p) => p instanceof FormatNode,
         ) as FormatNode;
     }
 
@@ -54,5 +54,5 @@ export default abstract class AtomNode<MetadataType> extends Node {
 
     abstract toBookdown(format?: FormatNode): string;
     abstract toText(): string;
-    abstract withMeta(meta: MetadataType): AtomNode<MetadataType>;
+    abstract withMeta(meta: MetadataType): AtomNode;
 }

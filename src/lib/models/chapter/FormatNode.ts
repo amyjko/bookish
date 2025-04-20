@@ -19,8 +19,8 @@ export type FormatNodeSegmentType =
     | TextNode
     | LineBreakNode
     | ErrorNode
-    | MetadataNode<any>
-    | AtomNode<any>;
+    | MetadataNode
+    | AtomNode;
 
 export default class FormatNode extends Node {
     readonly #format: Format;
@@ -49,7 +49,7 @@ export default class FormatNode extends Node {
                 item instanceof LineBreakNode &&
                 list[position + 1] instanceof LineBreakNode
                     ? [item, new TextNode()]
-                    : [item]
+                    : [item],
             )
             // Flatten the mapped list we made.
             .flat();
@@ -104,7 +104,7 @@ export default class FormatNode extends Node {
             (this.#format === 'v' ? '^v' : this.#format) +
             this.#segments
                 .map((s) =>
-                    s instanceof AtomNode ? s.toBookdown(this) : s.toBookdown()
+                    s instanceof AtomNode ? s.toBookdown(this) : s.toBookdown(),
                 )
                 .join('') +
             (this.#format === 'v' ? '^' : this.#format)
@@ -128,51 +128,51 @@ export default class FormatNode extends Node {
     copy(): this {
         return new FormatNode(
             this.#format,
-            this.#segments.map((s) => s.copy())
+            this.#segments.map((s) => s.copy()),
         ) as this;
     }
 
     getTextNodes(): TextNode[] {
         return this.getNodes().filter(
-            (n): n is TextNode => n instanceof TextNode
+            (n): n is TextNode => n instanceof TextNode,
         );
     }
 
     // Get all text or atom nodes in this format, except for any inside an atom node,
     // as this is used for navigation and editing, and they should be isolated from that.
-    getTextAndAtomNodes(): (TextNode | AtomNode<any>)[] {
+    getTextAndAtomNodes(): (TextNode | AtomNode)[] {
         return this.getNodes().filter(
-            (n) => n instanceof TextNode || n instanceof AtomNode
-        ) as (TextNode | AtomNode<any>)[];
+            (n) => n instanceof TextNode || n instanceof AtomNode,
+        ) as (TextNode | AtomNode)[];
     }
 
     getAdjacentTextOrAtom(
-        node: TextNode | AtomNode<any>,
-        next: boolean
-    ): TextNode | AtomNode<any> | undefined {
+        node: TextNode | AtomNode,
+        next: boolean,
+    ): TextNode | AtomNode | undefined {
         // Find all of the text and atom nodes not in atom nodes in this node.
         const text = this.getTextAndAtomNodes();
         const index = text.indexOf(node);
         return index === undefined
             ? undefined
             : next
-            ? index >= 0 && index < text.length - 1
-                ? text[index + 1]
-                : undefined
-            : index > 0 && index <= text.length
-            ? text[index - 1]
-            : undefined;
+              ? index >= 0 && index < text.length - 1
+                  ? text[index + 1]
+                  : undefined
+              : index > 0 && index <= text.length
+                ? text[index - 1]
+                : undefined;
     }
 
     getNextTextOrAtom(
-        node: TextNode | AtomNode<any>
-    ): TextNode | AtomNode<any> | undefined {
+        node: TextNode | AtomNode,
+    ): TextNode | AtomNode | undefined {
         return this.getAdjacentTextOrAtom(node, true);
     }
 
     getPreviousTextOrAtom(
-        node: TextNode | AtomNode<any>
-    ): TextNode | AtomNode<any> | undefined {
+        node: TextNode | AtomNode,
+    ): TextNode | AtomNode | undefined {
         return this.getAdjacentTextOrAtom(node, false);
     }
 
@@ -211,12 +211,12 @@ export default class FormatNode extends Node {
                             : 1
                         : 0
                     : adjacentNode instanceof TextNode
-                    ? adjacentNode.isEmpty()
-                        ? 0
-                        : linebreak
-                        ? adjacentNode.getLength()
-                        : adjacentNode.getLength() - 1
-                    : 0,
+                      ? adjacentNode.isEmpty()
+                          ? 0
+                          : linebreak
+                            ? adjacentNode.getLength()
+                            : adjacentNode.getLength() - 1
+                      : 0,
             };
         }
         // Otherwise, there is no adjacent caret.
@@ -271,10 +271,10 @@ export default class FormatNode extends Node {
                               .substring(range.start.index, range.end.index)
                         : current.getText().substring(range.start.index)
                     : index > start && index < end
-                    ? current.getText()
-                    : current === range.end.node
-                    ? current.getText().substring(0, range.end.index)
-                    : '';
+                      ? current.getText()
+                      : current === range.end.node
+                        ? current.getText().substring(0, range.end.index)
+                        : '';
             })
             .join('');
     }
@@ -293,7 +293,7 @@ export default class FormatNode extends Node {
 
     withSegmentReplaced(
         segment: FormatNodeSegmentType,
-        replacement: FormatNodeSegmentType
+        replacement: FormatNodeSegmentType,
     ): this | undefined {
         const index = this.#segments.indexOf(segment);
         if (index < 0) return undefined;
@@ -314,7 +314,7 @@ export default class FormatNode extends Node {
 
     withChildReplaced(
         node: FormatNodeSegmentType,
-        replacement: FormatNodeSegmentType | undefined
+        replacement: FormatNodeSegmentType | undefined,
     ) {
         return replacement === undefined
             ? (this.withoutSegment(node) as this)
@@ -351,7 +351,7 @@ export default class FormatNode extends Node {
     // It's approach is to scan through every text, meta, and atom node build a new format based on the requested format.
     withFormat(
         range: CaretRange,
-        format: Format | undefined
+        format: Format | undefined,
     ): FormatNode | undefined {
         // This only transforms ranges that start and end with text/atom nodes in this format node.
         if (
@@ -386,7 +386,7 @@ export default class FormatNode extends Node {
         // to construct a new format tree with the old content.
         const everythingButFormats: FormatNodeSegmentType[] =
             this.getNodes().filter(
-                (n) => !(n instanceof FormatNode)
+                (n) => !(n instanceof FormatNode),
             ) as FormatNodeSegmentType[];
 
         // Check if all of the selected content has the requested format so we can toggle it if so.
@@ -497,7 +497,7 @@ export default class FormatNode extends Node {
                 (zeroWidthSelection && textIndex === selectionStartIndex)
             )
                 newFormats[0].segments.push(
-                    new FormatNode(formatSpec.format, formatSpec.segments)
+                    new FormatNode(formatSpec.format, formatSpec.segments),
                 );
         }
 
@@ -508,7 +508,7 @@ export default class FormatNode extends Node {
                 // account for it's length, but do nothing else.
                 const atomAncestor = node.getClosestParentOfType(
                     this,
-                    AtomNode
+                    AtomNode,
                 );
                 if (
                     atomAncestor instanceof AtomNode &&
@@ -533,7 +533,7 @@ export default class FormatNode extends Node {
                             // and if we're in the selected range, adjust them accordingly based on the current formats
                             // and the requested format. (If this is a range deletion, then we just stick with the existing formats).
                             let formatter = node.getFormat(this);
-                            let desiredFormats = formatter
+                            const desiredFormats: Format[] = formatter
                                 ? formatter.getFormats(this)
                                 : [];
                             if (
@@ -543,7 +543,7 @@ export default class FormatNode extends Node {
                                     inRange())
                             ) {
                                 // Remove all formatting if we were asked to.
-                                if (format === '') desiredFormats = [];
+                                if (format === '') desiredFormats.length = 0;
                                 // Apply the formatting if it's not already applied.
                                 else if (
                                     !alreadyApplied &&
@@ -557,7 +557,7 @@ export default class FormatNode extends Node {
                                 )
                                     desiredFormats.splice(
                                         desiredFormats.indexOf(format),
-                                        1
+                                        1,
                                     );
                             }
 
@@ -601,7 +601,10 @@ export default class FormatNode extends Node {
                             desiredFormats.forEach((desiredFormat) => {
                                 // If the current format does not yet include the desired format,
                                 // close the text node and start a new format.
-                                if (!getFormats().includes(desiredFormat)) {
+                                if (
+                                    desiredFormat !== '' &&
+                                    !getFormats().includes(desiredFormat)
+                                ) {
                                     // Save any text that we've accumulated in the curent format.
                                     saveText();
 
@@ -652,7 +655,7 @@ export default class FormatNode extends Node {
                     // by simply not adding one to this new format. Then, erase the text, since it was added in the metadata node.
                     if (currentText.length > 0) {
                         newFormats[0].segments.push(
-                            parent.withText(new TextNode(currentText))
+                            parent.withText(new TextNode(currentText)),
                         );
                         currentText = '';
                     }
@@ -681,14 +684,14 @@ export default class FormatNode extends Node {
                         ) {
                             const newFormat = atomMeta.withFormat(
                                 range,
-                                format
+                                format,
                             );
                             newAtom = node.withMeta(newFormat);
                         }
                     }
                     // Add the formatted atom if there is one.
                     newFormats[0].segments.push(
-                        newAtom !== undefined ? newAtom : node
+                        newAtom !== undefined ? newAtom : node,
                     );
                 }
 
@@ -721,7 +724,7 @@ export default class FormatNode extends Node {
         // Create the final format.
         let newFormat = new FormatNode(
             newFormats[0].format,
-            newFormats[0].segments
+            newFormats[0].segments,
         );
 
         // If after all that, it's empty, make sure there's one empty text node to type in.
@@ -766,7 +769,7 @@ export default class FormatNode extends Node {
 
     withSegmentAt(
         segment: FormatNodeSegmentType,
-        caret: Caret
+        caret: Caret,
     ): FormatNode | undefined {
         if (!(caret.node instanceof TextNode)) return;
 
@@ -776,7 +779,7 @@ export default class FormatNode extends Node {
 
         // Splice the text node.
         const left = new TextNode(
-            caret.node.getText().substring(0, caret.index)
+            caret.node.getText().substring(0, caret.index),
         );
         const right = new TextNode(caret.node.getText().substring(caret.index));
 
@@ -788,7 +791,7 @@ export default class FormatNode extends Node {
 
     withSegmentAtSelection(
         range: CaretRange,
-        nodeCreator: (text: string) => FormatNodeSegmentType
+        nodeCreator: (text: string) => FormatNodeSegmentType,
     ): Edit {
         // If there's a selection, grab it's text and then remove the text and update the root and text being edited.
         let selectedText = this.getSelectedText(range);
@@ -812,7 +815,7 @@ export default class FormatNode extends Node {
         // Create and insert the into the formatted node.
         const newNode = nodeCreator.call(
             undefined,
-            selectedText ? selectedText : ''
+            selectedText ? selectedText : '',
         );
         const revisedFormat = newFormat.withSegmentAt(newNode, caret);
         if (revisedFormat === undefined) return;
@@ -820,12 +823,12 @@ export default class FormatNode extends Node {
             newNode instanceof AtomNode
                 ? newNode.getDefaultCaret()
                 : newNode instanceof FormatNode
-                ? newNode.getFirstCaret()
-                : newNode instanceof MetadataNode
-                ? { node: newNode.getText(), index: 0 }
-                : newNode instanceof TextNode
-                ? { node: newNode, index: 0 }
-                : undefined;
+                  ? newNode.getFirstCaret()
+                  : newNode instanceof MetadataNode
+                    ? { node: newNode.getText(), index: 0 }
+                    : newNode instanceof TextNode
+                      ? { node: newNode, index: 0 }
+                      : undefined;
 
         if (newCaret === undefined) return;
         return {
@@ -870,7 +873,7 @@ export default class FormatNode extends Node {
         if (withoutBefore === undefined) return;
         const revisedEndCaret = indexToCaret(
             withoutBefore,
-            endIndex - startIndex
+            endIndex - startIndex,
         );
         if (revisedEndCaret === undefined) return;
         return withoutBefore.withoutContentAfter(revisedEndCaret) as this;
@@ -905,7 +908,7 @@ export default class FormatNode extends Node {
         } else if (adjacentCaret.node instanceof AtomNode) {
             const newFormat = this.withNodeReplaced(
                 adjacentCaret.node,
-                undefined
+                undefined,
             );
             if (newFormat === undefined) return;
             return { root: newFormat, range: { start: caret, end: caret } };
@@ -931,7 +934,7 @@ export default class FormatNode extends Node {
     withNodeInserted(caret: Caret, node: Node): Edit {
         // The caret node has to be one of the nodes in this format to insert.
         const index = this.#segments.indexOf(
-            caret.node as FormatNodeSegmentType
+            caret.node as FormatNodeSegmentType,
         );
         if (index < 0) return;
         // The inserted node has to be a segment type.
@@ -953,27 +956,31 @@ export default class FormatNode extends Node {
             node instanceof AtomNode
                 ? node.getDefaultCaret()
                 : node instanceof FormatNode
-                ? node.getLastCaret()
-                : // Line break? Place the caret just after the line break, whether a text node or something else
-                node instanceof LineBreakNode
-                ? segmentAfter !== undefined && segmentAfter instanceof TextNode
-                    ? { node: segmentAfter, index: 0 }
-                    : undefined
-                : node instanceof MetadataNode
-                ? { node: node.getText(), index: node.getText().getLength() }
-                : { node: node, index: node.getLength() };
+                  ? node.getLastCaret()
+                  : // Line break? Place the caret just after the line break, whether a text node or something else
+                    node instanceof LineBreakNode
+                    ? segmentAfter !== undefined &&
+                      segmentAfter instanceof TextNode
+                        ? { node: segmentAfter, index: 0 }
+                        : undefined
+                    : node instanceof MetadataNode
+                      ? {
+                            node: node.getText(),
+                            index: node.getText().getLength(),
+                        }
+                      : { node: node, index: node.getLength() };
         if (newCaret === undefined) return;
         return { root: newFormat, range: { start: newCaret, end: newCaret } };
     }
 
     getSegmentAfter(
-        segment: FormatNodeSegmentType
+        segment: FormatNodeSegmentType,
     ): FormatNodeSegmentType | undefined {
         return this.#segments[this.#segments.indexOf(segment) + 1];
     }
 
     getSegmentBefore(
-        segment: FormatNodeSegmentType
+        segment: FormatNodeSegmentType,
     ): FormatNodeSegmentType | undefined {
         return this.#segments[this.#segments.indexOf(segment) - 1];
     }
