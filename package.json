@@ -59,6 +59,9 @@
         "smoothscroll-polyfill": "^0.4",
         "svelte": "^4"
     },
+    "engines": {
+        "node": "20"
+    },
     "types": "./dist/index.d.ts",
     "main": "./dist/index.js",
     "exports": {
