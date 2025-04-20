@@ -62,7 +62,7 @@ import SuperscriptIcon from './icons/super.svg?raw';
 import TableIcon from './icons/table.svg?raw';
 import UndoIcon from './icons/undo.svg?raw';
 import UnindentIcon from './icons/unindent.svg?raw';
-import type { PasteContent } from './CaretContext';
+import { Accents, type Accent, type PasteContent } from './CaretContext';
 import LineBreakNode from '../../models/chapter/LineBreakNode';
 /**
  * Icons:
@@ -155,6 +155,33 @@ function rootWithNode<NodeType extends Node>(
             newCaret !== undefined
                 ? { start: newCaret, end: newCaret }
                 : context.range,
+    };
+}
+
+function createAccentCommand(
+    accent: Accent,
+    code: string,
+    control: boolean,
+    alt: boolean,
+    shift: boolean,
+    description: string,
+): Command {
+    return {
+        icon: accent,
+        description: description,
+        category: 'text',
+        mutates: false,
+        control,
+        alt,
+        shift,
+        key: undefined,
+        code,
+        visible: false,
+        active: true,
+        handler: (context: CaretContext) => {
+            context.setAccent(accent);
+            return true;
+        },
     };
 }
 
@@ -837,6 +864,8 @@ const commands: Command[] = [
         active: true,
         handler: (context) => {
             if (context.root === undefined) return;
+            // Reset the accent.
+            context.setAccent(undefined);
             if (context.isSelection) {
                 const edit = context.root.withRangeFormatted(
                     context.range,
@@ -1941,6 +1970,96 @@ const commands: Command[] = [
             return { root: context.root, range: context.range };
         },
     },
+    // Windows grave
+    createAccentCommand(
+        '`',
+        'Backquote',
+        true,
+        false,
+        false,
+        'insert a grave accent',
+    ),
+    // Mac grave
+    createAccentCommand(
+        '`',
+        'Backquote',
+        false,
+        true,
+        false,
+        'insert a grave accent',
+    ),
+    // Windows apostrophe
+    createAccentCommand(
+        "'",
+        'Quote',
+        true,
+        false,
+        false,
+        'insert an apostrophe accent',
+    ),
+    // Mac apostrophe
+    createAccentCommand(
+        '`',
+        'KeyE',
+        false,
+        true,
+        false,
+        'insert an apostrophe accent',
+    ),
+    // Windows caret
+    createAccentCommand(
+        '^',
+        'Digit6',
+        true,
+        false,
+        true,
+        'insert a caret accent',
+    ),
+    // Mac caret
+    createAccentCommand(
+        '^',
+        'KeyI',
+        false,
+        true,
+        false,
+        'insert a caret accent',
+    ),
+    // Windows tilde
+    createAccentCommand(
+        '~',
+        'Backquote',
+        true,
+        false,
+        true,
+        'insert a tilde accent',
+    ),
+    // Mac tilde
+    createAccentCommand(
+        '~',
+        'KeyN',
+        false,
+        true,
+        false,
+        'insert a tilde accent',
+    ),
+    // Windows umlaut
+    createAccentCommand(
+        ':',
+        'Semicolon',
+        true,
+        false,
+        true,
+        'insert a tilde accent',
+    ),
+    // Mac umlaut
+    createAccentCommand(
+        ':',
+        'KeyU',
+        false,
+        true,
+        false,
+        'insert a grave accent',
+    ),
     {
         icon: 'insert symbol',
         description: 'insert character',
@@ -1958,6 +2077,17 @@ const commands: Command[] = [
             utilities;
             const range = context.range;
             if (key.length === 1) {
+                // See if there's an accent.
+                const accent = context.getAccent();
+                if (accent !== undefined) {
+                    // Reset the accent.
+                    context.setAccent(undefined);
+                    const match = Accents[accent + key];
+                    if (match) {
+                        key = match;
+                    }
+                }
+
                 // Insert at the start.
                 let sortedRange = range.start.node.sortRange(range);
                 let insertionPoint = sortedRange.start;

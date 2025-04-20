@@ -1,5 +1,6 @@
 <script lang="ts">
     import { afterUpdate, tick } from 'svelte';
+    import type { Accent } from './CaretContext';
 
     export let left: number;
     export let top: number;
@@ -11,6 +12,7 @@
     export let ignored: boolean;
     export let blink: boolean;
     export let locked: boolean;
+    export let accent: Accent | undefined;
 
     let element: HTMLElement | undefined;
 
@@ -46,7 +48,9 @@
     style:height="{height}px"
     style:scroll-margin-top="{headerHeight}px"
     bind:this={element}
-    >{#if locked}🔒{/if}</div
+    >{#if locked}🔒{/if}{#if accent}
+        <span class="accent">{accent}</span>
+    {/if}</div
 >
 
 <style>
@@ -91,5 +95,13 @@
     .linked {
         outline-width: 1px;
         outline-color: var(--bookish-link-color);
+    }
+
+    .accent {
+        display: inline-block;
+        position: absolute;
+        top: 0;
+        color: var(--app-muted-color);
+        font-size: 200%;
     }
 </style>

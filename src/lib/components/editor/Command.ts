@@ -31,7 +31,8 @@ type Command = {
         context: CaretContext,
         utilities: CaretUtilities,
         key: string,
-    ) => Edit;
+        code: string,
+    ) => Edit | true;
 };
 
 export type { Command as default };

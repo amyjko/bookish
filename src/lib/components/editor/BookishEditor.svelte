@@ -33,7 +33,7 @@
     import commands from './Commands';
 
     import { afterUpdate, onMount, setContext } from 'svelte';
-    import type { PasteContent } from './CaretContext';
+    import type { Accent, PasteContent } from './CaretContext';
     import { getCaret } from '../page/Contexts';
     import CaretView from './CaretView.svelte';
     import Parser, { Reserved } from '$lib/models/chapter/Parser';
@@ -65,6 +65,8 @@
     let ignoredInput = false;
 
     let activeEditor = getCaret();
+
+    let accent: Accent | undefined = undefined;
 
     let editedNode: RootNode;
     $: {
@@ -597,7 +599,17 @@
             clipboard: clipboard,
             handleCopy: handleCopy,
             handlePaste: handlePaste,
+            setAccent,
+            getAccent,
         };
+    }
+
+    function setAccent(newAccent: Accent | undefined) {
+        accent = newAccent;
+    }
+
+    function getAccent(): Accent | undefined {
+        return accent;
     }
 
     function getUtilities(): CaretUtilities {
@@ -648,7 +660,7 @@
                         command.active.call(undefined, context, event.key)))
             ) {
                 // See if the command is handled
-                if (executeCommand(command, event.key)) {
+                if (executeCommand(command, event.key, event.code)) {
                     event.preventDefault();
                     event.stopPropagation();
                     return true;
@@ -711,7 +723,11 @@
         }
     }
 
-    function executeCommand(command: Command, key: string): boolean {
+    function executeCommand(
+        command: Command,
+        key: string,
+        code: string,
+    ): boolean {
         // Assume we process it, then flip it if we don't.
         ignoredInput = false;
 
@@ -722,10 +738,13 @@
                 context,
                 getUtilities(),
                 key,
+                code,
             );
 
             // If the command invoked produced a new range
-            if (results !== undefined) {
+            if (results === true) {
+                return true;
+            } else if (results !== undefined) {
                 const { root, range } = results;
                 const newRange = { start: range.start, end: range.end };
 
@@ -1055,6 +1074,7 @@
             italic={isItalic}
             disabled={!editorFocused || locked}
             {locked}
+            {accent}
         />
     {/if}
 </div>

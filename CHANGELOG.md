@@ -5,6 +5,7 @@
 ## Added
 
 - Editing built-in chapter names and table of contents headers.
+- Added support for dead key accent insertion.
 
 ## Fixed
 
