@@ -16,9 +16,9 @@
     "main": "lib/index.js",
     "dependencies": {
         "@google-cloud/storage": "^7.6",
-        "bookish-press": "latest",
-        "firebase-admin": "^13",
-        "firebase-functions": "^6",
+        "bookish-press": "^0.7.0",
+        "firebase-admin": "^13.2.0",
+        "firebase-functions": "^6.3.2",
         "sharp": "^0"
     },
     "devDependencies": {
