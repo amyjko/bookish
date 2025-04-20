@@ -27,7 +27,6 @@
         "merge": "git checkout main && git merge dev && git push origin main && git checkout dev"
     },
     "devDependencies": {
-        "@eslint/js": "^9.3.0",
         "@sveltejs/adapter-auto": "^3",
         "@sveltejs/adapter-static": "^3",
         "@sveltejs/kit": "^2",
@@ -37,7 +36,6 @@
         "@types/smoothscroll-polyfill": "^0",
         "@types/uuid": "^10",
         "chalk": "^5.3.0",
-        "eslint": "^9.3.0",
         "globals": "^16",
         "prettier": "^3",
         "prettier-plugin-svelte": "^3",

@@ -5,6 +5,7 @@
 ## Maintenance
 
 - Updated minor versions of vite, vitest, Typescript, prettier, vite, Svelte, SvelteKit, ajv, firebase, firebase-functions.
+- Removed eslint.
 
 # 0.6.54 - 2024-05-26
 

@@ -25,11 +25,6 @@
     "devDependencies": {
         "@types/node": "^22",
         "@types/sharp": "^0",
-        "@typescript-eslint/eslint-plugin": "^8",
-        "@typescript-eslint/parser": "^8",
-        "eslint": "^9",
-        "eslint-config-google": "^0",
-        "eslint-plugin-import": "^2",
         "firebase-functions-test": "^3.0.0",
         "tslib": "^2.5.0",
         "typescript": "^5"
