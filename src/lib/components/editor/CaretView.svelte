@@ -100,7 +100,7 @@
     .accent {
         display: inline-block;
         position: absolute;
-        top: 0;
+        top: -0.5em;
         color: var(--app-muted-color);
         font-size: 200%;
     }
