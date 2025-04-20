@@ -55,7 +55,8 @@
         "firebase-functions": "^6",
         "prismjs": "^1.29",
         "smoothscroll-polyfill": "^0.4",
-        "svelte": "^4"
+        "svelte": "^4",
+        "uuid": "^11"
     },
     "engines": {
         "node": "20"
