@@ -18,10 +18,10 @@
         $edition === undefined
             ? []
             : glossary === undefined || Object.keys(glossary).length === 0
-            ? null
-            : Object.keys(glossary).sort((a, b) =>
-                  glossary[a].phrase.localeCompare(glossary[b].phrase)
-              );
+              ? null
+              : Object.keys(glossary).sort((a, b) =>
+                    glossary[a].phrase.localeCompare(glossary[b].phrase),
+                );
 
     function addEmptyDefinition() {
         if ($edition === undefined) return;
@@ -47,21 +47,27 @@
             setImage={(embed) =>
                 $edition
                     ? edition.set(
-                          $edition.withImage(ChapterIDs.GlossaryID, embed)
+                          $edition.withImage(ChapterIDs.GlossaryID, embed),
                       )
                     : undefined}
-            header="Glossary"
+            header={$edition.getHeader(ChapterIDs.GlossaryID)}
             tags={$edition.getTags()}
+            save={(text) =>
+                $edition
+                    ? edition.set(
+                          $edition.withHeader(ChapterIDs.GlossaryID, text),
+                      )
+                    : undefined}
         >
             <Outline
                 slot="outline"
                 previous={$edition.getPreviousChapterID(
                     ChapterIDs.GlossaryID,
-                    editable
+                    editable,
                 )}
                 next={$edition.getNextChapterID(
                     ChapterIDs.GlossaryID,
-                    editable
+                    editable,
                 )}
             />
         </Header>

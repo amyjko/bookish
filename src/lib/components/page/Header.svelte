@@ -21,6 +21,7 @@
     export let setImage:
         | undefined
         | ((embed: string | null) => Promise<void> | void) = undefined;
+    /** For saving the revised chapter title*/
     export let save: ((text: string) => Promise<void> | void) | null = null;
 
     let title: HTMLHeadingElement | null = null;

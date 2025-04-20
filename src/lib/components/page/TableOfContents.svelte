@@ -33,6 +33,7 @@
     import Publish from './Publish.svelte';
     import { onMount } from 'svelte';
     import Editions from './Editions.svelte';
+    import EditableHeader from './EditableHeader.svelte';
 
     let auth = getUser();
     let book = getBook();
@@ -187,9 +188,7 @@
 
                 <TableOfContentsRow
                     {chapter}
-                    {chapterID}
                     number={$edition.getChapterNumber(chapterID)}
-                    title={chapter.getTitle()}
                     forthcoming={chapter.isForthcoming()}
                 >
                     <span slot="annotation">
@@ -233,33 +232,27 @@
                 </TableOfContentsRow>
             {/each}
             {#if $edition.hasReferences() || editable}
-                <TableOfContentsRow
-                    chapterID={ChapterIDs.ReferencesID}
-                    title="References"
-                >
+                <TableOfContentsRow chapter={ChapterIDs.ReferencesID}>
                     <span slot="annotation">Everything cited</span>
                 </TableOfContentsRow>
             {/if}
             {#if ($edition.getGlossary() && Object.keys($edition.getGlossary()).length > 0) || editable}
-                <TableOfContentsRow
-                    chapterID={ChapterIDs.GlossaryID}
-                    title="Glossary"
-                >
+                <TableOfContentsRow chapter={ChapterIDs.GlossaryID}>
                     <span slot="annotation">Definitions</span>
                 </TableOfContentsRow>
             {/if}
-            <TableOfContentsRow chapterID={ChapterIDs.IndexID} title="Index">
+            <TableOfContentsRow chapter={ChapterIDs.IndexID}>
                 <span slot="annotation">Common words and where they are</span>
             </TableOfContentsRow>
-            <TableOfContentsRow chapterID={ChapterIDs.SearchID} title="Search">
+            <TableOfContentsRow chapter={ChapterIDs.SearchID}>
                 <span slot="annotation">Find where words occur</span>
             </TableOfContentsRow>
 
-            <TableOfContentsRow chapterID={ChapterIDs.MediaID} title="Media">
+            <TableOfContentsRow chapter={ChapterIDs.MediaID}>
                 <span slot="annotation">Images and video in the book</span>
             </TableOfContentsRow>
             {#if editable}
-                <TableOfContentsRow chapterID="unknown" title="Unknown">
+                <TableOfContentsRow chapter={ChapterIDs.UnknownID}>
                     <span slot="annotation">Customize bad links</span>
                 </TableOfContentsRow>
             {/if}
@@ -268,7 +261,7 @@
         <Acknowledgements />
         <License />
 
-        <PageHeader id="print">Print</PageHeader>
+        <EditableHeader id="print" label="Edit print header" />
 
         <Instructions {editable}>
             This link will generate the entire book on a single page, suitable
@@ -281,7 +274,7 @@
             > and then print or export. Long books can take some time to render.
         </PageParagraph>
 
-        <PageHeader id="citation">Citation</PageHeader>
+        <EditableHeader id="citation" label="Edit citation header" />
 
         <Instructions {editable}>
             This citation is created from the current authors, title, and date.

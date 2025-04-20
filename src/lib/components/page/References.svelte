@@ -34,8 +34,14 @@
                           $edition.withImage(ChapterIDs.ReferencesID, embed),
                       )
                     : undefined}
-            header="References"
+            header={$edition.getHeader(ChapterIDs.ReferencesID)}
             tags={$edition.getTags()}
+            save={(text) =>
+                $edition
+                    ? edition.set(
+                          $edition.withHeader(ChapterIDs.ReferencesID, text),
+                      )
+                    : undefined}
         >
             <Outline
                 slot="outline"

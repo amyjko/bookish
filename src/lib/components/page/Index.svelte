@@ -26,7 +26,7 @@
     // Figure out what letters have words
     $: {
         for (const word of Object.keys(bookIndex).sort((a, b) =>
-            a.localeCompare(b)
+            a.localeCompare(b),
         ))
             letters[word.charAt(0).toLocaleLowerCase()] = true;
     }
@@ -59,14 +59,18 @@
                 $edition
                     ? edition.set($edition.withImage(ChapterIDs.IndexID, embed))
                     : undefined}
-            header="Index"
+            header={$edition.getHeader(ChapterIDs.IndexID)}
             tags={$edition.getTags()}
+            save={(text) =>
+                $edition
+                    ? edition.set($edition.withHeader(ChapterIDs.IndexID, text))
+                    : undefined}
         >
             <Outline
                 slot="outline"
                 previous={$edition.getPreviousChapterID(
                     ChapterIDs.IndexID,
-                    editable
+                    editable,
                 )}
                 next={$edition.getNextChapterID(ChapterIDs.IndexID, editable)}
             />
@@ -122,19 +126,19 @@
                                         if (numberA === undefined) return -1;
                                         if (numberB === undefined) return 1;
                                         return numberA - numberB;
-                                    } ) as chapterID}
+                                    }, ) as chapterID}
                                     <!-- Map them to links to the first occurrence in the chapter. -->
                                     <p>
                                         <ChapterNumber
                                             >Chapter {#if $edition.getChapterNumber(chapterID) !== undefined}{$edition.getChapterNumber(
-                                                    chapterID
+                                                    chapterID,
                                                 )}.
                                             {/if}</ChapterNumber
                                         >
                                         <ChapterTitle
                                             link={`${$base}/${chapterID}?word=${word}`}
                                             >{$edition.getChapterName(
-                                                chapterID
+                                                chapterID,
                                             )}</ChapterTitle
                                         >
                                     </p>

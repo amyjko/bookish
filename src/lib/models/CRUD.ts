@@ -217,6 +217,7 @@ export async function createBook(userID: string): Promise<string> {
         '',
         null,
         {},
+        undefined,
         '',
         [],
         'All rights reserved.',

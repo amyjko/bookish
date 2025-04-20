@@ -40,7 +40,7 @@
 
     $: unused = images?.filter(
         (image) =>
-            !embeds.some((embed) => image.url.includes(embed.embed.getURL()))
+            !embeds.some((embed) => image.url.includes(embed.embed.getURL())),
     );
 </script>
 
@@ -55,14 +55,18 @@
                 $edition
                     ? edition.set($edition.withImage(ChapterIDs.MediaID, embed))
                     : undefined}
-            header="Media"
+            header={$edition.getHeader(ChapterIDs.MediaID)}
             tags={$edition.getTags()}
+            save={(text) =>
+                $edition
+                    ? edition.set($edition.withHeader(ChapterIDs.MediaID, text))
+                    : undefined}
         >
             <Outline
                 slot="outline"
                 previous={$edition.getPreviousChapterID(
                     ChapterIDs.MediaID,
-                    editable
+                    editable,
                 )}
                 next={$edition.getNextChapterID(ChapterIDs.MediaID, editable)}
             />

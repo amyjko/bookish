@@ -11,6 +11,7 @@
         lease,
     } from './Contexts';
     import PageHeader from './PageHeader.svelte';
+    import EditableHeader from './EditableHeader.svelte';
 
     let auth = getUser();
     let edition = getEdition();
@@ -25,10 +26,14 @@
 </Instructions>
 
 <!-- If editable, show acknowledgements even if they're empty, otherwise hide -->
-{#if $edition && acknowledgements}
+{#if $edition}
     {#if editable}
+        <EditableHeader
+            id="acknowledgements"
+            label="Edit acknowledgements header"
+        />
         <BookishEditor
-            text={acknowledgements}
+            text={acknowledgements ?? ''}
             parser={(text) => Parser.parseChapter($edition, text)}
             chapter={false}
             component={ChapterBody}
@@ -36,14 +41,16 @@
             save={(node) =>
                 $edition
                     ? edition.set(
-                          $edition.withAcknowledgements(node.toBookdown())
+                          $edition.withAcknowledgements(node.toBookdown()),
                       )
                     : undefined}
             leasee={getLeasee(auth, edition, `acks`)}
             lease={(lock) => lease(auth, edition, `acks`, lock)}
         />
-    {:else if acknowledgements.length > 0}
-        <PageHeader id="acknowledgements">Acknowledgements</PageHeader>
+    {:else if acknowledgements && acknowledgements.length > 0}
+        <PageHeader id="acknowledgements"
+            >{$edition.getHeader('acknowledgements')}</PageHeader
+        >
         <ChapterBody node={Parser.parseChapter($edition, acknowledgements)} />
     {/if}
 {/if}

@@ -9,7 +9,7 @@
     export let placeholder: string;
     export let valid: (text: string) => string | undefined;
     export let save: (
-        text: string
+        text: string,
     ) => Promise<void> | undefined | void | string;
     export let saveOnExit: boolean = false;
     export let width: number | undefined = undefined;
@@ -143,6 +143,7 @@
         </span>
     {/if}
 </span>
+<span style:font-size="small">✐</span>
 
 <style>
     .text-editor {

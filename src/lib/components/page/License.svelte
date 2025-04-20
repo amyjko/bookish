@@ -10,14 +10,14 @@
         isEditionEditable,
         lease,
     } from './Contexts';
-    import PageHeader from './PageHeader.svelte';
+    import EditableHeader from './EditableHeader.svelte';
 
     let auth = getUser();
     let edition = getEdition();
     let editable = isEditionEditable();
 </script>
 
-<PageHeader id="license">License</PageHeader>
+<EditableHeader id="license" label="Edit license header" />
 
 <Instructions {editable}>
     Do you want to specify rights other than your region's default copyrights?
@@ -46,7 +46,7 @@
         <Format
             node={Parser.parseFormat(
                 $edition,
-                $edition.getLicense()
+                $edition.getLicense(),
             ).withTextIfEmpty()}
         />
     {/if}

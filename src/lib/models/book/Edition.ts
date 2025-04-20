@@ -5,7 +5,10 @@ import EmbedNode from '../chapter/EmbedNode';
 import Reference from './Reference';
 import type Theme from './Theme';
 import type Definition from './Definition.js';
-import ChapterIDs from './ChapterID.js';
+import ChapterIDs, {
+    type ChapterIDKey,
+    type TOCHeaderKey,
+} from './ChapterID.js';
 import type { DocumentReference } from 'firebase/firestore';
 import type Book from './Book';
 import type FormatNode from '../chapter/FormatNode';
@@ -22,7 +25,10 @@ export type EditionSpecification = {
     // A time stamp or nothing, indicating when the book was published.
     published: number | null;
     authors: string[];
-    images: Record<string, string | null>;
+    /** Custom images for built-in chapters */
+    images: Record<ChapterIDKey, string | null>;
+    /** Optional custom names for built-in chapters */
+    headers?: Record<ChapterIDKey | TOCHeaderKey, string> | undefined;
     description: string;
     chapters: ChapterSpecification[];
     license: string;
@@ -53,6 +59,7 @@ export default class Edition {
     readonly summary: string;
     readonly published: number | null;
     readonly images: Record<string, string | null>;
+    readonly headers: Record<ChapterIDKey | TOCHeaderKey, string> | undefined;
     readonly description: string;
     readonly chapters: Chapter[];
     readonly license: string;
@@ -79,6 +86,7 @@ export default class Edition {
         summary: string,
         published: number | null,
         images: Record<string, string | null>,
+        headers: Record<ChapterIDKey | TOCHeaderKey, string> | undefined,
         description: string,
         chapters: Chapter[],
         license: string,
@@ -104,6 +112,7 @@ export default class Edition {
         this.summary = summary;
         this.published = published;
         this.images = images;
+        this.headers = headers;
         this.description = description;
         this.chapters = chapters.slice();
         this.license = license;
@@ -141,6 +150,7 @@ export default class Edition {
             spec.summary,
             spec.published,
             spec.images,
+            spec.headers,
             spec.description,
             spec.chapters.map((chap) => Chapter.fromJSON(chap)),
             spec.license,
@@ -201,6 +211,7 @@ export default class Edition {
             summary: this.summary,
             published: this.published,
             images: Object.assign({}, this.images),
+            headers: Object.assign({}, this.headers),
             description: this.description,
             chapters: this.chapters.map((chap) => chap.toJSON()),
             license: this.license,
@@ -245,6 +256,7 @@ export default class Edition {
             this.summary,
             this.published,
             this.images,
+            this.headers,
             this.description,
             this.chapters,
             this.license,
@@ -276,6 +288,7 @@ export default class Edition {
             this.summary,
             this.published,
             this.images,
+            this.headers,
             this.description,
             this.chapters,
             this.license,
@@ -306,6 +319,7 @@ export default class Edition {
             this.summary,
             this.published,
             this.images,
+            this.headers,
             description,
             this.chapters,
             this.license,
@@ -337,6 +351,7 @@ export default class Edition {
             this.summary,
             this.published,
             this.images,
+            this.headers,
             this.description,
             this.chapters,
             this.license,
@@ -364,6 +379,7 @@ export default class Edition {
             summary,
             this.published,
             this.images,
+            this.headers,
             this.description,
             this.chapters,
             this.license,
@@ -391,6 +407,7 @@ export default class Edition {
             this.summary,
             published ? Date.now() : null,
             this.images,
+            this.headers,
             this.description,
             this.chapters,
             this.license,
@@ -421,6 +438,7 @@ export default class Edition {
             this.summary,
             this.published,
             this.images,
+            this.headers,
             this.description,
             this.chapters,
             license,
@@ -483,6 +501,7 @@ export default class Edition {
             this.summary,
             this.published,
             this.images,
+            this.headers,
             this.description,
             chapters,
             this.license,
@@ -564,6 +583,7 @@ export default class Edition {
             this.summary,
             this.published,
             this.images,
+            this.headers,
             this.description,
             this.chapters,
             this.license,
@@ -640,6 +660,7 @@ export default class Edition {
             this.summary,
             this.published,
             this.images,
+            this.headers,
             this.description,
             newChapters,
             this.license,
@@ -685,6 +706,7 @@ export default class Edition {
             this.summary,
             this.published,
             this.images,
+            this.headers,
             this.description,
             this.chapters,
             this.license,
@@ -754,6 +776,7 @@ export default class Edition {
             this.summary,
             this.published,
             this.images,
+            this.headers,
             this.description,
             this.chapters,
             this.license,
@@ -825,6 +848,7 @@ export default class Edition {
             this.summary,
             this.published,
             this.images,
+            this.headers,
             this.description,
             this.chapters,
             this.license,
@@ -884,6 +908,7 @@ export default class Edition {
             this.summary,
             this.published,
             this.images,
+            this.headers,
             this.description,
             this.chapters,
             this.license,
@@ -932,6 +957,7 @@ export default class Edition {
             this.summary,
             this.published,
             this.images,
+            this.headers,
             this.description,
             this.chapters,
             this.license,
@@ -948,11 +974,11 @@ export default class Edition {
         );
     }
 
-    hasImage(id: string) {
+    hasImage(id: ChapterIDKey) {
         return this.images[id] !== null;
     }
 
-    getImage(id: string) {
+    getImage(id: ChapterIDKey | string) {
         return this.images[id] ?? null;
     }
 
@@ -969,6 +995,7 @@ export default class Edition {
             this.summary,
             this.published,
             newImages,
+            this.headers,
             this.description,
             this.chapters,
             this.license,
@@ -1020,6 +1047,7 @@ export default class Edition {
             this.summary,
             this.published,
             this.images,
+            this.headers,
             this.description,
             this.chapters,
             this.license,
@@ -1047,6 +1075,7 @@ export default class Edition {
             this.summary,
             this.published,
             this.images,
+            this.headers,
             this.description,
             this.chapters,
             this.license,
@@ -1252,7 +1281,13 @@ export default class Edition {
         });
 
         // Add the back matter covers
-        let backmatter = ['references', 'glossary', 'index', 'search', 'media'];
+        let backmatter: ChapterIDKey[] = [
+            'references',
+            'glossary',
+            'index',
+            'search',
+            'media',
+        ];
         backmatter.forEach((id) => {
             const img = this.getImage(id);
             if (img) {
@@ -1278,6 +1313,56 @@ export default class Edition {
         return (
             latestEditionID !== undefined &&
             latestEditionID === this.editionRef?.id
+        );
+    }
+
+    /** Get the custom header, if there is one */
+    getHeader(id: ChapterIDKey | TOCHeaderKey): string {
+        const header = this.headers ? this.headers[id] : undefined;
+        if (header) return header;
+        return {
+            references: 'References',
+            glossary: 'Glossary',
+            index: 'Index',
+            search: 'Search',
+            media: 'Media',
+            unknown: 'Oops...',
+            acknowledgements: 'Acknowledgements',
+            license: 'License',
+            print: 'Print',
+            citation: 'Citation',
+            chapters: 'Chapters',
+            cover: 'Cover',
+        }[id];
+    }
+
+    withHeader(id: ChapterIDKey | TOCHeaderKey, header: string) {
+        const newHeaders = Object.assign({}, this.headers);
+        newHeaders[id] = header;
+        return new Edition(
+            this.bookRef,
+            this.editionRef,
+            this.uids,
+            this.title,
+            this.authors,
+            this.number,
+            this.summary,
+            this.published,
+            this.images,
+            { ...newHeaders },
+            this.description,
+            this.chapters,
+            this.license,
+            this.acknowledgements,
+            this.tags,
+            this.sources,
+            this.references,
+            this.symbols,
+            this.glossary,
+            this.theme,
+            this.base,
+            this.active,
+            this.gtagid,
         );
     }
 

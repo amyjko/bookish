@@ -2,6 +2,10 @@
 
 # 0.7.0 - 2024-05-26
 
+## Added
+
+- Editing built-in chapter names and table of contents headers.
+
 ## Maintenance
 
 - Updated minor versions of vite, vitest, Typescript, prettier, vite, Svelte, SvelteKit, ajv, firebase, firebase-functions.

@@ -63,11 +63,11 @@
                                     match.match.substring(0, start),
                                 match: match.match.substring(
                                     start,
-                                    start + query.length
+                                    start + query.length,
                                 ),
                                 right:
                                     match.match.substring(
-                                        start + query.length
+                                        start + query.length,
                                     ) + match.right,
                             });
                         });
@@ -86,18 +86,24 @@
             setImage={(embed) =>
                 $edition
                     ? edition.set(
-                          $edition.withImage(ChapterIDs.SearchID, embed)
+                          $edition.withImage(ChapterIDs.SearchID, embed),
                       )
                     : undefined}
-            header="Search"
+            header={$edition.getHeader(ChapterIDs.SearchID)}
             id="search"
             tags={$edition.getTags()}
+            save={(text) =>
+                $edition
+                    ? edition.set(
+                          $edition.withHeader(ChapterIDs.SearchID, text),
+                      )
+                    : undefined}
         >
             <Outline
                 slot="outline"
                 previous={$edition.getPreviousChapterID(
                     ChapterIDs.SearchID,
-                    false
+                    false,
                 )}
                 next={$edition.getNextChapterID(ChapterIDs.SearchID, false)}
             />
@@ -123,7 +129,7 @@
             {:else}
                 <p
                     >Found {results.filter(
-                        (result) => !(result instanceof Chapter)
+                        (result) => !(result instanceof Chapter),
                     ).length} occurrences of <em>{query}</em>...</p
                 >
                 {#each results as result}
@@ -131,7 +137,7 @@
                         <PageHeader id={'header-' + result.getID()}
                             ><ChapterNumber
                                 >Chapter{#if $edition.getChapterNumber(result.getID()) !== undefined}&nbsp;{$edition.getChapterNumber(
-                                        result.getID()
+                                        result.getID(),
                                     )}{/if}</ChapterNumber
                             > - <ChapterTitle>{result.getTitle()}</ChapterTitle
                             ></PageHeader

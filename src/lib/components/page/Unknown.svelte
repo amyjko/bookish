@@ -20,10 +20,10 @@
             setImage={(embed) =>
                 $edition
                     ? edition.set(
-                          $edition.withImage(ChapterIDs.UnknownID, embed)
+                          $edition.withImage(ChapterIDs.UnknownID, embed),
                       )
                     : undefined}
-            header="Oops."
+            header={$edition.getHeader(ChapterIDs.UnknownID)}
         >
             <Outline slot="outline" previous={null} next={null} />
         </Header>

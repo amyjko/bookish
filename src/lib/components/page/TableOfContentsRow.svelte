@@ -1,6 +1,6 @@
 <script lang="ts">
     import TableOfContentsImage from './TableOfContentsImage.svelte';
-    import type Chapter from '$lib/models/book/Chapter';
+    import Chapter from '$lib/models/book/Chapter';
     import Toggle from '$lib/components/editor/Toggle.svelte';
     import ConfirmButton from '$lib/components/editor/ConfirmButton.svelte';
     import {
@@ -14,10 +14,10 @@
     import Button from '../app/Button.svelte';
     import ChapterTitle from './ChapterTitle.svelte';
     import Authors from './Authors.svelte';
+    import type { ChapterIDKey } from '$lib/models/book/ChapterID';
 
-    export let chapterID: string;
-    export let chapter: Chapter | undefined = undefined;
-    export let title: string;
+    /** Either the chapter or a built in chapter ID */
+    export let chapter: Chapter | ChapterIDKey;
     export let number: number | undefined = undefined;
     export let forthcoming: boolean = false;
 
@@ -25,25 +25,37 @@
     let base = getBase();
     let editable = isEditionEditable();
 
+    $: title =
+        chapter instanceof Chapter
+            ? chapter.getTitle()
+            : $edition
+              ? $edition.getHeader(chapter)
+              : '—';
+
     function moveUp() {
-        if ($edition && chapter)
-            edition.set($edition.withMovedChapter(chapter.getID(), -1));
+        if ($edition && chapter instanceof Chapter)
+            edition.set($edition.withMovedChapter(getChapterID(), -1));
     }
     function moveDown() {
-        if ($edition && chapter)
-            edition.set($edition.withMovedChapter(chapter.getID(), 1));
+        if ($edition && chapter instanceof Chapter)
+            edition.set($edition.withMovedChapter(getChapterID(), 1));
+    }
+
+    function getChapterID() {
+        if (chapter instanceof Chapter) return chapter.getID();
+        else return chapter;
     }
 
     $: chapterURL =
-        forthcoming && !editable ? undefined : `${$base}/${chapterID}`;
+        forthcoming && !editable ? undefined : `${$base}/${getChapterID()}`;
 </script>
 
 <tr class="toc-row" class:forthcoming>
     <td
         ><TableOfContentsImage
-            embed={chapter
+            embed={chapter instanceof Chapter
                 ? chapter.getImage()
-                : $edition?.getImage(chapterID) ?? null}
+                : ($edition?.getImage(chapter) ?? null)}
             url={chapterURL}
         /></td
     >
@@ -52,7 +64,7 @@
             <Toggle
                 on={number !== undefined}
                 save={(on) =>
-                    chapter
+                    chapter instanceof Chapter
                         ? setChapter(edition, chapter, chapter.asNumbered(on))
                         : undefined}
             >
@@ -68,7 +80,7 @@
             <ChapterNumber>{'Chapter ' + number}</ChapterNumber>
         {/if}
         <ChapterTitle link={chapterURL}>{title}</ChapterTitle>
-        {#if chapter && chapter.getAuthors().length > 0}
+        {#if chapter instanceof Chapter && chapter.getAuthors().length > 0}
             <Authors
                 editable={false}
                 authors={chapter.getAuthors()}
@@ -81,7 +93,7 @@
     <td><slot name="etc" /></td>
     {#if editable && $edition}
         <td class="controls">
-            {#if chapter}
+            {#if chapter instanceof Chapter}
                 <Button
                     tooltip="move chapter {title} up"
                     disabled={$edition.getChapterPosition(chapter.getID()) ===
