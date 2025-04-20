@@ -43,7 +43,7 @@
         "svelte-preprocess": "^5",
         "tslib": "^2",
         "typescript": "^5",
-        "uuid": "^11",
+        "uuid": "^11.1.0",
         "vite": "^5",
         "vitest": "^3"
     },
