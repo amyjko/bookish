@@ -1,6 +1,12 @@
 # bookish changelog
 
-# 0.7.0 - 2024-05-26
+# 0.7.1 - 2025-05-11
+
+## Fixed
+
+- Fixed type error in toolbar invocation.
+
+# 0.7.0 - 2025-04-26
 
 ## Added
 

@@ -235,12 +235,7 @@
                                     ' ' +
                                     getShortcutDescription(command)}
                                 tabIndex="0"
-                                command={() =>
-                                    caret?.executor.call(
-                                        undefined,
-                                        command,
-                                        '',
-                                    )}
+                                command={() => caret?.executor(command, '', '')}
                             >
                                 <Icon icon={command.icon} />
                             </Button>
