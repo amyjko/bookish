@@ -5,6 +5,7 @@
 ## Fixed
 
 - Fixed type error in toolbar invocation.
+- Fixed type errors in edition creation caused by Firebase use of `any`.
 
 # 0.7.0 - 2025-04-26
 

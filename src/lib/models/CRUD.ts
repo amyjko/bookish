@@ -267,24 +267,31 @@ export async function createNewEdition(book: Book): Promise<Book> {
     const latestDraftDoc = await getDoc(
         doc(db, 'books', book.id, 'editions', latestEditionID),
     );
-    const latestDraft = latestDraftDoc.exists()
-        ? latestDraftDoc.data()
-        : undefined;
+    const latestDraftData: EditionSpecification | undefined =
+        latestDraftDoc.exists()
+            ? (latestDraftDoc.data() as EditionSpecification | undefined)
+            : undefined;
 
-    if (latestDraft === undefined) return book;
+    if (latestDraftData === undefined) return book;
+
+    const latestDraft = Edition.fromJSON(latestDraftDoc.ref, latestDraftData);
 
     // Make a copy without chapter and edition refs, because we want to create new ones,
     // and with an incremented edition number.
-    const newEdition = latestDraft.withoutRefs();
+    let newEdition = latestDraft.withoutRefs();
 
     // Create a copy of the existing draft as a new edition.
     const newEditionRef = await addDoc(
-        collection(db, 'editions'),
+        collection(db, 'books', book.id, 'editions'),
         newEdition.toObject(),
     );
 
+    newEdition = newEdition
+        .withRef(newEditionRef)
+        .withIncrementedEditionNumber();
+
     // Create the edition, creating chapter text as necessary, using the edition sync function.
-    updateEdition(book, undefined, newEdition.withRef(newEditionRef));
+    updateEdition(book, undefined, newEdition);
 
     // Put the new edition in the book.
     book = book.withEditions([

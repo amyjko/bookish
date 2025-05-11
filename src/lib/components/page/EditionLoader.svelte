@@ -125,7 +125,7 @@
 </script>
 
 {#if $book === undefined || error}
-    <Feedback error>Unable to load edition.</Feedback>
+    <Feedback error>Unable to load edition: {error}</Feedback>
 {:else if $edition === undefined}
     <Loading />
 {:else}
