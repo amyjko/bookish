@@ -38,7 +38,9 @@
             ><Marginal
                 {node}
                 id={'citation-' + citations.join('-')}
-                label="citations"
+                label="reference {citations
+                    .map((c) => $root.getCitationNumber(c))
+                    .join(', ')}"
                 ><svelte:fragment slot="interactor">
                     {#each citations as citationID, index}{@const citationNumber =
                             $root.getCitationNumber(
@@ -61,6 +63,7 @@
                         {@const ref = $edition?.getReference(citationID)}
                         {#if citationNumber && ref && $edition}<span
                                 class="bookish-reference"
+                                aria-hidden="true"
                             >
                                 <sup class="bookish-citation-symbol"
                                     >{citationNumber}</sup
