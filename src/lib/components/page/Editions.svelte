@@ -53,10 +53,11 @@
                 disabled={!publisher}>+ edition</Button
             >
         </p>
-        {#if !publisher}
+        {#if !publisher || !$book.hasPublishedEdition()}
             <Note
-                >You must have publisher privileges to create new editions. If
-                you believe this is an error, please contact support.</Note
+                >You must have publisher privileges to create new editions of a
+                published book. If you believe this is an error, please contact
+                support.</Note
             >
         {/if}
     {/if}
@@ -68,7 +69,7 @@
         and then publish. By default, readers will see the latest published
         edition, but they can access older editions here.
     </Instructions>
-    {#each editions as edition, index (edition.ref)}
+    {#each editions.toReversed() as edition (edition.ref)}
         {@const editionNumber = edition.number}
         {@const editionLabel =
             editionNumber +
@@ -95,17 +96,14 @@
                                 to={latestPublishedID === edition.ref.id &&
                                 $book.getSubdomain() !== undefined
                                     ? `/${$book.getSubdomain()}`
-                                    : `/${$book.getID()}/${
-                                          editions.length - index
-                                      }`}
+                                    : `/${$book.getID()}/${editionNumber}`}
                                 external>read</Link
                             >{/if}
                         {#if editable || ($user?.user?.uid && edition.editionuids.includes($user?.user.uid))}
                             &nbsp;
                             <Link
-                                to={`/write/${$book.getID()}/${
-                                    editions.length - index
-                                }`}>edit</Link
+                                to={`/write/${$book.getID()}/${editionNumber}`}
+                                >edit</Link
                             >
                         {/if}
                     </Note>

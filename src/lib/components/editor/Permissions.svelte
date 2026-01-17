@@ -34,7 +34,7 @@
     function hasEditor(email: string): boolean {
         if (email.length === 0) return false;
         const match = Array.from($emails.entries()).find(
-            ([, e]) => e === email
+            ([, e]) => e === email,
         );
         if (match === undefined) return false;
         const uid = match[0];
@@ -64,23 +64,25 @@
             </form>
         {/if}
 
-        {#each uids as uid, index (uid)}
-            {@const email = $emails.get(uid)}
-            <p>
-                {#if email}{email}{:else}<em>missing email</em>{/if}
-                {#if writable}
-                    <Button
-                        tooltip="remove {email} editing rights"
-                        command={() =>
-                            change([
-                                ...uids.slice(0, index),
-                                ...uids.slice(index + 1),
-                            ])}
-                        disabled={atleastone && uids.length <= 1}>⨉</Button
-                    >
-                {/if}
-            </p>
-        {/each}
+        {#key $emails}
+            {#each uids as uid, index (uid)}
+                {@const email = $emails.get(uid)}
+                <p>
+                    {#if email}{email}{:else}<em>loading...</em>{/if}
+                    {#if writable}
+                        <Button
+                            tooltip="remove {email} editing rights"
+                            command={() =>
+                                change([
+                                    ...uids.slice(0, index),
+                                    ...uids.slice(index + 1),
+                                ])}
+                            disabled={atleastone && uids.length <= 1}>⨉</Button
+                        >
+                    {/if}
+                </p>
+            {/each}
+        {/key}
         {#each inheriteduids as uid}
             <p><em>{$emails.get(uid)}</em> <Note>book editor</Note></p>
         {/each}

@@ -49,22 +49,29 @@
     setContext<EditorsStore>(EDITORS, editors);
 
     $: {
+        // Update when the edition changes.
+        $edition;
         // Each time the book or edition changes, request any new user emails we don't have
         // and add them to the cache.
-        if ($book && $edition) {
+        if ($book) {
             // Get a list of all of the book, edition, and chapter user IDs that aren't in the editors store.
             retrieveEmails(
                 Array.from(
                     new Set([
                         ...$book.uids,
-                        ...$edition.uids,
-                        ...$edition.chapters.reduce(
-                            (uids: string[], chapter) => [
-                                ...uids,
-                                ...chapter.uids,
-                            ],
-                            [],
-                        ),
+                        ...($edition
+                            ? [
+                                  ...$edition.uids,
+                                  ...$edition.getChapterUIDS(),
+                                  ...$edition.chapters.reduce(
+                                      (uids: string[], chapter) => [
+                                          ...uids,
+                                          ...chapter.uids,
+                                      ],
+                                      [],
+                                  ),
+                              ]
+                            : []),
                     ]),
                 ).filter((uid) => !$editors.has(uid)),
             );
