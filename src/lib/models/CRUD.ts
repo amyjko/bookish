@@ -258,7 +258,7 @@ export async function createBook(userID: string): Promise<string> {
 }
 
 export async function createNewEdition(book: Book): Promise<Book> {
-    if (!db) throw Error("Can't publish draft, no Firebase connection.");
+    if (!db) throw Error("Can't create new edition, no Firebase connection.");
 
     // Get the latest draft.
     const latestEditionID = book.getLatestEditionID();
@@ -272,6 +272,7 @@ export async function createNewEdition(book: Book): Promise<Book> {
             ? (latestDraftDoc.data() as EditionSpecification | undefined)
             : undefined;
 
+    // No latest draft? Return the book as is.
     if (latestDraftData === undefined) return book;
 
     const latestDraft = Edition.fromJSON(latestDraftDoc.ref, latestDraftData);
@@ -290,8 +291,8 @@ export async function createNewEdition(book: Book): Promise<Book> {
         .withRef(newEditionRef)
         .withIncrementedEditionNumber();
 
-    // Create the edition, creating chapter text as necessary, using the edition sync function.
-    updateEdition(book, undefined, newEdition);
+    // Save the edition, creating chapter text as necessary, using the edition sync function.
+    await updateEdition(book, undefined, newEdition);
 
     // Put the new edition in the book.
     book = book.withEditions([
@@ -300,7 +301,7 @@ export async function createNewEdition(book: Book): Promise<Book> {
     ]);
 
     // Update the book.
-    updateBook(book);
+    await updateBook(book);
 
     return book;
 }

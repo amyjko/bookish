@@ -19,19 +19,46 @@
 
     $: latestPublishedID = $book?.getLatestPublishedEditionID();
 
+    let publisher = false;
+
+    $: {
+        if ($user && $user.user) updateUserClaims();
+    }
+
+    async function updateUserClaims() {
+        if ($user === undefined || $user.user === null) return;
+        const token = await $user.user.getIdTokenResult();
+        publisher =
+            'publisher' in token.claims && token.claims.publisher === true;
+    }
+
     async function handleDraftEdition() {
         if ($book === undefined) return;
-        book.set(await createNewEdition($book));
+
+        try {
+            const revisedBook = await createNewEdition($book);
+            book.set(revisedBook);
+        } catch (err) {
+            console.error('Error creating new edition:', err);
+        }
     }
 </script>
 
 {#if $book && editions}
     {#if editable}
         <p>
-            <Button tooltip="create new edition" command={handleDraftEdition}
-                >+ edition</Button
+            <Button
+                tooltip="create new edition"
+                command={handleDraftEdition}
+                disabled={!publisher}>+ edition</Button
             >
         </p>
+        {#if !publisher}
+            <Note
+                >You must have publisher privileges to create new editions. If
+                you believe this is an error, please contact support.</Note
+            >
+        {/if}
     {/if}
     <Instructions {editable}>
         Each book has one or more editions, allowing you to track revisions and
@@ -42,8 +69,7 @@
         edition, but they can access older editions here.
     </Instructions>
     {#each editions as edition, index (edition.ref)}
-        {@const editionNumber =
-            editions === undefined ? -1 : editions.length - index}
+        {@const editionNumber = edition.number}
         {@const editionLabel =
             editionNumber +
             (editionNumber === 1

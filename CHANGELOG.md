@@ -3,6 +3,7 @@
 # 0.7.2 - 2026-01-17
 
 - Formatted edition revision summary.
+- Better error handling on edition creation.
 
 # 0.7.1 - 2025-05-11
 
