@@ -49,10 +49,10 @@
             (editionNumber === 1
                 ? 'st'
                 : editionNumber === 2
-                ? 'nd'
-                : editionNumber === 3
-                ? 'rd'
-                : 'th')}
+                  ? 'nd'
+                  : editionNumber === 3
+                    ? 'rd'
+                    : 'th')}
 
         {#if $book && (editable || edition.published || ($user?.user?.uid && edition.editionuids.includes($user.user.uid)))}
             <section class="edition">
@@ -60,9 +60,9 @@
                     >{editionLabel}
                     <Note
                         >{#if edition.published}{new Date(
-                                edition.published
+                                edition.published,
                             ).toLocaleDateString(
-                                'en-us'
+                                'en-us',
                             )}{:else}unpublished{/if}
                         {#if edition.published}&nbsp;
                             <Link
@@ -84,14 +84,16 @@
                         {/if}
                     </Note>
                 </h3>
-                <p
-                    >{#if edition.summary !== ''}<Format
-                            node={Parser.parseFormat(
-                                undefined,
-                                edition.summary
-                            )}
-                        />{:else}&mdash;{/if}</p
-                >
+                {#if edition.summary !== ''}<p
+                        ><em
+                            ><Format
+                                node={Parser.parseFormat(
+                                    undefined,
+                                    edition.summary,
+                                )}
+                            /></em
+                        ></p
+                    >{/if}
             </section>
         {/if}
     {/each}

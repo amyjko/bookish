@@ -1,5 +1,9 @@
 # bookish changelog
 
+# 0.7.2 - 2026-01-17
+
+- Formatted edition revision summary.
+
 # 0.7.1 - 2025-05-11
 
 ## Fixed
