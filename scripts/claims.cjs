@@ -24,7 +24,7 @@ if (email === undefined) {
 const project = process.argv[3];
 if (project !== 'dev' && project !== 'prod') {
     console.log(
-        `Expected 'dev' or 'prod' after email, but received ${project}`
+        `Expected 'dev' or 'prod' after email, but received ${project}`,
     );
     return;
 }
@@ -39,6 +39,7 @@ if (operation !== undefined && operation !== '+' && operation !== '-') {
 // Get the field
 const privilege = process.argv[5];
 if (
+    operation !== undefined &&
     privilege !== undefined &&
     privilege !== 'publisher' &&
     privilege !== 'admin'
@@ -52,7 +53,9 @@ console.log('Reading service key...');
 const serviceKeyPath = `../firebase-${project}-service-key.json`;
 
 // Log in with the secret service key generated in the Firebase service accounts console.
-const serviceAccount = require(`../bookish-${project}-firebase-service-key.json`);
+const serviceAccount = require(
+    `../bookish-${project}-firebase-service-key.json`,
+);
 
 if (serviceAccount === undefined) {
     console.log(`Couldn't find service key at ${serviceKeyPath}`);
@@ -89,7 +92,7 @@ getAuth()
                     console.log(
                         `Successfully ${
                             operation === '+' ? 'added' : 'removed'
-                        } '${privilege}' privilege`
+                        } '${privilege}' privilege`,
                     );
                 });
         }
