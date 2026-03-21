@@ -32,7 +32,7 @@
             'publisher' in token.claims && token.claims.publisher === true;
     }
 
-    async function handleDraftEdition() {
+    async function createEdition() {
         if ($book === undefined) return;
 
         try {
@@ -49,7 +49,7 @@
         <p>
             <Button
                 tooltip="create new edition"
-                command={handleDraftEdition}
+                command={createEdition}
                 disabled={!publisher}>+ edition</Button
             >
         </p>

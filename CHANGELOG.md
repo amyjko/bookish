@@ -1,5 +1,10 @@
 # bookish changelog
 
+# 0.7.3 - 2026-03-20
+
+- Fixed edition numbering on edition creation.
+- Fixed edition chapter text copying.
+
 # 0.7.2 - 2026-01-17
 
 - Formatted edition revision summary.

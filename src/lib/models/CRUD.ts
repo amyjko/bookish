@@ -287,9 +287,27 @@ export async function createNewEdition(book: Book): Promise<Book> {
         newEdition.toObject(),
     );
 
+    // Create a new edition that has the new ref and an updated edition number.
     newEdition = newEdition
         .withRef(newEditionRef)
         .withIncrementedEditionNumber();
+
+    // Add the chapter text of the existing edition into the new edition's chapters, so it gets copied over. We have to do this because the chapter text is stored in the chapter documents, not the edition document.
+    const textByID = new Map<string, string>();
+    for (const chapter of latestDraft.chapters) {
+        if (chapter.ref === undefined) continue;
+        const chapterDoc = await getDoc(chapter.ref);
+        if (!chapterDoc.exists()) continue;
+        const chapterData = chapterDoc.data();
+        if (!chapterData || typeof chapterData.text !== 'string') continue;
+        textByID.set(chapter.id, chapterData.text);
+    }
+    newEdition = newEdition.withChapters(
+        newEdition.chapters.map((c) => {
+            const text = textByID.get(c.id) ?? '';
+            return c.withText(text);
+        }),
+    );
 
     // Save the edition, creating chapter text as necessary, using the edition sync function.
     await updateEdition(book, undefined, newEdition);

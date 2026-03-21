@@ -215,7 +215,7 @@ export default class Book {
     }
 
     getLatestEditionID(): string | undefined {
-        return this.editions[0]?.ref.id;
+        return this.editions.toSorted((a, b) => b.number - a.number)[0]?.ref.id;
     }
 
     getEditions() {
