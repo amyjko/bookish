@@ -62,7 +62,7 @@ export default class Book {
         this.cover = cover;
         // The published state is always true if some edition's published flag isn't null.
         this.published = editions.some((edition) => edition.published !== null);
-        // We always keep editions in reversed edition number for easy reference.
+        // We always keep editions in ascending edition number for easy reference.
         this.editions = editions.sort((a, b) => a.number - b.number);
         this.domain = domain;
         this.uids = uids;
@@ -211,7 +211,7 @@ export default class Book {
     }
 
     getLatestPublishedEditionID() {
-        return this.editions.filter((ed) => ed.published !== null)[0]?.ref.id;
+        return this.editions.filter((ed) => ed.published !== null).at(-1)?.ref.id;
     }
 
     getLatestEditionID(): string | undefined {
