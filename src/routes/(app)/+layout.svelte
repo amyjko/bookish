@@ -217,7 +217,7 @@
 <div class="bookish-app">
     <Auth>
         {#if $page.route.id !== null && !$page.route.id.startsWith('/[bookid]/[[editionid=edition]]')}
-            <Header />
+            <Header print={$page.route.id.endsWith('/print')} />
         {/if}
         <slot />
         <Footer />

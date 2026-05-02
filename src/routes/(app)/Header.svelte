@@ -13,6 +13,8 @@
     import DarkToggle from '$lib/components/controls/DarkToggle.svelte';
     import { isDark, setDark } from '$lib/util/dark';
 
+    export let print: boolean = false;
+
     let auth = getUser();
 
     let caret = getCaret();
@@ -51,7 +53,7 @@
             {#if $edition}<Status />{/if}
         </div>
     </nav>
-    {#if $edition}
+    {#if $edition && !print}
         <Toolbar caret={$caret} />
     {/if}
 </section>

@@ -240,12 +240,13 @@
     });
 
     let editable =
-        isBookEditable() ||
-        isEditionEditable() ||
-        isChapterEditable() ||
-        ($auth !== undefined &&
-            $auth.user !== null &&
-            chapter.isEditor($auth.user.uid));
+        !print &&
+        (isBookEditable() ||
+            isEditionEditable() ||
+            isChapterEditable() ||
+            ($auth !== undefined &&
+                $auth.user !== null &&
+                chapter.isEditor($auth.user.uid)));
 </script>
 
 {#if $edition}
@@ -254,7 +255,7 @@
         title={`${$edition.getTitle()} - ${chapter.getTitle()}`}
     >
         <Header
-            editable={isChapterEditable()}
+            {editable}
             id={chapter.id}
             header={chapter.getTitle()}
             label="Chapter title"

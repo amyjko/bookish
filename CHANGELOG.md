@@ -3,6 +3,7 @@
 # 0.7.4 - 2026-05-02
 
 - Updated to node 22, and related downstream dependencies.
+- When in editing mode, the print route should just show the page as it would be shown in reading mode.
 
 # 0.7.3 - 2026-03-20
 
