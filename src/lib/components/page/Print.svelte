@@ -9,8 +9,10 @@
         ? [
               $edition.getTitle(),
               `${$edition.getEditionLabel()} Edition`,
-              Parser.parseFormat($edition, $edition.getAuthors().at(0) ?? '').toText() +
-                  ($edition.getAuthors().length > 1 ? ' et al.' : ''),
+              Parser.parseFormat(
+                  $edition,
+                  $edition.getAuthors().at(0) ?? '',
+              ).toText() + ($edition.getAuthors().length > 1 ? ' et al.' : ''),
           ]
               .filter(Boolean)
               .join(' - ')
@@ -33,6 +35,9 @@
     @media print {
         :global(.bookish-chapter-header) {
             break-before: page;
+        }
+        :global(.bookish-page:first-of-type .bookish-chapter-header) {
+            break-before: auto;
         }
 
         :global(body) {
