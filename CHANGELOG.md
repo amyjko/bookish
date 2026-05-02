@@ -4,6 +4,7 @@
 
 - Updated to node 22, and related downstream dependencies.
 - When in editing mode, the print route should just show the page as it would be shown in reading mode.
+- Set a sensible page title for the print route (#380).
 
 # 0.7.3 - 2026-03-20
 

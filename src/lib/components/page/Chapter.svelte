@@ -252,7 +252,7 @@
 {#if $edition}
     <Page
         afterLoaded={scrollToLastLocation}
-        title={`${$edition.getTitle()} - ${chapter.getTitle()}`}
+        title={print ? undefined : `${$edition.getTitle()} - ${chapter.getTitle()}`}
     >
         <Header
             {editable}

@@ -2,7 +2,7 @@
     import { onMount } from 'svelte';
     import Loading from '$lib/components/page/Loading.svelte';
 
-    export let title: string;
+    export let title: string | undefined = undefined;
     export let afterLoaded: Function | undefined = undefined;
 
     let fontsLoaded = false;
@@ -56,8 +56,10 @@
 </script>
 
 <svelte:head>
-    <title>{title}</title>
-    <meta name="description" content={title} />
+    {#if title !== undefined}
+        <title>{title}</title>
+        <meta name="description" content={title} />
+    {/if}
 </svelte:head>
 
 <section class={'bookish-page' + (imagesLoaded ? ' loaded' : '')}>
