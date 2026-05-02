@@ -5,6 +5,9 @@
 - Updated to node 22, and related downstream dependencies.
 - When in editing mode, the print route should just show the page as it would be shown in reading mode.
 - Set a sensible page title for the print route (#380).
+- Removed page break preceding first chapter in print mode (#381).
+- Improved the outline width to avoid clipping before entering a mobile layout (#382).
+- Improved the outline width to avoid clipping before entering a mobile layout (#383).
 
 # 0.7.3 - 2026-03-20
 

@@ -354,6 +354,7 @@
     /* Desktop */
     @media screen and (min-width: 1200px) {
         .outline {
+            --outline-width: min(12em, calc((100vw - 740px) / 2 - 3 * var(--outline-padding)));
             width: var(--outline-width);
             z-index: 0; /* Put it below everything when it's in the margin. */
             border-right: 1px solid var(--bookish-border-color-light);
