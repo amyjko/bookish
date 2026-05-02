@@ -1,5 +1,9 @@
 # bookish changelog
 
+# 0.7.4 - 2026-05-02
+
+- Updated to node 22, and related downstream dependencies.
+
 # 0.7.3 - 2026-03-20
 
 - Fixed edition numbering on edition creation.

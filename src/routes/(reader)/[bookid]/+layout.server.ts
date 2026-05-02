@@ -2,8 +2,9 @@ import type { BookSpecification } from '$lib/models/book/Book';
 import type { EditionSpecification } from '$lib/models/book/Edition';
 import { error } from '@sveltejs/kit';
 import admin from 'firebase-admin';
+import { PUBLIC_FIREBASE_PROJECT_ID } from '$env/static/public';
 
-admin.initializeApp();
+admin.initializeApp({ projectId: PUBLIC_FIREBASE_PROJECT_ID });
 const db = admin.firestore();
 
 type BookMatch = { bookID: string | null; bookJSON: BookSpecification | null };
@@ -137,7 +138,8 @@ async function getLatestEdition(
     // If there's no latest published edition, get the latest unpublished edition
     const editionID =
         bookJSON.editions.filter((ed) => ed.published !== null).at(-1)?.ref.id ??
-        bookJSON.editions.at(-1)?.ref.id;
+        bookJSON.editions.at(-1)?.ref.id ??
+        null;
 
     // If there is one, get the edition.
     if (editionID !== null) {
