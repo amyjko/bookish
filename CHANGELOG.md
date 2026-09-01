@@ -2,6 +2,7 @@
 
 # Unreleased
 
+- Moved server-side rendering from the experimental Firebase Hosting web frameworks integration to a Cloud Run service (`bookish-ssr`) behind a Firebase Hosting rewrite, reusing the adapter-node build. Deploys now build locally and ship the artifacts (see `Dockerfile`); the old auto-generated `ssrbookishprod` function can be deleted after cutover. This removes the integration's Vite version ceiling ahead of the Svelte 5 migration.
 - Replaced the deploy-on-PR GitHub workflow with a verify workflow that type checks, tests, and builds; deploys remain manual.
 - Added component smoke tests for chapter rendering and marginal layout, and a Playwright browser test of marginal positioning against a new local-only `/fixture` route.
 - Updated all dependencies within their current major versions (SvelteKit 2.70, Vite 5.4.21, TypeScript 5.9, Prettier 3.9, Firebase 11.10, among others), and fixed two `$page.params` nullability errors the SvelteKit update surfaced.
