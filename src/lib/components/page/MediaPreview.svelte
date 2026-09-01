@@ -2,15 +2,25 @@
     import Link from '../Link.svelte';
     import { getBase } from './Contexts';
 
-    export let url: string;
-    export let alt: string;
-    export let chapterID: string | undefined;
+    interface Props {
+        url: string;
+        alt: string;
+        chapterID: string | undefined;
+        children?: import('svelte').Snippet;
+    }
+
+    let {
+        url,
+        alt,
+        chapterID,
+        children
+    }: Props = $props();
 
     let base = getBase();
 
-    let loaded: boolean | null;
-    let urlChecked: string;
-    $: {
+    let loaded: boolean | null | undefined = $state();
+    let urlChecked: string | undefined = $state();
+    $effect.pre(() => {
         if (urlChecked !== url && typeof Image !== 'undefined') {
             urlChecked = url;
             let image = new Image();
@@ -21,7 +31,7 @@
                 image.onerror = () => (loaded = null);
             }
         }
-    }
+    });
 </script>
 
 <figure class={'media-preview'}>
@@ -32,7 +42,7 @@
     {:else if loaded === null}
         <div class="missing">missing image</div>
     {/if}
-    <figcaption class="credit"><slot /></figcaption>
+    <figcaption class="credit">{@render children?.()}</figcaption>
 </figure>
 
 <style>

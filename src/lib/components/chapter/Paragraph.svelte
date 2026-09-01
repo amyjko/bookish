@@ -1,36 +1,38 @@
-<svelte:options immutable={true} />
-
 <script lang="ts">
     import type ParagraphNode from '$lib/models/chapter/ParagraphNode';
     import Format from './Format.svelte';
     import { getChapter, getEdition, getRoot } from '../page/Contexts';
 
-    export let node: ParagraphNode;
-    export let placeholder: string | undefined = undefined;
+    interface Props {
+        node: ParagraphNode;
+        placeholder?: string | undefined;
+    }
 
-    $: level = node.getLevel();
+    let { node, placeholder = undefined }: Props = $props();
+
+    let level = $derived(node.getLevel());
 
     let chapter = getChapter();
     let edition = getEdition();
     let root = getRoot();
 
-    $: id =
-        node.getLevel() === 0 || $edition === undefined
+    let id =
+        $derived(node.getLevel() === 0 || $edition === undefined
             ? undefined
-            : 'header-' + ($root.getHeaders().indexOf(node) ?? '');
-    $: classes =
-        node.getLevel() === 0
+            : 'header-' + ($root.getHeaders().indexOf(node) ?? ''));
+    let classes =
+        $derived(node.getLevel() === 0
             ? undefined
             : 'page-header' +
               ($chapter && $chapter.highlightedID === id
                   ? ' bookish-content-highlight'
-                  : '');
+                  : ''));
 
-    $: firstParagraph = $root.getFirstParagraph();
-    $: dropcap =
-        placeholder === undefined &&
+    let firstParagraph = $derived($root.getFirstParagraph());
+    let dropcap =
+        $derived(placeholder === undefined &&
         node === firstParagraph &&
-        /^[a-zA-Z]/.test(firstParagraph.getFirstTextNode().getText());
+        /^[a-zA-Z]/.test(firstParagraph.getFirstTextNode().getText()));
 </script>
 
 {#if level === 0}

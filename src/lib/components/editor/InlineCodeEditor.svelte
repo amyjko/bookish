@@ -3,7 +3,11 @@
     import LanguageEditor from './LanguageEditor.svelte';
     import { getCaret } from '$lib/components/page/Contexts';
 
-    export let code: InlineCodeNode;
+    interface Props {
+        code: InlineCodeNode;
+    }
+
+    let { code }: Props = $props();
 
     let caret = getCaret();
 </script>

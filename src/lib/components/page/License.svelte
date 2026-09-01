@@ -27,7 +27,7 @@
 {#if $edition}
     <!-- If editable, show acknowledgements even if they're empty, otherwise hide -->
     {#if editable}
-        <!-- svelte-ignore missing-declaration -->
+        <!-- svelte-ignore missing_declaration -->
         <BookishEditor
             text={$edition.getLicense()}
             parser={(text) =>

@@ -31,7 +31,7 @@ export default abstract class Node {
     // Returns a new node with the given child node replaced, or undefined if it didn't contain such a child.
     abstract withChildReplaced(
         node: Node,
-        replacement: Node | undefined
+        replacement: Node | undefined,
     ): this | undefined;
 
     // Returns an ordered list of the child nodes.
@@ -46,7 +46,7 @@ export default abstract class Node {
 
     traverse(
         fn: (node: Node, parents: Node[]) => void,
-        parents?: Node[]
+        parents?: Node[],
     ): void {
         const path = parents === undefined ? [this] : [...parents, this];
         this.traverseChildren(fn, path);
@@ -56,7 +56,7 @@ export default abstract class Node {
     // Traverses each of the children of this node.
     traverseChildren(
         fn: (node: Node, parents: Node[]) => void,
-        parents: Node[]
+        parents: Node[],
     ): void {
         const children = this.getChildren();
         children.forEach((child) => child.traverse(fn, parents));
@@ -71,7 +71,7 @@ export default abstract class Node {
 
     getNodeBefore<Kind extends Node>(
         node: Node,
-        matcher: (node: Kind) => boolean
+        matcher: (node: Kind) => boolean,
     ): Kind | undefined {
         const nodes = this.getNodes();
         let previous: Kind | undefined = undefined;
@@ -84,7 +84,7 @@ export default abstract class Node {
 
     getNodeAfter<Kind extends Node>(
         node: Node,
-        matcher: (node: Kind) => boolean
+        matcher: (node: Kind) => boolean,
     ): Kind | undefined {
         const nodes = this.getNodes();
         let found: boolean = false;
@@ -133,19 +133,19 @@ export default abstract class Node {
             startIndex < endIndex
             ? range
             : // If they're the same node, order the index.
-            startIndex === endIndex
-            ? {
-                  start: {
-                      node: range.start.node,
-                      index: Math.min(range.start.index, range.end.index),
-                  },
-                  end: {
-                      node: range.end.node,
-                      index: Math.max(range.start.index, range.end.index),
-                  },
-              }
-            : // Otherwise, swap the caret positions
-              { start: range.end, end: range.start };
+              startIndex === endIndex
+              ? {
+                    start: {
+                        node: range.start.node,
+                        index: Math.min(range.start.index, range.end.index),
+                    },
+                    end: {
+                        node: range.end.node,
+                        index: Math.max(range.start.index, range.end.index),
+                    },
+                }
+              : // Otherwise, swap the caret positions
+                { start: range.end, end: range.start };
     }
 
     getNode(id: number) {
@@ -194,7 +194,7 @@ export default abstract class Node {
 
     getClosestParentOfType<T extends Node>(
         root: Node,
-        type: Function
+        type: Function,
     ): T | undefined {
         let parent = root.getParentOf(this);
         while (parent) {
@@ -213,7 +213,7 @@ export default abstract class Node {
 
     getClosestParentMatching(
         root: Node,
-        match: (node: Node) => boolean
+        match: (node: Node) => boolean,
     ): Node | undefined {
         let parent = root.getParentOf(this);
         while (parent) {
@@ -225,7 +225,7 @@ export default abstract class Node {
 
     getFarthestParentMatching(
         root: Node,
-        match: (node: Node) => boolean
+        match: (node: Node) => boolean,
     ): Node | undefined {
         const matchingParents = this.getAncestors(root).filter(match);
         return matchingParents.length > 0
@@ -258,7 +258,7 @@ export default abstract class Node {
     // Traverse this node's children, trying to replace the given node with the replacement node (or nothing, if allowed)
     withNodeReplaced(
         node: Node,
-        replacement: Node | undefined
+        replacement: Node | undefined,
     ): this | undefined {
         // Is this the node we're replacing? Return the replacement.
         if (node === this) return replacement as this;
@@ -296,7 +296,7 @@ export default abstract class Node {
         // Find the common ancestor of the range, then ask it to copy the portion of it selected and produce a node.
         const commonAncestor = sortedRange.start.node.getCommonAncestor(
             this,
-            sortedRange.end.node
+            sortedRange.end.node,
         );
         if (commonAncestor === undefined) return;
         return commonAncestor.withContentInRange(sortedRange);

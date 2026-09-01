@@ -1,3 +1,4 @@
+<!-- @migration-task Error while migrating Svelte code: Can't migrate code with afterUpdate. Please migrate by hand. -->
 <script lang="ts">
     import Parser from '$lib/models/chapter/Parser';
     import type Definition from '$lib/models/book/Definition';

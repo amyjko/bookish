@@ -3,7 +3,11 @@
     import PositionEditor from './PositionEditor.svelte';
     import { getCaret } from '$lib/components/page/Contexts';
 
-    export let callout: CalloutNode;
+    interface Props {
+        callout: CalloutNode;
+    }
+
+    let { callout }: Props = $props();
 
     let caret = getCaret();
 </script>

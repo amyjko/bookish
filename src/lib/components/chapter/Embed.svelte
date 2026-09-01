@@ -1,5 +1,3 @@
-<svelte:options immutable={true} />
-
 <script lang="ts">
     import type EmbedNode from '$lib/models/chapter/EmbedNode';
     import { storage } from '$lib/models/Firebase';
@@ -12,13 +10,22 @@
     import Figure from './Figure.svelte';
     import { getContext } from 'svelte';
 
-    export let node: EmbedNode;
-    export let editable: boolean = true;
-    export let placeholder: string = '';
-    export let imageOnly: boolean = false;
+    interface Props {
+        node: EmbedNode;
+        editable?: boolean;
+        placeholder?: string;
+        imageOnly?: boolean;
+    }
 
-    $: url = node.getURL();
-    $: description = node.getDescription();
+    let {
+        node,
+        editable = true,
+        placeholder = '',
+        imageOnly = false
+    }: Props = $props();
+
+    let url = $derived(node.getURL());
+    let description = $derived(node.getDescription());
 
     let caret = getCaret();
     let book = getBook();
@@ -28,10 +35,12 @@
     // Bookish editor should have passed down a way to set the active editor.
     let claimCaret = getContext<Function>('claimeditor');
 
-    let dragging = false;
-    let dragFeedback: undefined | string = undefined;
-    let imageError = false;
-    $: if (node) imageError = false;
+    let dragging = $state(false);
+    let dragFeedback: undefined | string = $state(undefined);
+    let imageError = $state(false);
+    $effect.pre(() => {
+        if (node) imageError = false;
+    });
 
     function handleDrop(event: DragEvent) {
         event.preventDefault();
@@ -126,15 +135,18 @@
                     class={`bookish-figure-unspecified ${
                         dragging ? 'bookish-figure-dragging' : ''
                     }`}
-                    on:click|preventDefault={handleClick}
+                    onclick={(event) => {
+                        event.preventDefault();
+                        handleClick();
+                    }}
                     tabindex="0"
-                    on:keydown={(event) =>
+                    onkeydown={(event) =>
                         event.key === ' ' || event.key === 'Enter'
                             ? handleClick()
                             : undefined}
-                    on:drop|preventDefault={handleDrop}
-                    on:dragover={handleDrag}
-                    on:dragleave={handleDragLeave}
+                    ondrop={handleDrop}
+                    ondragover={handleDrag}
+                    ondragleave={handleDragLeave}
                     >{dragFeedback !== undefined
                         ? dragFeedback
                         : placeholder.length > 0
@@ -153,7 +165,7 @@
                     frameBorder="0"
                     allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"
                     allowFullScreen
-                />
+></iframe>
             </article>
         {:else}
             <img
@@ -166,8 +178,8 @@
                     ? '(min-width: 1024px) 1024px, 320px'
                     : undefined}
                 alt={description}
-                on:load={handleLoad}
-                on:error={handleError}
+                onload={handleLoad}
+                onerror={handleError}
             />
         {/if}
     </Figure>

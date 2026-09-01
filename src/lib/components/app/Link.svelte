@@ -1,24 +1,35 @@
 <script lang="ts">
     import { page } from '$app/stores';
 
-    export let to: string;
-    export let before: Function | undefined = undefined;
-    export let title: string | undefined = undefined;
-    export let external: boolean = false;
+    interface Props {
+        to: string;
+        before?: Function | undefined;
+        title?: string | undefined;
+        external?: boolean;
+        children?: import('svelte').Snippet;
+    }
 
-    $: at = to === $page.url.pathname;
+    let {
+        to,
+        before = undefined,
+        title = undefined,
+        external = false,
+        children
+    }: Props = $props();
+
+    let at = $derived(to === $page.url.pathname);
 </script>
 
 {#if at}
-    <span class="link"> <slot /></span>
+    <span class="link"> {@render children?.()}</span>
 {:else}
     <a
         class="link"
         href={to}
         {title}
-        on:click={() => (before ? before() : undefined)}
+        onclick={() => (before ? before() : undefined)}
         target={to.startsWith('http') || external ? '_blank' : null}
-        rel={external ? 'noreferrer' : null}><slot /></a
+        rel={external ? 'noreferrer' : null}>{@render children?.()}</a
     >
 {/if}
 

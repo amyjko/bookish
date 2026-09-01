@@ -1,5 +1,3 @@
-<svelte:options immutable={true} />
-
 <script lang="ts">
     import type CodeNode from '$lib/models/chapter/CodeNode';
     import Code from './Code.svelte';
@@ -9,15 +7,19 @@
     import Figure from './Figure.svelte';
     import Button from '../app/Button.svelte';
 
-    export let node: CodeNode;
+    interface Props {
+        node: CodeNode;
+    }
 
-    $: language = node.getLanguage();
+    let { node }: Props = $props();
+
+    let language = $derived(node.getLanguage());
 
     let editable = isChapterEditable();
 
     // const languages = [ "C", "C++", "CSS", "Go", "HTML", "Java", "JavaScript", "Markdown", "Plaintext", "Python", "TypeScript" ];
 
-    let editing = true;
+    let editing = $state(true);
 </script>
 
 <Figure {node} caption={node.getCaption()} focusable={false}>

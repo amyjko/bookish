@@ -1,13 +1,17 @@
 <script lang="ts">
     import type { Image } from '../../models/book/BookMedia';
 
-    export let image: Image;
-    export let selected: boolean;
-    export let select: (image: Image) => void;
+    interface Props {
+        image: Image;
+        selected: boolean;
+        select: (image: Image) => void;
+    }
+
+    let { image, selected, select }: Props = $props();
 
     let retries = 3;
-    let error: boolean = false;
-    let loading: boolean = true;
+    let error: boolean = $state(false);
+    let loading: boolean = $state(true);
 
     function loadImage(url: string) {
         retries--;
@@ -30,13 +34,16 @@
 </script>
 
 {#if loading}
-    <div class="thumbnail loading" />
+    <div class="thumbnail loading"></div>
 {:else}
     <div
         tabindex="0"
         role="button"
-        on:click|stopPropagation={() => select(image)}
-        on:keydown={(event) =>
+        onclick={(event) => {
+            event.stopPropagation();
+            select(image);
+        }}
+        onkeydown={(event) =>
             event.key === 'Enter' || event.key === ' '
                 ? select(image)
                 : undefined}

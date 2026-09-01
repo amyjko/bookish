@@ -1,13 +1,17 @@
-<svelte:options immutable={true} />
-
 <script lang="ts">
+    import { run } from 'svelte/legacy';
+
     import type TextNode from '$lib/models/chapter/TextNode';
     import { getChapter, isChapterEditable } from '../page/Contexts';
 
-    export let node: TextNode;
-    export let placeholder: string | undefined = undefined;
+    interface Props {
+        node: TextNode;
+        placeholder?: string | undefined;
+    }
 
-    $: text = node.getText();
+    let { node, placeholder = undefined }: Props = $props();
+
+    let text = $derived(node.getText());
 
     let context = getChapter();
     let editable = isChapterEditable();
@@ -30,7 +34,7 @@
     }
 
     // Manipulate text for rendering.
-    $: {
+    run(() => {
         // Replace any spaces at the beginning or end of the string with explicit non-breaking spaces to ensure that they render.
         text = replaceMultipleSpacesWithNonBreakingSpaces(text);
 
@@ -40,11 +44,11 @@
 
         // If there's no text, render a non-breaking space, or a placeholder if provided.
         if (text.length === 0) text = placeholder ?? '\ufeff';
-    }
+    });
 
     // Compute highlights, if highlighted
-    let segments: [string, boolean][] | undefined = undefined;
-    $: {
+    let segments: [string, boolean][] | undefined = $state(undefined);
+    run(() => {
         segments = undefined;
         if (!editable) {
             // Is there a query we're supposed to highlight? If so, highlight it.
@@ -93,7 +97,7 @@
                 }
             }
         }
-    }
+    });
 </script>
 
 {#if segments}

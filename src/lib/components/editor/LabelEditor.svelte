@@ -4,14 +4,18 @@
     import { getChapter, getEdition } from '../page/Contexts';
     import { getCaret } from '$lib/components/page/Contexts';
 
-    export let label: LabelNode;
+    interface Props {
+        label: LabelNode;
+    }
+
+    let { label }: Props = $props();
 
     let edition = getEdition();
     let chapter = getChapter();
     let caret = getCaret();
 
-    $: ast =
-        $edition && $chapter ? $chapter.chapter.getAST($edition) : undefined;
+    let ast =
+        $derived($edition && $chapter ? $chapter.chapter.getAST($edition) : undefined);
 </script>
 
 <code>

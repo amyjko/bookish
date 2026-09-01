@@ -19,14 +19,12 @@ export function hideOutlineIfObscured() {
         Array.from(document.getElementsByClassName('inset-left')).forEach(
             (el) => {
                 let insetRect: DOMRect = el.getBoundingClientRect();
-                if (
-                    !(
-                        outlineRect.bottom < insetRect.top - threshold ||
-                        outlineRect.top > insetRect.bottom + threshold
-                    )
-                )
+                if (!(
+                    outlineRect.bottom < insetRect.top - threshold ||
+                    outlineRect.top > insetRect.bottom + threshold
+                ))
                     overlapRect = insetRect;
-            }
+            },
         );
 
         // If it overlaps, reduce opacity by the proportion of the vertical distance between two rectangles and the height of the marginal.
@@ -36,12 +34,12 @@ export function hideOutlineIfObscured() {
                 outlineRect.bottom < overlap.top
                     ? threshold
                     : outlineRect.bottom < overlap.top + threshold
-                    ? threshold - (outlineRect.bottom - overlap.top)
-                    : outlineRect.top > overlap.bottom - threshold
-                    ? threshold - (overlap.bottom - outlineRect.top)
-                    : outlineRect.top > overlap.bottom
-                    ? threshold
-                    : 0;
+                      ? threshold - (outlineRect.bottom - overlap.top)
+                      : outlineRect.top > overlap.bottom - threshold
+                        ? threshold - (overlap.bottom - outlineRect.top)
+                        : outlineRect.top > overlap.bottom
+                          ? threshold
+                          : 0;
             let proportion = distance / threshold;
             outline.style.opacity = '' + proportion * proportion;
         }
@@ -65,7 +63,7 @@ export function hideOutlineIfObscured() {
 export function layoutMarginals() {
     // Get the chapter DOM node, so we can calculate margins.
     let chapter = document.getElementsByClassName(
-        'bookish-chapter-body'
+        'bookish-chapter-body',
     )[0] as HTMLElement;
 
     // If there's no chapter rendered yet, stop.

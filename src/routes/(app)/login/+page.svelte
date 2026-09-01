@@ -9,10 +9,10 @@
 
     let auth = getUser();
 
-    let email: string = '';
-    let loading = false;
-    let feedback = '';
-    let error = '';
+    let email: string = $state('');
+    let loading = $state(false);
+    let feedback = $state('');
+    let error = $state('');
 
     async function handleSubmit() {
         if ($auth === undefined) return;
@@ -39,7 +39,10 @@
     link.</Paragraph
 >
 
-<form on:submit|preventDefault={handleSubmit}>
+<form onsubmit={(event) => {
+        event.preventDefault();
+        handleSubmit();
+    }}>
     <TextInput
         bind:text={email}
         autocomplete="username"

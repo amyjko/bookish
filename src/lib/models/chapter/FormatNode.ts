@@ -15,12 +15,7 @@ import LineBreakNode from './LineBreakNode';
 
 export type Format = '' | '*' | '_' | '^' | 'v';
 export type FormatNodeSegmentType =
-    | FormatNode
-    | TextNode
-    | LineBreakNode
-    | ErrorNode
-    | MetadataNode
-    | AtomNode;
+    FormatNode | TextNode | LineBreakNode | ErrorNode | MetadataNode | AtomNode;
 
 export default class FormatNode extends Node {
     readonly #format: Format;
@@ -938,15 +933,13 @@ export default class FormatNode extends Node {
         );
         if (index < 0) return;
         // The inserted node has to be a segment type.
-        if (
-            !(
-                node instanceof FormatNode ||
-                node instanceof TextNode ||
-                node instanceof MetadataNode ||
-                node instanceof LineBreakNode ||
-                node instanceof AtomNode
-            )
-        )
+        if (!(
+            node instanceof FormatNode ||
+            node instanceof TextNode ||
+            node instanceof MetadataNode ||
+            node instanceof LineBreakNode ||
+            node instanceof AtomNode
+        ))
             return;
 
         const newFormat = this.withSegmentAt(node, caret);

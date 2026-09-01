@@ -10,7 +10,7 @@ export default class FootnoteNode extends AtomNode<FormatNode> {
         super(
             content === undefined
                 ? new FormatNode('', [new TextNode()])
-                : content.withTextIfEmpty()
+                : content.withTextIfEmpty(),
         );
     }
 

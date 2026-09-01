@@ -9,13 +9,13 @@
     import TextInput from '../../../lib/components/app/TextInput.svelte';
     import { goto } from '$app/navigation';
 
-    let email: string;
+    let email: string = $state('');
     let auth = getUser();
 
-    let loading = false;
-    let feedback = '';
+    let loading = $state(false);
+    let feedback = $state('');
     let error = '';
-    let changed = false;
+    let changed = $state(false);
 
     const errors: Record<string, string> = {
         'auth/invalid-mail': "This wasn't a valid email.",
@@ -65,7 +65,10 @@
 </Paragraph>
 
 <Paragraph>
-    <form on:submit|preventDefault={handleSubmit}>
+    <form onsubmit={(event) => {
+        event.preventDefault();
+        handleSubmit();
+    }}>
         <TextInput
             autocomplete="username"
             type="email"

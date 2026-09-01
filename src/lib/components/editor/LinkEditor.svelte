@@ -8,7 +8,11 @@
     import Options from '../app/Options.svelte';
     import { getCaret } from '$lib/components/page/Contexts';
 
-    export let link: LinkNode;
+    interface Props {
+        link: LinkNode;
+    }
+
+    let { link }: Props = $props();
 
     let caret = getCaret();
     let edition = getEdition();
@@ -16,7 +20,7 @@
     let chapter = getChapter();
     let root = getRoot();
 
-    $: url = link.getMeta();
+    let url = $derived(link.getMeta());
 
     function saveEdit(value: string) {
         $caret?.edit(link, link.withMeta(value));
@@ -57,36 +61,36 @@
             return 'Not a valid chapter label.';
     }
 
-    let options: [string, string][] = [];
-    $: {
-        options = [];
+    let options: [string, string][] = $derived.by(() => {
+        const list: [string, string][] = [];
         // Add an empty option.
-        options.push(['External link', url.startsWith('http') ? url : '']);
+        list.push(['External link', url.startsWith('http') ? url : '']);
         // Add an option for each chapter and it's labels.
         if ($edition) {
             for (const chap of $edition?.getChapters() ?? []) {
                 // Include the chapter itself
-                options.push([`Chapter: ${chap.getTitle()}`, chap.getID()]);
+                list.push([`Chapter: ${chap.getTitle()}`, chap.getID()]);
                 const root = chap.getAST($edition);
                 if (root) {
                     // Include the chapter's headers
                     const headers = root.getHeaders();
                     for (let number = 0; number < headers.length; number++) {
-                        options.push([
+                        list.push([
                             chap.getTitle() + ': ' + headers[number].toText(),
                             `${chap.getID()}#header-${number}`,
                         ]);
                     }
                     // Include all of the labels in the chapter
                     for (const label of root.getLabels())
-                        options.push([
+                        list.push([
                             chap.getTitle() + ': ' + label.getMeta(),
                             `${chap.getID()}:${label.getMeta()}`,
                         ]);
                 }
             }
         }
-    }
+        return list;
+    });
 </script>
 
 <span>

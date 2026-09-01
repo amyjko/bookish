@@ -4,19 +4,23 @@
     import Note from './Note.svelte';
     import { getCaret, getEdition } from '$lib/components/page/Contexts';
 
-    export let definition: DefinitionNode;
+    interface Props {
+        definition: DefinitionNode;
+    }
+
+    let { definition }: Props = $props();
 
     let caret = getCaret();
     let edition = getEdition();
-    $: glossary = $edition?.getGlossary();
+    let glossary = $derived($edition?.getGlossary());
 
     function handleChange(glossaryID: string) {
         $caret?.edit(definition, definition.withMeta(glossaryID));
     }
 
     // Sort the glossary entries by phrase
-    $: entries =
-        glossary === undefined
+    let entries =
+        $derived(glossary === undefined
             ? undefined
             : Object.entries(glossary)
                   .map(([key, value]) => {
@@ -24,7 +28,7 @@
                   })
                   .sort((a, b) =>
                       a && b ? a.phrase.localeCompare(b.phrase) : 0
-                  );
+                  ));
 </script>
 
 {#if entries !== undefined && glossary !== undefined}

@@ -61,9 +61,9 @@ export default class ListNode extends BlockNode {
                 previous.concat(
                     current instanceof FormatNode
                         ? [current]
-                        : current.getFormats()
+                        : current.getFormats(),
                 ),
-            []
+            [],
         ) as FormatNode[];
     }
     getFirstLastItem(first: boolean): FormatNode | undefined {
@@ -95,7 +95,7 @@ export default class ListNode extends BlockNode {
                           (item instanceof ListNode
                               ? ''
                               : number + 1 + '.'.repeat(level) + ' ') +
-                          item.toBookdown(level + 1)
+                          item.toBookdown(level + 1),
                   )
                   .join('\n')
             : this.#items
@@ -104,7 +104,7 @@ export default class ListNode extends BlockNode {
                           (item instanceof ListNode
                               ? ''
                               : '*'.repeat(level) + ' ') +
-                          item.toBookdown(level + 1)
+                          item.toBookdown(level + 1),
                   )
                   .join('\n');
     }
@@ -128,7 +128,7 @@ export default class ListNode extends BlockNode {
     atBeginningOfItem(root: Node, caret: Caret) {
         const format = caret.node.getFarthestParentMatching(
             root,
-            (n) => n instanceof FormatNode
+            (n) => n instanceof FormatNode,
         ) as FormatNode;
 
         return (
@@ -141,7 +141,7 @@ export default class ListNode extends BlockNode {
 
     getItemContaining(caret: Caret): number | undefined {
         const match = this.#items.find(
-            (n) => n.getParentOf(caret.node) !== undefined
+            (n) => n.getParentOf(caret.node) !== undefined,
         );
         if (match === undefined) return undefined;
         const index = this.#items.indexOf(match);
@@ -163,7 +163,7 @@ export default class ListNode extends BlockNode {
     copy(): this {
         return new ListNode(
             this.#items.map((i) => i.copy()),
-            this.#numbered
+            this.#numbered,
         ) as this;
     }
 
@@ -188,7 +188,7 @@ export default class ListNode extends BlockNode {
 
     withItemAfter(
         item: ListNodeType,
-        anchor: ListNodeType
+        anchor: ListNodeType,
     ): ListNode | undefined {
         const index = this.#items.indexOf(anchor);
         if (index < 0) return;
@@ -239,12 +239,12 @@ export default class ListNode extends BlockNode {
             if (itemToMerge === undefined) return;
             const newSubList = deletedItem.withChildReplaced(
                 itemToMerge,
-                undefined
+                undefined,
             );
             if (newSubList === undefined) return;
             const listWithRevisedSublist = this.withChildReplaced(
                 deletedItem,
-                newSubList
+                newSubList,
             );
             if (listWithRevisedSublist === undefined) return;
             const lastCaret = previousItem.getLastCaret();
@@ -254,7 +254,7 @@ export default class ListNode extends BlockNode {
             const mergedItem = previousItem.withSegmentsAppended(itemToMerge);
             const listWithMergedItem = listWithRevisedSublist.withChildReplaced(
                 previousItem,
-                mergedItem
+                mergedItem,
             );
             if (listWithMergedItem === undefined) return;
             const newCaret = indexToCaret(mergedItem, textIndex);
@@ -272,12 +272,12 @@ export default class ListNode extends BlockNode {
             const mergedItem = lastItem.withSegmentsAppended(deletedItem);
             const newSublist = previousItem.withChildReplaced(
                 lastItem,
-                mergedItem
+                mergedItem,
             );
             if (newSublist === undefined) return;
             const newList = this.withChildReplaced(
                 previousItem,
-                newSublist
+                newSublist,
             )?.withoutItemAt(index);
             if (newList === undefined) return;
             const newCaret = indexToCaret(mergedItem, newCaretIndex);
@@ -291,7 +291,7 @@ export default class ListNode extends BlockNode {
             const mergedItem = previousItem.withSegmentsAppended(deletedItem);
             const newList = this.withItemReplaced(
                 index - 1,
-                mergedItem
+                mergedItem,
             )?.withoutItemAt(index);
             if (newList === undefined) return;
             const newCaret = indexToCaret(mergedItem, newCaretIndex);
@@ -303,7 +303,7 @@ export default class ListNode extends BlockNode {
     withItemSplit(caret: Caret): ListNode | undefined {
         // Which item contains the caret?
         const item = this.#items.find(
-            (i) => i instanceof FormatNode && i.contains(caret.node)
+            (i) => i instanceof FormatNode && i.contains(caret.node),
         ) as FormatNode | undefined;
         if (item === undefined) return;
         const parts = item.split(caret);
@@ -327,19 +327,19 @@ export default class ListNode extends BlockNode {
                 if (beforeList instanceof ListNode)
                     return this.withItemReplaced(
                         index - 1,
-                        beforeList.withItemAppended(format)
+                        beforeList.withItemAppended(format),
                     )?.withoutItemAt(index);
                 // If the format is just before a list, move the format to the beginning of the list.
                 else if (afterList instanceof ListNode)
                     return this.withItemReplaced(
                         index + 1,
-                        afterList.withItemPrepended(format)
+                        afterList.withItemPrepended(format),
                     )?.withoutItemAt(index);
                 // Otherwise, make a new sub list node, add the format to it.
                 else
                     return this.withItemReplaced(
                         index,
-                        new ListNode([format], this.#numbered)
+                        new ListNode([format], this.#numbered),
                     );
             }
             // If this is a sublist, see if it contains the item, and if so,
@@ -364,11 +364,11 @@ export default class ListNode extends BlockNode {
                 if (match >= 0) {
                     const before = new ListNode(
                         list.#items.slice(0, match),
-                        this.#numbered
+                        this.#numbered,
                     );
                     const after = new ListNode(
                         list.#items.slice(match + 1),
-                        this.#numbered
+                        this.#numbered,
                     );
                     let newItems: ListNodeType[] = this.#items.slice(0, index);
                     if (before.getLength() > 0) newItems.push(before);
@@ -390,7 +390,7 @@ export default class ListNode extends BlockNode {
 
     withChildReplaced(
         node: ListNodeType,
-        replacement: ListNodeType | undefined
+        replacement: ListNodeType | undefined,
     ): this | undefined {
         const index = this.#items.indexOf(node);
         if (index < 0) return;
@@ -405,7 +405,7 @@ export default class ListNode extends BlockNode {
                       replacement,
                       ...this.#items.slice(index + 1),
                   ],
-            this.#numbered
+            this.#numbered,
         ) as this;
     }
 

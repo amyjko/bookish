@@ -1,5 +1,3 @@
-<svelte:options immutable={true} />
-
 <script lang="ts">
     import Reference from '$lib/models/book/Reference';
     import Button from '../app/Button.svelte';
@@ -10,13 +8,17 @@
     import Link from '../Link.svelte';
     import Note from '../editor/Note.svelte';
 
-    export let reference: Reference;
-    export let edit: boolean = false;
+    interface Props {
+        reference: Reference;
+        edit?: boolean;
+    }
+
+    let { reference, edit = false }: Props = $props();
 
     let editable = isEditionEditable();
     let edition = getEdition();
 
-    let editing = false;
+    let editing = $state(false);
 
     function startEditing() {
         editing = true;

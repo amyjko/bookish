@@ -9,23 +9,46 @@
     import Button from '../app/Button.svelte';
     import ConfirmButton from '../editor/ConfirmButton.svelte';
 
-    /** True if an author should be able to edit this header. */
-    export let editable: boolean;
-    export let label: string;
-    export let header: string;
-    export let id: string;
-    export let subtitle: string | undefined = undefined;
-    export let print: boolean = false;
-    export let tags: string[] | undefined = undefined;
-    export let getImage: undefined | (() => string | null) = undefined;
-    export let setImage:
+    
+    
+    interface Props {
+        /** True if an author should be able to edit this header. */
+        editable: boolean;
+        label: string;
+        header: string;
+        id: string;
+        subtitle?: string | undefined;
+        print?: boolean;
+        tags?: string[] | undefined;
+        getImage?: undefined | (() => string | null);
+        setImage?: 
         | undefined
-        | ((embed: string | null) => Promise<void> | void) = undefined;
-    /** For saving the revised chapter title*/
-    export let save: ((text: string) => Promise<void> | void) | null = null;
+        | ((embed: string | null) => Promise<void> | void);
+        /** For saving the revised chapter title*/
+        save?: ((text: string) => Promise<void> | void) | null;
+        outline?: import('svelte').Snippet;
+        before?: import('svelte').Snippet;
+        after?: import('svelte').Snippet;
+    }
 
-    let title: HTMLHeadingElement | null = null;
-    let showReminder: boolean = true;
+    let {
+        editable,
+        label,
+        header,
+        id,
+        subtitle = undefined,
+        print = false,
+        tags = undefined,
+        getImage = undefined,
+        setImage = undefined,
+        save = null,
+        outline,
+        before,
+        after
+    }: Props = $props();
+
+    let title: HTMLHeadingElement | null = $state(null);
+    let showReminder: boolean = $state(true);
 
     let auth = getUser();
     let edition = getEdition();
@@ -60,8 +83,8 @@
     });
 
     // Get the embed, update when getImage function prop changes.
-    let embed: string | null;
-    $: embed = getImage ? getImage() : null;
+    let embed: string | null = $derived(getImage ? getImage() : null);
+    
 </script>
 
 <!-- We key on the chapter ID to avoid laggy updates from image loading -->
@@ -89,7 +112,7 @@
                     />
                 {/if}
                 {#if !print && showReminder}
-                    <div class="bookish-scroll-reminder" />
+                    <div class="bookish-scroll-reminder"></div>
                 {/if}
             </div>
         {:else}
@@ -97,7 +120,7 @@
             <p>&nbsp;</p>
         {/if}
         {#if !print}
-            <slot name="outline" />
+            {@render outline?.()}
         {/if}
         {#if editable && getImage && setImage}
             {#if embed === null}
@@ -113,7 +136,7 @@
             {/if}
         {/if}
         <div bind:this={title} class="bookish-chapter-header-text">
-            <slot name="before" />
+            {@render before?.()}
             <Title>
                 {#if editable && save}
                     <TextEditor
@@ -132,7 +155,7 @@
                         >{/if}
                 {/if}
             </Title>
-            <slot name="after" />
+            {@render after?.()}
             {#if tags}
                 <div
                     >{#each tags as tag}<span class="bookish-tag">{tag}</span

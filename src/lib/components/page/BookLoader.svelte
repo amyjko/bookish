@@ -10,25 +10,33 @@
         listenToBooksByName as listenToBooksWithName,
     } from '$lib/models/CRUD';
     import type { Unsubscribe } from 'firebase/auth';
+    interface Props {
+        children?: import('svelte').Snippet;
+    }
+
+    let { children }: Props = $props();
 
     let auth = getUser();
     let book = getBook();
 
     // Keep track of the query updates
-    let booksByName: Book[] | undefined = undefined;
-    let bookByID: Book | null | undefined = undefined;
+    let booksByName: Book[] | undefined = $state(undefined);
+    let bookByID: Book | null | undefined = $state(undefined);
 
-    // Mege them together here
-    $: currentBook =
+    // Merge them together here
+    let currentBook = $derived.by(() => {
         // Neither loaded? Current book isn't loaded.
-        booksByName === undefined && bookByID === undefined
-            ? undefined
-            : booksByName !== undefined && booksByName.length > 0
+        if (booksByName === undefined && bookByID === undefined)
+            return undefined;
+        return booksByName !== undefined && booksByName.length > 0
             ? booksByName[0]
             : bookByID ?? null;
+    });
 
     // Whenever the merge changes, update the book store (updating the whole UI)
-    $: book.set(currentBook ?? undefined);
+    $effect.pre(() => {
+        book.set(currentBook ?? undefined);
+    });
 
     // Keep track of listeners to unsubscribe to on page changes.
     let nameUnsub: Unsubscribe | undefined = undefined;
@@ -40,7 +48,7 @@
     }
 
     // Keep track of any errors.
-    let error: string | undefined;
+    let error: string | undefined = $state();
 
     function listen() {
         unsub();
@@ -61,7 +69,9 @@
     }
 
     // When page or auth changes and there's a user, update the listener.
-    $: if ($page && $auth && $auth.user !== null) listen();
+    $effect(() => {
+        if ($page && $auth && $auth.user !== null) listen();
+    });
 
     // When this is unmounted, unset them.
     onDestroy(() => {
@@ -75,5 +85,5 @@
 {:else if currentBook === undefined}
     <Loading />
 {:else}
-    <slot />
+    {@render children?.()}
 {/if}

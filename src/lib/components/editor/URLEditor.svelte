@@ -2,9 +2,13 @@
     import TextEditor from './TextEditor.svelte';
     import Link from '../app/Link.svelte';
 
-    export let url: string;
-    export let validator: (text: string) => undefined | string;
-    export let edit: (newURL: string) => string | undefined;
+    interface Props {
+        url: string;
+        validator: (text: string) => undefined | string;
+        edit: (newURL: string) => string | undefined;
+    }
+
+    let { url, validator, edit }: Props = $props();
 </script>
 
 <TextEditor

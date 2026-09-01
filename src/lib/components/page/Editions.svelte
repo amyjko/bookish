@@ -9,21 +9,20 @@
     import Parser from '../../models/chapter/Parser';
     import Permissions from '../editor/Permissions.svelte';
 
-    export let editors: boolean = true;
+    interface Props {
+        editors?: boolean;
+    }
+
+    let { editors = true }: Props = $props();
 
     let book = getBook();
     let editable = isBookEditable();
     let user = getUser();
 
-    $: editions = $book?.getEditions();
 
-    $: latestPublishedID = $book?.getLatestPublishedEditionID();
 
-    let publisher = false;
+    let publisher = $state(false);
 
-    $: {
-        if ($user && $user.user) updateUserClaims();
-    }
 
     async function updateUserClaims() {
         if ($user === undefined || $user.user === null) return;
@@ -42,6 +41,11 @@
             console.error('Error creating new edition:', err);
         }
     }
+    let editions = $derived($book?.getEditions());
+    let latestPublishedID = $derived($book?.getLatestPublishedEditionID());
+    $effect(() => {
+        if ($user && $user.user) updateUserClaims();
+    });
 </script>
 
 {#if $book && editions}

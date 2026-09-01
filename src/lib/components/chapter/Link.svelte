@@ -1,19 +1,21 @@
-<svelte:options immutable={true} />
-
 <script lang="ts">
     import type LinkNode from '$lib/models/chapter/LinkNode';
     import { getBase, getEdition, isChapterEditable } from '../page/Contexts';
     import Text from './Text.svelte';
     import Problem from './Problem.svelte';
 
-    export let node: LinkNode;
+    interface Props {
+        node: LinkNode;
+    }
+
+    let { node }: Props = $props();
 
     let base = getBase();
     let editable = isChapterEditable();
     let edition = getEdition();
 
-    $: url = node.getMeta();
-    $: content = node.getText();
+    let url = $derived(node.getMeta());
+    let content = $derived(node.getText());
 
     function isInvalidChapterLink() {
         // If it's internal, validate it.

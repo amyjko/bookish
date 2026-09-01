@@ -1,3 +1,4 @@
+<!-- @migration-task Error while migrating Svelte code: Can't migrate code with afterUpdate. Please migrate by hand. -->
 <script lang="ts">
     import BookishNode from '$lib/models/chapter/Node';
     import ChapterNode from '$lib/models/chapter/ChapterNode';
@@ -45,7 +46,7 @@
     export let save: (node: RootNode) => Promise<void> | void;
     export let chapter: boolean;
     export let autofocus: boolean = false;
-    export let component: ConstructorOfATypedSvelteComponent;
+    export let component: import('svelte').Component<any>;
     export let placeholder: string;
     export let leasee: string | boolean;
     export let lease: (lock: boolean) => Promise<boolean> | boolean;

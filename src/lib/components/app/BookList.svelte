@@ -2,8 +2,12 @@
     import type Book from '../../models/book/Book';
     import BookPreview from '../BookPreview.svelte';
 
-    export let books: Book[];
-    export let write: boolean;
+    interface Props {
+        books: Book[];
+        write: boolean;
+    }
+
+    let { books, write }: Props = $props();
 </script>
 
 <section class="previews">

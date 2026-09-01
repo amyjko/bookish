@@ -18,22 +18,22 @@
     let base = getBase();
 
     // What letter are we matching?
-    $: letter = $page.params.letter;
+    let letter = $derived($page.params.letter);
 
-    $: bookIndex = $edition?.getBookIndex() ?? {};
+    let bookIndex = $derived($edition?.getBookIndex() ?? {});
 
-    let letters: Record<string, boolean> = {};
     // Figure out what letters have words
-    $: {
+    let letters: Record<string, boolean> = $derived.by(() => {
+        const map: Record<string, boolean> = {};
         for (const word of Object.keys(bookIndex).sort((a, b) =>
             a.localeCompare(b),
         ))
-            letters[word.charAt(0).toLocaleLowerCase()] = true;
-    }
+            map[word.charAt(0).toLocaleLowerCase()] = true;
+        return map;
+    });
 
-    let words: (string | true)[] = [];
-    $: {
-        words = [];
+    let words: (string | true)[] = $derived.by(() => {
+        const list: (string | true)[] = [];
         let count = 0;
         Object.keys(bookIndex)
             .sort((a, b) => a.localeCompare(b))
@@ -41,11 +41,12 @@
                 const firstLetter = word.charAt(0).toLowerCase();
                 if (letter === firstLetter) {
                     count++;
-                    if (count % 20 === 0) words.push(true);
-                    words.push(word);
+                    if (count % 20 === 0) list.push(true);
+                    list.push(word);
                 }
             });
-    }
+        return list;
+    });
 </script>
 
 {#if $edition}
@@ -66,14 +67,16 @@
                     ? edition.set($edition.withHeader(ChapterIDs.IndexID, text))
                     : undefined}
         >
-            <Outline
-                slot="outline"
-                previous={$edition.getPreviousChapterID(
-                    ChapterIDs.IndexID,
-                    editable,
-                )}
-                next={$edition.getNextChapterID(ChapterIDs.IndexID, editable)}
-            />
+            {#snippet outline()}
+                        <Outline
+                    
+                    previous={$edition.getPreviousChapterID(
+                        ChapterIDs.IndexID,
+                        editable,
+                    )}
+                    next={$edition.getNextChapterID(ChapterIDs.IndexID, editable)}
+                />
+                    {/snippet}
         </Header>
 
         <Instructions {editable}>

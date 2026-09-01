@@ -1,11 +1,11 @@
 import adapter from '@sveltejs/adapter-node';
-import preprocess from 'svelte-preprocess';
+import { vitePreprocess } from '@sveltejs/vite-plugin-svelte';
 
 /** @type {import('@sveltejs/kit').Config} */
 const config = {
-    // Consult https://github.com/sveltejs/svelte-preprocess
-    // for more information about preprocessors
-    preprocess: preprocess(),
+    // script: true because some components use TS features (e.g. enums)
+    // that Svelte's native TypeScript support does not handle.
+    preprocess: vitePreprocess({ script: true }),
 
     kit: {
         adapter: adapter(),

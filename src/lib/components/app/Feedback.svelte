@@ -1,13 +1,18 @@
 <script lang="ts">
     import Large from './Large.svelte';
 
-    export let error: boolean = false;
+    interface Props {
+        error?: boolean;
+        children?: import('svelte').Snippet;
+    }
+
+    let { error = false, children }: Props = $props();
 </script>
 
 {#if error}
-    <p role="alert"><slot /></p>
+    <p role="alert">{@render children?.()}</p>
 {:else}
-    <p role="status" aria-live="polite"><Large><slot /></Large></p>
+    <p role="status" aria-live="polite"><Large>{@render children?.()}</Large></p>
 {/if}
 
 <style>

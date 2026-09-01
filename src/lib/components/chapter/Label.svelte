@@ -1,22 +1,24 @@
-<svelte:options immutable={true} />
-
 <script lang="ts">
     import type LabelNode from '$lib/models/chapter/LabelNode';
     import Atom from '$lib/components/chapter/Atom.svelte';
     import { getChapter, getRoot, isChapterEditable } from '../page/Contexts';
     import Problem from './Problem.svelte';
 
-    export let node: LabelNode;
+    interface Props {
+        node: LabelNode;
+    }
+
+    let { node }: Props = $props();
 
     let editable = isChapterEditable();
     let chapter = getChapter();
     let root = getRoot();
 
-    $: duplicate =
-        $root === undefined
+    let duplicate =
+        $derived($root === undefined
             ? false
             : $root.getLabels().filter((l) => l.getMeta() === node.getMeta())
-                  .length > 1;
+                  .length > 1);
 </script>
 
 <Atom {node}>

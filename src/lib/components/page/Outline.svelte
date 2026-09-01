@@ -5,20 +5,29 @@
     import { getBase, getDarkMode } from './Contexts';
     import DarkToggle from '$lib/components/controls/DarkToggle.svelte';
 
-    export let previous: string | null;
-    export let next: string | null;
-    export let collapse = false;
-    export let listener:
+    interface Props {
+        previous: string | null;
+        next: string | null;
+        collapse?: boolean;
+        listener?: 
         | ((expanded: boolean, layout: Function) => void)
-        | undefined = undefined;
+        | undefined;
+    }
+
+    let {
+        previous,
+        next,
+        collapse = false,
+        listener = undefined
+    }: Props = $props();
 
     let headerString: string | null = null;
-    let headerIndex = -1;
-    let expanded = false;
+    let headerIndex = $state(-1);
+    let expanded = $state(false);
     let dark = getDarkMode();
     let base = getBase();
-    let outline: HTMLElement | null = null;
-    let headers: Element[] = [];
+    let outline: HTMLElement | null = $state(null);
+    let headers: Element[] = $state([]);
 
     function toggleExpanded() {
         // Don't toggle when in margin mode.
@@ -160,8 +169,8 @@
                 ? 'Collapse navigation menu'
                 : 'Expand navigation menu'}
             tabindex="0"
-            on:click={headers.length > 0 ? toggleExpanded : undefined}
-            on:keydown={(event) => {
+            onclick={headers.length > 0 ? toggleExpanded : undefined}
+            onkeydown={(event) => {
                 if (event.key === 'Enter' || event.key === ' ')
                     toggleExpanded();
             }}

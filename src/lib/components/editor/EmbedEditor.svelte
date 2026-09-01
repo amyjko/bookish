@@ -10,12 +10,16 @@
     import Note from './Note.svelte';
     import { getBook, getCaret } from '$lib/components/page/Contexts';
 
-    export let embed: EmbedNode;
+    interface Props {
+        embed: EmbedNode;
+    }
+
+    let { embed }: Props = $props();
 
     let caret = getCaret();
-    let upload: undefined | number | string = undefined;
+    let upload: undefined | number | string = $state(undefined);
 
-    $: description = embed.getDescription();
+    let description = $derived(embed.getDescription());
     let book = getBook();
 
     function isValidURL(url: string): string | undefined {
@@ -74,7 +78,7 @@
 <label class="file-upload" tabIndex="0">
     <input
         type="file"
-        on:input={handleImageChange}
+        oninput={handleImageChange}
         accept=".jpg,.jpeg,.png,.gif,image/jpeg,image/png,image/gif"
     />
     Upload

@@ -54,7 +54,10 @@ function makeChapterContext(layoutMarginals: () => void) {
     return context;
 }
 
-function renderChapter(markup: string, layoutMarginals: () => void = () => undefined) {
+function renderChapter(
+    markup: string,
+    layoutMarginals: () => void = () => undefined,
+) {
     return render(ChapterBody, {
         props: { node: Parser.parseChapter(undefined, markup) },
         context: new Map<symbol, unknown>([
@@ -69,7 +72,9 @@ test('renders paragraphs and code blocks', () => {
     const { container } = renderChapter(
         "Hello world, this is a paragraph.\n\n`\nconsole.log('hi');\n`\n",
     );
-    expect(container.textContent).toContain('Hello world, this is a paragraph.');
+    expect(container.textContent).toContain(
+        'Hello world, this is a paragraph.',
+    );
     expect(container.querySelector('code.bookish-code')).not.toBeNull();
 });
 

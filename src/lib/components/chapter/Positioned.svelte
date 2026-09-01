@@ -1,9 +1,12 @@
-<svelte:options immutable={true} />
-
 <script lang="ts">
     import type Position from '$lib/models/chapter/Position';
 
-    export let position: Position;
+    interface Props {
+        position: Position;
+        children?: import('svelte').Snippet;
+    }
+
+    let { position, children }: Props = $props();
 </script>
 
 <div
@@ -11,7 +14,7 @@
         ? 'inset-left'
         : position === '>'
         ? 'inset-right'
-        : ''}><slot /></div
+        : ''}>{@render children?.()}</div
 >
 
 <style>

@@ -4,13 +4,17 @@
     import { getBase, getEdition } from './Contexts';
     import Link from '../Link.svelte';
 
-    export let embed: string | null;
-    export let url: string | undefined;
+    interface Props {
+        embed: string | null;
+        url: string | undefined;
+    }
+
+    let { embed, url }: Props = $props();
 
     let edition = getEdition();
     let base = getBase();
 
-    $: embedNode = embed === null ? null : Parser.parseEmbed($edition, embed);
+    let embedNode = $derived(embed === null ? null : Parser.parseEmbed($edition, embed));
 </script>
 
 {#if embedNode instanceof EmbedNode}

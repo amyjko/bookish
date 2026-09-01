@@ -13,11 +13,11 @@ const format = new FormatNode('', [textOne, textTwo, bold, textFive]);
 
 test('Replace descendants', () => {
     expect(
-        format.withNodeReplaced(textThree, new TextNode('hi'))?.toBookdown()
+        format.withNodeReplaced(textThree, new TextNode('hi'))?.toBookdown(),
     ).toBe('onetwo*hifour*five');
 
     expect(
-        format.withNodeReplaced(textFive, new TextNode('yo'))?.toBookdown()
+        format.withNodeReplaced(textFive, new TextNode('yo'))?.toBookdown(),
     ).toBe('onetwo*threefour*yo');
 });
 

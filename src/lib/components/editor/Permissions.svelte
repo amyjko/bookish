@@ -5,18 +5,28 @@
     import { getEditors } from '../page/Contexts';
     import Note from './Note.svelte';
 
-    export let uids: string[];
-    export let inheriteduids: string[];
-    export let writable: boolean;
-    export let atleastone: boolean;
-    export let change: (uids: string[]) => void;
+    interface Props {
+        uids: string[];
+        inheriteduids: string[];
+        writable: boolean;
+        atleastone: boolean;
+        change: (uids: string[]) => void;
+    }
+
+    let {
+        uids,
+        inheriteduids,
+        writable,
+        atleastone,
+        change
+    }: Props = $props();
 
     let emails = getEditors();
 
-    let newEditor: string = '';
-    let newEditorError: string | null = null;
+    let newEditor: string = $state('');
+    let newEditorError: string | null = $state(null);
 
-    let loading: string | undefined = undefined;
+    let loading: string | undefined = $state(undefined);
 
     async function addEditor() {
         const email = newEditor;
@@ -47,7 +57,10 @@
 {:else}
     <section class="emails">
         {#if writable}
-            <form on:submit|preventDefault={addEditor}>
+            <form onsubmit={(event) => {
+                    event.preventDefault();
+                    addEditor();
+                }}>
                 <TextInput
                     type="email"
                     placeholder="email"

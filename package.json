@@ -36,20 +36,19 @@
         "@playwright/test": "^1",
         "@sveltejs/adapter-node": "^5",
         "@sveltejs/package": "^2",
-        "@sveltejs/vite-plugin-svelte": "^3",
+        "@sveltejs/vite-plugin-svelte": "^6",
         "@testing-library/svelte": "^5",
         "@types/prismjs": "^1.26",
         "@types/smoothscroll-polyfill": "^0",
         "chalk": "^5.3.0",
         "jsdom": "^29",
         "prettier": "^3",
-        "prettier-plugin-svelte": "^3",
-        "svelte-check": "^3",
-        "svelte-preprocess": "^5",
+        "prettier-plugin-svelte": "^4",
+        "svelte-check": "^4.7",
         "tslib": "^2",
         "typescript": "^5",
-        "vite": "^5",
-        "vitest": "^3"
+        "vite": "^7",
+        "vitest": "^4"
     },
     "dependencies": {
         "@sveltejs/kit": "^2",
@@ -60,7 +59,7 @@
         "firebase-functions": "^6",
         "prismjs": "^1.29",
         "smoothscroll-polyfill": "^0.4",
-        "svelte": "^4",
+        "svelte": "^5.57",
         "uuid": "^11"
     },
     "engines": {

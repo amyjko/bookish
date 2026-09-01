@@ -1,64 +1,46 @@
 <script lang="ts">
+    import { run } from 'svelte/legacy';
+
     enum Status {
         Viewing,
         Editing,
     }
 
-    export let text: string;
-    export let label: string;
-    export let placeholder: string;
-    export let valid: (text: string) => string | undefined;
-    export let save: (
+    interface Props {
+        text: string;
+        label: string;
+        placeholder: string;
+        valid: (text: string) => string | undefined;
+        save: (
         text: string,
     ) => Promise<void> | undefined | void | string;
-    export let saveOnExit: boolean = false;
-    export let width: number | undefined = undefined;
-    export let clip: boolean = false;
-    export let move:
+        saveOnExit?: boolean;
+        width?: number | undefined;
+        clip?: boolean;
+        move?: 
         | ((el: HTMLElement, direction: -1 | 1) => void)
-        | undefined = undefined;
-
-    let status = Status.Viewing;
-    let field: HTMLInputElement | null = null;
-    let sizer: HTMLSpanElement | null = null;
-
-    $: error = valid(text);
-
-    // Grow the sizer when text or status changes.
-    $: {
-        if (sizer) {
-            // Set the invisible sizer to the text to set the container's width.
-            // The browser strips trailing spaces, causing jitter after a space, so we replace
-            // them with non-breaking spaces.
-            const sizedText = showPlaceholder()
-                ? placeholder
-                : text.replace(/\s$/g, '\u00a0');
-            // Clip the text to prevent this editor from getting too long when editing. If it goes past one line,
-            // the measurements and layout are way off.
-            const trimmedText =
-                width !== undefined &&
-                (clip === true || status === Status.Editing)
-                    ? sizedText.substring(0, width) + '…'
-                    : sizedText;
-            sizer.innerHTML = trimmedText;
-        }
+        | undefined;
     }
 
-    // When status changes, focus or blur.
-    $: {
-        if (field) {
-            if (status === Status.Editing) {
-                field.focus();
-            } else {
-                field.blur();
-            }
-        }
-    }
+    let {
+        text = $bindable(),
+        label,
+        placeholder,
+        valid,
+        save,
+        saveOnExit = false,
+        width = undefined,
+        clip = false,
+        move = undefined
+    }: Props = $props();
 
-    // When text changes, save, unless we only save on exit.
-    $: {
-        if (!saveOnExit) saveText(text);
-    }
+    let status = $state(Status.Viewing);
+    let field: HTMLInputElement | null = $state(null);
+    let sizer: HTMLSpanElement | null = $state(null);
+
+
+
+
 
     function showPlaceholder() {
         return text === '';
@@ -105,6 +87,40 @@
             move(field, 1);
         }
     }
+    let error = $derived(valid(text));
+    // Grow the sizer when text or status changes.
+    run(() => {
+        if (sizer) {
+            // Set the invisible sizer to the text to set the container's width.
+            // The browser strips trailing spaces, causing jitter after a space, so we replace
+            // them with non-breaking spaces.
+            const sizedText = showPlaceholder()
+                ? placeholder
+                : text.replace(/\s$/g, '\u00a0');
+            // Clip the text to prevent this editor from getting too long when editing. If it goes past one line,
+            // the measurements and layout are way off.
+            const trimmedText =
+                width !== undefined &&
+                (clip === true || status === Status.Editing)
+                    ? sizedText.substring(0, width) + '…'
+                    : sizedText;
+            sizer.innerHTML = trimmedText;
+        }
+    });
+    // When status changes, focus or blur.
+    run(() => {
+        if (field) {
+            if (status === Status.Editing) {
+                field.focus();
+            } else {
+                field.blur();
+            }
+        }
+    });
+    // When text changes, save, unless we only save on exit.
+    run(() => {
+        if (!saveOnExit) saveText(text);
+    });
 </script>
 
 <span
@@ -116,8 +132,8 @@
         class={`sizer ${error ? 'error' : ''}`}
         aria-hidden={true}
         bind:this={sizer}
-        on:click={startEditing}
-    />
+        onclick={startEditing}
+></span>
     <input
         type="text"
         bind:this={field}
@@ -127,10 +143,10 @@
         aria-label={label}
         aria-placeholder={label}
         {placeholder}
-        on:change={edit}
-        on:keydown={handleKeyPress}
-        on:blur={stopEditing}
-        on:focus={startEditing}
+        onchange={edit}
+        onkeydown={handleKeyPress}
+        onblur={stopEditing}
+        onfocus={startEditing}
     />
     {#if error && status === Status.Editing}
         <span

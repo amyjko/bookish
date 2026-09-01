@@ -1,14 +1,16 @@
-<svelte:options immutable={true} />
-
 <script lang="ts">
     import type QuoteNode from '$lib/models/chapter/QuoteNode';
     import Block from './Block.svelte';
     import Format from './Format.svelte';
     import Positioned from './Positioned.svelte';
 
-    export let node: QuoteNode;
+    interface Props {
+        node: QuoteNode;
+    }
 
-    $: credit = node.getCredit();
+    let { node }: Props = $props();
+
+    let credit = $derived(node.getCredit());
 </script>
 
 <Positioned position={node.getPosition()}>

@@ -15,23 +15,23 @@ const table = new TableNode(
         [bl, br],
     ],
     '|',
-    caption
+    caption,
 );
 
 test('Replace', () => {
     expect(
         table
             .withChildReplaced(tl, new FormatNode('', [new TextNode('new')]))
-            ?.toBookdown()
+            ?.toBookdown(),
     ).toBe(',new|tr\n,bl|br\nhi');
 
     expect(
         table
             .withChildReplaced(
                 caption,
-                new FormatNode('', [new TextNode('bye')])
+                new FormatNode('', [new TextNode('bye')]),
             )
-            ?.toBookdown()
+            ?.toBookdown(),
     ).toBe(',tl|tr\n,bl|br\nbye');
 });
 

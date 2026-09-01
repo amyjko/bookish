@@ -1,3 +1,4 @@
+<!-- @migration-task Error while migrating Svelte code: This migration would change the name of a slot (interactor to interactor_1) making the component unusable -->
 <svelte:options immutable={true} />
 
 <script lang="ts">

@@ -55,7 +55,7 @@ export default abstract class BlocksNode extends BlockNode {
     getFormats() {
         return this.getBlocks().reduce(
             (prev: FormatNode[], current) => prev.concat(current.getFormats()),
-            []
+            [],
         );
     }
 
@@ -78,7 +78,7 @@ export default abstract class BlocksNode extends BlockNode {
 
     getBlocksBetween(
         first: BlockNode,
-        last: BlockNode
+        last: BlockNode,
     ): BlockNode[] | undefined {
         const firstIndex = this.getIndexOf(first);
         const lastIndex = this.getIndexOf(last);
@@ -140,19 +140,19 @@ export default abstract class BlocksNode extends BlockNode {
 
     getTextNodes(): TextNode[] {
         return this.getNodes().filter(
-            (node) => node instanceof TextNode
+            (node) => node instanceof TextNode,
         ) as TextNode[];
     }
 
     getAtomNodes(): AtomNode<any>[] {
         return this.getNodes().filter(
-            (node) => node instanceof AtomNode
+            (node) => node instanceof AtomNode,
         ) as AtomNode<any>[];
     }
 
     getTextAndAtomNodes(): (TextNode | AtomNode<any>)[] {
         return this.getNodes().filter(
-            (node) => node instanceof TextNode || node instanceof AtomNode
+            (node) => node instanceof TextNode || node instanceof AtomNode,
         ) as (TextNode | AtomNode<any>)[];
     }
 
@@ -182,7 +182,7 @@ export default abstract class BlocksNode extends BlockNode {
         // Navigate from code node.
         const code = caret.node.getFarthestParentMatching(
             this,
-            (n) => n instanceof CodeNode
+            (n) => n instanceof CodeNode,
         ) as CodeNode;
         if (code && caret.node === code.getCodeNode()) {
             // Get the adjacent text node.
@@ -194,7 +194,7 @@ export default abstract class BlocksNode extends BlockNode {
             if (next) return code.getCaption().getFirstCaret();
             // If there's no adjacent caret, find the adjacent root format.
             const blocks = this.getNodes().filter(
-                (n) => n instanceof BlockNode
+                (n) => n instanceof BlockNode,
             ) as BlockNode[];
             const codeIndex = blocks.indexOf(code);
             if (codeIndex <= 0) return;
@@ -206,7 +206,7 @@ export default abstract class BlocksNode extends BlockNode {
 
         const format = caret.node.getFarthestParentMatching(
             this,
-            (n) => n instanceof FormatNode
+            (n) => n instanceof FormatNode,
         ) as FormatNode;
         if (format === undefined) return;
 
@@ -238,13 +238,13 @@ export default abstract class BlocksNode extends BlockNode {
 
     getSelectedFormatRange(
         format: FormatNode,
-        range: CaretRange
+        range: CaretRange,
     ): CaretRange | undefined {
         // Find all of the formats.
         const formats = this.getNodes().filter(
             (n) =>
                 n instanceof FormatNode &&
-                !(this.getParentOf(n) instanceof FormatNode)
+                !(this.getParentOf(n) instanceof FormatNode),
         ) as FormatNode[];
 
         // Find the given format index.
@@ -303,7 +303,7 @@ export default abstract class BlocksNode extends BlockNode {
     withBlockInserted(
         anchor: BlockNode,
         block: BlockNode,
-        before: boolean
+        before: boolean,
     ): BlocksNode | undefined {
         const index = this.#blocks.indexOf(anchor);
         if (index < 0) return;
@@ -349,7 +349,7 @@ export default abstract class BlocksNode extends BlockNode {
         // Find what block the caret is in.
         const block = caret.node.getClosestParentOfType<BlockNode>(
             blocks,
-            BlockNode
+            BlockNode,
         );
 
         if (block === undefined) return;
@@ -392,7 +392,7 @@ export default abstract class BlocksNode extends BlockNode {
 
             const newBlocks = container.withBlockInsertedAfter(
                 block,
-                newParagraph
+                newParagraph,
             );
             if (newBlocks === undefined) return;
 
@@ -412,7 +412,7 @@ export default abstract class BlocksNode extends BlockNode {
         // Find the format that contains the atom.
         const format = atom.getFarthestParentMatching(
             this,
-            (p) => p instanceof FormatNode
+            (p) => p instanceof FormatNode,
         ) as FormatNode | undefined;
         if (format === undefined) return;
 
@@ -524,7 +524,7 @@ export default abstract class BlocksNode extends BlockNode {
                 else {
                     const edit = block.withRangeFormatted(
                         { start: blockStart, end: blockEnd },
-                        format
+                        format,
                     );
 
                     // If we failed to format it, remove it.
@@ -555,7 +555,7 @@ export default abstract class BlocksNode extends BlockNode {
                                     .withChildReplaced(block, newBlock)
                                     ?.withBlockInsertedBefore(
                                         newBlock,
-                                        new ParagraphNode(0, firstItem)
+                                        new ParagraphNode(0, firstItem),
                                     );
 
                             if (blocksWithList === undefined) return;
@@ -570,7 +570,7 @@ export default abstract class BlocksNode extends BlockNode {
                         // Replace the block, or delete it if it's empty.
                         newBlocks = newBlocks.withChildReplaced(
                             block,
-                            newBlock.isEmpty() ? undefined : newBlock
+                            newBlock.isEmpty() ? undefined : newBlock,
                         );
                     }
 
@@ -593,8 +593,10 @@ export default abstract class BlocksNode extends BlockNode {
                 newBlocks = newBlocks.withNodeReplaced(
                     first,
                     first.withContent(
-                        first.getFormat().withSegmentsAppended(last.getFormat())
-                    )
+                        first
+                            .getFormat()
+                            .withSegmentsAppended(last.getFormat()),
+                    ),
                 );
                 if (newBlocks === undefined) return;
                 // Remove the last paragraph.
@@ -618,7 +620,7 @@ export default abstract class BlocksNode extends BlockNode {
 
     withSegmentAtSelection(
         range: CaretRange,
-        nodeCreator: (text: string) => FormatNodeSegmentType
+        nodeCreator: (text: string) => FormatNodeSegmentType,
     ): Edit {
         let blocks: BlocksNode = this;
         let caret = range.start;
@@ -629,7 +631,7 @@ export default abstract class BlocksNode extends BlockNode {
         // Get the nearest FormatNode parent of the selected text. Bail on fail.
         const formatted = caret.node.getClosestParentOfType<FormatNode>(
             blocks,
-            FormatNode
+            FormatNode,
         );
         if (formatted === undefined) return;
 
@@ -643,7 +645,7 @@ export default abstract class BlocksNode extends BlockNode {
 
     withParagraphsAsLists(
         range: CaretRange,
-        numbered: boolean
+        numbered: boolean,
     ): BlocksNode | undefined {
         const sortedRange = this.sortRange(range);
         const blocksInRange = this.getBlocksInRange(sortedRange);
@@ -673,28 +675,28 @@ export default abstract class BlocksNode extends BlockNode {
             // Make the new list
             const newList = new ListNode(
                 sequence.map((p) => p.getFormat()),
-                numbered
+                numbered,
             );
             // Insert the new list
             const blocksParent: BlocksNode | undefined = sequence[0].getParent(
-                newBlocks
+                newBlocks,
             ) as BlocksNode;
             if (blocksParent === undefined) return;
             let newSequenceBlocks = blocksParent.withBlockInsertedBefore(
                 sequence[0],
-                newList
+                newList,
             );
             // Remove all of the old paragraphs
             for (let j = 0; j < sequence.length; j++) {
                 newSequenceBlocks = newSequenceBlocks?.withoutBlock(
-                    sequence[j]
+                    sequence[j],
                 );
                 if (newSequenceBlocks === undefined) return;
             }
             // Replace the blocks parent with the new blocks.
             const newRoot = newBlocks.withNodeReplaced(
                 blocksParent,
-                newSequenceBlocks
+                newSequenceBlocks,
             );
             if (newRoot === undefined || !(newRoot instanceof BlocksNode))
                 return;
@@ -718,11 +720,11 @@ export default abstract class BlocksNode extends BlockNode {
                         l.getParent(this) instanceof ListNode
                             ? l.getFarthestParentMatching(
                                   this,
-                                  (m) => m instanceof ListNode
+                                  (m) => m instanceof ListNode,
                               )
-                            : l
+                            : l,
                     )
-                    .filter((n) => n !== undefined)
+                    .filter((n) => n !== undefined),
             ),
         ] as ListNode[];
         if (listRootsInRange.length === 0) return undefined;
@@ -734,14 +736,14 @@ export default abstract class BlocksNode extends BlockNode {
                 .getNodes()
                 .filter((n) => n instanceof FormatNode)
                 .map(
-                    (f) => new ParagraphNode(0, f as FormatNode)
+                    (f) => new ParagraphNode(0, f as FormatNode),
                 ) as ParagraphNode[];
             // Insert in reverse order to keep them in order, since the list is our anchor.
             for (let j = paragraphs.length - 1; j >= 0; j--) {
                 const paragraph = paragraphs[j];
                 const insertedBlocks = newBlocks.withBlockInsertedAfter(
                     list,
-                    paragraph
+                    paragraph,
                 );
                 if (insertedBlocks === undefined) return;
                 newBlocks = insertedBlocks;
@@ -756,20 +758,20 @@ export default abstract class BlocksNode extends BlockNode {
 
     withListsIndented(
         range: CaretRange,
-        indent: boolean
+        indent: boolean,
     ): BlocksNode | undefined {
         let newBlocks: BlocksNode = this;
 
         // Find all of the formats in list nodes in the range and indent them.
         const ancestor = range.start.node.getCommonAncestor(
             newBlocks,
-            range.end.node
+            range.end.node,
         );
         const nodes = ancestor?.getNodes();
         const formats = nodes?.filter(
             (n) =>
                 n instanceof FormatNode &&
-                newBlocks.getParentOf(n) instanceof ListNode
+                newBlocks.getParentOf(n) instanceof ListNode,
         ) as FormatNode[];
         const startIndex = nodes?.indexOf(range.start.node);
         const endIndex = nodes?.indexOf(range.end.node);
@@ -793,7 +795,7 @@ export default abstract class BlocksNode extends BlockNode {
                 // Find the root list node of the format.
                 const list = format.getFarthestParentMatching(
                     newBlocks,
-                    (n) => n instanceof ListNode
+                    (n) => n instanceof ListNode,
                 );
                 if (list instanceof ListNode) {
                     const newList = indent
@@ -802,7 +804,7 @@ export default abstract class BlocksNode extends BlockNode {
                     if (newList === undefined) return;
                     const blocksWithIndent = newBlocks.withChildReplaced(
                         list,
-                        newList
+                        newList,
                     );
                     if (blocksWithIndent === undefined) return;
                     newBlocks = blocksWithIndent;
@@ -838,7 +840,7 @@ export default abstract class BlocksNode extends BlockNode {
                 if (editedFormat !== undefined) {
                     const newBlocks = this.withNodeReplaced(
                         parent,
-                        editedFormat.root
+                        editedFormat.root,
                     );
                     if (newBlocks === undefined) return;
                     return { root: newBlocks, range: editedFormat.range };
@@ -856,12 +858,12 @@ export default abstract class BlocksNode extends BlockNode {
                 if (revisedCode === undefined) return;
                 const revisedCodeNode = parent.withChildReplaced(
                     parent.getCodeNode(),
-                    revisedCode
+                    revisedCode,
                 );
                 if (revisedCodeNode === undefined) return;
                 const newBlocks = this.withNodeReplaced(
                     parent,
-                    revisedCodeNode
+                    revisedCodeNode,
                 );
                 const newCaret = {
                     node: revisedCode,
@@ -900,7 +902,7 @@ export default abstract class BlocksNode extends BlockNode {
                     const newParagraph = new ParagraphNode(0, item);
                     const newBlocks = this.withNodeReplaced(
                         parent,
-                        newParagraph
+                        newParagraph,
                     );
                     const newCaret = newParagraph.getFirstCaret();
                     if (newBlocks === undefined || newCaret === undefined)
@@ -937,7 +939,7 @@ export default abstract class BlocksNode extends BlockNode {
                             ? caretToIndex(parent.getFormat(), currentCaret)
                             : caretToIndex(
                                   adjacentBlock.getFormat(),
-                                  currentCaret
+                                  currentCaret,
                               );
                         if (textIndex === undefined) return;
                         const mergedParagraph = next
@@ -949,14 +951,14 @@ export default abstract class BlocksNode extends BlockNode {
                             blocks
                                 .withChildReplaced(
                                     adjacentBlock,
-                                    mergedParagraph
+                                    mergedParagraph,
                                 )
-                                ?.withoutBlock(parent)
+                                ?.withoutBlock(parent),
                         );
                         if (newBlocks === undefined) return;
                         const newCaret = indexToCaret(
                             mergedParagraph.getFormat(),
-                            textIndex
+                            textIndex,
                         );
                         if (newCaret === undefined) return;
                         return {
@@ -973,7 +975,7 @@ export default abstract class BlocksNode extends BlockNode {
                                 const newParagraph = parent.withContent(
                                     parent
                                         .getFormat()
-                                        .withSegmentsAppended(format)
+                                        .withSegmentsAppended(format),
                                 );
                                 const newBlocks = blocks
                                     .withNodeReplaced(parent, newParagraph)
@@ -991,7 +993,7 @@ export default abstract class BlocksNode extends BlockNode {
                             const format = adjacentBlock.getLastItem();
                             if (format !== undefined) {
                                 const newFormat = format.withSegmentAppended(
-                                    parent.getFormat()
+                                    parent.getFormat(),
                                 );
                                 const newBlocks = blocks
                                     .withNodeReplaced(format, newFormat)
@@ -1015,7 +1017,7 @@ export default abstract class BlocksNode extends BlockNode {
                     else {
                         const newBlocks = this.withNodeReplaced(
                             blocks,
-                            blocks.withoutBlock(adjacentBlock)
+                            blocks.withoutBlock(adjacentBlock),
                         );
                         return newBlocks === undefined
                             ? undefined
@@ -1038,8 +1040,8 @@ export default abstract class BlocksNode extends BlockNode {
             node instanceof BlocksNode
                 ? node.getBlocks()
                 : node instanceof BlockNode
-                ? [node]
-                : [];
+                  ? [node]
+                  : [];
         // If there are none, do nothing.
         if (blocks.length === 0) return;
         // Find the block in this blocks node that contains the caret.
@@ -1079,7 +1081,7 @@ export default abstract class BlocksNode extends BlockNode {
             else {
                 newBlocks = newBlocks.withBlockInsertedAfter(
                     lastInsert,
-                    newBlock
+                    newBlock,
                 );
             }
             // Bail on fail.
@@ -1094,12 +1096,12 @@ export default abstract class BlocksNode extends BlockNode {
         if (formats.length === 0) {
             const newParagraph = new ParagraphNode(
                 0,
-                new FormatNode('', [new TextNode()])
+                new FormatNode('', [new TextNode()]),
             );
             newCaret = newParagraph.getFirstCaret();
             newBlocks = newBlocks.withBlockInsertedAfter(
                 lastInsert,
-                newParagraph
+                newParagraph,
             );
             if (newCaret === undefined || newBlocks === undefined) return;
         } else {

@@ -5,6 +5,11 @@
     import Instructions from './Instructions.svelte';
     import ChapterIDs from '$lib/models/book/ChapterID';
     import { getEdition, isEditionEditable } from './Contexts';
+    interface Props {
+        children?: import('svelte').Snippet;
+    }
+
+    let { children }: Props = $props();
 
     let editable = isEditionEditable();
     let edition = getEdition();
@@ -25,7 +30,9 @@
                     : undefined}
             header={$edition.getHeader(ChapterIDs.UnknownID)}
         >
-            <Outline slot="outline" previous={null} next={null} />
+            {#snippet outline()}
+                        <Outline  previous={null} next={null} />
+                    {/snippet}
         </Header>
 
         <Instructions {editable}>
@@ -33,6 +40,6 @@
             doesn't exist. You can customize the image shown.
         </Instructions>
 
-        <slot />
+        {@render children?.()}
     </Page>
 {/if}

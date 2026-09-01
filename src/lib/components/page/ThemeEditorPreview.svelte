@@ -4,19 +4,23 @@
     import Parser from '$lib/models/chapter/Parser';
     import { getDarkMode } from './Contexts';
 
-    export let theme: Theme | null;
+    interface Props {
+        theme: Theme | null;
+    }
 
-    let position: number;
+    let { theme }: Props = $props();
+
+    let position: number = $state(0);
 
     let darkMode = getDarkMode();
-    $: backgroundColor =
-        theme === null
+    let backgroundColor =
+        $derived(theme === null
             ? null
             : $darkMode
             ? theme.dark?.backgroundColor
-            : theme.light?.backgroundColor;
+            : theme.light?.backgroundColor);
 
-    $: preview = Parser.parseChapter(
+    let preview = $derived(Parser.parseChapter(
         undefined,
         `# Header 1
 		## Header 2
@@ -27,7 +31,7 @@
 		* How does it look?
 		* Would you change anything?
 	`
-    );
+    ));
 </script>
 
 <aside

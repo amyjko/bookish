@@ -4,9 +4,14 @@
     import { getEdition, isEditionEditable } from './Contexts';
     import PageHeader from './PageHeader.svelte';
 
-    export let id: TOCHeaderKey;
-    /** ARIA label */
-    export let label: string;
+    
+    interface Props {
+        id: TOCHeaderKey;
+        /** ARIA label */
+        label: string;
+    }
+
+    let { id, label }: Props = $props();
 
     let edition = getEdition();
     let editable = isEditionEditable();

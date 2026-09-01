@@ -21,7 +21,7 @@ export default abstract class BlockNode extends Node {
     }
     getTextNodes(): TextNode[] {
         return this.getNodes().filter(
-            (n) => n instanceof TextNode
+            (n) => n instanceof TextNode,
         ) as TextNode[];
     }
     getFirstCaret() {
@@ -58,7 +58,7 @@ export default abstract class BlockNode extends Node {
                 node: node,
                 index: node instanceof TextNode ? node.getLength() : 0,
             },
-            true
+            true,
         )?.node;
     }
     getPreviousTextOrAtom(node: SelectableNode): SelectableNode | undefined {
@@ -67,7 +67,7 @@ export default abstract class BlockNode extends Node {
 
     withSegmentAtSelection(
         range: CaretRange,
-        nodeCreator: (text: string) => FormatNodeSegmentType
+        nodeCreator: (text: string) => FormatNodeSegmentType,
     ): Edit {
         let block: BlockNode = this;
         let caret = range.start;
@@ -78,7 +78,7 @@ export default abstract class BlockNode extends Node {
         // Get the nearest FormatNode parent of the selected text. Bail on fail.
         const formatted = caret.node.getClosestParentOfType<FormatNode>(
             block,
-            FormatNode
+            FormatNode,
         );
         if (formatted === undefined) return;
 
@@ -108,7 +108,7 @@ export default abstract class BlockNode extends Node {
         if (newFormatEdit && editedFormat) {
             const newRoot = this.withChildReplaced(
                 editedFormat,
-                newFormatEdit.root
+                newFormatEdit.root,
             );
             if (newRoot) return { root: newRoot, range: newFormatEdit.range };
         }
@@ -139,7 +139,7 @@ export default abstract class BlockNode extends Node {
                 if (first && last) {
                     const edit = f.withRangeFormatted(
                         { start: first, end: last },
-                        format
+                        format,
                     );
                     if (edit === undefined) return;
                     const newFormat = edit.root as FormatNode;
@@ -150,7 +150,7 @@ export default abstract class BlockNode extends Node {
                     // Delete the format if it's empty.
                     newRoot = newRoot.withNodeReplaced(
                         f,
-                        deleteChild ? undefined : newFormat
+                        deleteChild ? undefined : newFormat,
                     );
                     if (newRoot === undefined) return;
                 }

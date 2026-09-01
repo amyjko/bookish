@@ -11,7 +11,7 @@
     let edition = getEdition();
     let editable = isEditionEditable();
 
-    $: references = $edition?.hasReferences() ? $edition.getReferences() : null;
+    let references = $derived($edition?.hasReferences() ? $edition.getReferences() : null);
 
     // Otherwise, map references to a list with letter headers.
     if (references !== null) {
@@ -43,17 +43,19 @@
                       )
                     : undefined}
         >
-            <Outline
-                slot="outline"
-                previous={$edition.getPreviousChapterID(
-                    ChapterIDs.ReferencesID,
-                    editable,
-                )}
-                next={$edition.getNextChapterID(
-                    ChapterIDs.ReferencesID,
-                    editable,
-                )}
-            />
+            {#snippet outline()}
+                        <Outline
+                    
+                    previous={$edition.getPreviousChapterID(
+                        ChapterIDs.ReferencesID,
+                        editable,
+                    )}
+                    next={$edition.getNextChapterID(
+                        ChapterIDs.ReferencesID,
+                        editable,
+                    )}
+                />
+                    {/snippet}
         </Header>
         {#if editable}<BulkReferenceEditor />{/if}
         {#if references !== null}

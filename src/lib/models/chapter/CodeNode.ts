@@ -18,7 +18,7 @@ export default class CodeNode extends BlockNode {
         code: TextNode,
         language: string,
         position: Position,
-        caption?: FormatNode
+        caption?: FormatNode,
     ) {
         super();
 
@@ -90,7 +90,7 @@ export default class CodeNode extends BlockNode {
             this.#code.copy(),
             this.#language,
             this.#position,
-            this.#caption.copy()
+            this.#caption.copy(),
         ) as this;
     }
 
@@ -115,7 +115,7 @@ export default class CodeNode extends BlockNode {
                   newCode ? newCode : this.#code,
                   this.#language,
                   this.#position,
-                  newCaption ? newCaption : this.#caption
+                  newCaption ? newCaption : this.#caption,
               ) as this)
             : undefined;
     }
@@ -125,7 +125,7 @@ export default class CodeNode extends BlockNode {
             this.#code,
             this.#language,
             position,
-            this.#caption
+            this.#caption,
         );
     }
     withLanguage(language: string) {
@@ -133,7 +133,7 @@ export default class CodeNode extends BlockNode {
             this.#code,
             language,
             this.#position,
-            this.#caption
+            this.#caption,
         );
     }
     withExecutable(executable: boolean) {
@@ -141,7 +141,7 @@ export default class CodeNode extends BlockNode {
             this.#code,
             executable ? this.#language + '!' : this.#language,
             this.#position,
-            this.#caption
+            this.#caption,
         );
     }
     withCaption(caption: FormatNode) {
@@ -149,7 +149,7 @@ export default class CodeNode extends BlockNode {
             this.#code,
             this.#language,
             this.#position,
-            caption
+            caption,
         );
     }
 
@@ -168,7 +168,7 @@ export default class CodeNode extends BlockNode {
             newCode,
             this.#language,
             this.#position,
-            newCaption
+            newCaption,
         ) as this;
     }
 

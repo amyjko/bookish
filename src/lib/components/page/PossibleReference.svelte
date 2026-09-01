@@ -4,8 +4,12 @@
     import Format from '../chapter/Format.svelte';
     import Reference from './Reference.svelte';
 
-    export let node: FormatNode | Ref;
-    export let edit: boolean;
+    interface Props {
+        node: FormatNode | Ref;
+        edit: boolean;
+    }
+
+    let { node, edit }: Props = $props();
 </script>
 
 {#if node instanceof FormatNode}

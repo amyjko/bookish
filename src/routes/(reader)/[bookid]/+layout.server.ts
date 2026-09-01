@@ -137,7 +137,8 @@ async function getLatestEdition(
 ): Promise<EditionMatch> {
     // If there's no latest published edition, get the latest unpublished edition
     const editionID =
-        bookJSON.editions.filter((ed) => ed.published !== null).at(-1)?.ref.id ??
+        bookJSON.editions.filter((ed) => ed.published !== null).at(-1)?.ref
+            .id ??
         bookJSON.editions.at(-1)?.ref.id ??
         null;
 

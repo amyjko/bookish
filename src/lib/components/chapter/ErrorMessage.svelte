@@ -1,10 +1,12 @@
-<svelte:options immutable={true} />
-
 <script lang="ts">
     import type ErrorNode from '$lib/models/chapter/ErrorNode';
     import Problem from './Problem.svelte';
 
-    export let node: ErrorNode;
+    interface Props {
+        node: ErrorNode;
+    }
+
+    let { node }: Props = $props();
 </script>
 
 <Problem

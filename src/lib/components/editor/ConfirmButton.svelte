@@ -1,16 +1,26 @@
 <script lang="ts">
     import Button from '../app/Button.svelte';
 
-    export let tooltip: string;
-    export let confirm: string;
-    export let command: () => Promise<void> | void;
+    interface Props {
+        tooltip: string;
+        confirm: string;
+        command: () => Promise<void> | void;
+        children?: import('svelte').Snippet;
+    }
 
-    let confirming = false;
+    let {
+        tooltip,
+        confirm,
+        command,
+        children
+    }: Props = $props();
+
+    let confirming = $state(false);
 </script>
 
 <div class="confirm">
     {#if !confirming}
-        <Button {tooltip} command={() => (confirming = true)}><slot /></Button>
+        <Button {tooltip} command={() => (confirming = true)}>{@render children?.()}</Button>
     {:else}
         <Button tooltip="no" command={() => (confirming = false)}>cancel</Button
         >&nbsp;<Button

@@ -1,9 +1,11 @@
-<svelte:options immutable={true} />
-
 <script lang="ts">
     import type RuleNode from '$lib/models/chapter/RuleNode';
 
-    export let node: RuleNode;
+    interface Props {
+        node: RuleNode;
+    }
+
+    let { node }: Props = $props();
 </script>
 
 <hr data-nodeid={node.nodeID} />

@@ -392,8 +392,9 @@ export default class Chapter {
 
     getWordCount(edition: Edition): number | undefined {
         if (this._wordCount === undefined)
-            this._wordCount = this.getAST(edition)?.toText().split(/\s+/)
-                .length;
+            this._wordCount = this.getAST(edition)
+                ?.toText()
+                .split(/\s+/).length;
         return this._wordCount;
     }
 

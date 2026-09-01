@@ -1,4 +1,6 @@
 <script lang="ts">
+    import { run } from 'svelte/legacy';
+
     import Footer from './Footer.svelte';
     import Header from './Header.svelte';
     import Auth from '$lib/components/Auth.svelte';
@@ -23,6 +25,11 @@
     import { getUserEmails, updateBook, updateEdition } from '$lib/models/CRUD';
     import { page } from '$app/stores';
     import Analytics from '$lib/components/page/Analytics.svelte';
+    interface Props {
+        children?: import('svelte').Snippet;
+    }
+
+    let { children }: Props = $props();
 
     // A global store context for the focused editor, used to display toolbar.
     let caret = writable<CaretState | undefined>(undefined);
@@ -48,35 +55,6 @@
     let editors = writable<Map<string, string>>(new Map());
     setContext<EditorsStore>(EDITORS, editors);
 
-    $: {
-        // Update when the edition changes.
-        $edition;
-        // Each time the book or edition changes, request any new user emails we don't have
-        // and add them to the cache.
-        if ($book) {
-            // Get a list of all of the book, edition, and chapter user IDs that aren't in the editors store.
-            retrieveEmails(
-                Array.from(
-                    new Set([
-                        ...$book.uids,
-                        ...($edition
-                            ? [
-                                  ...$edition.uids,
-                                  ...$edition.getChapterUIDS(),
-                                  ...$edition.chapters.reduce(
-                                      (uids: string[], chapter) => [
-                                          ...uids,
-                                          ...chapter.uids,
-                                      ],
-                                      [],
-                                  ),
-                              ]
-                            : []),
-                    ]),
-                ).filter((uid) => !$editors.has(uid)),
-            );
-        }
-    }
 
     async function retrieveEmails(uids: string[]) {
         if (uids.length === 0) return;
@@ -88,7 +66,7 @@
         editors.set(new Map($editors));
     }
 
-    let bookTimer: NodeJS.Timeout | undefined = undefined;
+    let bookTimer: NodeJS.Timeout | undefined = $state(undefined);
     let editionTimer: NodeJS.Timeout | undefined = undefined;
     function debounce(timer: NodeJS.Timeout | undefined, fun: Function) {
         clearTimeout(timer);
@@ -98,7 +76,7 @@
     }
 
     /** Save whatever edition is stored. */
-    let previousSavedEdition: Edition | undefined = undefined;
+    let previousSavedEdition: Edition | undefined = $state(undefined);
     /**
      * Note whether the update was due to us storing the revised edition from the
      * database so that we don't get in an infinite loop of saving.
@@ -196,19 +174,48 @@
         editionTimer = debounce(editionTimer, saveEdition);
     }
 
+
+    run(() => {
+        // Update when the edition changes.
+        $edition;
+        // Each time the book or edition changes, request any new user emails we don't have
+        // and add them to the cache.
+        if ($book) {
+            // Get a list of all of the book, edition, and chapter user IDs that aren't in the editors store.
+            retrieveEmails(
+                Array.from(
+                    new Set([
+                        ...$book.uids,
+                        ...($edition
+                            ? [
+                                  ...$edition.uids,
+                                  ...$edition.getChapterUIDS(),
+                                  ...$edition.chapters.reduce(
+                                      (uids: string[], chapter) => [
+                                          ...uids,
+                                          ...chapter.uids,
+                                      ],
+                                      [],
+                                  ),
+                              ]
+                            : []),
+                    ]),
+                ).filter((uid) => !$editors.has(uid)),
+            );
+        }
+    });
     // When the edition changes, update the book and debounce a save.
-    $: {
+    run(() => {
         // If the changed edition is different from the previously saved one, schedule a save.
         if ($edition && $edition !== previousSavedEdition) scheduleSave();
-    }
-
+    });
     // When the book changes, debounce a save.
-    $: {
+    run(() => {
         if ($book) {
             status.set(BookSaveStatus.Changed);
             bookTimer = debounce(bookTimer, saveBook);
         }
-    }
+    });
 </script>
 
 <!-- Do app analytics for Bookish.press -->
@@ -219,7 +226,7 @@
         {#if $page.route.id !== null && !$page.route.id.startsWith('/[bookid]/[[editionid=edition]]')}
             <Header print={$page.route.id.endsWith('/print')} />
         {/if}
-        <slot />
+        {@render children?.()}
         <Footer />
     </Auth>
 </div>

@@ -16,21 +16,34 @@
     import Authors from './Authors.svelte';
     import type { ChapterIDKey } from '$lib/models/book/ChapterID';
 
-    /** Either the chapter or a built in chapter ID */
-    export let chapter: Chapter | ChapterIDKey;
-    export let number: number | undefined = undefined;
-    export let forthcoming: boolean = false;
+    
+    interface Props {
+        /** Either the chapter or a built in chapter ID */
+        chapter: Chapter | ChapterIDKey;
+        number?: number | undefined;
+        forthcoming?: boolean;
+        annotation?: import('svelte').Snippet;
+        etc?: import('svelte').Snippet;
+    }
+
+    let {
+        chapter,
+        number = undefined,
+        forthcoming = false,
+        annotation,
+        etc
+    }: Props = $props();
 
     let edition = getEdition();
     let base = getBase();
     let editable = isEditionEditable();
 
-    $: title =
-        chapter instanceof Chapter
+    let title =
+        $derived(chapter instanceof Chapter
             ? chapter.getTitle()
             : $edition
               ? $edition.getHeader(chapter)
-              : '—';
+              : '—');
 
     function moveUp() {
         if ($edition && chapter instanceof Chapter)
@@ -46,8 +59,8 @@
         else return chapter;
     }
 
-    $: chapterURL =
-        forthcoming && !editable ? undefined : `${$base}/${getChapterID()}`;
+    let chapterURL =
+        $derived(forthcoming && !editable ? undefined : `${$base}/${getChapterID()}`);
 </script>
 
 <tr class="toc-row" class:forthcoming>
@@ -88,9 +101,9 @@
                 edit={() => {}}
                 remove={() => {}}
             />{/if}
-        <p><Muted><em><slot name="annotation" /></em></Muted></p>
+        <p><Muted><em>{@render annotation?.()}</em></Muted></p>
     </td>
-    <td><slot name="etc" /></td>
+    <td>{@render etc?.()}</td>
     {#if editable && $edition}
         <td class="controls">
             {#if chapter instanceof Chapter}

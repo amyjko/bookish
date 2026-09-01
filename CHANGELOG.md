@@ -2,6 +2,7 @@
 
 # Unreleased
 
+- **Migrated to Svelte 5** (5.57) with Vite 7, vite-plugin-svelte 6, svelte-check 4, prettier-plugin-svelte 4, and vitest 4; replaced svelte-preprocess with vitePreprocess. ~140 components now use runes syntax (via the official codemod plus manual triage of every `$:` side effect into `$derived`/`$effect`); the marginal components (Footnote, Citations, Definition, Comment, Marginal), Code, Python, DefinitionView, Text, TextEditor, Toolbar, Chapter, BookishEditor, and CaretView intentionally remain in legacy mode pending focused migration of the `afterUpdate` layout and editor logic. Also migrated most `$app/stores` uses to `$app/state`.
 - Moved server-side rendering from the experimental Firebase Hosting web frameworks integration to a Cloud Run service (`bookish-ssr`) behind a Firebase Hosting rewrite, reusing the adapter-node build. Deploys now build locally and ship the artifacts (see `Dockerfile`); the old auto-generated `ssrbookishprod` function can be deleted after cutover. This removes the integration's Vite version ceiling ahead of the Svelte 5 migration.
 - Replaced the deploy-on-PR GitHub workflow with a verify workflow that type checks, tests, and builds; deploys remain manual.
 - Added component smoke tests for chapter rendering and marginal layout, and a Playwright browser test of marginal positioning against a new local-only `/fixture` route.

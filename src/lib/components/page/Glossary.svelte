@@ -12,16 +12,16 @@
     let edition = getEdition();
     let editable = isEditionEditable();
 
-    $: glossary = $edition?.getGlossary() ?? {};
+    let glossary = $derived($edition?.getGlossary() ?? {});
     // Sort by canonical phrases
-    $: keys =
-        $edition === undefined
+    let keys =
+        $derived($edition === undefined
             ? []
             : glossary === undefined || Object.keys(glossary).length === 0
               ? null
               : Object.keys(glossary).sort((a, b) =>
                     glossary[a].phrase.localeCompare(glossary[b].phrase),
-                );
+                ));
 
     function addEmptyDefinition() {
         if ($edition === undefined) return;
@@ -59,17 +59,19 @@
                       )
                     : undefined}
         >
-            <Outline
-                slot="outline"
-                previous={$edition.getPreviousChapterID(
-                    ChapterIDs.GlossaryID,
-                    editable,
-                )}
-                next={$edition.getNextChapterID(
-                    ChapterIDs.GlossaryID,
-                    editable,
-                )}
-            />
+            {#snippet outline()}
+                        <Outline
+                    
+                    previous={$edition.getPreviousChapterID(
+                        ChapterIDs.GlossaryID,
+                        editable,
+                    )}
+                    next={$edition.getNextChapterID(
+                        ChapterIDs.GlossaryID,
+                        editable,
+                    )}
+                />
+                    {/snippet}
         </Header>
         {#if editable}
             <Instructions {editable}>

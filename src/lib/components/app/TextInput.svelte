@@ -1,11 +1,23 @@
 <script lang="ts">
-    export let text = '';
-    export let autocomplete: string | null = null;
-    export let type: string;
-    export let placeholder: string;
-    export let disabled: boolean;
+    import type { HTMLInputAttributes } from 'svelte/elements';
 
-    let input: HTMLInputElement;
+    interface Props {
+        text?: string;
+        autocomplete?: HTMLInputAttributes['autocomplete'];
+        type: string;
+        placeholder: string;
+        disabled: boolean;
+    }
+
+    let {
+        text = $bindable(''),
+        autocomplete = null,
+        type,
+        placeholder,
+        disabled
+    }: Props = $props();
+
+    let input: HTMLInputElement | undefined = $state();
 
     export function value() {
         return text;
@@ -19,7 +31,7 @@
     {disabled}
     value={text}
     bind:this={input}
-    on:input={() => (text = input.value)}
+    oninput={(event) => (text = event.currentTarget.value)}
 />
 
 <style>

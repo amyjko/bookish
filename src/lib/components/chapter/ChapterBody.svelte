@@ -1,5 +1,3 @@
-<svelte:options immutable />
-
 <script lang="ts">
     import type ChapterNode from '$lib/models/chapter/ChapterNode';
     import ParagraphNode from '$lib/models/chapter/ParagraphNode';
@@ -10,17 +8,23 @@
     import Paragraph from './Paragraph.svelte';
     import Problem from './Problem.svelte';
 
-    export let node: ChapterNode;
-    export let placeholder: string = '';
-    export let editable: boolean = false;
+    interface Props {
+        node: ChapterNode;
+        placeholder?: string;
+        editable?: boolean;
+    }
 
-    $: errors = node.getErrors();
-    $: blocks = node.getBlocks();
+    let { node, placeholder = '', editable = false }: Props = $props();
+
+    let errors = $derived(node.getErrors());
+    let blocks = $derived(node.getBlocks());
 
     // Make this chapter node available to all children in a reactive store.
     let root = writable<ChapterNode>(node);
     setContext(ROOT, root);
-    $: root.set(node);
+    $effect.pre(() => {
+        root.set(node);
+    });
 </script>
 
 <section class="bookish-chapter-body" data-nodeid={node.nodeID}>
