@@ -26,6 +26,7 @@
         'This is a fixture chapter for verifying that marginals are laid out correctly.{This is the first footnote, which should appear in the right margin on wide screens.} It contains several paragraphs and several footnotes.',
         'This second paragraph makes another claim.{This is the second footnote, which should be positioned below the first without overlapping it.} It exists to ensure that multiple marginals must be stacked vertically by the layout pass.',
         'A third paragraph adds a bit more text so the chapter has some height, letting the layout algorithm spread marginals out over a taller body of text before it runs out of room.',
+        '`python\ndef hello():\n    print("hello marginalia")\nhello()\n`',
         'And a final paragraph with a final note.{This is the third footnote, far enough down the page that it should be positioned near its reference.}',
     ].join('\n\n');
 

@@ -1,4 +1,3 @@
-<!-- @migration-task Error while migrating Svelte code: Can't migrate code with afterUpdate. Please migrate by hand. -->
 <script lang="ts">
     import Parser from '$lib/models/chapter/Parser';
     import type Definition from '$lib/models/book/Definition';
@@ -7,7 +6,6 @@
     import BookishEditor from '$lib/components/editor/BookishEditor.svelte';
     import Format from '$lib/components/chapter/Format.svelte';
     import Note from '../editor/Note.svelte';
-    import { afterUpdate } from 'svelte';
     import {
         getUser,
         getEdition,
@@ -18,8 +16,12 @@
     } from './Contexts';
     import Button from '../app/Button.svelte';
 
-    export let id: string;
-    export let definition: Definition;
+    interface Props {
+        id: string;
+        definition: Definition;
+    }
+
+    let { id, definition }: Props = $props();
 
     let auth = getUser();
     let edition = getEdition();
@@ -27,9 +29,12 @@
 
     // Focus after adding a new synonym.
     let newSynonym = false;
-    let synonymsEditor: HTMLSpanElement | null = null;
+    let synonymsEditor: HTMLSpanElement | null = $state(null);
 
-    afterUpdate(() => {
+    // After the definition re-renders with a newly added synonym,
+    // focus its editor.
+    $effect(() => {
+        void definition;
         if (newSynonym && synonymsEditor) {
             const editors = synonymsEditor.querySelectorAll('input');
             if (editors.length > 0) {
@@ -76,7 +81,7 @@
             );
     }
 
-    $: syns = definition.synonyms || [];
+    let syns = $derived(definition.synonyms || []);
 </script>
 
 {#if $edition}

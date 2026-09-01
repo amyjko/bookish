@@ -14,6 +14,11 @@ test('marginals are laid out in the right margin on a wide screen', async ({
     const marginals = page.locator('.bookish-marginal');
     await expect(marginals).toHaveCount(3);
 
+    // The code block gets highlighted by Prism after hydration.
+    await expect(
+        page.locator('code.bookish-code .token').first(),
+    ).toBeAttached();
+
     // After hydration, the layout pass positions each floating marginal
     // with explicit inline coordinates.
     for (const marginal of await marginals.all()) {

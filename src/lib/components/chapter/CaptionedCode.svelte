@@ -38,8 +38,9 @@
             editable={false}
             inline={false}
             language={node.getLanguage()}
-            nodeID={node.getCodeNode().nodeID}>{node.getCode()}</Code
-        >
+            nodeID={node.getCodeNode().nodeID}
+            code={node.getCode()}
+        />
     {/if}
     {#if editable}
         <Button

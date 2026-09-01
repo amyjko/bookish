@@ -23,6 +23,7 @@
         editable={false}
         inline={true}
         language={node.getMeta()}
-        nodeID={node.getText().nodeID}>{node.getText().getText()}</Code
-    >
+        nodeID={node.getText().nodeID}
+        code={node.getText().getText()}
+    />
 {/if}
