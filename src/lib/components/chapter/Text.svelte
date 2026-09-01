@@ -1,6 +1,4 @@
 <script lang="ts">
-    import { run } from 'svelte/legacy';
-
     import type TextNode from '$lib/models/chapter/TextNode';
     import { getChapter, isChapterEditable } from '../page/Contexts';
 
@@ -10,8 +8,6 @@
     }
 
     let { node, placeholder = undefined }: Props = $props();
-
-    let text = $derived(node.getText());
 
     let context = getChapter();
     let editable = isChapterEditable();
@@ -27,76 +23,75 @@
                     i === original.length - 1 ||
                     original.charAt(i - 1) === ' ')
             )
-                revisedText += '\u00a0';
+                revisedText += ' ';
             else revisedText += c;
         }
         return revisedText;
     }
 
     // Manipulate text for rendering.
-    run(() => {
+    let text = $derived.by(() => {
         // Replace any spaces at the beginning or end of the string with explicit non-breaking spaces to ensure that they render.
-        text = replaceMultipleSpacesWithNonBreakingSpaces(text);
+        let revised = replaceMultipleSpacesWithNonBreakingSpaces(
+            node.getText(),
+        );
 
         // If the text ends with a newline, render a non-breaking space at the end.
-        if (text.length > 0 && text.charAt(text.length - 1) === '\n')
-            text = text + '\ufeff';
+        if (revised.length > 0 && revised.charAt(revised.length - 1) === '\n')
+            revised = revised + '﻿';
 
         // If there's no text, render a non-breaking space, or a placeholder if provided.
-        if (text.length === 0) text = placeholder ?? '\ufeff';
+        if (revised.length === 0) revised = placeholder ?? '﻿';
+
+        return revised;
     });
 
     // Compute highlights, if highlighted
-    let segments: [string, boolean][] | undefined = $state(undefined);
-    run(() => {
-        segments = undefined;
-        if (!editable) {
-            // Is there a query we're supposed to highlight? If so, highlight it.
-            if ($context && $context.highlightedWord) {
-                const query = $context.highlightedWord;
-                const lowerText = text.toLowerCase();
-                // Does this text contain the query? Highlight it.
-                if (lowerText.indexOf(query) >= 0) {
-                    // Find all the matches
-                    const indices = [];
-                    for (let i = 0; i < text.length; ++i) {
-                        if (
-                            lowerText.substring(i, i + query.length) === query
-                        ) {
-                            indices.push(i);
-                        }
-                    }
+    let segments: [string, boolean][] | undefined = $derived.by(() => {
+        if (editable) return undefined;
 
-                    // Go through each one and construct contents for the span to return.
-                    segments = [];
-                    for (let i = 0; i < indices.length; i++) {
-                        // Push the text from the end of the last match or the start of the string.
-                        segments.push([
-                            text.substring(
-                                i === 0 ? 0 : indices[i - 1] + query.length,
-                                indices[i]
-                            ),
-                            false,
-                        ]);
-                        segments.push([
-                            text.substring(
-                                indices[i],
-                                indices[i] + query.length
-                            ),
-                            true,
-                        ]);
-                    }
-                    if (indices[indices.length - 1] < text.length - 1)
-                        segments.push([
-                            text.substring(
-                                indices[indices.length - 1] + query.length,
-                                text.length
-                            ),
-                            false,
-                        ]);
-                }
+        // Is there a query we're supposed to highlight? If so, highlight it.
+        if (!$context || !$context.highlightedWord) return undefined;
+
+        const query = $context.highlightedWord;
+        const lowerText = text.toLowerCase();
+
+        // Does this text contain the query? Highlight it.
+        if (lowerText.indexOf(query) < 0) return undefined;
+
+        // Find all the matches
+        const indices = [];
+        for (let i = 0; i < text.length; ++i) {
+            if (lowerText.substring(i, i + query.length) === query) {
+                indices.push(i);
             }
         }
+
+        // Go through each one and construct contents for the span to return.
+        const list: [string, boolean][] = [];
+        for (let i = 0; i < indices.length; i++) {
+            // Push the text from the end of the last match or the start of the string.
+            list.push([
+                text.substring(
+                    i === 0 ? 0 : indices[i - 1] + query.length,
+                    indices[i],
+                ),
+                false,
+            ]);
+            list.push([
+                text.substring(indices[i], indices[i] + query.length),
+                true,
+            ]);
+        }
+        if (indices[indices.length - 1] < text.length - 1)
+            list.push([
+                text.substring(
+                    indices[indices.length - 1] + query.length,
+                    text.length,
+                ),
+                false,
+            ]);
+        return list;
     });
 </script>
 

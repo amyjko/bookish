@@ -1,6 +1,4 @@
 <script lang="ts">
-    import { run, stopPropagation } from 'svelte/legacy';
-
     import commands from './Commands';
     import type Command from './Command';
 
@@ -132,8 +130,10 @@
         }${command.shift ? '\u21E7' : ''}${keyLabel}`;
     }
 
-    // Update the above when the dependencies below change.
-    run(() => {
+    // Update the above when the dependencies below change. Everything is
+    // computed into locals and assigned once so the effect never reads
+    // the state it writes.
+    $effect.pre(() => {
         if (context !== undefined && root) {
             // Filter the commands by those interactive with a mouse and active.
             const visible = commands.filter(
@@ -145,7 +145,7 @@
             );
 
             // Extract the active categories and sort them
-            categories = Array.from(
+            const newCategories = Array.from(
                 new Set(commands.map((command) => command.category)),
             ).sort((a, b) =>
                 a in categoryOrder && b in categoryOrder
@@ -154,15 +154,17 @@
             );
 
             // Make a list for each category of commands
-            commandsByCategory = {};
-            categories.forEach((cat) => {
-                if (commandsByCategory)
-                    commandsByCategory[cat] = visible.filter(
-                        (command) => command.category === cat,
-                    );
+            const byCategory: { [key: string]: Command[] } = {};
+            newCategories.forEach((cat) => {
+                byCategory[cat] = visible.filter(
+                    (command) => command.category === cat,
+                );
             });
 
             const caretNode = context.start.node;
+
+            categories = newCategories;
+            commandsByCategory = byCategory;
 
             metaNode =
                 caretNode instanceof AtomNode
@@ -212,7 +214,10 @@
     role="button"
     onkeypress={handleKeyPress}
     onkeydown={handleKeyPress}
-    onpointerdown={stopPropagation(() => element?.focus())}
+    onpointerdown={(event) => {
+        event.stopPropagation();
+        element?.focus();
+    }}
     tabindex="0"
     transition:slide={{ duration: 200 }}
 >

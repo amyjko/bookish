@@ -1,4 +1,3 @@
-<!-- @migration-task Error while migrating Svelte code: Can't migrate code with afterUpdate. Please migrate by hand. -->
 <script lang="ts">
     import BookishNode from '$lib/models/chapter/Node';
     import ChapterNode from '$lib/models/chapter/ChapterNode';
@@ -33,7 +32,7 @@
 
     import commands from './Commands';
 
-    import { afterUpdate, onMount, setContext } from 'svelte';
+    import { onMount, setContext, untrack } from 'svelte';
     import type { Accent, PasteContent } from './CaretContext';
     import { getCaret } from '../page/Contexts';
     import CaretView from './CaretView.svelte';
@@ -41,46 +40,65 @@
 
     const IDLE_TIME = 500;
 
-    export let text: string;
-    export let parser: (text: string) => RootNode;
-    export let save: (node: RootNode) => Promise<void> | void;
-    export let chapter: boolean;
-    export let autofocus: boolean = false;
-    export let component: import('svelte').Component<any>;
-    export let placeholder: string;
-    export let leasee: string | boolean;
-    export let lease: (lock: boolean) => Promise<boolean> | boolean;
-    export let inline = false;
+    interface Props {
+        text: string;
+        parser: (text: string) => RootNode;
+        save: (node: RootNode) => Promise<void> | void;
+        chapter: boolean;
+        autofocus?: boolean;
+        component: import('svelte').Component<any>;
+        placeholder: string;
+        leasee: string | boolean;
+        lease: (lock: boolean) => Promise<boolean> | boolean;
+        inline?: boolean;
+    }
 
-    let element: HTMLDivElement | null = null;
+    let {
+        text,
+        parser,
+        save,
+        chapter,
+        autofocus = false,
+        component,
+        placeholder,
+        leasee,
+        lease,
+        inline = false,
+    }: Props = $props();
 
-    let caretRange: CaretRange | undefined = undefined;
-    let caretCoordinate: { x: number; y: number; height: number } | undefined =
-        undefined;
+    let element: HTMLDivElement | null = $state(null);
+
+    let caretRange: CaretRange | undefined = $state(undefined);
+    let caretCoordinate:
+        | { x: number; y: number; height: number }
+        | undefined = $state(undefined);
     let lastInputTime = 0;
-    let keyboardIdle = true;
-    let editorFocused = false;
-    let undoStack: UndoState[] = [];
-    let undoPosition = -1;
-    let clipboard: Clipboard | undefined = undefined;
-    let ignoredInput = false;
+    let keyboardIdle = $state(true);
+    let editorFocused = $state(false);
+    let undoStack: UndoState[] = $state([]);
+    let undoPosition = $state(-1);
+    let clipboard: Clipboard | undefined = $state(undefined);
+    let ignoredInput = $state(false);
 
     let activeEditor = getCaret();
 
-    let accent: Accent | undefined = undefined;
+    let accent: Accent | undefined = $state(undefined);
 
-    let editedNode: RootNode;
-    $: {
-        // Note: when the text changes externally, the caret will be lost. We either have
-        // to implement fancy operational transform revision control for collaborative editing
-        // or a basic chapter locking strategy to avoid data loss. I went with locking for maintenance simplicity,
-        // but it would be nice to implement operational transform in the future.
-        if (editedNode === undefined || editedNode.toBookdown() !== text) {
+    // Note: when the text changes externally, the caret will be lost. We either have
+    // to implement fancy operational transform revision control for collaborative editing
+    // or a basic chapter locking strategy to avoid data loss. I went with locking for maintenance simplicity,
+    // but it would be nice to implement operational transform in the future.
+    let editedNode: RootNode = $state(parser(text));
+    $effect.pre(() => {
+        if (untrack(() => editedNode).toBookdown() !== text) {
             editedNode = parser(text);
         }
-    }
+    });
 
-    $: locked = typeof leasee === 'string';
+    let locked = $derived(typeof leasee === 'string');
+
+    // The component used to render the edited root node.
+    let RootView = $derived(component);
 
     onMount(() => {
         const caret = editedNode.getFirstCaret();
@@ -122,7 +140,10 @@
     // When the selection changes and is rendered, set the browser's selection to correspond. This helps with two things:
     // 1) we can rely on the browser to render selections rather than rendering it ourselves.
     // 2) We can measure the caret position, so we can render our own fancy one rather than relying on inconsistent cross browser behavior.
-    afterUpdate(() => {
+    // This runs after the DOM updates whenever the selection, content, or focus changes.
+    $effect(() => {
+        void caretRange;
+        void editedNode;
         if (!editorFocused) return;
 
         // Measure the location of the selection using the browser's selection.
@@ -993,36 +1014,55 @@
         return toolbar !== null && toolbar.contains(document.activeElement);
     }
 
-    $: isAtom = caretRange && caretRange.start.node instanceof AtomNode;
-    $: inAtom =
-        caretRange && caretRange.start.node.isInside(editedNode, AtomNode);
-    $: isSelection =
-        caretRange !== undefined &&
-        (caretRange.start.node !== caretRange.end.node ||
-            caretRange.start.index !== caretRange.end.index);
-    $: isItalic =
-        caretRange !== undefined &&
-        isSelection === false &&
-        caretRange.start.node instanceof TextNode &&
-        caretRange.start.node.isItalic(editedNode);
-    $: isBold =
-        caretRange !== undefined &&
-        isSelection === false &&
-        caretRange.start.node instanceof TextNode &&
-        caretRange.start.node.isBold(editedNode);
-    $: isLink =
-        caretRange !== undefined &&
-        isSelection === false &&
-        caretRange.start.node.getClosestParentMatching(
-            editedNode,
-            (p) => p instanceof LinkNode,
-        ) !== undefined;
+    let isAtom = $derived.by(
+        () => caretRange !== undefined && caretRange.start.node instanceof AtomNode,
+    );
+    let inAtom = $derived.by(
+        () =>
+            caretRange !== undefined &&
+            caretRange.start.node.isInside(editedNode, AtomNode),
+    );
+    let isSelection = $derived.by(
+        () =>
+            caretRange !== undefined &&
+            (caretRange.start.node !== caretRange.end.node ||
+                caretRange.start.index !== caretRange.end.index),
+    );
+    let isItalic = $derived.by(
+        () =>
+            caretRange !== undefined &&
+            isSelection === false &&
+            caretRange.start.node instanceof TextNode &&
+            caretRange.start.node.isItalic(editedNode),
+    );
+    let isBold = $derived.by(
+        () =>
+            caretRange !== undefined &&
+            isSelection === false &&
+            caretRange.start.node instanceof TextNode &&
+            caretRange.start.node.isBold(editedNode),
+    );
+    let isLink = $derived.by(
+        () =>
+            caretRange !== undefined &&
+            isSelection === false &&
+            caretRange.start.node.getClosestParentMatching(
+                editedNode,
+                (p) => p instanceof LinkNode,
+            ) !== undefined,
+    );
 
-    // When the caret context or editor focus changes, update the active editor.
-    $: {
-        if ((caretRange || editorFocused) && isFocused()) claimActiveEditor();
-        else activeEditor.set(undefined);
-    }
+    // When the caret range or editor focus changes, update the active editor.
+    // Only those two are tracked; the claim itself reads much more state.
+    $effect.pre(() => {
+        void caretRange;
+        void editorFocused;
+        untrack(() => {
+            if ((caretRange || editorFocused) && isFocused())
+                claimActiveEditor();
+            else activeEditor.set(undefined);
+        });
+    });
 
     function claimActiveEditor() {
         activeEditor.set({
@@ -1052,15 +1092,18 @@
     aria-disabled={locked}
     role="textbox"
     bind:this={element}
-    on:keydown={handleKey}
-    on:keypress={handlePress}
-    on:pointerdown|stopPropagation={handlePointerDown}
-    on:focus={handleFocus}
-    on:blur={handleBlur}
+    onkeydown={handleKey}
+    onkeypress={handlePress}
+    onpointerdown={(event) => {
+        event.stopPropagation();
+        handlePointerDown();
+    }}
+    onfocus={handleFocus}
+    onblur={handleBlur}
     tabindex="0"
 >
     <!-- A view of the root -->
-    <svelte:component this={component} node={editedNode} {placeholder} />
+    <RootView node={editedNode} {placeholder} />
     <!-- The caret. We render our own since this view isn't contentEditable and we can't show a caret.
          Customize the rendering based on the formatting applied to the text node. -->
     {#if caretCoordinate && caretRange && !isAtom && isSelection === false && editorFocused}

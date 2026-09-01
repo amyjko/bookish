@@ -1,6 +1,4 @@
 <script lang="ts">
-    import { run } from 'svelte/legacy';
-
     import Footer from './Footer.svelte';
     import Header from './Header.svelte';
     import Auth from '$lib/components/Auth.svelte';
@@ -175,9 +173,9 @@
     }
 
 
-    run(() => {
+    $effect(() => {
         // Update when the edition changes.
-        $edition;
+        void $edition;
         // Each time the book or edition changes, request any new user emails we don't have
         // and add them to the cache.
         if ($book) {
@@ -205,12 +203,12 @@
         }
     });
     // When the edition changes, update the book and debounce a save.
-    run(() => {
+    $effect(() => {
         // If the changed edition is different from the previously saved one, schedule a save.
         if ($edition && $edition !== previousSavedEdition) scheduleSave();
     });
     // When the book changes, debounce a save.
-    run(() => {
+    $effect(() => {
         if ($book) {
             status.set(BookSaveStatus.Changed);
             bookTimer = debounce(bookTimer, saveBook);

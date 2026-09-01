@@ -1,6 +1,4 @@
 <script lang="ts">
-    import { run } from 'svelte/legacy';
-
     enum Status {
         Viewing,
         Editing,
@@ -89,7 +87,7 @@
     }
     let error = $derived(valid(text));
     // Grow the sizer when text or status changes.
-    run(() => {
+    $effect(() => {
         if (sizer) {
             // Set the invisible sizer to the text to set the container's width.
             // The browser strips trailing spaces, causing jitter after a space, so we replace
@@ -108,7 +106,7 @@
         }
     });
     // When status changes, focus or blur.
-    run(() => {
+    $effect(() => {
         if (field) {
             if (status === Status.Editing) {
                 field.focus();
@@ -118,7 +116,7 @@
         }
     });
     // When text changes, save, unless we only save on exit.
-    run(() => {
+    $effect(() => {
         if (!saveOnExit) saveText(text);
     });
 </script>
