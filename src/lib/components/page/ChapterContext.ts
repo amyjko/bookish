@@ -7,7 +7,9 @@ type ChapterContext =
           highlightedWord?: string;
           highlightedID?: string;
           marginal: Writable<string | undefined>;
-          layoutMarginals: () => void;
+          /** Request a chapter-wide marginal layout pass. Requests are
+           *  coalesced into a single pass per animation frame. */
+          requestLayout: () => void;
       }
     | undefined;
 export type { ChapterContext as default };

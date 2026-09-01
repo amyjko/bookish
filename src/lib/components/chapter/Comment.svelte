@@ -1,6 +1,3 @@
-<!-- @migration-task Error while migrating Svelte code: Can't migrate code with afterUpdate. Please migrate by hand. -->
-<svelte:options immutable={true} />
-
 <script lang="ts">
     import type CommentNode from '$lib/models/chapter/CommentNode';
     import Atom from './Atom.svelte';
@@ -10,25 +7,33 @@
         getChapter,
         isChapterEditable,
         getCaret,
-        getEdition,
         getRoot,
     } from '$lib/components/page/Contexts';
-    import { afterUpdate } from 'svelte';
     import Icon from '../editor/Icon.svelte';
     import CommentIcon from '../editor/icons/comment.svg?raw';
 
-    export let node: CommentNode;
+    interface Props {
+        node: CommentNode;
+    }
+
+    let { node }: Props = $props();
 
     let chapter = getChapter();
     let editable = isChapterEditable();
     let root = getRoot();
     let caret = getCaret();
 
-    $: focused =
-        $caret && $caret.range && node.contains($caret.range.start.node);
+    let focused = $derived(
+        $caret && $caret.range && node.contains($caret.range.start.node),
+    );
 
-    // Position the marginals on every render.
-    afterUpdate(() => $chapter?.layoutMarginals());
+    // Whenever anything that affects this comment's rendered size or
+    // position changes, request a chapter-wide marginal layout pass.
+    $effect(() => {
+        void node;
+        void focused;
+        $chapter?.requestLayout();
+    });
 </script>
 
 <Atom {node}>
@@ -39,15 +44,16 @@
                 ($root === undefined ? '?' : $root.getComments().indexOf(node))}
             label="comment, escape to edit"
         >
-            <span slot="interactor" class="bookish-comment-symbol">
-                <Icon icon={CommentIcon} />
-            </span>
-            <span
-                slot="content"
-                class={`comment ${focused ? 'comment-focused' : ''}`}
-            >
-                <Format node={node.getMeta()} placeholder="comment" />
-            </span>
+            {#snippet interactor()}
+                <span class="bookish-comment-symbol">
+                    <Icon icon={CommentIcon} />
+                </span>
+            {/snippet}
+            {#snippet content()}
+                <span class={`comment ${focused ? 'comment-focused' : ''}`}>
+                    <Format node={node.getMeta()} placeholder="comment" />
+                </span>
+            {/snippet}
         </Marginal>
     {/if}
 </Atom>

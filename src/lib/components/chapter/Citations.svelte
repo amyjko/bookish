@@ -1,6 +1,3 @@
-<!-- @migration-task Error while migrating Svelte code: Can't migrate code with afterUpdate. Please migrate by hand. -->
-<svelte:options immutable={true} />
-
 <script lang="ts">
     import Marginal from './Marginal.svelte';
     import type CitationsNode from '$lib/models/chapter/CitationsNode';
@@ -8,30 +5,39 @@
     import Atom from './Atom.svelte';
     import { getChapter, getEdition, getRoot } from '../page/Contexts';
     import PossibleReference from '../page/PossibleReference.svelte';
-    import { afterUpdate } from 'svelte';
 
-    export let node: CitationsNode;
+    interface Props {
+        node: CitationsNode;
+    }
+
+    let { node }: Props = $props();
 
     let chapter = getChapter();
     let edition = getEdition();
     let root = getRoot();
 
     // Sort citations numerically, however they're numbered.
-    $: citations = node.getMeta().sort((a, b) => {
-        if ($root === undefined) return 0;
-        let aNumber = $root.getCitationNumber(a);
-        let bNumber = $root.getCitationNumber(b);
-        if (aNumber === null) {
-            if (bNumber === null) return 0;
-            else return 1;
-        } else {
-            if (bNumber === null) return -1;
-            else return aNumber - bNumber;
-        }
-    });
+    let citations = $derived(
+        node.getMeta().sort((a, b) => {
+            if ($root === undefined) return 0;
+            let aNumber = $root.getCitationNumber(a);
+            let bNumber = $root.getCitationNumber(b);
+            if (aNumber === null) {
+                if (bNumber === null) return 0;
+                else return 1;
+            } else {
+                if (bNumber === null) return -1;
+                else return aNumber - bNumber;
+            }
+        }),
+    );
 
-    // Position the marginals on every render.
-    afterUpdate(() => $chapter?.layoutMarginals());
+    // Whenever anything that affects these citations' rendered size or
+    // position changes, request a chapter-wide marginal layout pass.
+    $effect(() => {
+        void citations;
+        $chapter?.requestLayout();
+    });
 </script>
 
 <Atom {node}
@@ -42,7 +48,7 @@
                 label="reference {citations
                     .map((c) => $root.getCitationNumber(c))
                     .join(', ')}"
-                ><svelte:fragment slot="interactor">
+                >{#snippet interactor()}
                     {#each citations as citationID, index}{@const citationNumber =
                             $root.getCitationNumber(
                                 citationID,
@@ -56,26 +62,26 @@
                                 >,</sup
                             >{/if}{:else}<sup class="bookish-citation-symbol"
                             >{'\u2014'}</sup
-                        >{/each}</svelte:fragment
-                ><span slot="content" class="bookish-references"
-                    >{#each citations as citationID}
-                        {@const citationNumber =
-                            $root.getCitationNumber(citationID)}
-                        {@const ref = $edition?.getReference(citationID)}
-                        {#if citationNumber && ref && $edition}<span
-                                class="bookish-reference"
-                                aria-hidden="true"
-                            >
-                                <sup class="bookish-citation-symbol"
-                                    >{citationNumber}</sup
+                        >{/each}{/snippet}{#snippet content()}<span
+                        class="bookish-references"
+                        >{#each citations as citationID}
+                            {@const citationNumber =
+                                $root.getCitationNumber(citationID)}
+                            {@const ref = $edition?.getReference(citationID)}
+                            {#if citationNumber && ref && $edition}<span
+                                    class="bookish-reference"
+                                    aria-hidden="true"
                                 >
-                                <PossibleReference
-                                    node={ref}
-                                    edit={false}
-                                /></span
-                            >{/if}
-                    {/each}</span
-                ></Marginal
+                                    <sup class="bookish-citation-symbol"
+                                        >{citationNumber}</sup
+                                    >
+                                    <PossibleReference
+                                        node={ref}
+                                        edit={false}
+                                    /></span
+                                >{/if}
+                        {/each}</span
+                    >{/snippet}</Marginal
             ></span
         >{/if}</Atom
 >

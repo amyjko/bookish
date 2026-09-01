@@ -1,6 +1,4 @@
 <script lang="ts">
-    import { run } from 'svelte/legacy';
-
     import Parser from '$lib/models/chapter/Parser';
     import type ChapterModel from '$lib/models/book/Chapter';
     import Header from '$lib/components/page/Header.svelte';
@@ -101,7 +99,7 @@
 
         // When the chapter view resizes, the responsive layout might cause the marginals to move to the footer.
         // when this happens, we want to immediately remove all of the explicit positioning.
-        const resize = new ResizeObserver(() => layoutMarginals());
+        const resize = new ResizeObserver(() => requestLayout());
         resize.observe(document.body);
 
         // Remember the scroll position before a refresh.
@@ -235,15 +233,29 @@
     let citations = $derived(chapterAST ? chapterAST.getCitations() : undefined);
     let editionNumber = $derived($edition ? $edition.getEditionNumber() : undefined);
 
+    // Coalesce marginal layout requests from descendants into a single
+    // layout pass per animation frame. Marginal components request a pass
+    // whenever their rendered content changes.
+    let layoutRequested = false;
+    function requestLayout() {
+        if (typeof requestAnimationFrame === 'undefined') return;
+        if (layoutRequested) return;
+        layoutRequested = true;
+        requestAnimationFrame(() => {
+            layoutRequested = false;
+            layoutMarginals();
+        });
+    }
+
     let chapterStore = writable<ChapterContext>();
     setContext<ChapterStore>(CHAPTER, chapterStore);
-    run(() => {
+    $effect.pre(() => {
         chapterStore.set({
             chapter,
             highlightedWord: getHighlightedWord(),
             highlightedID,
             marginal,
-            layoutMarginals,
+            requestLayout,
         });
     });
 
