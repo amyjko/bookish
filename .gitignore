@@ -9,6 +9,8 @@ node_modules
 .firebase/
 coverage/
 *service-key.json
+test-results/
+playwright-report/
 
 # Logs
 logs

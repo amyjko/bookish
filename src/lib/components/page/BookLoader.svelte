@@ -44,13 +44,15 @@
 
     function listen() {
         unsub();
+        const bookid = $page.params.bookid;
+        if (bookid === undefined) return;
         try {
             nameUnsub = listenToBooksWithName(
-                $page.params.bookid,
+                bookid,
                 (books) => (booksByName = books)
             );
             idUnsub = listenToBooksWithID(
-                $page.params.bookid,
+                bookid,
                 (book) => (bookByID = book)
             );
         } catch (err) {

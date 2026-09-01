@@ -1,5 +1,12 @@
 # bookish changelog
 
+# Unreleased
+
+- Replaced the deploy-on-PR GitHub workflow with a verify workflow that type checks, tests, and builds; deploys remain manual.
+- Added component smoke tests for chapter rendering and marginal layout, and a Playwright browser test of marginal positioning against a new local-only `/fixture` route.
+- Updated all dependencies within their current major versions (SvelteKit 2.70, Vite 5.4.21, TypeScript 5.9, Prettier 3.9, Firebase 11.10, among others), and fixed two `$page.params` nullability errors the SvelteKit update surfaced.
+- Removed unused dependencies (`globals`, `@types/sharp`, the unused `bookish-press` dependency in functions, duplicate devDependency entries) and the dead `vite.reader.config.ts`.
+
 # 0.7.4 - 2026-05-02
 
 - Updated to node 22, and related downstream dependencies.
