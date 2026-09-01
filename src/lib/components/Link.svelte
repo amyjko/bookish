@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { page } from '$app/stores';
+    import { page } from '$app/state';
 
     interface Props {
         to: string;
@@ -40,7 +40,7 @@
     }
 </script>
 
-{#if !linked || $page.url.pathname === (to.charAt(to.length - 1) === '/' ? to.substring(0, to.length - 1) : to)}
+{#if !linked || page.url.pathname === (to.charAt(to.length - 1) === '/' ? to.substring(0, to.length - 1) : to)}
     {@render children?.()}
 {:else}
     <a

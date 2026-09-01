@@ -2,7 +2,7 @@
     import Loading from '$lib/components/page/Loading.svelte';
     import Feedback from '$lib/components/app/Feedback.svelte';
     import { onDestroy } from 'svelte';
-    import { page } from '$app/stores';
+    import { page } from '$app/state';
     import type Book from '$lib/models/book/Book';
     import { getBook, getUser } from '$lib/components/page/Contexts';
     import {
@@ -52,7 +52,7 @@
 
     function listen() {
         unsub();
-        const bookid = $page.params.bookid;
+        const bookid = page.params.bookid;
         if (bookid === undefined) return;
         try {
             nameUnsub = listenToBooksWithName(
@@ -68,9 +68,10 @@
         }
     }
 
-    // When page or auth changes and there's a user, update the listener.
+    // When the book id or auth changes and there's a user, update the listener.
     $effect(() => {
-        if ($page && $auth && $auth.user !== null) listen();
+        void page.params.bookid;
+        if ($auth && $auth.user !== null) listen();
     });
 
     // When this is unmounted, unset them.

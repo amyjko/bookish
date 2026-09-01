@@ -21,7 +21,7 @@
     import type CaretState from '$lib/components/editor/CaretState';
     import BookSaveStatus from '$lib/models/book/BookSaveStatus';
     import { getUserEmails, updateBook, updateEdition } from '$lib/models/CRUD';
-    import { page } from '$app/stores';
+    import { page } from '$app/state';
     import Analytics from '$lib/components/page/Analytics.svelte';
     interface Props {
         children?: import('svelte').Snippet;
@@ -221,8 +221,8 @@
 
 <div class="bookish-app">
     <Auth>
-        {#if $page.route.id !== null && !$page.route.id.startsWith('/[bookid]/[[editionid=edition]]')}
-            <Header print={$page.route.id.endsWith('/print')} />
+        {#if page.route.id !== null && !page.route.id.startsWith('/[bookid]/[[editionid=edition]]')}
+            <Header print={page.route.id.endsWith('/print')} />
         {/if}
         {@render children?.()}
         <Footer />

@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { page } from '$app/stores';
+    import { page } from '$app/state';
 
     interface Props {
         to: string;
@@ -17,7 +17,7 @@
         children
     }: Props = $props();
 
-    let at = $derived(to === $page.url.pathname);
+    let at = $derived(to === page.url.pathname);
 </script>
 
 {#if at}

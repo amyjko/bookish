@@ -12,7 +12,7 @@ import type Edition from '../../models/book/Edition';
 import type Authentication from '../Authentication';
 import type CaretState from '../editor/CaretState';
 import type ChapterContext from './ChapterContext';
-import { page } from '$app/stores';
+import { page } from '$app/state';
 import { updateLock } from '../../models/CRUD';
 import type { DocumentReference } from 'firebase/firestore';
 import type ChapterNode from '../../models/chapter/ChapterNode';
@@ -76,7 +76,7 @@ export function setChapter(
 }
 
 function isRouteWrite(): boolean {
-    return get(page).route.id?.startsWith('/(app)/write') ?? false;
+    return page.route.id?.startsWith('/(app)/write') ?? false;
 }
 
 export function isChapterEditable(): boolean {

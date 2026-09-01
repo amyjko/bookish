@@ -6,7 +6,7 @@
     import ChapterIDs from '$lib/models/book/ChapterID';
     import Link from '$lib/components/Link.svelte';
     import { getBase, getEdition, isEditionEditable } from './Contexts';
-    import { page } from '$app/stores';
+    import { page } from '$app/state';
     import Muted from './Muted.svelte';
     import ChapterTitle from './ChapterTitle.svelte';
     import ChapterNumber from './ChapterNumber.svelte';
@@ -18,7 +18,7 @@
     let base = getBase();
 
     // What letter are we matching?
-    let letter = $derived($page.params.letter);
+    let letter = $derived(page.params.letter);
 
     let bookIndex = $derived($edition?.getBookIndex() ?? {});
 

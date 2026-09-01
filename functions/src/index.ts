@@ -4,13 +4,16 @@ import {
     onObjectFinalized,
     onObjectDeleted,
 } from 'firebase-functions/v2/storage';
-import admin from 'firebase-admin';
+import { initializeApp } from 'firebase-admin/app';
+import { getAuth } from 'firebase-admin/auth';
+import { getStorage } from 'firebase-admin/storage';
+import { v1 as firestoreV1 } from 'firebase-admin/firestore';
 import path from 'path';
 import os from 'os';
 import fs from 'fs';
 import sharp from 'sharp';
 
-admin.initializeApp();
+initializeApp();
 
 /** When a file is created in the project's storage bucket, see if it's a non-thumbnail image, and if so, create a thumnail for it. */
 export const createThumbnailGen2 = onObjectFinalized(
@@ -29,8 +32,7 @@ export const createThumbnailGen2 = onObjectFinalized(
         }
 
         // First, make the new image public.
-        await admin
-            .storage()
+        await getStorage()
             .bucket(object.bucket)
             .file(object.name)
             .makePublic();
@@ -56,7 +58,7 @@ export const deleteThumbnailGen2 = onObjectDeleted(async ({ data: object }) => {
     }
 
     // Download file from bucket into a temporary location.
-    const bucket = admin.storage().bucket(object.bucket);
+    const bucket = getStorage().bucket(object.bucket);
     const thumbFilePath = getThumbnailPath(object.name);
 
     console.log(`Deleting ${thumbFilePath}`);
@@ -70,7 +72,7 @@ export const getUserEmailsGen2 = onCall<
 >(async ({ data }) => {
     const uids = data.uids;
 
-    const users = await admin.auth().getUsers(
+    const users = await getAuth().getUsers(
         uids.map((uid) => {
             return { uid };
         }),
@@ -90,12 +92,12 @@ export const createUserWithEmailGen2 = onCall<
 >(async ({ data }) => {
     // First try to get the user, in case they already exist.
     try {
-        const existingUser = await admin.auth().getUserByEmail(data.email);
+        const existingUser = await getAuth().getUserByEmail(data.email);
         return existingUser.uid;
     } catch (_) {}
 
     try {
-        const user = await admin.auth().createUser({ email: data.email });
+        const user = await getAuth().createUser({ email: data.email });
         return user.uid;
     } catch (error) {
         console.log(error);
@@ -104,7 +106,7 @@ export const createUserWithEmailGen2 = onCall<
 });
 
 export const backupGen2 = onSchedule('every 24 hours', async (event) => {
-    const client = new admin.firestore.v1.FirestoreAdminClient({});
+    const client = new firestoreV1.FirestoreAdminClient({});
     const projectID = getProjectID();
     if (projectID === undefined) {
         console.log('Skipping backup, no project ID.');
@@ -112,7 +114,7 @@ export const backupGen2 = onSchedule('every 24 hours', async (event) => {
     }
 
     // Get the default bucket
-    const bucket = admin.storage().bucket();
+    const bucket = getStorage().bucket();
 
     // Get the project default database
     const database = client.databasePath(projectID, '(default)');
@@ -145,7 +147,7 @@ async function resizeImage(
     contentType: string | undefined,
 ) {
     // Get the bucket.
-    const bucket = admin.storage().bucket(bucketID);
+    const bucket = getStorage().bucket(bucketID);
 
     // Get the path to the filename.
     const storageFileName = path.basename(storagePath);

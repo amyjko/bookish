@@ -14,7 +14,7 @@
     } from './Contexts';
     import { BookishTheme } from '$lib/models/book/Theme';
     import { isDark, setDark } from '../../util/dark';
-    import { page } from '$app/stores';
+    import { page } from '$app/state';
     import Title from './Title.svelte';
     import Page from './Page.svelte';
 
@@ -123,7 +123,7 @@
             property="og:url"
             content={edition.base ??
                 `https://bookish.press/${
-                    $book && $book.domain ? $book.domain : $page.params.bookid
+                    $book && $book.domain ? $book.domain : page.params.bookid
                 }`}
         />
     {/if}

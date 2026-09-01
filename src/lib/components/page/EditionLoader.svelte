@@ -9,7 +9,7 @@
         getChapterText,
     } from '$lib/components/page/Contexts';
     import { onDestroy } from 'svelte';
-    import { page } from '$app/stores';
+    import { page } from '$app/state';
     import type { Unsubscribe } from 'firebase/auth';
     import { listenToChapters, listenToEdition } from '../../models/CRUD';
 
@@ -50,7 +50,7 @@
             error = 'Unknown book.';
             return;
         } else {
-            currentEditionID = $page.params.editionid;
+            currentEditionID = page.params.editionid;
             const latestPublished = !write;
 
             // Figure out which edition to load.
@@ -119,7 +119,7 @@
     $effect(() => {
         if (
             (currentEditionID === undefined ||
-                $page.params.editionid !== currentEditionID) &&
+                page.params.editionid !== currentEditionID) &&
             $auth &&
             $auth.user !== null
         )

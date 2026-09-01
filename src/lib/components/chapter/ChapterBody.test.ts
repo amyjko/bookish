@@ -8,18 +8,15 @@ import ChapterBody from './ChapterBody.svelte';
 import { CARET, CHAPTER, EDITION } from '$lib/components/page/Contexts';
 import type ChapterContext from '$lib/components/page/ChapterContext';
 
-// The page store only exists inside a running SvelteKit app; Contexts.ts
+// The page state only exists inside a running SvelteKit app; Contexts.ts
 // reads it to decide whether a route is editable.
-vi.mock('$app/stores', async () => {
-    const { readable } = await import('svelte/store');
-    return {
-        page: readable({
-            route: { id: '/(reader)/[bookid]' },
-            params: {},
-            url: new URL('http://localhost/'),
-        }),
-    };
-});
+vi.mock('$app/state', () => ({
+    page: {
+        route: { id: '/(reader)/[bookid]' },
+        params: {},
+        url: new URL('http://localhost/'),
+    },
+}));
 
 beforeAll(() => {
     // jsdom doesn't implement matchMedia, which Marginal uses for mobile layout.

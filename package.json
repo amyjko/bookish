@@ -1,7 +1,7 @@
 {
     "name": "bookish-press",
     "private": false,
-    "version": "0.7.4",
+    "version": "0.8.0",
     "type": "module",
     "description": "A platform for reading and writing readable, accessible, beautiful online books.",
     "license": "MIT",
@@ -40,10 +40,10 @@
         "@testing-library/svelte": "^5",
         "@types/prismjs": "^1.26",
         "@types/smoothscroll-polyfill": "^0",
-        "chalk": "^5.3.0",
         "jsdom": "^29",
         "prettier": "^3",
         "prettier-plugin-svelte": "^4",
+        "svelte": "^5.57",
         "svelte-check": "^4.7",
         "tslib": "^2",
         "typescript": "^5",
@@ -54,13 +54,13 @@
         "@sveltejs/kit": "^2",
         "ajv": "^8",
         "ajv-formats": "^3",
-        "firebase": "^11",
-        "firebase-admin": "^12.7.0",
-        "firebase-functions": "^6",
+        "firebase": "^12",
+        "firebase-admin": "^14",
         "prismjs": "^1.29",
-        "smoothscroll-polyfill": "^0.4",
-        "svelte": "^5.57",
-        "uuid": "^11"
+        "smoothscroll-polyfill": "^0.4"
+    },
+    "peerDependencies": {
+        "svelte": "^5.0.0"
     },
     "engines": {
         "node": "22"
