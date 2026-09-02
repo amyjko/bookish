@@ -24,15 +24,10 @@ export default defineConfig({
         // Wide enough that marginals lay out in the right margin.
         viewport: { width: 1440, height: 900 },
     },
+    // The Firebase emulators are started around this suite by
+    // scripts/test-emulators.sh (via firebase emulators:exec), not here,
+    // so their output is visible and shutdown is clean.
     webServer: [
-        {
-            // Builds functions and clears orphaned processes from the
-            // test-only ports before starting.
-            command: 'bash scripts/test-emulators.sh',
-            url: `http://127.0.0.1:${EMULATOR_PORTS.auth}`,
-            reuseExistingServer: !process.env.CI,
-            timeout: 180000,
-        },
         {
             command: 'npx vite preview --port 4180 --strictPort',
             url: 'http://localhost:4180',

@@ -21,7 +21,7 @@
         "//test:e2e": "echo 'Build the app and run the Playwright smoke tests against a preview server.'",
         "test:e2e": "npm run build && playwright test",
         "//test:e2e:emu": "echo 'Build the app and run the Playwright suite that signs in and edits against dedicated Firebase emulators (see firebase.test.json).'",
-        "test:e2e:emu": "PUBLIC_FIREBASE_PROJECT_ID=demo-bookish PUBLIC_FIREBASE_STORAGE_BUCKET=demo-bookish.appspot.com npm run build && playwright test --config playwright.emulator.config.ts",
+        "test:e2e:emu": "PUBLIC_FIREBASE_PROJECT_ID=demo-bookish PUBLIC_FIREBASE_STORAGE_BUCKET=demo-bookish.appspot.com npm run build && bash scripts/test-emulators.sh 'npx playwright test --config playwright.emulator.config.ts'",
         "check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch",
         "check:ci": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
         "//env": "echo 'This copies the .env file corresponding to the current Firebase project specified with firebase use, defaulting to local'",
