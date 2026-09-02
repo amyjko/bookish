@@ -31,5 +31,6 @@ jobs:
             - run: npm run build
             - run: npx playwright install --with-deps chromium
             - run: npx playwright test
-            # The signed-in suite against the Firebase emulators.
-            - run: npx playwright test --config playwright.emulator.config.ts
+            # The signed-in suite against the Firebase emulators (rebuilds
+            # the app against the credential-free demo project id).
+            - run: npm run test:e2e:emu

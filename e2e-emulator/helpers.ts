@@ -1,7 +1,7 @@
 import { expect, type Page } from '@playwright/test';
 import { EMULATOR_PORTS } from '../playwright.emulator.config';
 
-export const PROJECT = 'bookish-dev-21ac3';
+export const PROJECT = 'demo-bookish';
 const AUTH = `http://127.0.0.1:${EMULATOR_PORTS.auth}`;
 const FIRESTORE = `http://127.0.0.1:${EMULATOR_PORTS.firestore}`;
 const owner = {
