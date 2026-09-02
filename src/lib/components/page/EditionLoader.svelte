@@ -5,9 +5,12 @@
     import {
         getBook,
         getEdition,
+        getStatus,
         getUser,
         getChapterText,
     } from '$lib/components/page/Contexts';
+    import BookSaveStatus from '$lib/models/book/BookSaveStatus';
+    import { get } from 'svelte/store';
     import { onDestroy, untrack } from 'svelte';
     import { page } from '$app/state';
     import type { Unsubscribe } from 'firebase/auth';
@@ -25,6 +28,42 @@
     let auth = getUser();
     let book = getBook();
     let edition = getEdition();
+    let status = getStatus();
+
+    /** Whether the edition store has been set by something other than this
+     *  loader's own snapshot application (i.e., a local edit) since the last
+     *  completed save. While true, incoming snapshots are by definition older
+     *  than local state and applying them would lose the newer edits, so they
+     *  are skipped; the pending save's own confirmation snapshot arrives
+     *  after the save completes and is applied then. (Reader routes never
+     *  edit, so this stays false there.) */
+    let locallyEdited = false;
+    let applyingSnapshot = false;
+    const localEditWatch = edition.subscribe(() => {
+        if (!applyingSnapshot) locallyEdited = true;
+    });
+    // When a save completes, local state and server state agree again.
+    const statusWatch = status?.subscribe((current) => {
+        if (current === BookSaveStatus.Saved) locallyEdited = false;
+    });
+
+    function skipStaleSnapshot() {
+        const current = status ? get(status) : undefined;
+        return (
+            locallyEdited &&
+            (current === BookSaveStatus.Changed ||
+                current === BookSaveStatus.Saving)
+        );
+    }
+
+    function applySnapshot(apply: () => void) {
+        applyingSnapshot = true;
+        try {
+            apply();
+        } finally {
+            applyingSnapshot = false;
+        }
+    }
     /** Mapping from Firestore docuemnt IDs to chapter text */
     let chapterText: Map<string, string> = new Map();
 
@@ -77,11 +116,14 @@
                     $book.getID(),
                     editionID,
                     (ed) => {
+                        if (skipStaleSnapshot()) return;
                         if (ed) {
                             // Before setting the new edition, augmented it with the chapter text.
-                            edition.set(ed.withChapterText(chapterText));
+                            applySnapshot(() =>
+                                edition.set(ed.withChapterText(chapterText)),
+                            );
                         } else {
-                            edition.set(undefined);
+                            applySnapshot(() => edition.set(undefined));
                             error = 'Unable to load edition';
                         }
                     },
@@ -91,12 +133,25 @@
                     $book.getID(),
                     editionID,
                     (chapters) => {
-                        // Update the text of the chapters we received.
+                        // Cache the text of the chapters we received — except
+                        // text we already have while local edits await a save,
+                        // which may be a stale echo of what the user since
+                        // revised. Text for a chapter not yet cached is load
+                        // data, not an echo; it must always be kept, since
+                        // nothing will re-deliver it. (The effect below keeps
+                        // this cache current with local edits, so applying it
+                        // to the edition never loses anything.)
+                        const stale = skipStaleSnapshot();
                         for (const [ref, text] of chapters)
-                            chapterText.set(ref.id, text);
+                            if (!stale || !chapterText.has(ref.id))
+                                chapterText.set(ref.id, text);
                         // Update the chapter text in the current edition.
                         if ($edition) {
-                            edition.set($edition.withChapterText(chapterText));
+                            applySnapshot(() =>
+                                edition.set(
+                                    $edition.withChapterText(chapterText),
+                                ),
+                            );
                         }
                     },
                 );
@@ -134,6 +189,8 @@
 
     // When unmounted, unset the stores — no longer viewing a book.
     onDestroy(() => {
+        localEditWatch();
+        statusWatch?.();
         edition.set(undefined);
         unsub();
     });
