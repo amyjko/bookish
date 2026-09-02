@@ -1,5 +1,17 @@
 # bookish changelog
 
+# Unreleased
+
+## Added
+
+- Regression tests pinning each fix below: unit and route-level tests for string-form references, a component test that delivers Firestore listener snapshots in adversarial orders around local edits, an emulator test of rapid successive glossary edits surviving a reload, and an emulator assertion that the add-synonym button focuses the new synonym.
+
+## Fixed
+
+- All three known issues recorded in 0.8.0: legacy string-form references no longer crash the edition editor (already-parsed references now survive the copy-on-write constructor's re-normalization); a save's Firestore listener echo no longer overwrites edits made while the save was pending (stale snapshots are skipped until the save completes, while chapter text the client doesn't have yet still merges in at load); and adding a synonym now moves focus to the new synonym field (focus is deferred past the button click's default action, which was stealing it back).
+- `scripts/import.js` crashed with `error is not defined` on any invalid input; fatal errors now print in red and exit.
+- Eliminated every remaining `svelte-check` and build warning. Two were latent defects: `Chapter.svelte` computed its editability once and never updated it across chapter navigation, and `ImageThumbnail.svelte` never reset or retried a failed thumbnail when its unkeyed list row was reused. The rest were invalid HTML (an `<aside>` inside a `<p>` in rendered references), dead code, a Svelte 4 nested-selector idiom in `List.svelte`, and deliberate initial-value captures now expressed with `untrack()` (script-level `svelte-ignore` comments are stripped by `vitePreprocess` before the compiler sees them).
+
 # 0.8.0 - 2026-09-02
 
 ## Added
