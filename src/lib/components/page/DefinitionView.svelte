@@ -39,7 +39,10 @@
             const editors = synonymsEditor.querySelectorAll('input');
             if (editors.length > 0) {
                 const last = editors[editors.length - 1];
-                if (last instanceof HTMLElement) last.focus();
+                // Defer past the click's default action, which would
+                // otherwise return focus to the add-synonym button.
+                if (last instanceof HTMLElement)
+                    setTimeout(() => last.focus(), 0);
             }
             newSynonym = false;
         }

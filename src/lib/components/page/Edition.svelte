@@ -3,7 +3,7 @@
     import type EditionModel from '$lib/models/book/Edition';
     import smoothscroll from 'smoothscroll-polyfill';
     import { goto } from '$app/navigation';
-    import { onMount, setContext } from 'svelte';
+    import { onMount, setContext, untrack } from 'svelte';
     import { writable } from 'svelte/store';
     import {
         BASE,
@@ -40,7 +40,9 @@
     let book = getBook();
 
     // Expose the base path to descendants, keeping it up to date when it changes.
-    let baseStore = writable<string>(base);
+    // Deliberately seeded with the initial base (untracked); the effect
+    // below keeps it in sync when the prop changes.
+    let baseStore = writable<string>(untrack(() => base));
     setContext<BaseStore>(BASE, baseStore);
     $effect.pre(() => {
         baseStore.set(base);

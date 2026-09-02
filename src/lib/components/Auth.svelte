@@ -17,7 +17,7 @@
     // The store that tracks the auth context.
     const authentication: Writable<Authentication> = writable({
         user: null,
-        loading: loading,
+        loading: true,
         login,
         logout,
     });

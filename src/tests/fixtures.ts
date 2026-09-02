@@ -35,7 +35,9 @@ export function makeBook() {
     });
 }
 
-export function makeEdition() {
+export function makeEdition(
+    references: Record<string, string | string[]> = {},
+) {
     return new Edition(
         bookRef,
         editionRef,
@@ -65,7 +67,7 @@ export function makeEdition() {
         '',
         [],
         {},
-        {},
+        references,
         {},
         {},
         null,

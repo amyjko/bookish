@@ -8,7 +8,7 @@
 
 <script lang="ts">
     import type CodeNode from '$lib/models/chapter/CodeNode';
-    import { onMount } from 'svelte';
+    import { onMount, untrack } from 'svelte';
     import Code from './Code.svelte';
 
     interface Props {
@@ -19,7 +19,9 @@
     let { node, startCode }: Props = $props();
 
     // Start with whatever code was passed in.
-    let code = $state(startCode);
+    // Deliberately captures the initial code (untracked): it's the
+    // baseline that the reset button restores.
+    let code = $state(untrack(() => startCode));
 
     // What is currently rendered to the console (not always program output).
     let output = $state('');

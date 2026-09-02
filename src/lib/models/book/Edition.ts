@@ -11,7 +11,7 @@ import ChapterIDs, {
 } from './ChapterID.js';
 import type { DocumentReference } from 'firebase/firestore';
 import type Book from './Book';
-import type FormatNode from '../chapter/FormatNode';
+import FormatNode from '../chapter/FormatNode';
 import type { EditionInfo } from './Book';
 
 export type EditionSpecification = {
@@ -121,8 +121,11 @@ export default class Edition {
         this.sources = Object.assign({}, sources);
         this.references = {};
         for (const [citationID, ref] of Object.entries(references)) {
+            // Pass through already-parsed references: strings parse to
+            // FormatNodes, and every copy-on-write constructor call re-runs
+            // this normalization, so FormatNodes must survive it too.
             this.references[citationID] =
-                ref instanceof Reference
+                ref instanceof Reference || ref instanceof FormatNode
                     ? ref
                     : Edition.parseReference(citationID, ref, this);
         }

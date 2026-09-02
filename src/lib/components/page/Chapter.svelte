@@ -259,14 +259,15 @@
         });
     });
 
-    let editable =
+    let editable = $derived(
         !print &&
-        (isBookEditable() ||
-            isEditionEditable() ||
-            isChapterEditable() ||
-            ($auth !== undefined &&
-                $auth.user !== null &&
-                chapter.isEditor($auth.user.uid)));
+            (isBookEditable() ||
+                isEditionEditable() ||
+                isChapterEditable() ||
+                ($auth !== undefined &&
+                    $auth.user !== null &&
+                    chapter.isEditor($auth.user.uid))),
+    );
 </script>
 
 {#if $edition}

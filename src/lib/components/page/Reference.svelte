@@ -54,7 +54,7 @@
             : authorList.length === 2
               ? authorList[0].trim() + ' & ' + authorList[1].trim()
               : authorList[0].trim() + ', et al.'}
-    <p class="reference">
+    <div class="reference">
         {authors}
         ({reference.year}).
         {#if reference.url === null}
@@ -64,7 +64,7 @@
         {/if}
         {reference.title.charAt(reference.title.length - 1) === '?' ? '' : '.'}
         <em>{reference.source}</em>
-    </p>
+    </div>
 {:else if editable && edit && editing}
     <!-- If editable, place in rows to make room for text editors to not have to wrap. -->
     <Table>
@@ -243,7 +243,7 @@
     </Table>
 {:else}
     <!-- Otherwise, just render the reference. -->
-    <p class="reference">
+    <div class="reference">
         {#if reference.authors}{reference.authors}{:else}<em>Authors</em>{/if}
         {#if reference.year}({reference.year}){:else}<em>Year</em>{/if}. {#if reference.url === null || reference.url.length === 0}{#if reference.title}{reference.title}{:else}<em
                     >Title</em
@@ -255,7 +255,7 @@
         >.
         {#if reference.summary}<aside class="summary">{reference.summary}</aside
             >{/if}
-    </p>
+    </div>
 {/if}
 {#if edit && editable && !reference.short}
     <div class="controls">
@@ -283,11 +283,6 @@
         line-height: var(--bookish-paragraph-line-height-tight);
         margin-top: 0;
         margin-top: var(--bookish-block-padding);
-    }
-
-    p {
-        margin-top: 0;
-        margin-bottom: 0;
     }
 
     .reference .summary {

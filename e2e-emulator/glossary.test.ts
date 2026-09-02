@@ -45,14 +45,11 @@ test('glossary entries can be created, used, and deleted', async ({ page }) => {
     await expect(definitionEditor).toContainText('A creature of legend.');
     await waitForSaveRoundtrip(page);
 
-    // Add a synonym. (The intended focus-the-new-input behavior does not
-    // work — verified identical with the pre-migration afterUpdate version;
-    // the Firestore listener echo re-render appears to drop focus — so this
-    // asserts the input appears and is editable, not that it's focused.)
+    // Add a synonym; the new synonym input receives focus (deferred past
+    // the click, which would otherwise keep focus on the button).
     await page.locator('button[title="add synonym"]').click();
     const synonym = page.locator('input[aria-label="Synonym editor."]').last();
-    await expect(synonym).toBeVisible();
-    await synonym.click();
+    await expect(synonym).toBeFocused();
     await synonym.fill('beast');
     await synonym.press('Enter');
     await waitForSaveRoundtrip(page);

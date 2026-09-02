@@ -9,19 +9,19 @@ jobs:
         # it; bound the job so a hang still fails loudly.
         timeout-minutes: 15
         steps:
-            - uses: actions/checkout@v4
-            - uses: actions/setup-node@v4
+            - uses: actions/checkout@v5
+            - uses: actions/setup-node@v5
               with:
                   node-version: 22
                   cache: npm
             # The Firestore emulator needs Java; firebase-tools requires 21+.
-            - uses: actions/setup-java@v4
+            - uses: actions/setup-java@v5
               with:
                   distribution: temurin
                   java-version: 21
             # The emulator-backed Playwright suite downloads Firebase
             # emulator jars on first run; cache them across builds.
-            - uses: actions/cache@v4
+            - uses: actions/cache@v5
               with:
                   path: ~/.cache/firebase/emulators
                   key: firebase-emulators-${{ runner.os }}

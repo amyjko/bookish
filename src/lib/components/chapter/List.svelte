@@ -44,13 +44,14 @@
         list-style-type: decimal;
     }
 
-    /* Second level is lowercase alpha */
-    ol ol li {
+    /* Second level is lowercase alpha. Nested lists render as child List
+       components, so the inner elements need :global to match. */
+    ol :global(ol li) {
         list-style-type: lower-alpha;
     }
 
     /* Third level is uppercase alpha */
-    ol ol ol li {
+    ol :global(ol ol li) {
         list-style-type: upper-alpha;
     }
 

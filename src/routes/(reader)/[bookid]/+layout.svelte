@@ -10,7 +10,7 @@
     import Book from '$lib/models/book/Book';
     import Edition from '$lib/components/page/Edition.svelte';
     import { writable } from 'svelte/store';
-    import { setContext } from 'svelte';
+    import { setContext, untrack } from 'svelte';
     import EditionModel from '$lib/models/book/Edition';
     import Error from '../+error.svelte';
     import Analytics from '$lib/components/page/Analytics.svelte';
@@ -33,7 +33,10 @@
 
     let { data, children }: Props = $props();
 
-    const meta = data.meta;
+    // Layout data is deliberately read once (untracked): readers reach each
+    // book by full page load, so this layout never survives a book-to-book
+    // navigation.
+    const meta = untrack(() => data).meta;
 
     // A global store for the current book. It's at the root so the header can do breadcrumbs.
     let book = writable<Book | undefined>(undefined);
@@ -50,7 +53,7 @@
 
     // After the chapter text promise resolves, update the edition with the chapter text.
     // We stream this to load the table of contents faster.
-    data.chapters.then((textByID) => {
+    untrack(() => data).chapters.then((textByID) => {
         if ($edition !== undefined)
             edition.set(
                 $edition.withChapterText(new Map(Object.entries(textByID))),
