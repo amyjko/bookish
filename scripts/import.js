@@ -16,6 +16,11 @@ function exit(err) {
     process.exit(1);
 }
 
+/** Report a problem without stopping; callers decide whether to continue. */
+function error(message) {
+    console.log(`𐄂 ${styleText('red', message)}`);
+}
+
 function success(message) {
     console.log(`✓ ${styleText('green', message)}`);
 }
@@ -53,7 +58,7 @@ await upload(process.argv[3], book, chapterTexts, images);
  * If there are errors, missing chapters, or missing images, returns undefined. */
 function getBook(path) {
     if (!existsSync(bookPath)) {
-        error("Hm, the path you gave to your book doesn't seem to exist.");
+        exit("Hm, the path you gave to your book doesn't seem to exist.");
     }
 
     success("Yay! We found your book folder. Let's look inside.");
@@ -74,7 +79,7 @@ function getBook(path) {
 
     if (!valid) {
         log(validator.errors);
-        error('The book.json file has some errors. Fix them, then try again.');
+        exit('The book.json file has some errors. Fix them, then try again.');
         return;
     }
 
@@ -83,7 +88,7 @@ function getBook(path) {
 
     const chaptersPath = join(bookPath, 'chapters');
 
-    if (!existsSync(chaptersPath)) error('There is no chapters/ folder');
+    if (!existsSync(chaptersPath)) exit('There is no chapters/ folder');
 
     const possibleChapterFiles = readdirSync(chaptersPath, 'utf8');
     const chapterTexts = new Map();
@@ -133,7 +138,7 @@ function getBook(path) {
     }
 
     if (!foundAll) {
-        error("Couldn't find all the chapter text. Check the errors above.");
+        exit("Couldn't find all the chapter text. Check the errors above.");
     }
 
     success('Found all the expected chapters.');
