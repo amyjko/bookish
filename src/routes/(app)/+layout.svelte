@@ -64,7 +64,10 @@
         editors.set(new Map($editors));
     }
 
-    let bookTimer: NodeJS.Timeout | undefined = $state(undefined);
+    // These are internal bookkeeping, not UI state: they must NOT be $state,
+    // because the effects below both read and write them, which would make
+    // each effect invalidate itself forever.
+    let bookTimer: NodeJS.Timeout | undefined = undefined;
     let editionTimer: NodeJS.Timeout | undefined = undefined;
     function debounce(timer: NodeJS.Timeout | undefined, fun: Function) {
         clearTimeout(timer);
@@ -73,8 +76,8 @@
         }, 1000);
     }
 
-    /** Save whatever edition is stored. */
-    let previousSavedEdition: Edition | undefined = $state(undefined);
+    /** Save whatever edition is stored. Also internal bookkeeping, not $state. */
+    let previousSavedEdition: Edition | undefined = undefined;
     /**
      * Note whether the update was due to us storing the revised edition from the
      * database so that we don't get in an infinite loop of saving.

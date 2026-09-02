@@ -19,7 +19,9 @@
     let base = getBase();
 
     let loaded: boolean | null | undefined = $state();
-    let urlChecked: string | undefined = $state();
+    // Not $state: it's only a guard against re-checking the same URL, and
+    // making it reactive would make this effect re-run on its own write.
+    let urlChecked: string | undefined = undefined;
     $effect.pre(() => {
         if (urlChecked !== url && typeof Image !== 'undefined') {
             urlChecked = url;

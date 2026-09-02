@@ -8,7 +8,7 @@
         getUser,
         getChapterText,
     } from '$lib/components/page/Contexts';
-    import { onDestroy } from 'svelte';
+    import { onDestroy, untrack } from 'svelte';
     import { page } from '$app/state';
     import type { Unsubscribe } from 'firebase/auth';
     import { listenToChapters, listenToEdition } from '../../models/CRUD';
@@ -115,15 +115,21 @@
         }
     });
 
-    // Whenever the book changes, change the listener.
+    // Whenever the requested edition or the user changes, change the listener.
+    // currentEditionID is read untracked because listen() writes it; tracking
+    // it would make this effect invalidate itself.
     $effect(() => {
-        if (
-            (currentEditionID === undefined ||
-                page.params.editionid !== currentEditionID) &&
-            $auth &&
-            $auth.user !== null
-        )
-            listen();
+        const requestedEditionID = page.params.editionid;
+        const user = $auth?.user;
+        untrack(() => {
+            if (
+                (currentEditionID === undefined ||
+                    requestedEditionID !== currentEditionID) &&
+                user !== null &&
+                user !== undefined
+            )
+                listen();
+        });
     });
 
     // When unmounted, unset the stores — no longer viewing a book.
