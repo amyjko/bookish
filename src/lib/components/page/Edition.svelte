@@ -46,7 +46,9 @@
         if (!cover) return undefined;
         const node = Parser.parseEmbed(edition, cover);
         const url = node instanceof EmbedNode ? node.getURL() : undefined;
-        return url && url.length > 0 ? url : undefined;
+        if (!url || url.length === 0) return undefined;
+        // Resolve local images the same way Embed.svelte does.
+        return url.startsWith('http') ? url : `${base}/images/${url}`;
     });
 
     let book = getBook();
