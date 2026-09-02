@@ -1,5 +1,11 @@
 # bookish changelog
 
+# 0.8.2 - 2026-09-02
+
+## Fixed
+
+- The `og:image` social-preview meta tag emitted the cover's raw Bookish embed markup instead of its image URL, breaking social previews for every published book (and producing stray prerendered pages when `bookish-reader`'s static site generator crawled the markup as a link). Discovered while migrating `bookish-reader` to Svelte 5.
+
 # 0.8.1 - 2026-09-02
 
 ## Added

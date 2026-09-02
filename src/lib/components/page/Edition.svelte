@@ -17,16 +17,16 @@
     import { page } from '$app/state';
     import Title from './Title.svelte';
     import Page from './Page.svelte';
+    import Parser from '$lib/models/chapter/Parser';
+    import EmbedNode from '$lib/models/chapter/EmbedNode';
 
     // Poly fill smooth scrolling for Safari.
     onMount(() => smoothscroll.polyfill());
 
-    
-
     // The base path allows links to adjust to different routing contexts in which a book is placed.
     // For example, when the book is hosted alone, all routes might start with the bare root "/",
     // but when the book is being viewed or edited in the Bookish app, it needs a prefix for the
-    
+
     interface Props {
         // The book and edition to render
         edition: EditionModel | undefined;
@@ -36,6 +36,18 @@
     }
 
     let { edition, base = '', children }: Props = $props();
+
+    /** The cover image's URL for social previews. The cover is stored as
+     *  Bookish embed markup, so it must be parsed; emitting the raw markup
+     *  would produce a nonsense og:image (and stray pages, when a static
+     *  site generator crawls it as a link). */
+    let coverURL = $derived.by(() => {
+        const cover = edition?.getImage('cover');
+        if (!cover) return undefined;
+        const node = Parser.parseEmbed(edition, cover);
+        const url = node instanceof EmbedNode ? node.getURL() : undefined;
+        return url && url.length > 0 ? url : undefined;
+    });
 
     let book = getBook();
 
@@ -54,7 +66,6 @@
 
     // Expose dark mode to descendants
     setContext<DarkModeStore>(DARK_MODE, darkMode);
-
 
     // The CSS to set on the edition, kept up to date with the edition's theme.
     let themeCSS: string = $derived(
@@ -117,7 +128,7 @@
 
     {#if edition}
         <meta property="og:title" content={edition.getTitle()} />
-        <meta property="og:image" content={edition.getImage('cover')} />
+        {#if coverURL}<meta property="og:image" content={coverURL} />{/if}
         <meta property="og:description" content={edition.getDescription()} />
         <meta property="og:type" content="book" />
         <meta property="og:author" content={edition.getAuthorsText()} />
