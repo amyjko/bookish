@@ -1,0 +1,21 @@
+# Type check, test, and build on every pull request.
+# Deploys remain manual, via `npm run stage` and `npm run release`.
+name: Verify
+'on': pull_request
+jobs:
+    verify:
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v4
+            - uses: actions/setup-node@v4
+              with:
+                  node-version: 22
+                  cache: npm
+            - run: npm ci
+            # Create .env from .env.example so $env/static/public resolves.
+            - run: npm run env
+            - run: npm run check:ci
+            - run: npm run test:ci
+            - run: npm run build
+            - run: npx playwright install --with-deps chromium
+            - run: npx playwright test

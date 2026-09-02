@@ -1,0 +1,8 @@
+# Upload only what the Cloud Run image needs (see Dockerfile).
+# Everything else — source, env files, service keys — stays local.
+*
+!Dockerfile
+!package.json
+!package-lock.json
+!build
+!build/**

@@ -6,6 +6,12 @@ Bookish is a framework and platform for writing and publishing web-based books. 
 
 I'm working on a 1.0 of the platform at [bookish.press](https://bookish.press) and expect to maintain the platform for the foreseeable future. Let me know if you'd like to help!
 
+## Hosting architecture
+
+The app is a SvelteKit app. Server-side rendering runs on a [Cloud Run](https://cloud.google.com/run) service named `bookish-ssr` (region `us-central1`) in each Firebase project; Firebase Hosting serves the static client assets from `build/client` and rewrites everything else to that service (see `firebase.json`). The `stage` and `release` scripts handle both: they build the app locally with the environment-specific `.env` (which is inlined at build time), deploy the resulting `build/` to Cloud Run (see `Dockerfile` and `.gcloudignore`), and then run `firebase deploy` for hosting, rules, and functions.
+
+One-time setup on a new machine: install the [gcloud CLI](https://cloud.google.com/sdk/docs/install) and run `gcloud auth login`. (This replaced the experimental Firebase Hosting "web frameworks" integration, which required `firebase experiments:enable webframeworks` and capped the Vite version; the old auto-generated `ssrbookishprod` Cloud Function can be deleted once the Cloud Run deploy is verified.)
+
 ## Deployment notes
 
 There are two major components to Bookish: the authoring platform and the reading front end. Changes to the authoring platform that do not affect reading can be verified and deployed to Firebase without any other coordination. However, changes to the reading experience have downstream dependencies that need to be managed. Here's the general deployment workflow, which I'm currently using as reminders for myself:

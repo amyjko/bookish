@@ -16,12 +16,28 @@
         "source": "functions"
     },
     "hosting": {
-        "source": ".",
-        "predeploy": ["npm run build"],
+        "public": "build/client",
         "ignore": ["firebase.json", "**/.*", "**/node_modules/**"],
-        "frameworksBackend": {
-            "region": "us-central1"
-        }
+        "headers": [
+            {
+                "source": "/_app/immutable/**",
+                "headers": [
+                    {
+                        "key": "Cache-Control",
+                        "value": "public, max-age=31536000, immutable"
+                    }
+                ]
+            }
+        ],
+        "rewrites": [
+            {
+                "source": "**",
+                "run": {
+                    "serviceId": "bookish-ssr",
+                    "region": "us-central1"
+                }
+            }
+        ]
     },
     "emulators": {
         "firestore": {
