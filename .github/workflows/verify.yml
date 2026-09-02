@@ -14,11 +14,22 @@ jobs:
               with:
                   node-version: 22
                   cache: npm
+            # The emulator-backed Playwright suite downloads Firebase
+            # emulator jars on first run; cache them across builds.
+            - uses: actions/cache@v4
+              with:
+                  path: ~/.cache/firebase/emulators
+                  key: firebase-emulators-${{ runner.os }}
             - run: npm ci
+            - run: npm ci --prefix functions
             # Create .env from .env.example so $env/static/public resolves.
             - run: npm run env
+            # Build the npm package; the import-script test depends on dist/.
+            - run: npm run package:build
             - run: npm run check:ci
             - run: npm run test:ci
             - run: npm run build
             - run: npx playwright install --with-deps chromium
             - run: npx playwright test
+            # The signed-in suite against the Firebase emulators.
+            - run: npx playwright test --config playwright.emulator.config.ts

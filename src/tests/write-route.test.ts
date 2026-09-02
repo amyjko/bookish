@@ -1,10 +1,6 @@
 import { beforeAll, expect, test, vi } from 'vitest';
 import { render } from '@testing-library/svelte';
 import { tick } from 'svelte';
-import Book from '$lib/models/book/Book';
-import Edition from '$lib/models/book/Edition';
-import Chapter from '$lib/models/book/Chapter';
-import type { DocumentReference } from 'firebase/firestore';
 import WriteRouteHarness from './WriteRouteHarness.svelte';
 
 vi.mock('$app/state', () => ({
@@ -38,124 +34,57 @@ vi.mock('$lib/models/Firebase', () => ({
     functions: undefined,
 }));
 
-const bookRef = {
-    id: 'testbook',
-    path: 'books/testbook',
-} as unknown as DocumentReference;
-const editionRef = {
-    id: 'edition1',
-    path: 'books/testbook/editions/edition1',
-} as unknown as DocumentReference;
-
-function makeBook() {
-    return Book.fromJSON('testbook', {
-        title: 'Test Book',
-        authors: [],
-        description: '',
-        cover: null,
-        published: false,
-        editions: [
-            {
-                ref: editionRef,
-                summary: '',
-                number: 1,
-                published: null,
-                editionuids: [],
-                chapteruids: [],
-            },
-        ],
-        domain: null,
-        uids: ['someuser'],
-        readuids: [],
-    });
-}
-
-function makeEdition() {
-    return new Edition(
-        bookRef,
-        editionRef,
-        ['someuser'],
-        'Test Book',
-        [],
-        1,
-        '',
-        null,
-        {},
-        undefined,
-        '',
-        [
-            Chapter.fromJSON({
-                ref: {
-                    id: 'chapter1',
-                } as unknown as DocumentReference,
-                id: 'chapter1',
-                title: 'Chapter One',
-                authors: [],
-                image: null,
-                numbered: true,
-                forthcoming: false,
-                text: 'Some chapter text.',
-                uids: [],
-            }),
-        ],
-        'All rights reserved.',
-        '',
-        [],
-        {},
-        {},
-        {},
-        {},
-        null,
-        null,
-        {},
-        null,
-    );
-}
-
+// Book/edition builders are shared with other suites.
 // Firestore delivers snapshots asynchronously; queueMicrotask mimics that
 // while keeping callbacks re-invocable like real listeners.
-vi.mock('$lib/models/CRUD', () => ({
-    listenToPublishedBooks: () => () => undefined,
-    listenToEditableBooks: () => () => undefined,
-    listenToPartiallyEditableBooks: () => () => undefined,
-    listenToBooksByName: (
-        _name: string,
-        callback: (books: unknown[]) => void,
-    ) => {
-        queueMicrotask(() => callback([]));
-        return () => undefined;
-    },
-    listenToBookWithID: (_id: string, callback: (book: unknown) => void) => {
-        queueMicrotask(() => callback(makeBook()));
-        return () => undefined;
-    },
-    listenToEdition: (
-        _bookID: string,
-        _editionID: string,
-        callback: (edition: unknown) => void,
-    ) => {
-        queueMicrotask(() => callback(makeEdition()));
-        return () => undefined;
-    },
-    listenToChapters: (
-        _bookID: string,
-        _editionID: string,
-        callback: (chapters: unknown[]) => void,
-    ) => {
-        queueMicrotask(() => callback([]));
-        return () => undefined;
-    },
-    getUserEmails: () => Promise.resolve(new Map()),
-    createUser: () => Promise.resolve(null),
-    createBook: () => Promise.resolve('testbook'),
-    createNewEdition: () => Promise.resolve(makeBook()),
-    updateLock: () => Promise.resolve(),
-    updateEdition: () => Promise.resolve(new Map()),
-    updateBook: () => Promise.resolve(),
-    isSubdomainAvailable: () => Promise.resolve(true),
-    getBookIDWithSubdomain: () => Promise.resolve(null),
-    publish: () => Promise.resolve('nope'),
-}));
+vi.mock('$lib/models/CRUD', async () => {
+    const { makeBook, makeEdition } = await import('./fixtures');
+    return {
+        listenToPublishedBooks: () => () => undefined,
+        listenToEditableBooks: () => () => undefined,
+        listenToPartiallyEditableBooks: () => () => undefined,
+        listenToBooksByName: (
+            _name: string,
+            callback: (books: unknown[]) => void,
+        ) => {
+            queueMicrotask(() => callback([]));
+            return () => undefined;
+        },
+        listenToBookWithID: (
+            _id: string,
+            callback: (book: unknown) => void,
+        ) => {
+            queueMicrotask(() => callback(makeBook()));
+            return () => undefined;
+        },
+        listenToEdition: (
+            _bookID: string,
+            _editionID: string,
+            callback: (edition: unknown) => void,
+        ) => {
+            queueMicrotask(() => callback(makeEdition()));
+            return () => undefined;
+        },
+        listenToChapters: (
+            _bookID: string,
+            _editionID: string,
+            callback: (chapters: unknown[]) => void,
+        ) => {
+            queueMicrotask(() => callback([]));
+            return () => undefined;
+        },
+        getUserEmails: () => Promise.resolve(new Map()),
+        createUser: () => Promise.resolve(null),
+        createBook: () => Promise.resolve('testbook'),
+        createNewEdition: () => Promise.resolve(makeBook()),
+        updateLock: () => Promise.resolve(),
+        updateEdition: () => Promise.resolve(new Map()),
+        updateBook: () => Promise.resolve(),
+        isSubdomainAvailable: () => Promise.resolve(true),
+        getBookIDWithSubdomain: () => Promise.resolve(null),
+        publish: () => Promise.resolve('nope'),
+    };
+});
 
 // Svelte 5 schedules effect flushes through queueMicrotask. A cycle that
 // spans a store write and a re-render churns microtasks forever, which

@@ -9,6 +9,7 @@ export default defineConfig({
     test: {
         environment: 'jsdom',
         globals: true,
+        setupFiles: ['src/tests/setup.ts'],
         // Playwright tests live in e2e/ and are run by `playwright test`.
         include: ['src/**/*.test.ts'],
     },

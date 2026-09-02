@@ -2,6 +2,12 @@
 
 # Unreleased (0.8.0)
 
+- Added a signed-in Playwright suite (`npm run test:e2e:emu`) that runs against dedicated Firebase emulators (`firebase.test.json`, ports offset to avoid colliding with other emulator suites; `firebase-tools` is now a pinned devDependency): email-link sign-in, every toolbar sub-editor (links, citations, footnotes, comments, inline code, tables) with Firestore persistence, image upload through the embed editor's file input, glossary entry create/use/delete, the change-email page, the write print view, and invalid-login-link rejection. Emulator ports are overridable via `PUBLIC_EMULATOR_*` env vars (local dev unchanged). CI runs the suite with cached emulators.
+- Fixed the change-email page's error feedback, which was dead code (a shadowed catch variable, a non-reactive `error`, and two typo'd Firebase error codes).
+- Added a usage smoke test for `scripts/import.js`; CI now also builds the npm package (`npm run package:build`).
+- Fixed the scheduled Firestore backups in both projects, which had been failing since May 2024: the functions' service accounts lacked the Firestore export role. Verified fresh exports in both buckets.
+- Known issues recorded while testing (all pre-existing): legacy string-form references crash the edition editor with "e is not iterable"; editing again before a save's Firestore listener echo arrives can lose the newer edits to the echoed snapshot; the add-synonym focus behavior doesn't survive the save echo re-render.
+
 - **Breaking for `bookish-press` consumers**: the package now requires Svelte 5 (`peerDependencies: { svelte: "^5.0.0" }`). Publish under the `next` dist-tag until `bookish-reader` has migrated; a `0.7.x` branch exists for maintenance releases. Version bumped to 0.8.0.
 - Upgraded Firebase across the board: client SDK 11→12, firebase-admin 12→14 (now using the modular API in both the reader's server route and functions/), firebase-functions 6→7, @google-cloud/storage 7→8. Removed unused `firebase-functions` from the app (it belonged to the retired webframeworks deploy) and unused `firebase-functions-test`.
 - Finished the `$app/stores` → `$app/state` migration (all ten remaining files).

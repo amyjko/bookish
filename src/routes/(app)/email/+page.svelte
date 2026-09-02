@@ -14,14 +14,14 @@
 
     let loading = $state(false);
     let feedback = $state('');
-    let error = '';
+    let error = $state('');
     let changed = $state(false);
 
     const errors: Record<string, string> = {
-        'auth/invalid-mail': "This wasn't a valid email.",
+        'auth/invalid-email': "This wasn't a valid email.",
         'auth/email-already-in-use':
             'This email is already associated with an account.',
-        'auto/requires-recent-login':
+        'auth/requires-recent-login':
             "You haven't logged in recently enough. Log out, log in again, then try again.",
     };
 
@@ -39,11 +39,12 @@
                     feedback = `Check your original email address, ${previousEmail}, for a confirmation link.`;
                     changed = true;
                 })
-                .catch((error: any) => {
-                    if (typeof error.code === 'string')
-                        error =
-                            errors[error.code] ??
-                            "Couldn't update email for an unknown reason.";
+                .catch((cause: unknown) => {
+                    feedback = '';
+                    const code = (cause as { code?: unknown })?.code;
+                    error =
+                        (typeof code === 'string' ? errors[code] : undefined) ??
+                        "Couldn't update email for an unknown reason.";
                 })
                 .finally(() => {
                     loading = false;
