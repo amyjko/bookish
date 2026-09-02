@@ -13,9 +13,6 @@
 
     let references = $derived($edition?.hasReferences() ? $edition.getReferences() : null);
 
-    // Otherwise, map references to a list with letter headers.
-    if (references !== null) {
-    }
 </script>
 
 {#if $edition}

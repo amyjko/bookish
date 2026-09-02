@@ -88,7 +88,9 @@
     // to implement fancy operational transform revision control for collaborative editing
     // or a basic chapter locking strategy to avoid data loss. I went with locking for maintenance simplicity,
     // but it would be nice to implement operational transform in the future.
-    let editedNode: RootNode = $state(parser(text));
+    // Deliberately parses the initial text (untracked); the effect below
+    // reparses when the text prop changes externally.
+    let editedNode: RootNode = $state(untrack(() => parser(text)));
     $effect.pre(() => {
         if (untrack(() => editedNode).toBookdown() !== text) {
             editedNode = parser(text);

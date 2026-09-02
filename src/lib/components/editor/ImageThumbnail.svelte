@@ -30,7 +30,14 @@
         img.src = url;
     }
 
-    loadImage(image.thumb);
+    // Load now and whenever the image prop changes (thumbnails can be
+    // reused for a different image by an unkeyed list).
+    $effect(() => {
+        retries = 3;
+        loading = true;
+        error = false;
+        loadImage(image.thumb);
+    });
 </script>
 
 {#if loading}

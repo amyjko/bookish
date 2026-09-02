@@ -2,7 +2,7 @@
     import type ChapterNode from '$lib/models/chapter/ChapterNode';
     import ParagraphNode from '$lib/models/chapter/ParagraphNode';
     import { writable } from 'svelte/store';
-    import { setContext } from 'svelte';
+    import { setContext, untrack } from 'svelte';
     import { ROOT } from '../page/Contexts';
     import Block from './Block.svelte';
     import Paragraph from './Paragraph.svelte';
@@ -20,7 +20,9 @@
     let blocks = $derived(node.getBlocks());
 
     // Make this chapter node available to all children in a reactive store.
-    let root = writable<ChapterNode>(node);
+    // The store is deliberately seeded with the initial node (untracked);
+    // the effect below keeps it in sync when the prop changes.
+    let root = writable<ChapterNode>(untrack(() => node));
     setContext(ROOT, root);
     $effect.pre(() => {
         root.set(node);
