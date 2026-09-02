@@ -9,6 +9,10 @@ test('editor accepts typing, navigation, and undo', async ({ page }) => {
     const editor = page.locator('.bookish-editor');
     await expect(editor).toBeVisible();
     await expect(editor).toContainText('This is an editable fixture chapter.');
+    // The fixture editor autofocuses on mount; waiting for that focus keeps
+    // the click below from racing hydration on slow CI runners (the text
+    // assertions above are satisfiable by server-rendered HTML alone).
+    await expect(editor).toBeFocused({ timeout: 15000 });
 
     // Click into the first paragraph to place the caret.
     await page
