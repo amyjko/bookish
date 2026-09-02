@@ -1,4 +1,6 @@
 <script lang="ts">
+    import { untrack } from 'svelte';
+
     enum Status {
         Viewing,
         Editing,
@@ -115,9 +117,16 @@
             }
         }
     });
-    // When text changes, save, unless we only save on exit.
+    // When text changes, save, unless we only save on exit. Only the text is
+    // tracked: the save/valid props are often inline closures recreated on
+    // every parent render, and saving usually triggers a parent re-render, so
+    // tracking them (as calling saveText inside the effect otherwise would)
+    // makes this effect loop forever.
     $effect(() => {
-        if (!saveOnExit) saveText(text);
+        void text;
+        untrack(() => {
+            if (!saveOnExit) saveText(text);
+        });
     });
 </script>
 
