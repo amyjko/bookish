@@ -5,7 +5,10 @@
     "type": "module",
     "description": "A platform for reading and writing readable, accessible, beautiful online books.",
     "license": "MIT",
-    "repository": "https://github.com/amyjko/bookish.git",
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/amyjko/bookish.git"
+    },
     "scripts": {
         "prepare": "svelte-kit sync",
         "//dev": "echo 'Run the Svelte/Vite local server to test locally. Use in combination with run emu to run locally.'",
