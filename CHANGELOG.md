@@ -2,33 +2,27 @@
 
 # 0.8.0 - 2026-09-02
 
-## Svelte 5
+## Added
 
-- **Breaking for `bookish-press` consumers**: the package now requires Svelte 5 (`peerDependencies: { svelte: "^5.0.0" }`). Published under the `next` dist-tag until `bookish-reader` migrates; the `0.7.x` branch holds the Svelte 4 line for maintenance releases.
-- Migrated all 154 components to Svelte 5 (5.57) runes, with Vite 7, vite-plugin-svelte 6, svelte-check 4, prettier-plugin-svelte 4, and vitest 4; replaced svelte-preprocess with vitePreprocess. Every `$:` side effect was triaged into `$derived` or `$effect` by hand, and `$app/stores` became `$app/state` throughout.
-- The marginal layout system now coalesces layout requests into one pass per animation frame (`ChapterContext.requestLayout`); the rich text editor was verified behavior-identical to the Svelte 4 editor by direct comparison, and Prism token styles are global again (they had silently become scoped when svelte-preprocess left).
-- Fixed two effect cycles the migration introduced, both from Svelte 5 tracking every read in an effect's call stack where `$:` tracked only compile-time references: the app layout's save/debounce bookkeeping, and TextEditor's auto-save tracking its inline `save`/`valid` function props. Both are pinned by regression tests that mount the real route stacks.
-- Deliberately deferred: Vite 8 + vite-plugin-svelte 7 (optional), TypeScript 7 (no Svelte tooling support yet).
+- A signed-in Playwright suite (`npm run test:e2e:emu`) against dedicated Firebase emulators (`firebase.test.json`; offset ports, overridable via `PUBLIC_EMULATOR_*`; credential-free `demo-` project): email-link sign-in, every toolbar sub-editor (links, citations, footnotes, comments, inline code, tables) with Firestore persistence, image upload through the embed editor's file input, glossary create/use/delete, the change-email page, the write print view, and invalid-login-link rejection.
+- Unit and browser tests: chapter rendering and the marginal layout contract, effect-cycle regressions that mount the real route stacks, marginal positioning and editor behavior against local-only `/fixture` routes, and a usage smoke test for `scripts/import.js`.
+- A CI verify workflow on pull requests (replacing the deploy-on-PR workflow): type check, unit tests, npm package build, app build, and both Playwright suites, with a 15-minute job timeout. Deploys remain manual.
 
-## Hosting
+## Changed
 
-- Moved server-side rendering from the retired Firebase Hosting web-frameworks experiment to a Cloud Run service (`bookish-ssr`) behind a Hosting rewrite, reusing the adapter-node build. Deploys build locally once and ship the artifacts (see `Dockerfile`), so Hosting and the SSR server share one set of asset hashes.
-
-## Dependencies
-
-- Firebase across the board: client SDK 11→12, firebase-admin 12→14 (modular API in the server route and functions), firebase-functions 6→7, @google-cloud/storage 7→8; SvelteKit 2.70 and all other in-range updates (which surfaced and fixed two `$page.params` nullability errors).
-- Replaced `uuid` with `crypto.randomUUID()` and `chalk` with `node:util`'s `styleText`; removed unused dependencies (`globals`, `@types/sharp`, `firebase-functions-test`, the functions' unused `bookish-press`) and the dead `vite.reader.config.ts`. `firebase-tools` is now a pinned devDependency.
-
-## Testing and CI
-
-- Replaced the deploy-on-PR workflow with a verify workflow: type check, unit tests, npm package build, app build, and two Playwright suites, with a 15-minute job timeout.
-- New unit and browser tests: chapter rendering and the marginal layout contract, effect-cycle regressions, marginal positioning and editor behavior against local-only `/fixture` routes, and a usage smoke test for `scripts/import.js`.
-- New signed-in Playwright suite (`npm run test:e2e:emu`) against dedicated Firebase emulators (`firebase.test.json`; offset ports, overridable via `PUBLIC_EMULATOR_*`; credential-free `demo-` project): email-link sign-in, every toolbar sub-editor (links, citations, footnotes, comments, inline code, tables) with Firestore persistence, image upload through the embed editor's file input, glossary create/use/delete, the change-email page, the write print view, and invalid-login-link rejection.
+- **Migrated to Svelte 5** (#379). **Breaking for `bookish-press` consumers**: the package now requires Svelte 5 (`peerDependencies: { svelte: "^5.0.0" }`); published under the `next` dist-tag until `bookish-reader` migrates, with the `0.7.x` branch holding the Svelte 4 line. All 154 components use runes (Svelte 5.57, Vite 7, vite-plugin-svelte 6, svelte-check 4, prettier-plugin-svelte 4, vitest 4; svelte-preprocess replaced with vitePreprocess); every `$:` side effect was triaged into `$derived` or `$effect` by hand, and `$app/stores` became `$app/state` throughout. The rich text editor was verified behavior-identical to the Svelte 4 editor by direct comparison. Deferred on purpose: Vite 8 (optional) and TypeScript 7 (no Svelte tooling support yet).
+- The marginal layout system coalesces layout requests into one pass per animation frame (`ChapterContext.requestLayout`) instead of one per component update.
+- Server-side rendering moved from the retired Firebase Hosting web-frameworks experiment to a Cloud Run service (`bookish-ssr`) behind a Hosting rewrite, reusing the adapter-node build. Deploys build locally once and ship the artifacts (see `Dockerfile`), so Hosting and the SSR server share one set of asset hashes.
+- Firebase across the board: client SDK 11→12, firebase-admin 12→14 (modular API in the server route and functions), firebase-functions 6→7, @google-cloud/storage 7→8; SvelteKit 2.70 and all other in-range updates.
+- Replaced `uuid` with `crypto.randomUUID()` and `chalk` with `node:util`'s `styleText`; removed unused dependencies (`globals`, `@types/sharp`, `firebase-functions-test`, the functions' unused `bookish-press`) and the dead `vite.reader.config.ts`; `firebase-tools` is now a pinned devDependency.
 
 ## Fixed
 
+- Two effect cycles introduced by the migration, both from Svelte 5 tracking every read in an effect's call stack where `$:` tracked only compile-time references: the app layout's save/debounce bookkeeping (blanked every editor page), and TextEditor's auto-save tracking its inline `save`/`valid` function props. Both are pinned by regression tests.
+- Prism token styles had silently become scoped (and thus inert) when svelte-preprocess was removed; they are global again via native `:global` blocks.
 - The change-email page's error feedback was dead code (a shadowed catch variable, a non-reactive `error`, and two typo'd Firebase error codes).
 - The scheduled Firestore backups in both projects had been failing silently since May 2024: the functions' service accounts lacked the Firestore export role. Granted, force-ran, and verified fresh exports in both buckets.
+- Two `$page.params` nullability errors surfaced by the SvelteKit update.
 
 ## Known issues (pre-existing, recorded while testing)
 
