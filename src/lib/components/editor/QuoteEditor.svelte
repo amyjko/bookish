@@ -3,7 +3,11 @@
     import { getCaret } from '$lib/components/page/Contexts';
     import PositionEditor from './PositionEditor.svelte';
 
-    export let quote: QuoteNode;
+    interface Props {
+        quote: QuoteNode;
+    }
+
+    let { quote }: Props = $props();
 
     let caret = getCaret();
 </script>

@@ -7,18 +7,17 @@ import { join } from 'path';
 import AjvModule from 'ajv';
 import addFormatsModule from 'ajv-formats';
 import Schema from 'bookish-press/Schema';
-import chalk from 'chalk';
-import { v4 as uuid } from 'uuid';
+import { styleText } from 'node:util';
 
 const log = console.log;
 
 function exit(err) {
-    console.log(`𐄂 ${chalk.red(err)}`);
+    console.log(`𐄂 ${styleText('red', String(err))}`);
     process.exit(1);
 }
 
 function success(message) {
-    console.log(`✓ ${chalk.green(message)}`);
+    console.log(`✓ ${styleText('green', message)}`);
 }
 
 // There must be exactly four arguments.
@@ -213,7 +212,7 @@ async function upload(bookID, localEdition, chapters, images) {
             const [, extension] = image.split('.');
             const imageName = image.split('/').pop();
             const file = bucket.file(`images/${bookID}/${imageName}`);
-            const token = uuid();
+            const token = crypto.randomUUID();
             await file.save(imageBuffer, {
                 metadat: { firebaseStorageDownloadTokens: token },
                 contentType: `image/${extension}`,

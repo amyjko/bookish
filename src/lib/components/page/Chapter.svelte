@@ -39,8 +39,12 @@
     import PageHeader from './PageHeader.svelte';
     import Permissions from '../editor/Permissions.svelte';
 
-    export let chapter: ChapterModel;
-    export let print: boolean = false;
+    interface Props {
+        chapter: ChapterModel;
+        print?: boolean;
+    }
+
+    let { chapter, print = false }: Props = $props();
 
     let book = getBook();
     let edition = getEdition();
@@ -55,7 +59,7 @@
     let marginal = writable<string | undefined>(undefined);
 
     // Keep track of which hash mark is scrolled to
-    let highlightedID: string | undefined = undefined;
+    let highlightedID: string | undefined = $state(undefined);
 
     // When this component is mounted...
     // 1) Subscribe and unsubscribe to window listeners
@@ -95,7 +99,7 @@
 
         // When the chapter view resizes, the responsive layout might cause the marginals to move to the footer.
         // when this happens, we want to immediately remove all of the explicit positioning.
-        const resize = new ResizeObserver(() => layoutMarginals());
+        const resize = new ResizeObserver(() => requestLayout());
         resize.observe(document.body);
 
         // Remember the scroll position before a refresh.
@@ -222,21 +226,37 @@
     }
 
     // Prepare to render the chapter by getting some data from the chapter and book.
-    $: chapterID = chapter.getID();
-    $: chapterNumber = $edition?.getChapterNumber(chapterID);
-    $: chapterSection = $edition?.getChapterSection(chapterID);
-    $: chapterAST = $edition ? chapter.getAST($edition) : undefined;
-    $: citations = chapterAST ? chapterAST.getCitations() : undefined;
-    $: editionNumber = $edition ? $edition.getEditionNumber() : undefined;
+    let chapterID = $derived(chapter.getID());
+    let chapterNumber = $derived($edition?.getChapterNumber(chapterID));
+    let chapterSection = $derived($edition?.getChapterSection(chapterID));
+    let chapterAST = $derived($edition ? chapter.getAST($edition) : undefined);
+    let citations = $derived(chapterAST ? chapterAST.getCitations() : undefined);
+    let editionNumber = $derived($edition ? $edition.getEditionNumber() : undefined);
+
+    // Coalesce marginal layout requests from descendants into a single
+    // layout pass per animation frame. Marginal components request a pass
+    // whenever their rendered content changes.
+    let layoutRequested = false;
+    function requestLayout() {
+        if (typeof requestAnimationFrame === 'undefined') return;
+        if (layoutRequested) return;
+        layoutRequested = true;
+        requestAnimationFrame(() => {
+            layoutRequested = false;
+            layoutMarginals();
+        });
+    }
 
     let chapterStore = writable<ChapterContext>();
     setContext<ChapterStore>(CHAPTER, chapterStore);
-    $: chapterStore.set({
-        chapter,
-        highlightedWord: getHighlightedWord(),
-        highlightedID,
-        marginal,
-        layoutMarginals,
+    $effect.pre(() => {
+        chapterStore.set({
+            chapter,
+            highlightedWord: getHighlightedWord(),
+            highlightedID,
+            marginal,
+            requestLayout,
+        });
     });
 
     let editable =
@@ -268,94 +288,100 @@
             {print}
         >
             <!-- Collapse the outline if a marginal is selected. -->
-            <Outline
-                slot="outline"
-                collapse={$marginal !== undefined}
-                previous={$edition.getPreviousChapterID(chapterID, editable)}
-                next={$edition.getNextChapterID(chapterID, editable)}
-                listener={(expanded) => {
-                    // If the outline is being expanded, hide the marginal, otherwise leave it alone.
-                    if (expanded) marginal.set(undefined);
+            {#snippet outline()}
+                        <Outline
+                    
+                    collapse={$marginal !== undefined}
+                    previous={$edition.getPreviousChapterID(chapterID, editable)}
+                    next={$edition.getNextChapterID(chapterID, editable)}
+                    listener={(expanded) => {
+                        // If the outline is being expanded, hide the marginal, otherwise leave it alone.
+                        if (expanded) marginal.set(undefined);
 
-                    // Check if we need to hide the outline after positioning.
-                    hideOutlineIfObscured();
-                }}
-            />
+                        // Check if we need to hide the outline after positioning.
+                        hideOutlineIfObscured();
+                    }}
+                />
+                    {/snippet}
             <!-- Add an editable chapter ID if in editor mode -->
-            <svelte:fragment slot="before">
-                {#if editable && $book}
-                    <Muted>
-                        <em>bookish.press/book/</em><TextEditor
-                            text={chapter.getID()}
-                            label="Chapter URL ID editor"
-                            save={// After the ID is edited, reload the page with the new URL.
-                            async (newChapterID) => {
-                                if ($book) {
-                                    setChapter(
-                                        edition,
-                                        chapter,
-                                        chapter.withChapterID(newChapterID),
-                                    );
-                                    // Navigate to the new ID
-                                    goto(
-                                        `/write/${$book.getID()}/${editionNumber}/${newChapterID}`,
-                                        {
-                                            keepFocus: true,
-                                        },
-                                    );
-                                }
-                            }}
-                            placeholder="chapter name"
-                            valid={(newChapterID) =>
-                                !/^[a-zA-Z0-9]+$/.test(newChapterID)
-                                    ? 'Chapter IDs must be one or more letters or numbers'
-                                    : chapter.getID() !== newChapterID &&
-                                        $edition?.hasChapter(newChapterID)
-                                      ? "There's already a chapter that has this ID."
-                                      : undefined}
-                            saveOnExit={true}
-                        />
-                    </Muted>
-                {/if}
-                {#if editable}
-                    <Toggle
-                        on={chapter.isNumbered()}
-                        save={(on) =>
-                            setChapter(
-                                edition,
-                                chapter,
-                                chapter.asNumbered(on),
-                            )}
-                    >
-                        <ChapterNumber
-                            >{#if chapterNumber !== undefined}Chapter {chapterNumber}{:else}<Muted
-                                    >Unnumbered</Muted
-                                >{/if}</ChapterNumber
+            {#snippet before()}
+                    
+                    {#if editable && $book}
+                        <Muted>
+                            <em>bookish.press/book/</em><TextEditor
+                                text={chapter.getID()}
+                                label="Chapter URL ID editor"
+                                save={// After the ID is edited, reload the page with the new URL.
+                                async (newChapterID) => {
+                                    if ($book) {
+                                        setChapter(
+                                            edition,
+                                            chapter,
+                                            chapter.withChapterID(newChapterID),
+                                        );
+                                        // Navigate to the new ID
+                                        goto(
+                                            `/write/${$book.getID()}/${editionNumber}/${newChapterID}`,
+                                            {
+                                                keepFocus: true,
+                                            },
+                                        );
+                                    }
+                                }}
+                                placeholder="chapter name"
+                                valid={(newChapterID) =>
+                                    !/^[a-zA-Z0-9]+$/.test(newChapterID)
+                                        ? 'Chapter IDs must be one or more letters or numbers'
+                                        : chapter.getID() !== newChapterID &&
+                                            $edition?.hasChapter(newChapterID)
+                                          ? "There's already a chapter that has this ID."
+                                          : undefined}
+                                saveOnExit={true}
+                            />
+                        </Muted>
+                    {/if}
+                    {#if editable}
+                        <Toggle
+                            on={chapter.isNumbered()}
+                            save={(on) =>
+                                setChapter(
+                                    edition,
+                                    chapter,
+                                    chapter.asNumbered(on),
+                                )}
                         >
-                    </Toggle>
-                {:else if chapterNumber !== undefined}
-                    <ChapterNumber>Chapter {chapterNumber}</ChapterNumber>
-                {/if}
-                {#if chapterSection !== undefined && chapterSection.length > 0}
-                    <span class="section-name">{chapterSection}</span>
-                {/if}
-            </svelte:fragment>
+                            <ChapterNumber
+                                >{#if chapterNumber !== undefined}Chapter {chapterNumber}{:else}<Muted
+                                        >Unnumbered</Muted
+                                    >{/if}</ChapterNumber
+                            >
+                        </Toggle>
+                    {:else if chapterNumber !== undefined}
+                        <ChapterNumber>Chapter {chapterNumber}</ChapterNumber>
+                    {/if}
+                    {#if chapterSection !== undefined && chapterSection.length > 0}
+                        <span class="section-name">{chapterSection}</span>
+                    {/if}
+                
+                    {/snippet}
             <!-- If there are chapter authors, render those, otherwise use the book authors -->
-            <Authors
-                editable={isChapterEditable()}
-                slot="after"
-                authors={chapter.getAuthors()}
-                inheritedAuthors={$edition.getAuthors()}
-                add={() => setChapter(edition, chapter, chapter.withAuthor(''))}
-                edit={(index, text) =>
-                    setChapter(
-                        edition,
-                        chapter,
-                        chapter.withRenamedAuthor(index, text),
-                    )}
-                remove={(index) =>
-                    setChapter(edition, chapter, chapter.withoutAuthor(index))}
-            />
+            {#snippet after()}
+                        <Authors
+                    editable={isChapterEditable()}
+                    
+                    authors={chapter.getAuthors()}
+                    inheritedAuthors={$edition.getAuthors()}
+                    add={() => setChapter(edition, chapter, chapter.withAuthor(''))}
+                    edit={(index, text) =>
+                        setChapter(
+                            edition,
+                            chapter,
+                            chapter.withRenamedAuthor(index, text),
+                        )}
+                    remove={(index) =>
+                        setChapter(edition, chapter, chapter.withoutAuthor(index))}
+                />
+                    {/snippet}
         </Header>
 
         <Instructions {editable}>

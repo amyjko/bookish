@@ -1,6 +1,10 @@
 <script lang="ts">
-    export let dark: boolean;
-    export let toggle: () => void;
+    interface Props {
+        dark: boolean;
+        toggle: () => void;
+    }
+
+    let { dark = $bindable(), toggle }: Props = $props();
 
     const lightLabel = '\u263C';
     const darkLabel = '\u263E';
@@ -17,8 +21,8 @@
     role="button"
     aria-label={dark === true ? 'Switch to light mode' : 'Switch to dark mode'}
     tabindex="0"
-    on:click={change}
-    on:keydown={(event) => {
+    onclick={change}
+    onkeydown={(event) => {
         if (event.key === 'Enter' || event.key === ' ') {
             change();
             event.stopPropagation();

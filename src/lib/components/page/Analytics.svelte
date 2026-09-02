@@ -1,8 +1,13 @@
 <script lang="ts">
-    /** By default, we use the Bookish.press Google Analytics tag */
-    export let gtagid: string | null = null;
+    
+    interface Props {
+        /** By default, we use the Bookish.press Google Analytics tag */
+        gtagid?: string | null;
+    }
 
-    $: id = gtagid ?? 'G-BGFDV229BN';
+    let { gtagid = null }: Props = $props();
+
+    let id = $derived(gtagid ?? 'G-BGFDV229BN');
 </script>
 
 <svelte:head>

@@ -9,8 +9,8 @@
     import BookList from '$lib/components/app/BookList.svelte';
     import Link from '$lib/components/app/Link.svelte';
 
-    let books: Book[] | undefined = undefined;
-    let error: string | undefined = undefined;
+    let books: Book[] | undefined = $state(undefined);
+    let error: string | undefined = $state(undefined);
 
     function updateBooks(latestBooks: Book[]) {
         books = latestBooks;

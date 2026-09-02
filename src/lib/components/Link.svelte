@@ -1,10 +1,15 @@
 <script lang="ts">
-    import { page } from '$app/stores';
+    import { page } from '$app/state';
 
-    export let to: string;
-    export let linked: boolean = true;
+    interface Props {
+        to: string;
+        linked?: boolean;
+        children?: import('svelte').Snippet;
+    }
 
-    let link: HTMLAnchorElement;
+    let { to, linked = true, children }: Props = $props();
+
+    let link: HTMLAnchorElement | undefined = $state();
 
     function scroll(event: MouseEvent) {
         // No element? Bail.
@@ -35,14 +40,14 @@
     }
 </script>
 
-{#if !linked || $page.url.pathname === (to.charAt(to.length - 1) === '/' ? to.substring(0, to.length - 1) : to)}
-    <slot />
+{#if !linked || page.url.pathname === (to.charAt(to.length - 1) === '/' ? to.substring(0, to.length - 1) : to)}
+    {@render children?.()}
 {:else}
     <a
         href={to}
         bind:this={link}
-        on:click={(event) => scroll(event)}
-        target={to.startsWith('http') ? '_blank' : null}><slot /></a
+        onclick={(event) => scroll(event)}
+        target={to.startsWith('http') ? '_blank' : null}>{@render children?.()}</a
     >
 {/if}
 

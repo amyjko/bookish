@@ -11,9 +11,13 @@
         spacing: 'CSS length',
     };
 
-    export let group: string;
-    export let name: string;
-    export let value: string;
+    interface Props {
+        group: string;
+        name: string;
+        value: string;
+    }
+
+    let { group, name, value }: Props = $props();
 
     let edition = getEdition();
 </script>

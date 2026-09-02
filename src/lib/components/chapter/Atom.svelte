@@ -1,15 +1,18 @@
-<svelte:options immutable={true} />
-
 <script lang="ts">
     import type AtomNode from '$lib/models/chapter/AtomNode';
     import { getCaret } from '$lib/components/page/Contexts';
 
-    export let node: AtomNode<any>;
+    interface Props {
+        node: AtomNode<any>;
+        children?: import('svelte').Snippet;
+    }
+
+    let { node, children }: Props = $props();
 
     let caret = getCaret();
 
     // Is the caret on this link?
-    $: selected = $caret && $caret.range && $caret.range.start.node === node;
+    let selected = $derived($caret && $caret.range && $caret.range.start.node === node);
 </script>
 
 <!-- Prevent the editor from receiving the click. -->
@@ -17,7 +20,7 @@
     class={`bookish-editor-atom ${
         selected ? 'bookish-editor-atom-selected' : ''
     } ${$caret?.focused ? 'bookish-editor-atom-selected-focused' : ''}`}
-    ><slot /></span
+    >{@render children?.()}</span
 >
 
 <style>

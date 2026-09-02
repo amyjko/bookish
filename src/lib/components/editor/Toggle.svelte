@@ -5,10 +5,15 @@
         Error,
     }
 
-    export let on: boolean;
-    export let save: (set: boolean) => Promise<void> | void;
+    interface Props {
+        on: boolean;
+        save: (set: boolean) => Promise<void> | void;
+        children?: import('svelte').Snippet;
+    }
 
-    let saving = Status.Viewing;
+    let { on, save, children }: Props = $props();
+
+    let saving = $state(Status.Viewing);
 
     function toggle() {
         saving = Status.Saving;
@@ -33,11 +38,11 @@
     tabindex="0"
     role="switch"
     aria-checked={on}
-    on:keydown={(event) =>
+    onkeydown={(event) =>
         event.key === 'Enter' || event.key === 'Space' ? toggle() : undefined}
-    on:click={toggle}
+    onclick={toggle}
 >
-    <slot />
+    {@render children?.()}
 </div>
 
 <style>

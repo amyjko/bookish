@@ -1,12 +1,14 @@
-<svelte:options immutable={true} />
-
 <script lang="ts">
     import type InlineCodeNode from '$lib/models/chapter/InlineCodeNode';
     import { isChapterEditable } from '../page/Contexts';
     import Code from './Code.svelte';
     import Text from './Text.svelte';
 
-    export let node: InlineCodeNode;
+    interface Props {
+        node: InlineCodeNode;
+    }
+
+    let { node }: Props = $props();
 
     let editable = isChapterEditable();
 </script>
@@ -21,6 +23,7 @@
         editable={false}
         inline={true}
         language={node.getMeta()}
-        nodeID={node.getText().nodeID}>{node.getText().getText()}</Code
-    >
+        nodeID={node.getText().nodeID}
+        code={node.getText().getText()}
+    />
 {/if}

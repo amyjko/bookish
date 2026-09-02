@@ -2,16 +2,21 @@
     import { onMount } from 'svelte';
     import Loading from '$lib/components/page/Loading.svelte';
 
-    export let title: string | undefined = undefined;
-    export let afterLoaded: Function | undefined = undefined;
+    interface Props {
+        title?: string | undefined;
+        afterLoaded?: Function | undefined;
+        children?: import('svelte').Snippet;
+    }
 
-    let fontsLoaded = false;
-    let imagesLoaded = false;
+    let { title = undefined, afterLoaded = undefined, children }: Props = $props();
+
+    let fontsLoaded = $state(false);
+    let imagesLoaded = $state(false);
     let lastHeight = 0;
     let intervalID: NodeJS.Timeout | null = null;
     let mountTime = Date.now();
 
-    $: loaded = fontsLoaded && imagesLoaded;
+    let loaded = $derived(fontsLoaded && imagesLoaded);
 
     function watchLoading() {
         const bodyHeight = document.body.clientHeight;
@@ -63,7 +68,7 @@
 </svelte:head>
 
 <section class={'bookish-page' + (imagesLoaded ? ' loaded' : '')}>
-    <slot />
+    {@render children?.()}
 </section>
 <!-- Overlay loading feedback if loading, but still render the page. -->
 {#if loaded === false}

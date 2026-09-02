@@ -5,8 +5,12 @@
     import MiddleIcon from './icons/middle.svg?raw';
     import RightIcon from './icons/right.svg?raw';
 
-    export let value: string;
-    export let edit: (newValue: Position) => void;
+    interface Props {
+        value: string;
+        edit: (newValue: Position) => void;
+    }
+
+    let { value, edit }: Props = $props();
 
     function editAsString(newValue: string) {
         edit(newValue as Position);

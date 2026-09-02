@@ -15,8 +15,10 @@
     import Error from '../+error.svelte';
     import Analytics from '$lib/components/page/Analytics.svelte';
 
-    /** This is the data we load in +layout.sever.ts */
-    export let data: {
+    
+    interface Props {
+        /** This is the data we load in +layout.sever.ts */
+        data: {
         meta: {
             bookID: string;
             editionID: string;
@@ -26,6 +28,10 @@
         };
         chapters: Promise<Record<string, string>>;
     };
+        children?: import('svelte').Snippet;
+    }
+
+    let { data, children }: Props = $props();
 
     const meta = data.meta;
 
@@ -60,8 +66,10 @@
         edition={$edition}
         base={`/${$book.getSubdomain() ?? $book.getID()}`}
     >
-        <slot />
+        {@render children?.()}
     </Edition>
 {:else}
-    <Error>{meta.message}</Error>
+    <!-- +error.svelte renders its own message and takes no children.
+         (Svelte 4 silently discarded the message passed here.) -->
+    <Error />
 {/if}

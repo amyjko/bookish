@@ -34,55 +34,55 @@ export default class ChapterNode extends BlocksNode {
 
     getErrors(): ErrorNode[] {
         return this.getNodes().filter(
-            (n): n is ErrorNode => n instanceof ErrorNode
+            (n): n is ErrorNode => n instanceof ErrorNode,
         );
     }
     getCitations(): Set<string> {
         const citations = new Set<string>();
         (
             this.getNodes().filter(
-                (n) => n instanceof CitationsNode
+                (n) => n instanceof CitationsNode,
             ) as CitationsNode[]
         ).forEach((cites) =>
-            cites.getMeta().forEach((citationID) => citations.add(citationID))
+            cites.getMeta().forEach((citationID) => citations.add(citationID)),
         );
         return citations;
     }
 
     getFootnotes(): FootnoteNode[] {
         return this.getNodes().filter(
-            (n): n is FootnoteNode => n instanceof FootnoteNode
+            (n): n is FootnoteNode => n instanceof FootnoteNode,
         );
     }
 
     getHeaders(): ParagraphNode[] {
         return this.getNodes().filter(
             (n): n is ParagraphNode =>
-                n instanceof ParagraphNode && n.getLevel() > 0
+                n instanceof ParagraphNode && n.getLevel() > 0,
         );
     }
 
     getEmbeds(): EmbedNode[] {
         return this.getNodes().filter(
-            (n): n is EmbedNode => n instanceof EmbedNode
+            (n): n is EmbedNode => n instanceof EmbedNode,
         );
     }
 
     getComments(): CommentNode[] {
         return this.getNodes().filter(
-            (n): n is CommentNode => n instanceof CommentNode
+            (n): n is CommentNode => n instanceof CommentNode,
         );
     }
 
     getLabels(): LabelNode[] {
         return this.getNodes().filter(
-            (n): n is LabelNode => n instanceof LabelNode
+            (n): n is LabelNode => n instanceof LabelNode,
         );
     }
 
     getFirstParagraph(): ParagraphNode | undefined {
         return this.getBlocks().find(
-            (b): b is ParagraphNode => b instanceof ParagraphNode
+            (b): b is ParagraphNode => b instanceof ParagraphNode,
         );
     }
 
@@ -120,7 +120,7 @@ export default class ChapterNode extends BlocksNode {
     }
 
     getNextTextOrAtom(
-        node: TextNode | AtomNode<any>
+        node: TextNode | AtomNode<any>,
     ): TextNode | AtomNode<any> | undefined {
         // Otherwise, find the next text node after this one.
         const nodes = this.getTextAndAtomNodes();
@@ -128,12 +128,12 @@ export default class ChapterNode extends BlocksNode {
         return index === undefined
             ? undefined
             : index < nodes.length - 1
-            ? nodes[index + 1]
-            : undefined;
+              ? nodes[index + 1]
+              : undefined;
     }
 
     getPreviousTextOrAtom(
-        node: TextNode | AtomNode<any>
+        node: TextNode | AtomNode<any>,
     ): TextNode | AtomNode<any> | undefined {
         // Otherwise, find the next text node after this one.
         const nodes = this.getTextAndAtomNodes();
@@ -141,8 +141,8 @@ export default class ChapterNode extends BlocksNode {
         return index === undefined
             ? undefined
             : index > 0
-            ? nodes[index - 1]
-            : undefined;
+              ? nodes[index - 1]
+              : undefined;
     }
 
     getChildren() {
@@ -174,7 +174,7 @@ export default class ChapterNode extends BlocksNode {
     copy() {
         return new ChapterNode(
             this.getBlocks().map((b) => b.copy()),
-            this.#metadata
+            this.#metadata,
         ) as this;
     }
 }

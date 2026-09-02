@@ -5,9 +5,14 @@
     import { auth } from '../models/Firebase';
     import type Authentication from './Authentication';
     import { USER, type UserStore } from './page/Contexts';
+    interface Props {
+        children?: import('svelte').Snippet;
+    }
+
+    let { children }: Props = $props();
 
     // Track the user and user loading status in state
-    let loading = true;
+    let loading = $state(true);
 
     // The store that tracks the auth context.
     const authentication: Writable<Authentication> = writable({
@@ -61,5 +66,5 @@
 
 <!-- Wrap whatever children are given in this context. -->
 {#if loading === false}
-    <slot />
+    {@render children?.()}
 {/if}

@@ -1,9 +1,9 @@
 <script>
     import Error from './Error.svelte';
-    import { page } from '$app/stores';
+    import { page } from '$app/state';
 </script>
 
 <Error>
-    {#if $page.error}{$page.error.message}{:else}There was a problem loading
+    {#if page.error}{page.error.message}{:else}There was a problem loading
         this page.{/if} Head <a href="/">home</a>?
 </Error>

@@ -17,22 +17,23 @@
     import Section from '$lib/components/app/Section.svelte';
     import Link from '$lib/components/app/Link.svelte';
 
-    let editableBooks: Book[] | undefined = undefined;
-    let partiallyEditableBooks: Book[] | undefined = undefined;
-    let error: string | undefined = undefined;
+    let editableBooks: Book[] | undefined = $state(undefined);
+    let partiallyEditableBooks: Book[] | undefined = $state(undefined);
+    let error: string | undefined = $state(undefined);
     let auth = getUser();
 
     // Merge and deduplicate the books
-    $: books =
-        editableBooks === undefined || partiallyEditableBooks === undefined
-            ? undefined
-            : [...editableBooks, ...partiallyEditableBooks].filter(
-                  (book1, index1, bookList) =>
-                      !bookList.some(
-                          (book2, index2) =>
-                              index2 > index1 && book1.getID() === book2.getID()
-                      )
-              );
+    let books = $derived.by(() => {
+        if (editableBooks === undefined || partiallyEditableBooks === undefined)
+            return undefined;
+        return [...editableBooks, ...partiallyEditableBooks].filter(
+            (book1, index1, bookList) =>
+                !bookList.some(
+                    (book2, index2) =>
+                        index2 > index1 && book1.getID() === book2.getID()
+                )
+        );
+    });
 
     // Get the books when the component loads.
     onMount(() => {
@@ -56,9 +57,9 @@
         } else error = "You're not logged in.";
     });
 
-    let creating = false;
+    let creating = $state(false);
     let timeSinceCreation = 0;
-    let creationFeedback = '';
+    let creationFeedback = $state('');
 
     function newBook() {
         creating = true;

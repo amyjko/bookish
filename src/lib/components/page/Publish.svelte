@@ -23,9 +23,9 @@
     let editable = isEditionEditable();
 
     let publishing = false;
-    let feedback: string | undefined = undefined;
-    let error: string | undefined = undefined;
-    let url: string | undefined = undefined;
+    let feedback: string | undefined = $state(undefined);
+    let error: string | undefined = $state(undefined);
+    let url: string | undefined = $state(undefined);
     async function requestPublish() {
         if ($edition) {
             publishing = true;
@@ -49,11 +49,8 @@
         }
     }
 
-    let publisher: boolean | undefined = undefined;
+    let publisher: boolean | undefined = $state(undefined);
 
-    $: {
-        if ($auth && $auth.user) updateUserClaims();
-    }
 
     async function updateUserClaims() {
         if ($auth === undefined || $auth.user === null) return;
@@ -61,6 +58,9 @@
         publisher =
             'publisher' in token.claims && token.claims.publisher === true;
     }
+    $effect(() => {
+        if ($auth && $auth.user) updateUserClaims();
+    });
 </script>
 
 {#if $edition && (publisher === true || PUBLIC_CONTEXT === 'local')}

@@ -13,7 +13,7 @@
     import Button from '../app/Button.svelte';
 
     let edition = getEdition();
-    let text = '';
+    let text = $state('');
     let editable = isEditionEditable() || isEditionPartiallyEditable();
 
     function handleBulkAdd() {
@@ -66,7 +66,7 @@
     likely to get some things wrong.
 </Instructions>
 
-<textarea rows={5} bind:value={text} style="width: 100%" />
+<textarea rows={5} bind:value={text} style="width: 100%"></textarea>
 <Button
     tooltip="convert to references"
     disabled={text.length === 0}

@@ -2,15 +2,27 @@
     import Link from '../Link.svelte';
     import { getBase } from './Contexts';
 
-    export let url: string;
-    export let alt: string;
-    export let chapterID: string | undefined;
+    interface Props {
+        url: string;
+        alt: string;
+        chapterID: string | undefined;
+        children?: import('svelte').Snippet;
+    }
+
+    let {
+        url,
+        alt,
+        chapterID,
+        children
+    }: Props = $props();
 
     let base = getBase();
 
-    let loaded: boolean | null;
-    let urlChecked: string;
-    $: {
+    let loaded: boolean | null | undefined = $state();
+    // Not $state: it's only a guard against re-checking the same URL, and
+    // making it reactive would make this effect re-run on its own write.
+    let urlChecked: string | undefined = undefined;
+    $effect.pre(() => {
         if (urlChecked !== url && typeof Image !== 'undefined') {
             urlChecked = url;
             let image = new Image();
@@ -21,7 +33,7 @@
                 image.onerror = () => (loaded = null);
             }
         }
-    }
+    });
 </script>
 
 <figure class={'media-preview'}>
@@ -32,7 +44,7 @@
     {:else if loaded === null}
         <div class="missing">missing image</div>
     {/if}
-    <figcaption class="credit"><slot /></figcaption>
+    <figcaption class="credit">{@render children?.()}</figcaption>
 </figure>
 
 <style>

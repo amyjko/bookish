@@ -89,19 +89,23 @@
         history: TimeIcon,
     };
 
-    export let caret: CaretState | undefined;
+    interface Props {
+        caret: CaretState | undefined;
+    }
 
-    $: context = caret?.context;
-    $: root = context?.root;
+    let { caret }: Props = $props();
 
-    let element: HTMLElement | null = null;
-    let categories: CommandCategory[] | undefined = undefined;
-    let commandsByCategory: { [key: string]: Command[] } = {};
-    let metaNode: MetadataNode<any> | AtomNode<any> | undefined = undefined;
-    let calloutNode: CalloutNode | undefined = undefined;
-    let quoteNode: QuoteNode | undefined = undefined;
-    let embedNode: EmbedNode | undefined = undefined;
-    let tableNode: TableNode | undefined = undefined;
+    let context = $derived(caret?.context);
+    let root = $derived(context?.root);
+
+    let element: HTMLElement | null = $state(null);
+    let categories: CommandCategory[] | undefined = $state(undefined);
+    let commandsByCategory: { [key: string]: Command[] } = $state({});
+    let metaNode: MetadataNode<any> | AtomNode<any> | undefined = $state(undefined);
+    let calloutNode: CalloutNode | undefined = $state(undefined);
+    let quoteNode: QuoteNode | undefined = $state(undefined);
+    let embedNode: EmbedNode | undefined = $state(undefined);
+    let tableNode: TableNode | undefined = $state(undefined);
 
     function getShortcutDescription(command: Command) {
         const macOS = navigator.userAgent.indexOf('Mac') >= 0;
@@ -126,8 +130,10 @@
         }${command.shift ? '\u21E7' : ''}${keyLabel}`;
     }
 
-    // Update the above when the dependencies below change.
-    $: {
+    // Update the above when the dependencies below change. Everything is
+    // computed into locals and assigned once so the effect never reads
+    // the state it writes.
+    $effect.pre(() => {
         if (context !== undefined && root) {
             // Filter the commands by those interactive with a mouse and active.
             const visible = commands.filter(
@@ -139,7 +145,7 @@
             );
 
             // Extract the active categories and sort them
-            categories = Array.from(
+            const newCategories = Array.from(
                 new Set(commands.map((command) => command.category)),
             ).sort((a, b) =>
                 a in categoryOrder && b in categoryOrder
@@ -148,15 +154,17 @@
             );
 
             // Make a list for each category of commands
-            commandsByCategory = {};
-            categories.forEach((cat) => {
-                if (commandsByCategory)
-                    commandsByCategory[cat] = visible.filter(
-                        (command) => command.category === cat,
-                    );
+            const byCategory: { [key: string]: Command[] } = {};
+            newCategories.forEach((cat) => {
+                byCategory[cat] = visible.filter(
+                    (command) => command.category === cat,
+                );
             });
 
             const caretNode = context.start.node;
+
+            categories = newCategories;
+            commandsByCategory = byCategory;
 
             metaNode =
                 caretNode instanceof AtomNode
@@ -185,7 +193,7 @@
                 (p) => p instanceof TableNode,
             ) as TableNode;
         }
-    }
+    });
 
     function handleKeyPress(event: KeyboardEvent) {
         // Return focus to the editor if someone presses an unhandled enter
@@ -204,9 +212,12 @@
     class="bookish-editor-toolbar"
     bind:this={element}
     role="button"
-    on:keypress={handleKeyPress}
-    on:keydown={handleKeyPress}
-    on:pointerdown|stopPropagation={() => element?.focus()}
+    onkeypress={handleKeyPress}
+    onkeydown={handleKeyPress}
+    onpointerdown={(event) => {
+        event.stopPropagation();
+        element?.focus();
+    }}
     tabindex="0"
     transition:slide={{ duration: 200 }}
 >
@@ -234,7 +245,6 @@
                                 tooltip={command.description +
                                     ' ' +
                                     getShortcutDescription(command)}
-                                tabIndex="0"
                                 command={() => caret?.executor(command, '', '')}
                             >
                                 <Icon icon={command.icon} />
@@ -275,7 +285,7 @@
         {:else if quoteNode}<ToolbarGroup icon={QuoteIcon}
                 ><QuoteEditor quote={quoteNode} /></ToolbarGroup
             >
-        {:else if embedNode}<div class="break" />
+        {:else if embedNode}<div class="break"></div>
             <ToolbarGroup icon={MediaIcon}>
                 <EmbedEditor embed={embedNode} />
             </ToolbarGroup>

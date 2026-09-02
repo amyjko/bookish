@@ -1,5 +1,3 @@
-<svelte:options immutable={true} />
-
 <script lang="ts">
     import type FootnoteNode from '$lib/models/chapter/FootnoteNode';
     import Atom from '$lib/components/chapter/Atom.svelte';
@@ -11,11 +9,14 @@
         getCaret,
         getRoot,
     } from '$lib/components/page/Contexts';
-    import { afterUpdate } from 'svelte';
 
-    export let node: FootnoteNode;
+    interface Props {
+        node: FootnoteNode;
+    }
 
-    $: content = node.getMeta();
+    let { node }: Props = $props();
+
+    let meta = $derived(node.getMeta());
     let caret = getCaret();
 
     let chapter = getChapter();
@@ -23,17 +24,26 @@
     let root = getRoot();
 
     // What footnote number is this?
-    $: number = $root.getFootnotes().indexOf(node);
-    $: letter =
-        number === undefined ? undefined : $edition?.getFootnoteSymbol(number);
+    let number = $derived($root.getFootnotes().indexOf(node));
+    let letter = $derived(
+        number === undefined ? undefined : $edition?.getFootnoteSymbol(number),
+    );
 
-    $: focused =
+    let focused = $derived(
         $caret &&
-        $caret.range &&
-        $caret.range.start.node.hasAncestor($root, node);
+            $caret.range &&
+            $caret.range.start.node.hasAncestor($root, node),
+    );
 
-    // Position the marginals on every render.
-    afterUpdate(() => $chapter?.layoutMarginals());
+    // Whenever anything that affects this footnote's rendered size or
+    // position changes, request a chapter-wide marginal layout pass.
+    $effect(() => {
+        void meta;
+        void number;
+        void letter;
+        void focused;
+        $chapter?.requestLayout();
+    });
 </script>
 
 <Atom {node}>
@@ -46,19 +56,21 @@
             <!-- We prevent default on the span to prevent mouse events from bubbling up to the footnote symbol. This is key for two reasons:
                  1) clicks on the footnote select the footnote atom node itself
                  2) we want to be able to click on footnote text and we can't do that if the footnote sets the caret to the atom after clicks. -->
-            <sup slot="interactor" class="bookish-footnote-symbol">{letter}</sup
-            >
-            <span
-                slot="content"
-                class={`bookish-footnote ${
-                    focused ? 'bookish-footnote-focused' : ''
-                }`}
-            >
-                <sup class="bookish-footnote-symbol">{letter}</sup><Format
-                    node={content}
-                    placeholder="footnote"
-                /></span
-            >
+            {#snippet interactor()}
+                <sup class="bookish-footnote-symbol">{letter}</sup>
+            {/snippet}
+            {#snippet content()}
+                <span
+                    class={`bookish-footnote ${
+                        focused ? 'bookish-footnote-focused' : ''
+                    }`}
+                >
+                    <sup class="bookish-footnote-symbol">{letter}</sup><Format
+                        node={meta}
+                        placeholder="footnote"
+                    /></span
+                >
+            {/snippet}
         </Marginal>
     </span>
 </Atom>

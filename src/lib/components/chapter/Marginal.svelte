@@ -1,8 +1,6 @@
-<svelte:options immutable={true} />
-
 <script lang="ts">
     import { isMobile, watchMobile } from '$lib/util/isMobile';
-    import { onMount } from 'svelte';
+    import { onMount, type Snippet } from 'svelte';
     import {
         getCaret,
         getChapter,
@@ -11,31 +9,39 @@
     import type Node from '../../models/chapter/Node';
     import AtomNode from '../../models/chapter/AtomNode';
 
-    export let node: Node;
-    export let id: string;
-    export let label: string;
+    interface Props {
+        node: Node;
+        id: string;
+        label: string;
+        interactor?: Snippet;
+        content?: Snippet;
+    }
 
-    let hovered = false;
+    let { node, id, label, interactor, content }: Props = $props();
+
+    let hovered = $state(false);
     let chapter = getChapter();
-    $: editable = isChapterEditable();
+    let editable = isChapterEditable();
     let caret = getCaret();
 
     // If there's no marginal selected or this is different from the current selection, this is hidden.
-    $: selectedMarginal = $chapter?.marginal;
-    $: isHidden = editable
-        ? // If editable, it's hidden if the caret is not inside the marginal content.
-          !(
-              $caret?.range?.start.node === node ||
-              $caret?.range?.start.node
-                  .getAncestors($caret.root)
-                  .some((ancestor) => ancestor === node)
-          )
-        : // If not editable, it's hidden if it's not selected.
-          $selectedMarginal !== id;
+    let selectedMarginal = $derived($chapter?.marginal);
+    let isHidden = $derived(
+        editable
+            ? // If editable, it's hidden if the caret is not inside the marginal content.
+              !(
+                  $caret?.range?.start.node === node ||
+                  $caret?.range?.start.node
+                      .getAncestors($caret.root)
+                      .some((ancestor) => ancestor === node)
+              )
+            : // If not editable, it's hidden if it's not selected.
+              $selectedMarginal !== id,
+    );
 
-    function toggle(event: MouseEvent | undefined, interactor: boolean) {
+    function toggle(event: MouseEvent | undefined, interacted: boolean) {
         if (editable) {
-            if (interactor) {
+            if (interacted) {
                 if (editable && $caret && node instanceof AtomNode) {
                     // Select this so that the view stays focused.
                     $caret.setCaret({
@@ -71,7 +77,7 @@
 
         return () =>
             mediaWatch.removeEventListener('change', () =>
-                toggle(undefined, false)
+                toggle(undefined, false),
             );
     });
 </script>
@@ -85,26 +91,26 @@
     aria-label={label}
     role="button"
     tabindex="0"
-    on:mousedown={(event) => toggle(event, true)}
-    on:keydown={(event) =>
+    onmousedown={(event) => toggle(event, true)}
+    onkeydown={(event) =>
         event.key === 'Enter' || event.key === ' '
             ? toggle(undefined, true)
             : undefined}
-    on:mouseenter={handleEnter}
-    on:mouseleave={handleExit}><slot name="interactor" /></span
+    onmouseenter={handleEnter}
+    onmouseleave={handleExit}>{@render interactor?.()}</span
 ><span
     class={'bookish-marginal' +
         (isHidden ? ' bookish-marginal-hidden' : '') +
         (hovered ? ' bookish-marginal-hovered' : '')}
     role="button"
     tabindex={editable ? null : 0}
-    on:mousedown={() => toggle(undefined, false)}
-    on:keydown={(event) =>
+    onmousedown={() => toggle(undefined, false)}
+    onkeydown={(event) =>
         event.key === 'Enter' || event.key === ' '
             ? toggle(undefined, false)
             : undefined}
-    on:mouseenter={handleEnter}
-    on:mouseleave={handleExit}><slot name="content" /></span
+    onmouseenter={handleEnter}
+    onmouseleave={handleExit}>{@render content?.()}</span
 >
 
 <style>
@@ -172,10 +178,10 @@
         }
 
         :global(
-                .bookish-definition
-                    .bookish-marginal.bookish-marginal-hovered
-                    .bookish-definition-entry
-            ) {
+            .bookish-definition
+                .bookish-marginal.bookish-marginal-hovered
+                .bookish-definition-entry
+        ) {
             background: linear-gradient(
                     to right,
                     var(--bookish-link-color) 0px,

@@ -1,11 +1,13 @@
-<svelte:options immutable={true} />
-
 <script lang="ts">
     import type CalloutNode from '$lib/models/chapter/CalloutNode';
     import Block from './Block.svelte';
     import Positioned from './Positioned.svelte';
 
-    export let node: CalloutNode;
+    interface Props {
+        node: CalloutNode;
+    }
+
+    let { node }: Props = $props();
 </script>
 
 <Positioned position={node.getPosition()}>

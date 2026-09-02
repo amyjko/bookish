@@ -350,8 +350,8 @@ export default class Parser {
                     name.trim() === ''
                         ? 'Did you mean to declare a symbol? Use an @ symbol, then a name of only numbers and letters, then a colon, then whatever content you want it to represent.'
                         : "'" +
-                          name +
-                          "' isn't a valid name for a symbol; letters and numbers only",
+                              name +
+                              "' isn't a valid name for a symbol; letters and numbers only",
                 );
                 return;
             }

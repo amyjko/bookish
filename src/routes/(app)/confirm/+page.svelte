@@ -8,7 +8,7 @@
     import Lead from '$lib/components/app/Lead.svelte';
     import Large from '$lib/components/app/Large.svelte';
 
-    let error: string | undefined = undefined;
+    let error: string | undefined = $state(undefined);
 
     const messages: Record<string, string> = {
         'auth/id-token-expired': 'This link expired.',

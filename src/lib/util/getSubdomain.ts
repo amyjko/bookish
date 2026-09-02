@@ -17,7 +17,7 @@ export function pathWithoutSubdomain(path: string) {
     // Otherwise, return a full URL without the subdomain
     return `${window.location.protocol}//${window.location.host.replace(
         subdomain + '.',
-        ''
+        '',
     )}${path}${window.location.search}`;
 }
 

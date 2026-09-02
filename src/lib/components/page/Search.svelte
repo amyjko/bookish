@@ -14,22 +14,22 @@
     let edition = getEdition();
     let base = getBase();
 
-    let query = '';
+    let query = $state('');
 
     let results: (
         | Chapter
         | { link: string; left: string; match: string; right: string }
-    )[] = [];
-    $: {
-        // Reset the results
-        results = [];
+    )[] = $derived.by(() => {
+        const list: (
+            | Chapter
+            | { link: string; left: string; match: string; right: string }
+        )[] = [];
 
-        const lowerQuery = query.toLowerCase();
-
-        query = query.trim();
+        const searchQuery = query.trim();
+        const lowerQuery = searchQuery.toLowerCase();
 
         // Go through all the chapter indexes and find matches.
-        if ($edition && query.length > 2)
+        if ($edition && searchQuery.length > 2)
             for (const chapter of $edition?.getChapters() ?? []) {
                 let index = chapter.getIndex($edition);
                 // No index yet? Skip this chapter.
@@ -39,7 +39,10 @@
 
                     // What are all of the words in the index that match the query?
                     for (const word of Object.keys(index)) {
-                        if (query.length > 0 && word.indexOf(lowerQuery) >= 0) {
+                        if (
+                            searchQuery.length > 0 &&
+                            word.indexOf(lowerQuery) >= 0
+                        ) {
                             if (index) {
                                 let matches = index[word];
                                 matches.forEach((match: Match) => {
@@ -50,31 +53,32 @@
                     }
 
                     if (chapterMatches.length > 0) {
-                        results.push(chapter);
+                        list.push(chapter);
                         chapterMatches.forEach((match, index) => {
                             // Only highlight the part of the word that matches.
                             const start = match.match
                                 .toLowerCase()
                                 .indexOf(lowerQuery);
-                            results.push({
+                            list.push({
                                 link: `${$base}/${chapter.getID()}?word=${match.match.toLowerCase()}&number=${index}`,
                                 left:
                                     match.left +
                                     match.match.substring(0, start),
                                 match: match.match.substring(
                                     start,
-                                    start + query.length,
+                                    start + searchQuery.length,
                                 ),
                                 right:
                                     match.match.substring(
-                                        start + query.length,
+                                        start + searchQuery.length,
                                     ) + match.right,
                             });
                         });
                     }
                 }
             }
-    }
+        return list;
+    });
 </script>
 
 {#if $edition}
@@ -99,14 +103,16 @@
                       )
                     : undefined}
         >
-            <Outline
-                slot="outline"
-                previous={$edition.getPreviousChapterID(
-                    ChapterIDs.SearchID,
-                    false,
-                )}
-                next={$edition.getNextChapterID(ChapterIDs.SearchID, false)}
-            />
+            {#snippet outline()}
+                        <Outline
+                    
+                    previous={$edition.getPreviousChapterID(
+                        ChapterIDs.SearchID,
+                        false,
+                    )}
+                    next={$edition.getNextChapterID(ChapterIDs.SearchID, false)}
+                />
+                    {/snippet}
         </Header>
 
         <p>

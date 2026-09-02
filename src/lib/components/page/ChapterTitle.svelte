@@ -1,13 +1,18 @@
 <script lang="ts">
     import Link from '../Link.svelte';
 
-    export let link: string | undefined = undefined;
+    interface Props {
+        link?: string | undefined;
+        children?: import('svelte').Snippet;
+    }
+
+    let { link = undefined, children }: Props = $props();
 </script>
 
 {#if link}
-    <Link to={link}><h3> <slot /></h3></Link>
+    <Link to={link}><h3> {@render children?.()}</h3></Link>
 {:else}
-    <h3><slot /></h3>
+    <h3>{@render children?.()}</h3>
 {/if}
 
 <style>

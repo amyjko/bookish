@@ -2,11 +2,16 @@
     import Icon from './Icon.svelte';
     import ToolbarSpacer from './ToolbarSpacer.svelte';
 
-    export let icon: string;
+    interface Props {
+        icon: string;
+        children?: import('svelte').Snippet;
+    }
+
+    let { icon, children }: Props = $props();
 </script>
 
 <div class="toolbar-group">
-    <Icon {icon} /><ToolbarSpacer /><slot />
+    <Icon {icon} /><ToolbarSpacer />{@render children?.()}
 </div>
 
 <style>

@@ -27,6 +27,8 @@ There are two major components to Bookish: the authoring platform and the readin
 7. Release to production (`npm run release`)
 8. Verify the change in production on [bookish.press](https://bookish.press)
 9. Merge dev to main (`npm run merge`)
+> **Svelte 5 note**: as of 0.8.0, `bookish-press` requires Svelte 5 (declared as a peer dependency), which is a breaking change for consumers. Until `bookish-reader` has been migrated to Svelte 5, publish with `npm publish --tag next` so `latest` keeps pointing at the last Svelte 4 compatible release; flip the tag once the reader has migrated. The `0.7.x` branch exists for emergency maintenance releases of the Svelte 4 line.
+
 10. If any of the changes affected the reading experience (essentially if any `.svelte` file or its dependencies in `/src/lib/components` changed), then we need to update the reader package for authors who pre-build their books manually:
     1. Update the bookish package with the Sveltekit package tooling (`npm run package`)
     2. Publish the package to npm (`npm publish`)

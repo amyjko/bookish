@@ -1,5 +1,3 @@
-<svelte:options immutable={true} />
-
 <script lang="ts">
     import FormatNode from '$lib/models/chapter/FormatNode';
     import CitationsNode from '$lib/models/chapter/CitationsNode';
@@ -25,12 +23,16 @@
     import LineBreakNode from '../../models/chapter/LineBreakNode';
     import LineBreak from './LineBreak.svelte';
 
-    export let node: FormatNode;
-    export let placeholder: string | undefined = undefined;
+    interface Props {
+        node: FormatNode;
+        placeholder?: string | undefined;
+    }
 
-    $: format = node.getFormat();
-    $: tag =
-        format === '*'
+    let { node, placeholder = undefined }: Props = $props();
+
+    let format = $derived(node.getFormat());
+    let tag =
+        $derived(format === '*'
             ? 'strong'
             : format === '_'
             ? 'em'
@@ -38,12 +40,12 @@
             ? 'sup'
             : format === 'v'
             ? 'sub'
-            : 'span';
+            : 'span');
 
-    $: showPlaceholder =
-        node.isEmptyText() &&
+    let showPlaceholder =
+        $derived(node.isEmptyText() &&
         placeholder !== undefined &&
-        (isChapterEditable() || isEditionEditable());
+        (isChapterEditable() || isEditionEditable()));
 </script>
 
 <svelte:element

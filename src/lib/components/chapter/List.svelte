@@ -1,10 +1,13 @@
-<svelte:options immutable={true} />
-
 <script lang="ts">
+    import List from './List.svelte';
     import ListNode from '$lib/models/chapter/ListNode';
     import Format from './Format.svelte';
 
-    export let node: ListNode;
+    interface Props {
+        node: ListNode;
+    }
+
+    let { node }: Props = $props();
 </script>
 
 <svelte:element
@@ -13,7 +16,7 @@
 >
     {#each node.getItems() as item (item.nodeID)}
         {#if item instanceof ListNode}
-            <svelte:self node={item} />
+            <List node={item} />
         {:else}
             <li><Format node={item} /></li>
         {/if}

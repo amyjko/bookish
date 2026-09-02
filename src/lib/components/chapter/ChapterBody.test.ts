@@ -8,18 +8,15 @@ import ChapterBody from './ChapterBody.svelte';
 import { CARET, CHAPTER, EDITION } from '$lib/components/page/Contexts';
 import type ChapterContext from '$lib/components/page/ChapterContext';
 
-// The page store only exists inside a running SvelteKit app; Contexts.ts
+// The page state only exists inside a running SvelteKit app; Contexts.ts
 // reads it to decide whether a route is editable.
-vi.mock('$app/stores', async () => {
-    const { readable } = await import('svelte/store');
-    return {
-        page: readable({
-            route: { id: '/(reader)/[bookid]' },
-            params: {},
-            url: new URL('http://localhost/'),
-        }),
-    };
-});
+vi.mock('$app/state', () => ({
+    page: {
+        route: { id: '/(reader)/[bookid]' },
+        params: {},
+        url: new URL('http://localhost/'),
+    },
+}));
 
 beforeAll(() => {
     // jsdom doesn't implement matchMedia, which Marginal uses for mobile layout.
@@ -36,7 +33,7 @@ beforeAll(() => {
         }) as unknown as MediaQueryList;
 });
 
-function makeChapterContext(layoutMarginals: () => void) {
+function makeChapterContext(requestLayout: () => void) {
     const context: ChapterContext = {
         chapter: Chapter.fromJSON({
             id: 'test',
@@ -49,16 +46,19 @@ function makeChapterContext(layoutMarginals: () => void) {
             uids: [],
         }),
         marginal: writable<string | undefined>(undefined),
-        layoutMarginals,
+        requestLayout,
     };
     return context;
 }
 
-function renderChapter(markup: string, layoutMarginals: () => void = () => undefined) {
+function renderChapter(
+    markup: string,
+    requestLayout: () => void = () => undefined,
+) {
     return render(ChapterBody, {
         props: { node: Parser.parseChapter(undefined, markup) },
         context: new Map<symbol, unknown>([
-            [CHAPTER, writable(makeChapterContext(layoutMarginals))],
+            [CHAPTER, writable(makeChapterContext(requestLayout))],
             [EDITION, writable(undefined)],
             [CARET, writable(undefined)],
         ]),
@@ -69,7 +69,9 @@ test('renders paragraphs and code blocks', () => {
     const { container } = renderChapter(
         "Hello world, this is a paragraph.\n\n`\nconsole.log('hi');\n`\n",
     );
-    expect(container.textContent).toContain('Hello world, this is a paragraph.');
+    expect(container.textContent).toContain(
+        'Hello world, this is a paragraph.',
+    );
     expect(container.querySelector('code.bookish-code')).not.toBeNull();
 });
 
@@ -86,9 +88,9 @@ test('renders footnote content in a marginal', () => {
 });
 
 // This guards the marginal layout contract: every render of a marginal
-// component must trigger a chapter-wide layout pass, including re-renders
-// caused by content changes. (In Svelte 4 this happens via afterUpdate;
-// any migration must preserve the re-trigger on update.)
+// component must request a chapter-wide layout pass, including re-renders
+// caused by content changes. (Marginal components do this in an $effect
+// that tracks their rendered inputs; see Footnote.svelte and friends.)
 test('lays out marginals on render and again when content changes', async () => {
     const layout = vi.fn();
     const { rerender } = renderChapter('A fact.{A footnote.}', layout);

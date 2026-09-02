@@ -58,16 +58,14 @@
     let progress = progressStorage === null ? {} : JSON.parse(progressStorage);
 
     // Is there a colon? Let's make a subtitle
-    $: title = $edition?.getTitle() ?? '';
-    let subtitle: string | undefined = undefined;
-    $: {
-        let colon = title.indexOf(':');
-        if (colon >= 0) {
-            subtitle = title.substring(colon + 1).trim();
-            title = title.substring(0, colon).trim();
-        }
-    }
-
+    let fullTitle = $derived($edition?.getTitle() ?? '');
+    let colon = $derived(fullTitle.indexOf(':'));
+    let title = $derived(
+        colon >= 0 ? fullTitle.substring(0, colon).trim() : fullTitle,
+    );
+    let subtitle: string | undefined = $derived(
+        colon >= 0 ? fullTitle.substring(colon + 1).trim() : undefined,
+    );
     let waitingForChapter = false;
 
     function addChapter() {
@@ -75,7 +73,7 @@
     }
 
     /** Doing this on mount allows for prerendering an an update. */
-    let bookURL = '…';
+    let bookURL = $state('…');
     onMount(() => {
         bookURL = location.protocol + '//' + location.host + location.pathname;
     });
@@ -98,36 +96,42 @@
             save={(text) =>
                 $edition ? edition.set($edition.withTitle(text)) : undefined}
         >
-            <svelte:fragment slot="before">
-                {#if editable}
-                    <SubdomainEditor />
-                {/if}
-            </svelte:fragment>
-            <Outline
-                slot="outline"
-                previous={null}
-                next={$edition.getNextChapterID('', editable)}
-            />
-            <div slot="after">
-                <Authors
-                    editable={isBookEditable()}
-                    authors={$edition.getAuthors()}
-                    add={() =>
-                        $edition
-                            ? edition.set($edition.withAuthor(''))
-                            : undefined}
-                    edit={(index, text) =>
-                        $edition
-                            ? edition.set($edition.withAuthorName(index, text))
-                            : undefined}
-                    remove={(index) =>
-                        $edition
-                            ? edition.set($edition.withoutAuthor(index))
-                            : undefined}
-                    editors={$edition.isEdited()}
+            {#snippet before()}
+                    
+                    {#if editable}
+                        <SubdomainEditor />
+                    {/if}
+                
+                    {/snippet}
+            {#snippet outline()}
+                        <Outline
+                    
+                    previous={null}
+                    next={$edition.getNextChapterID('', editable)}
                 />
-                <Note>{$edition.getEditionLabel()} edition</Note>
-            </div>
+                    {/snippet}
+            {#snippet after()}
+                        <div >
+                    <Authors
+                        editable={isBookEditable()}
+                        authors={$edition.getAuthors()}
+                        add={() =>
+                            $edition
+                                ? edition.set($edition.withAuthor(''))
+                                : undefined}
+                        edit={(index, text) =>
+                            $edition
+                                ? edition.set($edition.withAuthorName(index, text))
+                                : undefined}
+                        remove={(index) =>
+                            $edition
+                                ? edition.set($edition.withoutAuthor(index))
+                                : undefined}
+                        editors={$edition.isEdited()}
+                    />
+                    <Note>{$edition.getEditionLabel()} edition</Note>
+                </div>
+                    {/snippet}
         </Header>
 
         <Instructions {editable}>
@@ -191,69 +195,85 @@
                     number={$edition.getChapterNumber(chapterID)}
                     forthcoming={chapter.isForthcoming()}
                 >
-                    <span slot="annotation">
-                        {#if editable}
-                            <TextEditor
-                                label={'Chapter section editor'}
-                                text={section ? section : ''}
-                                placeholder="section"
-                                valid={() => undefined}
-                                save={(text) =>
-                                    setChapter(
-                                        edition,
-                                        chapter,
-                                        chapter.withSection(text),
-                                    )}
-                            />
-                        {:else if section}{section}{/if}
-                        {#if !editable && $auth !== undefined && $auth.user !== null && chapter.uids.includes($auth.user.uid)}
-                            You can edit this chapter.
-                        {/if}
-                    </span>
-                    <span class="etc" slot="etc">
-                        <Muted>
+                    {#snippet annotation()}
+                                        <span >
                             {#if editable}
-                                <Toggle
-                                    on={chapter.isForthcoming()}
-                                    save={(on) =>
+                                <TextEditor
+                                    label={'Chapter section editor'}
+                                    text={section ? section : ''}
+                                    placeholder="section"
+                                    valid={() => undefined}
+                                    save={(text) =>
                                         setChapter(
                                             edition,
                                             chapter,
-                                            chapter.asForthcoming(on),
+                                            chapter.withSection(text),
                                         )}
-                                >
-                                    {etc}
-                                </Toggle>
-                            {:else}
-                                {etc}
+                                />
+                            {:else if section}{section}{/if}
+                            {#if !editable && $auth !== undefined && $auth.user !== null && chapter.uids.includes($auth.user.uid)}
+                                You can edit this chapter.
                             {/if}
-                        </Muted>
-                    </span>
+                        </span>
+                                    {/snippet}
+                    {#snippet etc()}
+                                        <span class="etc" >
+                            <Muted>
+                                {#if editable}
+                                    <Toggle
+                                        on={chapter.isForthcoming()}
+                                        save={(on) =>
+                                            setChapter(
+                                                edition,
+                                                chapter,
+                                                chapter.asForthcoming(on),
+                                            )}
+                                    >
+                                        {etc}
+                                    </Toggle>
+                                {:else}
+                                    {etc}
+                                {/if}
+                            </Muted>
+                        </span>
+                                    {/snippet}
                 </TableOfContentsRow>
             {/each}
             {#if $edition.hasReferences() || editable}
                 <TableOfContentsRow chapter={ChapterIDs.ReferencesID}>
-                    <span slot="annotation">Everything cited</span>
+                    {#snippet annotation()}
+                                        <span >Everything cited</span>
+                                    {/snippet}
                 </TableOfContentsRow>
             {/if}
             {#if ($edition.getGlossary() && Object.keys($edition.getGlossary()).length > 0) || editable}
                 <TableOfContentsRow chapter={ChapterIDs.GlossaryID}>
-                    <span slot="annotation">Definitions</span>
+                    {#snippet annotation()}
+                                        <span >Definitions</span>
+                                    {/snippet}
                 </TableOfContentsRow>
             {/if}
             <TableOfContentsRow chapter={ChapterIDs.IndexID}>
-                <span slot="annotation">Common words and where they are</span>
+                {#snippet annotation()}
+                                <span >Common words and where they are</span>
+                            {/snippet}
             </TableOfContentsRow>
             <TableOfContentsRow chapter={ChapterIDs.SearchID}>
-                <span slot="annotation">Find where words occur</span>
+                {#snippet annotation()}
+                                <span >Find where words occur</span>
+                            {/snippet}
             </TableOfContentsRow>
 
             <TableOfContentsRow chapter={ChapterIDs.MediaID}>
-                <span slot="annotation">Images and video in the book</span>
+                {#snippet annotation()}
+                                <span >Images and video in the book</span>
+                            {/snippet}
             </TableOfContentsRow>
             {#if editable}
                 <TableOfContentsRow chapter={ChapterIDs.UnknownID}>
-                    <span slot="annotation">Customize bad links</span>
+                    {#snippet annotation()}
+                                        <span >Customize bad links</span>
+                                    {/snippet}
                 </TableOfContentsRow>
             {/if}
         </Rows>

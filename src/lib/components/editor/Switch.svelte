@@ -1,11 +1,22 @@
 <script lang="ts">
+
     import Icon from './Icon.svelte';
 
-    export let options: string[];
-    export let icons: Record<string, string> | undefined = undefined;
-    export let value: string;
-    export let enabled: boolean | undefined = undefined;
-    export let edit: (newValue: string) => void;
+    interface Props {
+        options: string[];
+        icons?: Record<string, string> | undefined;
+        value: string;
+        enabled?: boolean | undefined;
+        edit: (newValue: string) => void;
+    }
+
+    let {
+        options,
+        icons = undefined,
+        value,
+        enabled = undefined,
+        edit
+    }: Props = $props();
 
     function handleClick(event: MouseEvent) {
         const newValue = (event.currentTarget as HTMLElement).dataset.value;
@@ -21,7 +32,10 @@
             class={`option ${value === option ? 'selected' : ''}`}
             data-value={option}
             disabled={enabled === false}
-            on:click|stopPropagation={handleClick}
+            onclick={(event) => {
+                event.stopPropagation();
+                handleClick(event);
+            }}
         >
             {#if icons && option in icons}
                 <Icon icon={icons[option]} />

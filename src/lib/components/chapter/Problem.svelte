@@ -1,6 +1,12 @@
-<svelte:options immutable={true} />
+<script lang="ts">
+    interface Props {
+        children?: import('svelte').Snippet;
+    }
 
-<span><slot /></span>
+    let { children }: Props = $props();
+</script>
+
+<span>{@render children?.()}</span>
 
 <style>
     span {

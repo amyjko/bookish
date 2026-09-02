@@ -1,5 +1,3 @@
-<svelte:options immutable={true} />
-
 <script lang="ts">
     import type BlockNode from '$lib/models/chapter/BlockNode';
     import CalloutNode from '$lib/models/chapter/CalloutNode';
@@ -24,7 +22,11 @@
     import Problem from './Problem.svelte';
     import { isChapterEditable } from '../page/Contexts';
 
-    export let node: BlockNode;
+    interface Props {
+        node: BlockNode;
+    }
+
+    let { node }: Props = $props();
 
     let editable = isChapterEditable();
 </script>

@@ -5,17 +5,37 @@ name: Verify
 jobs:
     verify:
         runs-on: ubuntu-latest
+        # An effect cycle regression can hang the test run rather than fail
+        # it; bound the job so a hang still fails loudly.
+        timeout-minutes: 15
         steps:
             - uses: actions/checkout@v4
             - uses: actions/setup-node@v4
               with:
                   node-version: 22
                   cache: npm
+            # The Firestore emulator needs Java; firebase-tools requires 21+.
+            - uses: actions/setup-java@v4
+              with:
+                  distribution: temurin
+                  java-version: 21
+            # The emulator-backed Playwright suite downloads Firebase
+            # emulator jars on first run; cache them across builds.
+            - uses: actions/cache@v4
+              with:
+                  path: ~/.cache/firebase/emulators
+                  key: firebase-emulators-${{ runner.os }}
             - run: npm ci
+            - run: npm ci --prefix functions
             # Create .env from .env.example so $env/static/public resolves.
             - run: npm run env
+            # Build the npm package; the import-script test depends on dist/.
+            - run: npm run package:build
             - run: npm run check:ci
             - run: npm run test:ci
             - run: npm run build
             - run: npx playwright install --with-deps chromium
             - run: npx playwright test
+            # The signed-in suite against the Firebase emulators (rebuilds
+            # the app against the credential-free demo project id).
+            - run: npm run test:e2e:emu

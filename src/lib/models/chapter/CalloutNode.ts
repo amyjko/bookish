@@ -46,7 +46,7 @@ export default class CalloutNode extends BlocksNode {
     copy() {
         return new CalloutNode(
             this.getBlocks().map((e) => e.copy()),
-            this.#position
+            this.#position,
         ) as this;
     }
 

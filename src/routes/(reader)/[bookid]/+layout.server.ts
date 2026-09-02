@@ -1,11 +1,14 @@
 import type { BookSpecification } from '$lib/models/book/Book';
 import type { EditionSpecification } from '$lib/models/book/Edition';
 import { error } from '@sveltejs/kit';
-import admin from 'firebase-admin';
+import { getApps, initializeApp } from 'firebase-admin/app';
+import { getFirestore } from 'firebase-admin/firestore';
 import { PUBLIC_FIREBASE_PROJECT_ID } from '$env/static/public';
 
-admin.initializeApp({ projectId: PUBLIC_FIREBASE_PROJECT_ID });
-const db = admin.firestore();
+// Guard against re-initialization when the module is re-evaluated in dev.
+const app =
+    getApps()[0] ?? initializeApp({ projectId: PUBLIC_FIREBASE_PROJECT_ID });
+const db = getFirestore(app);
 
 type BookMatch = { bookID: string | null; bookJSON: BookSpecification | null };
 type EditionMatch = {
@@ -137,7 +140,8 @@ async function getLatestEdition(
 ): Promise<EditionMatch> {
     // If there's no latest published edition, get the latest unpublished edition
     const editionID =
-        bookJSON.editions.filter((ed) => ed.published !== null).at(-1)?.ref.id ??
+        bookJSON.editions.filter((ed) => ed.published !== null).at(-1)?.ref
+            .id ??
         bookJSON.editions.at(-1)?.ref.id ??
         null;
 

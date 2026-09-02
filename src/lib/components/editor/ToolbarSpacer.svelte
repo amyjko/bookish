@@ -1,4 +1,4 @@
-<span />
+<span></span>
 
 <style>
     span {

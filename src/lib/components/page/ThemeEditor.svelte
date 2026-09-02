@@ -33,9 +33,9 @@
 
     let editable = isEditionEditable();
     let edition = getEdition();
-    $: theme = $edition ? $edition.getTheme() : null;
-    $: isDefault =
-        theme === null || Object.values(themes).includes(theme as Theme);
+    let theme = $derived($edition ? $edition.getTheme() : null);
+    let isDefault =
+        $derived(theme === null || Object.values(themes).includes(theme as Theme));
 
     function getEmptyGroup(group: Record<string, string>) {
         const empty: Record<string, string> = {};
@@ -52,7 +52,9 @@
             id="theme"
             header="Theme"
         >
-            <Outline slot="outline" previous={null} next={null} />
+            {#snippet outline()}
+                        <Outline  previous={null} next={null} />
+                    {/snippet}
         </Header>
 
         <Instructions {editable}>

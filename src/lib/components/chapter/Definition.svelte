@@ -1,5 +1,3 @@
-<svelte:options immutable={true} />
-
 <script lang="ts">
     import Parser from '$lib/models/chapter/Parser';
     import type DefinitionNode from '$lib/models/chapter/DefinitionNode';
@@ -12,22 +10,30 @@
         getEdition,
         isChapterEditable,
     } from '../page/Contexts';
-    import { afterUpdate } from 'svelte';
 
-    export let node: DefinitionNode;
+    interface Props {
+        node: DefinitionNode;
+    }
+
+    let { node }: Props = $props();
 
     let editable = isChapterEditable();
     let edition = getEdition();
     let chapter = getChapter();
 
     // Find the definition.
-    $: glossaryID = node.getMeta();
-    $: phrase = node.getText();
-    $: glossary = $edition?.getGlossary() ?? {};
-    $: entry = glossary[glossaryID];
+    let glossaryID = $derived(node.getMeta());
+    let phrase = $derived(node.getText());
+    let glossary = $derived($edition?.getGlossary() ?? {});
+    let entry = $derived(glossary[glossaryID]);
 
-    // Position the marginals on every render.
-    afterUpdate(() => $chapter?.layoutMarginals());
+    // Whenever anything that affects this definition's rendered size or
+    // position changes, request a chapter-wide marginal layout pass.
+    $effect(() => {
+        void phrase;
+        void entry;
+        $chapter?.requestLayout();
+    });
 </script>
 
 <!-- Error if there's no corresponding entry. -->
@@ -36,23 +42,22 @@
         {node}
         id={'glossary-' + glossaryID}
         label={entry ? `definition: ${entry.phrase}` : 'undefined phrase'}
-        ><Text slot="interactor" node={phrase} /><span
-            slot="content"
-            class="bookish-definition-entry"
-            >{#if entry === undefined}<Problem
-                    >{#if editable}{glossaryID.length === 0
-                            ? 'choose a definition'
-                            : `unknown glossary ID ${glossaryID}`}{:else}<em
-                            >missing definition</em
-                        >{/if}</Problem
-                >{:else}<strong class="bookish-definition-entry-phrase"
-                    >{entry.phrase}</strong
-                >: <Format
-                    node={Parser.parseFormat($edition, entry.definition)}
-                />{#if entry.synonyms && entry.synonyms.length > 0}<p
-                        class="synonyms">{entry.synonyms.join(', ')}</p
-                    >{/if}{/if}</span
-        ></Marginal
+        >{#snippet interactor()}<Text node={phrase} />{/snippet}{#snippet content()}<span
+                class="bookish-definition-entry"
+                >{#if entry === undefined}<Problem
+                        >{#if editable}{glossaryID.length === 0
+                                ? 'choose a definition'
+                                : `unknown glossary ID ${glossaryID}`}{:else}<em
+                                >missing definition</em
+                            >{/if}</Problem
+                    >{:else}<strong class="bookish-definition-entry-phrase"
+                        >{entry.phrase}</strong
+                    >: <Format
+                        node={Parser.parseFormat($edition, entry.definition)}
+                    />{#if entry.synonyms && entry.synonyms.length > 0}<p
+                            class="synonyms">{entry.synonyms.join(', ')}</p
+                        >{/if}{/if}</span
+            >{/snippet}</Marginal
     ></span
 >
 

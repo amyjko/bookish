@@ -5,7 +5,7 @@
 
     let edition = getEdition();
 
-    $: title = $edition
+    let title = $derived($edition
         ? [
               $edition.getTitle(),
               `${$edition.getEditionLabel()} Edition`,
@@ -16,7 +16,7 @@
           ]
               .filter(Boolean)
               .join(' - ')
-        : undefined;
+        : undefined);
 </script>
 
 <svelte:head>

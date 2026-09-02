@@ -2,7 +2,7 @@
     import Parser from '$lib/models/chapter/Parser';
     import TextEditor from '$lib/components/editor/TextEditor.svelte';
     import Format from '$lib/components/chapter/Format.svelte';
-    import { afterUpdate } from 'svelte';
+    
     import { getEdition, getLeasee, getUser, lease } from './Contexts';
     import Note from '../editor/Note.svelte';
     import Button from '../app/Button.svelte';
@@ -10,20 +10,32 @@
     import BookishEditor from '../editor/BookishEditor.svelte';
     import { auth } from '$lib/models/Firebase';
 
-    export let editable: boolean;
-    export let authors: string[];
-    export let inheritedAuthors: string[] | undefined = undefined;
-    export let add: () => Promise<void> | void;
-    export let edit: (index: number, text: string) => Promise<void> | void;
-    export let remove: (index: number) => Promise<void> | void;
-    export let editors: boolean = false;
+    interface Props {
+        editable: boolean;
+        authors: string[];
+        inheritedAuthors?: string[] | undefined;
+        add: () => Promise<void> | void;
+        edit: (index: number, text: string) => Promise<void> | void;
+        remove: (index: number) => Promise<void> | void;
+        editors?: boolean;
+    }
+
+    let {
+        editable,
+        authors,
+        inheritedAuthors = undefined,
+        add,
+        edit,
+        remove,
+        editors = false
+    }: Props = $props();
 
     let edition = getEdition();
 
-    let authorList: HTMLDivElement | null = null;
+    let authorList: HTMLDivElement | null = $state(null);
 
-    $: showInherited = authors.length === 0 && inheritedAuthors !== undefined;
-    $: authorsToShow = showInherited ? inheritedAuthors : authors;
+    let showInherited = $derived(authors.length === 0 && inheritedAuthors !== undefined);
+    let authorsToShow = $derived(showInherited ? inheritedAuthors : authors);
 
     async function addAuthor() {
         add();

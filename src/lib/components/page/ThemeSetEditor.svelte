@@ -3,9 +3,13 @@
     import Rows from './Rows.svelte';
     import ThemeVariableEditor from './ThemeVariableEditor.svelte';
 
-    export let header: string;
-    export let group: string;
-    export let properties: Record<string, string>;
+    interface Props {
+        header: string;
+        group: string;
+        properties: Record<string, string>;
+    }
+
+    let { header, group, properties }: Props = $props();
 </script>
 
 <PageHeader>{header}</PageHeader>

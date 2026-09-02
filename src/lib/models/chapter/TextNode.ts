@@ -77,14 +77,14 @@ export default class TextNode extends Node {
     isItalic(root: Node) {
         return (
             this.getAncestors(root).filter(
-                (p) => p instanceof FormatNode && p.getFormat() === '_'
+                (p) => p instanceof FormatNode && p.getFormat() === '_',
             ).length > 0
         );
     }
     isBold(root: Node) {
         return (
             this.getAncestors(root).filter(
-                (p) => p instanceof FormatNode && p.getFormat() === '*'
+                (p) => p instanceof FormatNode && p.getFormat() === '*',
             ).length > 0
         );
     }
@@ -103,14 +103,14 @@ export default class TextNode extends Node {
         // past the atom node, since should be isolated from edits outside the atom.
         const atom = this.getClosestParentMatching(
             root,
-            (p) => p instanceof AtomNode
+            (p) => p instanceof AtomNode,
         ) as AtomNode<FormatNode>;
         if (atom && atom.getMeta() instanceof FormatNode) return atom.getMeta();
 
         // If this isn't in an atom, just return the highest format this is in.
         return this.getFarthestParentMatching(
             root,
-            (p) => p instanceof FormatNode
+            (p) => p instanceof FormatNode,
         ) as FormatNode;
     }
 
@@ -199,7 +199,7 @@ export default class TextNode extends Node {
     withCharacterAt(char: string, index: number): TextNode | undefined {
         if (index < 0 || index > this.#text.length) return undefined;
         return new TextNode(
-            this.#text.slice(0, index) + char + this.#text.slice(index)
+            this.#text.slice(0, index) + char + this.#text.slice(index),
         );
     }
 
@@ -208,10 +208,10 @@ export default class TextNode extends Node {
         const min = Math.max(0, Math.min(range.start.index, range.end.index));
         const max = Math.min(
             this.#text.length,
-            Math.max(range.start.index, range.end.index)
+            Math.max(range.start.index, range.end.index),
         );
         return new TextNode(
-            this.#text.substring(0, min) + this.#text.substring(max)
+            this.#text.substring(0, min) + this.#text.substring(max),
         );
     }
 
@@ -221,8 +221,8 @@ export default class TextNode extends Node {
         return new TextNode(
             this.#text.substring(
                 includesStart ? range.start.index : 0,
-                includesEnd ? range.end.index : this.#text.length
-            )
+                includesEnd ? range.end.index : this.#text.length,
+            ),
         ) as this;
     }
 }

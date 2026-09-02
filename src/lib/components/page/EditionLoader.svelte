@@ -8,14 +8,19 @@
         getUser,
         getChapterText,
     } from '$lib/components/page/Contexts';
-    import { onDestroy } from 'svelte';
-    import { page } from '$app/stores';
+    import { onDestroy, untrack } from 'svelte';
+    import { page } from '$app/state';
     import type { Unsubscribe } from 'firebase/auth';
     import { listenToChapters, listenToEdition } from '../../models/CRUD';
 
-    export let write: boolean;
+    interface Props {
+        write: boolean;
+        children?: import('svelte').Snippet;
+    }
 
-    let currentEditionID: string | undefined;
+    let { write, children }: Props = $props();
+
+    let currentEditionID: string | undefined = $state();
 
     let auth = getUser();
     let book = getBook();
@@ -26,7 +31,7 @@
     let editionUnsub: Unsubscribe | undefined = undefined;
     let chaptersUnsub: Unsubscribe | undefined = undefined;
 
-    let error: string | undefined = undefined;
+    let error: string | undefined = $state(undefined);
 
     function unsub() {
         // Unsubscribe to the old edition document if we were listening to one.
@@ -45,7 +50,7 @@
             error = 'Unknown book.';
             return;
         } else {
-            currentEditionID = $page.params.editionid;
+            currentEditionID = page.params.editionid;
             const latestPublished = !write;
 
             // Figure out which edition to load.
@@ -101,21 +106,31 @@
 
     // Remember the chapter text whenever the edition changes, so we don't overwrite stale text.
     // when other things change.
-    $: if ($edition) {
-        for (const chapter of $edition.chapters) {
-            if (chapter.ref && chapter.text !== null)
-                chapterText.set(chapter.ref.id, chapter.text);
+    $effect.pre(() => {
+        if ($edition) {
+            for (const chapter of $edition.chapters) {
+                if (chapter.ref && chapter.text !== null)
+                    chapterText.set(chapter.ref.id, chapter.text);
+            }
         }
-    }
+    });
 
-    // Whenever the book changes, change the listener.
-    $: if (
-        (currentEditionID === undefined ||
-            $page.params.editionid !== currentEditionID) &&
-        $auth &&
-        $auth.user !== null
-    )
-        listen();
+    // Whenever the requested edition or the user changes, change the listener.
+    // currentEditionID is read untracked because listen() writes it; tracking
+    // it would make this effect invalidate itself.
+    $effect(() => {
+        const requestedEditionID = page.params.editionid;
+        const user = $auth?.user;
+        untrack(() => {
+            if (
+                (currentEditionID === undefined ||
+                    requestedEditionID !== currentEditionID) &&
+                user !== null &&
+                user !== undefined
+            )
+                listen();
+        });
+    });
 
     // When unmounted, unset the stores — no longer viewing a book.
     onDestroy(() => {
@@ -135,6 +150,6 @@
             ? `/write/${$book.getID()}/${$edition.getEditionNumber()}`
             : `/${$book.getSubdomain() ?? $book.getID()}`}
     >
-        <slot />
+        {@render children?.()}
     </Edition>
 {/if}

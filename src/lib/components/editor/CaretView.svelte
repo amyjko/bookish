@@ -1,34 +1,48 @@
 <script lang="ts">
-    import { afterUpdate, tick } from 'svelte';
+    import { tick } from 'svelte';
     import type { Accent } from './CaretContext';
 
-    export let left: number;
-    export let top: number;
-    export let height: number;
-    export let linked: boolean;
-    export let italic: boolean;
-    export let bold: boolean;
-    export let disabled: boolean;
-    export let ignored: boolean;
-    export let blink: boolean;
-    export let locked: boolean;
-    export let accent: Accent | undefined;
+    interface Props {
+        left: number;
+        top: number;
+        height: number;
+        linked: boolean;
+        italic: boolean;
+        bold: boolean;
+        disabled: boolean;
+        ignored: boolean;
+        blink: boolean;
+        locked: boolean;
+        accent: Accent | undefined;
+    }
 
-    let element: HTMLElement | undefined;
+    let {
+        left,
+        top,
+        height,
+        linked,
+        italic,
+        bold,
+        disabled,
+        ignored,
+        blink,
+        locked,
+        accent,
+    }: Props = $props();
 
-    let headerHeight = 0;
+    let element: HTMLElement | undefined = $state();
 
-    // When the caret updates position, scroll the element into view after the render is complete.
-    $: {
-        left;
-        top;
+    let headerHeight = $state(0);
+
+    // When the caret updates position, scroll the element into view after
+    // the render is complete, and re-measure the header height so we can
+    // snap to the caret position.
+    $effect(() => {
+        void left;
+        void top;
         tick().then(() =>
             element ? element.scrollIntoView({ block: 'nearest' }) : undefined,
         );
-    }
-
-    /** Keep track of the header height, so we can snap to the caret position. */
-    afterUpdate(() => {
         headerHeight =
             (document.querySelector('.bookish-app > .header') as HTMLElement)
                 ?.offsetHeight ?? 0;

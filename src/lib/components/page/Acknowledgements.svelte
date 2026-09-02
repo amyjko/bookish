@@ -17,7 +17,7 @@
     let edition = getEdition();
     let editable = isEditionEditable();
 
-    $: acknowledgements = $edition?.getAcknowledgements();
+    let acknowledgements = $derived($edition?.getAcknowledgements());
 </script>
 
 <Instructions {editable}>

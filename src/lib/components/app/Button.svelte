@@ -1,21 +1,34 @@
 <script lang="ts">
-    export let type: 'submit' | 'button' | null = null;
-    export let tooltip: string;
-    export let disabled: boolean = false;
-    export let command: () => void;
+    interface Props {
+        type?: 'submit' | 'button' | null;
+        tooltip: string;
+        disabled?: boolean;
+        command: () => void;
+        class?: string;
+        children?: import('svelte').Snippet;
+    }
+
+    let {
+        type = null,
+        tooltip,
+        disabled = false,
+        command,
+        class: classes,
+        children,
+    }: Props = $props();
 </script>
 
 <button
-    class={$$props.class}
+    class={classes}
     title={tooltip}
     aria-label={tooltip}
     {type}
     {disabled}
-    on:mousedown={command}
-    on:keypress={(event) =>
+    onmousedown={command}
+    onkeypress={(event) =>
         event.key === ' ' || event.key === 'Enter' ? command() : undefined}
 >
-    <slot />
+    {@render children?.()}
 </button>
 
 <style>

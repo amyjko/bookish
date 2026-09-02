@@ -1,8 +1,13 @@
 <script lang="ts">
-    export let aside: boolean = false;
+    interface Props {
+        aside?: boolean;
+        children?: import('svelte').Snippet;
+    }
+
+    let { aside = false, children }: Props = $props();
 </script>
 
-<p class={aside ? 'aside' : ''}><slot /></p>
+<p class={aside ? 'aside' : ''}>{@render children?.()}</p>
 
 <style>
     p {

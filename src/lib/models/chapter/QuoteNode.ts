@@ -13,7 +13,7 @@ export default class QuoteNode extends BlocksNode {
     constructor(
         elements: BlockNode[],
         credit?: FormatNode,
-        position: Position = '|'
+        position: Position = '|',
     ) {
         super(elements);
 
@@ -78,7 +78,7 @@ export default class QuoteNode extends BlocksNode {
 
     withChildReplaced(
         node: BlockNode | FormatNode,
-        replacement: BlockNode | FormatNode | undefined
+        replacement: BlockNode | FormatNode | undefined,
     ) {
         // Replace the credit.
         if (
@@ -88,7 +88,7 @@ export default class QuoteNode extends BlocksNode {
             return new QuoteNode(
                 this.getBlocks(),
                 replacement,
-                this.#position
+                this.#position,
             ) as this;
 
         // Replace a block.

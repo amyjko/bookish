@@ -2,8 +2,12 @@
     import Options from '../app/Options.svelte';
     import Note from './Note.svelte';
 
-    export let language: string;
-    export let edit: (newValue: string) => void;
+    interface Props {
+        language: string;
+        edit: (newValue: string) => void;
+    }
+
+    let { language, edit }: Props = $props();
 
     const languages = ['', 'html', 'css', 'javascript', 'python', 'java'];
 </script>

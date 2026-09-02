@@ -31,7 +31,7 @@ const paragraphChapter = new ChapterNode([firstParagraph, lastParagraph]);
 const numberedList = new ListNode([firstFormat, lastFormat], true);
 const bulletedList = new ListNode(
     [firstFormat.copy(), lastFormat.copy()],
-    false
+    false,
 );
 
 const beforeBold = new TextNode('I am a ');
@@ -40,7 +40,11 @@ const afterBold = new TextNode(' word.');
 const boldChapter = new ChapterNode([
     new ParagraphNode(
         0,
-        new FormatNode('', [beforeBold, new FormatNode('*', [bold]), afterBold])
+        new FormatNode('', [
+            beforeBold,
+            new FormatNode('*', [bold]),
+            afterBold,
+        ]),
     ),
 ]);
 
@@ -59,23 +63,23 @@ test('Insert a block', () => {
     expect(
         paragraphChapter
             .withBlockInserted(firstParagraph, new RuleNode(), true)
-            ?.toBookdown()
+            ?.toBookdown(),
     ).toBe(`-\n\n${firstText}\n\n${lastText}`);
     expect(
         paragraphChapter
             .withBlockInserted(firstParagraph, new RuleNode(), false)
-            ?.toBookdown()
+            ?.toBookdown(),
     ).toBe(`${firstText}\n\n-\n\n${lastText}`);
     expect(
         paragraphChapter
             .withBlockInserted(lastParagraph, new RuleNode(), false)
-            ?.toBookdown()
+            ?.toBookdown(),
     ).toBe(`${firstText}\n\n${lastText}\n\n-`);
 });
 
 test('Remove a block', () => {
     expect(paragraphChapter.withoutBlock(firstParagraph)?.toBookdown()).toBe(
-        lastText
+        lastText,
     );
 });
 
@@ -86,19 +90,19 @@ test('Remove all blocks', () => {
                 start: { node: firstTextNode, index: 0 },
                 end: { node: lastTextNode, index: lastText.length },
             })
-            ?.root.toBookdown()
+            ?.root.toBookdown(),
     ).toBe('');
 });
 
 test('Merge adjascent lists', () => {
     expect(new ChapterNode([numberedList, bulletedList]).toBookdown()).toBe(
-        `1. ${firstText}\n2. ${lastText}\n\n* ${firstText}\n* ${lastText}`
+        `1. ${firstText}\n2. ${lastText}\n\n* ${firstText}\n* ${lastText}`,
     );
     expect(new ChapterNode([numberedList, numberedList]).toBookdown()).toBe(
-        `1. ${firstText}\n2. ${lastText}\n3. ${firstText}\n4. ${lastText}`
+        `1. ${firstText}\n2. ${lastText}\n3. ${firstText}\n4. ${lastText}`,
     );
     expect(new ChapterNode([bulletedList, bulletedList]).toBookdown()).toBe(
-        `* ${firstText}\n* ${lastText}\n* ${firstText}\n* ${lastText}`
+        `* ${firstText}\n* ${lastText}\n* ${firstText}\n* ${lastText}`,
     );
 });
 
@@ -109,7 +113,7 @@ test('Delete across start of paragraph/list boundary', () => {
                 start: { node: firstTextNode, index: 1 },
                 end: { node: itemOneTextNode, index: 1 },
             })
-            ?.root.toBookdown()
+            ?.root.toBookdown(),
     ).toBe('F\n\nne\n\n1. two\n\nLast paragraph.');
 });
 
@@ -120,7 +124,7 @@ test('Delete across end of paragraph/list boundary', () => {
                 start: { node: itemOneTextNode, index: 1 },
                 end: { node: lastTextNode, index: 1 },
             })
-            ?.root.toBookdown()
+            ?.root.toBookdown(),
     ).toBe('First paragraph.\n\n1. o\n\nast paragraph.');
 });
 
@@ -133,9 +137,9 @@ test('Format range', () => {
                     start: { node: firstTextNode, index: 6 },
                     end: { node: firstTextNode, index: 10 },
                 },
-                '*'
+                '*',
             )
-            ?.root.toBookdown()
+            ?.root.toBookdown(),
     ).toBe(`First *para*graph.\n\n${lastText}`);
 
     // Remove part of a paragraph.
@@ -146,9 +150,9 @@ test('Format range', () => {
                     start: { node: firstTextNode, index: 6 },
                     end: { node: firstTextNode, index: 10 },
                 },
-                undefined
+                undefined,
             )
-            ?.root.toBookdown()
+            ?.root.toBookdown(),
     ).toBe(`First graph.\n\n${lastText}`);
 
     // Unbold the bold part of a paragraph with the selection outside the bold.
@@ -159,9 +163,9 @@ test('Format range', () => {
                     start: { node: beforeBold, index: beforeBold.getLength() },
                     end: { node: afterBold, index: 0 },
                 },
-                ''
+                '',
             )
-            ?.root.toBookdown()
+            ?.root.toBookdown(),
     ).toBe(`I am a bold word.`);
 
     // Unbold the bold part of a paragraph with the selection inside the bold.
@@ -172,9 +176,9 @@ test('Format range', () => {
                     start: { node: bold, index: 0 },
                     end: { node: bold, index: bold.getLength() },
                 },
-                ''
+                '',
             )
-            ?.root.toBookdown()
+            ?.root.toBookdown(),
     ).toBe(`I am a bold word.`);
 
     // Expand the bold part of a paragraph.
@@ -188,9 +192,9 @@ test('Format range', () => {
                     },
                     end: { node: afterBold, index: 0 },
                 },
-                '*'
+                '*',
             )
-            ?.root.toBookdown()
+            ?.root.toBookdown(),
     ).toBe(`I am *a bold* word.`);
 
     // Delete across a paragraph boundary.
@@ -200,7 +204,7 @@ test('Format range', () => {
                 start: { node: firstTextNode, index: 6 },
                 end: { node: lastTextNode, index: 5 },
             })
-            ?.root.toBookdown()
+            ?.root.toBookdown(),
     ).toBe(`First paragraph.`);
 
     // Bold across a paragraph boundary.
@@ -211,9 +215,9 @@ test('Format range', () => {
                     start: { node: firstTextNode, index: 6 },
                     end: { node: lastTextNode, index: 4 },
                 },
-                '*'
+                '*',
             )
-            ?.root.toBookdown()
+            ?.root.toBookdown(),
     ).toBe(`First *paragraph.*\n\n*Last* paragraph.`);
 });
 
@@ -256,24 +260,24 @@ test('Without atom', () => {
         new ParagraphNode(0, new FormatNode('', [firstFormat, footnote])),
     ]);
     expect(chapterAtomEnd.withoutAtom(footnote)?.root.toBookdown()).toBe(
-        `${firstText}`
+        `${firstText}`,
     );
 
     const chapterAtomBegin = new ChapterNode([
         new ParagraphNode(0, new FormatNode('', [footnote, firstFormat])),
     ]);
     expect(chapterAtomBegin.withoutAtom(footnote)?.root.toBookdown()).toBe(
-        `${firstText}`
+        `${firstText}`,
     );
 
     const chapterAtomMiddle = new ChapterNode([
         new ParagraphNode(
             0,
-            new FormatNode('', [firstFormat, footnote, lastFormat])
+            new FormatNode('', [firstFormat, footnote, lastFormat]),
         ),
     ]);
     expect(chapterAtomMiddle.withoutAtom(footnote)?.root.toBookdown()).toBe(
-        `${firstText}${lastText}`
+        `${firstText}${lastText}`,
     );
 });
 
@@ -289,9 +293,9 @@ test('Insert atom', () => {
             .withSegmentAtSelection(
                 { start: endOfFirst, end: endOfFirst },
                 (text) =>
-                    new FootnoteNode(new FormatNode('', [new TextNode(text)]))
+                    new FootnoteNode(new FormatNode('', [new TextNode(text)])),
             )
-            ?.root.toBookdown()
+            ?.root.toBookdown(),
     ).toBe(`${firstText}{}\n\n${lastText}`);
 
     // Convert selection to footnote
@@ -303,9 +307,9 @@ test('Insert atom', () => {
                     end: { node: firstTextNode, index: 15 },
                 },
                 (text) =>
-                    new FootnoteNode(new FormatNode('', [new TextNode(text)]))
+                    new FootnoteNode(new FormatNode('', [new TextNode(text)])),
             )
-            ?.root.toBookdown()
+            ?.root.toBookdown(),
     ).toBe(`First {paragraph}.\n\n${lastText}`);
 });
 
@@ -318,9 +322,9 @@ test('Convert paragraphs to lists', () => {
                     start: { node: firstTextNode, index: 0 },
                     end: { node: firstTextNode, index: 0 },
                 },
-                false
+                false,
             )
-            ?.toBookdown()
+            ?.toBookdown(),
     ).toBe(`* ${firstText}\n\n${lastText}`);
 
     // Convert two paragraphs to a single list
@@ -331,9 +335,9 @@ test('Convert paragraphs to lists', () => {
                     start: { node: firstTextNode, index: 0 },
                     end: { node: lastTextNode, index: 0 },
                 },
-                true
+                true,
             )
-            ?.toBookdown()
+            ?.toBookdown(),
     ).toBe(`1. ${firstText}\n2. ${lastText}`);
 
     // Convert paragraphs that span a blocks boundary to separate lists.
@@ -344,9 +348,9 @@ test('Convert paragraphs to lists', () => {
                     start: { node: firstTextNode, index: 0 },
                     end: { node: lastTextNode, index: 0 },
                 },
-                true
+                true,
             )
-            ?.toBookdown()
+            ?.toBookdown(),
     ).toBe(`1. ${firstText}\n\n=\n1. ${lastText}\n=`);
 
     // Convert non-paragraphs to lists
@@ -356,8 +360,8 @@ test('Convert paragraphs to lists', () => {
                 start: { node: firstTextNode, index: 0 },
                 end: { node: lastTextNode, index: 0 },
             },
-            true
-        )
+            true,
+        ),
     ).toBeUndefined();
 });
 
@@ -369,7 +373,7 @@ test('Convert lists to paragraphs', () => {
                 start: { node: firstTextNode, index: 0 },
                 end: { node: firstTextNode, index: 5 },
             })
-            ?.toBookdown()
+            ?.toBookdown(),
     ).toBe(`${firstText}\n\n${lastText}`);
 
     // Convert both items to paragraphs.
@@ -379,7 +383,7 @@ test('Convert lists to paragraphs', () => {
                 start: { node: firstTextNode, index: 0 },
                 end: { node: lastTextNode, index: 5 },
             })
-            ?.toBookdown()
+            ?.toBookdown(),
     ).toBe(`${firstText}\n\n${lastText}`);
 
     // Convert non-list to paragraphs.
@@ -389,7 +393,7 @@ test('Convert lists to paragraphs', () => {
                 start: { node: firstTextNode, index: 0 },
                 end: { node: lastTextNode, index: 5 },
             })
-            ?.toBookdown()
+            ?.toBookdown(),
     ).toBeUndefined();
 
     // Convert two contiguous lists to paragraphs.
@@ -404,7 +408,7 @@ test('Convert lists to paragraphs', () => {
                     index: 0,
                 },
             })
-            ?.toBookdown()
+            ?.toBookdown(),
     ).toBe(`${firstText}\n\n${lastText}\n\n${firstText}\n\n${lastText}`);
 
     // Convert two non-contiguous lists to paragraphs.
@@ -413,7 +417,7 @@ test('Convert lists to paragraphs', () => {
             numberedList,
             new ParagraphNode(
                 0,
-                new FormatNode('', [new TextNode('Intruder!')])
+                new FormatNode('', [new TextNode('Intruder!')]),
             ),
             bulletedList,
         ])
@@ -426,9 +430,9 @@ test('Convert lists to paragraphs', () => {
                     index: 0,
                 },
             })
-            ?.toBookdown()
+            ?.toBookdown(),
     ).toBe(
-        `${firstText}\n\n${lastText}\n\nIntruder!\n\n${firstText}\n\n${lastText}`
+        `${firstText}\n\n${lastText}\n\nIntruder!\n\n${firstText}\n\n${lastText}`,
     );
 
     // Convert various subparts of a nested list into paragraphs.
@@ -444,11 +448,11 @@ test('Convert lists to paragraphs', () => {
                     new FormatNode('', [twoText]),
                     new FormatNode('', [threeText]),
                 ],
-                true
+                true,
             ),
             new FormatNode('', [fourText]),
         ],
-        true
+        true,
     );
 
     expect(
@@ -457,9 +461,9 @@ test('Convert lists to paragraphs', () => {
                 start: { node: oneText, index: 0 },
                 end: { node: fourText, index: 0 },
             })
-            ?.toBookdown()
+            ?.toBookdown(),
     ).toBe(
-        `${oneText.getText()}\n\n${twoText.getText()}\n\n${threeText.getText()}\n\n${fourText.getText()}`
+        `${oneText.getText()}\n\n${twoText.getText()}\n\n${threeText.getText()}\n\n${fourText.getText()}`,
     );
 
     expect(
@@ -468,9 +472,9 @@ test('Convert lists to paragraphs', () => {
                 start: { node: oneText, index: 0 },
                 end: { node: twoText, index: 0 },
             })
-            ?.toBookdown()
+            ?.toBookdown(),
     ).toBe(
-        `${oneText.getText()}\n\n${twoText.getText()}\n\n${threeText.getText()}\n\n${fourText.getText()}`
+        `${oneText.getText()}\n\n${twoText.getText()}\n\n${threeText.getText()}\n\n${fourText.getText()}`,
     );
 
     expect(
@@ -479,9 +483,9 @@ test('Convert lists to paragraphs', () => {
                 start: { node: twoText, index: 0 },
                 end: { node: threeText, index: 0 },
             })
-            ?.toBookdown()
+            ?.toBookdown(),
     ).toBe(
-        `${oneText.getText()}\n\n${twoText.getText()}\n\n${threeText.getText()}\n\n${fourText.getText()}`
+        `${oneText.getText()}\n\n${twoText.getText()}\n\n${threeText.getText()}\n\n${fourText.getText()}`,
     );
 });
 
@@ -493,9 +497,9 @@ test('Indent/unindent list items', () => {
                     start: { node: firstTextNode, index: 0 },
                     end: { node: firstTextNode, index: 0 },
                 },
-                true
+                true,
             )
-            ?.toBookdown()
+            ?.toBookdown(),
     ).toBe('1.. First paragraph.\n2. Last paragraph.');
 
     const indented = new ChapterNode([numberedList]).withListsIndented(
@@ -503,10 +507,10 @@ test('Indent/unindent list items', () => {
             start: { node: firstTextNode, index: 0 },
             end: { node: lastTextNode, index: 0 },
         },
-        true
+        true,
     );
     expect(indented?.toBookdown()).toBe(
-        '1.. First paragraph.\n2.. Last paragraph.'
+        '1.. First paragraph.\n2.. Last paragraph.',
     );
 
     expect(
@@ -516,9 +520,9 @@ test('Indent/unindent list items', () => {
                     start: { node: firstTextNode, index: 0 },
                     end: { node: lastTextNode, index: 0 },
                 },
-                false
+                false,
             )
-            ?.toBookdown()
+            ?.toBookdown(),
     ).toBe('1. First paragraph.\n2. Last paragraph.');
 });
 
@@ -526,7 +530,7 @@ test('Style lists', () => {
     expect(
         new ChapterNode([numberedList])
             .withListAsStyle(numberedList, false)
-            ?.toBookdown()
+            ?.toBookdown(),
     ).toBe(`* ${firstText}\n* ${lastText}`);
 });
 
@@ -536,41 +540,41 @@ test('Backspace/delete', () => {
     expect(
         chapter
             .withoutAdjacentContent({ node: lastTextNode, index: 1 }, true)
-            ?.root.toBookdown()
+            ?.root.toBookdown(),
     ).toBe(`${firstText}\n\nLst paragraph.`);
     expect(
         chapter
             .withoutAdjacentContent({ node: lastTextNode, index: 1 }, false)
-            ?.root.toBookdown()
+            ?.root.toBookdown(),
     ).toBe(`${firstText}\n\nast paragraph.`);
     expect(
         chapter
             .withoutAdjacentContent({ node: lastTextNode, index: 0 }, false)
-            ?.root.toBookdown()
+            ?.root.toBookdown(),
     ).toBe(`${firstText}${lastText}`);
     expect(
         chapter
             .withoutAdjacentContent(
                 { node: firstTextNode, index: firstTextNode.getLength() },
-                true
+                true,
             )
-            ?.root.toBookdown()
+            ?.root.toBookdown(),
     ).toBe(`${firstText}${lastText}`);
     expect(
         chapter
             .withoutAdjacentContent({ node: firstTextNode, index: 0 }, false)
-            ?.root.toBookdown()
+            ?.root.toBookdown(),
     ).toBeUndefined();
 
     const beforeText = new TextNode('Before');
     const beforeParagraph = new ParagraphNode(
         0,
-        new FormatNode('', [beforeText])
+        new FormatNode('', [beforeText]),
     );
     const afterText = new TextNode('After');
     const afterParagraph = new ParagraphNode(
         0,
-        new FormatNode('', [afterText])
+        new FormatNode('', [afterText]),
     );
     const listChapter = new ChapterNode([
         beforeParagraph,
@@ -582,29 +586,29 @@ test('Backspace/delete', () => {
     expect(
         listChapter
             .withoutAdjacentContent({ node: firstTextNode, index: 0 }, false)
-            ?.root.toBookdown()
+            ?.root.toBookdown(),
     ).toBeUndefined();
     // Delete a character in a list
     expect(
         listChapter
             .withoutAdjacentContent({ node: firstTextNode, index: 0 }, true)
-            ?.root.toBookdown()
+            ?.root.toBookdown(),
     ).toBe(`Before\n\n1. irst paragraph.\n2. ${lastText}\n\nAfter`);
     // Can't forward delete into a list
     expect(
         listChapter
             .withoutAdjacentContent(
                 { node: beforeText, index: beforeText.getLength() },
-                true
+                true,
             )
-            ?.root.toBookdown()
+            ?.root.toBookdown(),
     ).toBe(`Before${firstText}\n\n1. ${lastText}\n\nAfter`);
 
     // Backspace a paragraph into the last list item
     expect(
         listChapter
             .withoutAdjacentContent({ node: afterText, index: 0 }, false)
-            ?.root.toBookdown()
+            ?.root.toBookdown(),
     ).toBe(`Before\n\n1. ${firstText}\n2. ${lastText}After`);
 
     // Select two list items for deletion.
@@ -614,7 +618,7 @@ test('Backspace/delete', () => {
                 start: { node: firstTextNode, index: 0 },
                 end: { node: lastTextNode, index: 5 },
             })
-            ?.root.toBookdown()
+            ?.root.toBookdown(),
     ).toBe(`Before\n\n1. paragraph.\n\nAfter`);
 
     // Backspace over a block
@@ -622,7 +626,7 @@ test('Backspace/delete', () => {
     expect(
         quoteChapter
             .withoutAdjacentContent({ node: firstTextNode, index: 0 }, false)
-            ?.root.toBookdown()
+            ?.root.toBookdown(),
     ).toBe(`${firstText}`);
 });
 
@@ -635,7 +639,7 @@ test('Copy/paste', () => {
     const boldSentence3 = new TextNode(' Can you believe my size?');
     const paragraph2 = new ParagraphNode(
         0,
-        new FormatNode('', [sentence2, new FormatNode('*', [boldSentence3])])
+        new FormatNode('', [sentence2, new FormatNode('*', [boldSentence3])]),
     );
 
     const sentence3 = new TextNode('Lonely last.');
@@ -647,7 +651,7 @@ test('Copy/paste', () => {
         'nope',
         'nothing',
         new FormatNode('', [imageCaption]),
-        new FormatNode('', [imageCredit])
+        new FormatNode('', [imageCredit]),
     );
 
     const js = new TextNode('let a = 1;');
@@ -655,7 +659,7 @@ test('Copy/paste', () => {
         js,
         'js',
         '|',
-        new FormatNode('', [new TextNode('assignment')])
+        new FormatNode('', [new TextNode('assignment')]),
     );
 
     const item1 = new TextNode('one');
@@ -669,13 +673,13 @@ test('Copy/paste', () => {
             new FormatNode('', [item2]),
             new FormatNode('', [item3]),
         ],
-        true
+        true,
     );
 
     const afterList = new TextNode('Post-list');
     const afterListParagraph = new ParagraphNode(
         0,
-        new FormatNode('', [afterList])
+        new FormatNode('', [afterList]),
     );
 
     const cellr1c1 = new TextNode('a');
@@ -718,7 +722,7 @@ test('Copy/paste', () => {
     const quoteCredit = new TextNode('Boomy');
     const quote = new QuoteNode(
         [new ParagraphNode(0, new FormatNode('', [quoteOne]))],
-        new FormatNode('', [quoteCredit])
+        new FormatNode('', [quoteCredit]),
     );
 
     const chapter = new ChapterNode([
@@ -755,10 +759,10 @@ test('Copy/paste', () => {
     expect(partialSegment?.toBookdown()).toBe('a sentence');
     expect(reversedPartialSegment?.toBookdown()).toBe('a sentence');
     expect(consecutivePartialParagraphs?.toBookdown()).toBe(
-        'a sentence.\n\nHello'
+        'a sentence.\n\nHello',
     );
     expect(threeParagraphs?.toBookdown()).toBe(
-        `.\n\n${sentence2.toBookdown()}*${boldSentence3.toBookdown()}*\n\nLonely`
+        `.\n\n${sentence2.toBookdown()}*${boldSentence3.toBookdown()}*\n\nLonely`,
     );
 
     const partialImageCaption = chapter.copyRange({
@@ -791,7 +795,7 @@ test('Copy/paste', () => {
 
     // Code
     expect(imageAndCode?.toBookdown()).toBe(
-        `|nope|nothing||Amy|\n\n\`js\nlet\n\``
+        `|nope|nothing||Amy|\n\n\`js\nlet\n\``,
     );
 
     const partialList = chapter.copyRange({
@@ -806,7 +810,7 @@ test('Copy/paste', () => {
     // Lists
     expect(partialList?.toBookdown()).toBe(`1.. a\n2. t`);
     expect(partialListAndParagraph?.toBookdown()).toBe(
-        `1. two\n2. three\n\nPost`
+        `1. two\n2. three\n\nPost`,
     );
 
     // Tables
@@ -834,7 +838,7 @@ test('Copy/paste', () => {
 
     expect(partialCallout?.toBookdown()).toBe(`=\none\n\nt\n=`);
     expect(partialTableAndCallout?.toBookdown()).toBe(
-        `,||i\n\n\n=\none\n\ntwo\n=`
+        `,||i\n\n\n=\none\n\ntwo\n=`,
     );
 
     // Quote
@@ -844,7 +848,7 @@ test('Copy/paste', () => {
     });
 
     expect(partialCalloutAndQuote?.toBookdown()).toBe(
-        `=\nthree\n=\n\n"\nI'm tired\n"`
+        `=\nthree\n=\n\n"\nI'm tired\n"`,
     );
 });
 

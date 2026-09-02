@@ -1,9 +1,14 @@
 <script lang="ts">
-    export let editable: boolean;
+    interface Props {
+        editable: boolean;
+        children?: import('svelte').Snippet;
+    }
+
+    let { editable, children }: Props = $props();
 </script>
 
 {#if editable}
-    <aside class="instructions"><slot /></aside>
+    <aside class="instructions">{@render children?.()}</aside>
 {/if}
 
 <style>

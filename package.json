@@ -1,7 +1,7 @@
 {
     "name": "bookish-press",
     "private": false,
-    "version": "0.7.4",
+    "version": "0.8.0",
     "type": "module",
     "description": "A platform for reading and writing readable, accessible, beautiful online books.",
     "license": "MIT",
@@ -15,10 +15,13 @@
         "//emu": "echo 'This copies the local .env file and starts the emulator'",
         "emu": "firebase use dev && npm run env && firebase emulators:start",
         "package": "svelte-package --watch",
+        "package:build": "svelte-package",
         "test": "vitest",
         "test:ci": "vitest run",
         "//test:e2e": "echo 'Build the app and run the Playwright smoke tests against a preview server.'",
         "test:e2e": "npm run build && playwright test",
+        "//test:e2e:emu": "echo 'Build the app and run the Playwright suite that signs in and edits against dedicated Firebase emulators (see firebase.test.json).'",
+        "test:e2e:emu": "PUBLIC_FIREBASE_PROJECT_ID=demo-bookish PUBLIC_FIREBASE_STORAGE_BUCKET=demo-bookish.appspot.com npm run build && bash scripts/test-emulators.sh 'npx playwright test --config playwright.emulator.config.ts'",
         "check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch",
         "check:ci": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
         "//env": "echo 'This copies the .env file corresponding to the current Firebase project specified with firebase use, defaulting to local'",
@@ -36,32 +39,32 @@
         "@playwright/test": "^1",
         "@sveltejs/adapter-node": "^5",
         "@sveltejs/package": "^2",
-        "@sveltejs/vite-plugin-svelte": "^3",
+        "@sveltejs/vite-plugin-svelte": "^6",
         "@testing-library/svelte": "^5",
         "@types/prismjs": "^1.26",
         "@types/smoothscroll-polyfill": "^0",
-        "chalk": "^5.3.0",
+        "firebase-tools": "^15.28.2",
         "jsdom": "^29",
         "prettier": "^3",
-        "prettier-plugin-svelte": "^3",
-        "svelte-check": "^3",
-        "svelte-preprocess": "^5",
+        "prettier-plugin-svelte": "^4",
+        "svelte": "^5.57",
+        "svelte-check": "^4.7",
         "tslib": "^2",
         "typescript": "^5",
-        "vite": "^5",
-        "vitest": "^3"
+        "vite": "^7",
+        "vitest": "^4"
     },
     "dependencies": {
         "@sveltejs/kit": "^2",
         "ajv": "^8",
         "ajv-formats": "^3",
-        "firebase": "^11",
-        "firebase-admin": "^12.7.0",
-        "firebase-functions": "^6",
+        "firebase": "^12",
+        "firebase-admin": "^14",
         "prismjs": "^1.29",
-        "smoothscroll-polyfill": "^0.4",
-        "svelte": "^4",
-        "uuid": "^11"
+        "smoothscroll-polyfill": "^0.4"
+    },
+    "peerDependencies": {
+        "svelte": "^5.0.0"
     },
     "engines": {
         "node": "22"

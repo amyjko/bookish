@@ -1,8 +1,13 @@
 <script lang="ts">
-    export let id: string | null = null;
+    interface Props {
+        id?: string | null;
+        children?: import('svelte').Snippet;
+    }
+
+    let { id = null, children }: Props = $props();
 </script>
 
-<h2 {id}><slot /></h2>
+<h2 {id}>{@render children?.()}</h2>
 
 <style>
     h2 {

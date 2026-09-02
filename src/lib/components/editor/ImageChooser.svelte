@@ -4,12 +4,16 @@
     import { getBook } from '$lib/components/page/Contexts';
     import ImageThumbnail from './ImageThumbnail.svelte';
 
-    export let select: (image: Image) => void;
-    export let selection: string;
+    interface Props {
+        select: (image: Image) => void;
+        selection: string;
+    }
+
+    let { select, selection }: Props = $props();
 
     let book = getBook();
-    let images: Image[] | undefined = undefined;
-    let expanded = false;
+    let images: Image[] | undefined = $state(undefined);
+    let expanded = $state(false);
 
     function updateImages(newImages: Image[]) {
         images = newImages;
@@ -28,13 +32,13 @@
     class={`bookish-image-chooser ${expanded ? 'expanded' : ''}`}
     tabindex="0"
     role="button"
-    on:click={() => (expanded = !expanded)}
-    on:keydown={(event) =>
+    onclick={() => (expanded = !expanded)}
+    onkeydown={(event) =>
         event.key === 'Enter' || event.key === ' '
             ? (expanded = !expanded)
             : undefined}
-    on:mouseenter={() => (expanded = true)}
-    on:mouseleave={() => (expanded = false)}
+    onmouseenter={() => (expanded = true)}
+    onmouseleave={() => (expanded = false)}
 >
     {#if images === undefined}
         Loading images

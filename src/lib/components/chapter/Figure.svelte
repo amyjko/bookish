@@ -1,5 +1,3 @@
-<svelte:options immutable={true} />
-
 <script lang="ts">
     import type TableNode from '$lib/models/chapter/TableNode';
     import type EmbedNode from '$lib/models/chapter/EmbedNode';
@@ -9,15 +7,26 @@
     import Positioned from './Positioned.svelte';
     import { getCaret, isChapterEditable } from '../page/Contexts';
 
-    export let node: TableNode | EmbedNode | CodeNode;
-    export let caption: FormatNode | undefined;
-    export let credit: FormatNode | undefined = undefined;
-    export let focusable: boolean = true;
+    interface Props {
+        node: TableNode | EmbedNode | CodeNode;
+        caption: FormatNode | undefined;
+        credit?: FormatNode | undefined;
+        focusable?: boolean;
+        children?: import('svelte').Snippet;
+    }
+
+    let {
+        node,
+        caption,
+        credit = undefined,
+        focusable = true,
+        children
+    }: Props = $props();
 
     let editable = isChapterEditable();
     let caret = getCaret();
 
-    $: selected = $caret?.range?.start.node === node;
+    let selected = $derived($caret?.range?.start.node === node);
 
     function focusFigure() {
         if (!editable || $caret === undefined) return;
@@ -39,18 +48,18 @@
 
 <Positioned position={node.getPosition()}>
     <figure class="bookish-figure" data-nodeid={node.nodeID}>
-        <!-- svelte-ignore a11y-no-noninteractive-tabindex -->
+        <!-- svelte-ignore a11y_no_noninteractive_tabindex -->
         <div
             class:selected
             role={focusable ? 'button' : undefined}
             tabindex={focusable ? 0 : undefined}
-            on:mousedown={focusable ? focusFigure : null}
-            on:keydown={(event) =>
+            onmousedown={focusable ? focusFigure : null}
+            onkeydown={(event) =>
                 event.key === ' ' || event.key === 'Enter'
                     ? focusFigure()
                     : null}
         >
-            <slot />
+            {@render children?.()}
         </div>
         {#if caption !== undefined}
             <figcaption class="caption">

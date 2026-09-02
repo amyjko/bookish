@@ -5,7 +5,11 @@
     import Switch from '$lib/components/editor/Switch.svelte';
     import { getCaret } from '$lib/components/page/Contexts';
 
-    export let code: CodeNode;
+    interface Props {
+        code: CodeNode;
+    }
+
+    let { code }: Props = $props();
 
     let caret = getCaret();
 </script>

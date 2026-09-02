@@ -211,7 +211,8 @@ export default class Book {
     }
 
     getLatestPublishedEditionID() {
-        return this.editions.filter((ed) => ed.published !== null).at(-1)?.ref.id;
+        return this.editions.filter((ed) => ed.published !== null).at(-1)?.ref
+            .id;
     }
 
     getLatestEditionID(): string | undefined {

@@ -13,13 +13,17 @@
     import DarkToggle from '$lib/components/controls/DarkToggle.svelte';
     import { isDark, setDark } from '$lib/util/dark';
 
-    export let print: boolean = false;
+    interface Props {
+        print?: boolean;
+    }
+
+    let { print = false }: Props = $props();
 
     let auth = getUser();
 
     let caret = getCaret();
-    $: edition = getEdition();
-    $: book = getBook();
+    let edition = $derived(getEdition());
+    let book = $derived(getBook());
 </script>
 
 <section class="header">

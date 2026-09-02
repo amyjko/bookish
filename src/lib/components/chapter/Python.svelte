@@ -1,4 +1,4 @@
-<script context="module" lang="ts">
+<script module lang="ts">
     // Make Typescript happy
     type Skulpt =
         | { configure: Function; importMainWithBody: Function }
@@ -8,22 +8,26 @@
 
 <script lang="ts">
     import type CodeNode from '$lib/models/chapter/CodeNode';
-    import { afterUpdate, onMount } from 'svelte';
+    import { onMount } from 'svelte';
     import Code from './Code.svelte';
 
-    export let node: CodeNode;
-    export let startCode: string;
+    interface Props {
+        node: CodeNode;
+        startCode: string;
+    }
+
+    let { node, startCode }: Props = $props();
 
     // Start with whatever code was passed in.
-    let code = startCode;
+    let code = $state(startCode);
 
     // What is currently rendered to the console (not always program output).
-    let output = '';
+    let output = $state('');
 
     // Whether the runtime is loaded. Initialized based on presence of global.
-    let loaded = skulptLoaded();
+    let loaded = $state(skulptLoaded());
 
-    let ref: HTMLDivElement | null = null;
+    let ref: HTMLDivElement | null = $state(null);
 
     onMount(() => {
         // Dynamically load the script to minimize payload and reduce index complexity.
@@ -39,8 +43,9 @@
         }
     });
 
-    // Always scroll to the bottom of the output.
-    afterUpdate(() => {
+    // Always scroll to the bottom of the output when it changes.
+    $effect(() => {
+        void output;
         if (ref) {
             let outputView = ref.querySelector('.bookish-python-output');
             if (outputView) outputView.scrollTop = outputView.scrollHeight;
@@ -84,7 +89,7 @@
         }
     }
 
-    $: lines = output.split('\n');
+    let lines = $derived(output.split('\n'));
 </script>
 
 <div class="bookish-python" bind:this={ref}>
@@ -93,13 +98,14 @@
         language={'python'}
         editable
         edited={handleEdit}
-        nodeID={node.nodeID}>{code}</Code
-    >
+        nodeID={node.nodeID}
+        {code}
+    />
     <div class="bookish-python-controls">
-        <button disabled={startCode === code} on:click={reset}
+        <button disabled={startCode === code} onclick={reset}
             >{'\u21BB'}</button
         >
-        <button disabled={!loaded} on:click={start}>{'\u25B6\uFE0E'}</button>
+        <button disabled={!loaded} onclick={start}>{'\u25B6\uFE0E'}</button>
         <div class="bookish-python-output">
             {#each lines as line, index}
                 <span class="python-output-line"

@@ -14,28 +14,37 @@
     } from './Contexts';
     import { BookishTheme } from '$lib/models/book/Theme';
     import { isDark, setDark } from '../../util/dark';
-    import { page } from '$app/stores';
+    import { page } from '$app/state';
     import Title from './Title.svelte';
     import Page from './Page.svelte';
 
     // Poly fill smooth scrolling for Safari.
     onMount(() => smoothscroll.polyfill());
 
-    // The book and edition to render
-    export let edition: EditionModel | undefined;
+    
 
     // The base path allows links to adjust to different routing contexts in which a book is placed.
     // For example, when the book is hosted alone, all routes might start with the bare root "/",
     // but when the book is being viewed or edited in the Bookish app, it needs a prefix for the
-    // route in the app.
-    export let base: string = '';
+    
+    interface Props {
+        // The book and edition to render
+        edition: EditionModel | undefined;
+        // route in the app.
+        base?: string;
+        children?: import('svelte').Snippet;
+    }
+
+    let { edition, base = '', children }: Props = $props();
 
     let book = getBook();
 
-    // When the base changes, update the context.
+    // Expose the base path to descendants, keeping it up to date when it changes.
     let baseStore = writable<string>(base);
-    $: setContext<BaseStore>(BASE, baseStore);
-    $: baseStore.set(base);
+    setContext<BaseStore>(BASE, baseStore);
+    $effect.pre(() => {
+        baseStore.set(base);
+    });
 
     // Default dark mode to whatever's stored in local storage, if anything.
     // respect user choice on the website despite the system theme
@@ -44,31 +53,26 @@
     // Expose dark mode to descendants
     setContext<DarkModeStore>(DARK_MODE, darkMode);
 
+
+    // The CSS to set on the edition, kept up to date with the edition's theme.
+    let themeCSS: string = $derived(
+        themeToCSS(edition?.getTheme() ?? BookishTheme),
+    );
+
     // When dark mode changes, update the body's class list.
-    $: {
+    $effect.pre(() => {
         setDark($darkMode);
-
-        // Set the theme, whatever it is, and change it when the edition changes
-        setTheme(edition?.getTheme() ?? BookishTheme);
-    }
-
-    // The CSS to set on the edition.
-    let themeCSS: string;
-
-    // Set the theme on mount.
-    onMount(() => {
-        setTheme(edition?.getTheme() ?? BookishTheme);
     });
 
     // Redirect old hash routes by simply replacing their hash before routing.
     if (typeof window !== 'undefined' && window.location.hash.startsWith('#/'))
         goto(location.hash.replace('#', ''));
 
-    /** Given a theme, sets the appropriate CSS rules in the browser to apply the theme. */
-    function setTheme(theme: Theme | null) {
+    /** Given a theme, compute the CSS rules that apply the theme. */
+    function themeToCSS(theme: Theme | null) {
         if (theme === null) theme = BookishTheme;
 
-        themeCSS = `
+        return `
             ${(theme.imports ?? [])
                 .map((url) => `@import url(${url});`)
                 .join('\n')}
@@ -119,7 +123,7 @@
             property="og:url"
             content={edition.base ??
                 `https://bookish.press/${
-                    $book && $book.domain ? $book.domain : $page.params.bookid
+                    $book && $book.domain ? $book.domain : page.params.bookid
                 }`}
         />
     {/if}
@@ -127,7 +131,7 @@
 
 <main class="bookish {$darkMode ? ' dark' : ''}">
     {#if edition}
-        <slot />
+        {@render children?.()}
         <!-- No edition to render? Coming soon. -->
     {:else if $book}
         <Page title={$book.title}>

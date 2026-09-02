@@ -23,10 +23,10 @@
     let editable = isBookEditable();
     let base = getBase();
 
-    let images: Image[] | undefined = [];
+    let images: Image[] | undefined = $state([]);
 
-    $: embeds = $edition?.getEmbeds() ?? [];
-    $: media = $book?.getMedia();
+    let embeds = $derived($edition?.getEmbeds() ?? []);
+    let media = $derived($book?.getMedia());
 
     function updateImages(newImages: Image[] | undefined) {
         images = newImages;
@@ -38,10 +38,10 @@
         return () => media?.stopNotifying(updateImages);
     });
 
-    $: unused = images?.filter(
+    let unused = $derived(images?.filter(
         (image) =>
             !embeds.some((embed) => image.url.includes(embed.embed.getURL())),
-    );
+    ));
 </script>
 
 {#if $edition}
@@ -62,14 +62,16 @@
                     ? edition.set($edition.withHeader(ChapterIDs.MediaID, text))
                     : undefined}
         >
-            <Outline
-                slot="outline"
-                previous={$edition.getPreviousChapterID(
-                    ChapterIDs.MediaID,
-                    editable,
-                )}
-                next={$edition.getNextChapterID(ChapterIDs.MediaID, editable)}
-            />
+            {#snippet outline()}
+                        <Outline
+                    
+                    previous={$edition.getPreviousChapterID(
+                        ChapterIDs.MediaID,
+                        editable,
+                    )}
+                    next={$edition.getNextChapterID(ChapterIDs.MediaID, editable)}
+                />
+                    {/snippet}
         </Header>
         <Instructions {editable}>
             These are the images in the book, in order of appearance. You can

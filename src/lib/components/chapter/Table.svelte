@@ -1,5 +1,3 @@
-<svelte:options immutable={true} />
-
 <script lang="ts">
     import type TableNode from '$lib/models/chapter/TableNode';
     import Figure from './Figure.svelte';
@@ -7,10 +5,14 @@
     import Rows from '../page/Rows.svelte';
     import { isChapterEditable } from '../page/Contexts';
 
-    export let node: TableNode;
+    interface Props {
+        node: TableNode;
+    }
+
+    let { node }: Props = $props();
 
     let editable = isChapterEditable();
-    $: rows = node.getRows();
+    let rows = $derived(node.getRows());
 </script>
 
 <Figure {node} caption={node.getCaption()} focusable={false}>

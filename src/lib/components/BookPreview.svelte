@@ -6,23 +6,27 @@
     import Embed from './chapter/Embed.svelte';
     import Link from '$lib/components/app/Link.svelte';
 
-    export let book: Book;
-    export let write: boolean = false;
+    interface Props {
+        book: Book;
+        write?: boolean;
+    }
 
-    $: refID = book.getID();
-    $: cover = book.getCover();
-    $: authors = book.getAuthors();
-    $: description = book.getDescription();
-    $: subdomain = book.getSubdomain();
-    $: title = book.getTitle();
-    $: embed = cover === null ? null : Parser.parseEmbed(undefined, cover);
+    let { book, write = false }: Props = $props();
 
-    $: url =
-        subdomain === null || write
+    let refID = $derived(book.getID());
+    let cover = $derived(book.getCover());
+    let authors = $derived(book.getAuthors());
+    let description = $derived(book.getDescription());
+    let subdomain = $derived(book.getSubdomain());
+    let title = $derived(book.getTitle());
+    let embed = $derived(cover === null ? null : Parser.parseEmbed(undefined, cover));
+
+    let url =
+        $derived(subdomain === null || write
             ? refID === undefined
                 ? ''
                 : (write ? '/write/' : '/') + refID
-            : `/${subdomain}`;
+            : `/${subdomain}`);
 </script>
 
 <article class="book-preview">
