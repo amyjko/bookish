@@ -8,7 +8,7 @@ export type ChapterIDKey =
     | 'cover';
 
 export type TOCHeaderKey =
-    'chapters' | 'acknowledgements' | 'license' | 'print' | 'citation';
+    'chapters' | 'acknowledgements' | 'license' | 'print' | 'epub' | 'citation';
 
 const ChapterIDs: Record<string, ChapterIDKey> = {
     TableOfContentsID: 'cover',

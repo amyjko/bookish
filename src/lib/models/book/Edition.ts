@@ -1333,6 +1333,7 @@ export default class Edition {
             acknowledgements: 'Acknowledgements',
             license: 'License',
             print: 'Print',
+            epub: 'E-book',
             citation: 'Citation',
             chapters: 'Chapters',
             cover: 'Cover',
