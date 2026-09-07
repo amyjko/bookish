@@ -308,3 +308,19 @@ test('a document declares the epub namespace its footnotes use', () => {
 test('a document escapes its title', () => {
     expect(document_('A & B', '')).toContain('<title>A &amp; B</title>');
 });
+
+test('a video link is labelled distinctly from its caption', () => {
+    // The caption was previously used both as the link text and as the
+    // figcaption, so it appeared twice in a row on the page.
+    const out = html(
+        '|https://www.youtube.com/embed/abc|A description|A caption||',
+    );
+    expect(out).toContain('>A description</a>');
+    expect(out).toContain('<figcaption>A caption');
+    expect(out.match(/A caption/g)).toHaveLength(1);
+});
+
+test('a video link falls back to its URL when it has no description', () => {
+    const out = html('|https://www.youtube.com/embed/abc||A caption||');
+    expect(out).toContain('>https://www.youtube.com/embed/abc</a>');
+});

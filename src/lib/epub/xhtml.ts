@@ -210,7 +210,12 @@ function embed(node: EmbedNode, local: Local): string {
     // offer the link instead of silently dropping the content.
     if (node.isVideo()) {
         const url = escapeAttribute(node.getURL());
-        const label = caption.trim().length > 0 ? caption : url;
+        // The caption belongs to the figure, so the link is labelled with the
+        // description instead; using the caption for both printed it twice.
+        const label =
+            node.getDescription().trim().length > 0
+                ? escapeText(node.getDescription())
+                : url;
         return `<figure class="video"><p><a href="${url}">${label}</a></p>${figcaption}</figure>`;
     }
 
