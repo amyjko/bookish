@@ -420,6 +420,22 @@ function definition(node: DefinitionNode, local: Local): string {
           )}">${phrase}</a>`;
 }
 
+/**
+ * Serialize a standalone embed, for the header images that a chapter and the
+ * back matter pages carry. Those are stored as Bookdown, parsed by the caller.
+ */
+export function serializeEmbed(
+    node: EmbedNode,
+    context: SerializationContext,
+): string {
+    return embed(node, {
+        ...context,
+        footnotes: [],
+        headers: [],
+        endnotes: [],
+    });
+}
+
 /** Serialize a standalone format node, for titles, captions and definitions. */
 export function serializeFormat(
     node: FormatNode,

@@ -10,6 +10,7 @@ import type Chapter from '../models/book/Chapter';
 import Reference from '../models/book/Reference';
 import FormatNode from '../models/chapter/FormatNode';
 import Parser from '../models/chapter/Parser';
+import EmbedNode from '../models/chapter/EmbedNode';
 import {
     chapterPath,
     document_,
@@ -17,6 +18,7 @@ import {
     escapeAttribute,
     escapeText,
     serializeChapter,
+    serializeEmbed,
     serializeFormat,
     type SerializationContext,
 } from './xhtml';
@@ -189,6 +191,22 @@ export function safeFilename(title: string): string {
     return cleaned.length > 0 ? cleaned.slice(0, 80) : 'book';
 }
 
+/**
+ * A chapter or back-matter page's header image, rendered the way the web
+ * reader does: above the title, with its caption and credit. The image is
+ * stored as Bookdown and already packaged by Edition.getEmbeds(), so this only
+ * has to render it.
+ */
+function headerImage(
+    edition: Edition,
+    image: string | null,
+    context: SerializationContext,
+): string {
+    if (image === null || image.trim().length === 0) return '';
+    const node = Parser.parseEmbed(edition, image);
+    return node instanceof EmbedNode ? serializeEmbed(node, context) : '';
+}
+
 /** The plain-text form of a Bookdown string, for metadata. */
 function text(edition: Edition, bookdown: string): string {
     return Parser.parseFormat(edition, bookdown).toText().trim();
@@ -284,6 +302,7 @@ export function chapterDocument(
     const authors = chapter.getAuthors();
 
     const header = `<header>
+${headerImage(edition, chapter.getImage(), context)}
 ${
     number !== undefined
         ? `<span class="chapter-number">Chapter ${number}</span>`
@@ -349,6 +368,7 @@ export function referencesDocument(
 
     const header = edition.getHeader('references');
     const body = `<section epub:type="bibliography">
+${headerImage(edition, edition.getImage('references'), context)}
 <h1>${escapeText(header)}</h1>
 ${ids
     .map(
@@ -386,6 +406,7 @@ export function glossaryDocument(
     // content, so there is no way to put a block inside it that would survive.
     // The semantics are carried by the classes instead.
     const body = `<section epub:type="glossary">
+${headerImage(edition, edition.getImage('glossary'), context)}
 <h1>${escapeText(header)}</h1>
 ${ids
     .map((id) => {

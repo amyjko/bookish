@@ -524,3 +524,56 @@ test('a reference whose fields are not strings still exports', async () => {
     expect(references).toContain('-370');
     expect(references).toContain('The Republic');
 });
+
+test("a chapter's header image is rendered, not just packaged", async () => {
+    // Edition.getEmbeds() collects chapter header images, so they were fetched
+    // and packaged, but chapterDocument never rendered one -- the reader saw
+    // the book cover and nothing else, and paid for the bytes anyway.
+    const edition = makeEdition({
+        chapters: [
+            chapter('one', 'One', 'Text with no images of its own.', {
+                image: '|header.jpg|A header image|A caption|A credit|',
+            }),
+        ],
+    });
+    const { entries } = await build(edition);
+
+    const one = textOf(entries, 'OEBPS/one.xhtml');
+    expect(one).toContain('<img');
+    expect(one).toContain('A header image');
+    // Above the title, as the web reader places it.
+    expect(one.indexOf('<img')).toBeLessThan(one.indexOf('<h1>'));
+});
+
+test('every packaged image is referenced by a document', async () => {
+    // The general form of the bug above: an image that is fetched, shrunk and
+    // written into the package but never pointed at is pure weight.
+    const edition = makeEdition({
+        images: { cover: '|cover.jpg|The cover|||' },
+        chapters: [
+            chapter('one', 'One', 'A body image: |body.jpg|Alt|||', {
+                image: '|chapterhead.jpg|A chapter header|||',
+            }),
+            chapter('two', 'Two', 'No images here.', {
+                image: '|another.jpg|Another header|||',
+            }),
+        ],
+    });
+    const { entries } = await build(edition);
+
+    const documents = [...entries.keys()].filter((path) =>
+        path.endsWith('.xhtml'),
+    );
+    const markup = documents.map((path) => textOf(entries, path)).join('\n');
+
+    const images = [...entries.keys()]
+        .filter((path) => path.startsWith('OEBPS/images/'))
+        .map((path) => path.replace('OEBPS/', ''));
+    expect(images.length).toBeGreaterThan(2);
+
+    const orphans = images.filter((image) => !markup.includes(`"${image}"`));
+    expect(
+        orphans,
+        `packaged but never referenced: ${orphans.join(', ')}`,
+    ).toEqual([]);
+});

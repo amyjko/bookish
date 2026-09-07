@@ -1,5 +1,11 @@
 # bookish changelog
 
+# 0.9.3 - 2026-09-07
+
+## Fixed
+
+- Chapter header images never appeared in an exported EPUB, and neither did the header images on the references and glossary pages. `Edition.getEmbeds()` collects them, so they were fetched, shrunk and written into the package — the reader just never saw them, and paid for the bytes. They now render above the chapter title with their caption and credit, where the web reader puts them. Two regression tests cover it: one for the chapter header specifically, and one asserting that every image in the package is referenced by some document, which is the general form of the bug.
+
 # 0.9.2 - 2026-09-07
 
 ## Fixed
