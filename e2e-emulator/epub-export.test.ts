@@ -228,11 +228,14 @@ test('the packaged stylesheet renders correctly with no reading-system defaults'
         );
 
     await render('glossary.xhtml');
+    // Classed paragraphs rather than a definition list: <dt>/<dd> flatten on a
+    // reader that doesn't know them, and <dt> can hold nothing block-level.
     expect(
         await page.evaluate(() => {
-            const term = document.querySelector('dt');
-            const meaning = document.querySelector('dd');
-            if (!term || !meaning) return null;
+            const term = document.querySelector('.term');
+            const meaning = document.querySelector('.meaning');
+            if (!term || !meaning)
+                return `missing ${term ? '.meaning' : '.term'}`;
             return (
                 meaning.getBoundingClientRect().top >=
                 term.getBoundingClientRect().bottom
