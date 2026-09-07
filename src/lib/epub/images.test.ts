@@ -1,6 +1,7 @@
 import { expect, test } from 'vitest';
 import {
     DEFAULT_SIZE,
+    exceedsBudget,
     fitWithin,
     mapWithLimit,
     resolveImageURL,
@@ -142,4 +143,30 @@ test('handles fewer items than the limit', async () => {
 
 test('handles no items at all', async () => {
     expect(await mapWithLimit([], 4, async (n) => n)).toEqual([]);
+});
+
+// The rule that decides whether a crisp original may stay, or has to be
+// resampled even though that can make the file bigger.
+test('tolerates an image just past the budget', () => {
+    // 1600x1200 against Standard's 1280x1720: 1.25x on the long edge. Resizing
+    // line art this close to budget can double its size for no real gain.
+    expect(exceedsBudget(1600, 1200, SIZES.standard)).toBe(false);
+});
+
+test('does not tolerate an image well past the budget', () => {
+    expect(exceedsBudget(900, 900, SIZES.compact)).toBe(true);
+    expect(exceedsBudget(2400, 1600, SIZES.standard)).toBe(true);
+});
+
+test('measures the budget on whichever edge binds', () => {
+    // A panorama busts the width budget while sitting well inside the height.
+    expect(exceedsBudget(3000, 600, SIZES.standard)).toBe(true);
+    // A tall image busts the height budget while sitting inside the width.
+    expect(exceedsBudget(400, 2400, SIZES.compact)).toBe(true);
+});
+
+test('never asks to shrink an image that already fits', () => {
+    for (const size of Object.values(SIZES))
+        expect(exceedsBudget(size.maxWidth, size.maxHeight, size)).toBe(false);
+    expect(exceedsBudget(100, 100, SIZES.compact)).toBe(false);
 });

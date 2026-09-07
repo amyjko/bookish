@@ -81,6 +81,26 @@ export function fitWithin(
     };
 }
 
+/**
+ * How far past a budget an image may sit before it is shrunk even when its
+ * original encoding is smaller. Just over the budget is tolerated so a crisp
+ * original is not traded for a bigger resampled one; well past it is not,
+ * because the decode has to fit in the reader's memory.
+ */
+export const OVERSIZE_TOLERANCE = 1.5;
+
+/** Whether an image is far enough past a budget that it must be shrunk. */
+export function exceedsBudget(
+    width: number,
+    height: number,
+    size: ImageSize,
+): boolean {
+    return (
+        Math.max(width / size.maxWidth, height / size.maxHeight) >
+        OVERSIZE_TOLERANCE
+    );
+}
+
 /** A packaged image, ready to be added to the archive. */
 export type PreparedImage = {
     bytes: Uint8Array;
@@ -145,22 +165,30 @@ export async function prepareImage(
     if (mediaType === 'image/svg+xml') return passThrough(bytes, mediaType);
 
     const reencoded = await reencode(bytes, mediaType, size);
-    // Keep whichever is smaller: re-encoding an already-small PNG can inflate
-    // it, and the point of the exercise is a smaller file.
-    return reencoded !== undefined && reencoded.bytes.length < bytes.length
-        ? reencoded
+    if (reencoded === undefined) return passThrough(bytes, mediaType);
+
+    // Keep whichever is smaller, since re-encoding can inflate a file: resizing
+    // a diagram resamples its hairlines into shades of grey, and the result can
+    // be larger than the crisp original. But an image far past the budget is
+    // shrunk regardless, because decoding it costs a small reader memory it may
+    // not have, and a few extra kilobytes are the cheaper price.
+    const { oversize, ...prepared } = reencoded;
+    return oversize || prepared.bytes.length < bytes.length
+        ? prepared
         : passThrough(bytes, mediaType);
 }
 
 /**
- * Draw the image at its budgeted size and encode it as JPEG. Returns undefined
- * if the platform lacks the canvas APIs or the bytes don't decode.
+ * Draw the image at its budgeted size and encode it, reporting whether the
+ * original was far enough past the budget that it must be shrunk regardless of
+ * size. Returns undefined if the platform lacks the canvas APIs or the bytes
+ * don't decode.
  */
 async function reencode(
     bytes: Uint8Array,
     mediaType: string,
     size: ImageSize,
-): Promise<PreparedImage | undefined> {
+): Promise<(PreparedImage & { oversize: boolean }) | undefined> {
     if (
         typeof createImageBitmap === 'undefined' ||
         typeof document === 'undefined'
@@ -190,20 +218,42 @@ async function reencode(
             CanvasRenderingContext2D | OffscreenCanvasRenderingContext2D | null;
         if (context === null) return undefined;
 
-        // White underneath, so transparency doesn't become black in a JPEG.
-        context.fillStyle = '#ffffff';
-        context.fillRect(0, 0, width, height);
         context.drawImage(bitmap, 0, 0, width, height);
-
         if (size.grayscale) desaturate(context, width, height);
 
-        const blob = await toBlob(canvas, size.quality);
-        if (blob === null) return undefined;
+        // PNG first, while any transparency is still intact.
+        const png = await toBlob(canvas, 'image/png');
+
+        // Then white behind what is already drawn, because a JPEG has no alpha
+        // and transparent areas would otherwise come out black.
+        context.globalCompositeOperation = 'destination-over';
+        context.fillStyle = '#ffffff';
+        context.fillRect(0, 0, width, height);
+        context.globalCompositeOperation = 'source-over';
+        const jpeg = await toBlob(canvas, 'image/jpeg', size.quality);
+
+        const candidates: PreparedImage[] = [];
+        if (jpeg !== null)
+            candidates.push({
+                bytes: new Uint8Array(await jpeg.arrayBuffer()),
+                extension: 'jpg',
+                mediaType: 'image/jpeg',
+            });
+        if (png !== null)
+            candidates.push({
+                bytes: new Uint8Array(await png.arrayBuffer()),
+                extension: 'png',
+                mediaType: 'image/png',
+            });
+        if (candidates.length === 0) return undefined;
 
         return {
-            bytes: new Uint8Array(await blob.arrayBuffer()),
-            extension: 'jpg',
-            mediaType: 'image/jpeg',
+            // Whichever encoding came out smaller: JPEG wins on photographs,
+            // PNG on the flat colors and hairlines of a diagram.
+            ...candidates.reduce((a, b) =>
+                b.bytes.length < a.bytes.length ? b : a,
+            ),
+            oversize: exceedsBudget(bitmap.width, bitmap.height, size),
         };
     } catch {
         return undefined;
@@ -226,12 +276,13 @@ function makeCanvas(
 
 function toBlob(
     canvas: OffscreenCanvas | HTMLCanvasElement,
-    quality: number,
+    type: 'image/jpeg' | 'image/png',
+    quality?: number,
 ): Promise<Blob | null> {
     return 'convertToBlob' in canvas
-        ? canvas.convertToBlob({ type: 'image/jpeg', quality })
+        ? canvas.convertToBlob({ type, quality }).catch(() => null)
         : new Promise((resolve) =>
-              canvas.toBlob((blob) => resolve(blob), 'image/jpeg', quality),
+              canvas.toBlob((blob) => resolve(blob), type, quality),
           );
 }
 
