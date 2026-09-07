@@ -1,5 +1,7 @@
 import { expect, test } from '@playwright/test';
-import { readFileSync } from 'node:fs';
+import { mkdtempSync, readFileSync } from 'node:fs';
+import { tmpdir } from 'node:os';
+import { join } from 'node:path';
 import { execFileSync } from 'node:child_process';
 import { captureErrors, expectNoCycles, seedBook, signIn } from './helpers';
 import config from '../playwright.emulator.config';
@@ -165,6 +167,107 @@ test('a smaller image preset produces a smaller image', async ({
     // it must come out clearly smaller -- which also proves the size menu is
     // wired to the encoder rather than reusing a stale build.
     expect(compact).toBeLessThan(large);
+
+    expectNoCycles(errors);
+});
+
+/**
+ * Small e-readers often have almost no default stylesheet, so anything the
+ * packaged CSS leaves unsaid is left unrendered. An XTeink X3 ran glossary
+ * terms straight into their definitions for exactly that reason. This strips
+ * the browser's own defaults and checks the packaged stylesheet stands alone.
+ */
+test('the packaged stylesheet renders correctly with no reading-system defaults', async ({
+    page,
+}, testInfo) => {
+    const errors = captureErrors(page);
+    const uid = await signIn(page, 'epubcss@example.com');
+    await seedBook(uid, 'epubcss', {
+        title: 'CSS Book',
+        chapters: [
+            {
+                id: 'one',
+                title: 'One',
+                text: '# A header\n\nText with `code`js.\n\n1. First\n\n2. Second',
+            },
+        ],
+        glossary: {
+            bug: {
+                phrase: 'bug',
+                definition: 'A defect in software.',
+                synonyms: [],
+            },
+        },
+    });
+
+    await page.goto('/write/epubcss/1', { waitUntil: 'domcontentloaded' });
+    await expect(page.locator('.epub')).toBeVisible({ timeout: 20000 });
+
+    const epub = testInfo.outputPath('css.epub');
+    await download(page, 'standard', epub);
+
+    const unpacked = mkdtempSync(join(tmpdir(), 'epub-css-'));
+    execFileSync('unzip', ['-q', '-o', epub, '-d', unpacked]);
+    const read = (name: string) =>
+        readFileSync(join(unpacked, 'OEBPS', name), 'utf8');
+    const stylesheet = read('style.css');
+
+    // Everything a reading system would normally supply, removed.
+    const strip = `* { display: inline; font-size: inherit; font-family: inherit;
+        font-weight: inherit; font-style: inherit; list-style: none; margin: 0;
+        padding: 0; border: 0; vertical-align: baseline; white-space: normal;
+        border-collapse: separate; }`;
+    const render = async (name: string) =>
+        page.setContent(
+            read(name)
+                .replace(/<link rel="stylesheet"[^>]*>/, '')
+                .replace(
+                    '</head>',
+                    `<style>${strip}</style><style>${stylesheet}</style></head>`,
+                ),
+        );
+
+    await render('glossary.xhtml');
+    expect(
+        await page.evaluate(() => {
+            const term = document.querySelector('dt');
+            const meaning = document.querySelector('dd');
+            if (!term || !meaning) return null;
+            return (
+                meaning.getBoundingClientRect().top >=
+                term.getBoundingClientRect().bottom
+            );
+        }),
+        'a glossary term and its definition ran together',
+    ).toBe(true);
+
+    await render('one.xhtml');
+    const chapter = await page.evaluate(() => {
+        const size = (selector: string) => {
+            const element = document.querySelector(selector);
+            return element
+                ? parseFloat(getComputedStyle(element).fontSize)
+                : null;
+        };
+        const list = document.querySelector('ol');
+        const code = document.querySelector('code');
+        return {
+            heading: size('h2'),
+            paragraph: size('p'),
+            codeFamily: code ? getComputedStyle(code).fontFamily : null,
+            listType: list ? getComputedStyle(list).listStyleType : null,
+            listPosition: list
+                ? getComputedStyle(list).listStylePosition
+                : null,
+        };
+    });
+
+    // Headings were all one size on the device; code was not monospace; an
+    // ordered list came out bulleted; wrapped list items didn't hang.
+    expect(chapter.heading).toBeGreaterThan(chapter.paragraph as number);
+    expect(chapter.codeFamily).toContain('monospace');
+    expect(chapter.listType).toBe('decimal');
+    expect(chapter.listPosition).toBe('outside');
 
     expectNoCycles(errors);
 });

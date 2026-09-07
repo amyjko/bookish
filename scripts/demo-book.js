@@ -207,6 +207,95 @@ A table whose cells carry formatting:
 Formatting inside cells.`,
     },
     {
+        // A checklist chapter: every line states what it should look like, so
+        // a pass on a real device is a matter of reading down the page. Each
+        // item here corresponds to something that was actually broken once.
+        id: 'device',
+        title: 'What You Should See',
+        section: 'Part Three: Checking',
+        numbered: true,
+        forthcoming: false,
+        authors: [],
+        image: null,
+        text: `Read this on the device you care about. Every line says what it should look like; anything that doesn't match is a bug worth reporting.
+
+# Headings should get smaller
+
+The heading above this line is the largest. The three below should each be visibly smaller than the one before it, and all of them larger and bolder than this paragraph.
+
+## Second level
+
+### Third level
+
+#### Fourth level
+
+# Code should be monospace
+
+This sentence ends with inline code, which should be in a monospaced face, clearly different from the prose around it: \`const answer = 42\`js
+
+The block below should also be monospaced, and should keep its indentation:
+
+\`python
+def fits(width, height):
+    return width, height
+\`It should have this caption underneath.
+
+# Lists should be marked correctly
+
+This list should show bullets, not numbers:
+
+* First bullet
+
+* This item is deliberately long enough to wrap onto a second line. That second line should line up with the text above it, not tuck back underneath the bullet.
+
+A paragraph, because two adjacent lists become one.
+
+1. This list should read one,
+
+2. two,
+
+3. and three, as digits, not as bullets.
+
+# Emphasis should be distinguishable
+
+This sentence has *bold text*, _italic text_, and ^superscript^ with ^vsubscript^, each of which should look different from the plain words around it.
+
+# Notes and references should link
+
+This sentence has a footnote{it should sit at the end of this chapter, with a marker you can follow back} and a citation<ko2020>. Both markers should be raised and small, and both should be tappable, taking you to the end of this chapter and to the references.
+
+A ~bug~bug here should be tappable too, and should take you to the glossary. In the glossary, each term should be bold and on its own line, with its definition beneath it, and a blank line before the next term.
+
+# Tables should be tables
+
+The cells below should form a grid with visible rules, not run together as a paragraph of text.
+
+,Should be a header|And so should this
+,A cell|Another cell
+,A third|A fourth
+This caption should sit with the table.
+
+# Figures should be centered
+
+The image below should be centered, scaled to fit the screen, with its caption underneath and its credit under that in italics.
+
+|logo.svg|A circle and a triangle above a line.|This caption belongs to the figure.|And this is the credit|
+
+# Quotes and callouts should be set apart
+
+"
+This quotation should be indented from both sides and set in italics, with its credit underneath.
+"Someone Quotable
+
+=
+This callout should be set apart from the prose, with a rule down its left side.
+=
+
+-
+
+The rule above should be a short centered line, and this last paragraph should sit below it.`,
+    },
+    {
         id: 'unnumbered',
         title: 'An Unnumbered Chapter',
         section: undefined,

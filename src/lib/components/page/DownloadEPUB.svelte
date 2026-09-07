@@ -3,8 +3,6 @@
     import { getBase, getEdition } from './Contexts';
     import { buildEPUB, type BuildProgress } from '$lib/epub/build';
     import { DEFAULT_SIZE, SIZES } from '$lib/epub/images';
-    import Feedback from '../app/Feedback.svelte';
-    import Button from '../app/Button.svelte';
 
     let edition = getEdition();
     let base = getBase();
@@ -82,27 +80,36 @@
     <div class="epub">
         <label>
             Image size
-            <select
-                value={sizeID}
-                disabled={building}
-                onchange={(event) => chooseSize(event.currentTarget.value)}
-            >
-                {#each Object.values(SIZES) as size}
-                    <option value={size.id}>{size.label}</option>
-                {/each}
-            </select>
+            <!-- The wrapper carries the disclosure arrow: turning off native
+                 appearance to get the book's font also removes the browser's. -->
+            <span class="select">
+                <select
+                    value={sizeID}
+                    disabled={building}
+                    onchange={(event) => chooseSize(event.currentTarget.value)}
+                >
+                    {#each Object.values(SIZES) as size}
+                        <option value={size.id}>{size.label}</option>
+                    {/each}
+                </select>
+            </span>
         </label>
-        <Button
-            tooltip="Build an EPUB of this book to read on an e-reader"
+        <!-- A plain button rather than the app's, whose --app-* variables are
+             only defined in the (app) layout, so it renders unstyled here and
+             in books compiled by bookish-reader. -->
+        <button
+            type="button"
+            title="Build an EPUB of this book to read on an e-reader"
+            aria-label="Build an EPUB of this book to read on an e-reader"
             disabled={building}
-            command={build}>↓ EPUB</Button
+            onclick={build}>↓ EPUB</button
         >
     </div>
 
     {#if error}
-        <Feedback error>{error}</Feedback>
+        <p class="message error" role="alert">{error}</p>
     {:else if status}
-        <Feedback>{status}</Feedback>
+        <p class="message" role="status" aria-live="polite">{status}</p>
     {:else if url}
         <!-- Rendered only once the blob exists, so this link is never present
              in prerendered HTML for SvelteKit's crawler to follow. -->
@@ -121,6 +128,11 @@
 {/if}
 
 <style>
+    /* Everything here is drawn with the book's own --bookish-* variables, which
+       are defined on the .bookish ancestor in Edition.svelte and so are in
+       scope in both the app and in books compiled by bookish-reader. The
+       --app-* chrome variables are not: they exist only in the (app) layout. */
+
     .epub {
         display: flex;
         flex-direction: row;
@@ -133,26 +145,108 @@
     label {
         display: inline-flex;
         align-items: center;
-        gap: 0.25em;
+        gap: 0.5em;
         font-family: var(--bookish-paragraph-font-family);
         font-size: var(--bookish-small-font-size);
+        color: var(--bookish-muted-color);
     }
 
-    /* Styled without the --app-* variables, which aren't defined in books
-       compiled by bookish-reader. */
+    .select {
+        position: relative;
+        display: inline-block;
+    }
+
+    /* The disclosure arrow, in place of the native one. It inherits the text
+       color, so it follows the theme into dark mode. */
+    .select::after {
+        content: '▾';
+        position: absolute;
+        right: 0.6em;
+        top: 50%;
+        transform: translateY(-50%);
+        pointer-events: none;
+        font-size: 0.9em;
+        color: var(--bookish-paragraph-color);
+    }
+
+    /* A <select> is a native menulist, and WebKit renders its face in the
+       system font whatever the cascade says until appearance is turned off. */
     select {
-        font: inherit;
-        padding: 0.2em;
-        max-width: 16em;
+        appearance: none;
+        -webkit-appearance: none;
+        font-family: var(--bookish-paragraph-font-family);
+        font-size: var(--bookish-small-font-size);
+        font-weight: var(--bookish-paragraph-font-weight);
+        color: var(--bookish-paragraph-color);
+        background: var(--bookish-block-background-color);
+        border: 1px solid var(--bookish-border-color-light);
+        border-radius: var(--bookish-roundedness);
+        padding: var(--bookish-inline-padding);
+        padding-right: 2em;
+        max-width: 18em;
     }
 
-    .ready {
+    button {
         font-family: var(--bookish-paragraph-font-family);
+        font-size: var(--bookish-small-font-size);
+        font-weight: var(--bookish-bold-font-weight);
+        color: var(--bookish-link-color);
+        background: var(--bookish-block-background-color);
+        border: 1px solid var(--bookish-border-color-light);
+        border-radius: var(--bookish-roundedness);
+        padding: var(--bookish-inline-padding)
+            calc(var(--bookish-inline-padding) * 3);
+        cursor: pointer;
+    }
+
+    button:hover:not(:disabled) {
+        border-color: var(--bookish-highlight-color);
+    }
+
+    /* focus-visible, so a mouse click doesn't leave the ring behind while
+       keyboard users still get one. */
+    select:focus-visible,
+    button:focus-visible {
+        outline: none;
+        border-color: var(--bookish-highlight-color);
+        box-shadow: 0 0 0 2px var(--bookish-highlight-color);
+    }
+
+    select:disabled,
+    button:disabled {
+        opacity: 0.5;
+        cursor: auto;
+    }
+
+    .message,
+    .ready,
+    .warnings {
+        font-family: var(--bookish-paragraph-font-family);
+        line-height: var(--bookish-paragraph-line-height);
+    }
+
+    .message {
+        color: var(--bookish-muted-color);
+    }
+
+    .error {
+        color: var(--bookish-error-color);
+    }
+
+    /* Matches a book link, from components/Link.svelte. */
+    .ready a {
+        color: var(--bookish-link-color);
+        font-weight: var(--bookish-link-font-weight);
+        text-decoration: none;
+    }
+
+    .ready a:hover {
+        text-decoration: underline;
     }
 
     .warnings {
-        font-family: var(--bookish-paragraph-font-family);
         font-size: var(--bookish-small-font-size);
         font-style: italic;
+        color: var(--bookish-muted-color);
     }
 </style>

@@ -140,7 +140,7 @@
     }
 
     .file-upload {
-        font-family: var(--bookish-app-font);
+        font-family: var(--app-font);
         font-size: var(--app-chrome-font-size);
     }
 

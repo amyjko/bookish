@@ -151,7 +151,7 @@
         .token.char,
         .token.builtin,
         .token.inserted {
-            color: var(--bookish-pragraph-color);
+            color: var(--bookish-paragraph-color);
         }
 
         .token.operator,

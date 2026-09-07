@@ -167,7 +167,7 @@
 <style>
     .query {
         font-family: var(--bookish-header-font-family);
-        font-size: var(--bookish-header-font-size);
+        font-size: var(--bookish-header-1-font-size);
         border: none;
         border-bottom: 3px solid var(--bookish-border-color-light);
         padding: var(--bookish-inline-padding);

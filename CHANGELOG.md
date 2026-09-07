@@ -1,5 +1,21 @@
 # bookish changelog
 
+# 0.9.1 - 2026-09-07
+
+## Fixed
+
+- EPUB rendering on e-readers with a minimal default stylesheet. The packaged stylesheet was written on the assumption that the reading system supplies sensible defaults for anything it doesn't mention, which holds on Apple Books and Calibre but not on smaller devices. Testing on an XTeink X3 running Crosspoint firmware found inline code rendering in the prose font, every heading level at the same size, ordered lists showing bullets, wrapped list items not hanging, and glossary terms running straight into their definitions. None of those were device limitations: the firmware applies our CSS faithfully, so each was simply a property we never wrote. The stylesheet now states the whole baseline — a `display` for every element the serializer can emit (including the tables, which would have collapsed into inline text next), an explicit `em` scale and weight for `h1`–`h6`, `monospace` for code, `list-style-type` and `list-style-position: outside` for lists, and block rules for `dl`/`dt`/`dd`. Prose still sets no typeface and no absolute size, so the reader's own choices continue to govern.
+- Four `var(--bookish-…)` references that named variables the theme never emits, so the declaration was silently dropped and the element rendered unstyled: a `pragraph` typo in `Code.svelte`'s Prism colors, `--bookish-app-font` for what is app chrome in `EmbedEditor.svelte`, `--bookish-border-color` (only `-light` and `-bold` exist) in `Rows.svelte`, and `--bookish-header-font-size` (only the numbered levels exist) in `Search.svelte`.
+
+## Changed
+
+- The EPUB export UI on the table of contents is drawn with the book's own theme rather than app chrome. The size menu previously rendered in the OS system font — a `<select>` is a native menulist, and WebKit ignores an author `font-family` until `appearance` is turned off — and the download link fell through to the browser's default color because the reader defines no global link rule. The button and the progress and error messages came from `components/app/`, whose `--app-*` variables are only defined in the `(app)` layout, so on reader routes and in books compiled by `bookish-reader` they rendered unstyled; they are now plain elements styled with `--bookish-*`, keeping their `aria-label`, `role="status"` and `role="alert"` semantics.
+
+## Added
+
+- A device-check chapter in the demo book: one page stating what each construct should look like, so a pass on a real e-reader is a matter of reading down the page. Every bug above would have been caught on one screen.
+- Tests pinning all of it. A stylesheet contract test derives the element list from the serializer's own output rather than hardcoding it, so a future node type that emits a new element fails until the stylesheet covers it — it named all 28 unstyled elements when run against 0.9.0. An end-to-end test downloads a real EPUB, strips the browser's default stylesheet, and asserts the packaged CSS stands on its own: that a glossary term and its definition land on separate lines, that headings outsize body text, that code is monospace, and that ordered lists are decimal and hang. And a test scans every component for `--bookish-` variables the theme doesn't define, which is what found the four above.
+
 # 0.9.0 - 2026-09-07
 
 ## Added

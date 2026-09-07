@@ -34,29 +34,72 @@ export const CONTAINER = `<?xml version="1.0" encoding="utf-8"?>
 </container>`;
 
 /**
- * A deliberately plain stylesheet.
+ * The packaged stylesheet.
  *
- * The book's own theme is not carried across: it imports Google Fonts an
- * offline reader can't fetch, and encodes color an e-ink panel can't show.
- * Readers set their own font and size on these devices, and overriding that is
- * the single most common way an EPUB becomes unpleasant to read. So this sets
- * layout and rhythm only, in relative units, and leaves typeface and size alone.
+ * Two rules govern it. First, it sets no typeface and no absolute size for
+ * prose: e-reader users choose their own, and overriding that is the most
+ * common way an EPUB becomes unpleasant to read. (Code is the one exception --
+ * code that doesn't look like code is just wrong.) The book's own theme is not
+ * carried across either, since it imports fonts an offline reader can't fetch
+ * and encodes color e-ink can't show.
+ *
+ * Second, and learned the hard way on an XTeink X3: it assumes the reading
+ * system has *no* default stylesheet. Small readers often have barely any, so
+ * anything left unsaid is left unrendered -- headings came out all one size,
+ * ordered lists came out bulleted, and a definition list ran together into a
+ * paragraph. Every element the serializer can emit is given its display,
+ * spacing and emphasis here rather than being assumed. The contract test in
+ * stylesheet.test.ts derives that element list from the serializer itself, so
+ * a new node type that emits a new element fails until this file covers it.
  */
-export const STYLESHEET = `body { margin: 0 5%; line-height: 1.5; widows: 2; orphans: 2; }
+export const STYLESHEET = `/* Reading systems with a minimal default stylesheet render unknown elements
+   inline, so every block element states that it is one. */
+article, aside, details, div, dl, dd, dt, figcaption, figure, footer,
+header, hgroup, main, nav, section, blockquote, p, h1, h2, h3, h4, h5, h6,
+hr, ol, ul, pre { display: block; }
+li { display: list-item; }
+table { display: table; }
+thead { display: table-header-group; }
+tbody { display: table-row-group; }
+tr { display: table-row; }
+th, td { display: table-cell; }
+caption { display: table-caption; }
 
-h1, h2, h3, h4, h5, h6 { line-height: 1.2; page-break-after: avoid; break-after: avoid; }
-h1 { margin: 2em 0 1em; }
+body { margin: 0 5%; line-height: 1.5; widows: 2; orphans: 2; }
+
+/* An explicit scale, in em so the reader's chosen size still governs. Without
+   it a reader with no defaults renders every level at body size. */
+h1, h2, h3, h4, h5, h6 {
+    font-weight: bold;
+    line-height: 1.2;
+    margin: 1.2em 0 0.6em;
+    page-break-after: avoid;
+    break-after: avoid;
+}
+h1 { font-size: 1.6em; margin: 2em 0 1em; }
+h2 { font-size: 1.35em; }
+h3 { font-size: 1.2em; }
+h4 { font-size: 1.1em; }
+h5 { font-size: 1em; }
+h6 { font-size: 0.9em; }
 
 p { margin: 0; text-indent: 1.2em; }
 /* The first paragraph of a section is not a continuation, so it isn't indented. */
-p.first, h1 + p, h2 + p, h3 + p, h4 + p, blockquote p:first-child, li > p:first-child { text-indent: 0; }
+p.first, h1 + p, h2 + p, h3 + p, h4 + p, h5 + p, h6 + p,
+blockquote p:first-child, li > p:first-child { text-indent: 0; }
+
+strong { font-weight: bold; }
+em { font-style: italic; }
+sup { vertical-align: super; font-size: 0.75em; line-height: 0; }
+sub { vertical-align: sub; font-size: 0.75em; line-height: 0; }
+a { text-decoration: underline; }
 
 .chapter-number { display: block; margin-bottom: 0.5em; text-transform: uppercase; letter-spacing: 0.1em; font-size: 0.8em; }
 .section-name { display: block; font-style: italic; }
-.authors { font-style: italic; }
+.authors { display: block; font-style: italic; }
 
 figure { margin: 1.5em 0; text-align: center; page-break-inside: avoid; break-inside: avoid; }
-figure img { max-width: 100%; }
+img { max-width: 100%; }
 figcaption { font-size: 0.85em; text-align: left; margin-top: 0.5em; }
 .credit { display: block; font-style: italic; }
 .missing-image figcaption { text-align: center; font-style: italic; }
@@ -68,25 +111,44 @@ cite { font-style: normal; font-size: 0.85em; }
 .callout { margin: 1.5em 1em; padding-left: 1em; border-left: 3px solid currentColor; }
 .callout p { text-indent: 0; }
 
+/* The one place a family is set: monospace is what distinguishes code from
+   prose, and without it the two are indistinguishable. */
+pre, code, pre code, kbd, samp { font-family: monospace; }
 pre { font-size: 0.8em; white-space: pre-wrap; overflow-wrap: break-word; margin: 1.5em 0; }
 code { font-size: 0.9em; }
 
 table { border-collapse: collapse; margin: 1.5em auto; font-size: 0.9em; }
 th, td { border: 1px solid currentColor; padding: 0.3em 0.5em; text-align: left; }
+th { font-weight: bold; }
 caption { font-size: 0.85em; margin-bottom: 0.5em; }
 
-ul, ol { margin: 1em 0; padding-left: 1.5em; }
+/* Outside, so a wrapped item hangs with its text aligned rather than tucking
+   under the marker. Types are stated because a reader with no defaults numbers
+   nothing, and mirror how the web reader nests them. */
+ul, ol { margin: 1em 0; padding-left: 1.5em; list-style-position: outside; }
+ul { list-style-type: disc; }
+ul ul { list-style-type: circle; }
+ul ul ul { list-style-type: square; }
+ol { list-style-type: decimal; }
+ol ol { list-style-type: lower-alpha; }
+ol ol ol { list-style-type: upper-alpha; }
+li { margin-bottom: 0.25em; }
 
 hr { border: 0; border-top: 1px solid currentColor; margin: 2em auto; width: 30%; }
 
 .citation, .noteref { font-size: 0.75em; }
 .notes { margin-top: 3em; font-size: 0.9em; page-break-before: always; break-before: page; }
+.note { margin-bottom: 0.5em; }
 .note p { text-indent: 0; margin-bottom: 0.5em; }
 
-.reference, .definition-entry { margin-bottom: 0.8em; }
+.reference { margin-bottom: 0.8em; }
+
+/* Stated in full because a reader without dl defaults runs the term straight
+   into its definition. */
+dl { margin: 1em 0; }
 dt { font-weight: bold; margin-top: 1em; }
-dd { margin-left: 1em; }
-.synonyms { font-size: 0.85em; font-style: italic; }
+dd { margin: 0.25em 0 0.8em 1.5em; }
+.synonyms { font-size: 0.85em; font-style: italic; margin: 0.25em 0 0; }
 `;
 
 /** One document in the package. */

@@ -33,7 +33,7 @@
     table :global(tr:first-child th) {
         font-weight: bold;
         border: 0;
-        border-bottom: 1px solid var(--bookish-border-color);
+        border-bottom: 1px solid var(--bookish-border-color-light);
     }
 
     table :global(tr:nth-child(even)) {
