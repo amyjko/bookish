@@ -101,7 +101,8 @@ a { text-decoration: underline; }
 figure { margin: 1.5em 0; text-align: center; page-break-inside: avoid; break-inside: avoid; }
 img { max-width: 100%; }
 figcaption { font-size: 0.85em; text-align: left; margin-top: 0.5em; }
-.credit { display: block; font-style: italic; }
+figcaption p { margin: 0; text-indent: 0; }
+.credit { font-style: italic; }
 .missing-image figcaption { text-align: center; font-style: italic; }
 
 blockquote { margin: 1.5em 2em; font-style: italic; }
@@ -121,6 +122,7 @@ table { border-collapse: collapse; margin: 1.5em auto; font-size: 0.9em; }
 th, td { border: 1px solid currentColor; padding: 0.3em 0.5em; text-align: left; }
 th { font-weight: bold; }
 caption { font-size: 0.85em; margin-bottom: 0.5em; }
+caption p { margin: 0; text-indent: 0; }
 
 /* Outside, so a wrapped item hangs with its text aligned rather than tucking
    under the marker. Types are stated because a reader with no defaults numbers
@@ -143,12 +145,12 @@ hr { border: 0; border-top: 1px solid currentColor; margin: 2em auto; width: 30%
 
 .reference { margin-bottom: 0.8em; }
 
-/* Stated in full because a reader without dl defaults runs the term straight
-   into its definition. */
-dl { margin: 1em 0; }
-dt { font-weight: bold; margin-top: 1em; }
-dd { margin: 0.25em 0 0.8em 1.5em; }
-.synonyms { font-size: 0.85em; font-style: italic; margin: 0.25em 0 0; }
+/* The glossary is paragraphs rather than a definition list: see
+   glossaryDocument. Terms and meanings are distinguished by class. */
+.definition { margin-bottom: 1em; }
+.term { font-weight: bold; text-indent: 0; margin-top: 1em; }
+.meaning { text-indent: 0; margin-left: 1.5em; }
+.synonyms { font-size: 0.85em; font-style: italic; text-indent: 0; margin: 0.25em 0 0 1.5em; }
 `;
 
 /** One document in the package. */
@@ -376,28 +378,34 @@ export function glossaryDocument(
     if (ids.length === 0) return undefined;
 
     const header = edition.getHeader('glossary');
+    // Paragraphs rather than a <dl>. Definition lists are poorly supported by
+    // e-readers -- a term and its meaning run together into one paragraph on a
+    // reader that doesn't know <dt>/<dd> -- and <dt> takes only phrasing
+    // content, so there is no way to put a block inside it that would survive.
+    // The semantics are carried by the classes instead.
     const body = `<section epub:type="glossary">
 <h1>${escapeText(header)}</h1>
-<dl>
 ${ids
     .map((id) => {
         const entry = glossary[id];
         const synonyms = entry.synonyms ?? [];
         // The web glossary renders no id, so its anchors don't resolve; here
         // they must, because every definition in the text links to one.
-        return `<dt id="gloss-${escapeAttribute(id)}">${escapeText(
+        return `<div class="definition">
+<p class="term" id="gloss-${escapeAttribute(id)}"><strong>${escapeText(
             entry.phrase,
-        )}</dt><dd>${serializeFormat(
+        )}</strong></p>
+<p class="meaning">${serializeFormat(
             Parser.parseFormat(edition, entry.definition),
             context,
-        )}${
+        )}</p>${
             synonyms.length > 0
-                ? `<p class="synonyms">${escapeText(synonyms.join(', '))}</p>`
+                ? `\n<p class="synonyms">${escapeText(synonyms.join(', '))}</p>`
                 : ''
-        }</dd>`;
+        }
+</div>`;
     })
     .join('\n')}
-</dl>
 </section>`;
 
     return {

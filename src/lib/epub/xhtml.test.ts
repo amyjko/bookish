@@ -153,7 +153,7 @@ test('a table has a header row, a body, and closed rows', () => {
     const out = html(',a|b\n,c|d\nA caption');
     expect(out).toContain('<thead><tr><th>a</th><th>b</th></tr></thead>');
     expect(out).toContain('<tbody><tr><td>c</td><td>d</td></tr></tbody>');
-    expect(out).toContain('<caption>A caption</caption>');
+    expect(out).toContain('<caption><p>A caption</p></caption>');
 });
 
 test('a footnote becomes a linked reference plus an endnote', () => {
@@ -243,8 +243,10 @@ test('an image points at its packaged path', () => {
     });
     const out = html('|photo.jpg|A photo|A caption|A credit|', ctx);
     expect(out).toContain('<img src="images/0.jpg" alt="A photo"/>');
-    expect(out).toContain('<figcaption>A caption');
-    expect(out).toContain('<span class="credit">A credit</span>');
+    // Caption and credit are paragraphs, so they can't run together on a
+    // reader that drops the tags it doesn't know but keeps their contents.
+    expect(out).toContain('<p class="caption">A caption</p>');
+    expect(out).toContain('<p class="credit">A credit</p>');
 });
 
 test('an image that could not be packaged keeps its caption', () => {
@@ -316,11 +318,31 @@ test('a video link is labelled distinctly from its caption', () => {
         '|https://www.youtube.com/embed/abc|A description|A caption||',
     );
     expect(out).toContain('>A description</a>');
-    expect(out).toContain('<figcaption>A caption');
+    expect(out).toContain('<p class="caption">A caption</p>');
     expect(out.match(/A caption/g)).toHaveLength(1);
 });
 
 test('a video link falls back to its URL when it has no description', () => {
     const out = html('|https://www.youtube.com/embed/abc||A caption||');
     expect(out).toContain('>https://www.youtube.com/embed/abc</a>');
+});
+
+test('a code block carries its line breaks as markup', () => {
+    // A reader that ignores `white-space` reflows a <pre> into a paragraph, so
+    // the breaks are carried by <br/> instead of literal newlines. The
+    // newlines are dropped rather than kept alongside, which would double-space
+    // the block on a reader that honours both.
+    const out = html('`\nfirst\nsecond\n`');
+    expect(out).toContain('first<br/>second');
+    expect(out).not.toContain('first\nsecond');
+});
+
+test('a code block keeps its indentation without relying on white-space', () => {
+    const out = html('`python\nif x:\n    return 1\n`');
+    // Leading spaces become non-breaking, so they survive whitespace collapsing.
+    expect(out).toContain('if x:<br/>\u00a0\u00a0\u00a0\u00a0return 1');
+});
+
+test('a code block still escapes markup after the line-break rewrite', () => {
+    expect(html('`\n<script>&\n`')).toContain('&lt;script&gt;&amp;');
 });

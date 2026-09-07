@@ -117,11 +117,16 @@ function block_(node: Node, local: Local): string {
         const caption = inline(node.getCaption(), local);
         // No syntax highlighting: e-ink is greyscale, and the spans would only
         // add weight. The language is kept as a class for readers that style it.
+        // Newlines become <br/> and leading spaces become non-breaking, so
+        // the code keeps its shape on a reader that collapses whitespace
+        // rather than honouring `white-space`. The literal newlines are
+        // dropped rather than kept alongside the <br/>, which would otherwise
+        // double-space the block on a reader that honours both.
         const code = `<pre class="code${
             language && language !== 'plaintext'
                 ? ` language-${escapeAttribute(language)}`
                 : ''
-        }"><code>${escapeText(node.getCode())}</code></pre>`;
+        }"><code>${preformatted(node.getCode())}</code></pre>`;
         return caption.trim().length > 0
             ? `<figure class="code-figure">${code}<figcaption>${caption}</figcaption></figure>`
             : code;
@@ -152,6 +157,21 @@ function block_(node: Node, local: Local): string {
     if (node instanceof CommentNode || node instanceof ErrorNode) return '';
 
     return '';
+}
+
+/**
+ * Escape code for a <pre>, preserving its shape without relying on the reader
+ * honouring `white-space`: line breaks become <br/> and each line's leading
+ * indentation becomes non-breaking spaces.
+ */
+function preformatted(code: string): string {
+    return code
+        .split('\n')
+        .map((line) => {
+            const indent = line.length - line.trimStart().length;
+            return '\u00a0'.repeat(indent) + escapeText(line.slice(indent));
+        })
+        .join('<br/>');
 }
 
 function list(node: ListNode, local: Local): string {
@@ -188,7 +208,7 @@ function table(node: TableNode, local: Local): string {
         )
         .join('');
     return `<table>${
-        caption.trim().length > 0 ? `<caption>${caption}</caption>` : ''
+        caption.trim().length > 0 ? `<caption><p>${caption}</p></caption>` : ''
     }${head}<tbody>${body}</tbody></table>`;
 }
 
@@ -197,11 +217,19 @@ function embed(node: EmbedNode, local: Local): string {
     const credit = inline(node.getCredit(), local);
     const description = escapeAttribute(node.getDescription());
 
+    // The caption and credit are paragraphs rather than a bare string and a
+    // span. Simple readers drop tags they don't know but keep their contents,
+    // so text placed directly inside a <figcaption> runs into whatever follows
+    // it; a <p> is understood almost everywhere and breaks the line.
     const figcaption =
         caption.trim().length > 0 || credit.trim().length > 0
-            ? `<figcaption>${caption}${
+            ? `<figcaption>${
+                  caption.trim().length > 0
+                      ? `<p class="caption">${caption}</p>`
+                      : ''
+              }${
                   credit.trim().length > 0
-                      ? `<span class="credit">${credit}</span>`
+                      ? `<p class="credit">${credit}</p>`
                       : ''
               }</figcaption>`
             : '';

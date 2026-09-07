@@ -1,5 +1,15 @@
 # bookish changelog
 
+# 0.9.2 - 2026-09-07
+
+## Fixed
+
+- Four places where the EPUB put text directly inside an element that simple e-readers don't recognise. Reviewing the [CrossPoint firmware](https://github.com/crosspoint-reader/crosspoint-reader) source explained the pattern: its HTML parser knows exactly five block tags (`p`, `li`, `div`, `br`, `blockquote`) plus `h1`-`h6` and `table`/`tr`/`td`/`th`, and it drops any other tag while keeping its contents. So a caption sitting straight inside a `<figcaption>` ran into the credit after it, a `<pre>` reflowed into a paragraph, a table caption ran into the table, and a glossary term ran into its definition. Figure captions, credits and table captions are now paragraphs; code carries its line breaks as `<br/>` and its indentation as non-breaking spaces rather than depending on `white-space`; and the glossary is classed paragraphs rather than a `<dl>`, since `<dt>` accepts only phrasing content and so cannot hold anything that would survive. Capable readers are unaffected — the packaged CSS still gives all four the same appearance, verified against both a full browser and a model of CrossPoint's renderer.
+
+## Known limitations
+
+- Three things cannot be fixed from our side on CrossPoint-class firmware, confirmed by reading its renderer. Its CSS model ([`CssStyle.h`](https://github.com/crosspoint-reader/crosspoint-reader/blob/master/lib/Epub/Epub/css/CssStyle.h)) has no `font-size` and no `font-family` field at all, so heading levels all render at one size and code cannot be monospaced; and `list-style` appears nowhere in the firmware, because every `<li>` gets a hardcoded bullet with no `<ol>` handling, so ordered lists cannot be numbered. Upstream issues [#291](https://github.com/crosspoint-reader/crosspoint-reader/issues/291) and [#953](https://github.com/crosspoint-reader/crosspoint-reader/issues/953) track two of these. All three render correctly in Apple Books.
+
 # 0.9.1 - 2026-09-07
 
 ## Fixed

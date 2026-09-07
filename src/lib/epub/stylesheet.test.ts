@@ -205,9 +205,6 @@ test('the fixture really does exercise the elements that broke on a device', () 
     // pass while covering nothing.
     const emitted = emittedElements();
     for (const element of [
-        'dl',
-        'dt',
-        'dd',
         'table',
         'thead',
         'tbody',
@@ -268,10 +265,34 @@ test('list markers sit outside, so wrapped items hang', () => {
     expect(STYLESHEET).toMatch(/list-style-position:\s*outside/);
 });
 
-test('a definition term and its definition are separate blocks', () => {
-    for (const element of ['dt', 'dd'])
-        expect(hasDisplayRule(element), `${element} has no display`).toBe(true);
-    expect(STYLESHEET).toMatch(/(^|\n)dt\s*\{[^}]*font-weight:\s*bold/);
-    // Space beneath each definition, so entries don't run together.
-    expect(STYLESHEET).toMatch(/(^|\n)dd\s*\{[^}]*margin/);
+test('a glossary term and its meaning are separate paragraphs', () => {
+    // Definition lists flatten on readers that don't know <dt>/<dd>, and <dt>
+    // takes only phrasing content so nothing block-level can be nested inside
+    // it. The glossary uses classed paragraphs instead.
+    const glossary = glossaryDocument(
+        makeEdition({
+            glossary: {
+                gloss: {
+                    phrase: 'term',
+                    definition: 'A meaning',
+                    synonyms: ['x'],
+                },
+            },
+        }),
+        {
+            edition: makeEdition(),
+            images: new Map(),
+            chapters: new Set(),
+        },
+    )?.content;
+
+    expect(glossary).not.toContain('<dl');
+    expect(glossary).toContain('<p class="term" id="gloss-gloss">');
+    expect(glossary).toContain('<p class="meaning">');
+    // Bold via an element, since font-weight is one of the few properties a
+    // minimal reader honours but the term must survive even without CSS.
+    expect(glossary).toContain('<strong>term</strong>');
+
+    expect(STYLESHEET).toMatch(/\.term\s*\{[^}]*font-weight:\s*bold/);
+    expect(STYLESHEET).toMatch(/\.definition\s*\{[^}]*margin/);
 });
