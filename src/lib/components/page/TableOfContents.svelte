@@ -25,6 +25,7 @@
     } from './Contexts';
     import Muted from './Muted.svelte';
     import Button from '../app/Button.svelte';
+    import DownloadEPUB from './DownloadEPUB.svelte';
     import PageHeader from './PageHeader.svelte';
     import Rows from './Rows.svelte';
     import PageParagraph from './PageParagraph.svelte';
@@ -292,6 +293,21 @@
                 to="{$base}/print">all chapters on a single page</Link
             > and then print or export. Long books can take some time to render.
         </PageParagraph>
+
+        <EditableHeader id="epub" label="Edit e-book header" />
+
+        <Instructions {editable}>
+            This builds an EPUB in the reader's browser. Nothing is uploaded and
+            no server is involved.
+        </Instructions>
+
+        <PageParagraph>
+            Reading on an e-reader? Build an EPUB of this book. Images are
+            shrunk to fit the size you choose, so pick the one closest to your
+            device. Long books with many images can take a minute.
+        </PageParagraph>
+
+        <DownloadEPUB />
 
         <EditableHeader id="citation" label="Edit citation header" />
 

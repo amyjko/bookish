@@ -58,12 +58,15 @@ export default class TextNode extends Node {
     }
 
     toHTML() {
+        // Ampersands are escaped first, or the entities introduced below get
+        // escaped in turn ('<' would become '&amp;lt;'). The flags matter too:
+        // without them only the first occurrence of each character is escaped.
         return this.#text
-            .replace('<', '&lt;')
-            .replace('>', '&gt;')
-            .replace('&', '&amp;')
-            .replace('"', '&quot;')
-            .replace("'", '&#39;');
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#39;');
     }
 
     getChildren() {
