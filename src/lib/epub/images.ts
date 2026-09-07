@@ -136,11 +136,21 @@ export function resolveImageURL(url: string, base: string): string {
 }
 
 /**
+ * How long to wait for a single image before giving up on it. Books link
+ * images on hosts we don't control, and a host that accepts a connection then
+ * never answers would otherwise hang the whole export: with a bounded number
+ * of fetches in flight, a few dead ones stall every remaining image behind
+ * them and the progress indicator sits there forever.
+ */
+const FETCH_TIMEOUT_MS = 20000;
+
+/**
  * Fetch an image and re-encode it to fit the given budget.
  *
  * Returns undefined for anything that can't be fetched or decoded, which is a
- * real possibility: authors may link images on hosts that send no CORS headers.
- * Callers report those as warnings and drop the image, keeping its caption.
+ * real possibility: authors may link images on hosts that send no CORS headers,
+ * or that are simply gone. Callers report those as warnings and drop the image,
+ * keeping its caption.
  */
 export async function prepareImage(
     url: string,
@@ -149,7 +159,12 @@ export async function prepareImage(
     let bytes: Uint8Array;
     let mediaType: string;
     try {
-        const response = await fetch(url);
+        const response = await fetch(url, {
+            signal:
+                typeof AbortSignal !== 'undefined' && 'timeout' in AbortSignal
+                    ? AbortSignal.timeout(FETCH_TIMEOUT_MS)
+                    : undefined,
+        });
         if (!response.ok) return undefined;
         const blob = await response.blob();
         bytes = new Uint8Array(await blob.arrayBuffer());

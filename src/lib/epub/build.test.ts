@@ -307,7 +307,10 @@ test('resolves local image URLs against the book base path', async () => {
     });
     await build(edition, { base: '/ajko/books/test' });
 
-    expect(fetch).toHaveBeenCalledWith('/ajko/books/test/images/photo.jpg');
+    expect(fetch).toHaveBeenCalledWith(
+        '/ajko/books/test/images/photo.jpg',
+        expect.anything(),
+    );
 });
 
 test('leaves a remote image URL alone', async () => {
@@ -316,7 +319,10 @@ test('leaves a remote image URL alone', async () => {
     });
     await build(edition, { base: '/base' });
 
-    expect(fetch).toHaveBeenCalledWith('https://example.com/p.jpg');
+    expect(fetch).toHaveBeenCalledWith(
+        'https://example.com/p.jpg',
+        expect.anything(),
+    );
 });
 
 test('fetches each distinct image once, however often it appears', async () => {
@@ -479,4 +485,42 @@ test('every spine item is present in the archive', async () => {
             entries.has(`OEBPS/${match[1]}`),
             `manifest lists ${match[1]} but it is not in the archive`,
         ).toBe(true);
+});
+
+test('every image fetch carries a timeout', async () => {
+    // Books link images on hosts nobody controls. A host that accepts the
+    // connection and then never answers used to hang the whole export: fetches
+    // run a few at a time, so the dead ones block everything behind them and
+    // the progress indicator sits there forever. A failed or timed-out fetch is
+    // reported and dropped like any other, which the 404 case above covers.
+    const edition = makeEdition({
+        chapters: [chapter('one', 'One', '|photo.jpg|Alt|||')],
+    });
+    await build(edition);
+
+    const options = vi.mocked(fetch).mock.calls[0]?.[1] as
+        { signal?: AbortSignal } | undefined;
+    expect(options?.signal, 'the image fetch has no timeout').toBeInstanceOf(
+        AbortSignal,
+    );
+});
+
+test('a reference whose fields are not strings still exports', async () => {
+    // Real books predate the current types: years are often integers and URLs
+    // are often null, though Reference declares both as strings. One stale
+    // field used to throw partway through and lose the entire export.
+    const edition = makeEdition({
+        chapters: [chapter('one', 'One', 'A claim<old>.')],
+        references: {
+            // year as a number, url as null, summary missing.
+            old: ['Plato', -370, 'The Republic', 'Athens', null],
+        },
+    });
+    const { result, entries } = await build(edition);
+
+    expect(result.blob.size).toBeGreaterThan(0);
+    const references = textOf(entries, 'OEBPS/references.xhtml');
+    expect(references).toContain('Plato');
+    expect(references).toContain('-370');
+    expect(references).toContain('The Republic');
 });

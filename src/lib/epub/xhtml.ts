@@ -36,16 +36,25 @@ import RuleNode from '../models/chapter/RuleNode';
 import TableNode from '../models/chapter/TableNode';
 import TextNode from '../models/chapter/TextNode';
 
-/** Escape text content. Order matters: ampersands first, or we escape our own escapes. */
-export function escapeText(text: string): string {
-    return text
+/**
+ * Escape text content. Order matters: ampersands first, or we escape our own
+ * escapes.
+ *
+ * The argument is deliberately `unknown`. Book data is JSON that predates the
+ * current types and is only loosely validated, so fields the model declares as
+ * strings arrive as numbers or null in real books -- reference years in
+ * particular. Coercing here keeps one stale field from throwing partway through
+ * an export and losing the whole book.
+ */
+export function escapeText(text: unknown): string {
+    return String(text ?? '')
         .replace(/&/g, '&amp;')
         .replace(/</g, '&lt;')
         .replace(/>/g, '&gt;');
 }
 
 /** Escape an attribute value, which additionally must not close its own quotes. */
-export function escapeAttribute(value: string): string {
+export function escapeAttribute(value: unknown): string {
     return escapeText(value).replace(/"/g, '&quot;').replace(/'/g, '&#39;');
 }
 
@@ -237,7 +246,7 @@ function embed(node: EmbedNode, local: Local): string {
     // Video embeds are iframes on the web, which EPUB has no equivalent for, so
     // offer the link instead of silently dropping the content.
     if (node.isVideo()) {
-        const url = escapeAttribute(node.getURL());
+        const url = escapeAttribute(safeURL(node.getURL()));
         // The caption belongs to the figure, so the link is labelled with the
         // description instead; using the caption for both printed it twice.
         const label =
@@ -318,8 +327,26 @@ export function chapterPath(chapterID: string): string {
     return `${chapterID}.xhtml`;
 }
 
+/**
+ * Clean up a URL taken from book text.
+ *
+ * Two things come out of real books. Bookdown escapes punctuation with a
+ * backslash and authors write those inside URLs ("medium\\.com"), which the
+ * parser keeps verbatim. And an unclosed link swallows whatever follows it,
+ * so the address ends up containing spaces and brackets. Neither is a valid
+ * URL, and epubcheck rejects both -- which would make the whole book invalid
+ * over one typo, so the characters are encoded rather than passed through.
+ */
+function safeURL(url: string): string {
+    return url
+        .replace(/\\(.)/g, '$1')
+        .replace(/[ "<>`{}|\\^\[\]]/g, (character) =>
+            encodeURIComponent(character),
+        );
+}
+
 function link(node: LinkNode, local: Local): string {
-    const url = node.getMeta();
+    const url = safeURL(node.getMeta());
     const content = escapeText(node.getText().getText());
 
     if (url.startsWith('http'))

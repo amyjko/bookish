@@ -346,3 +346,21 @@ test('a code block keeps its indentation without relying on white-space', () => 
 test('a code block still escapes markup after the line-break rewrite', () => {
     expect(html('`\n<script>&\n`')).toContain('&lt;script&gt;&amp;');
 });
+
+test('a link URL carrying Bookdown escapes is unescaped', () => {
+    // Authors write escaped punctuation inside URLs; the parser keeps a link's
+    // address verbatim, and a backslash is never valid in one. epubcheck
+    // rejects it as a bad path segment delimiter.
+    expect(html('[text|https://medium\\.com/a-post]')).toContain(
+        'href="https://medium.com/a-post"',
+    );
+});
+
+test('an unclosed link cannot make the whole book invalid', () => {
+    // A missing ']' swallows what follows into the address. The link is wrong
+    // either way, but the characters are encoded so the document stays valid
+    // rather than the typo making the book unopenable.
+    const out = html('[text|https://example.com/a b, [other|https://x.com]');
+    expect(out).not.toMatch(/href="[^"]* [^"]*"/);
+    expect(xmlErrorIn(document_('T', out))).toBeUndefined();
+});

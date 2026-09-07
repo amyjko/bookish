@@ -329,7 +329,9 @@ function referenceContent(
     const period = reference.title.trim().endsWith('?') ? '' : '.';
     return `${escapeText(reference.authors)} (${escapeText(reference.year)}). ${
         reference.url
-            ? `<a href="${escapeAttribute(reference.url)}">${title}</a>`
+            ? `<a href="${escapeAttribute(
+                  encodeURI(String(reference.url)),
+              )}">${title}</a>`
             : title
     }${period} <em>${escapeText(reference.source)}</em>${
         reference.summary ? ` ${escapeText(reference.summary)}` : ''
