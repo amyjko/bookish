@@ -97,21 +97,18 @@
                 $edition ? edition.set($edition.withTitle(text)) : undefined}
         >
             {#snippet before()}
-                    
-                    {#if editable}
-                        <SubdomainEditor />
-                    {/if}
-                
-                    {/snippet}
+                {#if editable}
+                    <SubdomainEditor />
+                {/if}
+            {/snippet}
             {#snippet outline()}
-                        <Outline
-                    
+                <Outline
                     previous={null}
                     next={$edition.getNextChapterID('', editable)}
                 />
-                    {/snippet}
+            {/snippet}
             {#snippet after()}
-                        <div >
+                <div>
                     <Authors
                         editable={isBookEditable()}
                         authors={$edition.getAuthors()}
@@ -121,7 +118,9 @@
                                 : undefined}
                         edit={(index, text) =>
                             $edition
-                                ? edition.set($edition.withAuthorName(index, text))
+                                ? edition.set(
+                                      $edition.withAuthorName(index, text),
+                                  )
                                 : undefined}
                         remove={(index) =>
                             $edition
@@ -131,7 +130,7 @@
                     />
                     <Note>{$edition.getEditionLabel()} edition</Note>
                 </div>
-                    {/snippet}
+            {/snippet}
         </Header>
 
         <Instructions {editable}>
@@ -143,8 +142,8 @@
 
         <Instructions {editable}>
             This will appear on the <Link to="/read">book browsing</Link>
-            page and in your table of contents. Write an informative description
-            of what your book is about.
+            page and in your table of contents. Write an informative description of
+            what your book is about.
         </Instructions>
 
         <Instructions {editable}>
@@ -196,7 +195,7 @@
                     forthcoming={chapter.isForthcoming()}
                 >
                     {#snippet annotation()}
-                                        <span >
+                        <span>
                             {#if editable}
                                 <TextEditor
                                     label={'Chapter section editor'}
@@ -215,9 +214,9 @@
                                 You can edit this chapter.
                             {/if}
                         </span>
-                                    {/snippet}
+                    {/snippet}
                     {#snippet etc()}
-                                        <span class="etc" >
+                        <span class="etc">
                             <Muted>
                                 {#if editable}
                                     <Toggle
@@ -236,44 +235,44 @@
                                 {/if}
                             </Muted>
                         </span>
-                                    {/snippet}
+                    {/snippet}
                 </TableOfContentsRow>
             {/each}
             {#if $edition.hasReferences() || editable}
                 <TableOfContentsRow chapter={ChapterIDs.ReferencesID}>
                     {#snippet annotation()}
-                                        <span >Everything cited</span>
-                                    {/snippet}
+                        <span>Everything cited</span>
+                    {/snippet}
                 </TableOfContentsRow>
             {/if}
             {#if ($edition.getGlossary() && Object.keys($edition.getGlossary()).length > 0) || editable}
                 <TableOfContentsRow chapter={ChapterIDs.GlossaryID}>
                     {#snippet annotation()}
-                                        <span >Definitions</span>
-                                    {/snippet}
+                        <span>Definitions</span>
+                    {/snippet}
                 </TableOfContentsRow>
             {/if}
             <TableOfContentsRow chapter={ChapterIDs.IndexID}>
                 {#snippet annotation()}
-                                <span >Common words and where they are</span>
-                            {/snippet}
+                    <span>Common words and where they are</span>
+                {/snippet}
             </TableOfContentsRow>
             <TableOfContentsRow chapter={ChapterIDs.SearchID}>
                 {#snippet annotation()}
-                                <span >Find where words occur</span>
-                            {/snippet}
+                    <span>Find where words occur</span>
+                {/snippet}
             </TableOfContentsRow>
 
             <TableOfContentsRow chapter={ChapterIDs.MediaID}>
                 {#snippet annotation()}
-                                <span >Images and video in the book</span>
-                            {/snippet}
+                    <span>Images and video in the book</span>
+                {/snippet}
             </TableOfContentsRow>
             {#if editable}
                 <TableOfContentsRow chapter={ChapterIDs.UnknownID}>
                     {#snippet annotation()}
-                                        <span >Customize bad links</span>
-                                    {/snippet}
+                        <span>Customize bad links</span>
+                    {/snippet}
                 </TableOfContentsRow>
             {/if}
         </Rows>
