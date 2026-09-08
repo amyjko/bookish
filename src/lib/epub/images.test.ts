@@ -48,19 +48,13 @@ test('treats a degenerate image as empty rather than dividing by zero', () => {
     expect(fitWithin(-5, 10, 1200, 1600)).toEqual({ width: 0, height: 0 });
 });
 
-test('every preset is smaller than the next and shaped for its device', () => {
+test('every preset is smaller than the next', () => {
     const { compact, standard, large } = SIZES;
 
     expect(compact.maxWidth).toBeLessThan(standard.maxWidth);
     expect(standard.maxWidth).toBeLessThan(large.maxWidth);
     expect(compact.maxHeight).toBeLessThan(standard.maxHeight);
     expect(standard.maxHeight).toBeLessThan(large.maxHeight);
-
-    // Pocket e-ink panels are greyscale; the bigger presets are read on
-    // devices that can show color.
-    expect(compact.grayscale).toBe(true);
-    expect(standard.grayscale).toBe(false);
-    expect(large.grayscale).toBe(false);
 
     for (const size of Object.values(SIZES)) {
         expect(size.quality).toBeGreaterThan(0);
@@ -169,4 +163,12 @@ test('never asks to shrink an image that already fits', () => {
     for (const size of Object.values(SIZES))
         expect(exceedsBudget(size.maxWidth, size.maxHeight, size)).toBe(false);
     expect(exceedsBudget(100, 100, SIZES.compact)).toBe(false);
+});
+
+test('a preset says nothing about colour', () => {
+    // Colour is a separate choice: a preset is about how large an image may be,
+    // and an EPUB is read on whatever device is to hand, so colour discarded
+    // here cannot be recovered there.
+    for (const size of Object.values(SIZES))
+        expect(size).not.toHaveProperty('grayscale');
 });

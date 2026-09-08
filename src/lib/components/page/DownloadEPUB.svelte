@@ -8,6 +8,7 @@
     let base = getBase();
 
     let sizeID = $state(DEFAULT_SIZE.id);
+    let grayscale = $state(false);
     let building = $state(false);
     let progress: BuildProgress | undefined = $state(undefined);
     let error: string | undefined = $state(undefined);
@@ -23,12 +24,25 @@
         }
     }
 
-    /** A previous build is stale once the reader asks for a different size. */
-    function chooseSize(id: string) {
-        sizeID = id;
+    /**
+     * Any change to the controls makes an already-built file stale: without
+     * this the reader could flip a setting and download something that doesn't
+     * match what the controls say.
+     */
+    function invalidate() {
         release();
         warnings = [];
         error = undefined;
+    }
+
+    function chooseSize(id: string) {
+        sizeID = id;
+        invalidate();
+    }
+
+    function chooseGrayscale(on: boolean) {
+        grayscale = on;
+        invalidate();
     }
 
     async function build() {
@@ -46,6 +60,7 @@
             const result = await buildEPUB($edition, {
                 base: $base ?? '',
                 size: SIZES[sizeID] ?? DEFAULT_SIZE,
+                grayscale,
                 onProgress: (update) => (progress = update),
             });
             url = URL.createObjectURL(result.blob);
@@ -93,6 +108,19 @@
                     {/each}
                 </select>
             </span>
+        </label>
+        <label class="greyscale">
+            <input
+                type="checkbox"
+                checked={grayscale}
+                disabled={building}
+                onchange={(event) =>
+                    chooseGrayscale(event.currentTarget.checked)}
+            />
+            Greyscale
+            <span class="note"
+                >(a little smaller; e-readers convert anyway)</span
+            >
         </label>
         <!-- A plain button rather than the app's, whose --app-* variables are
              only defined in the (app) layout, so it renders unstyled here and
@@ -242,6 +270,14 @@
 
     .ready a:hover {
         text-decoration: underline;
+    }
+
+    .greyscale {
+        gap: 0.35em;
+    }
+
+    .greyscale .note {
+        color: var(--bookish-muted-color);
     }
 
     .warnings {

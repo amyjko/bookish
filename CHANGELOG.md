@@ -1,5 +1,15 @@
 # bookish changelog
 
+# 0.9.5 - 2026-09-07
+
+## Changed
+
+- Greyscale is now a separate choice rather than part of the Compact preset, and it is off by default. Compact baked greyscale into the file permanently, so a book built for a pocket e-ink reader had also lost its colour in Apple Books on an iPad, on a phone, or on a colour e-ink device, with no way to get it back. Measured across 173 real images at the Compact budget, discarding colour saves 8.5% — 3.50 MB against 3.20 MB — because JPEG already stores chroma at reduced resolution, so nearly all the bytes are luma detail. An e-ink reader also converts to greyscale on display, so throwing colour away in the file buys nothing on the device the preset exists for. A preset now governs how large an image may be; the checkbox beside it governs colour, and applies even to images small enough to otherwise pass through untouched.
+
+## Fixed
+
+- The print and e-book sections no longer appear when the table of contents is printed. One pointed at the print view you would already be looking at, and the other was a dropdown, a checkbox and a button — none of which mean anything on paper.
+
 # 0.9.4 - 2026-09-07
 
 ## Fixed

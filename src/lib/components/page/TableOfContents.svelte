@@ -281,33 +281,41 @@
         <Acknowledgements />
         <License />
 
-        <EditableHeader id="print" label="Edit print header" />
+        <!-- Both of these are ways of getting the book off the screen, so
+             neither belongs on a printed page: one points at the print view you
+             would already be looking at, and the other is a dropdown, a
+             checkbox and a button. -->
+        <div class="screen-only">
+            <EditableHeader id="print" label="Edit print header" />
 
-        <Instructions {editable}>
-            This link will generate the entire book on a single page, suitable
-            for printing.
-        </Instructions>
+            <Instructions {editable}>
+                This link will generate the entire book on a single page,
+                suitable for printing.
+            </Instructions>
 
-        <PageParagraph>
-            Want to print this book or generate a PDF? See <Link
-                to="{$base}/print">all chapters on a single page</Link
-            > and then print or export. Long books can take some time to render.
-        </PageParagraph>
+            <PageParagraph>
+                Want to print this book or generate a PDF? See <Link
+                    to="{$base}/print">all chapters on a single page</Link
+                > and then print or export. Long books can take some time to render.
+            </PageParagraph>
+        </div>
 
-        <EditableHeader id="epub" label="Edit e-book header" />
+        <div class="screen-only">
+            <EditableHeader id="epub" label="Edit e-book header" />
 
-        <Instructions {editable}>
-            This builds an EPUB in the reader's browser. Nothing is uploaded and
-            no server is involved.
-        </Instructions>
+            <Instructions {editable}>
+                This builds an EPUB in the reader's browser. Nothing is uploaded
+                and no server is involved.
+            </Instructions>
 
-        <PageParagraph>
-            Reading on an e-reader? Build an EPUB of this book. Images are
-            shrunk to fit the size you choose, so pick the one closest to your
-            device. Long books with many images can take a minute.
-        </PageParagraph>
+            <PageParagraph>
+                Reading on an e-reader? Build an EPUB of this book. Images are
+                shrunk to fit the size you choose, so pick the one closest to
+                your device. Long books with many images can take a minute.
+            </PageParagraph>
 
-        <DownloadEPUB />
+            <DownloadEPUB />
+        </div>
 
         <EditableHeader id="citation" label="Edit citation header" />
 
@@ -382,5 +390,11 @@
 <style>
     .etc {
         white-space: nowrap;
+    }
+
+    @media print {
+        .screen-only {
+            display: none;
+        }
     }
 </style>

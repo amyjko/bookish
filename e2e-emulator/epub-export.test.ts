@@ -274,3 +274,167 @@ test('the packaged stylesheet renders correctly with no reading-system defaults'
 
     expectNoCycles(errors);
 });
+
+/**
+ * A PNG of four saturated quadrants -- red, green, blue and yellow -- so "did
+ * colour survive?" is unambiguous. Drawn in the browser rather than committed
+ * as a fixture, and deliberately larger than the Compact budget: an image that
+ * fits within the budget passes through un-re-encoded, so a small one would
+ * keep its colour without the pipeline having done anything, and the assertion
+ * would hold even if the code were wrong.
+ */
+async function colourFixture(
+    page: import('@playwright/test').Page,
+): Promise<Buffer> {
+    const base64 = await page.evaluate(async () => {
+        const canvas = document.createElement('canvas');
+        canvas.width = 1200;
+        canvas.height = 900;
+        const context = canvas.getContext('2d');
+        if (context === null) return '';
+        const quadrants = ['#dc1e1e', '#1ec83c', '#283cdc', '#e6c814'];
+        quadrants.forEach((colour, index) => {
+            context.fillStyle = colour;
+            context.fillRect(
+                (index % 2) * 600,
+                Math.floor(index / 2) * 450,
+                600,
+                450,
+            );
+        });
+        const blob: Blob = await new Promise((resolve) =>
+            canvas.toBlob((b) => resolve(b as Blob), 'image/png'),
+        );
+        const bytes = new Uint8Array(await blob.arrayBuffer());
+        let binary = '';
+        for (const byte of bytes) binary += String.fromCharCode(byte);
+        return btoa(binary);
+    });
+    return Buffer.from(base64, 'base64');
+}
+
+/** Mean per-pixel spread between channels. Zero exactly when greyscale. */
+async function channelSpread(
+    page: import('@playwright/test').Page,
+    bytes: Buffer,
+    mediaType: string,
+): Promise<number> {
+    return page.evaluate(
+        async ([b64, type]) => {
+            const img = new Image();
+            img.src = `data:${type};base64,${b64}`;
+            await img.decode();
+            const canvas = document.createElement('canvas');
+            canvas.width = Math.min(img.naturalWidth, 128);
+            canvas.height = Math.min(img.naturalHeight, 128);
+            const context = canvas.getContext('2d');
+            if (context === null) return -1;
+            context.drawImage(img, 0, 0, canvas.width, canvas.height);
+            const { data } = context.getImageData(
+                0,
+                0,
+                canvas.width,
+                canvas.height,
+            );
+            let total = 0;
+            let count = 0;
+            for (let i = 0; i < data.length; i += 4) {
+                total +=
+                    Math.max(data[i], data[i + 1], data[i + 2]) -
+                    Math.min(data[i], data[i + 1], data[i + 2]);
+                count++;
+            }
+            return total / count;
+        },
+        [bytes.toString('base64'), mediaType] as const,
+    );
+}
+
+test("greyscale is the reader's choice, not the size preset's", async ({
+    page,
+}, testInfo) => {
+    // Compact used to force greyscale, so a file built for a pocket e-ink
+    // reader lost its colour everywhere else too -- in Apple Books on an iPad,
+    // say. It saves under a tenth of the bytes and e-ink readers desaturate on
+    // display anyway, so it is now an independent choice, off by default.
+    const errors = captureErrors(page);
+    const uid = await signIn(page, 'epubcolor@example.com');
+
+    await page.goto('/write', { waitUntil: 'domcontentloaded' });
+    const fixture = await colourFixture(page);
+
+    const image = `${BASE_URL}/color-fixture.png`;
+    await page.route(image, (route) =>
+        route.fulfill({ contentType: 'image/png', body: fixture }),
+    );
+
+    await seedBook(uid, 'epubcolor', {
+        title: 'Color Book',
+        chapters: [
+            { id: 'one', title: 'One', text: `|${image}|Four quadrants|||` },
+        ],
+    });
+
+    await page.goto('/write/epubcolor/1', { waitUntil: 'domcontentloaded' });
+    await expect(page.locator('.epub')).toBeVisible({ timeout: 20000 });
+
+    const packagedImage = async (name: string) => {
+        const path = testInfo.outputPath(`${name}.epub`);
+        await download(page, 'compact', path);
+        const entry = listing(path).find((e) =>
+            e.name.startsWith('OEBPS/images/'),
+        );
+        expect(entry, 'no image was packaged').toBeDefined();
+        const bytes = execFileSync('unzip', [
+            '-p',
+            path,
+            (entry as { name: string }).name,
+        ]);
+        const type = (entry as { name: string }).name.endsWith('.png')
+            ? 'image/png'
+            : 'image/jpeg';
+        return channelSpread(page, bytes, type);
+    };
+
+    // Compact, greyscale unchecked: colour survives.
+    const colour = await packagedImage('colour');
+    expect(colour, 'a Compact export dropped colour by itself').toBeGreaterThan(
+        5,
+    );
+
+    // Same preset with the box ticked: no colour at all.
+    await page.locator('.epub input[type="checkbox"]').check();
+    const grey = await packagedImage('grey');
+    expect(grey, 'greyscale was requested but colour remained').toBe(0);
+
+    expectNoCycles(errors);
+});
+
+test('the print and e-book sections are left off a printed page', async ({
+    page,
+}) => {
+    // Both are ways of getting the book off the screen, so neither means
+    // anything on paper: one points at the print view you would already be
+    // looking at, and the other is a dropdown, a checkbox and a button.
+    const errors = captureErrors(page);
+    const uid = await signIn(page, 'epubprint@example.com');
+    await seedBook(uid, 'epubprint', {
+        title: 'Print Book',
+        chapters: [{ id: 'one', title: 'Chapter One', text: 'Some text.' }],
+    });
+
+    await page.goto('/write/epubprint/1', { waitUntil: 'domcontentloaded' });
+    await expect(page.locator('.epub')).toBeVisible({ timeout: 20000 });
+
+    await page.emulateMedia({ media: 'print' });
+    await expect(page.locator('.epub')).toBeHidden();
+    await expect(page.getByText('all chapters on a single page')).toBeHidden();
+
+    // The rest of the page still prints.
+    await expect(page.getByText('Chapter One')).toBeVisible();
+
+    await page.emulateMedia({ media: 'screen' });
+    await expect(page.locator('.epub')).toBeVisible();
+
+    expectNoCycles(errors);
+});

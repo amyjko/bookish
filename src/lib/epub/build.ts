@@ -60,6 +60,12 @@ export type BuildOptions = {
     /** The book's base path, for resolving local image URLs. */
     base?: string;
     size?: ImageSize;
+    /**
+     * Discard color from every image. Off by default: it saves under a tenth of
+     * the bytes, and an e-ink reader desaturates on display anyway, so throwing
+     * colour away here only costs it on every other device.
+     */
+    grayscale?: boolean;
     onProgress?: (progress: BuildProgress) => void;
     /** Fixed timestamp, so tests can compare output. */
     modified?: Date;
@@ -85,6 +91,7 @@ export async function buildEPUB(
     const {
         base = '',
         size = DEFAULT_SIZE,
+        grayscale = false,
         onProgress,
         modified = new Date(),
     } = options;
@@ -128,7 +135,11 @@ export async function buildEPUB(
         urls,
         IMAGE_CONCURRENCY,
         async (url) => {
-            const image = await prepareImage(resolveImageURL(url, base), size);
+            const image = await prepareImage(
+                resolveImageURL(url, base),
+                size,
+                grayscale,
+            );
             onProgress?.({
                 phase: 'images',
                 done: ++fetched,

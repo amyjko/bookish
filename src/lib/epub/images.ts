@@ -21,15 +21,17 @@ export type ImageSize = {
     maxHeight: number;
     /** JPEG quality, 0 to 1. */
     quality: number;
-    /** Whether to discard color. E-ink panels below ~1000px are greyscale. */
-    grayscale: boolean;
 };
 
 /**
  * The presets offered to readers. Standard covers the common 6-7" e-ink panels
  * at native resolution (Kobo Clara 1072x1448, Kindle Paperwhite 1236x1648);
- * Compact targets pocket-sized greyscale readers; Large leaves room to zoom
- * into diagrams on a tablet.
+ * Compact targets pocket-sized readers; Large leaves room to zoom into diagrams
+ * on a tablet.
+ *
+ * A preset governs how large an image may be, not what colour it is. Discarding
+ * colour is a separate choice, because an EPUB is read on whatever device is to
+ * hand and colour thrown away here cannot be recovered there.
  */
 export const SIZES: Record<string, ImageSize> = {
     compact: {
@@ -38,7 +40,6 @@ export const SIZES: Record<string, ImageSize> = {
         maxWidth: 480,
         maxHeight: 640,
         quality: 0.7,
-        grayscale: true,
     },
     standard: {
         id: 'standard',
@@ -48,7 +49,6 @@ export const SIZES: Record<string, ImageSize> = {
         maxWidth: 1280,
         maxHeight: 1720,
         quality: 0.8,
-        grayscale: false,
     },
     large: {
         id: 'large',
@@ -56,7 +56,6 @@ export const SIZES: Record<string, ImageSize> = {
         maxWidth: 1600,
         maxHeight: 2200,
         quality: 0.85,
-        grayscale: false,
     },
 };
 
@@ -155,6 +154,7 @@ const FETCH_TIMEOUT_MS = 20000;
 export async function prepareImage(
     url: string,
     size: ImageSize,
+    grayscale = false,
 ): Promise<PreparedImage | undefined> {
     let bytes: Uint8Array;
     let mediaType: string;
@@ -179,7 +179,7 @@ export async function prepareImage(
     // wasteful and unreliable across browsers.
     if (mediaType === 'image/svg+xml') return passThrough(bytes, mediaType);
 
-    const reencoded = await reencode(bytes, mediaType, size);
+    const reencoded = await reencode(bytes, mediaType, size, grayscale);
     if (reencoded === undefined) return passThrough(bytes, mediaType);
 
     // Keep whichever is smaller, since re-encoding can inflate a file: resizing
@@ -187,8 +187,12 @@ export async function prepareImage(
     // be larger than the crisp original. But an image far past the budget is
     // shrunk regardless, because decoding it costs a small reader memory it may
     // not have, and a few extra kilobytes are the cheaper price.
+    //
+    // Greyscale overrides the size comparison too: it was asked for, and an
+    // image small enough to pass through untouched would otherwise come out in
+    // colour while everything around it was grey.
     const { oversize, ...prepared } = reencoded;
-    return oversize || prepared.bytes.length < bytes.length
+    return oversize || grayscale || prepared.bytes.length < bytes.length
         ? prepared
         : passThrough(bytes, mediaType);
 }
@@ -203,6 +207,7 @@ async function reencode(
     bytes: Uint8Array,
     mediaType: string,
     size: ImageSize,
+    grayscale: boolean,
 ): Promise<(PreparedImage & { oversize: boolean }) | undefined> {
     if (
         typeof createImageBitmap === 'undefined' ||
@@ -234,7 +239,7 @@ async function reencode(
         if (context === null) return undefined;
 
         context.drawImage(bitmap, 0, 0, width, height);
-        if (size.grayscale) desaturate(context, width, height);
+        if (grayscale) desaturate(context, width, height);
 
         // PNG first, while any transparency is still intact.
         const png = await toBlob(canvas, 'image/png');

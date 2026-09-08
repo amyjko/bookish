@@ -193,11 +193,11 @@ A few e-ink devices and their panels.
 
 A wider one, which will need to scroll or shrink on a narrow screen:
 
-,Preset|Longest edge|Quality|Color|Intended device|Typical image
-,Compact|640|0.70|Greyscale|Pocket e-ink|20 to 40 KB
-,Standard|1720|0.80|Color|Six inch e-ink|150 to 300 KB
-,Large|2200|0.85|Color|Tablets|400 to 600 KB
-The image size presets.
+,Preset|Longest edge|Quality|Intended device|Typical image
+,Compact|640|0.70|Pocket e-ink|20 to 40 KB
+,Standard|1720|0.80|Six inch e-ink|150 to 300 KB
+,Large|2200|0.85|Tablets|400 to 600 KB
+The image size presets. Colour is a separate choice, kept by default: discarding it saves under a tenth of the bytes, and an e-reader converts on display anyway.
 
 A table whose cells carry formatting:
 
