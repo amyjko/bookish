@@ -577,3 +577,77 @@ test('every packaged image is referenced by a document', async () => {
         `packaged but never referenced: ${orphans.join(', ')}`,
     ).toEqual([]);
 });
+
+test('a reference url that is not a URL does not become a broken link', async () => {
+    // Real books put bare DOIs, ISBNs and stray prose in the url field. Emitting
+    // those as an href produces a relative link that resolves against the
+    // package, which epubcheck reports as a missing resource.
+    const edition = makeEdition({
+        chapters: [chapter('one', 'One', 'Claims<doi><bare><isbn><prose>.')],
+        references: {
+            doi: ['A', '2020', 'Prefixed DOI', 'S', 'doi: 10.3390/s22134794'],
+            bare: ['B', '2020', 'Bare DOI', 'S', '10.21606/dma.2017.679'],
+            isbn: ['C', '2020', 'An ISBN', 'S', 'ISBN 9780128053904'],
+            prose: [
+                'D',
+                '2020',
+                'Prose',
+                'S',
+                ' In Proceedings of CHI (pp. 1)',
+            ],
+        },
+    });
+    const { entries } = await build(edition);
+    const references = textOf(entries, 'OEBPS/references.xhtml');
+
+    // Both DOI forms resolve through doi.org.
+    expect(references).toContain('href="https://doi.org/10.3390/s22134794"');
+    expect(references).toContain(
+        'href="https://doi.org/10.21606/dma.2017.679"',
+    );
+    // The others keep their titles but gain no link.
+    expect(references).toContain('An ISBN');
+    expect(references).toContain('Prose');
+    // No link in the reference list is relative; a relative one would resolve
+    // against the package and be reported as a missing resource.
+    for (const [, href] of references.matchAll(/<a href="([^"]+)"/g))
+        expect(href, `relative href: ${href}`).toMatch(/^(https?:|#)/);
+});
+
+test('images are not packaged for pages the export leaves out', async () => {
+    // getEmbeds() also returns header images for the index, search and media
+    // pages and for forthcoming chapters, none of which are exported. Fetching
+    // and shrinking those costs the reader bytes for something never shown.
+    const edition = makeEdition({
+        images: {
+            cover: '|cover.jpg|Cover|||',
+            index: '|indexhead.jpg|Index header|||',
+            search: '|searchhead.jpg|Search header|||',
+            media: '|mediahead.jpg|Media header|||',
+        },
+        chapters: [
+            chapter('one', 'One', 'Text.', {
+                image: '|onehead.jpg|One header|||',
+            }),
+            chapter('soon', 'Soon', '', {
+                forthcoming: true,
+                image: '|soonhead.jpg|Forthcoming header|||',
+            }),
+        ],
+    });
+    await build(edition);
+
+    const fetched = vi.mocked(fetch).mock.calls.map((call) => String(call[0]));
+    expect(fetched.some((url) => url.includes('cover.jpg'))).toBe(true);
+    expect(fetched.some((url) => url.includes('onehead.jpg'))).toBe(true);
+    for (const skipped of [
+        'indexhead.jpg',
+        'searchhead.jpg',
+        'mediahead.jpg',
+        'soonhead.jpg',
+    ])
+        expect(
+            fetched.some((url) => url.includes(skipped)),
+            `${skipped} was fetched for a page that is not exported`,
+        ).toBe(false);
+});

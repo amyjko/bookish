@@ -1,5 +1,13 @@
 # bookish changelog
 
+# 0.9.4 - 2026-09-07
+
+## Fixed
+
+- Images hosted in Firebase Storage were dropped from every export. The buckets had no CORS policy, so `fetch` was blocked even though the objects are publicly readable and display fine in an `<img>` — exporting a book on bookish.press reported "60 images couldn't be included" and produced a book with none. The buckets now carry a `GET`/`HEAD` policy (see `cors.json`), which is tracked in the repository rather than being undocumented infrastructure. This was missed because the demo runs against the storage emulator, which sends CORS headers of its own, and the pre-built books use same-origin images.
+- A reference whose `url` field isn't a URL no longer becomes a broken link. Real books put bare DOIs, DOIs with a `doi:` prefix, ISBNs and even fragments of the citation in that field; emitting those as an `href` produced a _relative_ link that resolved against the package, which epubcheck reports as a missing resource. DOIs in either form now resolve through doi.org, and anything else renders as text.
+- Header images are no longer fetched and packaged for pages the export leaves out — the index, search and media pages, and forthcoming chapters — which cost the reader bytes for images never shown.
+
 # 0.9.3 - 2026-09-07
 
 ## Fixed

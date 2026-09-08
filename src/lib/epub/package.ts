@@ -335,6 +335,26 @@ ${
     };
 }
 
+/**
+ * A reference's url field as an absolute address, or undefined if it isn't one.
+ *
+ * Real books put all sorts of things in that field: a bare DOI, a DOI with a
+ * "doi:" prefix, an ISBN, sometimes a fragment of the citation itself. Emitting
+ * those as an href produces a *relative* link that resolves against the package
+ * and fails validation, so only something that can be made absolute is linked.
+ */
+function referenceURL(url: unknown): string | undefined {
+    const value = String(url ?? '').trim();
+    if (value.length === 0) return undefined;
+    if (/^https?:\/\//i.test(value)) return encodeURI(value);
+    // A DOI is unambiguous and resolvable, so it's worth turning into a link.
+    const doi = value.replace(/^doi:\s*/i, '').trim();
+    if (/^10\.\d{4,9}\/\S+$/.test(doi))
+        return `https://doi.org/${encodeURI(doi)}`;
+    // An ISBN, a stray sentence, anything else: render it as text, not a link.
+    return undefined;
+}
+
 /** Render a reference the way the web reader's Reference.svelte does. */
 function referenceContent(
     reference: Reference | FormatNode,
@@ -346,13 +366,10 @@ function referenceContent(
     const title = escapeText(reference.title);
     // The web reader omits the period when the title already ends in one.
     const period = reference.title.trim().endsWith('?') ? '' : '.';
-    return `${escapeText(reference.authors)} (${escapeText(reference.year)}). ${
-        reference.url
-            ? `<a href="${escapeAttribute(
-                  encodeURI(String(reference.url)),
-              )}">${title}</a>`
-            : title
-    }${period} <em>${escapeText(reference.source)}</em>${
+    return `${escapeText(reference.authors)} (${escapeText(reference.year)}). ${(() => {
+        const href = referenceURL(reference.url);
+        return href ? `<a href="${escapeAttribute(href)}">${title}</a>` : title;
+    })()}${period} <em>${escapeText(reference.source)}</em>${
         reference.summary ? ` ${escapeText(reference.summary)}` : ''
     }`;
 }

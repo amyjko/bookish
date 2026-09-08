@@ -50,6 +50,22 @@ The content lives in `scripts/demo-book.js` and the images are drawn by `scripts
 
 It uses the offset emulator ports from `firebase.test.json`, so it doesn't collide with another project's emulators on the default ports, and it builds the app rather than running `vite dev` — the reader route's server render pulls the chapter model through a module cycle that Vite's dev SSR evaluator can't order, though the production build resolves it fine.
 
+## Storage CORS
+
+Book images live in Firebase Storage and are fetched by the browser when
+building an EPUB, which requires the bucket to send CORS headers. It does not
+by default, and without them every image is silently dropped from the export.
+`cors.json` holds the policy; apply it to a project's bucket with:
+
+```
+gcloud storage buckets update gs://<project>.appspot.com --cors-file=cors.json --project <project>
+```
+
+It is applied to both `bookish-prod` and `bookish-dev-21ac3`. The objects are
+already world-readable — the thumbnail function calls `makePublic()` on upload —
+so allowing `GET` from any origin grants nothing that a plain HTTP request
+couldn't already do.
+
 ## Deployment notes
 
 There are two major components to Bookish: the authoring platform and the reading front end. Changes to the authoring platform that do not affect reading can be verified and deployed to Firebase without any other coordination. However, changes to the reading experience have downstream dependencies that need to be managed. Here's the general deployment workflow, which I'm currently using as reminders for myself:

@@ -97,11 +97,28 @@ export async function buildEPUB(
     const coverEmbed = parseCover(edition);
     const embeds = new Map<string, EmbedNode>();
     if (coverEmbed) embeds.set(coverEmbed.getURL(), coverEmbed);
-    for (const { embed } of edition.getEmbeds())
+
+    // Only the pages that actually make it into the package. getEmbeds() also
+    // returns header images for the index, search and media pages, and for
+    // forthcoming chapters, none of which are exported -- fetching and shrinking
+    // those costs the reader time and bytes for something never shown.
+    const included = new Set<string>([
+        ...chapters.map((chapter) => chapter.getID()),
+        'references',
+        'glossary',
+    ]);
+    for (const { embed, chapterID } of edition
+        .getEmbeds()
+        .filter(
+            ({ chapterID }) =>
+                chapterID === undefined || included.has(chapterID),
+        )) {
+        void chapterID;
         // Videos are links in the package, not files, and an embed with no URL
         // is an empty placeholder the author hasn't filled in yet.
         if (!embed.isVideo() && embed.getURL().trim().length > 0)
             if (!embeds.has(embed.getURL())) embeds.set(embed.getURL(), embed);
+    }
 
     const urls = [...embeds.keys()];
     onProgress?.({ phase: 'images', done: 0, total: urls.length });
