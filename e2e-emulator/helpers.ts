@@ -283,3 +283,63 @@ export async function expectSaved(page: Page) {
         timeout: 15000,
     });
 }
+
+// ——— Calling Cloud Functions as a particular user ———
+
+const FUNCTIONS = `http://127.0.0.1:${EMULATOR_PORTS.functions}/${PROJECT}/us-central1`;
+
+/** Create an account and sign in as it, returning its uid and an ID token. */
+export async function signUpForToken(
+    email: string,
+): Promise<{ uid: string; token: string }> {
+    const res = await fetch(
+        `${AUTH}/identitytoolkit.googleapis.com/v1/accounts:signUp?key=fake-api-key`,
+        {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email, password: 'probe-password-1' }),
+        },
+    );
+    if (!res.ok) throw new Error(`signUp ${email}: ${await res.text()}`);
+    const body = (await res.json()) as { localId: string; idToken: string };
+    return { uid: body.localId, token: body.idToken };
+}
+
+/** Set who can edit (uids) and read (readuids) a seeded book. */
+export async function setBookAccess(
+    bookID: string,
+    uids: string[],
+    readuids: string[],
+) {
+    const res = await fetch(
+        `${DB}/books/${bookID}?updateMask.fieldPaths=uids&updateMask.fieldPaths=readuids`,
+        {
+            method: 'PATCH',
+            headers: owner,
+            body: JSON.stringify({
+                fields: {
+                    uids: ARR(...uids.map(S)),
+                    readuids: ARR(...readuids.map(S)),
+                },
+            }),
+        },
+    );
+    if (!res.ok) throw new Error(`setBookAccess: ${await res.text()}`);
+}
+
+/** Call a callable function, optionally as a signed-in user. */
+export async function callFunction(
+    name: string,
+    data: unknown,
+    token?: string,
+): Promise<{ status: number; result?: unknown; error?: { status: string } }> {
+    const res = await fetch(`${FUNCTIONS}/${name}`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        },
+        body: JSON.stringify({ data }),
+    });
+    return { status: res.status, ...(await res.json()) };
+}

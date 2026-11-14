@@ -29,7 +29,13 @@
             const { createUser } = await import('../../models/CRUD');
             const uid = await createUser(email);
             if (uid === null) newEditorError = "couldn't add editor";
-            else change([...uids, uid]);
+            else {
+                // The server only reveals the emails of people who already
+                // share a saved book, and this one isn't saved yet. We know
+                // the email anyway, so show it now.
+                emails.update((known) => new Map(known).set(uid, email));
+                change([...uids, uid]);
+            }
         } finally {
             loading = undefined;
         }
