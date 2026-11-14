@@ -4,10 +4,11 @@ import { defineConfig } from 'vitest/config';
 export default defineConfig({
     plugins: [sveltekit()],
     build: {
-        // The Firebase SDK vendor chunk is ~570KB minified; that's the SDK's
-        // size, not an app-splitting problem. Raise the warning threshold
-        // just past it so genuine regressions still warn.
-        chunkSizeWarningLimit: 600,
+        // The Firebase SDK vendor chunk is ~610KB minified (firebase 13; it
+        // was ~580KB on 12); that's the SDK's size, not an app-splitting
+        // problem. Raise the warning threshold just past it so genuine
+        // regressions still warn.
+        chunkSizeWarningLimit: 640,
     },
     // When running under vitest, resolve Svelte to its browser build so
     // components can be mounted in jsdom rather than server-rendered.

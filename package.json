@@ -49,7 +49,7 @@
         "@types/prismjs": "^1.26",
         "@types/smoothscroll-polyfill": "^0",
         "firebase-tools": "^15.28.2",
-        "jsdom": "^29",
+        "jsdom": "^31",
         "prettier": "^3",
         "prettier-plugin-svelte": "^4",
         "svelte": "^5.57",
@@ -57,13 +57,13 @@
         "tslib": "^2",
         "typescript": "^5",
         "vite": "^7",
-        "vitest": "^4"
+        "vitest": "^5"
     },
     "dependencies": {
         "@sveltejs/kit": "^2",
         "ajv": "^8",
         "ajv-formats": "^3",
-        "firebase": "^12",
+        "firebase": "^13",
         "firebase-admin": "^14",
         "prismjs": "^1.29",
         "smoothscroll-polyfill": "^0.4"
@@ -72,7 +72,7 @@
         "svelte": "^5.0.0"
     },
     "engines": {
-        "node": "22"
+        "node": "24"
     },
     "types": "./dist/index.d.ts",
     "main": "./dist/index.js",
