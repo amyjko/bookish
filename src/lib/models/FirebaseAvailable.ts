@@ -1,4 +1,4 @@
-import { PUBLIC_READER } from '$env/static/public';
+import { PUBLIC_READER } from '$app/env/public';
 
 /**
  * Whether this build talks to Firebase. A bound book (bookish-reader) never

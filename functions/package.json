@@ -11,7 +11,7 @@
         "logs": "firebase functions:log"
     },
     "engines": {
-        "node": "22"
+        "node": "24"
     },
     "main": "lib/index.js",
     "dependencies": {
@@ -21,7 +21,7 @@
         "sharp": "^0"
     },
     "devDependencies": {
-        "@types/node": "^22",
+        "@types/node": "^24",
         "tslib": "^2.5.0",
         "typescript": "^5"
     },
