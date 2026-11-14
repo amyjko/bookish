@@ -1,5 +1,12 @@
 # bookish changelog
 
+# Unreleased
+
+## Changed
+
+- The Cloud Functions now run on Node 24, the same as the rest of Bookish.
+- The `bookish-press` components now import environment variables from SvelteKit 3's `$app/env/public` rather than the deprecated `$env/*` modules, so the package now needs SvelteKit 3. `bookish-reader` 0.5.0 is already on it.
+
 # 0.10.0 - 2026-11-14
 
 ## Changed

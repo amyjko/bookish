@@ -13,7 +13,7 @@
     import Note from '../editor/Note.svelte';
     import Instructions from './Instructions.svelte';
     import Link from '../Link.svelte';
-    import { PUBLIC_CONTEXT } from '$env/static/public';
+    import { PUBLIC_CONTEXT } from '$app/env/public';
     import Button from '../app/Button.svelte';
     import Feedback from '../app/Feedback.svelte';
 
