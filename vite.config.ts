@@ -1,8 +1,17 @@
+import adapter from '@sveltejs/adapter-node';
+import { vitePreprocess } from '@sveltejs/vite-plugin-svelte';
 import { sveltekit } from '@sveltejs/kit/vite';
 import { defineConfig } from 'vitest/config';
 
 export default defineConfig({
-    plugins: [sveltekit()],
+    plugins: [
+        sveltekit({
+            // script: true because some components use TS features (e.g. enums)
+            // that Svelte's native TypeScript support does not handle.
+            preprocess: vitePreprocess({ script: true }),
+            adapter: adapter(),
+        }),
+    ],
     build: {
         // The Firebase SDK vendor chunk is ~610KB minified (firebase 13; it
         // was ~580KB on 12); that's the SDK's size, not an app-splitting
