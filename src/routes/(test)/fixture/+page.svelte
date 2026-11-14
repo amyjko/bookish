@@ -2,17 +2,17 @@
     import { setContext } from 'svelte';
     import { writable } from 'svelte/store';
     import type { DocumentReference } from 'firebase/firestore';
-    import Book from '$lib/models/book/Book';
-    import EditionModel from '$lib/models/book/Edition';
-    import ChapterModel from '$lib/models/book/Chapter';
-    import EditionView from '$lib/components/page/Edition.svelte';
-    import ChapterView from '$lib/components/page/Chapter.svelte';
+    import Book from '#lib/models/book/Book.js';
+    import EditionModel from '#lib/models/book/Edition.js';
+    import ChapterModel from '#lib/models/book/Chapter.js';
+    import EditionView from '#lib/components/page/Edition.svelte';
+    import ChapterView from '#lib/components/page/Chapter.svelte';
     import {
         BOOK,
         EDITION,
         type BookStore,
         type EditionStore,
-    } from '$lib/components/page/Contexts';
+    } from '#lib/components/page/Contexts.js';
 
     // A fake document reference; nothing on this page talks to Firestore.
     const bookRef = {

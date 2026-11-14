@@ -1,14 +1,14 @@
 <script lang="ts">
-    import Loading from '$lib/components/page/Loading.svelte';
-    import Feedback from '$lib/components/app/Feedback.svelte';
+    import Loading from '#lib/components/page/Loading.svelte';
+    import Feedback from '#lib/components/app/Feedback.svelte';
     import { onDestroy } from 'svelte';
     import { page } from '$app/state';
-    import type Book from '$lib/models/book/Book';
-    import { getBook, getUser } from '$lib/components/page/Contexts';
+    import type Book from '#lib/models/book/Book.js';
+    import { getBook, getUser } from '#lib/components/page/Contexts.js';
     import {
         listenToBookWithID as listenToBooksWithID,
         listenToBooksByName as listenToBooksWithName,
-    } from '$lib/models/CRUD';
+    } from '#lib/models/CRUD.js';
     import type { Unsubscribe } from 'firebase/auth';
     interface Props {
         children?: import('svelte').Snippet;

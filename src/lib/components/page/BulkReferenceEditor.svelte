@@ -3,8 +3,8 @@
     import {
         getUniqueReferenceID,
         mineReference,
-    } from '$lib/util/mineReference';
-    import Reference from '$lib/models/book/Reference';
+    } from '#lib/util/mineReference.js';
+    import Reference from '#lib/models/book/Reference.js';
     import {
         getEdition,
         isEditionEditable,

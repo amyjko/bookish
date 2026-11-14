@@ -1,14 +1,14 @@
 <script lang="ts">
-    import type BlockNode from '$lib/models/chapter/BlockNode';
-    import CalloutNode from '$lib/models/chapter/CalloutNode';
-    import CodeNode from '$lib/models/chapter/CodeNode';
-    import EmbedNode from '$lib/models/chapter/EmbedNode';
-    import ErrorNode from '$lib/models/chapter/ErrorNode';
-    import ListNode from '$lib/models/chapter/ListNode';
-    import ParagraphNode from '$lib/models/chapter/ParagraphNode';
-    import QuoteNode from '$lib/models/chapter/QuoteNode';
-    import RuleNode from '$lib/models/chapter/RuleNode';
-    import TableNode from '$lib/models/chapter/TableNode';
+    import type BlockNode from '#lib/models/chapter/BlockNode.js';
+    import CalloutNode from '#lib/models/chapter/CalloutNode.js';
+    import CodeNode from '#lib/models/chapter/CodeNode.js';
+    import EmbedNode from '#lib/models/chapter/EmbedNode.js';
+    import ErrorNode from '#lib/models/chapter/ErrorNode.js';
+    import ListNode from '#lib/models/chapter/ListNode.js';
+    import ParagraphNode from '#lib/models/chapter/ParagraphNode.js';
+    import QuoteNode from '#lib/models/chapter/QuoteNode.js';
+    import RuleNode from '#lib/models/chapter/RuleNode.js';
+    import TableNode from '#lib/models/chapter/TableNode.js';
 
     import Callout from './Callout.svelte';
     import CaptionedCode from './CaptionedCode.svelte';

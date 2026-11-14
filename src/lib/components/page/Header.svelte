@@ -1,10 +1,10 @@
 <script lang="ts">
-    import Parser from '$lib/models/chapter/Parser';
-    import Embed from '$lib/components/chapter/Embed.svelte';
-    import BookishEditor from '$lib/components/editor/BookishEditor.svelte';
+    import Parser from '#lib/models/chapter/Parser.js';
+    import Embed from '#lib/components/chapter/Embed.svelte';
+    import BookishEditor from '#lib/components/editor/BookishEditor.svelte';
     import Title from './Title.svelte';
     import { onMount } from 'svelte';
-    import TextEditor from '$lib/components/editor/TextEditor.svelte';
+    import TextEditor from '#lib/components/editor/TextEditor.svelte';
     import { getUser, getEdition, getLeasee, lease } from './Contexts';
     import Button from '../app/Button.svelte';
     import ConfirmButton from '../editor/ConfirmButton.svelte';

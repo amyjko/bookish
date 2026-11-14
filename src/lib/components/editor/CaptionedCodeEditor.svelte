@@ -1,9 +1,9 @@
 <script lang="ts">
-    import type CodeNode from '$lib/models/chapter/CodeNode';
+    import type CodeNode from '#lib/models/chapter/CodeNode.js';
     import LanguageEditor from './LanguageEditor.svelte';
     import PositionEditor from './PositionEditor.svelte';
-    import Switch from '$lib/components/editor/Switch.svelte';
-    import { getCaret } from '$lib/components/page/Contexts';
+    import Switch from '#lib/components/editor/Switch.svelte';
+    import { getCaret } from '#lib/components/page/Contexts.js';
 
     interface Props {
         code: CodeNode;

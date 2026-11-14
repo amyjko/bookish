@@ -1,11 +1,11 @@
 <script lang="ts">
-    import { isMobile, watchMobile } from '$lib/util/isMobile';
+    import { isMobile, watchMobile } from '#lib/util/isMobile.js';
     import { onMount, type Snippet } from 'svelte';
     import {
         getCaret,
         getChapter,
         isChapterEditable,
-    } from '$lib/components/page/Contexts';
+    } from '#lib/components/page/Contexts.js';
     import type Node from '../../models/chapter/Node';
     import AtomNode from '../../models/chapter/AtomNode';
 

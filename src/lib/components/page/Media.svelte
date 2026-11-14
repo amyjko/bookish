@@ -1,11 +1,11 @@
 <script lang="ts">
-    import Header from '$lib/components/page/Header.svelte';
-    import Outline from '$lib/components/page/Outline.svelte';
-    import type { Image } from '$lib/models/book/BookMedia';
-    import Page from '$lib/components/page/Page.svelte';
-    import Instructions from '$lib/components/page/Instructions.svelte';
-    import ChapterIDs from '$lib/models/book/ChapterID';
-    import Format from '$lib/components/chapter/Format.svelte';
+    import Header from '#lib/components/page/Header.svelte';
+    import Outline from '#lib/components/page/Outline.svelte';
+    import type { Image } from '#lib/models/book/BookMedia.js';
+    import Page from '#lib/components/page/Page.svelte';
+    import Instructions from '#lib/components/page/Instructions.svelte';
+    import ChapterIDs from '#lib/models/book/ChapterID.js';
+    import Format from '#lib/components/chapter/Format.svelte';
     import MediaPreview from './MediaPreview.svelte';
     import { onMount } from 'svelte';
     import {

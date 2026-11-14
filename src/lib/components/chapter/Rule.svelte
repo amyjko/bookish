@@ -1,5 +1,5 @@
 <script lang="ts">
-    import type RuleNode from '$lib/models/chapter/RuleNode';
+    import type RuleNode from '#lib/models/chapter/RuleNode.js';
 
     interface Props {
         node: RuleNode;

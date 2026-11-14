@@ -3,8 +3,8 @@
      *  probe can set the book/edition stores the layout provides. */
     import AppLayout from '../routes/(app)/+layout.svelte';
     import BookContextProbe from './BookContextProbe.svelte';
-    import type Book from '$lib/models/book/Book';
-    import type Edition from '$lib/models/book/Edition';
+    import type Book from '#lib/models/book/Book.js';
+    import type Edition from '#lib/models/book/Edition.js';
 
     interface Props {
         book?: Book | undefined;

@@ -2,11 +2,11 @@ import { beforeAll, expect, test, vi } from 'vitest';
 import { render } from '@testing-library/svelte';
 import { tick } from 'svelte';
 import { writable } from 'svelte/store';
-import Parser from '$lib/models/chapter/Parser';
-import Chapter from '$lib/models/book/Chapter';
+import Parser from '#lib/models/chapter/Parser.js';
+import Chapter from '#lib/models/book/Chapter.js';
 import ChapterBody from './ChapterBody.svelte';
-import { CARET, CHAPTER, EDITION } from '$lib/components/page/Contexts';
-import type ChapterContext from '$lib/components/page/ChapterContext';
+import { CARET, CHAPTER, EDITION } from '#lib/components/page/Contexts.js';
+import type ChapterContext from '#lib/components/page/ChapterContext.js';
 
 // The page state only exists inside a running SvelteKit app; Contexts.ts
 // reads it to decide whether a route is editable.

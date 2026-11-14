@@ -1,14 +1,14 @@
 <script lang="ts">
-    import type FootnoteNode from '$lib/models/chapter/FootnoteNode';
-    import Atom from '$lib/components/chapter/Atom.svelte';
-    import Marginal from '$lib/components/chapter/Marginal.svelte';
+    import type FootnoteNode from '#lib/models/chapter/FootnoteNode.js';
+    import Atom from '#lib/components/chapter/Atom.svelte';
+    import Marginal from '#lib/components/chapter/Marginal.svelte';
     import Format from './Format.svelte';
     import {
         getChapter,
         getEdition,
         getCaret,
         getRoot,
-    } from '$lib/components/page/Contexts';
+    } from '#lib/components/page/Contexts.js';
 
     interface Props {
         node: FootnoteNode;

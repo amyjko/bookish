@@ -1,14 +1,14 @@
 <script lang="ts">
     import PositionEditor from './PositionEditor.svelte';
-    import EmbedNode from '$lib/models/chapter/EmbedNode';
+    import EmbedNode from '#lib/models/chapter/EmbedNode.js';
     import TextEditor from './TextEditor.svelte';
-    import { storage } from '$lib/models/Firebase';
-    import type { Image } from '$lib/models/book/BookMedia';
+    import { storage } from '#lib/models/Firebase.js';
+    import type { Image } from '#lib/models/book/BookMedia.js';
     import ToolbarSpacer from './ToolbarSpacer.svelte';
     import ImageChooser from './ImageChooser.svelte';
     import URLEditor from './URLEditor.svelte';
     import Note from './Note.svelte';
-    import { getBook, getCaret } from '$lib/components/page/Contexts';
+    import { getBook, getCaret } from '#lib/components/page/Contexts.js';
 
     interface Props {
         embed: EmbedNode;

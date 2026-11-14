@@ -1,6 +1,6 @@
 <script lang="ts">
     import List from './List.svelte';
-    import ListNode from '$lib/models/chapter/ListNode';
+    import ListNode from '#lib/models/chapter/ListNode.js';
     import Format from './Format.svelte';
 
     interface Props {

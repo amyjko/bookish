@@ -9,14 +9,14 @@
         SeriousTheme,
         SketchyTheme,
         TechTheme,
-    } from '$lib/models/book/Theme';
-    import ConfirmButton from '$lib/components/editor/ConfirmButton.svelte';
+    } from '#lib/models/book/Theme.js';
+    import ConfirmButton from '#lib/components/editor/ConfirmButton.svelte';
     import Instructions from './Instructions.svelte';
     import ThemeSetEditor from './ThemeSetEditor.svelte';
     import ThemeEditorPreview from './ThemeEditorPreview.svelte';
     import { getEdition, isEditionEditable } from './Contexts';
     import TextEditor from '../editor/TextEditor.svelte';
-    import type Theme from '$lib/models/book/Theme';
+    import type Theme from '#lib/models/book/Theme.js';
     import Button from '../app/Button.svelte';
     import Switch from '../editor/Switch.svelte';
     import Link from '../app/Link.svelte';

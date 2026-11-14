@@ -1,7 +1,7 @@
 <script lang="ts">
     import { updateEmail } from 'firebase/auth';
     import { getUser } from '../../../lib/components/page/Contexts';
-    import Feedback from '$lib/components/app/Feedback.svelte';
+    import Feedback from '#lib/components/app/Feedback.svelte';
     import Button from '../../../lib/components/app/Button.svelte';
     import Lead from '../../../lib/components/app/Lead.svelte';
     import Large from '../../../lib/components/app/Large.svelte';

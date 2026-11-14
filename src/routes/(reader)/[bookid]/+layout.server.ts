@@ -1,5 +1,5 @@
-import type { BookSpecification } from '$lib/models/book/Book';
-import type { EditionSpecification } from '$lib/models/book/Edition';
+import type { BookSpecification } from '#lib/models/book/Book.js';
+import type { EditionSpecification } from '#lib/models/book/Edition.js';
 import { error } from '@sveltejs/kit';
 import { getApps, initializeApp } from 'firebase-admin/app';
 import { getFirestore } from 'firebase-admin/firestore';

@@ -1,12 +1,12 @@
 <script lang="ts">
     import { isSignInWithEmailLink, signInWithEmailLink } from 'firebase/auth';
     import { onMount } from 'svelte';
-    import { auth } from '$lib/models/Firebase';
-    import Link from '$lib/components/Link.svelte';
+    import { auth } from '#lib/models/Firebase.js';
+    import Link from '#lib/components/Link.svelte';
     import { goto } from '$app/navigation';
-    import Feedback from '$lib/components/app/Feedback.svelte';
-    import Lead from '$lib/components/app/Lead.svelte';
-    import Large from '$lib/components/app/Large.svelte';
+    import Feedback from '#lib/components/app/Feedback.svelte';
+    import Lead from '#lib/components/app/Lead.svelte';
+    import Large from '#lib/components/app/Large.svelte';
 
     let error: string | undefined = $state(undefined);
 

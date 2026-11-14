@@ -7,7 +7,7 @@
 </script>
 
 <script lang="ts">
-    import type CodeNode from '$lib/models/chapter/CodeNode';
+    import type CodeNode from '#lib/models/chapter/CodeNode.js';
     import { onMount, untrack } from 'svelte';
     import Code from './Code.svelte';
 

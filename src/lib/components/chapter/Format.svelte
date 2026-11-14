@@ -1,13 +1,13 @@
 <script lang="ts">
-    import FormatNode from '$lib/models/chapter/FormatNode';
-    import CitationsNode from '$lib/models/chapter/CitationsNode';
-    import CommentNode from '$lib/models/chapter/CommentNode';
-    import DefinitionNode from '$lib/models/chapter/DefinitionNode';
-    import FootnoteNode from '$lib/models/chapter/FootnoteNode';
-    import InlineCodeNode from '$lib/models/chapter/InlineCodeNode';
-    import LabelNode from '$lib/models/chapter/LabelNode';
-    import LinkNode from '$lib/models/chapter/LinkNode';
-    import TextNode from '$lib/models/chapter/TextNode';
+    import FormatNode from '#lib/models/chapter/FormatNode.js';
+    import CitationsNode from '#lib/models/chapter/CitationsNode.js';
+    import CommentNode from '#lib/models/chapter/CommentNode.js';
+    import DefinitionNode from '#lib/models/chapter/DefinitionNode.js';
+    import FootnoteNode from '#lib/models/chapter/FootnoteNode.js';
+    import InlineCodeNode from '#lib/models/chapter/InlineCodeNode.js';
+    import LabelNode from '#lib/models/chapter/LabelNode.js';
+    import LinkNode from '#lib/models/chapter/LinkNode.js';
+    import TextNode from '#lib/models/chapter/TextNode.js';
     import Problem from './Problem.svelte';
 
     import Citations from './Citations.svelte';

@@ -1,7 +1,7 @@
 <script lang="ts">
     import Chapter from './Chapter.svelte';
     import { getEdition } from './Contexts';
-    import Parser from '$lib/models/chapter/Parser';
+    import Parser from '#lib/models/chapter/Parser.js';
 
     let edition = getEdition();
 

@@ -1,8 +1,8 @@
 <script lang="ts">
-    import type LabelNode from '$lib/models/chapter/LabelNode';
+    import type LabelNode from '#lib/models/chapter/LabelNode.js';
     import TextEditor from './TextEditor.svelte';
     import { getChapter, getEdition } from '../page/Contexts';
-    import { getCaret } from '$lib/components/page/Contexts';
+    import { getCaret } from '#lib/components/page/Contexts.js';
 
     interface Props {
         label: LabelNode;

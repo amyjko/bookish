@@ -1,10 +1,10 @@
 <script lang="ts">
-    import Editions from '$lib/components/page/Editions.svelte';
-    import { getBook } from '$lib/components/page/Contexts';
-    import Feedback from '$lib/components/app/Feedback.svelte';
-    import Section from '$lib/components/app/Section.svelte';
-    import Lead from '$lib/components/app/Lead.svelte';
-    import Large from '$lib/components/app/Large.svelte';
+    import Editions from '#lib/components/page/Editions.svelte';
+    import { getBook } from '#lib/components/page/Contexts.js';
+    import Feedback from '#lib/components/app/Feedback.svelte';
+    import Section from '#lib/components/app/Section.svelte';
+    import Lead from '#lib/components/app/Lead.svelte';
+    import Large from '#lib/components/app/Large.svelte';
 
     let book = getBook();
 </script>

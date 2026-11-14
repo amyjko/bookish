@@ -1,5 +1,5 @@
 <script lang="ts">
-    import type CommentNode from '$lib/models/chapter/CommentNode';
+    import type CommentNode from '#lib/models/chapter/CommentNode.js';
     import Atom from './Atom.svelte';
     import Marginal from './Marginal.svelte';
     import Format from './Format.svelte';
@@ -8,7 +8,7 @@
         isChapterEditable,
         getCaret,
         getRoot,
-    } from '$lib/components/page/Contexts';
+    } from '#lib/components/page/Contexts.js';
     import Icon from '../editor/Icon.svelte';
     import CommentIcon from '../editor/icons/comment.svg?raw';
 

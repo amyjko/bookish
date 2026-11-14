@@ -1,5 +1,5 @@
 <script lang="ts">
-    import type QuoteNode from '$lib/models/chapter/QuoteNode';
+    import type QuoteNode from '#lib/models/chapter/QuoteNode.js';
     import Block from './Block.svelte';
     import Format from './Format.svelte';
     import Positioned from './Positioned.svelte';

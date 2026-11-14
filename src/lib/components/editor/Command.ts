@@ -1,4 +1,4 @@
-import type Edit from '$lib/models/chapter/Edit';
+import type Edit from '#lib/models/chapter/Edit.js';
 import type CaretUtilities from './CaretUtilities';
 import type CaretContext from './CaretContext';
 

@@ -1,6 +1,6 @@
 <script lang="ts">
     import Marginal from './Marginal.svelte';
-    import type CitationsNode from '$lib/models/chapter/CitationsNode';
+    import type CitationsNode from '#lib/models/chapter/CitationsNode.js';
     import Problem from './Problem.svelte';
     import Atom from './Atom.svelte';
     import { getChapter, getEdition, getRoot } from '../page/Contexts';

@@ -1,8 +1,8 @@
 <script lang="ts">
-    import Chapter from '$lib/components/page/Chapter.svelte';
+    import Chapter from '#lib/components/page/Chapter.svelte';
     import { page } from '$app/state';
-    import { getEdition } from '$lib/components/page/Contexts';
-    import Unknown from '$lib/components/page/Unknown.svelte';
+    import { getEdition } from '#lib/components/page/Contexts.js';
+    import Unknown from '#lib/components/page/Unknown.svelte';
 
     let edition = $derived(getEdition());
     let chapterID = $derived(page.params.chapterid);

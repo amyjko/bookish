@@ -1,12 +1,12 @@
 <script lang="ts">
-    import type LinkNode from '$lib/models/chapter/LinkNode';
+    import type LinkNode from '#lib/models/chapter/LinkNode.js';
     import URLEditor from './URLEditor.svelte';
     import { getChapter, getEdition, getRoot } from '../page/Contexts';
     import Icon from './Icon.svelte';
     import Button from '../app/Button.svelte';
     import UnlinkIcon from './icons/unlink.svg?raw';
     import Options from '../app/Options.svelte';
-    import { getCaret } from '$lib/components/page/Contexts';
+    import { getCaret } from '#lib/components/page/Contexts.js';
 
     interface Props {
         link: LinkNode;

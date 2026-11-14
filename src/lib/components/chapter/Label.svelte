@@ -1,6 +1,6 @@
 <script lang="ts">
-    import type LabelNode from '$lib/models/chapter/LabelNode';
-    import Atom from '$lib/components/chapter/Atom.svelte';
+    import type LabelNode from '#lib/models/chapter/LabelNode.js';
+    import Atom from '#lib/components/chapter/Atom.svelte';
     import { getChapter, getRoot, isChapterEditable } from '../page/Contexts';
     import Problem from './Problem.svelte';
 

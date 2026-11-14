@@ -3,9 +3,9 @@
     import Outline from './Outline.svelte';
     import Page from './Page.svelte';
     import Link from '../Link.svelte';
-    import Chapter from '$lib/models/book/Chapter';
-    import type { Match } from '$lib/models/book/Chapter';
-    import ChapterIDs from '$lib/models/book/ChapterID';
+    import Chapter from '#lib/models/book/Chapter.js';
+    import type { Match } from '#lib/models/book/Chapter.js';
+    import ChapterIDs from '#lib/models/book/ChapterID.js';
     import { getBase, getEdition, isEditionEditable } from './Contexts';
     import ChapterTitle from './ChapterTitle.svelte';
     import ChapterNumber from './ChapterNumber.svelte';

@@ -1,6 +1,6 @@
 <script lang="ts">
-    import type QuoteNode from '$lib/models/chapter/QuoteNode';
-    import { getCaret } from '$lib/components/page/Contexts';
+    import type QuoteNode from '#lib/models/chapter/QuoteNode.js';
+    import { getCaret } from '#lib/components/page/Contexts.js';
     import PositionEditor from './PositionEditor.svelte';
 
     interface Props {

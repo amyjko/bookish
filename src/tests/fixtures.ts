@@ -1,6 +1,6 @@
-import Book from '$lib/models/book/Book';
-import Edition from '$lib/models/book/Edition';
-import Chapter from '$lib/models/book/Chapter';
+import Book from '#lib/models/book/Book.js';
+import Edition from '#lib/models/book/Edition.js';
+import Chapter from '#lib/models/book/Chapter.js';
 import type { DocumentReference } from 'firebase/firestore';
 
 export const bookRef = {

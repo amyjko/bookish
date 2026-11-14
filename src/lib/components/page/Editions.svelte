@@ -1,6 +1,6 @@
 <script lang="ts">
-    import { createNewEdition } from '$lib/models/CRUD';
-    import Instructions from '$lib/components/page/Instructions.svelte';
+    import { createNewEdition } from '#lib/models/CRUD.js';
+    import Instructions from '#lib/components/page/Instructions.svelte';
     import Note from '../editor/Note.svelte';
     import { getBook, getUser, isBookEditable } from './Contexts';
     import Button from '../app/Button.svelte';

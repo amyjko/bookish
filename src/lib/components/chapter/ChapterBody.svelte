@@ -1,6 +1,6 @@
 <script lang="ts">
-    import type ChapterNode from '$lib/models/chapter/ChapterNode';
-    import ParagraphNode from '$lib/models/chapter/ParagraphNode';
+    import type ChapterNode from '#lib/models/chapter/ChapterNode.js';
+    import ParagraphNode from '#lib/models/chapter/ParagraphNode.js';
     import { writable } from 'svelte/store';
     import { setContext, untrack } from 'svelte';
     import { ROOT } from '../page/Contexts';

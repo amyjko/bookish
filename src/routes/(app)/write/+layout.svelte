@@ -1,6 +1,6 @@
 <script lang="ts">
     import { goto } from '$app/navigation';
-    import { getUser } from '$lib/components/page/Contexts';
+    import { getUser } from '#lib/components/page/Contexts.js';
     interface Props {
         children?: import('svelte').Snippet;
     }

@@ -1,7 +1,7 @@
 <script lang="ts">
-    import TextEditor from '$lib/components/editor/TextEditor.svelte';
-    import { isSubdomainAvailable } from '$lib/models/CRUD';
-    import { getSubdomain } from '$lib/util/getSubdomain';
+    import TextEditor from '#lib/components/editor/TextEditor.svelte';
+    import { isSubdomainAvailable } from '#lib/models/CRUD.js';
+    import { getSubdomain } from '#lib/util/getSubdomain.js';
     import { getBook } from './Contexts';
     import Muted from './Muted.svelte';
 

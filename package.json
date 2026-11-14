@@ -98,5 +98,9 @@
     "files": [
         "dist"
     ],
-    "svelte": "./dist/index.js"
+    "svelte": "./dist/index.js",
+    "imports": {
+        "#lib": "./src/lib/index.js",
+        "#lib/*": "./src/lib/*"
+    }
 }

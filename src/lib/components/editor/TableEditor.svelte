@@ -1,6 +1,6 @@
 <script lang="ts">
-    import type TableNode from '$lib/models/chapter/TableNode';
-    import { getCaret } from '$lib/components/page/Contexts';
+    import type TableNode from '#lib/models/chapter/TableNode.js';
+    import { getCaret } from '#lib/components/page/Contexts.js';
     import PositionEditor from './PositionEditor.svelte';
 
     interface Props {

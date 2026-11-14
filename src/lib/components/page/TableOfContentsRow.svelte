@@ -1,8 +1,8 @@
 <script lang="ts">
     import TableOfContentsImage from './TableOfContentsImage.svelte';
-    import Chapter from '$lib/models/book/Chapter';
-    import Toggle from '$lib/components/editor/Toggle.svelte';
-    import ConfirmButton from '$lib/components/editor/ConfirmButton.svelte';
+    import Chapter from '#lib/models/book/Chapter.js';
+    import Toggle from '#lib/components/editor/Toggle.svelte';
+    import ConfirmButton from '#lib/components/editor/ConfirmButton.svelte';
     import {
         getBase,
         getEdition,
@@ -14,7 +14,7 @@
     import Button from '../app/Button.svelte';
     import ChapterTitle from './ChapterTitle.svelte';
     import Authors from './Authors.svelte';
-    import type { ChapterIDKey } from '$lib/models/book/ChapterID';
+    import type { ChapterIDKey } from '#lib/models/book/ChapterID.js';
 
     
     interface Props {

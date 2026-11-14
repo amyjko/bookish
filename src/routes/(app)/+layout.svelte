@@ -1,7 +1,7 @@
 <script lang="ts">
     import Footer from './Footer.svelte';
     import Header from './Header.svelte';
-    import Auth from '$lib/components/Auth.svelte';
+    import Auth from '#lib/components/Auth.svelte';
     import { writable, type Writable } from 'svelte/store';
     import { onMount, setContext } from 'svelte';
     import {
@@ -15,14 +15,14 @@
         CHAPTERTEXT,
         type EditorsStore,
         EDITORS,
-    } from '$lib/components/page/Contexts';
-    import type Book from '$lib/models/book/Book';
-    import type Edition from '$lib/models/book/Edition';
-    import type CaretState from '$lib/components/editor/CaretState';
-    import BookSaveStatus from '$lib/models/book/BookSaveStatus';
-    import { getUserEmails, updateBook, updateEdition } from '$lib/models/CRUD';
+    } from '#lib/components/page/Contexts.js';
+    import type Book from '#lib/models/book/Book.js';
+    import type Edition from '#lib/models/book/Edition.js';
+    import type CaretState from '#lib/components/editor/CaretState.js';
+    import BookSaveStatus from '#lib/models/book/BookSaveStatus.js';
+    import { getUserEmails, updateBook, updateEdition } from '#lib/models/CRUD.js';
     import { page } from '$app/state';
-    import Analytics from '$lib/components/page/Analytics.svelte';
+    import Analytics from '#lib/components/page/Analytics.svelte';
     interface Props {
         children?: import('svelte').Snippet;
     }

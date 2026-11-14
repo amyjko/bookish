@@ -1,7 +1,7 @@
 <script lang="ts">
-    import type Theme from '$lib/models/book/Theme';
-    import ChapterBody from '$lib/components/chapter/ChapterBody.svelte';
-    import Parser from '$lib/models/chapter/Parser';
+    import type Theme from '#lib/models/book/Theme.js';
+    import ChapterBody from '#lib/components/chapter/ChapterBody.svelte';
+    import Parser from '#lib/models/chapter/Parser.js';
     import { getDarkMode } from './Contexts';
 
     interface Props {

@@ -5,7 +5,7 @@ import { tick } from 'svelte';
 import EchoRaceHarness from './EchoRaceHarness.svelte';
 import { captured } from './capture';
 import { installRouteTestShims } from './shims';
-import BookSaveStatus from '$lib/models/book/BookSaveStatus';
+import BookSaveStatus from '#lib/models/book/BookSaveStatus.js';
 
 vi.mock('$app/state', () => ({
     page: {
@@ -24,7 +24,7 @@ const fakeUser = {
 };
 
 // A signed-in user so the loaders actually listen.
-vi.mock('$lib/models/Firebase', () => ({
+vi.mock('#lib/models/Firebase.js', () => ({
     app: undefined,
     auth: {
         onAuthStateChanged: (callback: (user: unknown) => void) => {
@@ -44,7 +44,7 @@ const listeners = vi.hoisted(() => ({
     edition: undefined as ((edition: unknown) => void) | undefined,
 }));
 
-vi.mock('$lib/models/CRUD', async () => {
+vi.mock('#lib/models/CRUD.js', async () => {
     const { makeBook } = await import('./fixtures');
     return {
         listenToPublishedBooks: () => () => undefined,

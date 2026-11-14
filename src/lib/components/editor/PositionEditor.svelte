@@ -1,5 +1,5 @@
 <script lang="ts">
-    import type Position from '$lib/models/chapter/Position';
+    import type Position from '#lib/models/chapter/Position.js';
     import Switch from './Switch.svelte';
     import LeftIcon from './icons/left.svg?raw';
     import MiddleIcon from './icons/middle.svg?raw';

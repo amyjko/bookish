@@ -1,12 +1,12 @@
 <script lang="ts">
     import { setContext } from 'svelte';
     import { writable } from 'svelte/store';
-    import BookishEditor from '$lib/components/editor/BookishEditor.svelte';
-    import Toolbar from '$lib/components/editor/Toolbar.svelte';
-    import ChapterBody from '$lib/components/chapter/ChapterBody.svelte';
-    import Parser from '$lib/models/chapter/Parser';
-    import { CARET } from '$lib/components/page/Contexts';
-    import type CaretState from '$lib/components/editor/CaretState';
+    import BookishEditor from '#lib/components/editor/BookishEditor.svelte';
+    import Toolbar from '#lib/components/editor/Toolbar.svelte';
+    import ChapterBody from '#lib/components/chapter/ChapterBody.svelte';
+    import Parser from '#lib/models/chapter/Parser.js';
+    import { CARET } from '#lib/components/page/Contexts.js';
+    import type CaretState from '#lib/components/editor/CaretState.js';
 
     // The active editor context that BookishEditor claims and Toolbar reads.
     const caret = writable<CaretState | undefined>(undefined);

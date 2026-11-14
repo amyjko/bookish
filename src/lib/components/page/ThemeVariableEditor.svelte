@@ -1,5 +1,5 @@
 <script lang="ts">
-    import TextEditor from '$lib/components/editor/TextEditor.svelte';
+    import TextEditor from '#lib/components/editor/TextEditor.svelte';
     import { getEdition } from './Contexts';
 
     const placeholders: Record<string, string> = {

@@ -1,8 +1,8 @@
 import { beforeAll, expect, test, vi } from 'vitest';
 import { render } from '@testing-library/svelte';
 import { tick } from 'svelte';
-import Book from '$lib/models/book/Book';
-import Edition from '$lib/models/book/Edition';
+import Book from '#lib/models/book/Book.js';
+import Edition from '#lib/models/book/Edition.js';
 import type { DocumentReference } from 'firebase/firestore';
 import AppLayoutHarness from './AppLayoutHarness.svelte';
 
@@ -18,7 +18,7 @@ vi.mock('$app/state', () => ({
 
 vi.mock('$app/navigation', () => ({ goto: () => Promise.resolve() }));
 
-vi.mock('$lib/models/CRUD', () => ({
+vi.mock('#lib/models/CRUD.js', () => ({
     getUserEmails: () => Promise.resolve(new Map()),
     updateBook: () => Promise.resolve(),
     updateEdition: () => Promise.resolve(new Map()),
@@ -28,7 +28,7 @@ vi.mock('$lib/models/CRUD', () => ({
 // Auth only renders its children once onAuthStateChanged has reported, so
 // the fake auth must call back immediately — otherwise the layout renders
 // nothing and this test would pass without exercising anything.
-vi.mock('$lib/models/Firebase', () => ({
+vi.mock('#lib/models/Firebase.js', () => ({
     app: undefined,
     auth: {
         onAuthStateChanged: (callback: (user: unknown) => void) => {

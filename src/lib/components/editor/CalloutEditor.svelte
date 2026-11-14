@@ -1,7 +1,7 @@
 <script lang="ts">
-    import type CalloutNode from '$lib/models/chapter/CalloutNode';
+    import type CalloutNode from '#lib/models/chapter/CalloutNode.js';
     import PositionEditor from './PositionEditor.svelte';
-    import { getCaret } from '$lib/components/page/Contexts';
+    import { getCaret } from '#lib/components/page/Contexts.js';
 
     interface Props {
         callout: CalloutNode;

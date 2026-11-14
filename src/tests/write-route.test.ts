@@ -20,7 +20,7 @@ const fakeUser = {
 };
 
 // A signed-in user so the loaders actually listen.
-vi.mock('$lib/models/Firebase', () => ({
+vi.mock('#lib/models/Firebase.js', () => ({
     app: undefined,
     auth: {
         onAuthStateChanged: (callback: (user: unknown) => void) => {
@@ -37,7 +37,7 @@ vi.mock('$lib/models/Firebase', () => ({
 // Book/edition builders are shared with other suites.
 // Firestore delivers snapshots asynchronously; queueMicrotask mimics that
 // while keeping callbacks re-invocable like real listeners.
-vi.mock('$lib/models/CRUD', async () => {
+vi.mock('#lib/models/CRUD.js', async () => {
     const { makeBook, makeEdition } = await import('./fixtures');
     return {
         listenToPublishedBooks: () => () => undefined,

@@ -1,6 +1,6 @@
 <script lang="ts">
-    import Parser from '$lib/models/chapter/Parser';
-    import type DefinitionNode from '$lib/models/chapter/DefinitionNode';
+    import Parser from '#lib/models/chapter/Parser.js';
+    import type DefinitionNode from '#lib/models/chapter/DefinitionNode.js';
     import Text from './Text.svelte';
     import Format from './Format.svelte';
     import Marginal from './Marginal.svelte';

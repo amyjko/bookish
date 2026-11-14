@@ -1,17 +1,17 @@
 <script lang="ts">
-    import Link from '$lib/components/app/Link.svelte';
+    import Link from '#lib/components/app/Link.svelte';
     import {
         getUser,
         getBook,
         getEdition,
-    } from '$lib/components/page/Contexts';
-    import { getCaret } from '$lib/components/page/Contexts';
-    import Toolbar from '$lib/components/editor/Toolbar.svelte';
-    import Status from '$lib/components/page/Status.svelte';
-    import HomeIcon from '$lib/components/editor/icons/home.svg?raw';
-    import Icon from '$lib/components/editor/Icon.svelte';
-    import DarkToggle from '$lib/components/controls/DarkToggle.svelte';
-    import { isDark, setDark } from '$lib/util/dark';
+    } from '#lib/components/page/Contexts.js';
+    import { getCaret } from '#lib/components/page/Contexts.js';
+    import Toolbar from '#lib/components/editor/Toolbar.svelte';
+    import Status from '#lib/components/page/Status.svelte';
+    import HomeIcon from '#lib/components/editor/icons/home.svg?raw';
+    import Icon from '#lib/components/editor/Icon.svelte';
+    import DarkToggle from '#lib/components/controls/DarkToggle.svelte';
+    import { isDark, setDark } from '#lib/util/dark.js';
 
     interface Props {
         print?: boolean;

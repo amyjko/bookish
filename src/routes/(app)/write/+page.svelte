@@ -3,19 +3,19 @@
         createBook,
         listenToEditableBooks,
         listenToPartiallyEditableBooks,
-    } from '$lib/models/CRUD';
-    import type Book from '$lib/models/book/Book';
+    } from '#lib/models/CRUD.js';
+    import type Book from '#lib/models/book/Book.js';
     import { goto } from '$app/navigation';
     import { onMount } from 'svelte';
-    import { getUser } from '$lib/components/page/Contexts';
-    import Feedback from '$lib/components/app/Feedback.svelte';
-    import Lead from '$lib/components/app/Lead.svelte';
-    import Large from '$lib/components/app/Large.svelte';
-    import Paragraph from '$lib/components/app/Paragraph.svelte';
-    import Button from '$lib/components/app/Button.svelte';
-    import BookList from '$lib/components/app/BookList.svelte';
-    import Section from '$lib/components/app/Section.svelte';
-    import Link from '$lib/components/app/Link.svelte';
+    import { getUser } from '#lib/components/page/Contexts.js';
+    import Feedback from '#lib/components/app/Feedback.svelte';
+    import Lead from '#lib/components/app/Lead.svelte';
+    import Large from '#lib/components/app/Large.svelte';
+    import Paragraph from '#lib/components/app/Paragraph.svelte';
+    import Button from '#lib/components/app/Button.svelte';
+    import BookList from '#lib/components/app/BookList.svelte';
+    import Section from '#lib/components/app/Section.svelte';
+    import Link from '#lib/components/app/Link.svelte';
 
     let editableBooks: Book[] | undefined = $state(undefined);
     let partiallyEditableBooks: Book[] | undefined = $state(undefined);

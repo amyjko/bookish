@@ -1,5 +1,5 @@
 <script lang="ts">
-    import type TextNode from '$lib/models/chapter/TextNode';
+    import type TextNode from '#lib/models/chapter/TextNode.js';
     import { getChapter, isChapterEditable } from '../page/Contexts';
 
     interface Props {

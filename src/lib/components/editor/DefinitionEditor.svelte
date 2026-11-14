@@ -1,8 +1,8 @@
 <script lang="ts">
-    import type DefinitionNode from '$lib/models/chapter/DefinitionNode';
+    import type DefinitionNode from '#lib/models/chapter/DefinitionNode.js';
     import Options from '../app/Options.svelte';
     import Note from './Note.svelte';
-    import { getCaret, getEdition } from '$lib/components/page/Contexts';
+    import { getCaret, getEdition } from '#lib/components/page/Contexts.js';
 
     interface Props {
         definition: DefinitionNode;

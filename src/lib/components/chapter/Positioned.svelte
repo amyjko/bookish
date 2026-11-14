@@ -1,5 +1,5 @@
 <script lang="ts">
-    import type Position from '$lib/models/chapter/Position';
+    import type Position from '#lib/models/chapter/Position.js';
 
     interface Props {
         position: Position;

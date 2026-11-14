@@ -1,6 +1,6 @@
 <script lang="ts">
-    import EmbedNode from '$lib/models/chapter/EmbedNode';
-    import Parser from '$lib/models/chapter/Parser';
+    import EmbedNode from '#lib/models/chapter/EmbedNode.js';
+    import Parser from '#lib/models/chapter/Parser.js';
     import { getBase, getEdition } from './Contexts';
     import Link from '../Link.svelte';
 

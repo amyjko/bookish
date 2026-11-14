@@ -1,19 +1,19 @@
-import type Caret from '$lib/models/chapter/Caret';
-import type { CaretRange } from '$lib/models/chapter/Caret';
-import type ParagraphNode from '$lib/models/chapter/ParagraphNode';
-import type AtomNode from '$lib/models/chapter/AtomNode';
-import type FormatNode from '$lib/models/chapter/FormatNode';
-import type BlocksNode from '$lib/models/chapter/BlocksNode';
-import type ListNode from '$lib/models/chapter/ListNode';
-import type TableNode from '$lib/models/chapter/TableNode';
-import type MetadataNode from '$lib/models/chapter/MetadataNode';
-import type RootNode from '$lib/models/chapter/RootNode';
-import type Edit from '$lib/models/chapter/Edit';
-import type CodeNode from '$lib/models/chapter/CodeNode';
-import type BlockNode from '$lib/models/chapter/BlockNode';
+import type Caret from '#lib/models/chapter/Caret.js';
+import type { CaretRange } from '#lib/models/chapter/Caret.js';
+import type ParagraphNode from '#lib/models/chapter/ParagraphNode.js';
+import type AtomNode from '#lib/models/chapter/AtomNode.js';
+import type FormatNode from '#lib/models/chapter/FormatNode.js';
+import type BlocksNode from '#lib/models/chapter/BlocksNode.js';
+import type ListNode from '#lib/models/chapter/ListNode.js';
+import type TableNode from '#lib/models/chapter/TableNode.js';
+import type MetadataNode from '#lib/models/chapter/MetadataNode.js';
+import type RootNode from '#lib/models/chapter/RootNode.js';
+import type Edit from '#lib/models/chapter/Edit.js';
+import type CodeNode from '#lib/models/chapter/CodeNode.js';
+import type BlockNode from '#lib/models/chapter/BlockNode.js';
 import type Clipboard from './Clipboard';
 import type UndoState from './UndoState';
-import type Node from '$lib/models/chapter/Node';
+import type Node from '#lib/models/chapter/Node.js';
 
 export type PasteContent = { plain: string | undefined };
 

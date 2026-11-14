@@ -1,5 +1,5 @@
 <script lang="ts">
-    import type ParagraphNode from '$lib/models/chapter/ParagraphNode';
+    import type ParagraphNode from '#lib/models/chapter/ParagraphNode.js';
     import Format from './Format.svelte';
     import { getChapter, getEdition, getRoot } from '../page/Contexts';
 

@@ -1,4 +1,7 @@
-import type { EditionStore, StatusStore } from '$lib/components/page/Contexts';
+import type {
+    EditionStore,
+    StatusStore,
+} from '#lib/components/page/Contexts.js';
 
 /** Filled in by ContextCapture.svelte when a test harness mounts, so tests
  *  can read and write the same context stores the mounted components use. */
