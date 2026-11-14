@@ -1,10 +1,10 @@
 <script lang="ts">
-    import Parser from '$lib/models/chapter/Parser';
-    import type Definition from '$lib/models/book/Definition';
+    import Parser from '#lib/models/chapter/Parser.js';
+    import type Definition from '#lib/models/book/Definition.js';
     import ConfirmButton from '../editor/ConfirmButton.svelte';
-    import TextEditor from '$lib/components/editor/TextEditor.svelte';
-    import BookishEditor from '$lib/components/editor/BookishEditor.svelte';
-    import Format from '$lib/components/chapter/Format.svelte';
+    import TextEditor from '#lib/components/editor/TextEditor.svelte';
+    import BookishEditor from '#lib/components/editor/BookishEditor.svelte';
+    import Format from '#lib/components/chapter/Format.svelte';
     import Note from '../editor/Note.svelte';
     import {
         getUser,

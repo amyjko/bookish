@@ -2,7 +2,7 @@
     import Header from './Header.svelte';
     import Outline from './Outline.svelte';
     import Page from './Page.svelte';
-    import ChapterIDs from '$lib/models/book/ChapterID';
+    import ChapterIDs from '#lib/models/book/ChapterID.js';
     import DefinitionView from './DefinitionView.svelte';
     import { getUser, getEdition, isEditionEditable } from './Contexts';
     import Instructions from './Instructions.svelte';

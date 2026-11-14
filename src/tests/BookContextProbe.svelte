@@ -4,9 +4,9 @@
      * them, so a test can drive the layout's save/debounce effects the way
      * the real editor routes do. Lives outside src/lib so it isn't published.
      */
-    import { getBook, getEdition } from '$lib/components/page/Contexts';
-    import type Book from '$lib/models/book/Book';
-    import type Edition from '$lib/models/book/Edition';
+    import { getBook, getEdition } from '#lib/components/page/Contexts.js';
+    import type Book from '#lib/models/book/Book.js';
+    import type Edition from '#lib/models/book/Edition.js';
 
     interface Props {
         book?: Book | undefined;

@@ -4,7 +4,7 @@
 # image only installs production dependencies and serves the artifacts.
 # Building here instead would risk client asset hashes diverging from the
 # ones Firebase Hosting serves from build/client.
-FROM node:22-slim
+FROM node:24-slim
 
 WORKDIR /app
 

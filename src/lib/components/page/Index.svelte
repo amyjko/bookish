@@ -1,10 +1,10 @@
 <script lang="ts">
-    import Header from '$lib/components/page/Header.svelte';
-    import Outline from '$lib/components/page/Outline.svelte';
-    import Page from '$lib/components/page/Page.svelte';
-    import Instructions from '$lib/components/page/Instructions.svelte';
-    import ChapterIDs from '$lib/models/book/ChapterID';
-    import Link from '$lib/components/Link.svelte';
+    import Header from '#lib/components/page/Header.svelte';
+    import Outline from '#lib/components/page/Outline.svelte';
+    import Page from '#lib/components/page/Page.svelte';
+    import Instructions from '#lib/components/page/Instructions.svelte';
+    import ChapterIDs from '#lib/models/book/ChapterID.js';
+    import Link from '#lib/components/Link.svelte';
     import { getBase, getEdition, isEditionEditable } from './Contexts';
     import { page } from '$app/state';
     import Muted from './Muted.svelte';

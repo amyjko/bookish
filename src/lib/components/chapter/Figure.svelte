@@ -1,9 +1,9 @@
 <script lang="ts">
-    import type TableNode from '$lib/models/chapter/TableNode';
-    import type EmbedNode from '$lib/models/chapter/EmbedNode';
+    import type TableNode from '#lib/models/chapter/TableNode.js';
+    import type EmbedNode from '#lib/models/chapter/EmbedNode.js';
     import Format from './Format.svelte';
-    import type CodeNode from '$lib/models/chapter/CodeNode';
-    import type FormatNode from '$lib/models/chapter/FormatNode';
+    import type CodeNode from '#lib/models/chapter/CodeNode.js';
+    import type FormatNode from '#lib/models/chapter/FormatNode.js';
     import Positioned from './Positioned.svelte';
     import { getCaret, isChapterEditable } from '../page/Contexts';
 

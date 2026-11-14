@@ -1,7 +1,6 @@
 <script lang="ts">
-    import TextEditor from '$lib/components/editor/TextEditor.svelte';
-    import { isSubdomainAvailable } from '$lib/models/CRUD';
-    import { getSubdomain } from '$lib/util/getSubdomain';
+    import TextEditor from '#lib/components/editor/TextEditor.svelte';
+    import { getSubdomain } from '#lib/util/getSubdomain.js';
     import { getBook } from './Contexts';
     import Muted from './Muted.svelte';
 
@@ -25,6 +24,8 @@
             save={// Save the new domain
             async (domain) => {
                 if ($book) {
+                    const { isSubdomainAvailable } =
+                        await import('../../models/CRUD');
                     const available = await isSubdomainAvailable(domain);
                     if (available) book.set($book.withSubdomain(domain));
                     else if ($book.getSubdomain() !== domain)
@@ -37,10 +38,10 @@
                 invalidNames.includes(newDomain) ||
                 (newDomain.length > 0 &&
                     !/^[A-Za-z0-9](?:[A-Za-z0-9\-]{0,61}[A-Za-z0-9])?$/.test(
-                        newDomain
+                        newDomain,
                     ))
                     ? `Book IDs must be fewer than 63 characters, made of symbols a-z, A-Z, and 0-9, and not one of ${invalidNames.join(
-                          ', '
+                          ', ',
                       )}.`
                     : undefined}
             saveOnExit={true}

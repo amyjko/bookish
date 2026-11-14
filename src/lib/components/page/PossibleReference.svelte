@@ -1,6 +1,6 @@
 <script lang="ts">
-    import FormatNode from '$lib/models/chapter/FormatNode';
-    import type Ref from '$lib/models/book/Reference';
+    import FormatNode from '#lib/models/chapter/FormatNode.js';
+    import type Ref from '#lib/models/book/Reference.js';
     import Format from '../chapter/Format.svelte';
     import Reference from './Reference.svelte';
 

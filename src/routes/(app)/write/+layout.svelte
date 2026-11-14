@@ -1,6 +1,6 @@
 <script lang="ts">
     import { goto } from '$app/navigation';
-    import { getUser } from '$lib/components/page/Contexts';
+    import { getUser } from '#lib/components/page/Contexts.js';
     interface Props {
         children?: import('svelte').Snippet;
     }
@@ -12,7 +12,7 @@
     // Redirect to the login page if not authenticated.
     $effect(() => {
         if ($auth === undefined || $auth.user === null)
-            goto('/login', { replaceState: true });
+            goto('/login', { replace: true });
     });
 </script>
 

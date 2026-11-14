@@ -1,8 +1,8 @@
 <script lang="ts">
     import { onDestroy } from 'svelte';
     import { getBase, getEdition } from './Contexts';
-    import { buildEPUB, type BuildProgress } from '$lib/epub/build';
-    import { DEFAULT_SIZE, SIZES } from '$lib/epub/images';
+    import { buildEPUB, type BuildProgress } from '#lib/epub/build.js';
+    import { DEFAULT_SIZE, SIZES } from '#lib/epub/images.js';
 
     let edition = getEdition();
     let base = getBase();

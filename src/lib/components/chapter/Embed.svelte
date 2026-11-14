@@ -1,12 +1,11 @@
 <script lang="ts">
-    import type EmbedNode from '$lib/models/chapter/EmbedNode';
-    import { storage } from '$lib/models/Firebase';
+    import type EmbedNode from '#lib/models/chapter/EmbedNode.js';
     import {
         getCaret,
         getBook,
         getBase,
         isEditionEditable,
-    } from '$lib/components/page/Contexts';
+    } from '#lib/components/page/Contexts.js';
     import Figure from './Figure.svelte';
     import { getContext } from 'svelte';
 
@@ -21,7 +20,7 @@
         node,
         editable = true,
         placeholder = '',
-        imageOnly = false
+        imageOnly = false,
     }: Props = $props();
 
     let url = $derived(node.getURL());
@@ -64,7 +63,6 @@
                 const media = $book?.getMedia();
 
                 if (file === null) return;
-                if (storage === undefined) return;
                 if (media === undefined) return;
 
                 media.upload(
@@ -165,7 +163,7 @@
                     frameBorder="0"
                     allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"
                     allowFullScreen
-></iframe>
+                ></iframe>
             </article>
         {:else}
             <img

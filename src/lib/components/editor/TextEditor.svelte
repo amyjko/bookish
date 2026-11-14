@@ -1,10 +1,14 @@
 <script lang="ts">
     import { untrack } from 'svelte';
 
-    enum Status {
-        Viewing,
-        Editing,
-    }
+    // A plain object rather than a TypeScript enum: Vite 8's TS transform
+    // inlines enum members in the script and then drops the declaration as
+    // unused, though the markup below still reads it.
+    const Status = {
+        Viewing: 0,
+        Editing: 1,
+    } as const;
+    type Status = (typeof Status)[keyof typeof Status];
 
     interface Props {
         text: string;
@@ -34,7 +38,7 @@
         move = undefined
     }: Props = $props();
 
-    let status = $state(Status.Viewing);
+    let status: Status = $state(Status.Viewing);
     let field: HTMLInputElement | null = $state(null);
     let sizer: HTMLSpanElement | null = $state(null);
 

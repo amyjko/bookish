@@ -1,9 +1,9 @@
-import type { BookSpecification } from '$lib/models/book/Book';
-import type { EditionSpecification } from '$lib/models/book/Edition';
+import type { BookSpecification } from '#lib/models/book/Book.js';
+import type { EditionSpecification } from '#lib/models/book/Edition.js';
 import { error } from '@sveltejs/kit';
 import { getApps, initializeApp } from 'firebase-admin/app';
 import { getFirestore } from 'firebase-admin/firestore';
-import { PUBLIC_FIREBASE_PROJECT_ID } from '$env/static/public';
+import { PUBLIC_FIREBASE_PROJECT_ID } from '$app/env/public';
 
 // Guard against re-initialization when the module is re-evaluated in dev.
 const app =

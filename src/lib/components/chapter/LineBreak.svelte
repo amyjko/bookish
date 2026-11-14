@@ -1,5 +1,5 @@
 <script lang="ts">
-    import type LineBreakNode from '$lib/models/chapter/LineBreakNode';
+    import type LineBreakNode from '#lib/models/chapter/LineBreakNode.js';
 
     interface Props {
         node: LineBreakNode;

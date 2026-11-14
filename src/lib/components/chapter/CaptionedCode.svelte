@@ -1,5 +1,5 @@
 <script lang="ts">
-    import type CodeNode from '$lib/models/chapter/CodeNode';
+    import type CodeNode from '#lib/models/chapter/CodeNode.js';
     import Code from './Code.svelte';
     import Python from './Python.svelte';
     import Text from './Text.svelte';

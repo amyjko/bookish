@@ -1,8 +1,8 @@
 <script lang="ts">
-    import Parser from '$lib/models/chapter/Parser';
-    import BookishEditor from '$lib/components/editor/BookishEditor.svelte';
-    import Instructions from '$lib/components/page/Instructions.svelte';
-    import Format from '$lib/components/chapter/Format.svelte';
+    import Parser from '#lib/models/chapter/Parser.js';
+    import BookishEditor from '#lib/components/editor/BookishEditor.svelte';
+    import Instructions from '#lib/components/page/Instructions.svelte';
+    import Format from '#lib/components/chapter/Format.svelte';
     import {
         getUser,
         getEdition,

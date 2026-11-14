@@ -1,5 +1,5 @@
 <script lang="ts">
-    import Reference from '$lib/models/book/Reference';
+    import Reference from '#lib/models/book/Reference.js';
     import Button from '../app/Button.svelte';
     import Table from '../app/Table.svelte';
     import ConfirmButton from '../editor/ConfirmButton.svelte';

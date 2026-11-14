@@ -1,5 +1,5 @@
 <script lang="ts">
-    import type LinkNode from '$lib/models/chapter/LinkNode';
+    import type LinkNode from '#lib/models/chapter/LinkNode.js';
     import { getBase, getEdition, isChapterEditable } from '../page/Contexts';
     import Text from './Text.svelte';
     import Problem from './Problem.svelte';

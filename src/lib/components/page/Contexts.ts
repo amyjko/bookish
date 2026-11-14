@@ -13,7 +13,6 @@ import type Authentication from '../Authentication';
 import type CaretState from '../editor/CaretState';
 import type ChapterContext from './ChapterContext';
 import { page } from '$app/state';
-import { updateLock } from '../../models/CRUD';
 import type { DocumentReference } from 'firebase/firestore';
 import type ChapterNode from '../../models/chapter/ChapterNode';
 
@@ -169,6 +168,9 @@ export async function lease(
     const edition = get(editionStore);
     const auth = get(authStore);
     if (edition && auth && auth.user) {
+        // Loaded here rather than at the top so bound books, which never
+        // lease, don't load Firebase. See FirebaseAvailable.ts.
+        const { updateLock } = await import('../../models/CRUD');
         await updateLock(edition, auth.user.uid, contentID, lock);
         const latestEdition = get(editionStore);
         const latestAuth = get(authStore);

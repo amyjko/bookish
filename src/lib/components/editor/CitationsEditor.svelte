@@ -1,9 +1,9 @@
 <script lang="ts">
-    import type CitationsNode from '$lib/models/chapter/CitationsNode';
+    import type CitationsNode from '#lib/models/chapter/CitationsNode.js';
     import Note from './Note.svelte';
     import Options from '../app/Options.svelte';
     import Button from '../app/Button.svelte';
-    import { getCaret, getEdition } from '$lib/components/page/Contexts';
+    import { getCaret, getEdition } from '#lib/components/page/Contexts.js';
 
     interface Props {
         citations: CitationsNode;

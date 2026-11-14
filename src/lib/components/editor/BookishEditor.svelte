@@ -1,28 +1,28 @@
 <script lang="ts">
-    import BookishNode from '$lib/models/chapter/Node';
-    import ChapterNode from '$lib/models/chapter/ChapterNode';
-    import LinkNode from '$lib/models/chapter/LinkNode';
-    import ParagraphNode from '$lib/models/chapter/ParagraphNode';
-    import TextNode from '$lib/models/chapter/TextNode';
-    import AtomNode from '$lib/models/chapter/AtomNode';
-    import FormatNode from '$lib/models/chapter/FormatNode';
-    import BlocksNode from '$lib/models/chapter/BlocksNode';
-    import ListNode from '$lib/models/chapter/ListNode';
-    import TableNode from '$lib/models/chapter/TableNode';
-    import MetadataNode from '$lib/models/chapter/MetadataNode';
-    import type RootNode from '$lib/models/chapter/RootNode';
-    import type Edit from '$lib/models/chapter/Edit';
-    import CodeNode from '$lib/models/chapter/CodeNode';
-    import BlockNode from '$lib/models/chapter/BlockNode';
-    import EmbedNode from '$lib/models/chapter/EmbedNode';
-    import ErrorNode from '$lib/models/chapter/ErrorNode';
+    import BookishNode from '#lib/models/chapter/Node.js';
+    import ChapterNode from '#lib/models/chapter/ChapterNode.js';
+    import LinkNode from '#lib/models/chapter/LinkNode.js';
+    import ParagraphNode from '#lib/models/chapter/ParagraphNode.js';
+    import TextNode from '#lib/models/chapter/TextNode.js';
+    import AtomNode from '#lib/models/chapter/AtomNode.js';
+    import FormatNode from '#lib/models/chapter/FormatNode.js';
+    import BlocksNode from '#lib/models/chapter/BlocksNode.js';
+    import ListNode from '#lib/models/chapter/ListNode.js';
+    import TableNode from '#lib/models/chapter/TableNode.js';
+    import MetadataNode from '#lib/models/chapter/MetadataNode.js';
+    import type RootNode from '#lib/models/chapter/RootNode.js';
+    import type Edit from '#lib/models/chapter/Edit.js';
+    import CodeNode from '#lib/models/chapter/CodeNode.js';
+    import BlockNode from '#lib/models/chapter/BlockNode.js';
+    import EmbedNode from '#lib/models/chapter/EmbedNode.js';
+    import ErrorNode from '#lib/models/chapter/ErrorNode.js';
 
-    import type Caret from '$lib/models/chapter/Caret';
-    import type { CaretRange } from '$lib/models/chapter/Caret';
+    import type Caret from '#lib/models/chapter/Caret.js';
+    import type { CaretRange } from '#lib/models/chapter/Caret.js';
     import {
         caretRangeToIndexRange,
         indexRangeToCaretRange,
-    } from '$lib/models/chapter/Caret';
+    } from '#lib/models/chapter/Caret.js';
     import type WhatsAroundTheCaret from './CaretContext';
 
     import type Command from './Command';
@@ -36,7 +36,7 @@
     import type { Accent, PasteContent } from './CaretContext';
     import { getCaret } from '../page/Contexts';
     import CaretView from './CaretView.svelte';
-    import Parser, { Reserved } from '$lib/models/chapter/Parser';
+    import Parser, { Reserved } from '#lib/models/chapter/Parser.js';
 
     const IDLE_TIME = 500;
 

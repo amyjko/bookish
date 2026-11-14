@@ -1,6 +1,6 @@
 <script lang="ts">
-    import type Theme from '$lib/models/book/Theme';
-    import type EditionModel from '$lib/models/book/Edition';
+    import type Theme from '#lib/models/book/Theme.js';
+    import type EditionModel from '#lib/models/book/Edition.js';
     import smoothscroll from 'smoothscroll-polyfill';
     import { goto } from '$app/navigation';
     import { onMount, setContext, untrack } from 'svelte';
@@ -12,13 +12,13 @@
         type BaseStore,
         type DarkModeStore,
     } from './Contexts';
-    import { BookishTheme } from '$lib/models/book/Theme';
+    import { BookishTheme } from '#lib/models/book/Theme.js';
     import { isDark, setDark } from '../../util/dark';
     import { page } from '$app/state';
     import Title from './Title.svelte';
     import Page from './Page.svelte';
-    import Parser from '$lib/models/chapter/Parser';
-    import EmbedNode from '$lib/models/chapter/EmbedNode';
+    import Parser from '#lib/models/chapter/Parser.js';
+    import EmbedNode from '#lib/models/chapter/EmbedNode.js';
 
     // Poly fill smooth scrolling for Safari.
     onMount(() => smoothscroll.polyfill());
@@ -80,8 +80,12 @@
     });
 
     // Redirect old hash routes by simply replacing their hash before routing.
-    if (typeof window !== 'undefined' && window.location.hash.startsWith('#/'))
-        goto(location.hash.replace('#', ''));
+    // SvelteKit 3's goto rejects paths that match no route, where SvelteKit 2
+    // fell back to a full page load; keep that fallback.
+    if (typeof window !== 'undefined' && window.location.hash.startsWith('#/')) {
+        const path = location.hash.replace('#', '');
+        goto(path).catch(() => (window.location.href = path));
+    }
 
     /** Given a theme, compute the CSS rules that apply the theme. */
     function themeToCSS(theme: Theme | null) {

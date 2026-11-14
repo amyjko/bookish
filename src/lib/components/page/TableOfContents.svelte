@@ -1,18 +1,18 @@
 <script lang="ts">
-    import Instructions from '$lib/components/page/Instructions.svelte';
+    import Instructions from '#lib/components/page/Instructions.svelte';
     import TableOfContentsRow from './TableOfContentsRow.svelte';
-    import ChapterIDs from '$lib/models/book/ChapterID';
-    import Page from '$lib/components/page/Page.svelte';
-    import Header from '$lib/components/page/Header.svelte';
-    import Outline from '$lib/components/page/Outline.svelte';
-    import Link from '$lib/components/Link.svelte';
-    import SubdomainEditor from '$lib/components/page/SubdomainEditor.svelte';
+    import ChapterIDs from '#lib/models/book/ChapterID.js';
+    import Page from '#lib/components/page/Page.svelte';
+    import Header from '#lib/components/page/Header.svelte';
+    import Outline from '#lib/components/page/Outline.svelte';
+    import Link from '#lib/components/Link.svelte';
+    import SubdomainEditor from '#lib/components/page/SubdomainEditor.svelte';
     import Description from './Description.svelte';
     import Acknowledgements from './Acknowledgements.svelte';
-    import License from '$lib/components/page/License.svelte';
-    import Authors from '$lib/components/page/Authors.svelte';
-    import TextEditor from '$lib/components/editor/TextEditor.svelte';
-    import Toggle from '$lib/components/editor/Toggle.svelte';
+    import License from '#lib/components/page/License.svelte';
+    import Authors from '#lib/components/page/Authors.svelte';
+    import TextEditor from '#lib/components/editor/TextEditor.svelte';
+    import Toggle from '#lib/components/editor/Toggle.svelte';
     import {
         getUser,
         getBase,

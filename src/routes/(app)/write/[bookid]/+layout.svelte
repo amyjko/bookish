@@ -1,5 +1,5 @@
 <script lang="ts">
-    import BookLoader from '$lib/components/page/BookLoader.svelte';
+    import BookLoader from '#lib/components/page/BookLoader.svelte';
     interface Props {
         children?: import('svelte').Snippet;
     }

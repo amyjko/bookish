@@ -3,7 +3,7 @@
     import Outline from './Outline.svelte';
     import Page from './Page.svelte';
     import Instructions from './Instructions.svelte';
-    import ChapterIDs from '$lib/models/book/ChapterID';
+    import ChapterIDs from '#lib/models/book/ChapterID.js';
     import { getEdition, isEditionEditable } from './Contexts';
     interface Props {
         children?: import('svelte').Snippet;

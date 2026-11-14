@@ -1,5 +1,5 @@
 import { error } from '@sveltejs/kit';
-import { PUBLIC_CONTEXT } from '$env/static/public';
+import { PUBLIC_CONTEXT } from '$app/env/public';
 
 /**
  * This fixture page exists only for local testing and CI smoke tests

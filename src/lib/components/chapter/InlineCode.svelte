@@ -1,5 +1,5 @@
 <script lang="ts">
-    import type InlineCodeNode from '$lib/models/chapter/InlineCodeNode';
+    import type InlineCodeNode from '#lib/models/chapter/InlineCodeNode.js';
     import { isChapterEditable } from '../page/Contexts';
     import Code from './Code.svelte';
     import Text from './Text.svelte';

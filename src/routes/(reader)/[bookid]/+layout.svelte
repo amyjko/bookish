@@ -1,19 +1,19 @@
 <script lang="ts">
-    import type { BookSpecification } from '$lib/models/book/Book';
-    import type { EditionSpecification } from '$lib/models/book/Edition';
+    import type { BookSpecification } from '#lib/models/book/Book.js';
+    import type { EditionSpecification } from '#lib/models/book/Edition.js';
     import {
         BOOK,
         EDITION,
         type BookStore,
         type EditionStore,
-    } from '$lib/components/page/Contexts';
-    import Book from '$lib/models/book/Book';
-    import Edition from '$lib/components/page/Edition.svelte';
+    } from '#lib/components/page/Contexts.js';
+    import Book from '#lib/models/book/Book.js';
+    import Edition from '#lib/components/page/Edition.svelte';
     import { writable } from 'svelte/store';
     import { setContext, untrack } from 'svelte';
-    import EditionModel from '$lib/models/book/Edition';
+    import EditionModel from '#lib/models/book/Edition.js';
     import Error from '../+error.svelte';
-    import Analytics from '$lib/components/page/Analytics.svelte';
+    import Analytics from '#lib/components/page/Analytics.svelte';
 
     
     interface Props {

@@ -1,6 +1,6 @@
 <script lang="ts">
     import { onMount } from 'svelte';
-    import Loading from '$lib/components/page/Loading.svelte';
+    import Loading from '#lib/components/page/Loading.svelte';
 
     interface Props {
         title?: string | undefined;

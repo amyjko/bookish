@@ -1,15 +1,15 @@
 <script lang="ts">
-    import Loading from '$lib/components/page/Loading.svelte';
-    import Edition from '$lib/components/page/Edition.svelte';
-    import Feedback from '$lib/components/app/Feedback.svelte';
+    import Loading from '#lib/components/page/Loading.svelte';
+    import Edition from '#lib/components/page/Edition.svelte';
+    import Feedback from '#lib/components/app/Feedback.svelte';
     import {
         getBook,
         getEdition,
         getStatus,
         getUser,
         getChapterText,
-    } from '$lib/components/page/Contexts';
-    import BookSaveStatus from '$lib/models/book/BookSaveStatus';
+    } from '#lib/components/page/Contexts.js';
+    import BookSaveStatus from '#lib/models/book/BookSaveStatus.js';
     import { get } from 'svelte/store';
     import { onDestroy, untrack } from 'svelte';
     import { page } from '$app/state';

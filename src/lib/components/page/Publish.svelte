@@ -15,7 +15,6 @@
     import Link from '../Link.svelte';
     import { PUBLIC_CONTEXT } from '$env/static/public';
     import Button from '../app/Button.svelte';
-    import { publish } from '../../models/CRUD';
     import Feedback from '../app/Feedback.svelte';
 
     let auth = getUser();
@@ -32,6 +31,7 @@
             error = undefined;
             feedback = 'Binding the book, this could take a minute...';
             try {
+                const { publish } = await import('../../models/CRUD');
                 const result = await publish($edition);
                 if (typeof result === 'string') {
                     error = result;
@@ -50,7 +50,6 @@
     }
 
     let publisher: boolean | undefined = $state(undefined);
-
 
     async function updateUserClaims() {
         if ($auth === undefined || $auth.user === null) return;
@@ -77,7 +76,7 @@
                 save={(newSummary) =>
                     $edition
                         ? edition.set(
-                              $edition.withSummary(newSummary.toBookdown())
+                              $edition.withSummary(newSummary.toBookdown()),
                           )
                         : undefined}
                 chapter={false}
@@ -94,7 +93,7 @@
             edit={(published) =>
                 $edition
                     ? edition.set(
-                          $edition.asPublished(published === 'published')
+                          $edition.asPublished(published === 'published'),
                       )
                     : undefined}
         />
@@ -115,7 +114,7 @@
     <div>
         <Note
             >{#if $edition.published}Last published {new Date(
-                    $edition.published
+                    $edition.published,
                 ).toLocaleDateString('en-us')}{/if}</Note
         >
     </div>

@@ -1,7 +1,7 @@
 import { expect, test } from 'vitest';
 import { readFileSync, readdirSync } from 'node:fs';
 import { join } from 'node:path';
-import { BookishTheme } from '$lib/models/book/Theme';
+import { BookishTheme } from '#lib/models/book/Theme.js';
 
 /**
  * A `var(--bookish-typo)` fails silently: the declaration is simply dropped and

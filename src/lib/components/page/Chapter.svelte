@@ -1,15 +1,15 @@
 <script lang="ts">
-    import Parser from '$lib/models/chapter/Parser';
-    import type ChapterModel from '$lib/models/book/Chapter';
-    import Header from '$lib/components/page/Header.svelte';
-    import Authors from '$lib/components/page/Authors.svelte';
-    import Outline from '$lib/components/page/Outline.svelte';
-    import Page from '$lib/components/page/Page.svelte';
-    import TextEditor from '$lib/components/editor/TextEditor.svelte';
-    import BookishEditor from '$lib/components/editor/BookishEditor.svelte';
-    import Toggle from '$lib/components/editor/Toggle.svelte';
-    import Instructions from '$lib/components/page/Instructions.svelte';
-    import ChapterBody from '$lib/components/chapter/ChapterBody.svelte';
+    import Parser from '#lib/models/chapter/Parser.js';
+    import type ChapterModel from '#lib/models/book/Chapter.js';
+    import Header from '#lib/components/page/Header.svelte';
+    import Authors from '#lib/components/page/Authors.svelte';
+    import Outline from '#lib/components/page/Outline.svelte';
+    import Page from '#lib/components/page/Page.svelte';
+    import TextEditor from '#lib/components/editor/TextEditor.svelte';
+    import BookishEditor from '#lib/components/editor/BookishEditor.svelte';
+    import Toggle from '#lib/components/editor/Toggle.svelte';
+    import Instructions from '#lib/components/page/Instructions.svelte';
+    import ChapterBody from '#lib/components/chapter/ChapterBody.svelte';
     import PossibleReference from './PossibleReference.svelte';
     import ChapterNumber from './ChapterNumber.svelte';
     import Problem from '../chapter/Problem.svelte';
@@ -31,9 +31,9 @@
     import { onMount, setContext } from 'svelte';
     import { hideOutlineIfObscured, layoutMarginals } from './margins';
     import scrollToEyeLevel from '../../util/scrollToEyeLevel';
-    import type ChapterContext from '$lib/components/page/ChapterContext';
+    import type ChapterContext from '#lib/components/page/ChapterContext.js';
     import { goto } from '$app/navigation';
-    import ChapterNode from '$lib/models/chapter/ChapterNode';
+    import ChapterNode from '#lib/models/chapter/ChapterNode.js';
     import Muted from './Muted.svelte';
     import Title from './Title.svelte';
     import PageHeader from './PageHeader.svelte';
@@ -324,7 +324,7 @@
                                         goto(
                                             `/write/${$book.getID()}/${editionNumber}/${newChapterID}`,
                                             {
-                                                keepFocus: true,
+                                                reset: false,
                                             },
                                         );
                                     }

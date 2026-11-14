@@ -1,13 +1,13 @@
 <script lang="ts">
-    import { listenToPublishedBooks } from '$lib/models/CRUD';
-    import type Book from '$lib/models/book/Book';
+    import { listenToPublishedBooks } from '#lib/models/CRUD.js';
+    import type Book from '#lib/models/book/Book.js';
     import { onMount } from 'svelte';
-    import Feedback from '$lib/components/app/Feedback.svelte';
-    import Lead from '$lib/components/app/Lead.svelte';
-    import Paragraph from '$lib/components/app/Paragraph.svelte';
-    import Large from '$lib/components/app/Large.svelte';
-    import BookList from '$lib/components/app/BookList.svelte';
-    import Link from '$lib/components/app/Link.svelte';
+    import Feedback from '#lib/components/app/Feedback.svelte';
+    import Lead from '#lib/components/app/Lead.svelte';
+    import Paragraph from '#lib/components/app/Paragraph.svelte';
+    import Large from '#lib/components/app/Large.svelte';
+    import BookList from '#lib/components/app/BookList.svelte';
+    import Link from '#lib/components/app/Link.svelte';
 
     let books: Book[] | undefined = $state(undefined);
     let error: string | undefined = $state(undefined);

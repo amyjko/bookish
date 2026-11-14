@@ -1,6 +1,6 @@
 <script lang="ts">
-    import type AtomNode from '$lib/models/chapter/AtomNode';
-    import { getCaret } from '$lib/components/page/Contexts';
+    import type AtomNode from '#lib/models/chapter/AtomNode.js';
+    import { getCaret } from '#lib/components/page/Contexts.js';
 
     interface Props {
         node: AtomNode<any>;

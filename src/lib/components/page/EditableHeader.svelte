@@ -1,5 +1,5 @@
 <script lang="ts">
-    import type { TOCHeaderKey } from '$lib/models/book/ChapterID';
+    import type { TOCHeaderKey } from '#lib/models/book/ChapterID.js';
     import TextEditor from '../editor/TextEditor.svelte';
     import { getEdition, isEditionEditable } from './Contexts';
     import PageHeader from './PageHeader.svelte';

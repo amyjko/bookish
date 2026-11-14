@@ -1,5 +1,18 @@
 # bookish changelog
 
+# 0.10.0 - 2026-11-14
+
+## Changed
+
+- Bookish now runs on SvelteKit 3, Vite 8, TypeScript 6, firebase 13, vitest 5 and jsdom 31, with the rest of the dependencies at their latest compatible versions. Project configuration moved from `svelte.config.js` into `vite.config.ts`, and `$lib` imports became `#lib` subpath imports.
+- Bookish now requires Node 24, because firebase 13 does. The Cloud Run image and CI moved with it; the Cloud Functions stay on Node 22.
+- Bound books no longer download the Firebase SDK. The components a reader uses imported it at load time even though a bound book never talks to Firebase, so most of a book's JavaScript was code it never ran. The components now load Firebase only when an editor action needs it. On `bookish-reader`'s example book, the first page load drops from 762 KB of JavaScript to 414 KB (230 KB to 120 KB compressed). The editor on bookish.press loads it as before. A new test fails if anything the package entry reaches imports Firebase again.
+- The published `bookish-press` package still works with apps on SvelteKit 2, including `bookish-reader`. Its components keep importing the `$env/*` modules, which SvelteKit 3 deprecates but still serves, and it ships with its TypeScript compiled to JavaScript as before.
+
+## Fixed
+
+- An old `#/` link whose path matches no route now falls back to loading that page, as it did before SvelteKit 3, which rejects such navigations instead.
+
 # 0.9.5 - 2026-09-07
 
 ## Changed

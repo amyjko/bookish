@@ -1,9 +1,9 @@
 <script lang="ts">
-    import { isMobile } from '$lib/util/isMobile';
+    import { isMobile } from '#lib/util/isMobile.js';
     import { onMount } from 'svelte';
-    import Link from '$lib/components/Link.svelte';
+    import Link from '#lib/components/Link.svelte';
     import { getBase, getDarkMode } from './Contexts';
-    import DarkToggle from '$lib/components/controls/DarkToggle.svelte';
+    import DarkToggle from '#lib/components/controls/DarkToggle.svelte';
 
     interface Props {
         previous: string | null;

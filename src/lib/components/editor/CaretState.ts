@@ -1,7 +1,7 @@
-import type { CaretRange } from '$lib/models/chapter/Caret';
-import type RootNode from '$lib/models/chapter/RootNode';
+import type { CaretRange } from '#lib/models/chapter/Caret.js';
+import type RootNode from '#lib/models/chapter/RootNode.js';
 import type CaretContext from './CaretContext';
-import type Node from '$lib/models/chapter/Node';
+import type Node from '#lib/models/chapter/Node.js';
 import type Command from './Command';
 
 type CaretState = {

@@ -1,10 +1,10 @@
 <script lang="ts">
-    import Lead from '$lib/components/app/Lead.svelte';
-    import Large from '$lib/components/app/Large.svelte';
-    import Paragraph from '$lib/components/app/Paragraph.svelte';
-    import Link from '$lib/components/app/Link.svelte';
-    import Section from '$lib/components/app/Section.svelte';
-    import Head from '$lib/components/app/Head.svelte';
+    import Lead from '#lib/components/app/Lead.svelte';
+    import Large from '#lib/components/app/Large.svelte';
+    import Paragraph from '#lib/components/app/Paragraph.svelte';
+    import Link from '#lib/components/app/Link.svelte';
+    import Section from '#lib/components/app/Section.svelte';
+    import Head from '#lib/components/app/Head.svelte';
 </script>
 
 <Section>

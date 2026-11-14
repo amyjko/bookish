@@ -1,13 +1,17 @@
 import type { StorageReference } from 'firebase/storage';
-import {
-    deleteObject,
-    getDownloadURL,
-    listAll,
-    ref,
-    uploadBytes,
-} from 'firebase/storage';
 import type Book from './Book';
-import { storage } from '../Firebase';
+import { usesFirebase } from '../FirebaseAvailable';
+
+/** Firebase Storage and its API, loaded on first use so that bound books,
+ *  which never have storage, don't carry the SDK. See FirebaseAvailable.ts. */
+async function loadStorage() {
+    if (!usesFirebase) return undefined;
+    const [{ storage }, api] = await Promise.all([
+        import('../Firebase'),
+        import('firebase/storage'),
+    ]);
+    return storage === undefined ? undefined : { storage, ...api };
+}
 
 export type Image = {
     url: string;
@@ -47,7 +51,7 @@ export default class BookMedia {
 
     /** Get a listing of all of the images for the book. */
     async cacheImages(): Promise<Image[]> {
-        if (storage === undefined) return [];
+        if (!usesFirebase) return [];
 
         // Find all the prefixes and items.
         this._images = (await this.retrieveImages()).filter(
@@ -61,7 +65,9 @@ export default class BookMedia {
     }
 
     async retrieveImages(): Promise<(Image | undefined)[]> {
-        if (storage === undefined) return [];
+        const firebase = await loadStorage();
+        if (firebase === undefined) return [];
+        const { storage, ref, listAll, getDownloadURL } = firebase;
 
         // Create a reference under which you want to list
         const listRef = ref(storage, this.getImagePath());
@@ -110,14 +116,17 @@ export default class BookMedia {
             : url;
     }
 
-    getThumbnailURL(
+    async getThumbnailURL(
         url: string,
         thumbnailRef: StorageReference,
         error: (message: string) => void,
         finished: (url: string, thumbnailURL: string) => void,
         attempt = 0,
     ) {
-        getDownloadURL(thumbnailRef)
+        const firebase = await loadStorage();
+        if (firebase === undefined) return;
+        firebase
+            .getDownloadURL(thumbnailRef)
             .then((thumbnail) => finished(url, thumbnail))
             // Try again in a bit.
             .catch(() =>
@@ -143,7 +152,19 @@ export default class BookMedia {
         errorHandler: (message: string) => void,
         finishedHandler: (url: string, thumbnailURL: string) => void,
     ) {
-        if (storage === undefined) return;
+        loadStorage().then((firebase) => {
+            if (firebase === undefined) return;
+            this.uploadWith(firebase, file, errorHandler, finishedHandler);
+        });
+    }
+
+    private uploadWith(
+        firebase: NonNullable<Awaited<ReturnType<typeof loadStorage>>>,
+        file: File,
+        errorHandler: (message: string) => void,
+        finishedHandler: (url: string, thumbnailURL: string) => void,
+    ) {
+        const { storage, ref, uploadBytes, getDownloadURL } = firebase;
 
         // Get the extension if there is one.
         const [name, extension] = file.name.split('.');
@@ -196,7 +217,9 @@ export default class BookMedia {
     }
 
     async remove(image: Image) {
-        if (storage === undefined) return;
+        const firebase = await loadStorage();
+        if (firebase === undefined) return;
+        const { storage, ref, deleteObject } = firebase;
 
         const imageRef = ref(storage, image.ref.fullPath);
         await deleteObject(imageRef);

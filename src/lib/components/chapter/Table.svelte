@@ -1,5 +1,5 @@
 <script lang="ts">
-    import type TableNode from '$lib/models/chapter/TableNode';
+    import type TableNode from '#lib/models/chapter/TableNode.js';
     import Figure from './Figure.svelte';
     import Format from './Format.svelte';
     import Rows from '../page/Rows.svelte';

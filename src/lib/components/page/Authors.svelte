@@ -1,14 +1,13 @@
 <script lang="ts">
-    import Parser from '$lib/models/chapter/Parser';
-    import TextEditor from '$lib/components/editor/TextEditor.svelte';
-    import Format from '$lib/components/chapter/Format.svelte';
-    
+    import Parser from '#lib/models/chapter/Parser.js';
+    import TextEditor from '#lib/components/editor/TextEditor.svelte';
+    import Format from '#lib/components/chapter/Format.svelte';
+
     import { getEdition, getLeasee, getUser, lease } from './Contexts';
     import Note from '../editor/Note.svelte';
     import Button from '../app/Button.svelte';
     import { tick } from 'svelte';
     import BookishEditor from '../editor/BookishEditor.svelte';
-    import { auth } from '$lib/models/Firebase';
 
     interface Props {
         editable: boolean;
@@ -27,14 +26,16 @@
         add,
         edit,
         remove,
-        editors = false
+        editors = false,
     }: Props = $props();
 
     let edition = getEdition();
 
     let authorList: HTMLDivElement | null = $state(null);
 
-    let showInherited = $derived(authors.length === 0 && inheritedAuthors !== undefined);
+    let showInherited = $derived(
+        authors.length === 0 && inheritedAuthors !== undefined,
+    );
     let authorsToShow = $derived(showInherited ? inheritedAuthors : authors);
 
     async function addAuthor() {

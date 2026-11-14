@@ -1,7 +1,7 @@
 import { expect, test } from 'vitest';
-import Edition from '$lib/models/book/Edition';
+import Edition from '#lib/models/book/Edition.js';
 import { bookRef, editionRef } from './fixtures';
-import Chapter from '$lib/models/book/Chapter';
+import Chapter from '#lib/models/book/Chapter.js';
 
 // Reproduce the "e is not iterable" crash with a legacy string-form reference.
 test('an edition with a string-form reference can render its parts', () => {

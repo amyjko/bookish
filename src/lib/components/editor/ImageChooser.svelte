@@ -1,7 +1,7 @@
 <script lang="ts">
-    import type { Image } from '$lib/models/book/BookMedia';
+    import type { Image } from '#lib/models/book/BookMedia.js';
     import { onMount } from 'svelte';
-    import { getBook } from '$lib/components/page/Contexts';
+    import { getBook } from '#lib/components/page/Contexts.js';
     import ImageThumbnail from './ImageThumbnail.svelte';
 
     interface Props {

@@ -1,5 +1,5 @@
 <script lang="ts">
-    import type ErrorNode from '$lib/models/chapter/ErrorNode';
+    import type ErrorNode from '#lib/models/chapter/ErrorNode.js';
     import Problem from './Problem.svelte';
 
     interface Props {

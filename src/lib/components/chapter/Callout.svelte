@@ -1,5 +1,5 @@
 <script lang="ts">
-    import type CalloutNode from '$lib/models/chapter/CalloutNode';
+    import type CalloutNode from '#lib/models/chapter/CalloutNode.js';
     import Block from './Block.svelte';
     import Positioned from './Positioned.svelte';
 

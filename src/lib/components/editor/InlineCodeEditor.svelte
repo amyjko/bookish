@@ -1,7 +1,7 @@
 <script lang="ts">
-    import type InlineCodeNode from '$lib/models/chapter/InlineCodeNode';
+    import type InlineCodeNode from '#lib/models/chapter/InlineCodeNode.js';
     import LanguageEditor from './LanguageEditor.svelte';
-    import { getCaret } from '$lib/components/page/Contexts';
+    import { getCaret } from '#lib/components/page/Contexts.js';
 
     interface Props {
         code: InlineCodeNode;

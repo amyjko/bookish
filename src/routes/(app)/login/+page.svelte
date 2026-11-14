@@ -1,11 +1,11 @@
 <script lang="ts">
-    import { getUser } from '$lib/components/page/Contexts';
-    import Feedback from '$lib/components/app/Feedback.svelte';
-    import Lead from '$lib/components/app/Lead.svelte';
-    import Large from '$lib/components/app/Large.svelte';
-    import Paragraph from '$lib/components/app/Paragraph.svelte';
-    import TextInput from '$lib/components/app/TextInput.svelte';
-    import Button from '$lib/components/app/Button.svelte';
+    import { getUser } from '#lib/components/page/Contexts.js';
+    import Feedback from '#lib/components/app/Feedback.svelte';
+    import Lead from '#lib/components/app/Lead.svelte';
+    import Large from '#lib/components/app/Large.svelte';
+    import Paragraph from '#lib/components/app/Paragraph.svelte';
+    import TextInput from '#lib/components/app/TextInput.svelte';
+    import Button from '#lib/components/app/Button.svelte';
 
     let auth = getUser();
 
