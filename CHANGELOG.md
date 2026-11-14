@@ -1,6 +1,6 @@
 # bookish changelog
 
-# Unreleased
+# 0.11.1 - 2026-11-14
 
 ## Fixed
 
