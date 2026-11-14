@@ -12,7 +12,7 @@
     // Redirect to the login page if not authenticated.
     $effect(() => {
         if ($auth === undefined || $auth.user === null)
-            goto('/login', { replaceState: true });
+            goto('/login', { replace: true });
     });
 </script>
 

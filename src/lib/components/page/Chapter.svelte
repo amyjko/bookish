@@ -324,7 +324,7 @@
                                         goto(
                                             `/write/${$book.getID()}/${editionNumber}/${newChapterID}`,
                                             {
-                                                keepFocus: true,
+                                                reset: false,
                                             },
                                         );
                                     }

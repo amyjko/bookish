@@ -6,8 +6,10 @@ import { defineConfig } from 'vitest/config';
 export default defineConfig({
     plugins: [
         sveltekit({
-            // script: true because some components use TS features (e.g. enums)
-            // that Svelte's native TypeScript support does not handle.
+            // script: true so svelte-package publishes components with their
+            // TypeScript compiled to JavaScript, as earlier versions did.
+            // Avoid TS enums in components: this transform drops an enum's
+            // declaration when only the markup uses it.
             preprocess: vitePreprocess({ script: true }),
             adapter: adapter(),
         }),

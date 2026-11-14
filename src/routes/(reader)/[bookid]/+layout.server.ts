@@ -52,8 +52,9 @@ export async function load({ params }) {
     if (editionName === undefined) {
         console.log(`No edition specified, getting latest edition.`);
         ({ editionID, editionJSON } = await getLatestEdition(bookID, bookJSON));
-    } else // Otherwise, resolve the edition name provided.
-    {
+    }
+    // Otherwise, resolve the edition name provided.
+    else {
         console.log(`Looking for book with edition number ${editionName}...`);
         ({ editionID, editionJSON } = await getEditionByID(
             editionName,

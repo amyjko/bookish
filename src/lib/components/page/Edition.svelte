@@ -80,8 +80,12 @@
     });
 
     // Redirect old hash routes by simply replacing their hash before routing.
-    if (typeof window !== 'undefined' && window.location.hash.startsWith('#/'))
-        goto(location.hash.replace('#', ''));
+    // SvelteKit 3's goto rejects paths that match no route, where SvelteKit 2
+    // fell back to a full page load; keep that fallback.
+    if (typeof window !== 'undefined' && window.location.hash.startsWith('#/')) {
+        const path = location.hash.replace('#', '');
+        goto(path).catch(() => (window.location.href = path));
+    }
 
     /** Given a theme, compute the CSS rules that apply the theme. */
     function themeToCSS(theme: Theme | null) {

@@ -13,7 +13,7 @@
     import Note from '../editor/Note.svelte';
     import Instructions from './Instructions.svelte';
     import Link from '../Link.svelte';
-    import { PUBLIC_CONTEXT } from '$app/env/public';
+    import { PUBLIC_CONTEXT } from '$env/static/public';
     import Button from '../app/Button.svelte';
     import { publish } from '../../models/CRUD';
     import Feedback from '../app/Feedback.svelte';
@@ -64,7 +64,9 @@
 </script>
 
 {#if $edition && (publisher === true || PUBLIC_CONTEXT === 'local')}
-    <Instructions editable={editable}>Ready to publish this edition? Write a summary then hit the switch.</Instructions>
+    <Instructions {editable}>
+        Ready to publish this edition? Write a summary then hit the switch.
+    </Instructions>
 
     <div class="publisher">
         <div class="summary">
@@ -118,10 +120,10 @@
         >
     </div>
 {:else}
-    <Instructions editable={editable}>
-        You don't yet have publishing privileges. 
-        <Link to="mailto:amy@amyjko.com">Write Amy</Link>
-        to schedule a chat about your book and ask for publishing privileges.
+    <Instructions {editable}>
+        You don't yet have publishing privileges. <Link
+            to="mailto:amy@amyjko.com">Write Amy</Link
+        > to schedule a chat about your book and ask for publishing privileges.
     </Instructions>
 {/if}
 
