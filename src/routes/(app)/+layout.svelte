@@ -20,7 +20,11 @@
     import type Edition from '#lib/models/book/Edition.js';
     import type CaretState from '#lib/components/editor/CaretState.js';
     import BookSaveStatus from '#lib/models/book/BookSaveStatus.js';
-    import { getUserEmails, updateBook, updateEdition } from '#lib/models/CRUD.js';
+    import {
+        getUserEmails,
+        updateBook,
+        updateEdition,
+    } from '#lib/models/CRUD.js';
     import { page } from '$app/state';
     import Analytics from '#lib/components/page/Analytics.svelte';
     interface Props {
@@ -53,13 +57,17 @@
     let editors = writable<Map<string, string>>(new Map());
     setContext<EditorsStore>(EDITORS, editors);
 
-
     async function retrieveEmails(uids: string[]) {
         if (uids.length === 0) return;
         // Mark all of the emails as being retrieved so that we don't redundantly retrieve them.
         for (const uid of uids) $editors.set(uid, '');
-        const emails = await getUserEmails(uids);
-        if (emails === null) return;
+        const emails = await getUserEmails(uids).catch(() => null);
+        // Couldn't look them up (signed out, or offline): forget the
+        // placeholders so the next change tries again.
+        if (emails === null) {
+            for (const uid of uids) $editors.delete(uid);
+            return;
+        }
         for (const [uid, email] of emails.entries()) $editors.set(uid, email);
         editors.set(new Map($editors));
     }
@@ -174,7 +182,6 @@
         status.set(BookSaveStatus.Changed);
         editionTimer = debounce(editionTimer, saveEdition);
     }
-
 
     $effect(() => {
         // Update when the edition changes.

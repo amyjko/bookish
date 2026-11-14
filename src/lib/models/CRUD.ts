@@ -1,4 +1,4 @@
-import { db, functions } from './Firebase';
+import { auth, db, functions } from './Firebase';
 import {
     collection,
     getDocs,
@@ -155,6 +155,11 @@ export async function getUserEmails(
 ): Promise<Map<string, string> | null> {
     if (!functions)
         throw Error("Can't publish, no connection to Firebase functions.");
+
+    // The function only answers signed-in users, and a page load can get here
+    // before Firebase has restored the sign-in, so wait for it.
+    await auth?.authStateReady();
+    if (!auth?.currentUser) return null;
 
     const getUserEmails = httpsCallable<
         { uids: string[] },

@@ -1,5 +1,12 @@
 # bookish changelog
 
+# Unreleased
+
+## Fixed
+
+- The Cloud Functions that look up editors' emails and add new editors now refuse callers who aren't signed in. Before, anyone could send `getUserEmailsGen2` a list of user IDs and get back those users' email addresses, and anyone could use `createUserWithEmailGen2` to create accounts or check whether an email had one. Email lookups now answer only about people who share a book with the caller, and only editors of a book can add people.
+- Someone just added as an edition or chapter editor now shows by email straight away, instead of "loading..." until the book is next saved.
+
 # 0.11.0 - 2026-11-14
 
 ## Changed

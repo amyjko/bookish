@@ -1,4 +1,4 @@
-import { onCall } from 'firebase-functions/v2/https';
+import { onCall, HttpsError } from 'firebase-functions/v2/https';
 import { onSchedule } from 'firebase-functions/v2/scheduler';
 import {
     onObjectFinalized,
@@ -7,7 +7,7 @@ import {
 import { initializeApp } from 'firebase-admin/app';
 import { getAuth } from 'firebase-admin/auth';
 import { getStorage } from 'firebase-admin/storage';
-import { v1 as firestoreV1 } from 'firebase-admin/firestore';
+import { getFirestore, v1 as firestoreV1 } from 'firebase-admin/firestore';
 import path from 'path';
 import os from 'os';
 import fs from 'fs';
@@ -32,10 +32,7 @@ export const createThumbnailGen2 = onObjectFinalized(
         }
 
         // First, make the new image public.
-        await getStorage()
-            .bucket(object.bucket)
-            .file(object.name)
-            .makePublic();
+        await getStorage().bucket(object.bucket).file(object.name).makePublic();
 
         // Then, create a thumbnail for it.
         return resizeImage(object.name, object.bucket, object.contentType);
@@ -66,17 +63,74 @@ export const deleteThumbnailGen2 = onObjectDeleted(async ({ data: object }) => {
     return await bucket.file(thumbFilePath).delete();
 });
 
+/**
+ * Everyone who shares a book with the given user: its editors (uids), and the
+ * editors of its editions and chapters. The book keeps a copy of the latter
+ * (readuids), but it's only refreshed when the book itself is saved, so
+ * someone just added to an edition would be missing for a while. Read the
+ * editions too, which are the source of truth.
+ */
+async function collaboratorsOf(uid: string): Promise<Set<string>> {
+    const books = getFirestore().collection('books');
+    const [editing, reading] = await Promise.all([
+        books.where('uids', 'array-contains', uid).get(),
+        books.where('readuids', 'array-contains', uid).get(),
+    ]);
+    const shared = new Map(
+        [...editing.docs, ...reading.docs].map((book) => [book.id, book]),
+    );
+    const collaborators = new Set<string>([uid]);
+    const add = (ids: unknown) => {
+        if (Array.isArray(ids))
+            for (const id of ids)
+                if (typeof id === 'string') collaborators.add(id);
+    };
+    await Promise.all(
+        [...shared.values()].map(async (book) => {
+            add(book.data().uids);
+            add(book.data().readuids);
+            const editions = await book.ref.collection('editions').get();
+            for (const edition of editions.docs) {
+                add(edition.data().uids);
+                add(edition.data().chapteruids);
+            }
+        }),
+    );
+    return collaborators;
+}
+
+function requireUser(auth: { uid: string } | undefined): string {
+    if (auth === undefined)
+        throw new HttpsError('unauthenticated', 'Sign in first.');
+    return auth.uid;
+}
+
+/**
+ * Map user IDs to emails, so the editor can show who has access to a book.
+ * Only signed-in users can ask, and only about people they share a book
+ * with; anyone else is left out of the result.
+ */
 export const getUserEmailsGen2 = onCall<
     { uids: string[] },
     Promise<Record<string, string>>
->(async ({ data }) => {
-    const uids = data.uids;
+>(async ({ data, auth }) => {
+    const caller = requireUser(auth);
+    const uids = data?.uids;
+    if (
+        !Array.isArray(uids) ||
+        uids.length > 100 ||
+        !uids.every((uid) => typeof uid === 'string')
+    )
+        throw new HttpsError(
+            'invalid-argument',
+            'Expected up to 100 user IDs.',
+        );
 
-    const users = await getAuth().getUsers(
-        uids.map((uid) => {
-            return { uid };
-        }),
-    );
+    const collaborators = await collaboratorsOf(caller);
+    const allowed = uids.filter((uid) => collaborators.has(uid));
+    if (allowed.length === 0) return {};
+
+    const users = await getAuth().getUsers(allowed.map((uid) => ({ uid })));
 
     const map: Record<string, string> = {};
     users.users.forEach((user) => {
@@ -86,18 +140,43 @@ export const getUserEmailsGen2 = onCall<
     return map;
 });
 
+/**
+ * Find or create the account for an email, so an editor can give that person
+ * access to a book. Only signed-in editors of at least one book can ask:
+ * otherwise anyone could create accounts, or learn whether an email has one.
+ */
 export const createUserWithEmailGen2 = onCall<
     { email: string },
     Promise<string | null>
->(async ({ data }) => {
+>(async ({ data, auth }) => {
+    const caller = requireUser(auth);
+    const email = data?.email;
+    if (
+        typeof email !== 'string' ||
+        email.length > 320 ||
+        !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)
+    )
+        throw new HttpsError('invalid-argument', 'Expected an email address.');
+
+    const books = getFirestore().collection('books');
+    const [editing, reading] = await Promise.all([
+        books.where('uids', 'array-contains', caller).limit(1).get(),
+        books.where('readuids', 'array-contains', caller).limit(1).get(),
+    ]);
+    if (editing.empty && reading.empty)
+        throw new HttpsError(
+            'permission-denied',
+            'Only editors of a book can add people to it.',
+        );
+
     // First try to get the user, in case they already exist.
     try {
-        const existingUser = await getAuth().getUserByEmail(data.email);
+        const existingUser = await getAuth().getUserByEmail(email);
         return existingUser.uid;
     } catch (_) {}
 
     try {
-        const user = await getAuth().createUser({ email: data.email });
+        const user = await getAuth().createUser({ email });
         return user.uid;
     } catch (error) {
         console.log(error);
