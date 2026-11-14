@@ -12,7 +12,7 @@ import {
     PUBLIC_FIREBASE_STORAGE_BUCKET,
     PUBLIC_FIREBASE_MESSAGING_SENDER_ID,
     PUBLIC_FIREBASE_APP_ID,
-} from '$env/static/public';
+} from '$app/env/public';
 import { env } from '$env/dynamic/public';
 
 const isReader = PUBLIC_READER === 'true';

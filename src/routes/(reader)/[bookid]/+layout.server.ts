@@ -3,7 +3,7 @@ import type { EditionSpecification } from '#lib/models/book/Edition.js';
 import { error } from '@sveltejs/kit';
 import { getApps, initializeApp } from 'firebase-admin/app';
 import { getFirestore } from 'firebase-admin/firestore';
-import { PUBLIC_FIREBASE_PROJECT_ID } from '$env/static/public';
+import { PUBLIC_FIREBASE_PROJECT_ID } from '$app/env/public';
 
 // Guard against re-initialization when the module is re-evaluated in dev.
 const app =
@@ -52,9 +52,8 @@ export async function load({ params }) {
     if (editionName === undefined) {
         console.log(`No edition specified, getting latest edition.`);
         ({ editionID, editionJSON } = await getLatestEdition(bookID, bookJSON));
-    }
-    // Otherwise, resolve the edition name provided.
-    else {
+    } else // Otherwise, resolve the edition name provided.
+    {
         console.log(`Looking for book with edition number ${editionName}...`);
         ({ editionID, editionJSON } = await getEditionByID(
             editionName,
