@@ -1,5 +1,4 @@
 <script lang="ts">
-    import { createNewEdition } from '#lib/models/CRUD.js';
     import Instructions from '#lib/components/page/Instructions.svelte';
     import Note from '../editor/Note.svelte';
     import { getBook, getUser, isBookEditable } from './Contexts';
@@ -19,10 +18,7 @@
     let editable = isBookEditable();
     let user = getUser();
 
-
-
     let publisher = $state(false);
-
 
     async function updateUserClaims() {
         if ($user === undefined || $user.user === null) return;
@@ -35,6 +31,7 @@
         if ($book === undefined) return;
 
         try {
+            const { createNewEdition } = await import('../../models/CRUD');
             const revisedBook = await createNewEdition($book);
             book.set(revisedBook);
         } catch (err) {

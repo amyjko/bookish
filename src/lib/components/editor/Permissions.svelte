@@ -1,5 +1,4 @@
 <script lang="ts">
-    import { createUser } from '../../models/CRUD';
     import Button from '../app/Button.svelte';
     import TextInput from '../app/TextInput.svelte';
     import { getEditors } from '../page/Contexts';
@@ -13,13 +12,7 @@
         change: (uids: string[]) => void;
     }
 
-    let {
-        uids,
-        inheriteduids,
-        writable,
-        atleastone,
-        change
-    }: Props = $props();
+    let { uids, inheriteduids, writable, atleastone, change }: Props = $props();
 
     let emails = getEditors();
 
@@ -33,6 +26,7 @@
         newEditor = '';
         loading = email;
         try {
+            const { createUser } = await import('../../models/CRUD');
             const uid = await createUser(email);
             if (uid === null) newEditorError = "couldn't add editor";
             else change([...uids, uid]);
@@ -57,10 +51,12 @@
 {:else}
     <section class="emails">
         {#if writable}
-            <form onsubmit={(event) => {
+            <form
+                onsubmit={(event) => {
                     event.preventDefault();
                     addEditor();
-                }}>
+                }}
+            >
                 <TextInput
                     type="email"
                     placeholder="email"
