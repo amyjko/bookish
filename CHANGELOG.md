@@ -1,5 +1,11 @@
 # bookish changelog
 
+# 0.11.2 - 2026-11-14
+
+## Changed
+
+- An exported EPUB never contains WebP images: they are always converted to PNG or JPEG, even when that makes them larger. EPUB 3.3 allows WebP, but many e-readers still in use predate it and show nothing. Bound books now serve their images as WebP (bookish-reader 0.6.0), so without this, their e-books would have carried WebP too.
+
 # 0.11.1 - 2026-11-14
 
 ## Fixed
