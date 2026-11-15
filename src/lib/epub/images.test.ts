@@ -5,6 +5,7 @@ import {
     fitWithin,
     mapWithLimit,
     resolveImageURL,
+    shouldUseReencoded,
     SIZES,
 } from './images';
 
@@ -171,4 +172,53 @@ test('a preset says nothing about colour', () => {
     // here cannot be recovered there.
     for (const size of Object.values(SIZES))
         expect(size).not.toHaveProperty('grayscale');
+});
+
+const plain = {
+    oversize: false,
+    grayscale: false,
+    originalBytes: 1000,
+    reencodedBytes: 2000,
+};
+
+test('keeps a PNG or JPEG original when re-encoding would make it larger', () => {
+    expect(shouldUseReencoded({ ...plain, mediaType: 'image/png' })).toBe(
+        false,
+    );
+    expect(shouldUseReencoded({ ...plain, mediaType: 'image/jpeg' })).toBe(
+        false,
+    );
+});
+
+test('uses the re-encoded image when it is smaller', () => {
+    expect(
+        shouldUseReencoded({
+            ...plain,
+            mediaType: 'image/png',
+            reencodedBytes: 500,
+        }),
+    ).toBe(true);
+});
+
+test('always converts WebP, even when the conversion is larger', () => {
+    expect(shouldUseReencoded({ ...plain, mediaType: 'image/webp' })).toBe(
+        true,
+    );
+});
+
+test('oversize and greyscale images are always re-encoded', () => {
+    expect(
+        shouldUseReencoded({
+            ...plain,
+            mediaType: 'image/png',
+            oversize: true,
+        }),
+    ).toBe(true);
+    expect(
+        shouldUseReencoded({
+            ...plain,
+            mediaType: 'image/png',
+            grayscale: true,
+        }),
+    ).toBe(true);
 });

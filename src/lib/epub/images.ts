@@ -182,19 +182,45 @@ export async function prepareImage(
     const reencoded = await reencode(bytes, mediaType, size, grayscale);
     if (reencoded === undefined) return passThrough(bytes, mediaType);
 
-    // Keep whichever is smaller, since re-encoding can inflate a file: resizing
-    // a diagram resamples its hairlines into shades of grey, and the result can
-    // be larger than the crisp original. But an image far past the budget is
-    // shrunk regardless, because decoding it costs a small reader memory it may
-    // not have, and a few extra kilobytes are the cheaper price.
-    //
-    // Greyscale overrides the size comparison too: it was asked for, and an
-    // image small enough to pass through untouched would otherwise come out in
-    // colour while everything around it was grey.
     const { oversize, ...prepared } = reencoded;
-    return oversize || grayscale || prepared.bytes.length < bytes.length
+    return shouldUseReencoded({
+        mediaType,
+        oversize,
+        grayscale,
+        originalBytes: bytes.length,
+        reencodedBytes: prepared.bytes.length,
+    })
         ? prepared
         : passThrough(bytes, mediaType);
+}
+
+/**
+ * Whether to package the re-encoded image rather than the original.
+ *
+ * Keep whichever is smaller, since re-encoding can inflate a file: resizing a
+ * diagram resamples its hairlines into shades of grey, and the result can be
+ * larger than the crisp original. Three things override that:
+ *
+ * - An image far past the budget is shrunk regardless, because decoding it
+ *   costs a small reader memory it may not have.
+ * - Greyscale was asked for, and an image small enough to pass through would
+ *   otherwise come out in colour while everything around it was grey.
+ * - WebP is always converted. EPUB 3.3 allows it, but many e-readers still in
+ *   use predate that and show nothing, and bound books serve WebP by default.
+ */
+export function shouldUseReencoded(image: {
+    mediaType: string;
+    oversize: boolean;
+    grayscale: boolean;
+    originalBytes: number;
+    reencodedBytes: number;
+}): boolean {
+    return (
+        image.mediaType === 'image/webp' ||
+        image.oversize ||
+        image.grayscale ||
+        image.reencodedBytes < image.originalBytes
+    );
 }
 
 /**
